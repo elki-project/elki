@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
+import static de.lmu.ifi.dbs.elki.datasource.filter.transform.ClassicMultidimensionalScalingTransform.computeSquaredDistanceMatrix;
+import static de.lmu.ifi.dbs.elki.datasource.filter.transform.ClassicMultidimensionalScalingTransform.doubleCenterSymmetric;
+
 import java.util.List;
 import java.util.Random;
 
@@ -67,7 +70,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
   /**
    * Distance function to use.
    */
-  PrimitiveDistanceFunction<? super I> dist = null;
+  PrimitiveDistanceFunction<? super I> dist;
 
   /**
    * Target dimensionality
@@ -136,13 +139,19 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       }
 
       // Compute distance matrix.
-      double[][] imat = computeDistanceMatrix(castColumn);
-      ClassicMultidimensionalScalingTransform.doubleCenterSymmetric(imat);
+      double[][] imat = computeSquaredDistanceMatrix(castColumn, dist);
+      doubleCenterSymmetric(imat);
       // Find eigenvectors.
       {
         double[][] evs = new double[tdim][size];
         double[] lambda = new double[tdim];
         findEigenVectors(imat, evs, lambda);
+        // Undo squared, unless we were given a squared distance function:
+        if(!dist.isSquared()) {
+          for(int i = 0; i < tdim; i++) {
+            lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
+          }
+        }
 
         // Project each data point to the new coordinates.
         double[] buf = new double[tdim];
@@ -155,34 +164,6 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       }
     }
     return bundle;
-  }
-
-  /**
-   * Compute the distance matrix of a vector column.
-   *
-   * @param col Column
-   * @return Distance matrix
-   */
-  protected double[][] computeDistanceMatrix(final List<I> col) {
-    final int size = col.size();
-    double[][] imat = new double[size][size];
-    boolean squared = dist.isSquared();
-    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
-    for(int x = 0; x < size; x++) {
-      final I ox = col.get(x);
-      for(int y = x + 1; y < size; y++) {
-        final I oy = col.get(y);
-        double distance = dist.distance(ox, oy);
-        distance *= (squared ? -.5 : (-.5 * distance));
-        imat[x][y] = distance;
-        imat[y][x] = distance;
-      }
-      if(dprog != null) {
-        dprog.setProcessed(dprog.getProcessed() + size - x - 1, LOG);
-      }
-    }
-    LOG.ensureCompleted(dprog);
-    return imat;
   }
 
   /**
