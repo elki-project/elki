@@ -30,7 +30,9 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -54,27 +56,26 @@ public class InstanceLogRankNormalizationTest extends AbstractDataSourceTest {
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
     
-    // Verify that, in each row, the min value is 0 and the max value 1.
+    MeanVariance mvs = new MeanVariance();
+    for(int ii = 0; ii < dim; ii++) {
+      mvs.put(Math.log1p(ii / (double)(dim - 1 )) * MathUtil.ONE_BY_LOG2);
+    }
     
-    /* TODO: This filter is essentially the same as the min-max normalization filter,
-     * but this filter scales the values logarithmically rather than linearly.
-     * Is there another expected property of the resulting data which we can
-     * verify? 
-     */
-    DoubleMinMax[] mms = DoubleMinMax.newArray(bundle.dataLength());
+    // TODO: EXPLAIN WHAT IS BEING VERIFIED
+    MeanVarianceMinMax mms = new MeanVarianceMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
-        mms[row].put(v);
+        mms.put(v);
       }
-    }
-    
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      assertEquals("Min value is not 0", 0., mms[row].getMin(), 1e-8);
-      assertEquals("Max value is not 1", 1., mms[row].getMax(), 1e-8);     
+      assertEquals("Min value is not 0", 0., mms.getMin(), 1e-8);
+      assertEquals("Max value is not 1", 1., mms.getMax(), 1e-8);
+      assertEquals("Mean value is not as expected", mvs.getMean(), mms.getMean(), 1e-8);
+      assertEquals("Variance is not as expected", mvs.getNaiveVariance(), mms.getNaiveVariance(), 1e-8);
+      mms.reset();
     }
   }
 }
