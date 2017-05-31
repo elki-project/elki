@@ -56,26 +56,28 @@ public class InstanceLogRankNormalizationTest extends AbstractDataSourceTest {
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
     
+    // TODO: Can you explain this, Erich?
     MeanVariance mvs = new MeanVariance();
     for(int ii = 0; ii < dim; ii++) {
       mvs.put(Math.log1p(ii / (double)(dim - 1 )) * MathUtil.ONE_BY_LOG2);
     }
     
-    // TODO: EXPLAIN WHAT IS BEING VERIFIED
+    // Verify that each row has a min of 0, a max of 1, and that each row's mean and variance
+    // is as calculated above. TODO: Why?
     MeanVarianceMinMax mms = new MeanVarianceMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
+      mms.reset();
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         mms.put(v);
       }
-      assertEquals("Min value is not 0", 0., mms.getMin(), 1e-8);
-      assertEquals("Max value is not 1", 1., mms.getMax(), 1e-8);
+      assertEquals("Min value is not as expected", 0., mms.getMin(), 1e-8);
+      assertEquals("Max value is not as expected", 1., mms.getMax(), 1e-8);
       assertEquals("Mean value is not as expected", mvs.getMean(), mms.getMean(), 1e-8);
       assertEquals("Variance is not as expected", mvs.getNaiveVariance(), mms.getNaiveVariance(), 1e-8);
-      mms.reset();
     }
   }
 }

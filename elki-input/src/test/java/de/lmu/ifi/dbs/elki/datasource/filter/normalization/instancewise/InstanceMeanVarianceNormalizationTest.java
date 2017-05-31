@@ -67,8 +67,8 @@ public class InstanceMeanVarianceNormalizationTest extends AbstractDataSourceTes
           mvs.put(v);
         }
       }
-      assertEquals("Mean is not 0", 0., mvs.getMean(), 1e-15);
-      assertEquals("Variance is not 1", 1., mvs.getNaiveVariance(), 1e-15);
+      assertEquals("Mean is not as expected", 0., mvs.getMean(), 1e-15);
+      assertEquals("Variance is not as expected", 1., mvs.getNaiveVariance(), 1e-15);
     }
   }
 }

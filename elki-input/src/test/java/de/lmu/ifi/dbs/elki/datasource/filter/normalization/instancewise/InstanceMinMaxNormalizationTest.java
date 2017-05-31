@@ -53,22 +53,22 @@ public class InstanceMinMaxNormalizationTest extends AbstractDataSourceTest {
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
+        
     // Verify that, in each row, the min value is 0 and the max value 1.
-    DoubleMinMax[] mms = DoubleMinMax.newArray(bundle.dataLength());
+    DoubleMinMax mms = new DoubleMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
+      mms.reset();
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
-        mms[row].put(v);
+        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+          mms.put(v);
+        }
       }
-    }
-    
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      assertEquals("Min value is not 0", 0., mms[row].getMin(), 1e-8);
-      assertEquals("Max value is not 1", 1., mms[row].getMax(), 1e-8);     
+      assertEquals("Min value is not as expected", 0., mms.getMin(), 1e-8);
+      assertEquals("Max value is not as expected", 1., mms.getMax(), 1e-8);     
     }
   }
 }

@@ -63,7 +63,7 @@ public class LengthNormalizationTest extends AbstractDataSourceTest {
         final double v = d.doubleValue(col);
         len += v * v;
       }
-      assertEquals("Vector length is not 1", 1., len, 1e-15);
+      assertEquals("Vector length is not as expected", 1., len, 1e-15);
     }
   }
 }
