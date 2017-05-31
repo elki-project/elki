@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import net.jafama.FastMath;
 
 /**
- * Test the log 1  normalization filter.
+ * Test the log 1 plus normalization filter.
  *
  * @author Matthew Arcifa
  */
@@ -50,7 +49,7 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> minMaxFilter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    InstanceMinMaxNormalization<DoubleVector> minMaxFilter = ClassGenericsUtil.parameterizeOrAbort(InstanceMinMaxNormalization.class, new ListParameterization());
     Log1PlusNormalization<DoubleVector> log1plusFilter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, minMaxFilter, log1plusFilter);
     // Ensure the first column are the vectors.
@@ -58,23 +57,21 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
     
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    // We verify that minimum and maximum values in each row are 0 and 1:
+    DoubleMinMax mms = new DoubleMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
+      mms.reset();
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
         if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
+          mms.put(val);
         }
       }
-    }
-    
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+      assertEquals("Minimum not expected", 0., mms.getMin(), 1e-15);
+      assertEquals("Maximum not expected", 1., mms.getMax(), 1e-15);
     }
   }
   
@@ -111,9 +108,9 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
       DoubleVector dFil = (DoubleVector) objFiltered;
       DoubleVector dUnfil = (DoubleVector) objUnfiltered;      
       for(int col = 0; col < dim; col++) {
-        final double valFil = dFil.doubleValue(col);
-        final double valUnfil = dUnfil.doubleValue(col);
-        assertEquals("Value not as expected", valFil, FastMath.log1p(Math.abs(valUnfil) * b) / FastMath.log1p(b), 1e-8);
+        final double vFil = dFil.doubleValue(col);
+        final double vUnfil = dUnfil.doubleValue(col);
+        assertEquals("Value not as expected", vFil, FastMath.log1p(Math.abs(vUnfil) * b) / FastMath.log1p(b), 1e-15);
       }
     }
   }
