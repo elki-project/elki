@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <p>
  * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
  * Outlier Detection in Arbitrarily Oriented Subspaces<br />
- * in: Proc. IEEE International Conference on Data Mining (ICDM 2012)
+ * In: Proc. IEEE International Conference on Data Mining (ICDM 2012)
  * </p>
  * 
  * The basic RANSAC idea was explained in:
@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
-public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
+public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Number of iterations to perform
    */
@@ -107,17 +107,22 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
   public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
-    DBIDs best = DBIDUtil.EMPTYDBIDS;
+    ModifiableDBIDs best = DBIDUtil.newHashSet(),
+        support = DBIDUtil.newHashSet();
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
+    CovarianceMatrix cv = new CovarianceMatrix(dim);
     Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < iterations; i++) {
       DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random);
-      CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
+      cv.reset();
+      for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
+        cv.put(relation.get(it));
+      }
       double[] centroid = cv.getMeanVector();
       double[][] p = inverse(cv.destroyToSampleMatrix());
 
-      ModifiableDBIDs support = DBIDUtil.newHashSet();
+      support.clear();
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         double[] vec = minusEquals(relation.get(id).toArray(), centroid);
         double sqlen = transposeTimesTimes(vec, p, vec);
@@ -127,19 +132,17 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
       }
 
       if(support.size() > best.size()) {
+        ModifiableDBIDs swap = best;
         best = support;
+        support = swap;
       }
       if(support.size() >= ids.size()) {
         break; // Can't get better than this!
       }
     }
     // logger.warning("Consensus size: "+best.size()+" of "+ids.size());
-    // Fall back to regular PCA
-    if(best.size() <= dim) {
-      return CovarianceMatrix.make(relation, ids).destroyToSampleMatrix();
-    }
-    // Return estimation based on consensus set.
-    return CovarianceMatrix.make(relation, best).destroyToSampleMatrix();
+    // Fall back to regular PCA if too few samples.
+    return CovarianceMatrix.make(relation, best.size() > dim ? best : ids).destroyToSampleMatrix();
   }
 
   /**
@@ -173,8 +176,8 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter iterP = new IntParameter(ITER_ID, 1000);
-      iterP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter iterP = new IntParameter(ITER_ID, 1000) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(iterP)) {
         iterations = iterP.intValue();
       }
