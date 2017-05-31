@@ -85,7 +85,7 @@ public final class VMath {
     }
     while(norm == 0); // In the unlikely case we are all zero, retry.
     for(int row = 0; row < v.length; row++) {
-      v[row] /= norm;
+      v[row] /= Math.sqrt(norm); 
     }
     return v;
   }
@@ -1583,7 +1583,7 @@ public final class VMath {
    * @return true if delta smaller than maximum
    */
   public static boolean almostEquals(final double[][] m1, final double[][] m2, final double maxdelta) {
-    if(m1 == m2) {
+     if(m1 == m2) {
       return true;
     }
     if(m2 == null) {
