@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
+package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,63 +30,29 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-import net.jafama.FastMath;
-
 /**
- * Test the log 1 plus normalization filter.
+ * Test the histogram jitter filter.
  *
  * @author Matthew Arcifa
  */
-public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
+public class HistogramJitterFilterTest extends AbstractDataSourceTest {
   /**
-   * Test with default parameters.
-   */
-  @Test
-  public void defaultParameters() {
-    String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    InstanceMinMaxNormalization<DoubleVector> minMaxFilter = ClassGenericsUtil.parameterizeOrAbort(InstanceMinMaxNormalization.class, new ListParameterization());
-    Log1PlusNormalization<DoubleVector> log1plusFilter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, new ListParameterization());
-    MultipleObjectsBundle bundle = readBundle(filename, minMaxFilter, log1plusFilter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
-    // We verify that minimum and maximum values in each row are 0 and 1:
-    DoubleMinMax mms = new DoubleMinMax();
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
-      mms.reset();
-      for(int col = 0; col < dim; col++) {
-        final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms.put(val);
-        }
-      }
-      assertEquals("Minimum not expected", 0., mms.getMin(), 1e-15);
-      assertEquals("Maximum not expected", 1., mms.getMax(), 1e-15);
-    }
-  }
-  
-  /**
-   * Test with non-default parameters to ensure that both branches of the filter are tested.
+   * Test with seed of 0 and given jitter amount.
    */
   @Test
   public void parameters() {
-    String filename = UNITTEST + "normalization-test-1.csv";
+    String filename = UNITTEST + "transformation-test-1.csv";
     // Allow loading test data from resources.
-    // Use the value of b as the boost value.
-    double b = 15.;
+    // Use the value of s as the seed value and j as the jitter amount.
+    final double s = 0.;
+    final double j = .01;
     ListParameterization config = new ListParameterization();
-    config.addParameter(Log1PlusNormalization.Parameterizer.BOOST_ID, b);
-    Log1PlusNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, config);
+    config.addParameter(HistogramJitterFilter.Parameterizer.SEED_ID, s);
+    config.addParameter(HistogramJitterFilter.Parameterizer.JITTER_ID, j);
+    HistogramJitterFilter<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(HistogramJitterFilter.class, config);
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
@@ -98,8 +64,11 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
     int dim = ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality();
     // Verify that the filtered and unfiltered bundles have the same length.
     assertEquals("Test file interpreted incorrectly", filteredBundle.dataLength(), unfilteredBundle.dataLength());
-
-    // Verify that the filter correctly applies the specified mathematical method.
+        
+    // Verify that at least p% of the values are within a% of the unfiltered value.
+    final double p = .9;
+    final double a = .1;
+    int withinRange = 0;
     for(int row = 0; row < filteredBundle.dataLength(); row++) {
       Object objFiltered = filteredBundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, objFiltered.getClass());
@@ -110,8 +79,11 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
       for(int col = 0; col < dim; col++) {
         final double vFil = dFil.doubleValue(col);
         final double vUnfil = dUnfil.doubleValue(col);
-        assertEquals("Value not as expected", vFil, FastMath.log1p(Math.abs(vUnfil) * b) / FastMath.log1p(b), 1e-15);
+        if(Math.abs((vFil / vUnfil) - 1.) <= a) {
+          withinRange++;
+        }
       }
     }
+    assertEquals("Too many values have moved too much", 1., withinRange / (double) (dim * filteredBundle.dataLength()), 1. - p);
   }
 }
