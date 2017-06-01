@@ -89,7 +89,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
       }
       ssum += v * v;
     }
-    final double std = FastMath.sqrt(ssum / raw.length);
+    final double std = FastMath.sqrt(ssum) / (raw.length - 1);
     if(std > 0.) {
       for(int i = 0; i < raw.length; ++i) {
         raw[i] = (raw[i] - mean) / std;

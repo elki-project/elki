@@ -76,6 +76,11 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractNumberVec
     final double pcc = PearsonCorrelation.coefficient(v1, v2);
     return 1 - pcc * pcc;
   }
+  
+  @Override
+  public boolean isSquared() {
+    return true;
+  }
 
   @Override
   public String toString() {

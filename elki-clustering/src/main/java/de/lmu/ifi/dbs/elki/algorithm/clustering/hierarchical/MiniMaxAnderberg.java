@@ -98,7 +98,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
     }
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
 
     // Compute the initial (lower triangular) distance matrix.

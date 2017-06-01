@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias({ "centroid", "upgmc" })
 @Reference(authors = "A. K. Jain and R. C. Dubes", //
-title = "Algorithms for Clustering Data", //
-booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+    title = "Algorithms for Clustering Data", //
+    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
 public class CentroidLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.
@@ -60,10 +60,8 @@ public class CentroidLinkageMethod implements LinkageMethod {
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    final double wx = sizex / (double) (sizex + sizey);
-    final double wy = sizey / (double) (sizex + sizey);
-    final double beta = (sizex * sizey) / (double) ((sizex + sizey) * (sizex + sizey));
-    return wx * dx + wy * dy - beta * dxy;
+    final double f = 1. / (sizex + sizey);
+    return (sizex * dx + sizey * dy - (sizex * sizey) * f * dxy) * f;
   }
 
   /**

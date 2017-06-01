@@ -56,6 +56,17 @@ public interface DistanceFunction<O> {
   }
 
   /**
+   * Squared distances, that would become metric after square root.
+   * 
+   * E.g. squared Euclidean.
+   * 
+   * @return {@code true} when squared.
+   */
+  default boolean isSquared() {
+    return false;
+  }
+
+  /**
    * Get the input data type of the function.
    * 
    * @return Type restriction

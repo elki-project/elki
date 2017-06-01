@@ -189,8 +189,12 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     final long t = ((rel.size() - ignorednoise) * (long) (rel.size() - ignorednoise - 1)) >>> 1;
     final long tt = (t * (t - 1)) >>> 1;
 
-    final double gamma = (concordantPairs - discordantPairs) / (double) (concordantPairs + discordantPairs);
-    final double tau = computeTau(concordantPairs, discordantPairs, tt, withinDistances.length, betweenPairs);
+    double gamma = (concordantPairs - discordantPairs) / (double) (concordantPairs + discordantPairs);
+    double tau = computeTau(concordantPairs, discordantPairs, tt, withinDistances.length, betweenPairs);
+    
+    // Avoid NaN when everything is in a single cluster:
+    gamma = gamma > 0. ? gamma : 0.;
+    tau = tau > 0. ? tau : 0.;
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));

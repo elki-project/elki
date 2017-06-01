@@ -21,8 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
@@ -33,12 +32,14 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  */
 public interface CovarianceMatrixBuilder {
   /**
-   * Compute Covariance Matrix for a complete database.
+   * Compute Covariance Matrix for a complete relation.
    * 
-   * @param database the database used
+   * @param relation the relation to run on
    * @return Covariance Matrix
    */
-  double[][] processDatabase(Relation<? extends NumberVector> database);
+  default double[][] processRelation(Relation<? extends NumberVector> relation) {
+    return processIds(relation.getDBIDs(), relation);
+  }
 
   /**
    * Compute Covariance Matrix for a collection of database IDs.
@@ -52,23 +53,36 @@ public interface CovarianceMatrixBuilder {
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
    * 
-   * By default it will just collect the ids and run processIds
+   * By default it will just run processIds, but subclasses <em>may</em> use the
+   * distances for weighting.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k);
+  default double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
+    if(results.size() > k) {
+      ModifiableDBIDs ids = DBIDUtil.newArray(k);
+      for(DBIDIter it = results.iter(); it.valid() && ids.size() < k; it.advance()) {
+        ids.add(it);
+      }
+      return processIds(ids, database);
+    }
+    return processIds(results, database);
+  }
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
    * 
-   * By default it will just collect the ids and run processIds
+   * By default it will just collect the ids and run processIds, but subclasses
+   * <em>may</em> use the distance for weighting.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
    * @return Covariance Matrix
    */
-  double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database);
+  default double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database) {
+    return processQueryResults(results, database, results.size());
+  }
 }

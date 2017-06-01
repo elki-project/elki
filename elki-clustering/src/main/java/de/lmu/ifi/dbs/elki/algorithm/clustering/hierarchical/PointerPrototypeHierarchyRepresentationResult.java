@@ -46,11 +46,12 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * @param ids Objects clustered
    * @param parent Parent object
    * @param parentDistance Merging distance
+   * @param isSquared Flag to indicate squared distances
    * @param mergeOrder Merging order
    * @param prototypes Cluster prototypes
    */
-  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder, DBIDDataStore prototypes) {
-    super(ids, parent, parentDistance, mergeOrder);
+  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder, DBIDDataStore prototypes) {
+    super(ids, parent, parentDistance, isSquared, mergeOrder);
     this.prototypes = prototypes;
   }
 
@@ -60,10 +61,11 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * @param ids Objects clustered
    * @param parent Parent object
    * @param parentDistance Merging distance
+   * @param isSquared Flag to indicate squared distances
    * @param prototypes Cluster prototypes
    */
-  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototypes) {
-    this(ids, parent, parentDistance, null, prototypes);
+  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DBIDDataStore prototypes) {
+    this(ids, parent, parentDistance, isSquared, null, prototypes);
   }
 
   /**

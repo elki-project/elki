@@ -295,11 +295,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** get parameters
     String seedstr = ((Element) cur).getAttribute(ATTR_SEED);
     if(clusterRandom != RandomFactory.DEFAULT && seedstr != null && seedstr.length() > 0) {
-      clusterRandom = new RandomFactory((long) (Integer.parseInt(seedstr) * sizescale));
+      clusterRandom = new RandomFactory((long) (ParseUtil.parseIntBase10(seedstr) * sizescale));
     }
     String testmod = ((Element) cur).getAttribute(ATTR_TEST);
     if(testmod != null && testmod.length() > 0) {
-      testAgainstModel = Boolean.valueOf(Integer.parseInt(testmod) != 0);
+      testAgainstModel = Boolean.valueOf(ParseUtil.parseIntBase10(testmod) != 0);
     }
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
@@ -329,7 +329,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
     String sizestr = ((Element) cur).getAttribute(ATTR_SIZE);
     if(sizestr != null && sizestr.length() > 0) {
-      size = (int) (Integer.parseInt(sizestr) * sizescale);
+      size = (int) (ParseUtil.parseIntBase10(sizestr) * sizescale);
     }
 
     String name = ((Element) cur).getAttribute(ATTR_NAME);
@@ -530,11 +530,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
     String a1str = ((Element) cur).getAttribute(ATTR_AXIS1);
     if(a1str != null && a1str.length() > 0) {
-      axis1 = Integer.parseInt(a1str);
+      axis1 = ParseUtil.parseIntBase10(a1str);
     }
     String a2str = ((Element) cur).getAttribute(ATTR_AXIS2);
     if(a2str != null && a2str.length() > 0) {
-      axis2 = Integer.parseInt(a2str);
+      axis2 = ParseUtil.parseIntBase10(a2str);
     }
     String anstr = ((Element) cur).getAttribute(ATTR_ANGLE);
     if(anstr != null && anstr.length() > 0) {

@@ -31,8 +31,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
- * Normalization designed for data with a <em>meaningful zero</em>: Each
- * attribute is scaled to have the same mean (but 0 is not changed).
+ * Normalization designed for data with a <em>meaningful zero</em>:<br />
+ * The 0 is retained, and the data is linearly scaled to have a mean of 1,
+ * by projection with f(x) = x / mean(X).
+ * 
+ * Each attribute is processed separately.
  * 
  * @author Erich Schubert
  * @since 0.7.0

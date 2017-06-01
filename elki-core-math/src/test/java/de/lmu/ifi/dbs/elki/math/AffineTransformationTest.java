@@ -45,7 +45,7 @@ public class AffineTransformationTest {
   public void testIdentityTransform() {
     int testdim = 5;
     AffineTransformation t = new AffineTransformation(testdim);
-    assertTrue(t.getDimensionality() == testdim);
+    assertEquals(testdim, t.getDimensionality());
     double[][] tm = t.getTransformation();
     assertTrue("initial transformation matrix should be unity", VMath.almostEquals(tm, unitMatrix(testdim + 1)));
 

@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 /**
  * Compute the Davies-Bouldin index of a data set.
  *
@@ -64,9 +65,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "D. L. Davies and D. W. Bouldin", //
-title = "A Cluster Separation Measure",//
-booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)", //
-url = "http://dx.doi.org/10.1109/TPAMI.1979.4766909")
+    title = "A Cluster Separation Measure", //
+    booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)", //
+    url = "http://dx.doi.org/10.1109/TPAMI.1979.4766909")
 public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Logger for debug output.
@@ -159,7 +160,8 @@ public class EvaluateDaviesBouldin implements Evaluator {
       daviesBouldin.put(max);
     }
 
-    final double daviesBouldinMean = daviesBouldin.getMean();
+    // For a single cluster, we return 2 (result for equidistant points)
+    final double daviesBouldinMean = daviesBouldin.getCount() > 1 ? daviesBouldin.getMean() : 2.;
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".db-index.noise-handling", noiseOption.toString()));
@@ -178,21 +180,19 @@ public class EvaluateDaviesBouldin implements Evaluator {
 
   public double[] withinGroupDistances(Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids) {
     double[] withinGroupDists = new double[clusters.size()];
-    {
-      Iterator<? extends Cluster<?>> ci = clusters.iterator();
-      for(int i = 0; ci.hasNext(); i++) {
-        Cluster<?> cluster = ci.next();
-        NumberVector centroid = centroids[i];
-        if(centroid == null) { // Noise or singleton cluster:
-          withinGroupDists[i] = Double.NaN;
-          continue;
-        }
-        double wD = 0.;
-        for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-          wD += distanceFunction.distance(centroid, rel.get(it));
-        }
-        withinGroupDists[i] = wD / cluster.size();
+    Iterator<? extends Cluster<?>> ci = clusters.iterator();
+    for(int i = 0; ci.hasNext(); i++) {
+      Cluster<?> cluster = ci.next();
+      NumberVector centroid = centroids[i];
+      if(centroid == null) { // Empty, noise or singleton cluster:
+        withinGroupDists[i] = 0.;
+        continue;
       }
+      double wD = 0.;
+      for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+        wD += distanceFunction.distance(centroid, rel.get(it));
+      }
+      withinGroupDists[i] = wD / cluster.size();
     }
     return withinGroupDists;
   }

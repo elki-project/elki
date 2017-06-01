@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
+
 /**
  * A boolean number type.
  * 
@@ -58,7 +60,7 @@ public class Bit extends Number {
    *         the defined pattern.
    */
   public static Bit valueOf(String bit) throws NumberFormatException {
-    final int i = Integer.parseInt(bit);
+    final int i = ParseUtil.parseIntBase10(bit);
     if(i != 0 && i != 1) {
       throw new NumberFormatException("Input \"" + bit + "\" must be 0 or 1.");
     }

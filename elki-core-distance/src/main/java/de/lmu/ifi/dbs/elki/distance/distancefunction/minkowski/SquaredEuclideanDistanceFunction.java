@@ -56,8 +56,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   private final double preDistance(double[] v1, double[] v2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
-      final double xd = v1[d], yd = v2[d];
-      final double delta = xd - yd;
+      final double delta = v1[d] - v2[d];
       agg += delta * delta;
     }
     return agg;
@@ -66,8 +65,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   private final double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
-      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double delta = xd - yd;
+      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
       agg += delta * delta;
     }
     return agg;
@@ -76,11 +74,9 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
-      final double value = v.doubleValue(d), min = mbr.getMin(d);
-      double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      final double value = v.doubleValue(d);
+      double delta = mbr.getMin(d) - value;
+      delta = delta >= 0. ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -92,9 +88,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = delta >= 0. ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -124,9 +118,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = delta >= 0. ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -192,8 +184,8 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   }
 
   @Override
-  public boolean isMetric() {
-    return false;
+  public boolean isSquared() {
+    return true;
   }
 
   @Override

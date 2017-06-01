@@ -128,7 +128,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     convertToPointerRepresentation(ids, heap, pi, lambda);
 
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, coredists);
+    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistanceFunction().isSquared(), coredists);
   }
 
   @Override

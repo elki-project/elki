@@ -119,7 +119,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     final int size = ids.size();
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>(size);
 
     double[] dists = new double[AGNES.triangleSize(size)];

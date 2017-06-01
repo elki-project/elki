@@ -157,7 +157,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
         String name = null;
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           try {
-            int cnum = (int) tokenizer.getLongBase10();
+            int cnum = tokenizer.getIntBase10();
             buf1.add(cnum);
             // Update cluster sizes:
             if(!csize.increment(cnum)) {

@@ -67,14 +67,20 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
   IntegerDataStore mergeOrder = null;
 
   /**
+   * Flag for squared distances.
+   */
+  boolean isSquared = false;
+
+  /**
    * Constructor.
    *
    * @param ids IDs processed.
    * @param parent Parent pointer.
    * @param parentDistance Distance to parent.
+   * @param isSquared Flag to indicate squared distances
    */
-  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance) {
-    this(ids, parent, parentDistance, null);
+  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared) {
+    this(ids, parent, parentDistance, isSquared, null);
   }
 
   /**
@@ -83,14 +89,16 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
    * @param ids IDs processed.
    * @param parent Parent pointer.
    * @param parentDistance Distance to parent.
+   * @param isSquared Flag to indicate squared distances
    * @param mergeOrder Order in which to execute merges
    */
-  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder) {
+  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder) {
     super("Pointer Representation", "pointer-representation");
     this.ids = ids;
     this.parent = parent;
     this.parentDistance = parentDistance;
     this.mergeOrder = mergeOrder;
+    this.isSquared = isSquared;
   }
 
   /**
@@ -156,6 +164,15 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     siz.destroy();
     ins.destroy();
     return positions = pos;
+  }
+
+  /**
+   * Get the flag for squared distances.
+   *
+   * @return {@code true} if squared distances are used.
+   */
+  public boolean isSquared() {
+    return isSquared;
   }
 
   /**

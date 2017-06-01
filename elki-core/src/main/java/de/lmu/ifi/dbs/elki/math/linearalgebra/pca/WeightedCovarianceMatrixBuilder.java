@@ -49,11 +49,14 @@ import net.jafama.FastMath;
  * a covariance matrix. Covariance can be canonically extended with weights, as
  * shown in the article
  * 
+ * Reference:
+ * <p>
  * A General Framework for Increasing the Robustness of PCA-Based Correlation
- * Clustering Algorithms Hans-Peter Kriegel and Peer Kr&ouml;ger and Erich
- * Schubert and Arthur Zimek In: Proc. 20th Int. Conf. on Scientific and
- * Statistical Database Management (SSDBM), 2008, Hong Kong Lecture Notes in
- * Computer Science 5069, Springer
+ * Clustering Algorithms<br />
+ * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek<br />
+ * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM)
+ * </p>
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -65,10 +68,10 @@ import net.jafama.FastMath;
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms",//
-booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008",//
-url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
+    title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
+    booktitle = "Proc. 20th Int.l Conf. on Scientific and Statistical Database Management (SSDBM)", //
+    url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
+public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Holds the weight function.
    */
@@ -106,12 +109,10 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
     final Centroid centroid = Centroid.make(relation, ids);
 
     // find maximum distance
-    double maxdist = 0.0;
-    double stddev = 0.0;
+    double maxdist = 0.0, stddev = 0.0;
     {
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        NumberVector obj = relation.get(iter);
-        double distance = weightDistance.distance(centroid, obj);
+        double distance = weightDistance.distance(centroid, relation.get(iter));
         stddev += distance * distance;
         if(distance > maxdist) {
           maxdist = distance;
@@ -149,13 +150,10 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 
     // avoid bad parameters
-    if(k > results.size()) {
-      k = results.size();
-    }
+    k = k <= results.size() ? k : results.size();
 
     // find maximum distance
-    double maxdist = 0.0;
-    double stddev = 0.0;
+    double maxdist = 0.0, stddev = 0.0;
     {
       int i = 0;
       for(DoubleDBIDListIter it = results.iter(); it.valid() && i < k; it.advance(), k++) {
@@ -191,15 +189,13 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter to specify the weight function to use in weighted PCA, must
-     * implement
-     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction}
-     * .
+     * Parameter to specify the weight function to use in weighted PCA.
      * <p>
      * Key: {@code -pca.weight}
      * </p>
      */
     public static final OptionID WEIGHT_ID = new OptionID("pca.weight", "Weight function to use in weighted PCA.");
+
     /**
      * Weight function.
      */

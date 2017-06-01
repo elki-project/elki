@@ -438,6 +438,69 @@ public final class ParseUtil {
   }
 
   /**
+   * Parse an integer from a character sequence.
+   *
+   * @param str String
+   * @return Int value
+   */
+  public static int parseIntBase10(final CharSequence str) {
+    return parseIntBase10(str, 0, str.length());
+  }
+
+  /**
+   * Parse an integer from a character sequence.
+   *
+   * @param str String
+   * @param start Begin
+   * @param end End
+   * @return int value
+   */
+  public static int parseIntBase10(final CharSequence str, final int start, final int end) {
+    // Current position and character.
+    int pos = start;
+    char cur = str.charAt(pos);
+
+    // Match sign
+    boolean isNegative = (cur == '-');
+    // Carefully consume the - character, update c and i:
+    if((isNegative || (cur == '+')) && (++pos < end)) {
+      cur = str.charAt(pos);
+    }
+
+    // Begin parsing real numbers!
+    if((cur < '0') || (cur > '9')) {
+      throw NOT_A_NUMBER;
+    }
+
+    // Parse digits into a long, remember offset of decimal point.
+    int decimal = 0;
+    while(true) {
+      final int digit = cur - '0';
+      if((digit >= 0) && (digit <= 9)) {
+        final int tmp = (decimal << 3) + (decimal << 1) + digit;
+        if(tmp < decimal) {
+          throw PRECISION_OVERFLOW;
+        }
+        decimal = tmp;
+      }
+      else { // No more digits, or a second dot.
+        break;
+      }
+      if(++pos < end) {
+        cur = str.charAt(pos);
+      }
+      else {
+        break;
+      }
+    }
+    if(pos != end) {
+      throw TRAILING_CHARACTERS;
+    }
+
+    return isNegative ? -decimal : decimal;
+  }
+
+  /**
    * Match "inf", "infinity" in a number of different capitalizations.
    *
    * @param str String to match

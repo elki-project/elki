@@ -1,4 +1,8 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
 description = "ELKI - Parent Project"
+eclipse.project.name = 'elki-project'
 
 // Try to get a git commit id for javadoc
 def getCommitHash() {
@@ -33,7 +37,6 @@ class PropertiesFileTask extends PropertiesGeneratorTask<PropertiesFile> {
 }
 
 allprojects  {
-  apply plugin: 'maven'
   apply plugin: 'java'
   apply plugin: 'eclipse'
   if(project.hasProperty('jacoco')) apply plugin: 'jacoco'
@@ -42,8 +45,7 @@ allprojects  {
   version = '0.7.2-SNAPSHOT'
 
   repositories {
-    mavenLocal()
-    maven { url "http://repo.maven.apache.org/maven2" }
+    jcenter();
   }
   ext.description = description
   ext.year = new Date().format('yyyy')

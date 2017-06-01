@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
@@ -107,11 +106,10 @@ public class NNChain<O> extends AGNES<O> {
     double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
-    final boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    initializeDistanceMatrix(scratch, dq, ix, iy, square);
+    initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
     nnChainCore(size, scratch, ix, iy, builder);
 
@@ -154,7 +152,7 @@ public class NNChain<O> extends AGNES<O> {
         for(ix.advance(); ix.valid(); ix.advance()) {
           if(!builder.isLinked(ix)) {
             b = ix.getOffset();
-            assert(a != b);
+            assert (a != b);
             break;
           }
         }
@@ -209,7 +207,7 @@ public class NNChain<O> extends AGNES<O> {
         a = b;
         b = tmp;
       }
-      assert(minDist == getDistance(distances, a, b));
+      assert (minDist == getDistance(distances, a, b));
       merge(size, distances, ix, iy, builder, minDist, a, b);
       LOG.incrementProcessed(progress);
     }

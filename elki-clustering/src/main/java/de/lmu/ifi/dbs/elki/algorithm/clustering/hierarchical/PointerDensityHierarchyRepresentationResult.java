@@ -44,10 +44,11 @@ public class PointerDensityHierarchyRepresentationResult extends PointerHierarch
    * @param ids IDs processed.
    * @param parent Parent pointer.
    * @param parentDistance Distance to parent.
+   * @param isSquared Flag to indicate squared distances
    * @param coreDistance Core distances.
    */
-  public PointerDensityHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DoubleDataStore coreDistance) {
-    super(ids, parent, parentDistance);
+  public PointerDensityHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DoubleDataStore coreDistance) {
+    super(ids, parent, parentDistance, isSquared);
     this.coreDistance = coreDistance;
   }
 
