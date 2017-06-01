@@ -83,17 +83,16 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
     final double mean = sum / raw.length;
     double ssum = 0.;
     for(int i = 0; i < raw.length; ++i) {
-      final double v = raw[i] - mean;
-      if(v != v) { // NaN guard
+      double v = raw[i] - mean;
+      if(v != v) {
         continue;
       }
       ssum += v * v;
     }
-    // Compute the inverse standard deviation:
-    final double istd = ssum > 0. ? FastMath.sqrt(raw.length / ssum) : Double.POSITIVE_INFINITY;
-    if(istd < Double.POSITIVE_INFINITY) {
+    final double std = FastMath.sqrt(ssum) / (raw.length - 1);
+    if(std > 0.) {
       for(int i = 0; i < raw.length; ++i) {
-        raw[i] = (raw[i] - mean) * istd;
+        raw[i] = (raw[i] - mean) / std;
       }
     }
     return raw;
@@ -107,7 +106,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
     // Two pass normalization is numerically most stable,
     // And Java should optimize this well enough.
     double[] mean = new double[multiplicity];
-    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j == multiplicity ? 0 : j) {
+    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j % multiplicity) {
       final double v = raw[i];
       if(v != v) { // NaN guard
         continue;
@@ -115,23 +114,21 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
       mean[j] += v;
     }
     for(int j = 0; j < multiplicity; ++j) {
-      mean[j] *= multiplicity / (double) len;
+      mean[j] /= len;
     }
-    // Initially, the sum of squares, later the inverse std.
-    double[] istd = new double[multiplicity];
-    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j == multiplicity ? 0 : j) {
-      final double v = raw[i] - mean[j];
+    double[] std = new double[multiplicity];
+    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j % multiplicity) {
+      double v = raw[i] - mean[j];
       if(v != v) {
         continue;
       }
-      istd[j] += v * v;
+      std[j] += v * v;
     }
-    // Compute the INVERSE standard deviation from ssq.
     for(int j = 0; j < multiplicity; ++j) {
-      istd[j] = istd[j] > 0. ? FastMath.sqrt(len / istd[j]) : 1;
+      std[j] = std[j] > 0. ? FastMath.sqrt(std[j]) / (len - 1) : 1;
     }
-    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j == multiplicity ? 0 : j) {
-      raw[i] = (raw[i] - mean[j]) * istd[j];
+    for(int i = 0, j = 0; i < raw.length; ++i, j = ++j % multiplicity) {
+      raw[i] = (raw[i] - mean[j]) / std[j];
     }
     return raw;
   }

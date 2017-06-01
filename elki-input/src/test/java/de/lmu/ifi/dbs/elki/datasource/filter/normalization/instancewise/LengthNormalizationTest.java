@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,16 +30,15 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the min-max normalization filter.
+ * Test the length normalization filter.
  *
- * @author Erich Schubert
+ * @author Matthew Arcifa
  */
-public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest {
+public class LengthNormalizationTest extends AbstractDataSourceTest {
   /**
    * Test with default parameters.
    */
@@ -47,29 +46,24 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    LengthNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(LengthNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    
+    // Verify that the length of each row vector is 1.
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
+      double len = 0.0;
       for(int col = 0; col < dim; col++) {
-        final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
-        }
+        final double v = d.doubleValue(col);
+        len += v * v;
       }
-    }
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+      assertEquals("Vector length is not as expected", 1., len, 1e-15);
     }
   }
 }

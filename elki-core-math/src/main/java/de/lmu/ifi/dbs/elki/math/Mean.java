@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Compute the mean using a numerically stable online algorithm.
  *
- * This class can repeatedly be fed with data using the add() methods, the
+ * This class can repeatedly be fed with data using the put() methods, the
  * resulting values for mean can be queried at any time using getMean().
  *
  * Trivial code, but replicated a lot. The class is final so it should come at

@@ -30,46 +30,55 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the min-max normalization filter.
+ * Test the Beta normalization filter.
  *
- * @author Erich Schubert
+ * @author Matthew Arcifa
  */
-public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest {
+public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
   /**
-   * Test with default parameters.
+   * Test with parameter p as alpha.
    */
   @Test
-  public void defaultParameters() {
-    String filename = UNITTEST + "normalization-test-1.csv";
+  public void parameters() {
+    final double p = .88;
+    String filename = UNITTEST + "normally-distributed-data-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    ListParameterization config = new ListParameterization();
+    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p);
+    AttributeWiseBetaNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseBetaNormalization.class, config);
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    BetaDistribution dist = new BetaDistribution(p, p);
+    final double quantile = dist.quantile(p);
+    
+    // Verify that p% of the values in each column are less than the quantile.
+    int[] countUnderQuantile = new int[dim];
+    
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
       for(int col = 0; col < dim; col++) {
-        final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
+        final double v = d.doubleValue(col);
+        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+          if(v < quantile) {
+            countUnderQuantile[col]++;
+          }
         }
       }
     }
+    
     for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+          assertEquals("p% of the values should be under the quantile", p, (double)countUnderQuantile[col] / (double)bundle.dataLength(), .1);
     }
   }
 }

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,16 +30,16 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the min-max normalization filter.
+ * Test the mean-variance normalization filter.
  *
- * @author Erich Schubert
+ * @author Matthew Arcifa
  */
-public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest {
+public class InstanceMeanVarianceNormalizationTest extends AbstractDataSourceTest {
   /**
    * Test with default parameters.
    */
@@ -47,29 +47,28 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    InstanceMeanVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceMeanVarianceNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    
+    // Verify that the resulting data has mean 0 and variance 1 in each row.
+    MeanVariance mvs = new MeanVariance();
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
+      mvs.reset();
       for(int col = 0; col < dim; col++) {
-        final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
+        final double v = d.doubleValue(col);
+        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+          mvs.put(v);
         }
       }
-    }
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+      assertEquals("Mean is not as expected", 0., mvs.getMean(), 1e-15);
+      assertEquals("Variance is not as expected", 1., mvs.getNaiveVariance(), 1e-15);
     }
   }
 }
