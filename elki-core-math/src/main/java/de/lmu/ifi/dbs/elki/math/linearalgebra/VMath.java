@@ -68,29 +68,6 @@ public final class VMath {
   }
 
   /**
-   * Returns a randomly created vector of length 1.0
-   * 
-   * @param dimensionality dimensionality
-   * @return Random vector of length 1.0
-   */
-  public static double[] randomNormalizedVector(final int dimensionality) {
-    final double[] v = new double[dimensionality];
-    double norm;
-    do {
-      norm = 0;
-      for(int i = 0; i < dimensionality; i++) {
-        final double x = v[i] = Math.random();
-        norm += x * x;
-      }
-    }
-    while(norm == 0); // In the unlikely case we are all zero, retry.
-    for(int row = 0; row < v.length; row++) {
-      v[row] /= norm;
-    }
-    return v;
-  }
-
-  /**
    * Returns the ith unit vector of the specified dimensionality.
    * 
    * @param dimensionality the dimensionality of the vector
@@ -761,23 +738,6 @@ public final class VMath {
    */
   public static double[][] zeroMatrix(final int dim) {
     return new double[dim][dim];
-  }
-
-  /**
-   * Generate matrix with random elements
-   * 
-   * @param m Number of rows.
-   * @param n Number of columns.
-   * @return An m-by-n matrix with uniformly distributed random elements.
-   */
-  public static double[][] random(final int m, final int n) {
-    final double[][] A = new double[m][n];
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
-        A[i][j] = Math.random();
-      }
-    }
-    return A;
   }
 
   /**
