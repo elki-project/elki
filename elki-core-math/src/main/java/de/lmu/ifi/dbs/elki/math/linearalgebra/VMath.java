@@ -68,32 +68,6 @@ public final class VMath {
   }
 
   /**
-<<<<<<< HEAD
-   * Returns a randomly created vector of length 1.0
-   * 
-   * @param dimensionality dimensionality
-   * @return Random vector of length 1.0
-   */
-  public static double[] randomNormalizedVector(final int dimensionality) {
-    final double[] v = new double[dimensionality];
-    double norm;
-    do {
-      norm = 0;
-      for(int i = 0; i < dimensionality; i++) {
-        final double x = v[i] = Math.random();
-        norm += x * x;
-      }
-    }
-    while(norm == 0); // In the unlikely case we are all zero, retry.
-    for(int row = 0; row < v.length; row++) {
-      v[row] /= FastMath.sqrt(norm); 
-    }
-    return v;
-  }
-
-  /**
-=======
->>>>>>> upstream/master
    * Returns the ith unit vector of the specified dimensionality.
    * 
    * @param dimensionality the dimensionality of the vector

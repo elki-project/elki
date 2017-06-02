@@ -69,59 +69,39 @@ public class VMathTest {
   };
   
   /**
-   * Vector v1 as TestVector
+   * Vectors v1,v2 as TestVector
    */
-  private static double[] v1;
+  private static double[] v1, v2, RES_VEC;
   
   /**
-   * Vector v2 as TestVector
+   * Skalars s1, s2, d as TestSkalar
    */
-  private static double[] v2;
-  
-  /**
-   * Skalar s1 as TestSkalar
-   */
-  private static double s1;
-
-  /**
-   * Skalar s2 as TestSkalar
-   */
-  private static double s2;
-  
-  /**
-   * Skalar d as TestSkalar
-   */
-  private static double d;
-  
-  /**
-   * Vector RES_VEC as storage for results
-   */
-  private static double[] RES_VEC;
+  private static double s1, s2, d;
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
   
-  @Test //sqrt implemented was missing at first. Case 0 not working jet
-  public void testrandomNormalizedVector() {
-    
-    for(int i = 1; i < 10; i++){
-      final double[] v1 = randomNormalizedVector(i);
-      
-      // test if vector is normalized, checks if squared sums equal 1
-      double vnorm = 0;
-      for(int j=0; j < i;j++) {
-        final double x = v1[j];
-        vnorm += x*x;
-      };
-      assertEquals(1,vnorm,EPSILON); 
-      
-      // possible to use VMath euclideanLength()
-      // assertEquals(1,euclideanLength(v1),EPSILON) or
-      // assertEquals(1,squareSum(v1),EPSILON)   
-      
-    };
-    
-  }
+//  @Test //sqrt implemented was missing at first. Case 0 not working jet
+//  public void testrandomNormalizedVector() {
+//    
+//    for(int i = 1; i < 10; i++){
+//      final double[] v1 = randomNormalizedVector(i);
+//      
+//      // test if vector is normalized, checks if squared sums equal 1
+//      double vnorm = 0;
+//      for(int j=0; j < i;j++) {
+//        final double x = v1[j];
+//        vnorm += x*x;
+//      };
+//      assertEquals(1,vnorm,EPSILON); 
+//      
+//      // possible to use VMath euclideanLength()
+//      // assertEquals(1,euclideanLength(v1),EPSILON) or
+//      // assertEquals(1,squareSum(v1),EPSILON)   
+//      
+//    };
+//    
+//  }
   
 
   @Test //index is given Starting 0. 
@@ -176,23 +156,20 @@ public class VMathTest {
     // test near 0
     v1      = new double[] { 1, 2, 0.123456789123456789123};
     v2      = new double[] {-1,-2,-0.123456789123457000000};
-    s1      = 0;
-    s2      = 0;
-    d       = 0;
     RES_VEC = new double[] {0,0,0 };
     assertArrayEquals(RES_VEC,plus(v1,v2),EPSILON);
 
-//    // test "normal" vectors
-//    v1      = new double[] {1.6926, 182262, 0.7625, 2 , 10E20, 4};
-//    v2      = new double[] {3, 0.200, 2567E10,-500,3, 2};
-//    RES_VEC = new double[] {};
-//    assertArrayEquals(RES_VEC,plus(v1,v2),EPSILON);
+    // test "normal" vectors
+    v1      = new double[] {1.6926, 182262    , 0.7625             ,   2, 10E20, 4};
+    v2      = new double[] {3     , 0.201     , 2567E10            ,-500,   3, 2};
+    RES_VEC = new double[] {4.6926, 182262.201, 25670000000000.7625,-498, 10E20+3, 6.};
+    assertArrayEquals(RES_VEC,plus(v1,v2),EPSILON);
 
-//    // test numeric loss of percision
-//    v1      = new double[] {1,1};
-//    v2      = new double[] {1.12345678912345E17,1};
-//    RES_VEC = new double[] {1.12345678912345001E17,2};
-//    assertArrayEquals(RES_VEC,plus(v1,v2),EPSILON);
+    // test numeric loss of percision
+    v1      = new double[] {1                     ,1};
+    v2      = new double[] {1.12345678912345E-17   ,1};
+    RES_VEC = new double[] {1,2};
+    assertArrayEquals(RES_VEC,plus(v1,v2),0.);
     
     
     // test ERR_VEC_DIMENSIONS
@@ -232,6 +209,37 @@ public class VMathTest {
     assertArrayEquals(RES_VEC, timesPlus(v1, s1, v2), EPSILON);
     assertArrayEquals(RES_VEC, plusTimes(v1, v2, s2), EPSILON);
    
+  }
+  
+  /**
+   * testing the timesPlustimes function of VMath class
+   */
+  @Test
+  public void testtimesPlustimes() {
+    
+    v1 = new double[] {};
+    v2 = new double[] {};
+    s1 = 0;
+    s2 = 0;
+    assertArrayEquals(RES_VEC, timesPlusTimes(v1, s1, v2, s2), EPSILON);
+    
+  }
+  
+  /**
+   * testing the plusEquals function of VMath class
+   */
+  @Test
+  public void testplusEquals() {
+    // wie plus vielleicht, wenn er in place arbeitet warum returnwert v1?
+    
+  }
+  
+  /**
+   * testing the timesPlustimesEquals function of VMath class
+   */
+  @Test
+  public void testtimesPlustimesEquals() {
+    // wie times Plus times Equals
     
   }
   
