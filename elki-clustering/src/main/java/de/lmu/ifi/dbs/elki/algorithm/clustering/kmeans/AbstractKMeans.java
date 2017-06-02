@@ -364,8 +364,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterK(Parameterization config) {
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
@@ -380,7 +380,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
+        if(!(distanceFunction instanceof SquaredEuclideanDistanceFunction) && !(distanceFunction instanceof EuclideanDistanceFunction)) {
           getLogger().warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
@@ -404,8 +404,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterMaxIter(Parameterization config) {
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0).addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }

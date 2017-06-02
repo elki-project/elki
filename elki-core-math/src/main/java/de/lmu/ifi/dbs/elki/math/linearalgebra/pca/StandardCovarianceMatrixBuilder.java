@@ -26,7 +26,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 
 /**
- * Class for building a "traditional" covariance matrix.
+ * Class for building a "traditional" covariance matrix vai
+ * {@link CovarianceMatrix}.
  * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
  * @author Erich Schubert
@@ -34,18 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
  * 
  * @apiviz.uses CovarianceMatrix
  */
-public class StandardCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
-  /**
-   * Compute Covariance Matrix for a complete database.
-   * 
-   * @param database the database used
-   * @return Covariance Matrix
-   */
-  @Override
-  public double[][] processDatabase(Relation<? extends NumberVector> database) {
-    return CovarianceMatrix.make(database).destroyToNaiveMatrix();
-  }
-
+public class StandardCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Compute Covariance Matrix for a collection of database IDs.
    * 

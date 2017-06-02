@@ -125,7 +125,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   @Override
   protected boolean parseLineInternal() {
     /* tokenizer initialized by nextLineExceptComments() */
-    int cardinality = (int) tokenizer.getLongBase10();
+    int cardinality = tokenizer.getIntBase10();
     tokenizer.advance();
 
     int thismax = 0;
@@ -133,7 +133,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
     while(tokenizer.valid()) {
       if(values.size() < cardinality) {
         try {
-          int index = (int) tokenizer.getLongBase10();
+          int index = tokenizer.getIntBase10();
           tokenizer.advance();
           // Respect labelIndices.
           if(!isLabelColumn(index)) {

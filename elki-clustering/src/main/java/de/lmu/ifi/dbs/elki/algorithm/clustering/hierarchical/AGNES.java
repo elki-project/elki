@@ -151,11 +151,10 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Compute the initial (lower triangular) distance matrix.
     double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    initializeDistanceMatrix(scratch, dq, ix, iy, square);
+    initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -190,23 +189,30 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @param scratch Scratch space to be used.
    * @param dq Distance query
+   * @param linkage Linkage method
    * @param ix Data iterator
    * @param iy Data iterator
-   * @param square Flag to use squared distances.
    */
-  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy, boolean square) {
+  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, LinkageMethod linkage, DBIDArrayIter ix, DBIDArrayIter iy) {
+    final boolean issquare = dq.getDistanceFunction().isSquared();
     int pos = 0;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", scratch.length, LOG) : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       final int x = ix.getOffset();
       assert (pos == triangleSize(x));
       for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
-        double dist = dq.distance(ix, iy);
-        // Ward uses variances -- i.e. squared values
-        dist = square ? (dist * dist) : dist;
-        scratch[pos] = dist;
+        scratch[pos] = linkage.initial(dq.distance(ix, iy), issquare);
         pos++;
       }
+      if(prog != null) {
+        prog.setProcessed(pos, LOG);
+      }
     }
+    // Avoid logging errors in case scratch space was too large:
+    if(prog != null) {
+      prog.setProcessed(scratch.length, LOG);
+    }
+    LOG.ensureCompleted(prog);
   }
 
   /**
@@ -269,7 +275,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, mindist, iy);
+    builder.add(ix, linkage.restore(mindist, getDistanceFunction().isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);

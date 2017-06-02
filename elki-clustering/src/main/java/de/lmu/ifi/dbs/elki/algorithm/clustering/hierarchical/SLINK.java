@@ -142,7 +142,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     m.destroy();
     m = null;
 
-    return new PointerHierarchyRepresentationResult(ids, pi, lambda);
+    return new PointerHierarchyRepresentationResult(ids, pi, lambda, getDistanceFunction().isSquared());
   }
 
   /**

@@ -91,7 +91,7 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
       String[] values = SPLIT.split((String) obj);
       int[] intValue = new int[values.length];
       for(int i = 0; i < values.length; i++) {
-        intValue[i] = (int) ParseUtil.parseLongBase10(values[i]);
+        intValue[i] = ParseUtil.parseIntBase10(values[i]);
       }
       return intValue;
     }

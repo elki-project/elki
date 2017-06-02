@@ -99,7 +99,7 @@ public class AsciiDistanceParser implements DistanceParser {
         }
         int id1, id2;
         try {
-          id1 = (int) tokenizer.getLongBase10();
+          id1 = tokenizer.getIntBase10();
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
@@ -110,7 +110,7 @@ public class AsciiDistanceParser implements DistanceParser {
         }
 
         try {
-          id2 = (int) tokenizer.getLongBase10();
+          id2 = tokenizer.getIntBase10();
           tokenizer.advance();
         }
         catch(NumberFormatException e) {

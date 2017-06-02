@@ -106,7 +106,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewResults(context, start).filter(HistogramProjector.class).forEach(p -> {
+    VisualizationTree.findVis(context, start).filter(HistogramProjector.class).forEach(p -> {
       context.addVis(p, new VisualizationTask(this, CNAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
@@ -176,13 +176,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
 
       // Styling policy
       final StylingPolicy spol = context.getStylingPolicy();
-      final ClassStylingPolicy cspol;
-      if(spol instanceof ClassStylingPolicy) {
-        cspol = (ClassStylingPolicy) spol;
-      }
-      else {
-        cspol = null;
-      }
+      final ClassStylingPolicy cspol = (spol instanceof ClassStylingPolicy) ? (ClassStylingPolicy) spol : null;
       // TODO also use min style?
       setupCSS(svgp, (cspol != null) ? cspol.getMaxStyle() : 0);
 
@@ -392,8 +386,8 @@ public class ColoredHistogramVisualizer implements VisFactory {
       if(config.grab(curvesF)) {
         curves = curvesF.isTrue();
       }
-      IntParameter binsP = new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS);
-      binsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter binsP = new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(binsP)) {
         bins = binsP.intValue();
       }

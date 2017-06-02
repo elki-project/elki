@@ -110,7 +110,7 @@ public class EvaluateSquaredErrors implements Evaluator {
    * @return ssq
    */
   public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    boolean square = !(distance instanceof SquaredEuclideanDistanceFunction);
+    boolean square = !distance.isSquared();
     int ignorednoise = 0;
 
     List<? extends Cluster<?>> clusters = c.getAllClusters();

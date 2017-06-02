@@ -43,6 +43,7 @@ import org.apache.batik.util.ParsedURLData;
 import org.apache.batik.util.ParsedURLProtocolHandler;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 
 /**
  * Access images via an internal image registry.
@@ -169,7 +170,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
     }
     int id;
     try {
-      id = Integer.parseInt(url.getPath());
+      id = ParseUtil.parseIntBase10(url.getPath());
     }
     catch(NumberFormatException e) {
       return null;

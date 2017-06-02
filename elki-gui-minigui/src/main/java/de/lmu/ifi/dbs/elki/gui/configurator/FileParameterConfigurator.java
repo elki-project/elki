@@ -76,16 +76,8 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     button.setToolTipText(param.getShortDescription());
     button.addActionListener(this);
     // fill with value
-    File f = null;
-    if (fp.isDefined()) {
-      f = fp.getValue();
-    }
-    if (f != null) {
-      String fn = f.getPath();
-      textfield.setText(fn);
-    } else {
-      textfield.setText("");
-    }
+    File f = fp.isDefined() ? fp.getValue() : null;
+    textfield.setText(f == null ? "" : f.getPath());
 
     // make a panel
     GridBagConstraints constraints = new GridBagConstraints();
@@ -106,22 +98,22 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
   public void actionPerformed(ActionEvent e) {
     // Use a new JFileChooser. Inconsistent behaviour otherwise!
     final JFileChooser fc = new JFileChooser(new File("."));
-    if (param.isDefined()) {
+    if(param.isDefined()) {
       fc.setSelectedFile(param.getValue());
     }
 
-    if (e.getSource() == button) {
+    if(e.getSource() == button) {
       int returnVal = fc.showOpenDialog(button);
-
-      if (returnVal == JFileChooser.APPROVE_OPTION) {
+      if(returnVal == JFileChooser.APPROVE_OPTION) {
         textfield.setText(fc.getSelectedFile().getPath());
         fireValueChanged();
-      } else {
-        // Do nothing on cancel.
       }
-    } else if (e.getSource() == textfield) {
+      // else: do nothing on cancel.
+    }
+    else if(e.getSource() == textfield) {
       fireValueChanged();
-    } else {
+    }
+    else {
       LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
     }
   }

@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
 @Reference(authors = "A. K. Jain and R. C. Dubes", //
-title = "Algorithms for Clustering Data", //
-booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+    title = "Algorithms for Clustering Data", //
+    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
 public class GroupAverageLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.
@@ -59,9 +59,7 @@ public class GroupAverageLinkageMethod implements LinkageMethod {
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    final double wx = sizex / (double) (sizex + sizey);
-    final double wy = sizey / (double) (sizex + sizey);
-    return wx * dx + wy * dy;
+    return (sizex * dx + sizey * dy) / (double) (sizex + sizey);
   }
 
   /**

@@ -221,7 +221,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
   private void recomputeSeperation(double[][] means, double[] sep, double[][] cdist) {
     final int k = means.length;
     assert (sep.length == k);
-    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     Arrays.fill(sep, Double.POSITIVE_INFINITY);
     for(int i = 1; i < k; i++) {
       DoubleVector mi = DoubleVector.wrap(means[i]);
@@ -252,8 +252,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   private int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
     assert (k == means.length);
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    final boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    final boolean issquared = distanceFunction.isSquared();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       V fv = relation.get(it);
       double[] l = lower.get(it);
@@ -261,7 +260,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       double best = Double.POSITIVE_INFINITY;
       int cur = -1;
       for(int j = 0; j < k; j++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[j]));
+        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[j]));
         dist = issquared ? FastMath.sqrt(dist) : dist;
         l[j] = dist;
         if(dist < best) {
@@ -299,8 +298,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, double[][] cdist, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
     assert (k == means.length);
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    final boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    final boolean issquared = distanceFunction.isSquared();
     int changed = 0;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int orig = assignment.intValue(it);
@@ -319,7 +317,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
           continue; // Condition #3 i-iii not satisfied
         }
         if(recompute_u) { // Need to update bound? #3a
-          u = df.distance(fv, DoubleVector.wrap(means[cur]));
+          u = distanceFunction.distance(fv, DoubleVector.wrap(means[cur]));
           u = issquared ? FastMath.sqrt(u) : u;
           upper.putDouble(it, u);
           recompute_u = false; // Once only
@@ -327,7 +325,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
             continue;
           }
         }
-        double dist = df.distance(fv, DoubleVector.wrap(means[j]));
+        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[j]));
         dist = issquared ? FastMath.sqrt(dist) : dist;
         l[j] = dist;
         if(dist < u) {
@@ -368,7 +366,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     assert (means.length == k);
     assert (newmeans.length == k);
     assert (dists.length == k);
-    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));

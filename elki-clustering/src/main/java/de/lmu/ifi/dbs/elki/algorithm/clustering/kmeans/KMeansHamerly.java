@@ -209,7 +209,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private void recomputeSeperation(double[][] means, double[] sep) {
     final int k = means.length;
     assert (sep.length == k);
-    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     Arrays.fill(sep, Double.POSITIVE_INFINITY);
     for(int i = 1; i < k; i++) {
       DoubleVector m1 = DoubleVector.wrap(means[i]);
@@ -241,15 +241,14 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    */
   private int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.length);
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       V fv = relation.get(it);
       // Find closest center, and distance to two closest centers
       double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
       int minIndex = -1;
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
+        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
         if(dist < min1) {
           minIndex = i;
           min2 = min1;
@@ -294,8 +293,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.length);
     int changed = 0;
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int cur = assignment.intValue(it);
       // Compute the current bound:
@@ -307,7 +305,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       // Update the upper bound
       V fv = relation.get(it);
-      u = df.distance(fv, DoubleVector.wrap(means[cur]));
+      u = distanceFunction.distance(fv, DoubleVector.wrap(means[cur]));
       u = issquared ? FastMath.sqrt(u) : u;
       upper.putDouble(it, u);
       if(u <= z || u <= sa) {
@@ -317,7 +315,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
       int minIndex = -1;
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
+        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
         if(dist < min1) {
           minIndex = i;
           min2 = min1;
@@ -363,7 +361,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     assert (means.length == k);
     assert (newmeans.length == k);
     assert (dists.length == k);
-    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = distanceFunction.isSquared();
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));

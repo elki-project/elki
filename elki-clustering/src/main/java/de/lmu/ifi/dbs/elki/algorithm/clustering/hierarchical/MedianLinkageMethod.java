@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.3
  */
 @Reference(authors = "J. C. Gower", //
-title = "A comparison of some methods of cluster analysis", //
-booktitle = "Biometrics (1967)", //
-url = "http://www.jstor.org/stable/10.2307/2528417")
+    title = "A comparison of some methods of cluster analysis", //
+    booktitle = "Biometrics (1967)", //
+    url = "http://www.jstor.org/stable/10.2307/2528417")
 @Alias({ "wpgmc", "WPGMC", "weighted-centroid" })
 public class MedianLinkageMethod implements LinkageMethod {
   /**

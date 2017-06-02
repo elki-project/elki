@@ -58,18 +58,23 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
   /**
    * Stores the maximum in each dimension.
    */
-  private double[] maxima = new double[0];
+  private double[] maxima;
 
   /**
    * Stores the minimum in each dimension.
    */
-  private double[] minima = new double[0];
+  private double[] minima;
+
+  /**
+   * Empty double array.
+   */
+  private static final double[] EMPTY_ARRAY = new double[0];
 
   /**
    * Constructor.
    */
   public AttributeWiseMinMaxNormalization() {
-    super();
+    this(EMPTY_ARRAY, EMPTY_ARRAY);
   }
 
   /**
@@ -80,8 +85,8 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
    */
   public AttributeWiseMinMaxNormalization(double[] minima, double[] maxima) {
     super();
-    this.minima = minima;
-    this.maxima = maxima;
+    this.minima = minima != null ? minima : EMPTY_ARRAY;
+    this.maxima = maxima != null ? maxima : EMPTY_ARRAY;
   }
 
   @Override
@@ -106,10 +111,10 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     }
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       final double val = featureVector.doubleValue(d);
-      if(val > maxima[d]) {
+      if(val < Double.POSITIVE_INFINITY && val > maxima[d]) {
         maxima[d] = val;
       }
-      if(val < minima[d]) {
+      if(val > Double.NEGATIVE_INFINITY && val < minima[d]) {
         minima[d] = val;
       }
     }
@@ -220,12 +225,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     /**
      * Stores the maximum in each dimension.
      */
-    private double[] maxima = new double[0];
+    private double[] maxima = EMPTY_ARRAY;
 
     /**
      * Stores the minimum in each dimension.
      */
-    private double[] minima = new double[0];
+    private double[] minima = EMPTY_ARRAY;
 
     @Override
     protected void makeOptions(Parameterization config) {

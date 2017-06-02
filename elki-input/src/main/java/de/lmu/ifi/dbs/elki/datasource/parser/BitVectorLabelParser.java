@@ -77,7 +77,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
         if(word >= buf.size()) { // Ensure size.
           buf.add(0L);
         }
-        if(tokenizer.getLongBase10() > 0) {
+        if(tokenizer.getIntBase10() > 0) {
           buf.set(word, buf.get(word) | (1L << off));
         }
         ++curdim;

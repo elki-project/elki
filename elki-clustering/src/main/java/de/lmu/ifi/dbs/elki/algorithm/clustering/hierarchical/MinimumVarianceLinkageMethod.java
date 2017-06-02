@@ -26,31 +26,44 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
- * Ward's method clustering method.
- * 
- * This criterion minimizes the increase of squared errors, and should be used
- * with <em>squared Euclidean</em> distance.
- * 
+ * Minimum variance linkage.
+ *
+ * This is subtly different from Ward's method ({@link WardLinkageMethod}),
+ * because variance is normalized by the cluster size; and Ward minimizes the
+ * increase in sum of squares (without normalization).
+ *
  * Reference:
  * <p>
- * Ward Jr, Joe H.<br />
- * Hierarchical grouping to optimize an objective function<br />
- * Journal of the American statistical association 58.301 (1963): 236-244.
+ * J. Podani<br />
+ * New Combinatorial Clustering Methods<br />
+ * Vegetatio 81(1/2)
+ * </p>
+ * attributes this to (but we did not verify):
+ * <p>
+ * E. Diday, J. Lemaire, J. Pouget, and F.Testu<br />
+ * Elements d'analyse de donnees
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.6.0
  */
-@Reference(authors = "J. H. Ward Jr", //
-    title = "Hierarchical grouping to optimize an objective function", //
-    booktitle = "Journal of the American statistical association 58.301", //
-    url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
-@Alias({ "ward", "ssq" })
-public class WardLinkageMethod implements LinkageMethod {
+@Reference(authors = "J. Podani", //
+    title = "New Combinatorial Clustering Methods", //
+    booktitle = "Vegetatio 81(1/2)", //
+    url = "http://dx.doi.org/10.1007/978-94-009-2432-1_5")
+@Alias({ "variance" })
+public class MinimumVarianceLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.
    */
-  public static final WardLinkageMethod STATIC = new WardLinkageMethod();
+  public static final MinimumVarianceLinkageMethod STATIC = new MinimumVarianceLinkageMethod();
+
+  /**
+   * Additional reference.
+   */
+  @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, and F.Testu", //
+      title = "Elements d'analyse de donnees", //
+      booktitle = "Elements d'analyse de donnees")
+  private static Void SECOND_REFERENCE = null;
 
   /**
    * Constructor.
@@ -58,23 +71,26 @@ public class WardLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public WardLinkageMethod() {
+  public MinimumVarianceLinkageMethod() {
     super();
   }
 
   @Override
   public double initial(double d, boolean issquare) {
-    return .5 * (issquare ? d : (d * d));
+    return .25 * (issquare ? d : (d * d));
   }
 
   @Override
   public double restore(double d, boolean issquare) {
-    return issquare ? 2. * d : FastMath.sqrt(2. * d);
+    return issquare ? 4. * d : FastMath.sqrt(4. * d);
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
+    final int xj = sizex + sizej;
+    final int yj = sizey + sizej;
+    final int n = sizex + sizey + sizej;
+    return (xj * (double) xj * dx + yj * (double) yj * dy - (sizej * (double) (sizex + sizey)) * dxy) / (n * (double) n);
   }
 
   /**
@@ -88,7 +104,7 @@ public class WardLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WardLinkageMethod makeInstance() {
+    protected MinimumVarianceLinkageMethod makeInstance() {
       return STATIC;
     }
   }

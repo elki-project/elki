@@ -159,10 +159,9 @@ public class ArffParser implements Parser {
 
   @Override
   public MultipleObjectsBundle parse(InputStream instream) {
-    try {
-      BufferedReader br = new BufferedReader(new InputStreamReader(instream));
-      ArrayList<String> names = new ArrayList<>();
-      ArrayList<String> types = new ArrayList<>();
+    try (InputStreamReader ir = new InputStreamReader(instream);
+        BufferedReader br = new BufferedReader(ir)) {
+      ArrayList<String> names = new ArrayList<>(), types = new ArrayList<>();
 
       readHeader(br);
       parseAttributeStatements(br, names, types);
@@ -191,7 +190,7 @@ public class ArffParser implements Parser {
             setupBundleHeaders(names, targ, elkitypes, dimsize, bundle, false);
             state = 1; // dense
           }
-          if(state != 1) {
+          else if(state != 1) {
             throw new AbortException("Mixing dense and sparse vectors is currently not allowed.");
           }
           // Load a dense instance
@@ -200,16 +199,14 @@ public class ArffParser implements Parser {
         else {
           if(state == 0) {
             setupBundleHeaders(names, targ, elkitypes, dimsize, bundle, true);
-            state = 2; // dense
+            state = 2; // sparse
           }
-          if(state != 2) {
+          else if(state != 2) {
             throw new AbortException("Mixing dense and sparse vectors is currently not allowed.");
           }
           bundle.appendSimple(loadSparseInstance(tokenizer, targ, dimsize, elkitypes, bundle.metaLength()));
         }
-        if(tokenizer.ttype != StreamTokenizer.TT_EOF) {
-          nextToken(tokenizer);
-        }
+        nextToken(tokenizer);
       }
       return bundle;
     }
@@ -219,7 +216,6 @@ public class ArffParser implements Parser {
   }
 
   private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
-    // logger.warning("Sparse instance.");
     TIntObjectHashMap<Object> map = new TIntObjectHashMap<>();
     while(true) {
       nextToken(tokenizer);
@@ -234,18 +230,14 @@ public class ArffParser implements Parser {
         if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
           throw new AbortException("Unexpected token type encountered: " + tokenizer.toString() + " type: " + tokenizer.ttype);
         }
-        int dim = Integer.valueOf(tokenizer.sval);
+        int dim = ParseUtil.parseIntBase10(tokenizer.sval);
         if(map.containsKey(dim)) {
           throw new AbortException("Duplicate key in sparse vector: " + tokenizer.toString());
         }
         nextToken(tokenizer);
         if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
-          if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]])) {
-            map.put(dim, ParseUtil.parseDouble(tokenizer.sval));
-          }
-          else {
-            map.put(dim, tokenizer.sval);
-          }
+          map.put(dim, TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]]) //
+              ? ParseUtil.parseDouble(tokenizer.sval) : tokenizer.sval);
         }
         else {
           throw new AbortException("Unexpected token type encountered: " + tokenizer.toString());
@@ -288,33 +280,28 @@ public class ArffParser implements Parser {
           if(i >= s + dimsize[out]) {
             break;
           }
-          String v = (String) iter.value();
           if(labels.size() < i - s) {
             LOG.warning("Sparse consecutive labels are currently not correctly supported.");
           }
-          labels.add(v);
+          labels.add((String) iter.value());
         }
         data[out] = LabelList.make(labels);
       }
       else if(TypeUtil.EXTERNALID.equals(elkitypes[out])) {
         String val = (String) map.get(s);
-        if(val != null) {
-          data[out] = new ExternalID(val);
-        }
-        else {
+        if(val == null) {
           throw new AbortException("External ID column not set in sparse instance." + tokenizer.toString());
         }
+        data[out] = new ExternalID(val);
       }
       else if(TypeUtil.CLASSLABEL.equals(elkitypes[out])) {
         Object val = map.get(s);
-        if(val != null) {
-          // TODO: support other class label types.
-          ClassLabel lbl = new SimpleClassLabel(String.valueOf(val));
-          data[out] = lbl;
-        }
-        else {
+        if(val == null) {
           throw new AbortException("Class label column not set in sparse instance." + tokenizer.toString());
         }
+        // TODO: support other class label types.
+        ClassLabel lbl = new SimpleClassLabel(String.valueOf(val));
+        data[out] = lbl;
       }
       else {
         throw new AbortException("Unsupported type for column " + "->" + out + ": " + ((elkitypes[out] != null) ? elkitypes[out].toString() : "null"));

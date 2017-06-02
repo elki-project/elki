@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -115,16 +116,22 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
       final List<I> castColumn = (List<I>) column;
       bundle.appendColumn(new VectorFieldTypeInformation<>(factory, tdim), castColumn);
 
+      StepProgress prog = LOG.isVerbose() ? new StepProgress("Classic MDS", 2) : null;
       // Compute distance matrix.
-      double[][] mat = computeDistanceMatrix(castColumn, size);
+      LOG.beginStep(prog, 1, "Computing distance matrix");
+      double[][] mat = computeSquaredDistanceMatrix(castColumn, dist);
       doubleCenterSymmetric(mat);
       // Find eigenvectors.
       {
+        LOG.beginStep(prog, 2, "Computing singular value decomposition");
         SingularValueDecomposition svd = new SingularValueDecomposition(mat);
         double[][] u = svd.getU();
         double[] lambda = svd.getSingularValues();
-        for(int i = 0; i < tdim; i++) {
-          lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
+        // Undo squared, unless we were given a squared distance function:
+        if(!dist.isSquared()) {
+          for(int i = 0; i < tdim; i++) {
+            lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
+          }
         }
 
         double[] buf = new double[tdim];
@@ -136,23 +143,33 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
           column.set(i, factory.newNumberVector(buf));
         }
       }
+      LOG.setCompleted(prog);
     }
     return bundle;
   }
 
-  protected double[][] computeDistanceMatrix(final List<I> castColumn, final int size) {
+  /**
+   * Compute the squared distance matrix.
+   * 
+   * @param col Input data
+   * @param dist Distance function
+   * @return Distance matrix.
+   */
+  protected static <I> double[][] computeSquaredDistanceMatrix(final List<I> col, PrimitiveDistanceFunction<? super I> dist) {
+    final int size = col.size();
     double[][] imat = new double[size][size];
-    boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
+    boolean squared = dist.isSquared();
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     for(int x = 0; x < size; x++) {
-      final I ox = castColumn.get(x);
+      final I ox = col.get(x);
       for(int y = x + 1; y < size; y++) {
-        final I oy = castColumn.get(y);
+        final I oy = col.get(y);
         double distance = dist.distance(ox, oy);
-        distance *= (squared ? -.5 : -.5 * distance);
-        imat[x][y] = distance;
-        imat[y][x] = distance;
-        LOG.incrementProcessed(dprog);
+        distance *= squared ? -.5 : (-.5 * distance);
+        imat[x][y] = imat[y][x] = distance;
+      }
+      if(dprog != null) {
+        dprog.setProcessed(dprog.getProcessed() + size - x - 1, LOG);
       }
     }
     LOG.ensureCompleted(dprog);

@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.Arrays;
 
@@ -306,7 +307,7 @@ public class CovarianceMatrix {
     if(wsum <= 1.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    return times(elements, 1. / (wsum - 1.));
+    return timesEquals(elements, 1. / (wsum - 1.));
   }
 
   /**
@@ -323,7 +324,7 @@ public class CovarianceMatrix {
     if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    return times(elements, 1. / wsum);
+    return timesEquals(elements, 1. / wsum);
   }
 
   /**

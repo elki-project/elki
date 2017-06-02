@@ -11,7 +11,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.lmu.ifi.dbs.elki.application.KDDCLIApplication"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-dbc.in data/synthetic/Vorlesung/mickey-mouse.csv&#10;-algorithm NullAlgorithm&#10;-resulthandler de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-dbc.in data/synthetic/Vorlesung/mouse.csv&#10;-algorithm NullAlgorithm&#10;-resulthandler de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="elki-bundle"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:elki-project}"/>
