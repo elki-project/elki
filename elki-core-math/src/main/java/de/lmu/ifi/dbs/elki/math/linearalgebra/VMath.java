@@ -692,10 +692,10 @@ public final class VMath {
   /**
    * Reset the Matrix to 0.
    * 
-   * @param v1 Matrix
+   * @param m1 Matrix
    */
-  public static void clear(final double[][] v1) {
-    for(final double[] row : v1) {
+  public static void clear(final double[][] m1) {
+    for(final double[] row : m1) {
       Arrays.fill(row, 0.0);
     }
   }
