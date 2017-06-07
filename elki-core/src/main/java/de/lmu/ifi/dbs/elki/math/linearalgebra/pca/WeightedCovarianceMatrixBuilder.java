@@ -131,7 +131,7 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
       double weight = weightfunction.getWeight(distance, maxdist, stddev);
       cmat.put(obj, weight);
     }
-    return cmat.destroyToNaiveMatrix();
+    return cmat.destroyToPopulationMatrix();
   }
 
   /**
@@ -177,7 +177,7 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
       double weight = weightfunction.getWeight(dist, maxdist, stddev);
       cmat.put(obj, weight);
     }
-    return cmat.destroyToNaiveMatrix();
+    return cmat.destroyToPopulationMatrix();
   }
 
   /**
