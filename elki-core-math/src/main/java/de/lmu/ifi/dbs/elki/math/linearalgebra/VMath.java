@@ -547,19 +547,14 @@ public final class VMath {
    * Returns the scalar product (dot product) of this vector and the specified
    * vector v.
    * 
-   * This is the same as transposeTimes.
+   * This is the same as {@link #transposeTimes(double[], double[])}.
    * 
    * @param v1 vector
    * @param v2 other vector
    * @return double the scalar product of vectors v1 and v2
    */
   public static double scalarProduct(final double[] v1, final double[] v2) {
-    assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    double scalarProduct = 0.0;
-    for(int row = 0; row < v1.length; row++) {
-      scalarProduct += v1[row] * v2[row];
-    }
-    return scalarProduct;
+    return transposeTimes(v1, v2);
   }
 
   /**
@@ -598,12 +593,7 @@ public final class VMath {
    * @return Euclidean length of this vector
    */
   public static double euclideanLength(final double[] v1) {
-    double acc = 0.0;
-    for(int row = 0; row < v1.length; row++) {
-      final double v = v1[row];
-      acc += v * v;
-    }
-    return FastMath.sqrt(acc);
+    return FastMath.sqrt(squareSum(v1));
   }
 
   /**
@@ -692,11 +682,11 @@ public final class VMath {
   /**
    * Reset the Matrix to 0.
    * 
-   * @param v1 Matrix
+   * @param m Matrix
    */
-  public static void clear(final double[][] v1) {
-    for(final double[] row : v1) {
-      Arrays.fill(row, 0.0);
+  public static void clear(final double[][] m) {
+    for(int i = 0; i < m.length; i++) {
+      Arrays.fill(m[i], 0.0);
     }
   }
 
@@ -749,7 +739,8 @@ public final class VMath {
    */
   public static double[][] identity(final int m, final int n) {
     final double[][] A = new double[m][n];
-    for(int i = 0; i < Math.min(m, n); i++) {
+    final int dim = m < n ? m : n;
+    for(int i = 0; i < dim; i++) {
       A[i][i] = 1.0;
     }
     return A;
@@ -763,8 +754,9 @@ public final class VMath {
    * @return the resulting matrix
    */
   public static double[][] diagonal(final double[] v1) {
-    final double[][] result = new double[v1.length][v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    final int dim = v1.length;
+    final double[][] result = new double[dim][dim];
+    for(int i = 0; i < dim; i++) {
       result[i][i] = v1[i];
     }
     return result;
@@ -777,10 +769,10 @@ public final class VMath {
    * @return a new matrix containing the same values as this matrix
    */
   public static double[][] copy(final double[][] m1) {
-    final int columndimension = m1[0].length;
-    final double[][] X = new double[m1.length][columndimension];
-    for(int i = 0; i < m1.length; i++) {
-      System.arraycopy(m1[i], 0, X[i], 0, columndimension);
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    final double[][] X = new double[rowdim][coldim];
+    for(int i = 0; i < rowdim; i++) {
+      System.arraycopy(m1[i], 0, X[i], 0, coldim);
     }
     return X;
   }
@@ -792,10 +784,11 @@ public final class VMath {
    * @return Matrix elements packed in a one-dimensional array by rows.
    */
   public static double[] rowPackedCopy(final double[][] m1) {
-    final int columndimension = m1[0].length;
-    final double[] vals = new double[m1.length * columndimension];
-    for(int i = 0; i < m1.length; i++) {
-      System.arraycopy(m1[i], 0, vals, i * columndimension, columndimension);
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    final double[] vals = new double[rowdim * coldim];
+    for(int i = 0, j = 0; i < rowdim; i++, j += coldim) {
+      // assert (m1[i].length == coldim) : ERR_MATRIX_RAGGED;
+      System.arraycopy(m1[i], 0, vals, j, coldim);
     }
     return vals;
   }
@@ -807,11 +800,13 @@ public final class VMath {
    * @return Matrix elements packed in a one-dimensional array by columns.
    */
   public static double[] columnPackedCopy(final double[][] m1) {
-    final int columndimension = m1[0].length;
-    final double[] vals = new double[m1.length * columndimension];
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        vals[i + j * m1.length] = m1[i][j];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    final double[] vals = new double[m1.length * coldim];
+    for(int i = 0; i < rowdim; i++) {
+      final double[] rowM = m1[i];
+      // assert (rowM.length == coldim) : ERR_MATRIX_RAGGED;
+      for(int j = 0, k = i; j < coldim; j++, k += rowdim) {
+        vals[k] = rowM[j];
       }
     }
     return vals;
@@ -822,15 +817,16 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index
+   * @param r1 Final row index (inclusive!)
    * @param c0 Initial column index
-   * @param c1 Final column index
+   * @param c1 Final column index (inclusive!)
    * @return m1(r0:r1,c0:c1)
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1) {
-    final double[][] X = new double[r1 - r0 + 1][c1 - c0 + 1];
+    final int rowdim = r1 - r0 + 1, coldim = c1 - c0 + 1;
+    final double[][] X = new double[rowdim][coldim];
     for(int i = r0; i <= r1; i++) {
-      System.arraycopy(m1[i], c0, X[i - r0], 0, c1 - c0 + 1);
+      System.arraycopy(m1[i], c0, X[i - r0], 0, coldim);
     }
     return X;
   }
@@ -844,10 +840,12 @@ public final class VMath {
    * @return m1(r(:),c(:))
    */
   public static double[][] getMatrix(final double[][] m1, final int[] r, final int[] c) {
-    final double[][] X = new double[r.length][c.length];
-    for(int i = 0; i < r.length; i++) {
-      for(int j = 0; j < c.length; j++) {
-        X[i][j] = m1[r[i]][c[j]];
+    final int rowdim = r.length, coldim = c.length;
+    final double[][] X = new double[rowdim][coldim];
+    for(int i = 0; i < rowdim; i++) {
+      final double[] rowM = m1[r[i]], rowX = X[i];
+      for(int j = 0; j < coldim; j++) {
+        rowX[j] = rowM[c[j]];
       }
     }
     return X;
@@ -859,13 +857,14 @@ public final class VMath {
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
-   * @param c1 Final column index
+   * @param c1 Final column index (inclusive!)
    * @return m1(r(:),c0:c1)
    */
   public static double[][] getMatrix(final double[][] m1, final int[] r, final int c0, final int c1) {
-    final double[][] X = new double[r.length][c1 - c0 + 1];
-    for(int i = 0; i < r.length; i++) {
-      System.arraycopy(m1[r[i]], c0, X[i], 0, c1 - c0 + 1);
+    final int rowdim = r.length, coldim = c1 - c0 + 1;
+    final double[][] X = new double[rowdim][coldim];
+    for(int i = 0; i < rowdim; i++) {
+      System.arraycopy(m1[r[i]], c0, X[i], 0, coldim);
     }
     return X;
   }
@@ -875,15 +874,17 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index
+   * @param r1 Final row index (inclusive!)
    * @param c Array of column indices.
    * @return m1(r0:r1,c(:))
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int[] c) {
-    final double[][] X = new double[r1 - r0 + 1][c.length];
+    final int rowdim = r1 - r0 + 1, coldim = c.length;
+    final double[][] X = new double[rowdim][coldim];
     for(int i = r0; i <= r1; i++) {
-      for(int j = 0; j < c.length; j++) {
-        X[i - r0][j] = m1[i][c[j]];
+      final double[] row = m1[i];
+      for(int j = 0; j < coldim; j++) {
+        X[i - r0][j] = row[c[j]];
       }
     }
     return X;
@@ -900,8 +901,9 @@ public final class VMath {
    * @param m2 New values for m1(r0:r1,c0:c1)
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1, final double[][] m2) {
+    final int coldim = c1 - c0 + 1;
     for(int i = r0; i <= r1; i++) {
-      System.arraycopy(m2[i - r0], 0, m1[i], c0, c1 - c0 + 1);
+      System.arraycopy(m2[i - r0], 0, m1[i], c0, coldim);
     }
   }
 
@@ -915,8 +917,9 @@ public final class VMath {
    */
   public static void setMatrix(final double[][] m1, final int[] r, final int[] c, final double[][] m2) {
     for(int i = 0; i < r.length; i++) {
+      final double[] row1 = m1[r[i]], row2 = m2[i];
       for(int j = 0; j < c.length; j++) {
-        m1[r[i]][c[j]] = m2[i][j];
+        row1[c[j]] = row2[j];
       }
     }
   }
@@ -947,8 +950,9 @@ public final class VMath {
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int[] c, final double[][] m2) {
     for(int i = r0; i <= r1; i++) {
+      final double[] row1 = m1[i], row2 = m2[i - r0];
       for(int j = 0; j < c.length; j++) {
-        m1[i][c[j]] = m2[i - r0][j];
+        row1[c[j]] = row2[j];
       }
     }
   }
@@ -1013,11 +1017,12 @@ public final class VMath {
    * @return m1<sup>T</sup> as copy
    */
   public static double[][] transpose(final double[][] m1) {
-    final int columndimension = getColumnDimensionality(m1);
-    final double[][] re = new double[columndimension][m1.length];
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        re[j][i] = m1[i][j];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    final double[][] re = new double[coldim][rowdim];
+    for(int i = 0; i < rowdim; i++) {
+      final double[] row = m1[i];
+      for(int j = 0; j < coldim; j++) {
+        re[j][i] = row[j];
       }
     }
     return re;
@@ -1054,11 +1059,12 @@ public final class VMath {
    * @return m1 = m1 + m2
    */
   public static double[][] plusEquals(final double[][] m1, final double[][] m2) {
-    final int columndimension = getColumnDimensionality(m1);
-    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        m1[i][j] += m2[i][j];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && coldim == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
+    for(int i = 0; i < rowdim; i++) {
+      final double[] row1 = m1[i], row2 = m2[i];
+      for(int j = 0; j < coldim; j++) {
+        row1[j] += row2[j];
       }
     }
     return m1;
@@ -1073,11 +1079,12 @@ public final class VMath {
    * @return m1 = m1 + s2 * m2, overwriting m1
    */
   public static double[][] plusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
-    final int columndimension = getColumnDimensionality(m1);
-    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        m1[i][j] += s2 * m2[i][j];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && coldim == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
+    for(int i = 0; i < rowdim; i++) {
+      final double[] row1 = m1[i], row2 = m2[i];
+      for(int j = 0; j < coldim; j++) {
+        row1[j] += s2 * row2[j];
       }
     }
     return m1;
@@ -1135,8 +1142,7 @@ public final class VMath {
   public static double[][] minusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
     assert (getRowDimensionality(m1) == getRowDimensionality(m2) && getColumnDimensionality(m1) == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
     for(int i = 0; i < m1.length; i++) {
-      final double[] row1 = m1[i];
-      final double[] row2 = m2[i];
+      final double[] row1 = m1[i], row2 = m2[i];
       for(int j = 0; j < row1.length; j++) {
         row1[j] -= s2 * row2[j];
       }
@@ -1163,9 +1169,11 @@ public final class VMath {
    * @return m1 = s1 * m1, overwriting m1
    */
   public static double[][] timesEquals(final double[][] m1, final double s1) {
-    for(int i = 0; i < m1.length; i++) {
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    for(int i = 0; i < rowdim; i++) {
       final double[] row = m1[i];
-      for(int j = 0; j < row.length; j++) {
+      // assert (row.length == coldim) : ERR_MATRIX_RAGGED;
+      for(int j = 0; j < coldim; j++) {
         row[j] *= s1;
       }
     }
@@ -1180,24 +1188,23 @@ public final class VMath {
    * @return Matrix product, m1 * m2
    */
   public static double[][] times(final double[][] m1, final double[][] m2) {
-    final int columndimension = getColumnDimensionality(m1);
-    final int bcolumndimension = getColumnDimensionality(m2);
+    final int rowdim1 = m1.length, coldim1 = getColumnDimensionality(m1);
+    final int coldim2 = getColumnDimensionality(m2);
     // Optimized implementation, exploiting the storage layout
-    assert (m2.length == columndimension) : ERR_MATRIX_INNERDIM;
-    final double[][] r2 = new double[m1.length][bcolumndimension];
+    assert (m2.length == coldim1) : ERR_MATRIX_INNERDIM;
+    final double[][] r2 = new double[rowdim1][coldim2];
     // Optimized ala Jama. jik order.
-    final double[] Bcolj = new double[columndimension];
-    for(int j = 0; j < bcolumndimension; j++) {
+    final double[] Bcolj = new double[coldim1];
+    for(int j = 0; j < coldim2; j++) {
       // Make a linear copy of column j from B
-      // TODO: use column getter from B?
-      for(int k = 0; k < columndimension; k++) {
+      for(int k = 0; k < coldim1; k++) {
         Bcolj[k] = m2[k][j];
       }
       // multiply it with each row from A
-      for(int i = 0; i < m1.length; i++) {
+      for(int i = 0; i < rowdim1; i++) {
         final double[] Arowi = m1[i];
         double s = 0;
-        for(int k = 0; k < columndimension; k++) {
+        for(int k = 0; k < coldim1; k++) {
           s += Arowi[k] * Bcolj[k];
         }
         r2[i][j] = s;
@@ -1214,13 +1221,15 @@ public final class VMath {
    * @return Matrix product, m1 * v2
    */
   public static double[] times(final double[][] m1, final double[] v2) {
-    assert (v2.length == getColumnDimensionality(m1)) : ERR_MATRIX_INNERDIM;
-    final double[] re = new double[m1.length];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    assert (v2.length == coldim) : ERR_MATRIX_INNERDIM;
+    final double[] re = new double[rowdim];
     // multiply it with each row from A
-    for(int i = 0; i < m1.length; i++) {
+    for(int i = 0; i < rowdim; i++) {
       final double[] Arowi = m1[i];
+      // assert (Arowi.length == coldim) : ERR_MATRIX_RAGGED;
       double s = 0;
-      for(int k = 0; k < Arowi.length; k++) {
+      for(int k = 0; k < coldim; k++) {
         s += Arowi[k] * v2[k];
       }
       re[i] = s;
@@ -1236,13 +1245,13 @@ public final class VMath {
    * @return Matrix product, m1<sup>T</sup> * v2
    */
   public static double[] transposeTimes(final double[][] m1, final double[] v2) {
-    final int columndimension = getColumnDimensionality(m1);
-    assert (v2.length == m1.length) : ERR_MATRIX_INNERDIM;
-    final double[] re = new double[columndimension];
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    assert (v2.length == rowdim) : ERR_MATRIX_INNERDIM;
+    final double[] re = new double[coldim];
     // multiply it with each row from A
-    for(int i = 0; i < columndimension; i++) {
+    for(int i = 0; i < coldim; i++) {
       double s = 0;
-      for(int k = 0; k < m1.length; k++) {
+      for(int k = 0; k < rowdim; k++) {
         s += m1[k][i] * v2[k];
       }
       re[i] = s;
@@ -1258,20 +1267,20 @@ public final class VMath {
    * @return Matrix product, m1<sup>T</sup> * m2
    */
   public static double[][] transposeTimes(final double[][] m1, final double[][] m2) {
-    final int coldim1 = getColumnDimensionality(m1);
+    final int rowdim1 = m1.length, coldim1 = getColumnDimensionality(m1);
     final int coldim2 = getColumnDimensionality(m2);
-    assert (m2.length == m1.length) : ERR_MATRIX_INNERDIM;
+    assert (m2.length == rowdim1) : ERR_MATRIX_INNERDIM;
     final double[][] re = new double[coldim1][coldim2];
-    final double[] Bcolj = new double[m1.length];
+    final double[] Bcolj = new double[rowdim1];
     for(int j = 0; j < coldim2; j++) {
       // Make a linear copy of column j from B
-      for(int k = 0; k < m1.length; k++) {
+      for(int k = 0; k < rowdim1; k++) {
         Bcolj[k] = m2[k][j];
       }
       // multiply it with each row from A
       for(int i = 0; i < coldim1; i++) {
         double s = 0;
-        for(int k = 0; k < m1.length; k++) {
+        for(int k = 0; k < rowdim1; k++) {
           s += m1[k][i] * Bcolj[k];
         }
         re[i][j] = s;
@@ -1289,12 +1298,13 @@ public final class VMath {
    * @return Matrix product, a<sup>T</sup> * B * c
    */
   public static double transposeTimesTimes(final double[] a, final double[][] B, final double[] c) {
-    assert (B.length == a.length) : ERR_MATRIX_INNERDIM;
+    final int rowdim = B.length, coldim = getColumnDimensionality(B);
+    assert (rowdim == a.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for(int j = 0; j < B[0].length; j++) {
+    for(int j = 0; j < coldim; j++) {
       // multiply it with each row from A
       double s = 0;
-      for(int k = 0; k < a.length; k++) {
+      for(int k = 0; k < rowdim; k++) {
         s += a[k] * B[k][j];
       }
       sum += s * c[j];
@@ -1310,15 +1320,19 @@ public final class VMath {
    * @return Matrix product, m1 * m2^T
    */
   public static double[][] timesTranspose(final double[][] m1, final double[][] m2) {
-    assert (getColumnDimensionality(m2) == getColumnDimensionality(m1)) : ERR_MATRIX_INNERDIM;
-    final double[][] re = new double[m1.length][m2.length];
+    final int rowdim1 = m1.length, coldim1 = getColumnDimensionality(m1);
+    final int rowdim2 = m2.length;
+    assert (coldim1 == getColumnDimensionality(m2)) : ERR_MATRIX_INNERDIM;
+    final double[][] re = new double[rowdim1][rowdim2];
     for(int j = 0; j < re.length; j++) {
       final double[] Browj = m2[j];
       // multiply it with each row from A
-      for(int i = 0; i < m1.length; i++) {
+      for(int i = 0; i < rowdim1; i++) {
         final double[] Arowi = m1[i];
         double s = 0;
-        for(int k = 0; k < Browj.length; k++) {
+        // assert (Arowi.length == coldim1) : ERR_MATRIX_RAGGED;
+        // assert (Browj.length == coldim1) : ERR_MATRIX_INNERDIM;
+        for(int k = 0; k < coldim1; k++) {
           s += Arowi[k] * Browj[k];
         }
         re[i][j] = s;
@@ -1368,12 +1382,13 @@ public final class VMath {
    * @return Matrix product, (a-c)<sup>T</sup> * B * (a-c)
    */
   public static double mahalanobisDistance(final double[][] B, final double[] a, final double[] c) {
-    assert (B.length == a.length && a.length == c.length) : ERR_MATRIX_INNERDIM;
+    final int rowdim = B.length, coldim = B[0].length;
+    assert (rowdim == a.length && rowdim == c.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for(int j = 0; j < B[0].length; j++) {
+    for(int j = 0; j < coldim; j++) {
       // multiply it with each row from A
       double s = 0;
-      for(int k = 0; k < a.length; k++) {
+      for(int k = 0; k < rowdim; k++) {
         s += (a[k] - c[k]) * B[k][j];
       }
       sum += s * (a[j] - c[j]);
@@ -1546,13 +1561,7 @@ public final class VMath {
     if(m1 == m2) {
       return true;
     }
-    if(m2 == null) {
-      return false;
-    }
-    if(m1.getClass() != m2.getClass()) {
-      return false;
-    }
-    if(m1.length != m2.length) {
+    if(m2 == null || m1.getClass() != m2.getClass() || m1.length != m2.length) {
       return false;
     }
     final int columndimension = getColumnDimensionality(m1);
@@ -1602,19 +1611,6 @@ public final class VMath {
   }
 
   /**
-   * Cross product for 3d vectors, i.e. <code>vo = v1 x v2</code>
-   * 
-   * @param vo Output vector
-   * @param v1 First input vector
-   * @param v2 Second input vector
-   */
-  public static void cross3D(double[] vo, double[] v1, double[] v2) {
-    vo[0] = (v1[1] * v2[2]) - (v1[2] * v2[1]);
-    vo[1] = (v1[2] * v2[0]) - (v1[0] * v2[2]);
-    vo[2] = (v1[0] * v2[1]) - (v1[1] * v2[0]);
-  }
-
-  /**
    * Compute the angle between two vectors.
    *
    * @param v1 first vector
@@ -1628,8 +1624,7 @@ public final class VMath {
     // We can just compute all three in parallel.
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < mindim; k++) {
-      final double r1 = v1[k];
-      final double r2 = v2[k];
+      final double r1 = v1[k], r2 = v2[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
@@ -1663,8 +1658,7 @@ public final class VMath {
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < mindim; k++) {
       final double ok = (k < o.length) ? o[k] : 0;
-      final double r1 = v1[k] - ok;
-      final double r2 = v2[k] - ok;
+      final double r1 = v1[k] - ok, r2 = v2[k] - ok;
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
