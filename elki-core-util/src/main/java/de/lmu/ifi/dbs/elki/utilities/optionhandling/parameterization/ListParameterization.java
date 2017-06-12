@@ -68,9 +68,11 @@ public class ListParameterization extends AbstractParameterization {
    * Add a flag to the parameter list
    *
    * @param optionid Option ID
+   * @return this, for chanining
    */
-  public void addFlag(OptionID optionid) {
+  public ListParameterization addFlag(OptionID optionid) {
     parameters.add(new ParameterPair(optionid, Flag.SET));
+    return this;
   }
 
   /**
@@ -78,31 +80,11 @@ public class ListParameterization extends AbstractParameterization {
    *
    * @param optionid Option ID
    * @param value Value
+   * @return this, for chanining
    */
-  public void addParameter(OptionID optionid, Object value) {
+  public ListParameterization addParameter(OptionID optionid, Object value) {
     parameters.add(new ParameterPair(optionid, value));
-  }
-
-  /**
-   * Convenience - add a Flag option directly.
-   *
-   * @param flag Flag to add, if set
-   */
-  public void forwardOption(Flag flag) {
-    if(flag.isDefined() && flag.getValue().booleanValue()) {
-      addFlag(flag.getOptionID());
-    }
-  }
-
-  /**
-   * Convenience - add a Parameter for forwarding
-   *
-   * @param param Parameter to add
-   */
-  public void forwardOption(Parameter<?> param) {
-    if(param.isDefined()) {
-      addParameter(param.getOptionID(), param.getValue());
-    }
+    return this;
   }
 
   @Override
@@ -145,8 +127,8 @@ public class ListParameterization extends AbstractParameterization {
   public String toString() {
     StringBuilder buf = new StringBuilder();
     for(ParameterPair pair : parameters) {
-      buf.append('-').append(pair.option.toString()).append(' ');
-      buf.append(pair.value.toString()).append(' ');
+      buf.append('-').append(pair.option.toString()).append(' ')//
+          .append(pair.value.toString()).append(' ');
     }
     return buf.toString();
   }
