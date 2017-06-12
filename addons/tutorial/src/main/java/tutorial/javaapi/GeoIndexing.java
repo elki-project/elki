@@ -43,9 +43,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.Sort
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.geodesy.WGS84SpheroidEarthModel;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Example code for using the R-tree index of ELKI, with Haversine distance.
@@ -68,22 +67,22 @@ public class GeoIndexing {
     // Adapter to load data from an existing array.
     DatabaseConnection dbc = new ArrayAdapterDatabaseConnection(data);
 
-    // Since the R-tree has so many parameters, it is a bit easier to configure
-    // it using the parameterization API, which handles defaults, instantiation,
+    // Since the R-tree has so many options, it is a bit easier to configure it
+    // using the parameterization API, which handles defaults, instantiation,
     // and additional constraint checks.
-    ListParameterization params = new ListParameterization();
-    // Use 512 bytes pages, and bulk loading.
-    // If you have large query results, a larger page size can be better.
-    params.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512);
-    params.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
-    RStarTreeFactory<DoubleVector> indexfactory = ClassGenericsUtil.parameterizeOrAbort(RStarTreeFactory.class, params);
+    RStarTreeFactory<?> indexfactory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        // If you have large query results, a larger page size can be better.
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512) //
+        // Use bulk loading, for better performance.
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
+        .build();
     // Create the database, and initialize it.
     Database db = new StaticArrayDatabase(dbc, Arrays.asList(indexfactory));
     // This will build the index of the database.
     db.initialize();
     // Relation containing the number vectors we put in above:
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    // We can use this to identify rows in above matrix later.
+    // We can use this to identify rows of the input data below.
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // For all indexes, dump their statistics.
@@ -94,7 +93,7 @@ public class GeoIndexing {
     // We use the WGS84 earth model, and "latitude, longitude" coordinates:
     // This distance function returns meters.
     LatLngDistanceFunction df = new LatLngDistanceFunction(WGS84SpheroidEarthModel.STATIC);
-
+    // k nearest neighbor query:
     KNNQuery<NumberVector> knnq = QueryUtil.getKNNQuery(rel, df);
 
     // Let's find the closest points to New York:
