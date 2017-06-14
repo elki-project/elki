@@ -106,18 +106,20 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
           Object o = source.data(j);
           if(densecols[j] != null) {
             NumberVector v = (NumberVector) o;
+            if(v == null) {
+              continue;
+            }
             double[] ro = null; // replacement
-            if(v != null) {
-              for(int i = 0; i < v.getDimensionality(); i++) {
-                if(Double.isNaN(v.doubleValue(i))) {
-                  if(ro != null) {
-                    ro = v.toArray();
-                  }
-                  ro[i] = dist.nextRandom();
-                }
+            for(int i = 0; i < v.getDimensionality(); i++) {
+              if(Double.isNaN(v.doubleValue(i))) {
+                ro = ro != null ? ro : v.toArray();
+                ro[i] = dist.nextRandom();
               }
             }
-            o = densecols[j].newNumberVector(ro);
+            // If there was no NaN, ro will still be null.
+            if(ro != null) {
+              o = densecols[j].newNumberVector(ro);
+            }
           }
           rows.add(o);
         }
@@ -138,12 +140,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
       if(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
       }
-      if(TypeUtil.FLOAT_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
-        VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
-        densecols[i] = (NumberVector.Factory<?>) vmeta.getFactory();
-        continue;
-      }
-      if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
+      if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
         densecols[i] = (NumberVector.Factory<?>) vmeta.getFactory();
         continue;
