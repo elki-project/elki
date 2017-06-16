@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -49,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization", //
     "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
+@Priority(Priority.RECOMMENDED)
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.

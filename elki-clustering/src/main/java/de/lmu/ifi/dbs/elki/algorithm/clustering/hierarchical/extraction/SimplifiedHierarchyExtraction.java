@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -82,6 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
     booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
     url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
+@Priority(Priority.RECOMMENDED + 5) // Extraction should come before clustering
 public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.

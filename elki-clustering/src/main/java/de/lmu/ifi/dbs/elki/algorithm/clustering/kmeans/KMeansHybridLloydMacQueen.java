@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 
 /**
  * A hybrid k-means algorithm, alternating between MacQueen-style incremental
@@ -54,6 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
  *
  * @param <V> vector datatype
  */
+@Priority(Priority.DEFAULT - 10) // Rather obscure
 public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

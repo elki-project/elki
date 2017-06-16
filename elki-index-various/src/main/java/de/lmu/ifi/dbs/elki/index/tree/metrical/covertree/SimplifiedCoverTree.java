@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 
 /**
@@ -73,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * @apiviz.has CoverTreeRangeQuery
  * @apiviz.has CoverTreeKNNQuery
  */
+@Priority(Priority.RECOMMENDED)
 public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.

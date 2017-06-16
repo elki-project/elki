@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -72,9 +73,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Sort-Means")
 @Reference(authors = "S. J. Phillips", //
-title = "Acceleration of k-means and related clustering algorithms", //
-booktitle = "Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX 2002)", //
-url = "http://dx.doi.org/10.1007/3-540-45643-0_13")
+    title = "Acceleration of k-means and related clustering algorithms", //
+    booktitle = "Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX 2002)", //
+    url = "http://dx.doi.org/10.1007/3-540-45643-0_13")
+@Priority(Priority.RECOMMENDED)
 public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

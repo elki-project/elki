@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -81,6 +82,7 @@ import net.jafama.FastMath;
     title = "Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds", //
     booktitle = "Proc. 20th ACM SIGKDD international conference on Knowledge discovery and data mining", //
     url = "http://dx.doi.org/10.1145/2623330.2623740")
+@Priority(Priority.RECOMMENDED)
 public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger

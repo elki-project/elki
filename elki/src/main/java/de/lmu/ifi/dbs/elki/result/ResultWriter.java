@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -46,6 +47,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Erich Schubert
  * @since 0.2
  */
+@Priority(Priority.IMPORTANT)
 public class ResultWriter implements ResultHandler {
   /**
    * The logger for this class.

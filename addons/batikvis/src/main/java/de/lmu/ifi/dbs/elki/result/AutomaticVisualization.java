@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -49,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.ResultWindow;
  * @apiviz.uses ResultWindow oneway
  */
 @Alias({ "visualizer", "vis", "ResultVisualizer", "de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer" })
+@Priority(Priority.IMPORTANT + 5)
 public class AutomaticVisualization implements ResultHandler {
   /**
    * Get a logger for this class.

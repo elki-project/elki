@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -63,6 +64,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 @Reference(authors = "M. R. Anderberg", //
     title = "Hierarchical Clustering Methods", //
     booktitle = "Cluster Analysis for Applications")
+@Priority(Priority.RECOMMENDED - 5)
 public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger

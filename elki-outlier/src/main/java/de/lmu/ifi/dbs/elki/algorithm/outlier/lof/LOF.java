@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -92,11 +93,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander",//
-title = "LOF: Identifying Density-Based Local Outliers", //
-booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
-url = "http://dx.doi.org/10.1145/342009.335388")
+@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", //
+    title = "LOF: Identifying Density-Based Local Outliers", //
+    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
+    url = "http://dx.doi.org/10.1145/342009.335388")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LOF")
+@Priority(Priority.RECOMMENDED)
 public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -281,7 +283,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.intValue();
       }

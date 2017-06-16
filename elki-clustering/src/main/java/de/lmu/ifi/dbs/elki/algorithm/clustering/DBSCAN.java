@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -75,9 +76,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
-title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
-booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
+    title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
+    url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
+@Priority(Priority.RECOMMENDED)
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -221,7 +223,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     processedIDs.add(startObjectID);
 
     // try to expand the cluster
-    assert(seeds.size() == 0);
+    assert (seeds.size() == 0);
     seeds.clear();
     processNeighbors(neighbors.iter(), currentCluster, seeds);
 
@@ -310,13 +312,13 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
 
       IntParameter minptsP = new IntParameter(MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
         if(minpts <= 2) {

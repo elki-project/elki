@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -68,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Accelerating t-SNE using Tree-Based Algorithms", //
     booktitle = "Journal of Machine Learning Research 15", //
     url = "http://dl.acm.org/citation.cfm?id=2697068")
+@Priority(Priority.RECOMMENDED - 1)
 public class BarnesHutTSNE<O> extends TSNE<O> {
   /**
    * Class logger.
