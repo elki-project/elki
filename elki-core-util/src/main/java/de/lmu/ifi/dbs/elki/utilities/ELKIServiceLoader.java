@@ -124,7 +124,7 @@ public class ELKIServiceLoader {
   /**
    * Parse a single line from a service registry file.
    *
-   * @param parent PArent class
+   * @param parent Parent class
    * @param line Line to read
    * @param nam File name for error reporting
    */

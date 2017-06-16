@@ -22,14 +22,7 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.lang.reflect.Modifier;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -209,7 +202,7 @@ public class ELKIServiceRegistry {
    */
   protected static void registerAlias(Class<?> parent, String alias, String cname) {
     Entry e = data.get(parent);
-    assert(e != null);
+    assert (e != null);
     e.addAlias(alias, cname);
   }
 
@@ -298,11 +291,6 @@ public class ELKIServiceRegistry {
     if(!everything && parameterizable) {
       return findAllImplementations(c);
     }
-    // Add all from service files (i.e. jars)
-    if(!contains(c)) {
-      ELKIServiceLoader.load(c);
-      ELKIServiceScanner.load(c);
-    }
     // This codepath is used by utility classes to also find buggy
     // implementations (e.g. non-instantiable, abstract) of the interfaces.
     List<Class<?>> known = findAllImplementations(c);
@@ -376,33 +364,12 @@ public class ELKIServiceRegistry {
       }
     }
     else {
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest("Finding implementations for unregistered type: " + restrictionClass.getName() + " " + value);
+      if(LOG.isDebugging()) {
+        LOG.debug("Requested implementations for unregistered type: " + restrictionClass.getName() + " " + value);
       }
     }
     // Next, try alternative versions:
-    if(clazz == null) {
-      clazz = tryLoadClass(value + FACTORY_POSTFIX);
-      if(clazz == null) {
-        clazz = tryLoadClass(value);
-      }
-      if(clazz == null) {
-        clazz = tryLoadClass(restrictionClass.getPackage().getName() + "." + value + FACTORY_POSTFIX);
-        if(clazz == null) {
-          clazz = tryLoadClass(restrictionClass.getPackage().getName() + "." + value);
-        }
-      }
-    }
-    // Last, try aliases:
-    if(clazz == null && e != null && e.aliaslen > 0) {
-      String value2 = restrictionClass.getPackage().getName() + "." + value;
-      for(int i = 0; i < e.aliaslen; i += 2) {
-        if(e.aliases[i].equalsIgnoreCase(value) || e.aliases[i].equalsIgnoreCase(value2)) {
-          clazz = findImplementation(restrictionClass, e.aliases[++i]);
-          break;
-        }
-      }
-    }
+    clazz = clazz != null ? clazz : tryAlternateNames(restrictionClass, value, e);
     if(clazz == null) {
       return null;
     }
@@ -416,7 +383,7 @@ public class ELKIServiceRegistry {
         e.addHit(value, clazz);
       }
       else {
-        assert(e.names[pos].equalsIgnoreCase(value));
+        assert (e.names[pos].equalsIgnoreCase(value));
         e.clazzes[pos] = clazz;
       }
     }
@@ -426,5 +393,50 @@ public class ELKIServiceRegistry {
     @SuppressWarnings("unchecked")
     Class<? extends C> ret = (Class<? extends C>) clazz.asSubclass(restrictionClass);
     return ret;
+  }
+
+  /**
+   * Try loading alternative names.
+   *
+   * @param restrictionClass Context class, for prepending a package name.
+   * @param value Class name requested
+   * @param e Cache entry, may be null
+   * @param <C> Generic type
+   * @return Class, or null
+   */
+  private static <C> Class<?> tryAlternateNames(Class<? super C> restrictionClass, String value, Entry e) {
+    StringBuilder buf = new StringBuilder(value.length() + 100);
+    // Try with FACTORY_POSTFIX first:
+    Class<?> clazz = tryLoadClass(buf.append(value).append(FACTORY_POSTFIX).toString());
+    if(clazz != null) {
+      return clazz;
+    }
+    clazz = tryLoadClass(value); // Without FACTORY_POSTFIX.
+    if(clazz != null) {
+      return clazz;
+    }
+    buf.setLength(0);
+    // Try prepending the package name:
+    clazz = tryLoadClass(buf.append(restrictionClass.getPackage().getName()).append('.')//
+        .append(value).append(FACTORY_POSTFIX).toString());
+    if(clazz != null) {
+      return clazz;
+    }
+    // Remove FACTORY_POSTFIX again.
+    buf.setLength(buf.length() - FACTORY_POSTFIX.length());
+    String value2 = buf.toString(); // Will also be used below.
+    clazz = tryLoadClass(value2);
+    if(clazz != null) {
+      return clazz;
+    }
+    // Last, try aliases:
+    if(e != null && e.aliaslen > 0) {
+      for(int i = 0; i < e.aliaslen; i += 2) {
+        if(e.aliases[i].equalsIgnoreCase(value) || e.aliases[i].equalsIgnoreCase(value2)) {
+          return findImplementation(restrictionClass, e.aliases[++i]);
+        }
+      }
+    }
+    return null;
   }
 }

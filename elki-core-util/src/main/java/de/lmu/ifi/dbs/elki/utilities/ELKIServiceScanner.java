@@ -139,7 +139,7 @@ public class ELKIServiceScanner {
       cps = CLASSLOADER.getResources("");
     }
     catch(IOException e) {
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      LOG.exception(e);
       return;
     }
     List<Class<?>> res = new ArrayList<>();
