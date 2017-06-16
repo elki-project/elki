@@ -115,14 +115,6 @@ public class ListParameterization extends AbstractParameterization {
     return !parameters.isEmpty();
   }
 
-  /**
-   * {@inheritDoc} Default implementation, for flat parameterizations.
-   */
-  @Override
-  public Parameterization descend(Object option) {
-    return this;
-  }
-
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();

@@ -41,7 +41,7 @@ public final class ELKIBuilder<T> {
   /**
    * Class to build.
    */
-  private Class<? super T> clazz;
+  private Class<T> clazz;
 
   /**
    * Parameter list.
@@ -64,7 +64,7 @@ public final class ELKIBuilder<T> {
    *
    * @param clazz Class
    */
-  public ELKIBuilder(Class<? super T> clazz) {
+  public ELKIBuilder(Class<T> clazz) {
     this.clazz = clazz;
   }
 
@@ -96,15 +96,21 @@ public final class ELKIBuilder<T> {
    *
    * This will throw an {@link AbortException} if the parameters are incomplete,
    * or {@code build ()} is called twice.
+   * 
+   * We lose some type safety here, for convenience. The type {@code <C>} is
+   * meant to be {@code <T>} with generics added only, which is necessary
+   * because generics are implemented by erasure in Java.
    *
+   * @param <C> Output type
    * @return Instance
    */
-  public T build() {
+  @SuppressWarnings("unchecked")
+  public <C extends T> C build() {
     if(p == null) {
       throw new AbortException("build() may be called only once.");
     }
     final T obj = ClassGenericsUtil.parameterizeOrAbort(clazz, p);
     p = null; // Prevent build() from being called again.
-    return obj;
+    return (C) obj;
   }
 }

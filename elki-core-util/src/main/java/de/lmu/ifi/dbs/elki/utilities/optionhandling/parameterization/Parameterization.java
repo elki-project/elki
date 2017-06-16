@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -30,7 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 /**
  * Interface for object parameterizations.
  * 
- * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
+ * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
+ * documentation!
  *
  * @apiviz.landmark
  * @apiviz.uses Parameter
@@ -47,8 +50,9 @@ public interface Parameterization {
    * {@code opt} itself!
    * 
    * In particular {@link #grab} can return {@code true} when
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag#getValue Flag.getValue()}
-   * returns {@code false}! Instead the semantics of {@code grab} are those of {@code Parameter#isDefined()}.  
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag#getValue
+   * Flag.getValue()} returns {@code false}! Instead the semantics of
+   * {@code grab} are those of {@code Parameter#isDefined()}.
    * 
    * This method will catch {@link ParameterException}s and store them to be
    * retrieved by {@link #getErrors}.
@@ -56,7 +60,16 @@ public interface Parameterization {
    * @param opt Option to add
    * @return if the value is available (= readable)
    */
-  public boolean grab(Parameter<?> opt);
+  default boolean grab(Parameter<?> opt) {
+    try {
+      // Given value of default value instead.
+      return setValueForOption(opt) || opt.tryDefaultValue();
+    }
+    catch(ParameterException e) {
+      reportError(e);
+      return false;
+    }
+  }
 
   /**
    * Assign a value for an option, but not using default values and throwing
@@ -66,28 +79,28 @@ public interface Parameterization {
    * @return Success code
    * @throws ParameterException on assignment errors.
    */
-  public boolean setValueForOption(Parameter<?> opt) throws ParameterException;
+  boolean setValueForOption(Parameter<?> opt) throws ParameterException;
 
   /**
    * Get the configuration errors thrown in {@link #grab}
    * 
    * @return Configuration errors encountered
    */
-  public Collection<ParameterException> getErrors();
+  Collection<ParameterException> getErrors();
 
   /**
    * Report a configuration error.
    * 
    * @param e Destination to report errors to
    */
-  public void reportError(ParameterException e);
+  void reportError(ParameterException e);
 
   /**
    * Check for unused parameters
    * 
    * @return {@code true} if at least one parameter was not consumed
    */
-  public boolean hasUnusedParameters();
+  boolean hasUnusedParameters();
 
   /**
    * Check a parameter constraint.
@@ -95,37 +108,38 @@ public interface Parameterization {
    * @param constraint Parameter constraint
    * @return test result
    */
-  public boolean checkConstraint(GlobalParameterConstraint constraint);
-  
+  default boolean checkConstraint(GlobalParameterConstraint constraint) {
+    try {
+      constraint.test();
+      return true;
+    }
+    catch(ParameterException e) {
+      reportError(e);
+      return false;
+    }
+  }
+
   /**
    * Descend parameterization tree into sub-option.
    * 
-   * Note: this is done automatically by a {@link ClassParameter#instantiateClass}.
+   * Note: this is done automatically by a
+   * {@link ClassParameter#instantiateClass}.
    * You only need to call this when you want to expose the tree structure
    * without offering a class choice as parameter.
    * 
    * @param option Option subtree
    * @return Parameterization
    */
-  public Parameterization descend(Object option);
+  default Parameterization descend(Object option) {
+    return this;
+  }
 
   /**
    * Return true when there have been errors.
    * 
    * @return Success code
    */
-  public boolean hasErrors();
-
-  /**
-   * Try to instantiate a particular class.
-   * 
-   * @param <C> return type
-   * @param r Restriction class
-   * @param c Base class
-   * @return class instance or null
-   */
-  public <C> C tryInstantiate(Class<C> r, Class<?> c);
-
+  boolean hasErrors();
 
   /**
    * Try to instantiate a particular class.
@@ -134,5 +148,13 @@ public interface Parameterization {
    * @param c Base class
    * @return class instance or null
    */
-  public <C> C tryInstantiate(Class<C> c);
+  default <C> C tryInstantiate(Class<C> c) {
+    try {
+      return ClassGenericsUtil.tryInstantiate(c, c, this);
+    }
+    catch(Exception e) {
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
+      return null;
+    }
+  }
 }

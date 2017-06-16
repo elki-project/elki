@@ -20,17 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -153,11 +146,6 @@ public class TrackParameters implements Parameterization {
     return options;
   }
 
-  @Override
-  public boolean checkConstraint(GlobalParameterConstraint constraint) {
-    return inner.checkConstraint(constraint);
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -192,27 +180,5 @@ public class TrackParameters implements Parameterization {
    */
   public Object getParent(Object pos) {
     return parents.get(pos);
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> r, Class<?> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(r, c, this);
-    }
-    catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(c, c, this);
-    }
-    catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
   }
 }

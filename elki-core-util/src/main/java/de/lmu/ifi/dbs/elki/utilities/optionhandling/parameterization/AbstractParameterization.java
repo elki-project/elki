@@ -25,12 +25,9 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Abstract class with shared code for parameterization handling.
@@ -39,17 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @since 0.3
  */
 public abstract class AbstractParameterization implements Parameterization {
-  // TODO: refactor "tryInstantiate" even in a higher class?
+  /**
+   * The logger of the class.
+   */
+  private static final Logging LOG = Logging.getLogger(AbstractParameterization.class);
 
   /**
    * Errors
    */
   List<ParameterException> errors = new ArrayList<>();
-
-  /**
-   * The logger of the class.
-   */
-  private static final Logging LOG = Logging.getLogger(AbstractParameterization.class);
 
   @Override
   public Collection<ParameterException> getErrors() {
@@ -117,31 +112,6 @@ public abstract class AbstractParameterization implements Parameterization {
     }
   }
 
-  @Override
-  public final boolean grab(Parameter<?> opt) {
-    if(opt.isDefined()) {
-      LOG.warning("Option " + opt.getName() + " is already set!");
-    }
-    try {
-      // Given value of default value instead.
-      return setValueForOption(opt) || opt.tryDefaultValue();
-    }
-    catch(ParameterException e) {
-      reportError(e);
-      return false;
-    }
-  }
-
-  /**
-   * Perform the actual parameter assignment.
-   * 
-   * @param opt Option to be set
-   * @return Success code (value available)
-   * @throws ParameterException on assignment errors.
-   */
-  @Override
-  public abstract boolean setValueForOption(Parameter<?> opt) throws ParameterException;
-
   /**
    * Upon destruction, report any errors that weren't handled yet.
    * 
@@ -151,41 +121,5 @@ public abstract class AbstractParameterization implements Parameterization {
   protected void finalize() throws Throwable {
     failOnErrors();
     super.finalize();
-  }
-
-  @Override
-  public boolean checkConstraint(GlobalParameterConstraint constraint) {
-    try {
-      constraint.test();
-      return true;
-    }
-    catch(ParameterException e) {
-      reportError(e);
-      return false;
-    }
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> r, Class<?> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(r, c, this);
-    }
-    catch(Exception e) {
-      LOG.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(c, c, this);
-    }
-    catch(Exception e) {
-      LOG.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
   }
 }

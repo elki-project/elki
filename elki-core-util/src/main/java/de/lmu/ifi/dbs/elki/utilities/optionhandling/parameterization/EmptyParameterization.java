@@ -40,12 +40,4 @@ public class EmptyParameterization extends AbstractParameterization {
     // This will cause {@link AbstractParameterization} to use the default values
     return false;
   }
-
-  /** {@inheritDoc}
-   * Default implementation, for flat parameterizations. 
-   */
-  @Override
-  public Parameterization descend(Object option) {
-    return this;
-  }
 }
