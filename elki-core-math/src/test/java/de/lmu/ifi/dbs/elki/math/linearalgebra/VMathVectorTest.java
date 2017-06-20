@@ -35,21 +35,24 @@ import static org.junit.Assert.*;
 /**
  * Test the V(ector)Math class.
  *
- * @author Erich Schubert
- * @since 0.4.0
+ * @author Merlin Dietrich
+ * 
  */
+public final class VMathVectorTest {
 
-public class VMathTest {
-
-  /**
-   * A small number to handle numbers near 0 as 0.
-   */
-  private static final double EPSILON = 1E-15;
+  // TODO: replace with import of VMathOperationstest
+  protected static final double EPSILON = 1E-15;
   
   /**
    * Error message (in assertions!) when vector dimensionalities do not agree.
    */
-  private static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
+  protected static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
+  
+  /**
+   * vector of length 5 for testing
+   */
+  protected final double[] TESTVEC = {2,3,5,7,9};
+  
   
   @Rule
   public final ExpectedException exception = ExpectedException.none();
@@ -73,45 +76,15 @@ public class VMathTest {
     assertArrayEquals(new double[] {0,0,0,1,0}, unitVector(5,3),0. );
     assertArrayEquals(new double[] {0,0,0,0,1}, unitVector(5,4),0. );
     
-    // TOIMPL: unitMatrix(dim) QUEST: here?
     
-    // Assertion that index out of bound exception is raised.
+    // Assertion that index out of bound exception is raised. FIXME other implementation needed
     exception.expect(IndexOutOfBoundsException.class);
     unitVector(0,0);
     unitVector(4,4);
     unitVector(10,15);
   
   }
-  
-  /**
-   * Test the copy functions of VMath class.
-   * 
-   * Tested Methods:
-   * copy(vector), TOIMPL: copy(Matrix), columPackedCopy(Matrix), rowPackedcCopy(Matrix)
-   */
-  @Test
-  public void testcopy() {
-    
-    // testing copy(vector) method
-    double[] v; double[] v_copy;
-    
-    v   = new double[] {1,2,3,4};
-    v_copy = copy(v);
-    assertArrayEquals(v, v_copy,0.);
-    assertNotSame(v, v_copy);
-    
-    v = new double[] {0};
-    v_copy = copy(v);
-    assertArrayEquals(v, v_copy,0.);
-    assertNotSame(v, v_copy);
-    
-    //TOIMPL: testing copy(Matrix) method
-    
-    //TOIMPL: testing columPackedCopy(Matrix) method
-    
-    //TOIMPL: testing rowPackedcCopy(Matrix) method
 
-  }
   
   @Deprecated
   @Test
@@ -143,27 +116,7 @@ public class VMathTest {
     assertArrayEquals(RES_VEC,plus(v1,v2),0);
     
   }
-  
-  /**
-   * Testing the clear() method of VMath class.
-   */
-  @Test
-  public void testclear() {
-    // TOIMPL: clear(v1);
-    
-    // TOIMPL: clear(m);
-  }
-  
-  /**
-   * Testing the hashcode() method of VMath class.
-   */
-  @Test
-  public void testhashcode() {
-    // TOIMPL: hashCode()
-    // TOIMPL: hashCode(v1);
-    // TOIMPL: hashCode(m1);
-  }
-  
+
   
   // Tests on Vector operations.
   
@@ -177,9 +130,35 @@ public class VMathTest {
    * {@link Vmath#timesPlustimes}, {@link Vmath#timesPlustimesEquals}
    * QUEST: link in Docstrings or not?
    */
+  
+  /**
+   * Testing the times method of VMath class.
+   */
+  @Test
+  public void testVectorTimes() {
+    
+    final double[] v1       = {1,3,9,7}; 
+    final double   s_case1  = 5;
+    final double   s_case2  = 1/3;
+    final double   s_case3  = 0.100000000000006100004;
+    
+    final double[] res_case1  = {v1[0]*s_case1,v1[1]*s_case1,v1[2]*s_case1,v1[3]*s_case1};
+    final double[] res_case2  = {v1[0]*s_case2,v1[1]*s_case2,v1[2]*s_case2,v1[3]*s_case2};
+    final double[] res_case3  = {v1[0]*s_case3,v1[1]*s_case3,v1[2]*s_case3,v1[3]*s_case3};
+    
+    // test the three cases
+    assertArrayEquals(res_case1, times(v1,s_case1), 0.);
+    assertArrayEquals(res_case2, times(v1,s_case2), EPSILON);
+    assertArrayEquals(res_case3, times(v1,s_case3), EPSILON);
+    
+  }
+  
   @Test
   public void testVectorPLUS() {
+    // TODO: Degenerate cases: and comment
+    assertVectorLengthMismatch("plus() length mismatch", () -> plus(new double[]{2,2}, new double[]{1}));
     
+    // TODO: redefine structure with final double res vector and manual implementation of computations in. assert equality of method . .Equals
     double s1,s2,d; double[] v1, v2, res_plus, res_plus_scal, res_plusTimes, res_timesPlus, res_timesPlustimes;
     final double delta = 1E-10;
     
@@ -201,9 +180,12 @@ public class VMathTest {
     res_plusTimes      = new double[] { 28, 37,14,-0.500000000000035299996}; //  v1 + 6v2
     res_timesPlustimes = new double[] {-49,-16,-2, 0.500000000000032900008}; // 2v1 +(-3)v2
     
+    double[] out, in_eq; //QUEST: _ not in variable in Java?
+    
     // plus  and plusEquals (Vector + Vector) 
-    assertArrayEquals(res_plus, plus(v1,v2), EPSILON);
-    assertArrayEquals(res_plus, plusEquals(copy(v1), v2), EPSILON);
+    assertArrayEquals(res_plus, out = plus(v1,v2), EPSILON);
+    assertArrayEquals(res_plus, plusEquals(in_eq = copy(v1), v2), EPSILON);
+    assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TOIMPL go on doing this
     
     //plus() and plusEquals (Vector + Skalar)
     d = 13;
@@ -311,10 +293,8 @@ public class VMathTest {
    * 
    */
   @Test
-  public void testVectorPORDUCTS() {
-    
-    // TOIMPL: test for times()
-    
+  public void testVectorProducts() {
+    // einzelne klassen
     // TOIMPL: test for cross3D()
     
     // TOIMPL: test for scalarProduct()
@@ -334,7 +314,27 @@ public class VMathTest {
     // TOIMPL: normalize()
     // TOIMPL: normalizeEquals()
   }
-  
+
+  // TODO: move to top or bottom, or shared class
+  private static void assertVectorLengthMismatch(String msg, Runnable r) {
+    try {
+      r.run();
+    } catch(AssertionError e) {
+      // TODO: assert exception message as desired.
+      return; // If assertions are enabled.
+    } catch(ArrayIndexOutOfBoundsException e) {
+      return; // Expected failure
+    }
+    // We can only guarantee an error if assertions are enabled with -ea.
+    assert(failWrapper(msg));
+  }
+
+  // TODO: explain that we need a "fail" that returns boolean.
+  private static boolean failWrapper(String msg) {
+    fail(msg);
+    return true;
+  }
+
   /**
    * Testing the angle(Vector, Vector) methods of the VMath class.
    * 
@@ -342,9 +342,8 @@ public class VMathTest {
    */
   @Test
   public void testVectorANGLE() {
-    
     // TOIMPL: angle(v1, v2);
-    
+    // QUEST: new class?
     // TOIMPL: angle(v1, v2, o);
     
   }
@@ -362,11 +361,10 @@ public class VMathTest {
   /**
    * Testing the transposed method of VMath class.
    */
-  @Test // QUEST:Matrix implemeted without final? Problem Transposed² not identity
-  public void testVector_transposed() {
-    //TODO: get rid of V1_TESTVEC deprecated
+  @Test // QUEST: Matrix implemeted without final? Problem Transposed² not identity
+  public void testtransposed() {
     double[] v1; double[][] res;
-    
+    //TODO implement with almostEquals and update structure 
     v1  = new double[] {0.12345, 1E25 , 1};
     res = transpose(v1);
     
@@ -459,14 +457,13 @@ public class VMathTest {
    */
   @Test
   public void testVectorDimensionMissmach() {
-    // Test if assertionError ERR_VEC_DIMENSIONS is raised
-    exception.expect(AssertionError.class);
-    exception.expectMessage(ERR_VEC_DIMENSIONS);
+    // TOIMPL with new assertVectorLengthMismach
     
     final double[] v1      = {1,1};
     final double[] v2      = {1};
     double s1,s2; s1 = s2 = 1;
 
+    assertVectorLengthMismatch("Angle with different length should fail.", () -> plus(v1, v2));
     
     // 
     plus(v1, v2);
@@ -481,129 +478,6 @@ public class VMathTest {
     timesPlusTimes(v1, s1, v2, s2);
     timesPlusTimesEquals(v1, s1, v2, s2);
     
-    
- 
-  
-  }
-  
-  
-  //Tests on Matrix operations.
-  
-  /**
-   * Testing the Matrix plus operations of VMath class.
-   */
-  @Test
-  public void testMatrixPLUS() {
-    // TOIMPL: plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
-  }
-  
-  /**
-   * Testing the Matrix minus operations of VMath class.
-   */
-  @Test
-  public void testMatrixMINUS() {
-    // TOIMPL: minus(m1, m2) ... as in VectorMinus 
-  }
-  
-  /**
-   * Testing the _transposed method of VMath class.
-   */
-  @Test
-  public void testMatrix_transposed() {
-    // TOIMPL: transpose(m1)
-  }
-  
-  /**
-   * Testing the Matrix MULTIPLICATION methods of VMath class.
-   */
-  @Test
-  public void testMatrixMULTIPLICATION() {
-    // TOIMPL: Matrix Scalar multiplication & transposed.
-//    times(m1, s1); timesEquals(m1, s1);
-    
-    // TOIMPL: Matrix, Matrix multiplication & transposed.
-//    times(m1, m2); 
-//    timesTranspose(m1, m2);
-//    transposeTimes(m1, m2);
-//    transposeTimesTranspose(m1, m2);
-    
-    // TOIMPL: Vector and Matrix multiplication & transposed.
-//    times(m1, v2); 
-//    transposeTimes(m1, v2);
-//    transposeTimesTimes(a, B, c);
-    
-    
-//QUEST: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
-//FIXME: transposed and times notation. 
- 
-  }
-  
-  /**
-   * Testing the initialization and setting methods of VMath class on Matrix's. 
-   */
-  @Test
-  public void testMatrixSET() {
-    // Set a Matrix or a part of a Matrix.
-    // TOIMPL: setCol(m1, c, column); setRow(m1, r, row);
-    // TOIMPL: setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
-  
-    // TOIMPL: unitMatrix(dim); identity(m, n) QUEST: implement or create a unit&identity testclass with Vector
-    // TOIMPL: diagonal(v1);
-  }
-  
-  /**
-   * Testing the GET method of VMath class.
-   */
-  @Test
-  public void testMatrixGET() {
-    // Get a Submatix.
-    // TOIMPL: getMatrix(m1, r, c); getMatrix(m1, r0, r1, c); getMatrix(m1, r, c0, c1); getMatrix(m1, r0, r1, c0, c1);
-    
-    // Get colums of properties of am Matrix.
-    // TOIMPL: getCol(m1, col); getRow(m1, r)
-    // TOIMPL: getRowDimensionality(m1);    getColumnDimensionality(m1);
-    // TOIMPL: getDiagonal(m1);
-    
-  }
-  
-  /**
-   * Testing the _almosteq method of VMath class.
-   */
-  @Test
-  public void testMatrix_almosteq() {
-    // TOIMPL: almostEquals(m1, m2); almostEquals(m1, m2, maxdelta);
-  }
-
-  /**
-   * Testing the _solve method of VMath class.
-   */
-  @Test
-  public void testMatrix_solve() {
-    // TOIMPL: solve(A, B);
-  }
-  
-  /**
-   * Testing the _appendColums method of VMath class.
-   */
-  @Test
-  public void testMatrix_appendColums() {
-    // TOIMPL: appendColumns(m1, m2);
-  }
-  
-  /**
-   * Testing the Matrix_project method of VMath class.
-   */
-  @Test
-  public void testMatrix_project() {
-    // TOIMPL: project(v1, m2)
-  }
-
-  /**
-   * Testing the inverse method of VMath class.
-   */
-  @Test
-  public void testinverse() {
-    // TOIMPL: inverse(elements)
   }
 
   
