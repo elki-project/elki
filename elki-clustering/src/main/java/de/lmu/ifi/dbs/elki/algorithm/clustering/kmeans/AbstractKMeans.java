@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyCh
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
@@ -112,7 +113,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param varsum Variance sum output
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, double[][] means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+  protected boolean assignToNearestCluster(Relation<? extends NumberVector> relation, double[][] means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     assert (k == means.length);
     boolean changed = false;
     // Reset all clusters
@@ -123,7 +124,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
-      V fv = relation.get(iditer);
+      NumberVector fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
         double dist = df.distance(fv, DoubleVector.wrap(means[i]));
@@ -149,28 +150,80 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @param clusters the clusters to compute the means
    * @param means the recent means
-   * @param database the database containing the vectors
+   * @param relation the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected double[][] means(List<? extends DBIDs> clusters, double[][] means, Relation<V> database) {
-    // TODO: use Kahan summation for better numerical precision?
+  protected static double[][] means(List<? extends DBIDs> clusters, double[][] means, Relation<? extends NumberVector> relation) {
+    if(TypeUtil.SPARSE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<? extends SparseNumberVector> sparse = (Relation<? extends SparseNumberVector>) relation;
+      return sparseMeans(clusters, means, sparse);
+    }
+    return denseMeans(clusters, means, relation);
+  }
+
+  /**
+   * Returns the mean vectors of the given clusters in the given database.
+   *
+   * @param clusters the clusters to compute the means
+   * @param means the recent means
+   * @param relation the database containing the vectors
+   * @return the mean vectors of the given clusters in the given database
+   */
+  private static double[][] denseMeans(List<? extends DBIDs> clusters, double[][] means, Relation<? extends NumberVector> relation) {
+    final int k = means.length;
     double[][] newMeans = new double[k][];
-    for(int i = 0; i < k; i++) {
+    for(int i = 0; i < newMeans.length; i++) {
       DBIDs list = clusters.get(i);
-      if(list.size() == 0) {
+      if(list.isEmpty()) {
         // Keep degenerated means as-is for now.
         newMeans[i] = means[i];
         continue;
       }
       DBIDIter iter = list.iter();
       // Initialize with first.
-      double[] mean = database.get(iter).toArray();
+      double[] mean = relation.get(iter).toArray();
       iter.advance();
       // Update with remaining instances
       for(; iter.valid(); iter.advance()) {
-        NumberVector vec = database.get(iter);
+        NumberVector vec = relation.get(iter);
         for(int j = 0; j < mean.length; j++) {
           mean[j] += vec.doubleValue(j);
+        }
+      }
+      timesEquals(mean, 1.0 / list.size());
+      newMeans[i] = mean;
+    }
+    return newMeans;
+  }
+
+  /**
+   * Returns the mean vectors of the given clusters in the given database.
+   *
+   * @param clusters the clusters to compute the means
+   * @param means the recent means
+   * @param relation the database containing the vectors
+   * @return the mean vectors of the given clusters in the given database
+   */
+  private static double[][] sparseMeans(List<? extends DBIDs> clusters, double[][] means, Relation<? extends SparseNumberVector> relation) {
+    final int k = means.length;
+    double[][] newMeans = new double[k][];
+    for(int i = 0; i < k; i++) {
+      DBIDs list = clusters.get(i);
+      if(list.isEmpty()) {
+        // Keep degenerated means as-is for now.
+        newMeans[i] = means[i];
+        continue;
+      }
+      DBIDIter iter = list.iter();
+      // Initialize with first.
+      double[] mean = relation.get(iter).toArray();
+      iter.advance();
+      // Update with remaining instances
+      for(; iter.valid(); iter.advance()) {
+        SparseNumberVector vec = relation.get(iter);
+        for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
+          mean[vec.iterDim(j)] += vec.iterDoubleValue(j);
         }
       }
       timesEquals(mean, 1.0 / list.size());
@@ -187,7 +240,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected double[][] medians(List<? extends DBIDs> clusters, double[][] medians, Relation<V> database) {
+  protected double[][] medians(List<? extends DBIDs> clusters, double[][] medians, Relation<? extends NumberVector> database) {
     final int dim = medians[0].length;
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
     double[][] newMedians = new double[k][];
@@ -218,7 +271,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param newsize (New) size of cluster
    * @param op Cluster size change / Weight change
    */
-  protected void incrementalUpdateMean(double[] mean, V vec, int newsize, double op) {
+  protected static void incrementalUpdateMean(double[] mean, NumberVector vec, int newsize, double op) {
     if(newsize == 0) {
       return; // Keep old mean
     }
@@ -237,7 +290,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param varsum Variance sum output
    * @return true when the means have changed
    */
-  protected boolean macQueenIterate(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+  protected boolean macQueenIterate(Relation<? extends NumberVector> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
     Arrays.fill(varsum, 0.);
 
@@ -247,7 +300,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     // Incremental update
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
-      V fv = relation.get(iditer);
+      NumberVector fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
         double dist = df.distance(fv, DoubleVector.wrap(means[i]));
@@ -273,7 +326,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param assignment Current cluster assignment
    * @return {@code true} when assignment changed
    */
-  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, double[][] means, int minIndex, V fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
+  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, double[][] means, int minIndex, NumberVector fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
     int cur = assignment.intValue(iditer);
     if(cur == minIndex) {
       return false;
