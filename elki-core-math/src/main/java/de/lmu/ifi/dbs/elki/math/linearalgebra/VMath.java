@@ -1529,8 +1529,8 @@ public final class VMath {
    * @param m2 Other matrix
    * @return Equality
    */
-  public static boolean equals(final double[][] m1, final double[][] m2) {
-    return Arrays.equals(m1, m2);
+  public static boolean Equals(final double[][] m1, final double[][] m2) {
+    return Arrays.deepEquals(m1, m2);
   }
 
   /**
