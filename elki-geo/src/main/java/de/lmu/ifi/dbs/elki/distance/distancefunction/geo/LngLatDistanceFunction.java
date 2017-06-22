@@ -103,6 +103,11 @@ public class LngLatDistanceFunction implements SpatialPrimitiveDistanceFunction<
   }
 
   @Override
+  public boolean isMetric() {
+    return true;
+  }
+
+  @Override
   public int hashCode() {
     return model.hashCode() + getClass().hashCode();
   }
