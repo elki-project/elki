@@ -57,7 +57,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixPLUS() {
-    // TOIMPL: plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
+    // TODO: implement plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
   }
   
   /**
@@ -65,7 +65,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixMINUS() {
-    // TOIMPL: minus(m1, m2) ... as in VectorMinus 
+    // TODO: implement minus(m1, m2) ... as in VectorMinus 
   }
   
   /**
@@ -91,7 +91,7 @@ public class VMathMatrixTest {
     assertNotSame(m1, out_case1);
     
     
-    // QUEST: How many testcases needed
+    // FIXME: Question: How many testcases needed
     
   }
   
@@ -100,22 +100,22 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixMultiplication() {
-    // TOIMPL: Matrix Scalar multiplication & transposed.
+    // TODO: implement Matrix Scalar multiplication & transposed.
 //    times(m1, s1); timesEquals(m1, s1);
     
-    // TOIMPL: Matrix, Matrix multiplication & transposed.
+    // TODO: implement Matrix, Matrix multiplication & transposed.
 //    times(m1, m2); 
 //    timesTranspose(m1, m2);
 //    transposeTimes(m1, m2);
 //    transposeTimesTranspose(m1, m2);
     
-    // TOIMPL: Vector and Matrix multiplication & transposed.
+    // TODO: implement Vector and Matrix multiplication & transposed.
 //    times(m1, v2); 
 //    transposeTimes(m1, v2);
 //    transposeTimesTimes(a, B, c);
     
     
-//QUEST: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
+//FIXME: Question: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
 //FIXME: transposed and times notation. 
  
   }
@@ -126,9 +126,9 @@ public class VMathMatrixTest {
   @Test
   public void testSetMatrix() {
     // Set a Matrix or a part of a Matrix.
-    // TOIMPL: setCol(m1, c, column); setRow(m1, r, row);
+    // TODO: implement setCol(m1, c, column); setRow(m1, r, row);
     
-    // TOIMPL: setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
+    // TODO: implement setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
     
 
   }
@@ -138,39 +138,26 @@ public class VMathMatrixTest {
    */
   @Test
   public void testUnitMatrix() {
-    // QUEST: implement or create a unit&identity testclass with Vector
-    // QUEST: unitVector or manually
-    
     // test unitMatrix(dim) and unitMatrix(dim) equals identity(dim, dim)
     final double[][] m_unit = {{1,0,0,0,0},
                                {0,1,0,0,0},
                                {0,0,1,0,0},
                                {0,0,0,1,0},
                                {0,0,0,0,1} };
-//    final double[][] m_unit = {unitVector(5, 0),
-//                               unitVector(5, 1),
-//                               unitVector(5, 2),
-//                               unitVector(5, 3),
-//                               unitVector(5, 4) };
 
-     
-//  assertTrue(VMath.equals(unitMatrix(5), m_unit,0)); // FIXME: equals method not usable. It is not doing what it is suggests to do or is java wished intrepretation wiched? Also nameing problem nedd VMath.equals why?
-//  FIXME: equals  assertTrue(VMath.equals(identity(5, 5), m_unit,0));
+    assertTrue(Equals(unitMatrix(5), m_unit));
+    assertTrue(Equals(identity(5, 5), m_unit));
  
     // test identity with dimensions 3x5 and  5x3
-//    final double[][] m_identity3x5 = {{1,0,0,0,0},
-//                                      {0,1,0,0,0},
-//                                      {0,0,1,0,0}};
-  final double[][] m_identity3x5 = { unitVector(5, 0),
-                                     unitVector(5, 1),
-                                     unitVector(5, 2) };
-  
-  // TOIMPL: Dimension Missmatch probably in extra class
-  // FIXME: use equals when fixed
-  assertTrue(Equals(identity(3, 5), m_identity3x5));   
-  assertTrue(Equals(identity(5, 3), transpose(m_identity3x5)));  
-    
-  
+    final double[][] m_identity3x5 = {{1,0,0,0,0},
+                                      {0,1,0,0,0},
+                                      {0,0,1,0,0}};
+
+    // TODO: implement Dimension Missmatch probably in extra class
+
+    assertTrue(Equals(identity(3, 5), m_identity3x5));   
+    assertTrue(Equals(identity(5, 3), transpose(m_identity3x5)));  
+     
   }
   
   /**
@@ -192,12 +179,12 @@ public class VMathMatrixTest {
   @Test
   public void testGetMatrix() {
     // Get a Submatix.
-    // TOIMPL: getMatrix(m1, r, c); getMatrix(m1, r0, r1, c); getMatrix(m1, r, c0, c1); getMatrix(m1, r0, r1, c0, c1);
+    // TODO: implement getMatrix(m1, r, c); getMatrix(m1, r0, r1, c); getMatrix(m1, r, c0, c1); getMatrix(m1, r0, r1, c0, c1);
     
     // Get colums of properties of am Matrix.
-    // TOIMPL: getCol(m1, col); getRow(m1, r)
-    // TOIMPL: getRowDimensionality(m1);    getColumnDimensionality(m1);
-    // TOIMPL: getDiagonal(m1);
+    // TODO: implement getCol(m1, col); getRow(m1, r)
+    // TODO: implement getRowDimensionality(m1);    getColumnDimensionality(m1);
+    // TODO: implement getDiagonal(m1);
     
   }
   
@@ -206,7 +193,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testSolve() {
-    // TOIMPL: solve(A, B);
+    // TODO: implement solve(A, B);
   }
   
   /**
@@ -214,7 +201,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testAppendColums() {
-    // TOIMPL: appendColumns(m1, m2);
+    // TODO: implement appendColumns(m1, m2);
   }
   
   /**
@@ -222,7 +209,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testProject() {
-    // TOIMPL: project(v1, m2)
+    // TODO: implement project(v1, m2)
   }
 
   /**
@@ -230,7 +217,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testinverse() {
-    // TOIMPL: inverse(elements)
+    // TODO: implement inverse(elements)
   }
   
 
