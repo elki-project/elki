@@ -88,13 +88,14 @@ public final class VMathOperationsTest {
     assertNotSame(m2, m2_copy);
     
     //testing columPackedCopy(Matrix) method
-    final double[] m2_colpack = {0,1,0.123451234512345,2,  2,3,4.123451234512345,-1};
+    final double[] m2_colpack = {0,2,  1,3,  0.123451234512345,4.123451234512345,  2,-1};
+    
     final double[] m2_colpackres = columnPackedCopy(m2);
     assertArrayEquals(columnPackedCopy(m2), m2_colpack, 0.);
     assertNotSame(m2_colpack, m2_colpackres);
     
     //QUEST: row packed = colum packed vis versa?
-    final double[] m2_rowpack = {0,2,  1,3,  0.123451234512345,4.123451234512345,  2,-1};
+    final double[] m2_rowpack = {0,1,0.123451234512345,2,  2,3,4.123451234512345,-1};
     final double[] m2_rowpackres = rowPackedCopy(m2);
     assertArrayEquals(rowPackedCopy(m2), m2_rowpack, 0.);
     assertNotSame(m2_rowpack, m2_rowpackres);
@@ -134,22 +135,26 @@ public final class VMathOperationsTest {
   }
 
   // TOIMPL: Vector equals method
-  // TOIMPL: Matrix equals method
   
 
   /**
-   * Testing the equals methods on vectors an matrixs of VMath class.
+   * Testing the Equals methods on vectors an matrixs of VMath class.
    */
   @Test
-  public void testequals() {
-
-    final double[][] TEST = {{ 1, 2, 3},
-                             { 7, 3, 9},
-                             { 0, 2, 1},
-                             {20,-5, 4},
-                             {-3, 0, 3},
-                             { 1, 1, 1}};
+  public void testEquals() {
+    // equals(Matrix)
+    final double[] v1 = {2,4,3,0,-5,9};
     
+    // make copy of by hand to be independent of copy 
+    // module to be able to use Equals in testcopy
+    final double[] v1_copy = {2,4,3,0,-5,9};
+    
+    assertTrue(Equals(v1, v1));
+    assertTrue(Equals(v1, v1_copy));
+    assertFalse(Equals(unitVector(6, 2), v1));
+    
+    
+    // Equals(Matrix)
     final double[][] m1 = {{ 1, 2, 3},
                            { 7, 3, 9},
                            { 0, 2, 1},
@@ -157,16 +162,20 @@ public final class VMathOperationsTest {
                            {-3, 0, 3},
                            { 1, 1, 1}};
     
-    assertTrue(Equals(TEST, TEST));
-    assertTrue(Equals(m1,TEST));
-    assertFalse(Equals(identity(6, 3), TEST));
+    // make copy of by hand to be independent of copy 
+    // module to be able to use Equals in testcopy
+    final double[][] m1_copy = {{ 1, 2, 3},
+                                { 7, 3, 9},
+                                { 0, 2, 1},
+                                {20,-5, 4},
+                                {-3, 0, 3},
+                                { 1, 1, 1}};
+        
+    assertTrue(Equals(m1, m1));
+    assertTrue(Equals(m1, m1_copy));
+    assertFalse(Equals(identity(6, 3), m1));
     
-    
-    final double[][] m2 = copy(TESTMATRIXA);
-    
-    assertTrue(Equals(TESTMATRIXA, TESTMATRIXA));
-    assertTrue(Equals(m2,TESTMATRIXA));
-    assertFalse(Equals(identity(4, 5), TESTMATRIXA));
+    // TODO: Question: more testcases?
     
   }
   
