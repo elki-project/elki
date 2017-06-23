@@ -101,7 +101,7 @@ public class VMathMatrixTest {
   @Test
   public void testMatrixMultiplication() {
     // TODO: implement Matrix Scalar multiplication & transposed.
-//    times(m1, s1); timesEquals(m1, s1);
+//    times(m1, s1); timesEquals(m1, s1)
     
     // TODO: implement Matrix, Matrix multiplication & transposed.
 //    times(m1, m2); 
@@ -127,6 +127,7 @@ public class VMathMatrixTest {
   public void testSetMatrix() {
     // Set a Matrix or a part of a Matrix.
     // TODO: implement setCol(m1, c, column); setRow(m1, r, row);
+    
     
     // TODO: implement setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
     
@@ -171,7 +172,7 @@ public class VMathMatrixTest {
                                {0,0,0,TESTVEC[3],0},
                                {0,0,0,0,TESTVEC[4]}};
     
-    // FIXME: equals assertTrue(VMath.equals(diagonal(TESTVEC), m_diag);
+    assertTrue(Equals(diagonal(TESTVEC), m_diag));
   }
   /**
    * Testing the GET method of VMath class.
@@ -220,5 +221,6 @@ public class VMathMatrixTest {
     // TODO: implement inverse(elements)
   }
   
+  // TODO: implement Dimension mismatch
 
 }
