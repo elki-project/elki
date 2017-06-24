@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
@@ -35,19 +36,20 @@ import org.junit.Test;
 public class VMathMatrixTest {
   
   /**
-   * nonsymmetric 5x4 TESTMATRIX M = (v1, v2, v3, v5) where v1-v5 are Vectors
-   * TODO New Class VMathMatrixTest and move constant up
+   * Nonsymmetric 4 x 5 (rows x columns) TESTMATRIX
    */
   protected final double[][] TESTMATRIX = {
-      // (v1     ,      v2    ,      v3    ,    v4 ) 
-      {1,2,3,4,5}, {2,3,4,5,1}, {3,4,5,1,2}, {4,5,1,2,3}
-   
-  };
+      {1,2,3,4,5}, 
+      {2,3,4,5,1}, 
+      {3,4,5,1,2}, 
+      {4,5,1,2,3} };
   
   /**
    * 1x1 Matrix testing for dimension mismatch testing.
    */
   public final double[][] DIMTESTMATRIX = {{1}};
+  
+  protected static final double EPSILON = 1E-15;
   
   // TODO: replace with import of VMathVectortest
   protected final double[] TESTVEC = {2,3,5,7,9};
@@ -77,7 +79,6 @@ public class VMathMatrixTest {
     
     final double[][] m1 = TESTMATRIX;
  
-    // TODO: Document to think it transposed... mazbe get rid of m1 onlz use TESTMATRIX but rename it
     final double[][] res_case1 = {
           {m1[0][0], m1[1][0], m1[2][0], m1[3][0]},
           {m1[0][1], m1[1][1], m1[2][1], m1[3][1]},
@@ -96,29 +97,130 @@ public class VMathMatrixTest {
   }
   
   /**
-   * Testing the Matrix MULTIPLICATION methods of VMath class.
+   * Testing the Matrix,Scalar multiplication methods of VMath class. 
    */
   @Test
-  public void testMatrixMultiplication() {
-    // TODO: implement Matrix Scalar multiplication & transposed.
-//    times(m1, s1); timesEquals(m1, s1)
+  public void testMatrixScalarMultiplication() {
+    final double[][] m1 = TESTMATRIX;
     
-    // TODO: implement Matrix, Matrix multiplication & transposed.
-//    times(m1, m2); 
-//    timesTranspose(m1, m2);
-//    transposeTimes(m1, m2);
-//    transposeTimesTranspose(m1, m2);
+    final double[][] m1_times_one_third = {
+        {1/3*m1[0][0], 1/3*m1[0][1], 1/3*m1[0][2], 1/3*m1[0][3], 1/3*m1[0][4]},
+        {1/3*m1[1][0], 1/3*m1[1][1], 1/3*m1[1][2], 1/3*m1[1][3], 1/3*m1[1][4]},
+        {1/3*m1[2][0], 1/3*m1[2][1], 1/3*m1[2][2], 1/3*m1[2][3], 1/3*m1[2][4]},
+        {1/3*m1[3][0], 1/3*m1[3][1], 1/3*m1[3][2], 1/3*m1[3][3], 1/3*m1[3][4]}};
     
-    // TODO: implement Vector and Matrix multiplication & transposed.
-//    times(m1, v2); 
-//    transposeTimes(m1, v2);
-//    transposeTimesTimes(a, B, c);
+    assertTrue(almostEquals(m1_times_one_third, times(m1, 1/3),EPSILON));
+
+    assertTrue(almostEquals(m1_times_one_third, timesEquals(m1, 1/3),EPSILON));
+
     
+    final double[][] m1_times_zero = {
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0}};
+
+    assertTrue(Equals(m1_times_zero, times(m1, 0) ));
+    assertTrue(Equals(m1_times_zero, timesEquals(m1, 0) ));
     
-//FIXME: Question: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
-//FIXME: transposed and times notation. 
- 
+    assertTrue(Equals(m1, times(m1, 1)));
+    assertTrue(Equals(m1, timesEquals(copy(m1), 1)));
   }
+  
+  /**
+   * Testing the Matrix, Matrix multiplications methods of VMath class.
+   */
+  @Test
+  public void testMatrixMatrixMultiplication() {
+    //  test times(matrix, scalar); timesEquals(matrix, scalar)
+    final double[][] m1 = TESTMATRIX;
+    // TODO: implement transposed manually or assume transpose method to be correct
+    final double[][] m1_t = transpose(m1);
+    
+    // check times(Matrix, id) = Matrix = times(id, Matrix) 
+    assertTrue(Equals(m1, times(m1, unitMatrix(5) )));
+    assertTrue(Equals(m1, times(unitMatrix(4), m1 )));
+    
+    // check transposeTimesTranspose(Matrix, id) = transpose(Matrix) = transposeTimesTranspose(id, Matrix) 
+    assertTrue(Equals(m1_t, transposeTimesTranspose(m1, unitMatrix(4) )));
+    assertTrue(Equals(m1_t, transposeTimesTranspose(unitMatrix(5), m1 )));
+    
+    final double[][] m1_times_m1transposed = { 
+        {transposeTimes(m1[0], m1[0]), transposeTimes(m1[0], m1[1]), transposeTimes(m1[0], m1[2]), transposeTimes(m1[0], m1[3]) },
+        {transposeTimes(m1[1], m1[0]), transposeTimes(m1[1], m1[1]), transposeTimes(m1[1], m1[2]), transposeTimes(m1[1], m1[3]) },
+        {transposeTimes(m1[2], m1[0]), transposeTimes(m1[2], m1[1]), transposeTimes(m1[2], m1[2]), transposeTimes(m1[2], m1[3]) },
+        {transposeTimes(m1[3], m1[0]), transposeTimes(m1[3], m1[1]), transposeTimes(m1[3], m1[2]), transposeTimes(m1[3], m1[3]) } };
+    
+    // check timesTranspose without not using a matrix methods times
+    assertTrue(Equals(m1_times_m1transposed, timesTranspose(m1, m1) ));
+    
+    // check timesTranspose without not using a vector method transposeTimes
+    // this is at the same time a test for the times method assuming the test before succeeded.
+    assertTrue(Equals(times(m1, m1_t), timesTranspose(m1, m1) ));
+    // and the following analog a test for the transposeTimesTranspose method
+    assertTrue(Equals(transposeTimesTranspose(m1_t, m1), timesTranspose(m1, m1) ));
+    
+    
+    final double[][] m1transposed_times_m1 = {
+        {transposeTimes(m1_t[0], m1_t[0]), transposeTimes(m1_t[0], m1_t[1]), transposeTimes(m1_t[0], m1_t[2]), transposeTimes(m1_t[0], m1_t[3]), transposeTimes(m1_t[0], m1_t[4]) },
+        {transposeTimes(m1_t[1], m1_t[0]), transposeTimes(m1_t[1], m1_t[1]), transposeTimes(m1_t[1], m1_t[2]), transposeTimes(m1_t[1], m1_t[3]), transposeTimes(m1_t[1], m1_t[4]) },
+        {transposeTimes(m1_t[2], m1_t[0]), transposeTimes(m1_t[2], m1_t[1]), transposeTimes(m1_t[2], m1_t[2]), transposeTimes(m1_t[2], m1_t[3]), transposeTimes(m1_t[2], m1_t[4]) },
+        {transposeTimes(m1_t[3], m1_t[0]), transposeTimes(m1_t[3], m1_t[1]), transposeTimes(m1_t[3], m1_t[2]), transposeTimes(m1_t[3], m1_t[3]), transposeTimes(m1_t[3], m1_t[4]) },
+        {transposeTimes(m1_t[4], m1_t[0]), transposeTimes(m1_t[4], m1_t[1]), transposeTimes(m1_t[4], m1_t[2]), transposeTimes(m1_t[4], m1_t[3]), transposeTimes(m1_t[4], m1_t[4]) } };
+ 
+    // check transposeTimes without not using a matrix methods times
+    // without transpose and times
+    assertTrue(Equals(m1transposed_times_m1, transposeTimes(m1, m1) ));
+    
+    // check transposeTimes without using a vector method timesTransposed
+    // this is as well a test for the transposeTimesTranspose method assuming the test before succeeded.
+    assertTrue(Equals(times(m1_t, m1), transposeTimes(m1, m1) ));
+    // and the following analog a test for the transposeTimesTranspose method
+    assertTrue(Equals(transposeTimesTranspose(m1, m1_t), transposeTimes(m1, m1) ));
+
+    // TODO extra testcase for times and  transposedTimestransposed
+
+    //    final double[][] m2 = {
+    //        {1.21, 2000},
+    //        {0   ,-1   },
+    //        {7   , 0   } };
+    //    TODO: Question one more testcase needed?
+    //    final double[][] m3 = {
+    //        {1.21, 2000, 0},
+    //        {0   ,-1   , 7} };
+  }
+  
+  /**
+   * Testing the Vector, Matrix multiplications methods of VMath class. 
+   */
+  @Test
+  public void testVectorMatrixMultiplication() {
+    // TODO: implement Vector and Matrix multiplication & transposed.
+    // done with explicit definition of the results due to nameing issues
+    final double[][] M = {
+        {1.21, 2000},
+        {0   ,-1   },
+        {7   , 0   } };
+ 
+    // FIXME: replace or assume transpose to be correct.
+    final double[][] M_t = transpose(M);
+    
+    final double delta = 1E-11;
+    
+    //  times(m1, v2)
+    assertArrayEquals(M_t[0], times(M, unitVector(2, 0)) , delta);
+    assertArrayEquals(M_t[1], times(M, unitVector(2, 1)) , delta);
+
+    //  transposeTimes(m1, v2);
+    assertArrayEquals(M[0], transposeTimes(M, unitVector(3, 0)) , delta);
+    assertArrayEquals(M[1], transposeTimes(M, unitVector(3, 1)) , delta);
+    assertArrayEquals(M[2], transposeTimes(M, unitVector(3, 2)) , delta);
+//  transposeTimesTimes(a, B, c);
+  //FIXME: Question: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
+  //FIXME: transposed and times notation. 
+  }
+    
+  //TODO: implement Matrix Ref class
   
   /**
    * Testing the initialization and setting methods of VMath class on Matrix's. 
@@ -174,6 +276,7 @@ public class VMathMatrixTest {
     
     assertTrue(Equals(diagonal(TESTVEC), m_diag));
   }
+  
   /**
    * Testing the GET method of VMath class.
    */
@@ -224,3 +327,5 @@ public class VMathMatrixTest {
   // TODO: implement Dimension mismatch
 
 }
+
+// TODO: Have a look a normalize options of VMathclass
