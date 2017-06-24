@@ -128,7 +128,7 @@ public final class VMathVectorTest {
    * {@link Vmath#plus},{@link Vmath#plusEquals}; {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals}; 
    * {@link Vmath#plusTimes}, {@link Vmath#plusTimesEquals}, {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals};
    * {@link Vmath#timesPlustimes}, {@link Vmath#timesPlustimesEquals}
-   * QUEST: link in Docstrings or not?
+   * FIXME: Question link in Docstrings or not?
    */
   
   /**
@@ -180,12 +180,12 @@ public final class VMathVectorTest {
     res_plusTimes      = new double[] { 28, 37,14,-0.500000000000035299996}; //  v1 + 6v2
     res_timesPlustimes = new double[] {-49,-16,-2, 0.500000000000032900008}; // 2v1 +(-3)v2
     
-    double[] out, in_eq; //QUEST: _ not in variable in Java?
+    double[] out, in_eq; //FIXME: Question _ not in variable in Java?
     
     // plus  and plusEquals (Vector + Vector) 
     assertArrayEquals(res_plus, out = plus(v1,v2), EPSILON);
     assertArrayEquals(res_plus, plusEquals(in_eq = copy(v1), v2), EPSILON);
-    assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TOIMPL go on doing this
+    assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TODO: Implement go on doing this
     
     //plus() and plusEquals (Vector + Skalar)
     d = 13;
@@ -295,12 +295,12 @@ public final class VMathVectorTest {
   @Test
   public void testVectorProducts() {
     // einzelne klassen
-    // TOIMPL: test for cross3D()
+    // TODO: Implement: test for cross3D()
     
-    // TOIMPL: test for scalarProduct()
+    // TODO: Implement: test for scalarProduct()
     
-    // QUEST: implement tests for transposedtimes(), timestransposed() here.
-    // QUEST: isn't transposedtimes equal to scalarProduct --> kick one!
+    // FIXME: Question implement tests for transposedtimes(), timestransposed() here.
+    // FIXME: Question isn't transposedtimes equal to scalarProduct --> kick one!
 
   }
 
@@ -311,8 +311,8 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorNORMALIZE() {
-    // TOIMPL: normalize()
-    // TOIMPL: normalizeEquals()
+    // TODO: Implement: normalize()
+    // TODO: Implement: normalizeEquals()
   }
 
   // TODO: move to top or bottom, or shared class
@@ -342,9 +342,9 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorANGLE() {
-    // TOIMPL: angle(v1, v2);
-    // QUEST: new class?
-    // TOIMPL: angle(v1, v2, o);
+    // TODO: Implement: angle(v1, v2);
+    // FIXME: Question new class?
+    // TODO: Implement: angle(v1, v2, o);
     
   }
   
@@ -353,15 +353,15 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorsum() {
-    // TOIMPL: sum(v1)
-    // TOIMPL: squareSum(v1)
-    // TOIMPL: euclideanLength(v1) QUEST: Here or extra method?
+    // TODO: Implement: sum(v1)
+    // TODO: Implement: squareSum(v1)
+    // TODO: Implement: euclideanLength(v1) FIXME: Question Here or extra method?
   }
     
   /**
    * Testing the transposed method of VMath class.
    */
-  @Test // QUEST: Matrix implemeted without final? Problem Transposed² not identity
+  @Test // FIXME: Question Matrix implemeted without final? Problem Transposed² not identity
   public void testtransposed() {
     double[] v1; double[][] res;
     //TODO implement with almostEquals and update structure 
@@ -387,11 +387,11 @@ public final class VMathVectorTest {
    * Testing the rotate90 method of VMath class.
    */
   @Test
-  public void testVector_rotate90() { // QUEST: notation of methods?
-    // TOIMPL: rotate90Equals(v1)
+  public void testVector_rotate90() { // FIXME: Question notation of methods?
+    // TODO: Implement: rotate90Equals(v1)
   }
 
-  //QUEST: REF method instead of VectorREF Missmach?
+  //FIXME: Question REF method instead of VectorREF Missmach?
   /**
    * Testing that *Equals vector-operations of the {@link VMath} class work in place and the other operations don't.
    *  
@@ -400,8 +400,8 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorREF() {
+    final double[] v1 = {0};
     final double[] v2 = {0};
-    double[] v1 = v2;
     final double s1 = 0;
     final double s2 = 0;
     final double d  = 0;
@@ -447,7 +447,7 @@ public final class VMathVectorTest {
   }
   
  
-  // QUEST: DimensionMissmach method instead of VectorDim missmach?
+  // FIXME: Question DimensionMissmach method instead of VectorDim missmach?
   /**
    * testing that Error is Vector dimension missmach is raised if input data of Vector Operation has different dimensions.
    * 
@@ -457,7 +457,7 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorDimensionMissmach() {
-    // TOIMPL with new assertVectorLengthMismach
+    // TODO: Implement with new assertVectorLengthMismach
     
     final double[] v1      = {1,1};
     final double[] v2      = {1};
