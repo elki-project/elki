@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 
@@ -55,7 +55,7 @@ public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable> extends 
   }
 
   @Override
-  public double minDist(SpatialComparable mbr, DBID id) {
+  public double minDist(SpatialComparable mbr, DBIDRef id) {
     return distanceFunction.minDist(mbr, relation.get(id));
   }
 
