@@ -110,7 +110,7 @@ public final class VMathOperationsTest {
   @Test
   public void testhashcode() {
 
-    // QUEST: hashCode(v1) hashCode(m1) test needed?
+    // TODO QUEST: hashCode(v1) hashCode(m1) test needed?
   }
   
   /**
@@ -134,11 +134,8 @@ public final class VMathOperationsTest {
     assertTrue(almostEquals(zeros4x5 , m, 0.));
   }
 
-  // TOIMPL: Vector equals method
-  
-
   /**
-   * Testing the Equals methods on vectors an matrixs of VMath class.
+   * Testing the Equals methods on vectors an matrixes of VMath class.
    */
   @Test
   public void testEquals() {
