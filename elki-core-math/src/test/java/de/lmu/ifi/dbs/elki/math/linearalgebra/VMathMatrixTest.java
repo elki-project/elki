@@ -24,6 +24,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -55,22 +56,6 @@ public class VMathMatrixTest {
   protected final double[] TESTVEC = {2,3,5,7,9};
   
   /**
-   * Testing the Matrix plus operations of VMath class.
-   */
-  @Test
-  public void testMatrixPLUS() {
-    // TODO: implement plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
-  }
-  
-  /**
-   * Testing the Matrix minus operations of VMath class.
-   */
-  @Test
-  public void testMatrixMINUS() {
-    // TODO: implement minus(m1, m2) ... as in VectorMinus 
-  }
-  
-  /**
    * Testing the transposed(Matrix) method of VMath class.
    */
   @Test
@@ -92,8 +77,24 @@ public class VMathMatrixTest {
     assertNotSame(m1, out_case1);
     
     
-    // FIXME: Question: How many testcases needed
+    // FIXME: Question: How many testcases needed, put in ref class?
     
+  }
+  
+  /**
+   * Testing the Matrix plus operations of VMath class.
+   */
+  @Test
+  public void testMatrixPLUS() {
+    // TODO: implement plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
+  }
+  
+  /**
+   * Testing the Matrix minus operations of VMath class.
+   */
+  @Test
+  public void testMatrixMINUS() {
+    // TODO: implement minus(m1, m2) ... as in VectorMinus 
   }
   
   /**
@@ -191,50 +192,42 @@ public class VMathMatrixTest {
   }
   
   /**
-   * Testing the Vector, Matrix multiplications methods of VMath class. 
+   * Testing the Matrix, Vector multiplications methods of VMath class. 
    */
   @Test
-  public void testVectorMatrixMultiplication() {
-    // TODO: implement Vector and Matrix multiplication & transposed.
-    // done with explicit definition of the results due to nameing issues
-    final double[][] M = {
+  public void testMatrixVectorMultiplication() {
+    // TODO: more testcases via eigenvalues.
+    final double[][] m1 = {
         {1.21, 2000},
         {0   ,-1   },
         {7   , 0   } };
  
     // FIXME: replace or assume transpose to be correct.
-    final double[][] M_t = transpose(M);
+    final double[][] m1_t = transpose(m1);
     
     final double delta = 1E-11;
     
     //  times(m1, v2)
-    assertArrayEquals(M_t[0], times(M, unitVector(2, 0)) , delta);
-    assertArrayEquals(M_t[1], times(M, unitVector(2, 1)) , delta);
+    assertArrayEquals(m1_t[0], times(m1, unitVector(2, 0)) , delta);
+    assertArrayEquals(m1_t[1], times(m1, unitVector(2, 1)) , delta);
 
     //  transposeTimes(m1, v2);
-    assertArrayEquals(M[0], transposeTimes(M, unitVector(3, 0)) , delta);
-    assertArrayEquals(M[1], transposeTimes(M, unitVector(3, 1)) , delta);
-    assertArrayEquals(M[2], transposeTimes(M, unitVector(3, 2)) , delta);
-//  transposeTimesTimes(a, B, c);
-  //FIXME: Question: times(v1, m2) vs transposeTimes(v1, m2) dublicate or what ? --> answer on timesTranspose(v1, m2);
-  //FIXME: transposed and times notation. 
+    assertArrayEquals(m1[0], transposeTimes(m1, unitVector(3, 0)) , delta);
+    assertArrayEquals(m1[1], transposeTimes(m1, unitVector(3, 1)) , delta);
+    assertArrayEquals(m1[2], transposeTimes(m1, unitVector(3, 2)) , delta);
+    //  transposeTimesTimes(a, B, c);
+    
+    // TODO: implement below, and maybe write better documentation in VMath class
+    // times(v1, m2) sames a timesTransposed(Vector, Vector) should be same as times (vector, transpose(vector))
+    //   this is why this method exists                                                                                       |- is aMatrix
+    // basically same timesTransposed as above but second vector given as matrix bzw m1 = transpose(transpose(vector))
+    
+    // transposedTimes(vector, Matrix) same as transposed(transposedTimes(matrix, vector)
+    // problem may be assertation not m2.lenth but columndimension needed
+     
   }
     
   //TODO: implement Matrix Ref class
-  
-  /**
-   * Testing the initialization and setting methods of VMath class on Matrix's. 
-   */
-  @Test
-  public void testSetMatrix() {
-    // Set a Matrix or a part of a Matrix.
-    // TODO: implement setCol(m1, c, column); setRow(m1, r, row);
-    
-    
-    // TODO: implement setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
-    
-
-  }
   
   /**
    * Testing the unitMatrix and the identity method of VMath class.
@@ -264,34 +257,131 @@ public class VMathMatrixTest {
   }
   
   /**
-   * Testing the diagnoal method of VMath class.
+   * Testing the getMatrix, getCol and getRow methods of VMath class.
    */
   @Test
-  public void testDiagnoal() {
+  public void testGet() {
+    
+    final double[][] m1 = {
+        {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9},
+        { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
+        { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29},
+        { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39},
+        { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49},
+        { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59},
+        { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69} };
+    // TODO: randomize
+    // array of row indices
+    final int[] r = {0,3,5};
+    // array of column indices
+    final int[] c = {1,3,5,9};
+    
+    // test getMatrix(Matrix, rows, columns)
+    final double[][] sub1 = {
+        {m1[r[0]][c[0]], m1[r[0]][c[1]], m1[r[0]][c[2]], m1[r[0]][c[3]]},
+        {m1[r[1]][c[0]], m1[r[1]][c[1]], m1[r[1]][c[2]], m1[r[1]][c[3]]},
+        {m1[r[2]][c[0]], m1[r[2]][c[1]], m1[r[2]][c[2]], m1[r[2]][c[3]]} };
+
+    assertTrue(Equals(sub1, getMatrix(m1, r, c) )); 
+    
+    // test getMatrix(Matrix, rowstart, rowend , columns)
+    final double[][] sub2 = {
+        {m1[2][c[0]], m1[2][c[1]], m1[2][c[2]], m1[2][c[3]]},
+        {m1[3][c[0]], m1[3][c[1]], m1[3][c[2]], m1[3][c[3]]},
+        {m1[4][c[0]], m1[4][c[1]], m1[4][c[2]], m1[4][c[3]]},
+        {m1[5][c[0]], m1[5][c[1]], m1[5][c[2]], m1[5][c[3]]} };
+    
+    assertTrue(Equals(sub2, getMatrix(m1, 2, 5, c) ));
+    
+    // test getMatrix(Matrix, rows, columnstart, columnend)
+    final double[][] sub3 = {
+        {m1[r[0]][4], m1[r[0]][5], m1[r[0]][6], m1[r[0]][7]},
+        {m1[r[1]][4], m1[r[1]][5], m1[r[1]][6], m1[r[1]][7]},
+        {m1[r[2]][4], m1[r[2]][5], m1[r[2]][6], m1[r[2]][7]} };
+
+    assertTrue(Equals(sub3, getMatrix(m1, r, 4, 7) ));
+    
+    // test getMatrix(Matrix, rowstart, rowend, columnstart, columnend)
+    final double[][] sub4 = {
+    {m1[0][6], m1[0][7], m1[0][8]},
+    {m1[1][6], m1[1][7], m1[1][8]},
+    {m1[2][6], m1[2][7], m1[2][8]} };
+     
+    assertTrue(Equals(sub4, getMatrix(m1, 0, 2, 6, 8) ));
+    
+    // FIXME: maybe randomize
+    assertTrue(Equals(m1, getMatrix(m1, 0, getRowDimensionality(m1)-1, 0, getColumnDimensionality(m1)-1) ));
+
+    final int[] riter = {3,4,5};
+    final int[] citer = {0,1,2};
+    assertTrue(Equals(getMatrix(m1, riter, citer), getMatrix(m1, riter[0], riter[riter.length-1], citer[0], citer[citer.length-1]) ));
+    assertTrue(Equals(getMatrix(m1, riter, citer), getMatrix(m1, riter, citer[0], citer[citer.length-1]) ));
+    assertTrue(Equals(getMatrix(m1, riter, citer), getMatrix(m1, riter[0], riter[riter.length-1], citer) ));
+   
+
+    // test getCol and getRow 
+    // we assume transpose to be correct
+    for(int i = 0; i < TESTMATRIX.length; i++) {
+      double[] v = TESTMATRIX[i];
+      assertArrayEquals(v, getRow(TESTMATRIX, i), 0.);
+      assertArrayEquals(v, getCol(transpose(TESTMATRIX), i), 0.);
+    }
+
+  }
+  
+  /**
+   * Testing the getRowDimensionality and getColumnDimensionality methods of VMath class.
+   */
+  @Test
+  public void testGetDimensionality() {
+    // FIXME: Question +random testcases
+    final double[][] m3 = {
+        {0,0,0,0,0},
+        {0,0,0,0,0},
+        {0,0,0,0,0} };
+    
+    assertEquals(3, getRowDimensionality(m3));
+    assertEquals(3, getColumnDimensionality(transpose(m3) ));
+
+    assertEquals(5, getColumnDimensionality(m3));
+    assertEquals(5, getRowDimensionality(transpose(m3) ));
+    
+  }
+  
+  /**
+   * Testing the diagonal and getdiagonal methods of VMath class.
+   */
+  @Test
+  public void testDiagonal() {
     final double[][] m_diag = {{TESTVEC[0],0,0,0,0},
                                {0,TESTVEC[1],0,0,0},
                                {0,0,TESTVEC[2],0,0},
                                {0,0,0,TESTVEC[3],0},
                                {0,0,0,0,TESTVEC[4]}};
-    
     assertTrue(Equals(diagonal(TESTVEC), m_diag));
+    
+    final double[] dia_TEST = { TESTMATRIX[0][0],TESTMATRIX[1][1],TESTMATRIX[2][2],TESTMATRIX[3][3] };
+    assertArrayEquals(dia_TEST, getDiagonal(TESTMATRIX), 0.);
+    
+    // if diagonal    is correct this is a test for getDiagonal
+    // if getDiagonal is correct         a test for diagonal
+    final double[] dia = { -2, 0, 1.21, 4, 7};
+    assertArrayEquals(dia, getDiagonal(diagonal(dia)), 0.);
   }
   
   /**
-   * Testing the GET method of VMath class.
+   * Testing setMatrix, setCol and setRow methods of VMath class. 
    */
   @Test
-  public void testGetMatrix() {
-    // Get a Submatix.
-    // TODO: implement getMatrix(m1, r, c); getMatrix(m1, r0, r1, c); getMatrix(m1, r, c0, c1); getMatrix(m1, r0, r1, c0, c1);
+  public void testSet() {
+    // Set a Matrix or a part of a Matrix.
+    // TODO: implement setCol(m1, c, column); setRow(m1, r, row);
+    // test via get .. setRow = row etc.
     
-    // Get colums of properties of am Matrix.
-    // TODO: implement getCol(m1, col); getRow(m1, r)
-    // TODO: implement getRowDimensionality(m1);    getColumnDimensionality(m1);
-    // TODO: implement getDiagonal(m1);
+    // TODO: implement setMatrix(m1, r, c, m2); setMatrix(m1, r0, r1, c, m2); setMatrix(m1, r, c0, c1, m2); setMatrix(m1, r0, r1, c0, c1, m2);
     
+
   }
-  
   /**
    * Testing the _solve method of VMath class.
    */
