@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import gnu.trove.impl.Constants;
@@ -92,15 +93,22 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
   private int min, max;
 
   /**
+   * Distance to return when not defined otherwise.
+   */
+  protected double defaultDistance = Double.POSITIVE_INFINITY;
+
+  /**
    * Constructor.
    *
    * @param parser Parser
    * @param matrixfile input file
+   * @param defaultDistance Default distance (when undefined)
    */
-  public FileBasedSparseDoubleDistanceFunction(DistanceParser parser, File matrixfile) {
+  public FileBasedSparseDoubleDistanceFunction(DistanceParser parser, File matrixfile, double defaultDistance) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
+    this.defaultDistance = defaultDistance;
   }
 
   @Override
@@ -131,7 +139,7 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
    */
   protected void loadCache(int size, InputStream in) throws IOException {
     // Expect a sparse matrix here.
-    cache = new TLongDoubleHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, Double.POSITIVE_INFINITY);
+    cache = new TLongDoubleHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, defaultDistance);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {
@@ -218,6 +226,13 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
         "Parser used to load the distance matrix.");
 
     /**
+     * Optional parameter to specify the distance to return when no distance was
+     * given in the file. Defaults to infinity.
+     */
+    public static final OptionID DEFAULTDIST_ID = new OptionID("distance.default", //
+        "Default distance to use for undefined values.");
+
+    /**
      * Input file.
      */
     protected File matrixfile = null;
@@ -227,23 +242,33 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
      */
     protected DistanceParser parser = null;
 
+    /**
+     * Distance to return when not defined otherwise.
+     */
+    protected double defaultDistance = Double.POSITIVE_INFINITY;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(MATRIX_PARAM)) {
-        matrixfile = MATRIX_PARAM.getValue();
+      FileParameter matrixfileP = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(matrixfileP)) {
+        matrixfile = matrixfileP.getValue();
       }
 
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
-      if(config.grab(PARSER_PARAM)) {
-        parser = PARSER_PARAM.instantiateClass(config);
+      ObjectParameter<DistanceParser> parserP = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
+      if(config.grab(parserP)) {
+        parser = parserP.instantiateClass(config);
+      }
+
+      DoubleParameter distanceP = new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY);
+      if(config.grab(distanceP)) {
+        defaultDistance = distanceP.doubleValue();
       }
     }
 
     @Override
     protected FileBasedSparseDoubleDistanceFunction makeInstance() {
-      return new FileBasedSparseDoubleDistanceFunction(parser, matrixfile);
+      return new FileBasedSparseDoubleDistanceFunction(parser, matrixfile, defaultDistance);
     }
   }
 }

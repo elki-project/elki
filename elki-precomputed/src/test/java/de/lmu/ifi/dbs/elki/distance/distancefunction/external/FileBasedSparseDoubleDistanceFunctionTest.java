@@ -60,7 +60,7 @@ public class FileBasedSparseDoubleDistanceFunctionTest extends AbstractClusterAl
     ListParameterization distparams = new ListParameterization();
     distparams.addParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
     FileBasedSparseDoubleDistanceFunction df = new FileBasedSparseDoubleDistanceFunction(//
-        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null);
+        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null, Double.POSITIVE_INFINITY);
     // We need to read from a resource, instead of a file.
     df.loadCache(4, FileUtil.openSystemFile(FILENAME));
     SLINK<DBID> slink = new SLINK<>(df);

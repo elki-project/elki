@@ -60,7 +60,7 @@ public class FileBasedSparseFloatDistanceFunctionTest extends AbstractClusterAlg
     ListParameterization distparams = new ListParameterization();
     distparams.addParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
     FileBasedSparseFloatDistanceFunction df = new FileBasedSparseFloatDistanceFunction(//
-        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null);
+        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null, Float.POSITIVE_INFINITY);
     // We need to read from a resource, instead of a file.
     df.loadCache(4, FileUtil.openSystemFile(FILENAME));
     SLINK<DBID> slink = new SLINK<>(df);

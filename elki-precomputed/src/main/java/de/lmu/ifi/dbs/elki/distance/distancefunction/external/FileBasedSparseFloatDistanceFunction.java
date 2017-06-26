@@ -38,7 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import gnu.trove.impl.Constants;
@@ -91,15 +93,22 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
   private int min, max;
 
   /**
+   * Distance to return when not defined otherwise.
+   */
+  protected float defaultDistance = Float.POSITIVE_INFINITY;
+
+  /**
    * Constructor.
    *
    * @param parser Parser
    * @param matrixfile input file
+   * @param defaultDistance Default distance (when undefined)
    */
-  public FileBasedSparseFloatDistanceFunction(DistanceParser parser, File matrixfile) {
+  public FileBasedSparseFloatDistanceFunction(DistanceParser parser, File matrixfile, float defaultDistance) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
+    this.defaultDistance = defaultDistance;
   }
 
   @Override
@@ -128,7 +137,7 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
    * @throws IOException
    */
   protected void loadCache(int size, InputStream in) throws IOException {
-    cache = new TLongFloatHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, Float.POSITIVE_INFINITY);
+    cache = new TLongFloatHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, defaultDistance);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {
@@ -195,6 +204,30 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Parameter that specifies the name of the distance matrix file.
+     * <p>
+     * Key: {@code -distance.matrix}
+     * </p>
+     */
+    public static final OptionID MATRIX_ID = FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID;
+
+    /**
+     * Optional parameter to specify the parsers to provide a database, must
+     * extend {@link DistanceParser}. If this parameter is not set,
+     * {@link AsciiDistanceParser} is used as parser for all input files.
+     * <p>
+     * Key: {@code -distance.parser}
+     * </p>
+     */
+    public static final OptionID PARSER_ID = FileBasedSparseDoubleDistanceFunction.Parameterizer.PARSER_ID;
+
+    /**
+     * Optional parameter to specify the distance to return when no distance was
+     * given in the file. Defaults to infinity.
+     */
+    public static final OptionID DEFAULTDIST_ID = FileBasedSparseDoubleDistanceFunction.Parameterizer.DEFAULTDIST_ID;
+
+    /**
      * Input file.
      */
     protected File matrixfile = null;
@@ -204,23 +237,33 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
      */
     protected DistanceParser parser = null;
 
+    /**
+     * Distance to return when not defined otherwise.
+     */
+    protected float defaultDistance = Float.POSITIVE_INFINITY;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter MATRIX_PARAM = new FileParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(FileBasedSparseDoubleDistanceFunction.Parameterizer.PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
+      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         parser = PARSER_PARAM.instantiateClass(config);
+      }
+
+      DoubleParameter distanceP = new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY);
+      if(config.grab(distanceP)) {
+        defaultDistance = (float) distanceP.doubleValue();
       }
     }
 
     @Override
     protected FileBasedSparseFloatDistanceFunction makeInstance() {
-      return new FileBasedSparseFloatDistanceFunction(parser, matrixfile);
+      return new FileBasedSparseFloatDistanceFunction(parser, matrixfile, defaultDistance);
     }
   }
 }
