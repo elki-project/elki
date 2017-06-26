@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -62,11 +63,12 @@ import gnu.trove.map.hash.TLongFloatHashMap;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction")
+public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(FileBasedFloatDistanceFunction.class);
+  private static final Logging LOG = Logging.getLogger(FileBasedSparseFloatDistanceFunction.class);
 
   /**
    * The distance cache
@@ -94,23 +96,23 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
    * @param parser Parser
    * @param matrixfile input file
    */
-  public FileBasedFloatDistanceFunction(DistanceParser parser, File matrixfile) {
+  public FileBasedSparseFloatDistanceFunction(DistanceParser parser, File matrixfile) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
   }
 
   @Override
-  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> relation) {
     if(cache == null) {
       try {
-        loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
+        loadCache(relation.size(), new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
       }
     }
-    return super.instantiate(database);
+    return super.instantiate(relation);
   }
 
   @Override
@@ -121,11 +123,12 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
   /**
    * Fill cache from an input stream.
    * 
+   * @param size Expected size
    * @param in Input stream
    * @throws IOException
    */
-  protected void loadCache(InputStream in) throws IOException {
-    cache = new TLongFloatHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Float.POSITIVE_INFINITY);
+  protected void loadCache(int size, InputStream in) throws IOException {
+    cache = new TLongFloatHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, Float.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {
@@ -141,14 +144,12 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
         }
         cache.put(makeKey(id1, id2), (float) distance);
       }
-
-      @Override
-      public boolean containsKey(int id1, int id2) {
-        return cache.containsKey(makeKey(id1, id2));
-      }
     });
     if(min != 0) {
       LOG.verbose("Distance matrix is supposed to be 0-indexed. Choosing offset " + min + " to compensate.");
+    }
+    if(max + 1 - min != size) {
+      LOG.warning("ID range is not consistent with relation size.");
     }
   }
 
@@ -181,7 +182,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
     if(getClass() != obj.getClass()) {
       return false;
     }
-    FileBasedFloatDistanceFunction other = (FileBasedFloatDistanceFunction) obj;
+    FileBasedSparseFloatDistanceFunction other = (FileBasedSparseFloatDistanceFunction) obj;
     return this.cache.equals(other.cache);
   }
 
@@ -206,20 +207,20 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter MATRIX_PARAM = new FileParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      final FileParameter MATRIX_PARAM = new FileParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(FileBasedDoubleDistanceFunction.Parameterizer.PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
+      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(FileBasedSparseDoubleDistanceFunction.Parameterizer.PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         parser = PARSER_PARAM.instantiateClass(config);
       }
     }
 
     @Override
-    protected FileBasedFloatDistanceFunction makeInstance() {
-      return new FileBasedFloatDistanceFunction(parser, matrixfile);
+    protected FileBasedSparseFloatDistanceFunction makeInstance() {
+      return new FileBasedSparseFloatDistanceFunction(parser, matrixfile);
     }
   }
 }

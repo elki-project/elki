@@ -35,15 +35,4 @@ public interface DistanceCacheWriter {
    * @param distance the distance value
    */
   void put(int id1, int id2, double distance);
-
-  /**
-   * Returns <tt>true</tt> if the specified distance cache contains a distance
-   * value for the specified ids.
-   * 
-   * @param id1 the first id offset
-   * @param id2 the second id offset
-   * @return <tt>true</tt> if this cache contains a distance value for the
-   *         specified ids, false otherwise
-   */
-  boolean containsKey(int id1, int id2);
 }

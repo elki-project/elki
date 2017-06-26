@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -63,11 +64,12 @@ import gnu.trove.map.hash.TLongDoubleHashMap;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction")
+public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(FileBasedDoubleDistanceFunction.class);
+  private static final Logging LOG = Logging.getLogger(FileBasedSparseDoubleDistanceFunction.class);
 
   /**
    * The distance cache
@@ -95,23 +97,24 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
    * @param parser Parser
    * @param matrixfile input file
    */
-  public FileBasedDoubleDistanceFunction(DistanceParser parser, File matrixfile) {
+  public FileBasedSparseDoubleDistanceFunction(DistanceParser parser, File matrixfile) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
   }
 
   @Override
-  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> relation) {
     if(cache == null) {
+      int size = relation.size();
       try {
-        loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
+        loadCache(size, new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
       }
     }
-    return super.instantiate(database);
+    return super.instantiate(relation);
   }
 
   @Override
@@ -122,11 +125,13 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
   /**
    * Fill cache from an input stream.
    * 
+   * @param size Expected size
    * @param in Input stream
    * @throws IOException
    */
-  protected void loadCache(InputStream in) throws IOException {
-    cache = new TLongDoubleHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Double.POSITIVE_INFINITY);
+  protected void loadCache(int size, InputStream in) throws IOException {
+    // Expect a sparse matrix here.
+    cache = new TLongDoubleHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, Double.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {
@@ -142,14 +147,12 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
         }
         cache.put(makeKey(id1, id2), distance);
       }
-
-      @Override
-      public boolean containsKey(int id1, int id2) {
-        return cache.containsKey(makeKey(id1, id2));
-      }
     });
     if(min != 0 && LOG.isVerbose()) {
       LOG.verbose("Distance matrix is supposed to be 0-indexed. Choosing offset " + min + " to compensate.");
+    }
+    if(max + 1 - min != size) {
+      LOG.warning("ID range is not consistent with relation size.");
     }
   }
 
@@ -182,7 +185,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
     if(getClass() != obj.getClass()) {
       return false;
     }
-    FileBasedDoubleDistanceFunction other = (FileBasedDoubleDistanceFunction) obj;
+    FileBasedSparseDoubleDistanceFunction other = (FileBasedSparseDoubleDistanceFunction) obj;
     return this.cache.equals(other.cache);
   }
 
@@ -239,8 +242,8 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
     }
 
     @Override
-    protected FileBasedDoubleDistanceFunction makeInstance() {
-      return new FileBasedDoubleDistanceFunction(parser, matrixfile);
+    protected FileBasedSparseDoubleDistanceFunction makeInstance() {
+      return new FileBasedSparseDoubleDistanceFunction(parser, matrixfile);
     }
   }
 }
