@@ -452,10 +452,10 @@ public final class VMath {
   }
 
   /**
-   * Matrix multiplication: v1 * m2
+   * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>)
    * 
    * @param v1 vector
-   * @param m2 other matrix
+   * @param m2 other matrix, must have one row.
    * @return Matrix product, v1 * m2
    */
   public static double[][] times(final double[] v1, final double[][] m2) {
@@ -1561,15 +1561,15 @@ public final class VMath {
     if(m1 == m2) {
       return true;
     }
-    if(m2 == null || m1.getClass() != m2.getClass() || m1.length != m2.length) {
+    if(m2 == null) {
       return false;
     }
-    final int columndimension = getColumnDimensionality(m1);
-    if(columndimension != getColumnDimensionality(m2)) {
+    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    if(rowdim != m2.length || coldim != getColumnDimensionality(m2)) {
       return false;
     }
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < rowdim; i++) {
+      for(int j = 0; j < coldim; j++) {
         if(Math.abs(m1[i][j] - m2[i][j]) > maxdelta) {
           return false;
         }
