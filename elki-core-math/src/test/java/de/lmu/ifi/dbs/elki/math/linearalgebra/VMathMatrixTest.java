@@ -69,7 +69,7 @@ public class VMathMatrixTest {
     };
     
     final double[][] out_case1 = transpose(m1);
-    assertTrue((almostEquals(res_case1, out_case1, 0)));
+    assertThat(res_case1, is(equalTo(out_case1)));
     assertNotSame(m1, out_case1);
     
     
@@ -98,6 +98,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixScalarMultiplication() {
+    // TODO: comment
     final double[][] m1 = TESTMATRIX;
     
     final double[][] m1_times_one_third = {
@@ -106,10 +107,8 @@ public class VMathMatrixTest {
         {1/3*m1[2][0], 1/3*m1[2][1], 1/3*m1[2][2], 1/3*m1[2][3], 1/3*m1[2][4]},
         {1/3*m1[3][0], 1/3*m1[3][1], 1/3*m1[3][2], 1/3*m1[3][3], 1/3*m1[3][4]}};
     
-    assertTrue(almostEquals(m1_times_one_third, times(m1, 1/3),EPSILON));
-
-    assertTrue(almostEquals(m1_times_one_third, timesEquals(m1, 1/3),EPSILON));
-
+    assertTrue(almostEquals(m1_times_one_third, times(m1, 1/3), EPSILON));
+    assertTrue(almostEquals(m1_times_one_third, timesEquals(m1, 1/3), EPSILON));
     
     final double[][] m1_times_zero = {
         {0, 0, 0, 0, 0},
@@ -117,11 +116,11 @@ public class VMathMatrixTest {
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0}};
 
-    assertThat(m1_times_zero, times(m1, is(equalTo(0) )));
-    assertThat(m1_times_zero, timesEquals(m1, is(equalTo(0) )));
+    assertThat(m1_times_zero, is(equalTo(times(m1, 0) )));
+    assertThat(m1_times_zero, is(equalTo(timesEquals(m1, 0) )));
     
-    assertThat(m1, times(m1, is(equalTo(1))));
-    assertThat(m1, timesEquals(copy(m1), is(equalTo(1))));
+    assertThat(m1, is(equalTo(times(m1, 1))));
+    assertThat(m1, is(equalTo(timesEquals(m1, 1))));
   }
   
   /**
@@ -135,12 +134,12 @@ public class VMathMatrixTest {
     final double[][] m1_t = transpose(m1);
     
     // check times(Matrix, id) = Matrix = times(id, Matrix) 
-    assertThat(m1, times(m1, is(equalTo(unitMatrix(5) ))));
-    assertThat(m1, times(unitMatrix(4), is(equalTo(m1 ))));
+    assertThat(m1, is(equalTo(times(m1, unitMatrix(5) ))));
+    assertThat(m1, is(equalTo(times(unitMatrix(4), m1 ))));
     
     // check transposeTimesTranspose(Matrix, id) = transpose(Matrix) = transposeTimesTranspose(id, Matrix) 
-    assertThat(m1_t, transposeTimesTranspose(m1, is(equalTo(unitMatrix(4) ))));
-    assertThat(m1_t, transposeTimesTranspose(unitMatrix(5), is(equalTo(m1 ))));
+    assertThat(m1_t, is(equalTo(transposeTimesTranspose(m1, unitMatrix(4) ))));
+    assertThat(m1_t, is(equalTo(transposeTimesTranspose(unitMatrix(5), m1 ))));
     
     final double[][] m1_times_m1transposed = { 
         {transposeTimes(m1[0], m1[0]), transposeTimes(m1[0], m1[1]), transposeTimes(m1[0], m1[2]), transposeTimes(m1[0], m1[3]) },
@@ -149,13 +148,13 @@ public class VMathMatrixTest {
         {transposeTimes(m1[3], m1[0]), transposeTimes(m1[3], m1[1]), transposeTimes(m1[3], m1[2]), transposeTimes(m1[3], m1[3]) } };
     
     // check timesTranspose without not using a matrix methods times
-    assertThat(m1_times_m1transposed, timesTranspose(m1, is(equalTo(m1) )));
+    assertThat(m1_times_m1transposed, is(equalTo(timesTranspose(m1, m1) )));
     
     // check timesTranspose without not using a vector method transposeTimes
     // this is at the same time a test for the times method assuming the test before succeeded.
-    assertThat(times(m1, m1_t), timesTranspose(m1, is(equalTo(m1) )));
+    assertThat(times(m1, m1_t), is(equalTo(timesTranspose(m1, m1) )));
     // and the following analog a test for the transposeTimesTranspose method
-    assertThat(transposeTimesTranspose(m1_t, m1), timesTranspose(m1, is(equalTo(m1) )));
+    assertThat(transposeTimesTranspose(m1_t, m1), is(equalTo(timesTranspose(m1, m1) )));
     
     
     final double[][] m1transposed_times_m1 = {
@@ -167,13 +166,13 @@ public class VMathMatrixTest {
  
     // check transposeTimes without not using a matrix methods times
     // without transpose and times
-    assertThat(m1transposed_times_m1, transposeTimes(m1, is(equalTo(m1) )));
+    assertThat(m1transposed_times_m1, is(equalTo(transposeTimes(m1, m1) )));
     
     // check transposeTimes without using a vector method timesTransposed
     // this is as well a test for the transposeTimesTranspose method assuming the test before succeeded.
-    assertThat(times(m1_t, m1), transposeTimes(m1, is(equalTo(m1) )));
+    assertThat(times(m1_t, m1), is(equalTo(transposeTimes(m1, m1) )));
     // and the following analog a test for the transposeTimesTranspose method
-    assertThat(transposeTimesTranspose(m1, m1_t), transposeTimes(m1, is(equalTo(m1) )));
+    assertThat(transposeTimesTranspose(m1, m1_t), is(equalTo(transposeTimes(m1, m1) )));
 
     // TODO extra testcase for times and  transposedTimestransposed
 
@@ -280,7 +279,7 @@ public class VMathMatrixTest {
         {m1[r[1]][c[0]], m1[r[1]][c[1]], m1[r[1]][c[2]], m1[r[1]][c[3]]},
         {m1[r[2]][c[0]], m1[r[2]][c[1]], m1[r[2]][c[2]], m1[r[2]][c[3]]} };
 
-    assertThat(sub1, getMatrix(m1, r, is(equalTo(c) ))); 
+    assertThat(sub1, is(equalTo(getMatrix(m1, r, c) ))); 
     
     // test getMatrix(Matrix, rowstart, rowend , columns)
     final double[][] sub2 = {
@@ -289,7 +288,7 @@ public class VMathMatrixTest {
         {m1[4][c[0]], m1[4][c[1]], m1[4][c[2]], m1[4][c[3]]},
         {m1[5][c[0]], m1[5][c[1]], m1[5][c[2]], m1[5][c[3]]} };
     
-    assertThat(sub2, getMatrix(m1, 2, 5, is(equalTo(c) )));
+    assertThat(sub2, is(equalTo(getMatrix(m1, 2, 5, c) )));
     
     // test getMatrix(Matrix, rows, columnstart, columnend)
     final double[][] sub3 = {
@@ -297,7 +296,7 @@ public class VMathMatrixTest {
         {m1[r[1]][4], m1[r[1]][5], m1[r[1]][6], m1[r[1]][7]},
         {m1[r[2]][4], m1[r[2]][5], m1[r[2]][6], m1[r[2]][7]} };
 
-    assertThat(sub3, getMatrix(m1, r, 4, is(equalTo(7) )));
+    assertThat(sub3, is(equalTo(getMatrix(m1, r, 4, 7) )));
     
     // test getMatrix(Matrix, rowstart, rowend, columnstart, columnend)
     final double[][] sub4 = {
@@ -305,16 +304,16 @@ public class VMathMatrixTest {
     {m1[1][6], m1[1][7], m1[1][8]},
     {m1[2][6], m1[2][7], m1[2][8]} };
      
-    assertThat(sub4, getMatrix(m1, 0, 2, 6, is(equalTo(8) )));
+    assertThat(sub4, is(equalTo(getMatrix(m1, 0, 2, 6, 8) )));
     
     // FIXME: maybe randomize
-    assertThat(m1, getMatrix(m1, 0, getRowDimensionality(m1)-1, 0, is(equalTo(getColumnDimensionality(m1)-1) )));
+    assertThat(m1, is(equalTo(getMatrix(m1, 0, getRowDimensionality(m1)-1, 0, getColumnDimensionality(m1)-1) )));
 
     final int[] riter = {3,4,5};
     final int[] citer = {0,1,2};
-    assertThat(getMatrix(m1, riter, citer), getMatrix(m1, riter[0], riter[riter.length-1], citer[0], is(equalTo(citer[citer.length-1]) )));
-    assertThat(getMatrix(m1, riter, citer), getMatrix(m1, riter, citer[0], is(equalTo(citer[citer.length-1]) )));
-    assertThat(getMatrix(m1, riter, citer), getMatrix(m1, riter[0], riter[riter.length-1], is(equalTo(citer) )));
+    assertThat(getMatrix(m1, riter, citer), is(equalTo(getMatrix(m1, riter[0], riter[riter.length-1], citer[0], citer[citer.length-1]) )));
+    assertThat(getMatrix(m1, riter, citer), is(equalTo(getMatrix(m1, riter, citer[0], citer[citer.length-1]) )));
+    assertThat(getMatrix(m1, riter, citer), is(equalTo(getMatrix(m1, riter[0], riter[riter.length-1], citer) )));
    
 
     // test getCol and getRow 

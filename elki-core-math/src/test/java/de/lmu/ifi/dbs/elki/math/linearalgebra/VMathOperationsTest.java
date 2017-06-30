@@ -24,6 +24,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -134,7 +135,7 @@ public final class VMathOperationsTest {
     
     assertThat(v1, is(equalTo(v1)));
     assertThat(v1, is(equalTo(v1_copy)));
-    assertFalse(Equals(unitVector(6, 2), v1));
+    assertThat(unitVector(6, 2), is(not(equalTo(v1))));
     
     
     // Equals(Matrix)
@@ -156,7 +157,7 @@ public final class VMathOperationsTest {
         
     assertThat(m1, is(equalTo(m1)));
     assertThat(m1, is(equalTo(m1_copy)));
-    assertFalse(Equals(identity(6, 3), m1));
+    assertThat(identity(6, 3), is(not(equalTo(m1))));
     
     // TODO: Question: more testcases?
     
