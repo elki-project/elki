@@ -676,7 +676,7 @@ public final class VMath {
    * @param v2 second vector
    * @return comparison result
    */
-  public static boolean Equals(final double[] v1, final double[] v2) {
+  public static boolean equals(final double[] v1, final double[] v2) {
     return Arrays.equals(v1, v2);
   }
 
@@ -1529,7 +1529,7 @@ public final class VMath {
    * @param m2 Other matrix
    * @return Equality
    */
-  public static boolean Equals(final double[][] m1, final double[][] m2) {
+  public static boolean equals(final double[][] m1, final double[][] m2) {
     return Arrays.deepEquals(m1, m2);
   }
 
