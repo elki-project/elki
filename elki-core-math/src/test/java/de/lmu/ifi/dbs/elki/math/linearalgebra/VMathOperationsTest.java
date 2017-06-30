@@ -22,10 +22,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
-
-
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 /**
@@ -35,19 +32,7 @@ import org.junit.Test;
  * 
  */
 public final class VMathOperationsTest {
-  
-  // TODO: replace with import of VMathMatrix test
-  protected final double[][] TESTMATRIXA = {
-      // (v1     ,      v2    ,      v3    ,    v4 ) 
-      {1,2,3,4,5}, {2,3,4,5,1}, {3,4,5,1,2}, {4,5,1,2,3}};
-  
-  // TODO: replace with import of VMathMatrixtest
-  public final double[][] DIMTESTMATRIXA = {{1}};
-  
-  // TODO: replace with import of VMathvectortest
-  protected final double[] TESTVECA = {2,3,5,7,9};
-  
-  
+    
   /**
    * A small number to handle numbers near 0 as 0.
    */
@@ -60,7 +45,7 @@ public final class VMathOperationsTest {
    * copy(vector), TOIMPL: copy(Matrix), columPackedCopy(Matrix), rowPackedcCopy(Matrix)
    */
   @Test
-  public void testcopy() {
+  public void testCopy() {
     
     // testing copy(vector) method
     double[] v; double[] v_copy;
@@ -76,7 +61,7 @@ public final class VMathOperationsTest {
     assertNotSame(v, v_copy);
     
     //testing copy(Matrix) method
-    final double[][] m1 = TESTMATRIXA;
+    final double[][] m1 = VMathMatrixTest.TESTMATRIX;
     final double[][] m1_copy = copy(m1);
     assertTrue(Equals(m1, m1_copy));
     assertNotSame(m1, m1_copy);
@@ -108,7 +93,7 @@ public final class VMathOperationsTest {
    * Testing the hashcode() method of VMath class.
    */
   @Test
-  public void testhashcode() {
+  public void testHashcode() {
 
     // TODO QUEST: hashCode(v1) hashCode(m1) test needed?
   }
@@ -119,16 +104,15 @@ public final class VMathOperationsTest {
    * QUEST vector and matrix in one mehtod
    */
   @Test
-  public void testclear() {
-    
+  public void testClear() {
     
     // test clear(vector) with TESTVEC of lenght 5
-    double[] v = copy(TESTVECA); clear(v); 
+    double[] v = VMathVectorTest.TESTVEC; clear(v); 
     final double[] zeros5 = {0,0,0,0,0};
     assertArrayEquals(zeros5, v, 0.);
     
     // test clear(matrix) with TESTMATRIX of dimesions 45x5
-    double[][] m = copy(TESTMATRIXA); clear(m);   
+    double[][] m = copy(VMathMatrixTest.TESTMATRIX); clear(m);   
     final double[][] zeros4x5 = {{0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}};
     
     assertTrue(almostEquals(zeros4x5 , m, 0.));
@@ -177,38 +161,38 @@ public final class VMathOperationsTest {
   }
   
   /**
-   * Testing the almostEquals and almostEquals and methods of VMath class.
+   * Testing the almostEquals and methods of VMath class.
    * 
-   * Note that almostEquals(m1,m2) is evivalent to almostEquals(m1,m2, {@link VMath#DELTA})
+   * Note that almostEquals(m1,m2) is equivalent to almostEquals(m1,m2, {@link VMath#DELTA})
    * @see VMath#almostEquals(double[][], double[][])
    */
   @Test
   public void testMatrixAlmosteq() {
 
-    final double[][] m = copy(TESTMATRIXA);
+    final double[][] m = copy(VMathMatrixTest.TESTMATRIX);
     
     final double[][] unit4x5 = {
         {1,0,0,0,0}, {0,1,0,0,0}, {0,0,1,0,0}, {0,0,0,1,0}
     };
     
     // basic function test
-    assertTrue(almostEquals(m , TESTMATRIXA));
-    assertTrue(almostEquals(m , TESTMATRIXA, 0.));
+    assertTrue(almostEquals(m , VMathMatrixTest.TESTMATRIX));
+    assertTrue(almostEquals(m , VMathMatrixTest.TESTMATRIX, 0.));
     assertFalse(almostEquals(m, unit4x5));
     assertFalse(almostEquals(m, unit4x5, EPSILON));
     
     
     // fail if dimensions mismatch
-    assertFalse(almostEquals(m, DIMTESTMATRIXA));
+    assertFalse(almostEquals(m, VMathMatrixTest.DIMTESTMATRIX));
     
     // fail if difference d > maxdelta with increasing maxdelta
     // maxdelta = EPSILON
-    double[][] res_diff = copy(TESTMATRIXA); res_diff[3][3] += 1.5*EPSILON;
+    double[][] res_diff = copy(VMathMatrixTest.TESTMATRIX); res_diff[3][3] += 1.5*EPSILON;
     assertFalse(almostEquals(m, res_diff, EPSILON));
     res_diff[3][3] -= EPSILON;
     assertTrue(almostEquals(m, res_diff, EPSILON));
     
-    // maxdelta DELTA of VMath respectivly 1E-5
+    // maxdelta DELTA of VMath respectively 1E-5
     res_diff[0][4] += 1.5E-5;
     assertFalse(almostEquals(m, res_diff));
     res_diff[0][4] -= 1E-5;

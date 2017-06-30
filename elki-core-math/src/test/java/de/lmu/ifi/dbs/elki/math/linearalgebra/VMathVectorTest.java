@@ -22,13 +22,13 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
+import static org.junit.Assert.*;
 
 import org.junit.Rule;
 //import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 //import org.junit.rules.RuleChain;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 
 
@@ -51,7 +51,7 @@ public final class VMathVectorTest {
   /**
    * vector of length 5 for testing
    */
-  protected final double[] TESTVEC = {2,3,5,7,9};
+  protected static final double[] TESTVEC = {2,3,5,7,9};
   
   
   @Rule
@@ -61,7 +61,7 @@ public final class VMathVectorTest {
   // Tests on general (matrix and vector) operations.
   
   @Test //index is given Starting 0. 
-  public void testVector_unitVector() {
+  public void testUnitVector() {
     
     // test if unitVector is returned
     // for dimension 3
@@ -135,7 +135,7 @@ public final class VMathVectorTest {
    * Testing the times method of VMath class.
    */
   @Test
-  public void testVectorTimes() {
+  public void testTimes() {
     
     final double[] v1       = {1,3,9,7}; 
     final double   s_case1  = 5;
@@ -154,7 +154,7 @@ public final class VMathVectorTest {
   }
   
   @Test
-  public void testVectorPLUS() {
+  public void testPlus() {
     // TODO: Degenerate cases: and comment
     assertVectorLengthMismatch("plus() length mismatch", () -> plus(new double[]{2,2}, new double[]{1}));
     
@@ -266,7 +266,7 @@ public final class VMathVectorTest {
    * 
    */
   @Test
-  public void testVectorMINUS() {
+  public void testMinus() {
     double s1,s2,d; double[] v1, v2, res_plus, res_plus_scal, res_plusTimes, res_timesPlus, res_timesPlustimes;
     final double delta = 1E-10;
     
@@ -310,7 +310,7 @@ public final class VMathVectorTest {
    * normalize(), normalizeEquals()
    */
   @Test
-  public void testVectorNORMALIZE() {
+  public void testNormalize() {
     // TODO: Implement: normalize()
     // TODO: Implement: normalizeEquals()
   }
@@ -341,7 +341,7 @@ public final class VMathVectorTest {
    * 
    */
   @Test
-  public void testVectorANGLE() {
+  public void testAngle() {
     // TODO: Implement: angle(v1, v2);
     // FIXME: Question new class?
     // TODO: Implement: angle(v1, v2, o);
@@ -352,8 +352,16 @@ public final class VMathVectorTest {
    * Testing the sum methods of VMath class.
    */
   @Test
-  public void testVectorsum() {
-    // TODO: Implement: sum(v1)
+  public void testSum() {
+    // TODO: more defindes testing Implement: sum(v1)
+    final double res1_sum = TESTVEC[0]+TESTVEC[1]+TESTVEC[2]+TESTVEC[3]+TESTVEC[4];
+    assertEquals(res1_sum, sum(TESTVEC), 0.);
+    
+    assertEquals(1 , sum(unitVector(20, 10)), 0.);
+    
+    final double[] v = { 0.1234512345123456 , - 0.123451234512345};
+    assertEquals( 0, sum(v), EPSILON);
+    
     // TODO: Implement: squareSum(v1)
     // TODO: Implement: euclideanLength(v1) FIXME: Question Here or extra method?
   }
@@ -362,7 +370,7 @@ public final class VMathVectorTest {
    * Testing the transposed method of VMath class.
    */
   @Test // FIXME: Question Matrix implemeted without final? Problem Transposed² not identity
-  public void testtransposed() {
+  public void testTransposed() {
     double[] v1; double[][] res;
     //TODO implement with almostEquals and update structure 
     v1  = new double[] {0.12345, 1E25 , 1};
@@ -387,7 +395,7 @@ public final class VMathVectorTest {
    * Testing the rotate90 method of VMath class.
    */
   @Test
-  public void testVector_rotate90() { // FIXME: Question notation of methods?
+  public void testVectorRotate90() { // FIXME: Question notation of methods?
     // TODO: Implement: rotate90Equals(v1)
   }
 
@@ -399,7 +407,7 @@ public final class VMathVectorTest {
    * This class tests the VMath methods as in {@link #testVectorPLUS } {@link #testVectorMINUS} and ...
    */
   @Test
-  public void testVectorREF() {
+  public void testVectorReference() {
     final double[] v1 = {0};
     final double[] v2 = {0};
     final double s1 = 0;

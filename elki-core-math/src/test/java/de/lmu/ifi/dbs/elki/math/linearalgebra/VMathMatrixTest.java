@@ -21,11 +21,8 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
@@ -39,7 +36,7 @@ public class VMathMatrixTest {
   /**
    * Nonsymmetric 4 x 5 (rows x columns) TESTMATRIX
    */
-  protected final double[][] TESTMATRIX = {
+  protected static final double[][] TESTMATRIX = {
       {1,2,3,4,5}, 
       {2,3,4,5,1}, 
       {3,4,5,1,2}, 
@@ -48,12 +45,9 @@ public class VMathMatrixTest {
   /**
    * 1x1 Matrix testing for dimension mismatch testing.
    */
-  public final double[][] DIMTESTMATRIX = {{1}};
+  protected static final double[][] DIMTESTMATRIX = {{1}};
   
   protected static final double EPSILON = 1E-15;
-  
-  // TODO: replace with import of VMathVectortest
-  protected final double[] TESTVEC = {2,3,5,7,9};
   
   /**
    * Testing the transposed(Matrix) method of VMath class.
@@ -85,7 +79,7 @@ public class VMathMatrixTest {
    * Testing the Matrix plus operations of VMath class.
    */
   @Test
-  public void testMatrixPLUS() {
+  public void testPlus() {
     // TODO: implement plus(m1, m2); plusEquals(m1, m2); plusTimes(m1, m2, s2) ... as in VectorPLUS 
   }
   
@@ -93,7 +87,7 @@ public class VMathMatrixTest {
    * Testing the Matrix minus operations of VMath class.
    */
   @Test
-  public void testMatrixMINUS() {
+  public void testMinus() {
     // TODO: implement minus(m1, m2) ... as in VectorMinus 
   }
   
@@ -196,7 +190,7 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixVectorMultiplication() {
-    // TODO: more testcases via eigenvalues.
+    // TODO: more testcases via eigenvalues. New class for new Times and Transposed 
     final double[][] m1 = {
         {1.21, 2000},
         {0   ,-1   },
@@ -222,8 +216,10 @@ public class VMathMatrixTest {
     //   this is why this method exists                                                                                       |- is aMatrix
     // basically same timesTransposed as above but second vector given as matrix bzw m1 = transpose(transpose(vector))
     
-    // transposedTimes(vector, Matrix) same as transposed(transposedTimes(matrix, vector)
+    // transposedTimes(vector, Matrix) same as transpose(transposeTimes(matrix, vector))
     // problem may be assertation not m2.lenth but columndimension needed
+    
+    // TODO Vortrag: Warum so viele Verschieden Multiplicationen Querverweise.
      
   }
     
@@ -250,7 +246,7 @@ public class VMathMatrixTest {
                                       {0,0,1,0,0}};
 
     // TODO: implement Dimension Missmatch probably in extra class
-
+    // FIXME: randomize
     assertTrue(Equals(identity(3, 5), m_identity3x5));   
     assertTrue(Equals(identity(5, 3), transpose(m_identity3x5)));  
      
@@ -353,12 +349,14 @@ public class VMathMatrixTest {
    */
   @Test
   public void testDiagonal() {
-    final double[][] m_diag = {{TESTVEC[0],0,0,0,0},
-                               {0,TESTVEC[1],0,0,0},
-                               {0,0,TESTVEC[2],0,0},
-                               {0,0,0,TESTVEC[3],0},
-                               {0,0,0,0,TESTVEC[4]}};
-    assertTrue(Equals(diagonal(TESTVEC), m_diag));
+    
+    final double[] m = VMathVectorTest.TESTVEC;
+    final double[][] m_diag = {{m[0],0,0,0,0},
+                               {0,m[1],0,0,0},
+                               {0,0,m[2],0,0},
+                               {0,0,0,m[3],0},
+                               {0,0,0,0,m[4]}};
+    assertTrue(Equals(diagonal(m), m_diag));
     
     final double[] dia_TEST = { TESTMATRIX[0][0],TESTMATRIX[1][1],TESTMATRIX[2][2],TESTMATRIX[3][3] };
     assertArrayEquals(dia_TEST, getDiagonal(TESTMATRIX), 0.);
@@ -410,7 +408,7 @@ public class VMathMatrixTest {
    * Testing the inverse method of VMath class.
    */
   @Test
-  public void testinverse() {
+  public void testInverse() {
     // TODO: implement inverse(elements)
   }
   
