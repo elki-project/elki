@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -63,13 +65,13 @@ public final class VMathOperationsTest {
     //testing copy(Matrix) method
     final double[][] m1 = VMathMatrixTest.TESTMATRIX;
     final double[][] m1_copy = copy(m1);
-    assertTrue(Equals(m1, m1_copy));
+    assertThat(m1, is(equalTo(m1_copy)));
     assertNotSame(m1, m1_copy);
     
     final double[][] m2 = {{0, 1, 0.123451234512345, 2},
                            {2, 3, 4.123451234512345,-1}};
     final double[][] m2_copy = copy(m2);
-    assertTrue(Equals(m2, m2_copy));
+    assertThat(m2, is(equalTo(m2_copy)));
     assertNotSame(m2, m2_copy);
     
     //testing columPackedCopy(Matrix) method
@@ -130,8 +132,8 @@ public final class VMathOperationsTest {
     // module to be able to use Equals in testcopy
     final double[] v1_copy = {2,4,3,0,-5,9};
     
-    assertTrue(Equals(v1, v1));
-    assertTrue(Equals(v1, v1_copy));
+    assertThat(v1, is(equalTo(v1)));
+    assertThat(v1, is(equalTo(v1_copy)));
     assertFalse(Equals(unitVector(6, 2), v1));
     
     
@@ -152,8 +154,8 @@ public final class VMathOperationsTest {
                                 {-3, 0, 3},
                                 { 1, 1, 1}};
         
-    assertTrue(Equals(m1, m1));
-    assertTrue(Equals(m1, m1_copy));
+    assertThat(m1, is(equalTo(m1)));
+    assertThat(m1, is(equalTo(m1_copy)));
     assertFalse(Equals(identity(6, 3), m1));
     
     // TODO: Question: more testcases?
