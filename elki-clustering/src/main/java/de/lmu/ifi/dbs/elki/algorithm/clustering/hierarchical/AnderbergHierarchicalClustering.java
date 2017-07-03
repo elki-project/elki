@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -72,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "M. R. Anderberg", //
     title = "Hierarchical Clustering Methods", //
     booktitle = "Cluster Analysis for Applications")
+@Priority(Priority.RECOMMENDED)
 public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger

@@ -123,7 +123,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     for(Cluster<?> clus : split) {
       CovarianceMatrix covmat = CovarianceMatrix.make(relation, clus.getIDs());
       averages.put(clus, covmat.getMeanVector());
-      covmats.put(clus, covmat.destroyToNaiveMatrix());
+      covmats.put(clus, covmat.destroyToPopulationMatrix());
     }
 
     MeanVarianceStaticHistogram hist = new MeanVarianceStaticHistogram(numbins, 0.0, 1.0);

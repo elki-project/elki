@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -69,6 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering")
+@Priority(Priority.SUPPLEMENTARY - 5)
 public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -123,12 +124,23 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the name of the distance matrix file.
+     * <p>
+     * Key: {@code -distance.matrix}
+     * </p>
+     */
+    public static final OptionID MATRIX_ID = DiskCacheBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID;
+
+    /**
+     * The distance matrix
+     */
     protected OnDiskUpperTriangleMatrix cache = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter param = new FileParameter(DiskCacheBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      final FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(param)) {
         File matrixfile = param.getValue();
         try {

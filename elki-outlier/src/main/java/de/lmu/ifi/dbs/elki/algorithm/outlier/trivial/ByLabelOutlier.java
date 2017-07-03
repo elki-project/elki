@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Priority(Priority.SUPPLEMENTARY)
 public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Our logger.

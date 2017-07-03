@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 
 /**
@@ -53,7 +53,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable> extends Dista
    * @return the minimum distance between the given MBR and the FeatureVector
    *         object according to this distance function
    */
-  double minDist(SpatialComparable mbr, DBID id);
+  double minDist(SpatialComparable mbr, DBIDRef id);
 
   /**
    * Get the inner distance function.

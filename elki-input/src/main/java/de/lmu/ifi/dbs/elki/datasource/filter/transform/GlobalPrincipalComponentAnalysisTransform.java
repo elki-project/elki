@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -59,6 +60,7 @@ import net.jafama.FastMath;
  * @param <O> Vector type
  */
 @Alias({ "whiten", "whitening", "pca" })
+@Priority(Priority.RECOMMENDED)
 public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> extends AbstractVectorConversionFilter<O, O> {
   /**
    * Class logger.
@@ -123,7 +125,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   @Override
   protected void prepareComplete() {
     mean = covmat.getMeanVector();
-    PCAResult pcares = (new PCARunner(null)).processCovarMatrix(covmat.destroyToSampleMatrix());
+    PCAResult pcares = (new PCARunner(null)).processCovarMatrix(covmat.destroyToPopulationMatrix());
     SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;
 

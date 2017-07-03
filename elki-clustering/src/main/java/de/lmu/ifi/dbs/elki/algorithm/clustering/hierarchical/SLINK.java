@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -69,12 +70,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
 @Reference(authors = "R. Sibson", //
-title = "SLINK: An optimally efficient algorithm for the single-link cluster method", //
-booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
-url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
+    title = "SLINK: An optimally efficient algorithm for the single-link cluster method", //
+    booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
+    url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", //
-"single-link", "single-linkage" })
-public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
+    "single-link", "single-linkage" })
+@Priority(Priority.RECOMMENDED)
+public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * The logger for this class.
    */

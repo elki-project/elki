@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -99,7 +100,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("P3C: A Robust Projected Clustering Algorithm.")
-@Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", url = "http://dx.doi.org/10.1109/ICDM.2006.123")
+@Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", //
+    title = "P3C: A Robust Projected Clustering Algorithm", //
+    booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", //
+    url = "http://dx.doi.org/10.1109/ICDM.2006.123")
+@Priority(Priority.RECOMMENDED - 10) // More specialized
 public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

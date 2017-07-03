@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -97,10 +98,11 @@ import net.jafama.FastMath;
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "LoOP: Local Outlier Probabilities", //
-booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", //
-url = "http://dx.doi.org/10.1145/1645953.1646195")
+    title = "LoOP: Local Outlier Probabilities", //
+    booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", //
+    url = "http://dx.doi.org/10.1145/1645953.1646195")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP")
+@Priority(Priority.RECOMMENDED)
 public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -241,7 +243,9 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     // computing PRDs
     FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1); // + query point
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1); // +
+                                                                       // query
+                                                                       // point
       // use first kref neighbors as reference set
       int ks = 0;
       double ssum = 0.;
@@ -273,7 +277,8 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
     double nplof = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1); // + query point
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1); // + query
+                                                                      // point
       // use first kref neighbors as comparison set.
       int ks = 0;
       double sum = 0.;

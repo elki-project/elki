@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -81,6 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "Mining frequent patterns without candidate generation", //
     booktitle = "Proceedings of the 2000 ACM SIGMOD international conference on Management of data ", //
     url = "http://dx.doi.org/10.1145/342009.335372")
+@Priority(Priority.RECOMMENDED)
 public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.

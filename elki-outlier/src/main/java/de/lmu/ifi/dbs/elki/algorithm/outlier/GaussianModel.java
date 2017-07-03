@@ -105,7 +105,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     CovarianceMatrix temp = CovarianceMatrix.make(relation);
     double[] mean = temp.getMeanVector(relation).toArray();
     // debugFine(mean.toString());
-    double[][] covarianceMatrix = temp.destroyToNaiveMatrix();
+    double[][] covarianceMatrix = temp.destroyToPopulationMatrix();
     // debugFine(covarianceMatrix.toString());
     double[][] covarianceTransposed = inverse(covarianceMatrix);
 

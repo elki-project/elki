@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -79,9 +80,10 @@ import net.jafama.FastMath;
  * @param <O> Object type
  */
 @Reference(authors = "E. Biçici and D. Yuret", //
-title = "Locally Scaled Density Based Clustering", //
-booktitle = "Adaptive and Natural Computing Algorithms", //
-url = "http://dx.doi.org/10.1007/978-3-540-71618-1_82")
+    title = "Locally Scaled Density Based Clustering", //
+    booktitle = "Adaptive and Natural Computing Algorithms", //
+    url = "http://dx.doi.org/10.1007/978-3-540-71618-1_82")
+@Priority(Priority.IMPORTANT)
 public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Class logger.
@@ -331,13 +333,13 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

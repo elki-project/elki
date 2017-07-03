@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 
 /**
  * Trivial method that claims to find no outliers. Can be used as reference
@@ -43,6 +44,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Our logger.

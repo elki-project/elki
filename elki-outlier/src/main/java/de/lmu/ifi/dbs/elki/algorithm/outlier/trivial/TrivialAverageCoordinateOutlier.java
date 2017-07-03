@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 
 /**
  * Trivial method that takes the average of all dimensions (for one-dimensional
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Our logger.

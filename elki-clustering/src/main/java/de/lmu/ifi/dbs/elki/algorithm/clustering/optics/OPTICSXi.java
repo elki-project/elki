@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -70,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.has SteepAreaResult oneway - «produces»
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
+@Priority(Priority.RECOMMENDED)
 public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
   /**
    * The logger for this class.

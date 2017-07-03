@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.parser.ArffParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @apiviz.landmark
  */
 @Alias("de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection")
+@Priority(Priority.IMPORTANT)
 public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
   /**
    * Constructor.

@@ -24,10 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization.ParameterPair;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -137,47 +134,7 @@ public class MergedParameterization implements Parameterization {
   }
 
   @Override
-  public boolean grab(Parameter<?> opt) {
-    try {
-      // Try given or default value:
-      return setValueForOption(opt) || opt.tryDefaultValue();
-    }
-    catch(ParameterException e) {
-      reportError(e);
-      return false;
-    }
-  }
-
-  @Override
   public boolean hasUnusedParameters() {
     return inner.hasUnusedParameters();
-  }
-
-  @Override
-  public boolean checkConstraint(GlobalParameterConstraint constraint) {
-    // TODO: does checkConstraint work here reliably?
-    return inner.checkConstraint(constraint);
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> r, Class<?> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(r, c, this);
-    }
-    catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
-  }
-
-  @Override
-  public <C> C tryInstantiate(Class<C> c) {
-    try {
-      return ClassGenericsUtil.tryInstantiate(c, c, this);
-    }
-    catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
-      return null;
-    }
   }
 }

@@ -53,11 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Number Distance Parser")
 @Description("Parser for the following line format:\n" //
-+ "id1 id2 distanceValue, where id1 and is2 are integers starting at 0 representing the two ids belonging to the distance value.\n" //
-+ "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
+    + "id1 id2 distanceValue, where id1 and is2 are integers starting at 0 representing the two ids belonging to the distance value.\n" //
+    + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser", //
-"de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser", //
-"de.lmu.ifi.dbs.elki.parser.NumberDistanceParser" })
+    "de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser", //
+    "de.lmu.ifi.dbs.elki.parser.NumberDistanceParser" })
 public class AsciiDistanceParser implements DistanceParser {
   /**
    * The logger for this class.
@@ -89,15 +89,13 @@ public class AsciiDistanceParser implements DistanceParser {
   public void parse(InputStream in, DistanceCacheWriter cache) {
     reader.reset(in);
 
-    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
     try {
+      int id1, id2;
       while(reader.nextLineExceptComments()) {
-        LOG.incrementProcessed(prog);
         if(!tokenizer.valid()) {
           throw new IllegalArgumentException("Less than three values in line " + reader.getLineNumber());
         }
-        int id1, id2;
         try {
           id1 = tokenizer.getIntBase10();
           tokenizer.advance();
@@ -120,19 +118,8 @@ public class AsciiDistanceParser implements DistanceParser {
           throw new IllegalArgumentException("Less than three values in line " + reader.getLineNumber());
         }
 
-        // Track minimum and maximum
-        if(id1 < id2) {
-          min = (id1 < min) ? id1 : min;
-          max = (id2 > min) ? id2 : max;
-        }
-        else {
-          min = (id2 < min) ? id2 : min;
-          max = (id1 > min) ? id1 : max;
-        }
-
         try {
-          double distance = tokenizer.getDouble();
-          cache.put(id1, id2, distance);
+          cache.put(id1, id2, tokenizer.getDouble());
         }
         catch(IllegalArgumentException e) {
           throw new IllegalArgumentException("Error in line " + reader.getLineNumber() + ":" + e.getMessage(), e);
@@ -141,6 +128,7 @@ public class AsciiDistanceParser implements DistanceParser {
         if(tokenizer.valid()) {
           throw new IllegalArgumentException("More than three values in line " + reader.getLineNumber());
         }
+        LOG.incrementProcessed(prog);
       }
     }
     catch(IOException e) {
@@ -148,15 +136,6 @@ public class AsciiDistanceParser implements DistanceParser {
     }
 
     LOG.setCompleted(prog);
-
-    // check if all distance values are specified
-    for(int i1 = min; i1 <= max; i1++) {
-      for(int i2 = i1 + 1; i2 <= max; i2++) {
-        if(!cache.containsKey(i1, i2)) {
-          throw new IllegalArgumentException("Distance value for " + i1 + " to " + i2 + " is missing!");
-        }
-      }
-    }
   }
 
   /**

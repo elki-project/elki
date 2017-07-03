@@ -45,6 +45,6 @@ public class StandardCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
    */
   @Override
   public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> database) {
-    return CovarianceMatrix.make(database, ids).destroyToNaiveMatrix();
+    return CovarianceMatrix.make(database, ids).destroyToPopulationMatrix();
   }
 }

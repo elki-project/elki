@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class FileBasedFloatDistanceFunctionTest extends AbstractClusterAlgorithmTest {
+public class FileBasedSparseDoubleDistanceFunctionTest extends AbstractClusterAlgorithmTest {
   final static String FILENAME = "elki/testdata/unittests/distance/AsciiDistanceMatrix.ascii";
 
   @Test
@@ -58,11 +58,11 @@ public class FileBasedFloatDistanceFunctionTest extends AbstractClusterAlgorithm
     db.initialize();
 
     ListParameterization distparams = new ListParameterization();
-    distparams.addParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
-    FileBasedFloatDistanceFunction df = new FileBasedFloatDistanceFunction(//
-        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null);
+    distparams.addParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
+    FileBasedSparseDoubleDistanceFunction df = new FileBasedSparseDoubleDistanceFunction(//
+        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null, Double.POSITIVE_INFINITY);
     // We need to read from a resource, instead of a file.
-    df.loadCache(FileUtil.openSystemFile(FILENAME));
+    df.loadCache(4, FileUtil.openSystemFile(FILENAME));
     SLINK<DBID> slink = new SLINK<>(df);
     CutDendrogramByHeight clus = new CutDendrogramByHeight(slink, 0.5, false);
     Clustering<DendrogramModel> c = clus.run(db);

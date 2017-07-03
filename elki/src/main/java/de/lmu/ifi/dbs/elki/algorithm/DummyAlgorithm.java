@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -38,7 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Dummy algorithm, which just iterates over all points once, doing a 10NN query
  * each. Useful in testing e.g. index structures and as template for custom
  * algorithms. While this algorithm doesn't produce a result, it
- * still performs rather expensive operations. If you are looking for an algorithm that does <em>nothing</em>,
+ * still performs rather expensive operations. If you are looking for an
+ * algorithm that does <em>nothing</em>,
  * you must use {@link de.lmu.ifi.dbs.elki.algorithm.NullAlgorithm
  * NullAlgorithm} instead.
  * 
@@ -50,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes an Euclidean 10NN query on all data points, and can be used in unit testing")
+@Priority(Priority.SUPPLEMENTARY)
 public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Result> {
   /**
    * The logger for this class.

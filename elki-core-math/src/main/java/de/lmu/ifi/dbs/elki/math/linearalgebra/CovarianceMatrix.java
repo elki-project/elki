@@ -281,12 +281,12 @@ public class CovarianceMatrix {
    * degrees of freedom.
    * 
    * This method duplicates the matrix contents, so it does allow further
-   * updates. Use {@link #destroyToNaiveMatrix()} if you do not need further
+   * updates. Use {@link #destroyToPopulationMatrix()} if you do not need further
    * updates.
    * 
    * @return New matrix
    */
-  public double[][] makeNaiveMatrix() {
+  public double[][] makePopulationMatrix() {
     if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
@@ -315,12 +315,12 @@ public class CovarianceMatrix {
    * degrees of freedom.
    * 
    * This method doesn't require matrix duplication, but will not allow further
-   * updates, the object should be discarded. Use {@link #makeNaiveMatrix()} if
+   * updates, the object should be discarded. Use {@link #makePopulationMatrix()} if
    * you want to perform further updates.
    * 
    * @return New matrix
    */
-  public double[][] destroyToNaiveMatrix() {
+  public double[][] destroyToPopulationMatrix() {
     if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }

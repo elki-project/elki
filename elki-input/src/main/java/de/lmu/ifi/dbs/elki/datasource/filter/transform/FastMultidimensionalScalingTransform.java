@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -61,6 +62,7 @@ import net.jafama.FastMath;
  * @param <I> Data type
  */
 @Alias({ "fastmds" })
+@Priority(Priority.IMPORTANT - 1)
 public class FastMultidimensionalScalingTransform<I, O extends NumberVector> implements ObjectFilter {
   /**
    * Class logger.

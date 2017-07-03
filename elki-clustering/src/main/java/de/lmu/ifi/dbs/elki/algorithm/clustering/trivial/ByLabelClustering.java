@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -75,6 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering")
+@Priority(Priority.SUPPLEMENTARY)
 public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -202,15 +204,16 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   private void assign(HashMap<String, DBIDs> labelMap, String label, DBIDRef id) {
     if(labelMap.containsKey(label)) {
       DBIDs exist = labelMap.get(label);
-      if (exist instanceof DBID) {
+      if(exist instanceof DBID) {
         ModifiableDBIDs n = DBIDUtil.newHashSet();
-        n.add((DBID)exist);
+        n.add((DBID) exist);
         n.add(id);
         labelMap.put(label, n);
-      } else {
-        assert(exist instanceof HashSetModifiableDBIDs);
+      }
+      else {
+        assert (exist instanceof HashSetModifiableDBIDs);
         assert (exist.size() > 1);
-        ((ModifiableDBIDs)exist).add(id);
+        ((ModifiableDBIDs) exist).add(id);
       }
     }
     else {

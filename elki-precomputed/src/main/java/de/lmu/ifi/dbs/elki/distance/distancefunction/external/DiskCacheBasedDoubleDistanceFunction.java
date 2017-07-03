@@ -106,10 +106,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
     DiskCacheBasedDoubleDistanceFunction other = (DiskCacheBasedDoubleDistanceFunction) obj;
@@ -124,8 +121,6 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    // TODO: constructor with file.
-
     /**
      * Parameter that specifies the name of the distance matrix file.
      * <p>
@@ -133,8 +128,11 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
      * </p>
      */
     public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
-    "The name of the file containing the distance matrix.");
+        "The name of the file containing the distance matrix.");
 
+    /**
+     * The distance matrix
+     */
     protected OnDiskUpperTriangleMatrix cache = null;
 
     @Override

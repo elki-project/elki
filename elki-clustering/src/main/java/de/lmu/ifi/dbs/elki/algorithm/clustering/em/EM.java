@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -84,6 +85,7 @@ import net.jafama.FastMath;
     booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
     url = "http://www.jstor.org/stable/2984875")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
+@Priority(Priority.RECOMMENDED)
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * The logger for this class.

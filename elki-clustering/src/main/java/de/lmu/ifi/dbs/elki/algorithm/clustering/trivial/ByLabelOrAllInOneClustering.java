@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 /**
  * Trivial class that will try to cluster by label, and fall back to an
  * "all-in-one" clustering.
@@ -37,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Erich Schubert
  * @since 0.2
  */
+@Priority(Priority.SUPPLEMENTARY - 50)
 public class ByLabelOrAllInOneClustering extends ByLabelClustering {
   /**
    * Constructor.

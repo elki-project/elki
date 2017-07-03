@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -79,10 +80,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
 @Reference(authors = "S. Ramaswamy, and R. Rastogi, and K. Shim", //
-title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
-booktitle = "Proc. Int. Conf. on Management of Data, 2000", //
-url = "http://dx.doi.org/10.1145/342009.335437")
+    title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
+    booktitle = "Proc. Int. Conf. on Management of Data, 2000", //
+    url = "http://dx.doi.org/10.1145/342009.335437")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier", "knno" })
+@Priority(Priority.RECOMMENDED)
 public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -167,8 +169,8 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
      * Parameter to specify the k nearest neighbor
      */
     public static final OptionID K_ID = new OptionID("knno.k", //
-    "The k nearest neighbor, excluding the query point "//
-    + "(i.e. query point is the 0-nearest-neighbor)");
+        "The k nearest neighbor, excluding the query point "//
+            + "(i.e. query point is the 0-nearest-neighbor)");
 
     /**
      * k parameter
@@ -179,7 +181,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
