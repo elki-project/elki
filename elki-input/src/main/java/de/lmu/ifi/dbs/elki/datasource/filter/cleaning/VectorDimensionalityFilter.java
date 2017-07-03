@@ -191,7 +191,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     /**
      * Parameter for specifying the dimensionality.
      */
-    private static final OptionID DIM_P = new OptionID("filter.dim", "Dimensionality of vectors to retain.");
+    public static final OptionID DIM_P = new OptionID("filter.dim", "Dimensionality of vectors to retain.");
 
     /**
      * Desired dimensionality.

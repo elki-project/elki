@@ -33,7 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * A filter to sort the data set by some label.
+ * A filter to sort the data set by some label. The filter sorts the
+ * labels in alphabetical order.
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -57,7 +58,7 @@ public class SortByLabelFilter implements ObjectFilter {
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
     if(LOG.isDebugging()) {
-      LOG.debug("Shuffling the data set");
+      LOG.debug("Sorting the data set");
     }
 
     // Prepare a reposition array for cheap resorting

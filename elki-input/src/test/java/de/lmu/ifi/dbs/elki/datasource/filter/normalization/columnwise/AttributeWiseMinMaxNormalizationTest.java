@@ -46,6 +46,7 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
+    // Allow loading test data from resources.
     AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
@@ -53,7 +54,40 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that minimum and maximum are 0 and 1:
+    // We verify that minimum and maximum values in each column are 0 and 1:
+    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    for(int row = 0; row < bundle.dataLength(); row++) {
+      Object obj = bundle.data(row, 0);
+      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
+      DoubleVector d = (DoubleVector) obj;
+      for(int col = 0; col < dim; col++) {
+        final double val = d.doubleValue(col);
+        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
+          mms[col].put(val);
+        }
+      }
+    }
+    for(int col = 0; col < dim; col++) {
+      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
+      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+    }
+  }
+  
+  /**
+   * Test with default parameters and for correcting handling of NaN and Inf.
+   */
+  @Test
+  public void NaNParameters() {
+    String filename = UNITTEST + "nan-test-1.csv";
+    // Allow loading test data from resources.
+    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    MultipleObjectsBundle bundle = readBundle(filename, filter);
+    // Ensure the first column are the vectors.
+    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
+    // This cast is now safe (vector field):
+    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
+
+    // We verify that minimum and maximum values in each column are 0 and 1:
     DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
