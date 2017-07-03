@@ -1597,7 +1597,7 @@ public final class VMath {
    * @return the number of rows.
    */
   public static int getRowDimensionality(final double[][] m1) {
-    return m1[0].length;
+    return m1.length;
   }
 
   /**
@@ -1607,7 +1607,7 @@ public final class VMath {
    * @return the number of columns.
    */
   public static int getColumnDimensionality(final double[][] m1) {
-    return m1.length;
+    return m1[0].length;
   }
 
   /**
