@@ -21,9 +21,13 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMathOperationsTest.assertDimensionMismatch;
+import java.math.*;
 
 import static org.junit.Assert.*;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import org.junit.Rule;
 //import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
@@ -45,22 +49,21 @@ public final class VMathVectorTest {
   
   /**
    * Error message (in assertions!) when vector dimensionalities do not agree.
+   * @see VMath#ERR_VEC_DIMENSIONS
    */
   protected static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
+
+  /**
+   * Error message if expected {@link ERR_VEC_DIMENSIONS} Error is not raised.
+   */
+  protected static final String NO_ERR_VEC_DIMENSIONS_RAISE = "Failed to raise expected errormessage:".concat(ERR_VEC_DIMENSIONS);
   
   /**
    * vector of length 5 for testing
    */
   protected static final double[] TESTVEC = {2,3,5,7,9};
-  
-  
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
-  
-  // Tests on general (matrix and vector) operations.
-  
-  @Test //index is given Starting 0. 
+  @Test
   public void testUnitVector() {
     
     // test if unitVector is returned
@@ -76,20 +79,13 @@ public final class VMathVectorTest {
     assertArrayEquals(new double[] {0,0,0,1,0}, unitVector(5,3),0. );
     assertArrayEquals(new double[] {0,0,0,0,1}, unitVector(5,4),0. );
     
-    
-    // Assertion that index out of bound exception is raised. FIXME other implementation needed
-    exception.expect(IndexOutOfBoundsException.class);
-    unitVector(0,0);
-    unitVector(4,4);
-    unitVector(10,15);
-  
+
   }
 
   
   @Deprecated
   @Test
   public void testplus() {
-    // TODO: Merge into testVectorAdd
     double[] v1,v2, RES_VEC;
     
 
@@ -104,11 +100,6 @@ public final class VMathVectorTest {
     v2      = new double[] {1.123456789123456789E-17, 1E17, 1};
     RES_VEC = new double[] {1                       , 1E17, 2};
     assertArrayEquals(RES_VEC,plus(v1,v2),0);
-    
-    
-    // test ERR_VEC_DIMENSIONS
-    exception.expect(AssertionError.class);
-    exception.expectMessage(ERR_VEC_DIMENSIONS);
     
     v1      = new double[] {1,1};
     v2      = new double[] {1};
@@ -156,7 +147,6 @@ public final class VMathVectorTest {
   @Test
   public void testPlus() {
     // TODO: Degenerate cases: and comment
-    assertVectorLengthMismatch("plus() length mismatch", () -> plus(new double[]{2,2}, new double[]{1}));
     
     // TODO: redefine structure with final double res vector and manual implementation of computations in. assert equality of method . .Equals
     double s1,s2,d; double[] v1, v2, res_plus, res_plus_scal, res_plusTimes, res_timesPlus, res_timesPlustimes;
@@ -185,7 +175,7 @@ public final class VMathVectorTest {
     // plus  and plusEquals (Vector + Vector) 
     assertArrayEquals(res_plus, out = plus(v1,v2), EPSILON);
     assertArrayEquals(res_plus, plusEquals(in_eq = copy(v1), v2), EPSILON);
-    assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TODO: Implement go on doing this
+    assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TODO: beispiel fuer Vortrag
     
     //plus() and plusEquals (Vector + Skalar)
     d = 13;
@@ -286,22 +276,50 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing VMath Vector Products. 
-   * 
-   * scalarProduct, 3D Cross Product, Vector*scalar, ...
-   * 
-   * 
+   * Testing VMath Vector scalarProduct and transposeTimes methods
    */
   @Test
-  public void testVectorProducts() {
-    // einzelne klassen
-    // TODO: Implement: test for cross3D()
+  public void testScalarProduct() {
     
-    // TODO: Implement: test for scalarProduct()
+    // testing scalarProduct(vector, vector)
+    final double[] v1 = {1.21, 3 , 7 ,-2};
+    final double[] v2 = {3.5 , -1, 4 ,-7};
+    final double res = v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]+v1[3]*v2[3];
+    
+    assertEquals(transposeTimes(v1, v2), scalarProduct(v1, v2), EPSILON);
+    assertEquals(res, scalarProduct(v1, v2), EPSILON);
+    assertEquals(squareSum(v1), scalarProduct(v1, v1), EPSILON);
+    
+    
+    // TODO: ?randomize or more test
     
     // FIXME: Question implement tests for transposedtimes(), timestransposed() here.
-    // FIXME: Question isn't transposedtimes equal to scalarProduct --> kick one!
-
+  }
+  
+  /**
+   * Testing the timesTranspose method of VMath class. 
+   */
+  @Test
+  public void testTimesTranspose() {
+ 
+    final double[] v1 = {1.21, 3 , 7 ,-2};
+    final double[] v2 = {3.5 , -1, 4 ,-7};
+    
+    final double[][] res = {
+        {v1[0]*v2[0], v1[0]*v2[1], v1[0]*v2[2], v1[0]*v2[3]},
+        {v1[1]*v2[0], v1[1]*v2[1], v1[1]*v2[2], v1[1]*v2[3]},
+        {v1[2]*v2[0], v1[2]*v2[1], v1[2]*v2[2], v1[2]*v2[3]},
+        {v1[3]*v2[0], v1[3]*v2[1], v1[3]*v2[2], v1[3]*v2[3]} };
+    
+    assertThat(timesTranspose(v1, v2), is(equalTo(res)));
+    
+    // testing timesTranspose(vector, vector) via times(matrix, matrix)
+    // because times(vector) returns a matrix. This is at the same time a test for transpose if timesTranspose is correct.
+    //FIXME: transpose(v1) with result {v1}?
+    final double[][] m1 = transpose(transpose(TESTVEC));
+    final double[][] m2 = transpose(TESTVEC);
+    
+    assertThat(timesTranspose(TESTVEC, TESTVEC), is(equalTo(times(m1, m2))));
   }
 
   /**
@@ -313,26 +331,6 @@ public final class VMathVectorTest {
   public void testNormalize() {
     // TODO: Implement: normalize()
     // TODO: Implement: normalizeEquals()
-  }
-
-  // TODO: move to top or bottom, or shared class
-  private static void assertVectorLengthMismatch(String msg, Runnable r) {
-    try {
-      r.run();
-    } catch(AssertionError e) {
-      // TODO: assert exception message as desired.
-      return; // If assertions are enabled.
-    } catch(ArrayIndexOutOfBoundsException e) {
-      return; // Expected failure
-    }
-    // We can only guarantee an error if assertions are enabled with -ea.
-    assert(failWrapper(msg));
-  }
-
-  // TODO: explain that we need a "fail" that returns boolean.
-  private static boolean failWrapper(String msg) {
-    fail(msg);
-    return true;
   }
 
   /**
@@ -353,41 +351,60 @@ public final class VMathVectorTest {
    */
   @Test
   public void testSum() {
-    // TODO: more defindes testing Implement: sum(v1)
-    final double res1_sum = TESTVEC[0]+TESTVEC[1]+TESTVEC[2]+TESTVEC[3]+TESTVEC[4];
-    assertEquals(res1_sum, sum(TESTVEC), 0.);
+    // TODO: more defindes testing Implement: 
+    final double[] v = TESTVEC;
     
-    assertEquals(1 , sum(unitVector(20, 10)), 0.);
+    // testing sum(vector)
+    final double res_vsum = v[0]+v[1]+v[2]+v[3]+v[4];
+    assertEquals(res_vsum, sum(v), 0.);
     
-    final double[] v = { 0.1234512345123456 , - 0.123451234512345};
-    assertEquals( 0, sum(v), EPSILON);
+    assertEquals(1 , sum(unitVector(3, 1)), 0.);
     
-    // TODO: Implement: squareSum(v1)
-    // TODO: Implement: euclideanLength(v1) FIXME: Question Here or extra method?
+    final double[] v1 = { 0.1234512345123456 , - 0.123451234512345};
+    assertEquals( 0, sum(v1), EPSILON);
+    
+    
+    // testing squareSum(vector)
+    final double res_vsumsqare = v[0]*v[0]+v[1]*v[1]+v[2]*v[2]+v[3]*v[3]+v[4]*v[4];
+    assertEquals(res_vsumsqare, squareSum(v), 0.);
+    assertEquals(1 , squareSum(unitVector(20, 10)), 0.);
+    
+    // testing euclideanLength(vector) FIXME: Question Here or extra method?
+    final double res_veuclid = Math.sqrt(res_vsumsqare);
+    assertEquals(res_veuclid, euclideanLength(v), EPSILON);
+    assertEquals(1 , euclideanLength(unitVector(3, 1)), 0.);
   }
     
   /**
-   * Testing the transposed method of VMath class.
+   * Testing the transpose(vector) method of VMath class.
    */
-  @Test // FIXME: Question Matrix implemeted without final? Problem Transposed² not identity
+  @Test // FIXME: Question comment on why in loops
   public void testTransposed() {
-    double[] v1; double[][] res;
-    //TODO implement with almostEquals and update structure 
-    v1  = new double[] {0.12345, 1E25 , 1};
-    res = transpose(v1);
+    
+    // testcase 1
+    final double[] v1 = TESTVEC;
+    final double[][] v1_t = transpose(v1);
     
     for(int i = 0; i< v1.length; i++){
-      assertEquals(v1[i], res[i][0],0);
-      assertEquals(1, res[i].length );
+      assertEquals(v1[i], v1_t[i][0],0);
+      assertEquals(1, v1_t[i].length );
     }
+    // test that double transpose or rather tranpose(matrix) after
+    // transpose(matrix) returns v1 but in Matrix form
+    final double[][] v1_t_t = {v1};
+    assertThat(transpose(transpose(v1)), is(equalTo(v1_t_t)));
     
-    v1 = new double[] {4,5,6,0,2,1};
-    res = transpose(v1);
-    
-    for(int i = 0; i< v1.length; i++){
-      assertEquals(v1[i], res[i][0],0);
-      assertEquals(1, res[i].length );
+    // testcase 2
+    final double[] v2 = {4,5,6,0,2,1};
+    final double[][] v2_t = transpose(v2);
+    for(int i = 0; i< v2.length; i++){
+      assertEquals(v2[i], v2_t[i][0],0);
+      assertEquals(1, v2_t[i].length );
     }
+    // test that double transpose or rather tranpose(matrix) after
+    // transpose(matrix) returns v1 but in Matrix form which is still to interpret as vector //FIXME: transpose(v1) with result {v1}?
+    final double[][] v2_t_t = {v2};
+    assertThat(transpose(transpose(v2)), is(equalTo(v2_t_t)));
       
   }
 
@@ -395,16 +412,18 @@ public final class VMathVectorTest {
    * Testing the rotate90 method of VMath class.
    */
   @Test
-  public void testVectorRotate90() { // FIXME: Question notation of methods?
+  public void testVectorRotate90() { 
     // TODO: Implement: rotate90Equals(v1)
   }
 
-  //FIXME: Question REF method instead of VectorREF Missmach?
+  //TODO: complete
   /**
-   * Testing that *Equals vector-operations of the {@link VMath} class work in place and the other operations don't.
-   *  
-   *  
-   * This class tests the VMath methods as in {@link #testVectorPLUS } {@link #testVectorMINUS} and ...
+   * Testing that *Equals vector-operations of the {@link VMath} class work in place and testing that other vector-operations create a new instance.
+   * 
+   * Tests of vector-methods where the class of the instance returned differs form class of input method are omitted e.g. transposed
+   * 
+   * For a complete list of tested methods
+   * @see testPlus, testMinus, 
    */
   @Test
   public void testVectorReference() {
@@ -414,7 +433,7 @@ public final class VMathVectorTest {
     final double s2 = 0;
     final double d  = 0;
     
-    // VectorADD
+    // methods as in testPlus
     assertNotSame(v1, plus(v1, d));
     assertSame(v1, plusEquals(v1, d));
     
@@ -433,7 +452,7 @@ public final class VMathVectorTest {
     assertNotSame(v1, timesPlusTimes(v1, s1, v2, s2));
     assertSame(v1, timesPlusTimesEquals(v1, s1, v2, s2));
     
-    // VectorMINUS
+    
     assertNotSame(v1, minus(v1, d));
     assertSame(v1, minusEquals(v1, d));
     
@@ -453,9 +472,8 @@ public final class VMathVectorTest {
     assertSame(v1, timesMinusTimesEquals(v1, s1, v2, s2));
 
   }
-  
  
-  // FIXME: Question DimensionMissmach method instead of VectorDim missmach?
+  // TODO: complete
   /**
    * testing that Error is Vector dimension missmach is raised if input data of Vector Operation has different dimensions.
    * 
@@ -465,26 +483,43 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorDimensionMissmach() {
-    // TODO: Implement with new assertVectorLengthMismach
     
-    final double[] v1      = {1,1};
-    final double[] v2      = {1};
+    final double[] v1      = {1};
+    final double[] v2      = {1,1};
     double s1,s2; s1 = s2 = 1;
 
-    assertVectorLengthMismatch("Angle with different length should fail.", () -> plus(v1, v2));
+    // methods as in testPlus
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plus(v1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusEquals(v1, v2));
+
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlus(v1, s1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusEquals(v1, s1, v2));
+
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimes(v1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimesEquals(v1, v2, s2));
+
+
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimes(v1, s1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimesEquals(v1, s1, v2, s2));
     
-    // 
-    plus(v1, v2);
-    plusEquals(v1, v2);
+    // methods as in testMinus
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minus(v1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusEquals(v1, v2));
     
-    timesPlus(v1, s1, v2);
-    timesPlusEquals(v1, s1, v2);
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinus(v1, s1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusEquals(v1, s1, v2));
     
-    plusTimes(v1, v2, s2);
-    plusTimesEquals(v1, v2, s2);
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimes(v1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimesEquals(v1, v2, s2));
     
-    timesPlusTimes(v1, s1, v2, s2);
-    timesPlusTimesEquals(v1, s1, v2, s2);
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimes(v1, s1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimesEquals(v1, s1, v2, s2));
+    
+    // test unitMatrix
+    assertDimensionMismatch("", () -> unitVector(0,0));
+    assertDimensionMismatch("", () -> unitVector(4,4));
+    assertDimensionMismatch("", () -> unitVector(10,15));
+
     
   }
 
