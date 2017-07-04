@@ -453,7 +453,6 @@ public final class VMathVectorTest {
     assertSame(v1, timesPlusTimesEquals(v1, s1, v2, s2));
     
     
-    // methods as in testMinus
     assertNotSame(v1, minus(v1, d));
     assertSame(v1, minusEquals(v1, d));
     
