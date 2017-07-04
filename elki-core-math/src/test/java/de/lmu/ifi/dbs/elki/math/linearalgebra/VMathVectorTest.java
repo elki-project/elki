@@ -44,22 +44,16 @@ import org.junit.Test;
  */
 public final class VMathVectorTest {
 
-  // TODO: replace with import of VMathOperationstest
-  protected static final double EPSILON = 1E-15;
+  private static final double EPSILON = VMathOperationsTest.EPSILON;
   
   /**
    * Error message (in assertions!) when vector dimensionalities do not agree.
    * @see VMath#ERR_VEC_DIMENSIONS
    */
   protected static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
-
-  /**
-   * Error message if expected {@link ERR_VEC_DIMENSIONS} Error is not raised.
-   */
-  protected static final String NO_ERR_VEC_DIMENSIONS_RAISE = "Failed to raise expected errormessage:".concat(ERR_VEC_DIMENSIONS);
   
   /**
-   * vector of length 5 for testing
+   * A vector of length 5 for testing
    */
   protected static final double[] TESTVEC = {2,3,5,7,9};
 
@@ -446,13 +440,10 @@ public final class VMathVectorTest {
     assertNotSame(v1, plusTimes(v1, v2, s2));
     assertSame(v1, plusTimesEquals(v1, v2, s2));
     
-    assertNotSame(v1, timesPlus(v1, s1, v2));
-    assertSame(v1, timesPlusEquals(v1, s1, v2));
-    
     assertNotSame(v1, timesPlusTimes(v1, s1, v2, s2));
     assertSame(v1, timesPlusTimesEquals(v1, s1, v2, s2));
     
-    
+    // methods as in testMinus
     assertNotSame(v1, minus(v1, d));
     assertSame(v1, minusEquals(v1, d));
     
@@ -465,62 +456,66 @@ public final class VMathVectorTest {
     assertNotSame(v1, minusTimes(v1, v2, s2));
     assertSame(v1, minusTimesEquals(v1, v2, s2));
     
-    assertNotSame(v1, timesMinus(v1, s1, v2));
-    assertSame(v1, timesMinusEquals(v1, s1, v2));
-    
     assertNotSame(v1, timesMinusTimes(v1, s1, v2, s2));
     assertSame(v1, timesMinusTimesEquals(v1, s1, v2, s2));
 
   }
  
-  // TODO: complete
   /**
    * testing that Error is Vector dimension missmach is raised if input data of Vector Operation has different dimensions.
-   * 
-   * FIXME: Class not working properly. Break after the first Assertation error.
-   * Solution: Probably  with ErrorCollector Rule, but did not work in combination with expect expectation.
-   * Try with Test(expectation=AssertationError.class) but not good because error code may not be ERR_VEC_Dimesions
    */
   @Test
   public void testVectorDimensionMissmach() {
-    
-    final double[] v1      = {1};
-    final double[] v2      = {1,1};
+
+    final double[] v_len1 = {1};
+    final double[] v_len2 = {1,1};
+    final double[] v_len3 = {1,1,1};
     double s1,s2; s1 = s2 = 1;
-
+    
+    // test angle not needed
+    // test Normalize is not needed
+    
     // methods as in testPlus
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plus(v1, v2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusEquals(v1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plus(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusEquals(v_len1, v_len2));
 
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlus(v1, s1, v2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusEquals(v1, s1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlus(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusEquals(v_len1, s1, v_len2));
 
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimes(v1, v2, s2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimesEquals(v1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimes(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimesEquals(v_len1, v_len2, s2));
 
-
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimes(v1, s1, v2, s2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimesEquals(v1, s1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimes(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimesEquals(v_len1, s1, v_len2, s2));
     
     // methods as in testMinus
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minus(v1, v2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusEquals(v1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minus(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusEquals(v_len1, v_len2));
     
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinus(v1, s1, v2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusEquals(v1, s1, v2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinus(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusEquals(v_len1, s1, v_len2));
     
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimes(v1, v2, s2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimesEquals(v1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimes(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimesEquals(v_len1, v_len2, s2));
     
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimes(v1, s1, v2, s2));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimesEquals(v1, s1, v2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimes(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimesEquals(v_len1, s1, v_len2, s2));
     
-    // test unitMatrix
+    // methods as in testScalarProduct
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> scalarProduct(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> transposeTimes(v_len1, v_len2));
+    
+    // test for methods as in testSum is not needed
+    // test timesTranspose is no needed
+    
+    // unitVector only use index out of Bound exception in assertDimensionMismatch
     assertDimensionMismatch("", () -> unitVector(0,0));
     assertDimensionMismatch("", () -> unitVector(4,4));
     assertDimensionMismatch("", () -> unitVector(10,15));
-
     
+    // test rotate90
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> rotate90Equals(v_len1));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> rotate90Equals(v_len3)); 
   }
 
   
