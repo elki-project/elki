@@ -309,7 +309,7 @@ public class VMathMatrixTest {
     assertThat(getMatrix(m1, 0, 2, 6, 8) , is(equalTo(sub4)));
     
     // cross mehtods and general testing FIXME: maybe randomize
-    assertThat(getMatrix(m1, 0, getColumnDimensionality(m1)-1, 0, getRowDimensionality(m1)-1) , is(equalTo(m1)));
+    assertThat(getMatrix(m1, 0, getRowDimensionality(m1)-1, 0, getColumnDimensionality(m1)-1) , is(equalTo(m1)));
 
     final int[] riter = {3,4,5};
     final int[] citer = {0,1,2};
@@ -339,11 +339,11 @@ public class VMathMatrixTest {
         {0,0,0,0,0},
         {0,0,0,0,0} };
     
-    assertEquals(5, getRowDimensionality(m3));
-    assertEquals(5, getColumnDimensionality(transpose(m3) ));
+    assertEquals(3, getRowDimensionality(m3));
+    assertEquals(3, getColumnDimensionality(transpose(m3) ));
 
-    assertEquals(3, getColumnDimensionality(m3));
-    assertEquals(3, getRowDimensionality(transpose(m3) ));
+    assertEquals(5, getColumnDimensionality(m3));
+    assertEquals(5, getRowDimensionality(transpose(m3) ));
     
   }
   
@@ -443,8 +443,8 @@ public class VMathMatrixTest {
     
     // check that setting a full matrix  FIXME: maybe randomize
     final double[][] m2 = TESTMATRIX;
-    final double[][] res1 = new double[getColumnDimensionality(m2)][getRowDimensionality(m1)]; 
-    setMatrix(res1, 0, getColumnDimensionality(m2)-1, 0, getRowDimensionality(m2)-1, m2);
+    final double[][] res1 = new double[getRowDimensionality(m2)][getColumnDimensionality(m1)]; 
+    setMatrix(res1, 0, getRowDimensionality(m2)-1, 0, getColumnDimensionality(m2)-1, m2);
     assertThat(res1, is(equalTo(m2)));
     
     // check that different the different setMatrix methods to the same if exchangeable
