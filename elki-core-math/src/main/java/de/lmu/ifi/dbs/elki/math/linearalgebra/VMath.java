@@ -498,10 +498,10 @@ public final class VMath {
    * 
    * @param v1 vector
    * @param v2 other vector
-   * @return Matrix product, v1<sup>T</sup> * v2
+   * @return scalar result of matrix product, v1<sup>T</sup> * v2
    */
   public static double transposeTimes(final double[] v1, final double[] v2) {
-    assert (v2.length == v1.length) : ERR_MATRIX_INNERDIM;
+    assert (v2.length == v1.length) : ERR_VEC_DIMENSIONS;
     double s = 0;
     for(int k = 0; k < v1.length; k++) {
       s += v1[k] * v2[k];
