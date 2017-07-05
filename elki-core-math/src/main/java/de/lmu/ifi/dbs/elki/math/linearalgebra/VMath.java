@@ -97,11 +97,8 @@ public final class VMath {
    * @return Matrix
    */
   public static double[][] transpose(final double[] v) {
-    double[][] re = new double[v.length][1];
-    for(int i = 0; i < v.length; i++) {
-      re[i][0] = v[i];
-    }
-    return re;
+    final double[][] result = {v};
+    return result;
   }
 
   /**
