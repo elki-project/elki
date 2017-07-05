@@ -68,7 +68,7 @@ public final class VMathOperationsTest {
     try {
       r.run();
     } catch(AssertionError e) {
-      assertEquals(e.getMessage() , msg);
+      assertEquals(msg, e.getMessage());
       
       return; // If assertions are enabled.
     } catch(ArrayIndexOutOfBoundsException e) {
