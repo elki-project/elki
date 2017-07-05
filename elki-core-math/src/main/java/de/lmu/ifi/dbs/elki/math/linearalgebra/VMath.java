@@ -273,6 +273,7 @@ public final class VMath {
    * @return v1 - v2
    */
   public static double[] minus(final double[] v1, final double[] v2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i];
@@ -289,6 +290,7 @@ public final class VMath {
    * @return v1 - v2 * s2
    */
   public static double[] minusTimes(final double[] v1, final double[] v2, final double s2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i] * s2;
@@ -305,6 +307,7 @@ public final class VMath {
    * @return v1 * s1 - v2
    */
   public static double[] timesMinus(final double[] v1, final double s1, final double[] v2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i];
@@ -322,6 +325,7 @@ public final class VMath {
    * @return v1 * s1 - v2 * s2
    */
   public static double[] timesMinusTimes(final double[] v1, final double s1, final double[] v2, final double s2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i] * s2;
