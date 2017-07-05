@@ -95,7 +95,7 @@ public class VMathMatrixTest {
   }
   
   /**
-   * Testing the Matrix,Scalar multiplication methods of VMath class. 
+   * Testing the Matrix,Scalar multiplication methods times, timesEquals of VMath class. 
    */
   @Test
   public void testMatrixScalarMultiplication() {
@@ -126,10 +126,12 @@ public class VMathMatrixTest {
   
   /**
    * Testing the Matrix, Matrix multiplications methods of VMath class.
+   * <p>
+   * The following VMath methods are tested:<br>
+   * times, transposeTimesTranspose, timesTranspose, transposeTimes
    */
   @Test
   public void testMatrixMatrixMultiplication() {
-    //  test times(matrix, scalar); timesEquals(matrix, scalar)
     final double[][] m1 = TESTMATRIX;
     // TODO: implement transposed manually or assume transpose method to be correct
     final double[][] m1_t = transpose(m1);
@@ -189,6 +191,10 @@ public class VMathMatrixTest {
   
   /**
    * Testing the Matrix, Vector multiplications methods of VMath class. 
+   * <p>
+   * The following VMath methods are tested:<br>
+   * times(matrix, vector), times(vector, matrix), transposeTimes(matrix, vector), transposeTimes(vector, matrix),
+   * timesTranspose(vector, matrix), transposeTimesTimes(vector, matrix, vector)
    */
   @Test
   public void testMatrixVectorMultiplication() {
@@ -218,7 +224,7 @@ public class VMathMatrixTest {
     //   this is why this method exists                                                                                       |- is aMatrix
     // basically same timesTransposed as above but second vector given as matrix bzw m1 = transpose(transpose(vector))
     
-    // transposedTimes(vector, Matrix) same as transpose(transposeTimes(matrix, vector))
+    // timesTranspose(v1, m2); transposedTimes(vector, Matrix) same as transpose(transposeTimes(matrix, vector))
     // problem may be assertation not m2.lenth but columndimension needed
     
     // TODO Vortrag: Warum so viele Verschieden Multiplicationen Querverweise.
@@ -443,25 +449,24 @@ public class VMathMatrixTest {
     
     // check that setting a full matrix  FIXME: maybe randomize
     final double[][] m2 = TESTMATRIX;
-    final double[][] res1 = new double[getRowDimensionality(m2)][getColumnDimensionality(m1)]; 
+    final double[][] res1 = new double[getRowDimensionality(m2)][getColumnDimensionality(m2)]; 
     setMatrix(res1, 0, getRowDimensionality(m2)-1, 0, getColumnDimensionality(m2)-1, m2);
     assertThat(res1, is(equalTo(m2)));
     
     // check that different the different setMatrix methods to the same if exchangeable
-    final int[] riter = {3,4,5};
-    final int[] citer = {0,1,2};
+    final int[] riter = {0,1,2,3}, citer = {0,1,2,3,4};
     final double[][] res2 = new double[riter.length][citer.length];
     
     setMatrix(res2, riter[0], riter[riter.length-1], citer[0], citer[citer.length-1], m2);
-    assertThat(res2, is(equalTo( getMatrix(m1, riter, citer) ))); 
+    assertThat(res2, is(equalTo( getMatrix(m2, riter, citer) ))); 
     clear(res2);
     
     setMatrix(res2, riter, citer[0], citer[citer.length-1], m2);
-    assertThat(res2, is(equalTo( getMatrix(m1, riter, citer) ))); 
+    assertThat(res2, is(equalTo( getMatrix(m2, riter, citer) ))); 
     clear(res2);
     
     setMatrix(res2, riter[0], riter[riter.length-1], citer, m2);
-    assertThat(res2, is(equalTo( getMatrix(m1, riter, citer) ))); 
+    assertThat(res2, is(equalTo( getMatrix(m2, riter, citer) ))); 
     
     
     // testing setCol and setRow
@@ -558,6 +563,74 @@ public class VMathMatrixTest {
   }
   
   // TODO: implement Dimension mismatch
+  
+  /**
+   * Testing that *Equals Matrix-operations of the {@link VMath} 
+   * class work in place and testing that other matrix-operations
+   * create a new instance.
+   * 
+   * Tests of matrix-methods where the class of the instance 
+   * returned differs form class of input method are reasonably omitted,
+   * when testing reference.
+   * <p>
+   * For a complete list of tested methods: <br>
+   */
+  @Test
+  public void testReference() {
+    final double[][] m1 = {{1}}, m2 = {{1}};
+    
+    // testing the methods as in testAppendColums
+    assertNotSame(m1, appendColumns(m1, m2));
+    
+    // testing the methods as in Diagonal omitted
+    
+    // testing the methods as in testGet TODO: question inner object reference possible
+    
+    // testing the methods as in omitted
+    
+    // testing the methods as in testInverse
+    assertNotSame(m1, inverse(m1));
+    
+    // testing the methods as in testMatrixMatrixMultiplication
+    assertNotSame(m1, times(m1,m2));
+    assertNotSame(m1, times(m1,m2));
+    
+    assertNotSame(m1, transposeTimesTranspose(m1, m2));
+    assertNotSame(m2, transposeTimesTranspose(m1, m2));
+    
+    assertNotSame(m1, timesTranspose(m1,m2));
+    assertNotSame(m2, timesTranspose(m1,m2));
+    
+    assertNotSame(m1, transposeTimes(m1,m2));
+    assertNotSame(m2, transposeTimes(m1,m2));
+    
+    // testing the methods as in testMatrixScalarMultiplication 
+    final double s1 = 1;
+    assertNotSame(m1, times(m1, s1));
+    assertSame(m1, timesEquals(m1, s1));
+    
+    // testing the methods as in testTranspose
+    assertNotSame(m1, transpose(m1));
+    
+    // testing the methods as in testMatrixVectorMultiplication
+    final double[] v1 = {1}, v2 = {1};
+    
+    assertNotSame(m2, times(v1, m2));
+    assertNotSame(m1, times(m1, v2));
+    
+    assertNotSame(m1, transposeTimes(m1, v2));
+    assertNotSame(m2, transposeTimes(v1, m2));
+    
+    assertNotSame(m2, timesTranspose(v1, m2));
+    
+    // testing the methods as in testMinus
+    // TODO: implement when Minus
+    // testing the methods as in testPlus
+    // TODO: implement when Plus
+    // testing the methods as in testSet omitted no return values
+    // testing the methods as in testSolve omitted
+    // testing the methods as in testUnitMatrix omitted
+  }
 
 }
 
