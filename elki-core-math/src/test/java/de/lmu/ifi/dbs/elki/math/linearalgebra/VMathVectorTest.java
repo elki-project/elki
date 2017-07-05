@@ -97,11 +97,11 @@ public final class VMathVectorTest {
     RES_VEC = new double[] {1                       , 1E17, 2};
     assertArrayEquals(RES_VEC,plus(v1,v2),0);
     
-    v1      = new double[] {1,1};
-    v2      = new double[] {1};
-    RES_VEC = new double[] {};
-    assertArrayEquals(RES_VEC,plus(v1,v2),0);
-    
+//    v1      = new double[] {1,1};
+//    v2      = new double[] {1};
+//    RES_VEC = new double[] {};
+//    assertArrayEquals(RES_VEC,plus(v1,v2),0);
+//    
   }
 
   
@@ -311,6 +311,7 @@ public final class VMathVectorTest {
     final double[][] m1 = transpose(transpose(TESTVEC));
     final double[][] m2 = transpose(TESTVEC);
     
+    // FIXME: vector transpose issue
     assertThat(timesTranspose(TESTVEC, TESTVEC), is(equalTo(times(m1, m2))));
   }
 
@@ -406,22 +407,29 @@ public final class VMathVectorTest {
   @Test
   public void testVectorRotate90Equals() { 
     // simple testcase
-    final double[] v1 = {1,0};
-    final double[] res = {0,1};
+    final double[] v1 = {1, 0};
+    final double[] res = {0,-1};
     assertArrayEquals(res, rotate90Equals(v1), 0);
    
-    // more complex testcase via scalarProduct method TODO: randomize
+    // more complex testcase TODO: randomize
     final double[] v2 = {1.21, -2.4};
     final double[] v2_copy = copy(v2);
-    assertEquals(0.0, scalarProduct(v2_copy, v2), EPSILON);
+    assertEquals(0.0, scalarProduct(v2_copy, rotate90Equals(v2)), EPSILON);
+    final double[] v2_copy1rotate = copy(v2);
+    assertArrayEquals(times( v2_copy, -1), rotate90Equals(v2), EPSILON);
+    assertArrayEquals(times( v2_copy1rotate, -1), rotate90Equals(v2), EPSILON);
+    assertArrayEquals(v2_copy, rotate90Equals(v2), EPSILON);
+    
+    // TODO: Question What is angle? assertEquals(Math.PI/2, angle(v2, v2_copy), EPSILON);
   }
 
   /**
    * Testing that *Equals vector-operations of the {@link VMath} class work in place and testing that other vector-operations create a new instance.
    * 
-   * Tests of vector-methods where the class of the instance returned differs form class of input method are omitted e.g. transposed
+   * Tests of vector-methods where the class of the instance returned differs form class of input method are reasonably omitted,
+   * when testing reference e.g. transposed.
    * <p>
-   * For a complete list of tested methods:
+   * For a complete list of tested methods: <br>
    * {@link #testMinus}, {@link #testNormalize}, {@link #testPlus}, {@link #testTimes}, {@link #testRotate90Equals} 
    */
   @Test
@@ -537,8 +545,8 @@ public final class VMathVectorTest {
     assertDimensionMismatch("", () -> unitVector(10,15));
     
     // test rotate90
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> rotate90Equals(v_len1));
-    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> rotate90Equals(v_len3)); 
+    assertDimensionMismatch("rotate90Equals is only valid for 2d vectors.", () -> rotate90Equals(v_len1));
+    assertDimensionMismatch("rotate90Equals is only valid for 2d vectors.", () -> rotate90Equals(v_len3)); 
   }
 
   
