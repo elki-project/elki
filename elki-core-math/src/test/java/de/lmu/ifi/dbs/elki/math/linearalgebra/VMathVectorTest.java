@@ -39,6 +39,7 @@ import org.junit.Test;
 /**
  * Test the V(ector)Math class.
  *
+ * @see VMath
  * @author Merlin Dietrich
  * 
  */
@@ -56,10 +57,12 @@ public final class VMathVectorTest {
    * A vector of length 5 for testing
    */
   protected static final double[] TESTVEC = {2,3,5,7,9};
-
+  
+  /**
+   * Testing the {@link VMath#unitVector(int, int)} method.
+   */
   @Test
-  public void testUnitVector() {
-    
+  public void testUnitVector() { 
     // test if unitVector is returned
     // for dimension 3
     assertArrayEquals(new double[] {1,0,0}, unitVector(3,0),0. );
@@ -72,8 +75,7 @@ public final class VMathVectorTest {
     assertArrayEquals(new double[] {0,0,1,0,0}, unitVector(5,2),0. );
     assertArrayEquals(new double[] {0,0,0,1,0}, unitVector(5,3),0. );
     assertArrayEquals(new double[] {0,0,0,0,1}, unitVector(5,4),0. );
-    
-
+   
   }
 
   
@@ -105,19 +107,10 @@ public final class VMathVectorTest {
   
   // Tests on Vector operations.
   
-  /**
-   * Testing VMath plus-operations for addition on vectors.
-   * 
-   * The following VMath methods are tested:
-   *  
-   * {@link Vmath#plus},{@link Vmath#plusEquals}; {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals}; 
-   * {@link Vmath#plusTimes}, {@link Vmath#plusTimesEquals}, {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals};
-   * {@link Vmath#timesPlustimes}, {@link Vmath#timesPlustimesEquals}
-   * FIXME: Question link in Docstrings or not?
-   */
+
   
   /**
-   * Testing the times method of VMath class.
+   * Testing the times(vector, scalar) method of {@link VMath} class.
    */
   @Test
   public void testTimes() {
@@ -138,6 +131,14 @@ public final class VMathVectorTest {
     
   }
   
+  /**
+   * Testing {@link VMath} plus-operations for addition on vectors.
+   * <p>
+   * The following VMath methods are tested:<br>
+   * {@link Vmath#plus},{@link Vmath#plusEquals}; {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals}; 
+   * {@link Vmath#plusTimes}, {@link Vmath#plusTimesEquals}, {@link Vmath#timesPlus}, {@link Vmath#timesPlusEquals};
+   * {@link Vmath#timesPlustimes}, {@link Vmath#timesPlustimesEquals}
+   */
   @Test
   public void testPlus() {
     // TODO: Degenerate cases: and comment
@@ -239,15 +240,12 @@ public final class VMathVectorTest {
   }
   
   /**
-   * Testing VMath minus-operations for subtraction on vectors.
-   * 
-   * (vector - vector, multiplied with scalars & vector - scalar)
-   * 
-   * The following VMath methods are tested:
-   * minus, minusEquals; timesMinus, timesMinusEquals; 
+   * Testing {@link VMath} minus-operations for subtraction on vectors.
+   * <p> 
+   * The following VMath methods are tested:<br>
+   * minus, minusEquals, timesMinus, timesMinusEquals; 
    * minusTimes, minusTimesEquals, timesMinus, timesMinusEquals;
    * timesMinustimes, timesMinustimesEquals
-   * 
    */
   @Test
   public void testMinus() {
@@ -270,7 +268,7 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing VMath Vector scalarProduct and transposeTimes methods
+   * Testing {@link VMath} Vector scalarProduct and transposeTimes methods
    */
   @Test
   public void testScalarProduct() {
@@ -291,7 +289,7 @@ public final class VMathVectorTest {
   }
   
   /**
-   * Testing the timesTranspose method of VMath class. 
+   * Testing the timesTranspose(vector, vector) method of {@link VMath} class. 
    */
   @Test
   public void testTimesTranspose() {
@@ -317,7 +315,7 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing the normalize(Vector) methods of the VMath class.
+   * Testing the normalize(Vector) methods of the {@link VMath} class.
    * 
    * normalize(), normalizeEquals()
    */
@@ -328,7 +326,7 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing the angle(Vector, Vector) methods of the VMath class.
+   * Testing the angle(Vector, Vector) methods of the {@link VMath} class.
    * 
    * 
    */
@@ -341,7 +339,7 @@ public final class VMathVectorTest {
   }
   
   /**
-   * Testing the sum methods of VMath class.
+   * Testing the sum methods of {@link VMath} class.
    */
   @Test
   public void testSum() {
@@ -370,7 +368,7 @@ public final class VMathVectorTest {
   }
     
   /**
-   * Testing the transpose(vector) method of VMath class.
+   * Testing the transpose(vector) method of {@link VMath} class.
    */
   @Test // FIXME: Question comment on why in loops
   public void testTransposed() {
@@ -403,20 +401,28 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing the rotate90 method of VMath class.
+   * Testing the rotate90Equals(vector) method of {@link VMath} class.
    */
   @Test
-  public void testVectorRotate90() { 
-    // TODO: Implement: rotate90Equals(v1)
+  public void testVectorRotate90Equals() { 
+    // simple testcase
+    final double[] v1 = {1,0};
+    final double[] res = {0,1};
+    assertArrayEquals(res, rotate90Equals(v1), 0);
+   
+    // more complex testcase via scalarProduct method TODO: randomize
+    final double[] v2 = {1.21, -2.4};
+    final double[] v2_copy = copy(v2);
+    assertEquals(0.0, scalarProduct(v2_copy, v2), EPSILON);
   }
 
   /**
    * Testing that *Equals vector-operations of the {@link VMath} class work in place and testing that other vector-operations create a new instance.
    * 
    * Tests of vector-methods where the class of the instance returned differs form class of input method are omitted e.g. transposed
-   * 
-   * For a complete list of tested methods
-   * @see testPlus, testMinus, 
+   * <p>
+   * For a complete list of tested methods:
+   * {@link #testMinus}, {@link #testNormalize}, {@link #testPlus}, {@link #testTimes}, {@link #testRotate90Equals} 
    */
   @Test
   public void testVectorReference() {
