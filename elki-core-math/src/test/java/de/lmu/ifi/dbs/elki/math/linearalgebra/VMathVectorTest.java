@@ -371,34 +371,18 @@ public final class VMathVectorTest {
   /**
    * Testing the transpose(vector) method of {@link VMath} class.
    */
-  @Test // FIXME: Question comment on why in loops
+  @Test 
   public void testTransposed() {
     
-    // testcase 1
     final double[] v1 = TESTVEC;
-    final double[][] v1_t = transpose(v1);
+    final double[][] v1_t = {v1};
     
-    for(int i = 0; i< v1.length; i++){
-      assertEquals(v1[i], v1_t[i][0],0);
-      assertEquals(1, v1_t[i].length );
-    }
-    // test that double transpose or rather tranpose(matrix) after
-    // transpose(matrix) returns v1 but in Matrix form
-    final double[][] v1_t_t = {v1};
-    assertThat(transpose(transpose(v1)), is(equalTo(v1_t_t)));
+    assertThat(transpose(v1), is(equalTo(v1_t)));
     
-    // testcase 2
     final double[] v2 = {4,5,6,0,2,1};
-    final double[][] v2_t = transpose(v2);
-    for(int i = 0; i< v2.length; i++){
-      assertEquals(v2[i], v2_t[i][0],0);
-      assertEquals(1, v2_t[i].length );
-    }
-    // test that double transpose or rather tranpose(matrix) after
-    // transpose(matrix) returns v1 but in Matrix form which is still to interpret as vector //FIXME: transpose(v1) with result {v1}?
-    final double[][] v2_t_t = {v2};
-    assertThat(transpose(transpose(v2)), is(equalTo(v2_t_t)));
-      
+    final double[][] v2_t = {v2};
+    
+    assertThat(transpose(v2), is(equalTo(v2_t)));
   }
 
   /**
