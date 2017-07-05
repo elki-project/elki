@@ -410,7 +410,6 @@ public final class VMathVectorTest {
     // TODO: Implement: rotate90Equals(v1)
   }
 
-  //TODO: complete
   /**
    * Testing that *Equals vector-operations of the {@link VMath} class work in place and testing that other vector-operations create a new instance.
    * 
@@ -421,31 +420,14 @@ public final class VMathVectorTest {
    */
   @Test
   public void testVectorReference() {
-    final double[] v1 = {0};
-    final double[] v2 = {0};
-    final double s1 = 0;
-    final double s2 = 0;
-    final double d  = 0;
+    final double[] v1 = {0}, v2 = {0};
+    final double s1 = 0, s2  = 0;
     
-    // methods as in testPlus
-    assertNotSame(v1, plus(v1, d));
-    assertSame(v1, plusEquals(v1, d));
+    // testing methods as in testAngele is not needed
     
-    assertNotSame(v1, plus(v1, v2));
-    assertSame(v1, plusEquals(v1, v2));
-    
-    assertNotSame(v1, timesPlus(v1, s1, v2));
-    assertSame(v1, timesPlusEquals(v1, s1, v2));
-    
-    assertNotSame(v1, plusTimes(v1, v2, s2));
-    assertSame(v1, plusTimesEquals(v1, v2, s2));
-    
-    assertNotSame(v1, timesPlusTimes(v1, s1, v2, s2));
-    assertSame(v1, timesPlusTimesEquals(v1, s1, v2, s2));
-    
-    // methods as in testMinus
-    assertNotSame(v1, minus(v1, d));
-    assertSame(v1, minusEquals(v1, d));
+    // testing methods as in testMinus
+    assertNotSame(v1, minus(v1, s1));
+    assertSame(v1, minusEquals(v1, s1));
     
     assertNotSame(v1, minus(v1, v2));
     assertSame(v1, minusEquals(v1, v2));
@@ -458,7 +440,42 @@ public final class VMathVectorTest {
     
     assertNotSame(v1, timesMinusTimes(v1, s1, v2, s2));
     assertSame(v1, timesMinusTimesEquals(v1, s1, v2, s2));
-
+    
+    // testing methods as in testNormalize
+    final double[] v3 = {2};
+    assertNotSame(v3, normalize(v3));
+    assertSame(v3, normalizeEquals(v3));
+    
+    // testing methods as in testPlus
+    assertNotSame(v1, plus(v1, s1));
+    assertSame(v1, plusEquals(v1, s1));
+    
+    assertNotSame(v1, plus(v1, v2));
+    assertSame(v1, plusEquals(v1, v2));
+    
+    assertNotSame(v1, timesPlus(v1, s1, v2));
+    assertSame(v1, timesPlusEquals(v1, s1, v2));
+    
+    assertNotSame(v1, plusTimes(v1, v2, s2));
+    assertSame(v1, plusTimesEquals(v1, v2, s2));
+    
+    assertNotSame(v1, timesPlusTimes(v1, s1, v2, s2));
+    assertSame(v1, timesPlusTimesEquals(v1, s1, v2, s2));
+ 
+    // testing methods as in testScalarProduct is not needed
+    // testing methods as in testSum is not needed
+    
+    // testing methods as in testTimes
+    assertNotSame(v1, times(v1, s1));
+    assertSame(v1, timesEquals(v1, s1));
+    
+    // testing methods as in testTimesTranspose is not needed
+    // testing methods as in testTranspose is not needed
+    // testing methods as in testUnitVector is not needed
+       
+    // testing methods as in testRotate90Equals
+    final double[] v4 = {1,0};
+    assertSame(v4 , rotate90Equals(v4));
   }
  
   /**
