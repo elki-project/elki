@@ -454,6 +454,9 @@ public final class VMath {
 
   /**
    * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>)
+   * <br>
+   * This method is equivalent to the {@link #timesTranspose(double[], double[])} method
+   * with m2 being the second vector as matrix, but transposed.
    * 
    * @param v1 vector
    * @param m2 other matrix, must have one row.
