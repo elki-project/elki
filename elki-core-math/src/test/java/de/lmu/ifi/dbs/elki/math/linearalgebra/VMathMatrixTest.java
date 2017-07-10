@@ -35,6 +35,15 @@ import org.junit.Test;
  * 
  */
 public class VMathMatrixTest {
+  /**
+   * Error message (in assertions!) when matrix dimensionalities do not agree.
+   */
+  private static final String ERR_MATRIX_DIMENSIONS = "Matrix dimensions do not agree.";
+
+  /**
+   * Error message (in assertions!) when matrix dimensionalities do not agree.
+   */
+  private static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions do not agree.";
   
   /**
    * Nonsymmetric 4 x 5 (rows x columns) TESTMATRIX
@@ -44,11 +53,6 @@ public class VMathMatrixTest {
       {2,3,4,5,1}, 
       {3,4,5,1,2}, 
       {4,5,1,2,3} };
-  
-  /**
-   * 1x1 Matrix testing for dimension mismatch testing.
-   */
-  protected static final double[][] DIMTESTMATRIX = {{1}};
   
   protected static final double EPSILON = 1E-15;
   
@@ -198,40 +202,62 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixVectorMultiplication() {
-    // TODO: more testcases via eigenvalues. New class for new Times and Transposed 
-    final double[][] m1 = {
-        {1.21, 2000},
-        {0   ,-1   },
-        {7   , 0   } };
- 
-    // we assume the transpose(matrix) method to be correct.
-    final double[][] m1_t = transpose(m1);
-    
     final double delta = 1E-11;
     
-    //  times(m1, v2)
-    assertArrayEquals(m1_t[0], times(m1, unitVector(2, 0)) , delta);
-    assertArrayEquals(m1_t[1], times(m1, unitVector(2, 1)) , delta);
+    final double[] v1 = {1.21, 2}, v2 = {3, 0.5, -3};
+    final double[][] m1 = {
+        {1.21, 2000}, //
+        {0   ,-1   }, //
+        {7   , 0   }  //
+    };
+    
+    final double[] res_times = { m1[0][0]*v1[0] + m1[0][1]*v1[1], m1[1][0]*v1[0] + m1[1][1]*v1[1], m1[2][0]*v1[0] + m1[2][1]*v1[1],};
+    final double[] res_transposeTimes = { m1[0][0]*v2[0] + m1[1][0]*v2[1] + m1[2][0]*v2[2], m1[0][1]*v2[0] + m1[1][1]*v2[1] + m1[2][1]*v2[2]};
+    final double res_transposeTimesTimes = (m1[0][0]*v2[0]+m1[1][0]*v2[1]+m1[2][0]*v2[2])*v1[0]+ (m1[0][1]*v2[0]+m1[1][1]*v2[1]+m1[2][1]*v2[2])*v1[1];
+    
+    // testing times(m1, v2)
+    assertArrayEquals(res_times, times(m1, v1), delta);
+    assertArrayEquals(transpose(m1)[0], times(m1, unitVector(2, 0)) , delta);
+    assertArrayEquals(transpose(m1)[1], times(m1, unitVector(2, 1)) , delta);
 
-    //  transposeTimes(m1, v2);
+    // testing transposeTimes(m1, v2);
+    assertArrayEquals(res_transposeTimes, transposeTimes(m1, v2), delta);
     assertArrayEquals(m1[0], transposeTimes(m1, unitVector(3, 0)) , delta);
     assertArrayEquals(m1[1], transposeTimes(m1, unitVector(3, 1)) , delta);
     assertArrayEquals(m1[2], transposeTimes(m1, unitVector(3, 2)) , delta);
-    //  transposeTimesTimes(a, B, c);
     
-    // TODO: implement below, and maybe write better documentation in VMath class
-    // times(v1, m2) sames a timesTransposed(Vector, Vector) should be same as times (vector, transpose(vector))
-    //   this is why this method exists                                                                                       |- is aMatrix
-    // basically same timesTransposed as above but second vector given as matrix bzw m1 = transpose(transpose(vector))
+    // testing transposeTimesTimes(a, B, c);
+    assertEquals(res_transposeTimesTimes, transposeTimesTimes(v2, m1, v1), delta);
+    assertEquals(transposeTimes(v2, times(m1, v1)), transposeTimesTimes(v2, m1, v1), delta);
+    assertEquals(times(transposeTimes(v2, m1),  v1)[0], transposeTimesTimes(v2, m1, v1) , delta);
     
-    // timesTranspose(v1, m2); transposedTimes(vector, Matrix) same as transpose(transposeTimes(matrix, vector))
-    // problem may be assertation not m2.lenth but columndimension needed
+    // testing transposedTimes(vector, Matrix) via transpose(transposeTimes(matrix, vector))
+    assertThat(transposeTimes(unitVector(3, 0), m1), is(equalTo(transpose(transposeTimes(m1, unitVector(3, 0))))));
+    assertThat(transposeTimes(unitVector(3, 1), m1), is(equalTo(transpose(transposeTimes(m1, unitVector(3, 1))))));
+    assertThat(transposeTimes(unitVector(3, 2), m1), is(equalTo(transpose(transposeTimes(m1, unitVector(3, 2))))));
     
-    // TODO Vortrag: Warum so viele Verschieden Multiplicationen Querverweise.
-     
+    final double[] v3 = {1,2,-7};
+    final double[] v4 = {-5,1,3,-4};
+    final double[][] m2 = {v4};
+    final double[][] m2_t = {{v4[0]}, {v4[1]}, {v4[2]}, {v4[3]}};
+
+    final double[][] res = {
+        {v3[0]*v4[0], v3[0]*v4[1], v3[0]*v4[2], v3[0]*v4[3]}, //
+        {v3[1]*v4[0], v3[1]*v4[1], v3[1]*v4[2], v3[1]*v4[3]}, //
+        {v3[2]*v4[0], v3[2]*v4[1], v3[2]*v4[2], v3[2]*v4[3]}, //
+    };
+    
+    // testing times(vector, matrix)
+    assertThat(times(v3, m2), is(equalTo(res)));
+    // via timesTranspose(vector,vector)
+    assertThat(times(v3, m2), is(equalTo(timesTranspose(v3, v4))));
+
+    // testing timesTranspose(vector, matrix)
+    assertThat(timesTranspose(v3, m2_t), is(equalTo(res)));
+    // via timesTranspose(vector,vector) 
+    assertThat(timesTranspose(v3, m2_t), is(equalTo(timesTranspose(v3, v4))));
+    // TODO Vortrag: Warum so viele Verschieden Multiplicationen Querverweise.   
   }
-    
-  //TODO: implement Matrix Ref class
   
   /**
    * Testing the unitMatrix and the identity method of VMath class.
@@ -253,8 +279,6 @@ public class VMathMatrixTest {
                                       {0,1,0,0,0},
                                       {0,0,1,0,0}};
 
-    // TODO: implement Dimension Missmatch probably in extra class
-    // FIXME: randomize
     assertThat(identity(3, 5), is(equalTo(m_identity3x5)));   
     assertThat(identity(5, 3), is(equalTo(transpose(m_identity3x5))));  
      
@@ -275,7 +299,7 @@ public class VMathMatrixTest {
         { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49},
         { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59},
         { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69} };
-    // TODO: randomize
+
     // array of row indices
     final int[] r = {0,3,5};
     // array of column indices
@@ -314,7 +338,7 @@ public class VMathMatrixTest {
      
     assertThat(getMatrix(m1, 0, 2, 6, 8) , is(equalTo(sub4)));
     
-    // cross mehtods and general testing FIXME: maybe randomize
+    // cross methods and general testing
     assertThat(getMatrix(m1, 0, getRowDimensionality(m1)-1, 0, getColumnDimensionality(m1)-1) , is(equalTo(m1)));
 
     final int[] riter = {3,4,5};
@@ -339,7 +363,6 @@ public class VMathMatrixTest {
    */
   @Test
   public void testGetDimensionality() {
-    // FIXME: andom testcases
     final double[][] m3 = {
         {0,0,0,0,0},
         {0,0,0,0,0},
@@ -524,9 +547,7 @@ public class VMathMatrixTest {
     };
     
     assertThat(appendColumns(m1, m2), is(equalTo(m1_res)));
-    // TODO which reference wanted?
   }
-  // TODO: Question test void methods to stay void?
   
   /**
    * Testing the project(vector, Matrix) method of VMath class.
@@ -562,8 +583,6 @@ public class VMathMatrixTest {
     // TODO: implement inverse(elements)
   }
   
-  // TODO: implement Dimension mismatch
-  
   /**
    * Testing that *Equals Matrix-operations of the {@link VMath} 
    * class work in place and testing that other matrix-operations
@@ -579,14 +598,14 @@ public class VMathMatrixTest {
   public void testReference() {
     final double[][] m1 = {{1}}, m2 = {{1}};
     
-    // testing the methods as in testAppendColums
+    // testing the appendColums method as it is now: not working in place
     assertNotSame(m1, appendColumns(m1, m2));
     
     // testing the methods as in Diagonal omitted
     
     // testing the methods as in testGet TODO: question inner object reference possible
     
-    // testing the methods as in omitted
+    // testing the methods as in testGetDimensionality omitted
     
     // testing the methods as in testInverse
     assertNotSame(m1, inverse(m1));
@@ -631,7 +650,60 @@ public class VMathMatrixTest {
     // testing the methods as in testSolve omitted
     // testing the methods as in testUnitMatrix omitted
   }
+  
+  /**
+   * Testing that correct Error is raised when dimension of the input data mismatch the needs of the method.
+   */
+  @Test
+  public void testDimensionMismatch() {
+    
+    // testing the appendColums method as it is now: not working in place
+    
+    // testing the methods as in Diagonal omitted
+    
+    // testing the methods as in testGet 
+    
+    // testing the methods as in testGetDimensionality omitted
+    
+    // testing the methods as in testInverse
+
+    // testing the methods as in testMatrixMatrixMultiplication
+
+    // testing the methods as in testMatrixScalarMultiplication 
+
+    // testing the methods as in testTranspose
+
+    // testing the methods as in testMatrixVectorMultiplication
+    // vector length and number of rows in matrix differ
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(identity(2, 3), unitVector(2, 0)));
+    
+    // vector length and number of columns in matrix differ
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(identity(2, 3), unitVector(3, 0)));
+    
+    // first vector has wrong length
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(3, 0), identity(2, 3), unitVector(3, 0)));
+    // second vector has wrong length
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(2, 0), identity(2, 3), unitVector(2, 0)));
+    
+    // matrix has more than one row
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(unitVector(3, 0), identity(2, 3)));
+
+    // matrix has more than one column
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> timesTranspose(unitVector(3, 0), identity(3, 2)));
+    
+    // vector length and number of rows in matrix differ
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(unitVector(3, 0), identity(2, 3)));
+
+    // testing the methods as in testMinus
+    
+    // testing the methods as in testPlus
+    
+    // testing the methods as in testSet omitted
+    
+    // testing the methods as in testSolve omitted
+    
+    // testing the methods as in testUnitMatrix omitted
+
+  }
 
 }
-
-// TODO: Have a look a normalize options of VMathclass
