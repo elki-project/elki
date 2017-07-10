@@ -142,57 +142,45 @@ public final class VMathVectorTest {
   @Test
   public void testPlus() {
     // TODO: Degenerate cases: and comment
-    
-    // TODO: redefine structure with final double res vector and manual implementation of computations in. assert equality of method . .Equals
-    double s1,s2,d; double[] v1, v2, res_plus, res_plus_scal, res_plusTimes, res_timesPlus, res_timesPlustimes;
-    final double delta = 1E-10;
-    
+        
     /**
      * TestData I consists of:
      * Four dimensional test vectors, Near 0 numerical loss of precision in ResultData res* and
      * mixed positive and negative numbers.
-     * 
-     * Notes:
-     * Calculated ResultData res* by hand.
      */
-    v1                 = new double[] {-14,  1, 2, 0.100000000000006100004};
-    v2                 = new double[] {  7,  6, 2,-0.1000000000000069     };
+    final double[] v1_I                 = {-14,  1, 2, 0.100000000000006100004};
+    final double[] v2_I                 = {  7,  6, 2,-0.1000000000000069     };
     
+    final double s_I = 13, s1_I =  2, s2_I = -3;
                 
-    res_plus           = new double[] { -7,  7, 4,-0.000000000000000700877}; //  v1 +  v2
-    res_plus_scal      = new double[] { -1, 14,15,13.100000000000006100004}; //  v1 +  13
-    res_timesPlus      = new double[] {-77, 12,14, 0.500000000000029700024}; // 6v1 +  v2
-    res_plusTimes      = new double[] { 28, 37,14,-0.500000000000035299996}; //  v1 + 6v2
-    res_timesPlustimes = new double[] {-49,-16,-2, 0.500000000000032900008}; // 2v1 +(-3)v2
+    final double[] res_plus_I           = {v1_I[0]+v2_I[0], v1_I[1]+v2_I[1], v1_I[2]+v2_I[2], v1_I[3]+v2_I[3]}; //  v1_I +  v2_I
+    final double[] res_plus_scal_I      = {v1_I[0]+s_I, v1_I[1]+s_I, v1_I[2]+s_I, v1_I[3]+s_I}; //  v1_I +  13
+    final double[] res_timesPlus_I      = {s1_I*v1_I[0]+v2_I[0], s1_I*v1_I[1]+v2_I[1], s1_I*v1_I[2]+v2_I[2], s1_I*v1_I[3]+v2_I[3]}; //  v1_I + 6v2
+    final double[] res_plusTimes_I      = {v1_I[0]+s2_I*v2_I[0], v1_I[1]+s2_I*v2_I[1], v1_I[2]+s2_I*v2_I[2], v1_I[3]+s2_I*v2_I[3]}; // 6v1 +  v2_I
+    final double[] res_timesPlustimes_I = {s1_I*v1_I[0]+s2_I*v2_I[0], s1_I*v1_I[1]+s2_I*v2_I[1], s1_I*v1_I[2]+s2_I*v2_I[2], s1_I*v1_I[3]+s2_I*v2_I[3]}; // 2v1 +(-3)v2_I
     
     double[] out, in_eq; //FIXME: Question _ not in variable in Java?
     
     // plus  and plusEquals (Vector + Vector) 
-    assertArrayEquals(res_plus, out = plus(v1,v2), EPSILON);
-    assertArrayEquals(res_plus, plusEquals(in_eq = copy(v1), v2), EPSILON);
+    assertArrayEquals(res_plus_I, out = plus(v1_I,v2_I), EPSILON);
+    assertArrayEquals(res_plus_I, plusEquals(in_eq = copy(v1_I), v2_I), EPSILON);
     assertArrayEquals(out, in_eq, 0); // assert methods doing the same //TODO: beispiel fuer Vortrag
     
     //plus() and plusEquals (Vector + Skalar)
-    d = 13;
-    assertArrayEquals(res_plus_scal, plus(v1,d), EPSILON);
-    assertArrayEquals(res_plus_scal, plusEquals(copy(v1), d), EPSILON);
+    assertArrayEquals(res_plus_scal_I, plus(v1_I,s_I), EPSILON);
+    assertArrayEquals(res_plus_scal_I, plusEquals(copy(v1_I), s_I), EPSILON);
     
     // timesPlus() and timesPlusEquals() 
-    s1      = 6;
-    assertArrayEquals(res_timesPlus, timesPlus(v1, s1, v2), EPSILON);
-    assertArrayEquals(res_timesPlus, timesPlusEquals(copy(v1), s1, v2), EPSILON);
+    assertArrayEquals(res_timesPlus_I, timesPlus(v1_I, s1_I, v2_I), EPSILON);
+    assertArrayEquals(res_timesPlus_I, timesPlusEquals(copy(v1_I), s1_I, v2_I), EPSILON);
     
     // plusTimes() and plusTimesEquals()
-    s2      = 6;
-    assertArrayEquals(res_plusTimes, plusTimes(v1, v2, s2), EPSILON);
-    assertArrayEquals(res_plusTimes, plusTimesEquals(copy(v1), v2, s2), EPSILON);
+    assertArrayEquals(res_plusTimes_I, plusTimes(v1_I, v2_I, s2_I), EPSILON);
+    assertArrayEquals(res_plusTimes_I, plusTimesEquals(copy(v1_I), v2_I, s2_I), EPSILON);
     
     // timesPlustimes() and timesPlustimesEquals()
-    s1      =  2;    s2      = -3;
-    assertArrayEquals(res_timesPlustimes, timesPlusTimes(v1, s1, v2, s2), EPSILON);
-    assertArrayEquals(res_timesPlustimes, timesPlusTimesEquals(copy(v1), s1, v2, s2), 0);
-    
-    
+    assertArrayEquals(res_timesPlustimes_I, timesPlusTimes(v1_I, s1_I, v2_I, s2_I), EPSILON);
+    assertArrayEquals(res_timesPlustimes_I, timesPlusTimesEquals(copy(v1_I), s1_I, v2_I, s2_I), 0);
     
     
     /**
@@ -200,43 +188,52 @@ public final class VMathVectorTest {
      * Three dimensional test vectors of type double with 5 decimal places as
      * mantissa. Numbers are strictly positive
      * 
-     * Notes:
-     * Consider v1 + v2. Octave was used to aid calculation of ResultData res*.
      */  
-    v1                 = new double[] { 0.17825, 32.546, 2958.3 };
-    v2                 = new double[] { 0.82175, 67.454, 7041.7 };
+    final double delta = 1E-10;
+    final double[] v1_II                 = { 0.17825, 32.546, 2958.3 };
+    final double[] v2_II                 = { 0.82175, 67.454, 7041.7 };
     
                 
-    res_plus           = new double[] { 1       , 100      , 10000      }; //    v1 +   v2
-    res_plus_scal      = new double[] { 1.1     ,  33.46775,  2959.22175}; //    v1 +  0.92175
-    res_timesPlus      = new double[] { 1.089125, 116.273  , 11479.15   }; // 1.5v1 +   v2
-    res_plusTimes      = new double[] { 1.410875, 133.727  , 13520.85   }; //    v1 +1.5v2
-    res_timesPlustimes = new double[] { 0.67825 , 82.546   ,  7958.3    }; // 1.5v1 +0.5v2
-    
+    final double s_II = 0.92175, s1_II =  1.5, s2_II =  0.5;
+                
+    final double[] res_plus_II           = {v1_II[0]+v2_II[0], v1_II[1]+v2_II[1], v1_II[2]+v2_II[2]}; //  v1_II +  v2_II
+    final double[] res_plus_scal_II      = {v1_II[0]+s_II, v1_II[1]+s_II, v1_II[2]+s_II}; //  v1_II +  13
+    final double[] res_timesPlus_II      = {s1_II*v1_II[0]+v2_II[0], s1_II*v1_II[1]+v2_II[1], s1_II*v1_II[2]+v2_II[2]}; //  v1_II + 6v2
+    final double[] res_plusTimes_II      = {v1_II[0]+s2_II*v2_II[0], v1_II[1]+s2_II*v2_II[1], v1_II[2]+s2_II*v2_II[2]}; // 6v1 +  v2_II
+    final double[] res_timesPlustimes_II = {s1_II*v1_II[0]+s2_II*v2_II[0], s1_II*v1_II[1]+s2_II*v2_II[1], s1_II*v1_II[2]+s2_II*v2_II[2]}; // 2v1 +(-3)v2_II
+
     // plus  and plusEquals (Vector + Vector) 
-    assertArrayEquals(res_plus, plus(v1,v2), delta);
-    assertArrayEquals(res_plus, plusEquals(copy(v1), v2), delta);
+    assertArrayEquals(res_plus_II, plus(v1_II,v2_II), delta);
+    assertArrayEquals(res_plus_II, plusEquals(copy(v1_II), v2_II), delta);
     
     //plus() and plusEquals (Vector + Skalar)
-    d = 0.92175;
-    assertArrayEquals(res_plus_scal, plus(v1,d), delta);
-    assertArrayEquals(res_plus_scal, plusEquals(copy(v1), d), delta);
+    assertArrayEquals(res_plus_scal_II, plus(v1_II,s_II), delta);
+    assertArrayEquals(res_plus_scal_II, plusEquals(copy(v1_II), s_II), delta);
     
     // timesPlus() and timesPlusEquals() 
-    s1      = 1.5;
-    assertArrayEquals(res_timesPlus, timesPlus(v1, s1, v2), delta);
-    assertArrayEquals(res_timesPlus, timesPlusEquals(copy(v1), s1, v2), delta);
+    assertArrayEquals(res_timesPlus_II, timesPlus(v1_II, s1_II, v2_II), delta);
+    assertArrayEquals(res_timesPlus_II, timesPlusEquals(copy(v1_II), s1_II, v2_II), delta);
     
     // plusTimes() and plusTimesEquals()
-    s2      = 1.5;
-    assertArrayEquals(res_plusTimes, plusTimes(v1, v2, s2), delta);
-    assertArrayEquals(res_plusTimes, plusTimesEquals(copy(v1), v2, s2), delta);
+    assertArrayEquals(res_plusTimes_II, plusTimes(v1_II, v2_II, s2_II), delta);
+    assertArrayEquals(res_plusTimes_II, plusTimesEquals(copy(v1_II), v2_II, s2_II), delta);
     
     // timesPlustimes() and timesPlustimesEquals()
-    s1      =  1.5; s2      =  0.5;
-    assertArrayEquals(res_timesPlustimes, timesPlusTimes(v1, s1, v2, s2), delta);
-    assertArrayEquals(res_timesPlustimes, timesPlusTimesEquals(copy(v1), s1, v2, s2), delta);
+    assertArrayEquals(res_timesPlustimes_II, timesPlusTimes(v1_II, s1_II, v2_II, s2_II), delta);
+    assertArrayEquals(res_timesPlustimes_II, timesPlusTimesEquals(copy(v1_II), s1_II, v2_II, s2_II), delta);
     
+    
+    // General testing
+    final double[] v5                 = {1,2,3};
+    final double[] v6                 = {4,5,6};              
+    final double s5 =  2, s6 =  3;
+    
+    // consistency check to minus method
+    assertArrayEquals(minus(v5, times(v6, -1)), plus(v5, v6), 0.);
+    // consistency check within the plus methods
+    assertArrayEquals(plus(v5, times(v6, s6)), plusTimes(v5, v6, s6), 0.);    
+    assertArrayEquals(plus(times(v5, s5), v6), timesPlus(v5, s5, v6), 0.);
+    assertArrayEquals(plus(times(v5, s5), times(v6, s6)), timesPlusTimes(v5, s5, v6, s6), 0.);
   }
   
   /**
@@ -249,22 +246,89 @@ public final class VMathVectorTest {
    */
   @Test
   public void testMinus() {
-    double s1,s2,d; double[] v1, v2, res_plus, res_plus_scal, res_plusTimes, res_timesPlus, res_timesPlustimes;
+    // Testcase I
+    final double[] v1                 = {-14,  1, 2, 0.100000000000006100004};
+    final double[] v2                 = {  7,  6, 2,-0.1000000000000069     };
+    
+    final double s0 = 13, s1 =  2, s2 = -3;
+                
+    final double[] res_minus_I           = {v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2], v1[3]-v2[3]}; //  v1_I -  v2_I
+    final double[] res_minus_scal_I      = {v1[0]-s0, v1[1]-s0, v1[2]-s0, v1[3]-s0}; //  v1_I -  13
+    final double[] res_timesMinus_I      = {s1*v1[0]-v2[0], s1*v1[1]-v2[1], s1*v1[2]-v2[2], s1*v1[3]-v2[3]}; //  v1_I - 6v2
+    final double[] res_minusTimes_I      = {v1[0]-s2*v2[0], v1[1]-s2*v2[1], v1[2]-s2*v2[2], v1[3]-s2*v2[3]}; // 6v1 -  v2_I
+    final double[] res_timesMinustimes_I = {s1*v1[0]-s2*v2[0], s1*v1[1]-s2*v2[1], s1*v1[2]-s2*v2[2], s1*v1[3]-s2*v2[3]}; // 2v1 -(-3)v2_I
+    
+    // minus  and minusEquals (Vector - Vector) 
+    assertArrayEquals(res_minus_I, minus(v1,v2), EPSILON);
+    assertArrayEquals(res_minus_I, minusEquals(copy(v1), v2), EPSILON);
+    
+    //minus() and minusEquals (Vector - Skalar)
+    assertArrayEquals(res_minus_scal_I, minus(v1,s0), EPSILON);
+    assertArrayEquals(res_minus_scal_I, minusEquals(copy(v1), s0), EPSILON);
+    
+    // timesMinus() and timesMinusEquals() 
+    assertArrayEquals(res_timesMinus_I, timesMinus(v1, s1, v2), EPSILON);
+    assertArrayEquals(res_timesMinus_I, timesMinusEquals(copy(v1), s1, v2), EPSILON);
+    
+    // minusTimes() and minusTimesEquals()
+    assertArrayEquals(res_minusTimes_I, minusTimes(v1, v2, s2), EPSILON);
+    assertArrayEquals(res_minusTimes_I, minusTimesEquals(copy(v1), v2, s2), EPSILON);
+    
+    // timesMinustimes() and timesMinustimesEquals()
+    assertArrayEquals(res_timesMinustimes_I, timesMinusTimes(v1, s1, v2, s2), EPSILON);
+    assertArrayEquals(res_timesMinustimes_I, timesMinusTimesEquals(copy(v1), s1, v2, s2), 0);
+    
+    
+    
+    //TestcaseII
     final double delta = 1E-10;
+    final double[] v3                 = { 0.17825, 32.546, 2958.3 };
+    final double[] v4                 = { 0.82175, 67.454, 7041.7 };
     
-    /**
-     * TODO TestData I:
-     * 
-     * Octave was used to aid calculation of ResultData res*.
-     */
+                
+    final double s00 = 0.92175, s3 =  1.5, s4 =  0.5;
+                
+    final double[] res_minus_II           = {v3[0]-v4[0], v3[1]-v4[1], v3[2]-v4[2]}; //  v1_II -  v2_II
+    final double[] res_minus_scal_II      = {v3[0]-s00, v3[1]-s00, v3[2]-s00}; //  v1_II -  13
+    final double[] res_timesMinus_II      = {s3*v3[0]-v4[0], s3*v3[1]-v4[1], s3*v3[2]-v4[2]}; //  v1_II - 6v2
+    final double[] res_minusTimes_II      = {v3[0]-s4*v4[0], v3[1]-s4*v4[1], v3[2]-s4*v4[2]}; // 6v1 -  v2_II
+    final double[] res_timesMinustimes_II = {s3*v3[0]-s4*v4[0], s3*v3[1]-s4*v4[1], s3*v3[2]-s4*v4[2]}; // 2v1 -(-3)v2_II
+
+    // minus  and minusEquals (Vector - Vector) 
+    assertArrayEquals(res_minus_II, minus(v3,v4), delta);
+    assertArrayEquals(res_minus_II, minusEquals(copy(v3), v4), delta);
+    
+    //minus() and minusEquals (Vector - Skalar)
+    assertArrayEquals(res_minus_scal_II, minus(v3,s00), delta);
+    assertArrayEquals(res_minus_scal_II, minusEquals(copy(v3), s00), delta);
+    
+    // timesMinus() and timesMinusEquals() 
+    assertArrayEquals(res_timesMinus_II, timesMinus(v3, s3, v4), delta);
+    assertArrayEquals(res_timesMinus_II, timesMinusEquals(copy(v3), s3, v4), delta);
+    
+    // minusTimes() and minusTimesEquals()
+    assertArrayEquals(res_minusTimes_II, minusTimes(v3, v4, s4), delta);
+    assertArrayEquals(res_minusTimes_II, minusTimesEquals(copy(v3), v4, s4), delta);
+    
+    // timesMinustimes() and timesMinustimesEquals()
+    assertArrayEquals(res_timesMinustimes_II, timesMinusTimes(v3, s3, v4, s4), delta);
+    assertArrayEquals(res_timesMinustimes_II, timesMinusTimesEquals(copy(v3), s3, v4, s4), delta);
     
     
+    // general testing
+    final double[] v5                 = {1,2,3};
+    final double[] v6                 = {4,5,6};              
+    final double s5 =  2, s6 =  3;
     
-    /**
-     * TODO TestData II:
-     * 
-     * Octave was used to calculate ResultData res*;
-     */
+    // checking that vector - same_vector is zero
+    assertArrayEquals(new double[] {0,0,0,}, minus(v5, v5), 0.);
+    // consistency check to plus methods
+    assertArrayEquals(plus(v5, times(v6, -1)), minus(v5, v6), 0.);
+    // consistency check within the minus methods
+    assertArrayEquals(minus(v5, times(v6, s6)), minusTimes(v5, v6, s6), 0.);    
+    assertArrayEquals(minus(times(v5, s5), v6), timesMinus(v5, s5, v6), 0.);
+    assertArrayEquals(minus(times(v5, s5), times(v6, s6)), timesMinusTimes(v5, s5, v6, s6), 0.);
+    
   }
 
   /**
@@ -340,21 +404,37 @@ public final class VMathVectorTest {
    * Testing the angle(Vector, Vector) methods of the {@link VMath} class.
    * <p>
    * We assert here that the angle method does what it did till now: <br> 
-   * calculating the sinus of the angle between two vectors, 
+   * calculating the cosine of the angle between two vectors, 
    * where the smaller angle between those vectors is viewed.
    */
   @Test
   public void testAngle() {
-    final double[] v1 = {1,0};
-    final double[] v2 = {1,1};
+    // TODO: Fix documentation for Angle method
+    // Testscase II
+    final double[] v1_I = {1,0};
+    final double[] v2_I = {1,1};
 
-    assertEquals(Math.sin(Math.PI/4), angle(v2, v1), EPSILON);
-    assertEquals(Math.sin(Math.PI/4), angle(v1, v2), EPSILON);
+    assertEquals(Math.cos(Math.PI/4), angle(v2_I, v1_I), EPSILON);
+    assertEquals(Math.cos(Math.PI/4), angle(v1_I, v2_I), EPSILON);
     
-    // set the origin
-    final double[] or = {0,1};
-    assertEquals(Math.sin(Math.PI/4), angle(v2, v1,  or), EPSILON);
-    assertEquals(Math.sin(Math.PI/4), angle(v1, v2,  or), EPSILON);
+    // set the origin, no change of data needed
+    final double[] origin_I = {0,1};
+    assertEquals(Math.cos(Math.PI/4), angle(v2_I, v1_I,  origin_I), EPSILON);
+    assertEquals(Math.cos(Math.PI/4), angle(v1_I, v2_I,  origin_I), EPSILON);
+    
+    // Testscase II
+    final double[] v1_II = {1,0};
+    final double[] v2_II = {1, Math.tan(Math.PI/3)};
+
+    assertEquals(Math.cos(Math.PI/3), angle(v2_II, v1_II), EPSILON);
+    assertEquals(Math.cos(Math.PI/3), angle(v1_II, v2_II), EPSILON);
+    
+    // change the origin
+    final double[] v3_II = {2,3};
+    final double[] v4_II = {2, 3+Math.tan(Math.PI/3)};
+    final double[] origin_II = {1,3};
+    assertEquals(Math.cos(Math.PI/3), angle(v3_II, v4_II,  origin_II), EPSILON);
+    assertEquals(Math.cos(Math.PI/3), angle(v4_II, v3_II,  origin_II), EPSILON);
   }
   
   /**
