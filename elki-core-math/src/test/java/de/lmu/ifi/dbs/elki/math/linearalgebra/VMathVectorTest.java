@@ -283,8 +283,6 @@ public final class VMathVectorTest {
     assertEquals(squareSum(v1), scalarProduct(v1, v1), EPSILON);
     
     
-    // TODO: ?randomize or more test
-    
     // FIXME: Question implement tests for transposedtimes(), timestransposed() here.
   }
   
@@ -307,23 +305,35 @@ public final class VMathVectorTest {
     
     // testing timesTranspose(vector, vector) via times(matrix, matrix)
     // because times(vector) returns a matrix. This is at the same time a test for transpose if timesTranspose is correct.
-    //FIXME: transpose(v1) with result {v1}?
     final double[][] m1 = transpose(transpose(TESTVEC));
     final double[][] m2 = transpose(TESTVEC);
     
-    // FIXME: vector transpose issue
     assertThat(timesTranspose(TESTVEC, TESTVEC), is(equalTo(times(m1, m2))));
   }
 
   /**
-   * Testing the normalize(Vector) methods of the {@link VMath} class.
+   * Testing the normalizeVector) and normalizeEquals(Vector) methods of the {@link VMath} class.
    * 
-   * normalize(), normalizeEquals()
+   * 
    */
   @Test
   public void testNormalize() {
-    // TODO: Implement: normalize()
-    // TODO: Implement: normalizeEquals()
+    
+    final double[] v1 = copy(TESTVEC);
+    final double[] v1_copy = copy(v1);
+    final double[] v1_normal = normalize(v1);
+    
+    // Test that both methods return a vector with length 1
+    // that more methods ensure the testresult we use squareSum instead of euclideanLength here
+    assertEquals(1, squareSum(v1_normal), EPSILON);
+    assertEquals(1, squareSum(normalizeEquals(v1)), EPSILON);
+    
+    // Check that both methods return the same Vector
+    assertArrayEquals(v1_normal, v1, EPSILON);
+    
+    // Check that the normalize Vector times the euclidean length of the original Vector equals the original vector
+    assertArrayEquals(v1_copy, times(v1_normal, euclideanLength(v1_copy)) , EPSILON);
+
   }
 
   /**
@@ -334,31 +344,38 @@ public final class VMathVectorTest {
   @Test
   public void testAngle() {
     // TODO: Implement: angle(v1, v2);
+    final double[] v1 = {1,0};
+    final double[] v2 = {1,1};
+    
+//    assertEquals(0.5, angle(v1, v2), EPSILON);
+    assertEquals(Math.sin(Math.PI/4), angle(v2, v1), EPSILON);
+    // comment on this strange format
+    
+    // This is a mathimatically strange method it esecially calculate the sclarproduct of two vectors and gives back the normaliy 
+    
     // FIXME: Question new class?
     // TODO: Implement: angle(v1, v2, o);
     
   }
   
   /**
-   * Testing the sum methods of {@link VMath} class.
+   * Testing the sum methods and the euclidienLength method of {@link VMath} class.
    */
   @Test
   public void testSum() {
     // TODO: more defindes testing Implement: 
-    final double[] v = TESTVEC;
-    
     // testing sum(vector)
-    final double res_vsum = v[0]+v[1]+v[2]+v[3]+v[4];
-    assertEquals(res_vsum, sum(v), 0.);
+    final double[] v = {1.21, -3, 2, 3.2, -5, 1};
+    final double res_vsum = v[0]+v[1]+v[2]+v[3]+v[4]+v[5];
+    assertEquals(res_vsum, sum(v), EPSILON);
     
     assertEquals(1 , sum(unitVector(3, 1)), 0.);
     
     final double[] v1 = { 0.1234512345123456 , - 0.123451234512345};
     assertEquals( 0, sum(v1), EPSILON);
     
-    
     // testing squareSum(vector)
-    final double res_vsumsqare = v[0]*v[0]+v[1]*v[1]+v[2]*v[2]+v[3]*v[3]+v[4]*v[4];
+    final double res_vsumsqare = v[0]*v[0]+v[1]*v[1]+v[2]*v[2]+v[3]*v[3]+v[4]*v[4]+v[5]*v[5];
     assertEquals(res_vsumsqare, squareSum(v), 0.);
     assertEquals(1 , squareSum(unitVector(20, 10)), 0.);
     
@@ -395,7 +412,7 @@ public final class VMathVectorTest {
     final double[] res = {0,-1};
     assertArrayEquals(res, rotate90Equals(v1), 0);
    
-    // more complex testcase TODO: randomize
+    // more complex testcase TODO: use angle method if it is not deprecated
     final double[] v2 = {1.21, -2.4};
     final double[] v2_copy = copy(v2);
     assertEquals(0.0, scalarProduct(v2_copy, rotate90Equals(v2)), EPSILON);
@@ -404,7 +421,6 @@ public final class VMathVectorTest {
     assertArrayEquals(times( v2_copy1rotate, -1), rotate90Equals(v2), EPSILON);
     assertArrayEquals(v2_copy, rotate90Equals(v2), EPSILON);
     
-    // TODO: Question What is angle? assertEquals(Math.PI/2, angle(v2, v2_copy), EPSILON);
   }
 
   /**
