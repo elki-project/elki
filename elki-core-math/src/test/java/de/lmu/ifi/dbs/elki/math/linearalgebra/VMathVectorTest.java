@@ -360,10 +360,11 @@ public final class VMathVectorTest {
     final double[] v2 = {3.5 , -1, 4 ,-7};
     
     final double[][] res = {
-        {v1[0]*v2[0], v1[0]*v2[1], v1[0]*v2[2], v1[0]*v2[3]},
-        {v1[1]*v2[0], v1[1]*v2[1], v1[1]*v2[2], v1[1]*v2[3]},
-        {v1[2]*v2[0], v1[2]*v2[1], v1[2]*v2[2], v1[2]*v2[3]},
-        {v1[3]*v2[0], v1[3]*v2[1], v1[3]*v2[2], v1[3]*v2[3]} };
+        {v1[0]*v2[0], v1[0]*v2[1], v1[0]*v2[2], v1[0]*v2[3]}, //
+        {v1[1]*v2[0], v1[1]*v2[1], v1[1]*v2[2], v1[1]*v2[3]}, //
+        {v1[2]*v2[0], v1[2]*v2[1], v1[2]*v2[2], v1[2]*v2[3]}, //
+        {v1[3]*v2[0], v1[3]*v2[1], v1[3]*v2[2], v1[3]*v2[3]}  //
+    };
     
     assertThat(timesTranspose(v1, v2), is(equalTo(res)));
     
@@ -572,10 +573,10 @@ public final class VMathVectorTest {
   }
  
   /**
-   * testing that Error is Vector dimension missmach is raised if input data of Vector Operation has different dimensions.
+   * Testing that correct Error is raised when dimension of the input data mismatch the needs of the method.
    */
   @Test
-  public void testVectorDimensionMissmach() {
+  public void testDimensionMismatch() {
 
     final double[] v_len1 = {1};
     final double[] v_len2 = {1,1};

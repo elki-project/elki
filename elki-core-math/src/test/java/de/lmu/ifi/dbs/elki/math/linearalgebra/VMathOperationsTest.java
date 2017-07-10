@@ -234,7 +234,7 @@ public final class VMathOperationsTest {
     
     
     // fail if dimensions mismatch
-    assertFalse(almostEquals(m, VMathMatrixTest.DIMTESTMATRIX));
+    assertFalse(almostEquals(m, new double[][] {{1}}));
     
     // fail if difference d > maxdelta with increasing maxdelta
     // maxdelta = EPSILON
