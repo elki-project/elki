@@ -514,6 +514,9 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, v1 * m2^T
+   * <br>
+   * This method is equivalent to the {@link #timesTranspose(double[], double[])} method
+   * with m2 being the second vector as matrix.
    * 
    * @param v1 vector
    * @param m2 other matrix
