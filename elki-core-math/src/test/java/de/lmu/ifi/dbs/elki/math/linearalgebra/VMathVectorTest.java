@@ -338,24 +338,23 @@ public final class VMathVectorTest {
 
   /**
    * Testing the angle(Vector, Vector) methods of the {@link VMath} class.
-   * 
-   * 
+   * <p>
+   * We assert here that the angle method does what it did till now: <br> 
+   * calculating the sinus of the angle between two vectors, 
+   * where the smaller angle between those vectors is viewed.
    */
   @Test
   public void testAngle() {
-    // TODO: Implement: angle(v1, v2);
     final double[] v1 = {1,0};
     final double[] v2 = {1,1};
-    
-//    assertEquals(0.5, angle(v1, v2), EPSILON);
+
     assertEquals(Math.sin(Math.PI/4), angle(v2, v1), EPSILON);
-    // comment on this strange format
+    assertEquals(Math.sin(Math.PI/4), angle(v1, v2), EPSILON);
     
-    // This is a mathimatically strange method it esecially calculate the sclarproduct of two vectors and gives back the normaliy 
-    
-    // FIXME: Question new class?
-    // TODO: Implement: angle(v1, v2, o);
-    
+    // set the origin
+    final double[] or = {0,1};
+    assertEquals(Math.sin(Math.PI/4), angle(v2, v1,  or), EPSILON);
+    assertEquals(Math.sin(Math.PI/4), angle(v1, v2,  or), EPSILON);
   }
   
   /**
