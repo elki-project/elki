@@ -461,7 +461,7 @@ public final class VMath {
    * @return Matrix product, v1 * m2
    */
   public static double[][] times(final double[] v1, final double[][] m2) {
-    assert (m2.length == 1) : ERR_MATRIX_INNERDIM;
+    assert (m2.length == 1 && m2[0].length == v1.length) : ERR_MATRIX_INNERDIM;
     final int columndimension = m2[0].length;
     final double[][] re = new double[v1.length][columndimension];
     for(int j = 0; j < columndimension; j++) {
@@ -517,7 +517,7 @@ public final class VMath {
    * @return Matrix product, v1 * m2^T
    */
   public static double[][] timesTranspose(final double[] v1, final double[][] m2) {
-    assert (m2[0].length == 1) : ERR_MATRIX_INNERDIM;
+    assert (m2[0].length == 1 && m2.length == v1.length) : ERR_MATRIX_INNERDIM;
 
     final double[][] re = new double[v1.length][m2.length];
     for(int j = 0; j < m2.length; j++) {
