@@ -28,6 +28,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+
 /**
  * Test the VMath class methods operating on matrixs.
  *
@@ -49,10 +50,11 @@ public class VMathMatrixTest {
    * Nonsymmetric 4 x 5 (rows x columns) TESTMATRIX
    */
   protected static final double[][] TESTMATRIX = {
-      {1,2,3,4,5}, 
-      {2,3,4,5,1}, 
-      {3,4,5,1,2}, 
-      {4,5,1,2,3} };
+      {1,2,3,4,5}, // 
+      {2,3,4,5,1}, // 
+      {3,4,5,1,2}, // 
+      {4,5,1,2,3}, //
+  };
   
   protected static final double EPSILON = 1E-15;
   
@@ -64,11 +66,11 @@ public class VMathMatrixTest {
     final double[][] m1 = TESTMATRIX;
  
     final double[][] res_case1 = {
-          {m1[0][0], m1[1][0], m1[2][0], m1[3][0]},
-          {m1[0][1], m1[1][1], m1[2][1], m1[3][1]},
-          {m1[0][2], m1[1][2], m1[2][2], m1[3][2]},
-          {m1[0][3], m1[1][3], m1[2][3], m1[3][3]},
-          {m1[0][4], m1[1][4], m1[2][4], m1[3][4]} 
+          {m1[0][0], m1[1][0], m1[2][0], m1[3][0]}, //
+          {m1[0][1], m1[1][1], m1[2][1], m1[3][1]}, //
+          {m1[0][2], m1[1][2], m1[2][2], m1[3][2]}, //
+          {m1[0][3], m1[1][3], m1[2][3], m1[3][3]}, //
+          {m1[0][4], m1[1][4], m1[2][4], m1[3][4]}, // 
     };
     
     assertThat(transpose(m1), is(equalTo(res_case1)));
@@ -81,15 +83,15 @@ public class VMathMatrixTest {
   public void testPlus() {
     // TODO: better Data    
     final double[][] m1                 = {
-	  {-14,  1, 2, 0.100000000000006100004},
-	  {-14,  1, 2, 0.100000000000006100004},
-	  {-14,  1, 2, 0.100000000000006100004}
+	  {-14,  1, 2, 0.100000000000006100004}, //
+	  {-14,  1, 2, 0.100000000000006100004}, //
+	  {-14,  1, 2, 0.100000000000006100004}, //
     };
 
     final double[][] m2                 = {
-	  {  7,  6, 2,-0.1000000000000069},
-	  {  7,  6, 2,-0.1000000000000069},
-	  {  7,  6, 2,-0.1000000000000069}
+	  {  7,  6, 2,-0.1000000000000069}, //
+	  {  7,  6, 2,-0.1000000000000069}, //
+	  {  7,  6, 2,-0.1000000000000069}, //
     };
     
     final double s = 13;
@@ -120,20 +122,20 @@ public class VMathMatrixTest {
   @Test
   public void testMinus() {
     // TODO: better Data
-    final double[][] m1                 = {
-	  {-14,  1, 2},
-	  {-14,  1, 2},
-	  {-14,  1, 2},
-	  {-14,  1, 2},
-	  {-14,  1, 2},
+    final double[][] m1 = {
+        {-14,  1, 2}, //
+        {-14,  1, 2}, //
+        {-14,  1, 2}, //
+        {-14,  1, 2}, //
+        {-14,  1, 2}, //
     };
 
-    final double[][] m2                 = {
-	  {  7,  6, 2},
-	  {  7,  6, 2},
-	  {  7,  6, 2},
-	  {  7,  6, 2},
-	  {  7,  6, 2},
+    final double[][] m2 = {
+        {  7,  6, 2}, //
+        {  7,  6, 2}, //
+        {  7,  6, 2}, //
+        {  7,  6, 2}, //
+        {  7,  6, 2}, //
     };
     
     final double s = 13;
@@ -171,19 +173,16 @@ public class VMathMatrixTest {
     final double[][] m1 = TESTMATRIX;
     
     final double[][] m1_times_one_third = {
-        {1/3*m1[0][0], 1/3*m1[0][1], 1/3*m1[0][2], 1/3*m1[0][3], 1/3*m1[0][4]},
-        {1/3*m1[1][0], 1/3*m1[1][1], 1/3*m1[1][2], 1/3*m1[1][3], 1/3*m1[1][4]},
-        {1/3*m1[2][0], 1/3*m1[2][1], 1/3*m1[2][2], 1/3*m1[2][3], 1/3*m1[2][4]},
-        {1/3*m1[3][0], 1/3*m1[3][1], 1/3*m1[3][2], 1/3*m1[3][3], 1/3*m1[3][4]}};
+        {1/3*m1[0][0], 1/3*m1[0][1], 1/3*m1[0][2], 1/3*m1[0][3], 1/3*m1[0][4]}, //
+        {1/3*m1[1][0], 1/3*m1[1][1], 1/3*m1[1][2], 1/3*m1[1][3], 1/3*m1[1][4]}, //
+        {1/3*m1[2][0], 1/3*m1[2][1], 1/3*m1[2][2], 1/3*m1[2][3], 1/3*m1[2][4]}, //
+        {1/3*m1[3][0], 1/3*m1[3][1], 1/3*m1[3][2], 1/3*m1[3][3], 1/3*m1[3][4]}, //
+    };
     
     assertTrue(almostEquals(m1_times_one_third, times(m1, 1/3), EPSILON));
     assertTrue(almostEquals(m1_times_one_third, timesEquals(m1, 1/3), EPSILON));
     
-    final double[][] m1_times_zero = {
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0}};
+    final double[][] m1_times_zero = new double[m1.length][m1[0].length]; clear(m1_times_zero);
 
     assertThat(times(m1, 0), is(equalTo(m1_times_zero )));
     assertThat(timesEquals(m1, 0), is(equalTo(m1_times_zero )));
@@ -200,61 +199,86 @@ public class VMathMatrixTest {
    */
   @Test
   public void testMatrixMatrixMultiplication() {
-    final double[][] m1 = TESTMATRIX;
-    // TODO: implement transposed manually or assume transpose method to be correct
-    final double[][] m1_t = transpose(m1);
+    // testing times and  transposedTimestransposed
+    final double[][] m1 = {
+        {1.21, 2000}, // 
+        {0   ,-1   }, //
+        {7   , 0   }  //
+    };
+    
+    final double[][] m2 = {
+        {-1.21, 2000, 2  }, //
+        {-700 ,-2368, 4.3}  // 
+    };
+    
+    final double[][] res_times = {
+      {m1[0][0]*m2[0][0]+m1[0][1]*m2[1][0], m1[0][0]*m2[0][1]+m1[0][1]*m2[1][1], m1[0][0]*m2[0][2]+m1[0][1]*m2[1][2]},    
+      {m1[1][0]*m2[0][0]+m1[1][1]*m2[1][0], m1[1][0]*m2[0][1]+m1[1][1]*m2[1][1], m1[1][0]*m2[0][2]+m1[1][1]*m2[1][2]},    
+      {m1[2][0]*m2[0][0]+m1[2][1]*m2[1][0], m1[2][0]*m2[0][1]+m1[2][1]*m2[1][1], m1[2][0]*m2[0][2]+m1[2][1]*m2[1][2]},    
+    };
+    final double[][] res_transTimesTrans = {
+      {m1[0][0]*m2[0][0]+m1[1][0]*m2[0][1]+m1[2][0]*m2[0][2], m1[0][0]*m2[1][0]+m1[1][0]*m2[1][1]+m1[2][0]*m2[1][2]},
+      {m1[0][1]*m2[0][0]+m1[1][1]*m2[0][1]+m1[2][1]*m2[0][2], m1[0][1]*m2[1][0]+m1[1][1]*m2[1][1]+m1[2][1]*m2[1][2]},
+    };
+    
+    assertThat(times(m1, m2), is(equalTo(res_times)));
+    assertThat(transposeTimesTranspose(m2, m1), is(equalTo(transpose(res_times))));
+    
+    assertThat(transposeTimesTranspose(m1, m2), is(equalTo(res_transTimesTrans)));
+    assertThat(times(m2, m1), is(equalTo(transpose(res_transTimesTrans))));
+    
+    
+    // general testing and testing transposeTimes and timesTranspose
+    final double[][] m3 = TESTMATRIX;
+    final double[][] m3_t = transpose(m3);
+    final double[][] m4 = {
+        { 5,  0,  4,  3,  1}, //
+        { 9, -3,  2,  8,  8}, //
+        {-4, -1,  4,  9, -9}, //
+        { 1,  1,  7,  5,  7}, //
+    };
+    final double[][] m4_t = transpose(m4);
     
     // check times(Matrix, id) = Matrix = times(id, Matrix) 
-    assertThat(times(m1, unitMatrix(5) ), is(equalTo(m1)));
-    assertThat(times(unitMatrix(4), m1 ), is(equalTo(m1)));
+    assertThat(times(m3, unitMatrix(5) ), is(equalTo(m3)));
+    assertThat(times(unitMatrix(4), m3 ), is(equalTo(m3)));
     
     // check transposeTimesTranspose(Matrix, id) = transpose(Matrix) = transposeTimesTranspose(id, Matrix) 
-    assertThat(transposeTimesTranspose(m1, unitMatrix(4) ), is(equalTo(m1_t)));
-    assertThat(transposeTimesTranspose(unitMatrix(5), m1 ), is(equalTo(m1_t)));
+    assertThat(transposeTimesTranspose(m3, unitMatrix(4) ), is(equalTo(m3_t)));
+    assertThat(transposeTimesTranspose(unitMatrix(5), m3 ), is(equalTo(m3_t)));
     
-    final double[][] m1_times_m1transposed = { 
-        {transposeTimes(m1[0], m1[0]), transposeTimes(m1[0], m1[1]), transposeTimes(m1[0], m1[2]), transposeTimes(m1[0], m1[3]) },
-        {transposeTimes(m1[1], m1[0]), transposeTimes(m1[1], m1[1]), transposeTimes(m1[1], m1[2]), transposeTimes(m1[1], m1[3]) },
-        {transposeTimes(m1[2], m1[0]), transposeTimes(m1[2], m1[1]), transposeTimes(m1[2], m1[2]), transposeTimes(m1[2], m1[3]) },
-        {transposeTimes(m1[3], m1[0]), transposeTimes(m1[3], m1[1]), transposeTimes(m1[3], m1[2]), transposeTimes(m1[3], m1[3]) } };
+    final double[][] m3_times_m4transposed = { 
+        {transposeTimes(m3[0], m4[0]), transposeTimes(m3[0], m4[1]), transposeTimes(m3[0], m4[2]), transposeTimes(m3[0], m4[3]) },
+        {transposeTimes(m3[1], m4[0]), transposeTimes(m3[1], m4[1]), transposeTimes(m3[1], m4[2]), transposeTimes(m3[1], m4[3]) },
+        {transposeTimes(m3[2], m4[0]), transposeTimes(m3[2], m4[1]), transposeTimes(m3[2], m4[2]), transposeTimes(m3[2], m4[3]) },
+        {transposeTimes(m3[3], m4[0]), transposeTimes(m3[3], m4[1]), transposeTimes(m3[3], m4[2]), transposeTimes(m3[3], m4[3]) } };
     
     // check timesTranspose without not using a matrix methods times
-    assertThat(timesTranspose(m1, m1) , is(equalTo(m1_times_m1transposed)));
+    assertThat(timesTranspose(m3, m4) , is(equalTo(m3_times_m4transposed)));
     
     // check timesTranspose without not using a vector method transposeTimes
     // this is at the same time a test for the times method assuming the test before succeeded.
-    assertThat(timesTranspose(m1, m1) , is(equalTo(times(m1, m1_t))));
+    assertThat(timesTranspose(m3, m4) , is(equalTo(times(m3, m4_t))));
     // and the following analog a test for the transposeTimesTranspose method
-    assertThat(timesTranspose(m1, m1) , is(equalTo(transposeTimesTranspose(m1_t, m1))));
+    assertThat(timesTranspose(m3, m4) , is(equalTo(transposeTimesTranspose(m3_t, m4))));
     
     
-    final double[][] m1transposed_times_m1 = {
-        {transposeTimes(m1_t[0], m1_t[0]), transposeTimes(m1_t[0], m1_t[1]), transposeTimes(m1_t[0], m1_t[2]), transposeTimes(m1_t[0], m1_t[3]), transposeTimes(m1_t[0], m1_t[4]) },
-        {transposeTimes(m1_t[1], m1_t[0]), transposeTimes(m1_t[1], m1_t[1]), transposeTimes(m1_t[1], m1_t[2]), transposeTimes(m1_t[1], m1_t[3]), transposeTimes(m1_t[1], m1_t[4]) },
-        {transposeTimes(m1_t[2], m1_t[0]), transposeTimes(m1_t[2], m1_t[1]), transposeTimes(m1_t[2], m1_t[2]), transposeTimes(m1_t[2], m1_t[3]), transposeTimes(m1_t[2], m1_t[4]) },
-        {transposeTimes(m1_t[3], m1_t[0]), transposeTimes(m1_t[3], m1_t[1]), transposeTimes(m1_t[3], m1_t[2]), transposeTimes(m1_t[3], m1_t[3]), transposeTimes(m1_t[3], m1_t[4]) },
-        {transposeTimes(m1_t[4], m1_t[0]), transposeTimes(m1_t[4], m1_t[1]), transposeTimes(m1_t[4], m1_t[2]), transposeTimes(m1_t[4], m1_t[3]), transposeTimes(m1_t[4], m1_t[4]) } };
+    final double[][] m3transposed_times_m4 = {
+        {transposeTimes(m3_t[0], m4_t[0]), transposeTimes(m3_t[0], m4_t[1]), transposeTimes(m3_t[0], m4_t[2]), transposeTimes(m3_t[0], m4_t[3]), transposeTimes(m3_t[0], m4_t[4]) },
+        {transposeTimes(m3_t[1], m4_t[0]), transposeTimes(m3_t[1], m4_t[1]), transposeTimes(m3_t[1], m4_t[2]), transposeTimes(m3_t[1], m4_t[3]), transposeTimes(m3_t[1], m4_t[4]) },
+        {transposeTimes(m3_t[2], m4_t[0]), transposeTimes(m3_t[2], m4_t[1]), transposeTimes(m3_t[2], m4_t[2]), transposeTimes(m3_t[2], m4_t[3]), transposeTimes(m3_t[2], m4_t[4]) },
+        {transposeTimes(m3_t[3], m4_t[0]), transposeTimes(m3_t[3], m4_t[1]), transposeTimes(m3_t[3], m4_t[2]), transposeTimes(m3_t[3], m4_t[3]), transposeTimes(m3_t[3], m4_t[4]) },
+        {transposeTimes(m3_t[4], m4_t[0]), transposeTimes(m3_t[4], m4_t[1]), transposeTimes(m3_t[4], m4_t[2]), transposeTimes(m3_t[4], m4_t[3]), transposeTimes(m3_t[4], m4_t[4]) } };
  
     // check transposeTimes without not using a matrix methods times
     // without transpose and times
-    assertThat(transposeTimes(m1, m1) , is(equalTo(m1transposed_times_m1)));
+    assertThat(transposeTimes(m3, m4) , is(equalTo(m3transposed_times_m4)));
     
     // check transposeTimes without using a vector method timesTransposed
     // this is as well a test for the times method assuming the test before succeeded.
-    assertThat(transposeTimes(m1, m1) , is(equalTo(times(m1_t, m1))));
+    assertThat(transposeTimes(m3, m4) , is(equalTo(times(m3_t, m4))));
     // and the following analog a test for the transposeTimesTranspose method
-    assertThat(transposeTimes(m1, m1) , is(equalTo(transposeTimesTranspose(m1, m1_t))));
-
-    // TODO extra testcase for times and  transposedTimestransposed
-
-    //    final double[][] m2 = {
-    //        {1.21, 2000},
-    //        {0   ,-1   },
-    //        {7   , 0   } };
-    //
-    //    final double[][] m3 = {
-    //        {1.21, 2000, 0},
-    //        {0   ,-1   , 7} };
+    assertThat(transposeTimes(m3, m4) , is(equalTo(transposeTimesTranspose(m3, m4_t))));
   }
   
   /**
@@ -300,6 +324,7 @@ public class VMathMatrixTest {
     assertThat(transposeTimes(unitVector(3, 1), m1), is(equalTo(transpose(transposeTimes(m1, unitVector(3, 1))))));
     assertThat(transposeTimes(unitVector(3, 2), m1), is(equalTo(transpose(transposeTimes(m1, unitVector(3, 2))))));
     
+    // TODO new method VectorVector Multiplication -> maybe in test timesTranspose Vector?
     final double[] v3 = {1,2,-7};
     final double[] v4 = {-5,1,3,-4};
     final double[][] m2 = {v4};
@@ -578,13 +603,6 @@ public class VMathMatrixTest {
     }
   
   }
-  /**
-   * Testing the _solve method of VMath class.
-   */
-  @Test
-  public void testSolve() {
-    // TODO: implement solve(A, B);
-  }
   
   /**
    * Testing the appendColums method of VMath class.
@@ -637,14 +655,6 @@ public class VMathMatrixTest {
     final double[] pv3 = {4,  3, 0};
     assertThat(project(v3, m1), is(equalTo(pv3)));
     
-  }
-
-  /**
-   * Testing the inverse method of VMath class.
-   */
-  @Test
-  public void testInverse() {
-    // TODO: implement inverse(elements)
   }
   
   /**
@@ -732,6 +742,7 @@ public class VMathMatrixTest {
     assertNotSame(m1, transposeTimes(v1, m1));
     
     assertNotSame(m1, timesTranspose(v1, m1));
+    // transposeTimesTimes reasonably omitted
     
     // testing the methods as in testMinus
     assertNotSame(m1, minus(m1, m2));
@@ -761,21 +772,41 @@ public class VMathMatrixTest {
   @Test
   public void testDimensionMismatch() {
     
-    // testing the appendColums method as it is now: not working in place
+    // testing the appendColums method
+    assertDimensionMismatch("m.getRowDimension() != column.getRowDimension()", () -> appendColumns(identity(3, 2), identity(2, 2)));
     
     // testing the methods as in Diagonal omitted
     
     // testing the methods as in testGet 
-    
+    final int[] r = {5}, c = {5};
+    final int r1 = 5, c1 = 5;
+    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), r, c ));
+    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), 0, r1, c));
+    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), r, 0, c1));
+    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), 0, r1, 0, c1));
+    assertDimensionMismatch("", () -> getCol(unitMatrix(2), c1));
+    assertDimensionMismatch("", () -> getRow(unitMatrix(2), r1));
+        
+    // testing the methods as in testSet
+    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), r, c, unitMatrix(6) ));
+    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), 0, r1, c, unitMatrix(6)));
+    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), r, 0, c1, unitMatrix(6)));
+    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), 0, r1, 0, c1, unitMatrix(6)));
+    assertDimensionMismatch("", () -> setCol(unitMatrix(2), c1, unitVector(6,0)));
+    assertDimensionMismatch("", () -> setRow(unitMatrix(2), r1, unitVector(6,0)));
     // testing the methods as in testGetDimensionality omitted
     
-    // testing the methods as in testInverse
+    // testing the methods as in testInverse omitted
 
     // testing the methods as in testMatrixMatrixMultiplication
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(unitMatrix(3), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTranspose(unitMatrix(3), identity(3, 2)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> timesTranspose(unitMatrix(3), identity(3, 2)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(unitMatrix(3), identity(2, 3)));
 
-    // testing the methods as in testMatrixScalarMultiplication 
+    // testing the methods as in testMatrixScalarMultiplication omitted
 
-    // testing the methods as in testTranspose
+    // testing the methods as in testTranspose omitted
 
     // testing the methods as in testMatrixVectorMultiplication
     // vector length and number of rows in matrix differ
@@ -811,8 +842,6 @@ public class VMathMatrixTest {
     
     assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plusTimes(identity(3, 3), identity(2, 3), 1));
     assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plusTimesEquals(identity(2, 2), identity(2, 3), 1));
-    
-    // testing the methods as in testSet omitted
     
     // testing the methods as in testSolve omitted
     
