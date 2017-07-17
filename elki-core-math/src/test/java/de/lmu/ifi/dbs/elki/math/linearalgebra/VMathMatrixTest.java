@@ -391,47 +391,9 @@ public class VMathMatrixTest {
   @Test
   public void testReference() {
     final double[][] m1 = {{1}};
-    
-    // testing the appendColums method as it is now: not working in place
-    assertNotSame(m1, appendColumns(m1, m1));
-    
-    // testing the methods as in Diagonal omitted
-    
-    // testing that methods as in testGet return new copys of the submatrix to get
     final double[] inner = {1};
     final double[][] m2 = {inner};
-    // assert that inner reference is possible
-    assertSame(inner, m2[0]);
-    
-    final int[] rows = {0}, cols = {0};
-    final int c0 = 0, c1 = 0, r0 = 0, r1 = 0;
 
-    assertNotSame(inner, getMatrix(m2, rows, cols)[0]);
-    assertNotSame(inner, getMatrix(m2, r0, r1, cols)[0]);
-    assertNotSame(inner, getMatrix(m2, rows, c0, c1)[0]);
-    assertNotSame(inner, getMatrix(m2, r0, r1, c0, c1)[0]);
-    
-    assertNotSame(inner, getRow(m2, r0));
-    // getCol reasonably omitted
-    
-    // testing that the methods as in testSet, set the rows in the submatrix to refer to a new instance.
-    final double[][] m3 = new double[1][1];
-    
-    setMatrix(m3, rows, cols, m2);
-    assertNotSame(inner, m3[0]);
-    setMatrix(m3, r0, r1, cols, m2);
-    assertNotSame(inner, m3[0]);
-    setMatrix(m3, rows, c0, c1, m2);
-    assertNotSame(inner, m3[0]);
-    setMatrix(m3, r0, r1, c0, c1, m2);
-    assertNotSame(inner, m3[0]);
-    
-    setRow(m3, r0, inner);
-    assertNotSame(inner, m3[0]);
-    // setCol reasonably omitted
-    
-    // testing the methods as in testGetDimensionality omitted
-    
     // testing the methods as in testInverse
     assertNotSame(m1, inverse(m1));
     
@@ -483,7 +445,7 @@ public class VMathMatrixTest {
     // testing the methods as in testTraspose
     assertNotSame(m1, transpose(m1));
     
-    // testing the methods as in testUnitMatrix omitted
+
   }
   
   /**
@@ -494,27 +456,6 @@ public class VMathMatrixTest {
     
     // testing the appendColums method
     assertDimensionMismatch("m.getRowDimension() != column.getRowDimension()", () -> appendColumns(identity(3, 2), identity(2, 2)));
-    
-    // testing the methods as in Diagonal omitted
-    
-    // testing the methods as in testGet 
-    final int[] r = {5}, c = {5};
-    final int r1 = 5, c1 = 5;
-    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), r, c ));
-    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), 0, r1, c));
-    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), r, 0, c1));
-    assertDimensionMismatch("", () -> getMatrix(unitMatrix(2), 0, r1, 0, c1));
-    assertDimensionMismatch("", () -> getCol(unitMatrix(2), c1));
-    assertDimensionMismatch("", () -> getRow(unitMatrix(2), r1));
-        
-    // testing the methods as in testSet
-    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), r, c, unitMatrix(6) ));
-    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), 0, r1, c, unitMatrix(6)));
-    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), r, 0, c1, unitMatrix(6)));
-    assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), 0, r1, 0, c1, unitMatrix(6)));
-    assertDimensionMismatch("Dimensionalities do not agree.", () -> setCol(unitMatrix(2), c1, unitVector(6,0)));
-    assertDimensionMismatch("Dimensionalities do not agree.", () -> setRow(unitMatrix(2), r1, unitVector(6,0)));
-    // testing the methods as in testGetDimensionality omitted
     
     // testing the methods as in testInverse omitted
 
