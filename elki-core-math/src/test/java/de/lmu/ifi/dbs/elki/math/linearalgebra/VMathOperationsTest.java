@@ -26,11 +26,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+
 import org.junit.Test;
-import org.junit.validator.TestClassValidator;
 
 /**
- * Test the VMath class methods which are non mathimatical operations on Vector or Matrixes.
+ * Test the VMath class methods which are non mathematical operations on vectors or matrixes.
  *
  * @author Merlin Dietrich
  * 
@@ -147,8 +149,11 @@ public final class VMathOperationsTest {
    */
   @Test
   public void testHashcode() {
-
-    // TODO: QUEST: hashCode(v1) hashCode(m1) test needed?
+    
+    final double[] v = VMathVectorTest.TESTVEC;
+    final double[][] m = VMathMatrixTest.TESTMATRIX;
+    assertEquals(Arrays.hashCode(v), VMath.hashCode(v), 0.);
+    assertEquals(Arrays.deepHashCode(m), VMath.hashCode(m), 0.);
   }
   
   /**
@@ -165,10 +170,11 @@ public final class VMathOperationsTest {
     // test clear(matrix) 
     final double[][] m = copy(VMathMatrixTest.TESTMATRIX); clear(m);   
     final double[][] zeros4x5 = {
-        {0,0,0,0,0}, 
-        {0,0,0,0,0}, 
-        {0,0,0,0,0}, 
-        {0,0,0,0,0}};
+        {0,0,0,0,0}, //
+        {0,0,0,0,0}, //
+        {0,0,0,0,0}, //
+        {0,0,0,0,0}, //
+    };
     
     assertThat(zeros4x5, is(equalTo(m)));
   }
@@ -209,9 +215,6 @@ public final class VMathOperationsTest {
     assertThat(m1, is(equalTo(m1)));
     assertThat(m1, is(equalTo(m1_copy)));
     assertThat(identity(6, 3), is(not(equalTo(m1))));
-    
-    // TODO: Question: more testcases?
-    
   }
   
   /**
@@ -250,12 +253,14 @@ public final class VMathOperationsTest {
     assertTrue(almostEquals(m, res_diff));
     
     // maxdelta = EPSILON
-    res_diff[2][1] = 1E20; res_diff[2][1] += 1.5E10;
+    res_diff[2][1] = 1E20; res_diff[2][1] += 1.5E9;
     assertFalse(almostEquals(m, res_diff, 1E10));
-    res_diff[2][1] -= 1E10;
+    res_diff[2][1] -= 1E9;
     assertTrue(almostEquals(m, res_diff, 1E10));
     // TODO QUEST: What is this case getClass() for? why is this test failing?
     
   }
 
 }
+// TODO put testGet testSet here, getDimensionality, testDiagonal
+// TODO put testUniMatrix testUnitvector here
