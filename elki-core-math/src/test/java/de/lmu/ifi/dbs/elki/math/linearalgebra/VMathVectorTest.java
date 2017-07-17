@@ -22,16 +22,13 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMathOperationsTest.assertDimensionMismatch;
-import java.math.*;
+// TODO replace math with fastmath import net.jafama.FastMath;
 
 import static org.junit.Assert.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import org.junit.Rule;
-//import org.junit.rules.ErrorCollector;
-import org.junit.rules.ExpectedException;
-//import org.junit.rules.RuleChain;
+
 import org.junit.Test;
 
 
@@ -332,22 +329,24 @@ public final class VMathVectorTest {
   }
 
   /**
-   * Testing {@link VMath} Vector scalarProduct and transposeTimes methods
+   * Testing {@link VMath} Vector scalarProduct and transposeTimes methods.
    */
   @Test
   public void testScalarProduct() {
     
-    // testing scalarProduct(vector, vector)
+    // testing scalarProduct(vector, vector) and that transposeTimes does the same
     final double[] v1 = {1.21, 3 , 7 ,-2};
     final double[] v2 = {3.5 , -1, 4 ,-7};
     final double res = v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]+v1[3]*v2[3];
     
     assertEquals(transposeTimes(v1, v2), scalarProduct(v1, v2), EPSILON);
     assertEquals(res, scalarProduct(v1, v2), EPSILON);
+    
     assertEquals(squareSum(v1), scalarProduct(v1, v1), EPSILON);
+    assertEquals(transposeTimes(v1, v1), scalarProduct(v1, v1), EPSILON);
     
-    
-    // FIXME: Question implement tests for transposedtimes(), timestransposed() here.
+    assertEquals(squareSum(v2), transposeTimes(v2, v2), EPSILON);
+    assertEquals(transposeTimes(v2, v2), scalarProduct(v2, v2), EPSILON);
   }
   
   /**
@@ -439,10 +438,10 @@ public final class VMathVectorTest {
   }
   
   /**
-   * Testing the sum methods and the euclidienLength method of {@link VMath} class.
+   * Testing the summation methods and the euclidienLength method of {@link VMath} class.
    */
   @Test
-  public void testSum() {
+  public void testSumation() {
     // TODO: more defindes testing Implement: 
     // testing sum(vector)
     final double[] v = {1.21, -3, 2, 3.2, -5, 1};
@@ -486,19 +485,23 @@ public final class VMathVectorTest {
    * Testing the rotate90Equals(vector) method of {@link VMath} class.
    */
   @Test
-  public void testVectorRotate90Equals() { 
+  public void testRotate90Equals() { 
     // simple testcase
     final double[] v1 = {1, 0};
     final double[] res = {0,-1};
     assertArrayEquals(res, rotate90Equals(v1), 0);
    
-    // more complex testcase TODO: use angle method if it is not deprecated
+    // more complex testcase
     final double[] v2 = {1.21, -2.4};
     final double[] v2_copy = copy(v2);
-    assertEquals(0.0, scalarProduct(v2_copy, rotate90Equals(v2)), EPSILON);
+    // first rotation -> angle of 90° while cos(90°) = 0
+    assertEquals(0.0, angle(v2_copy, rotate90Equals(v2)), EPSILON);
     final double[] v2_copy1rotate = copy(v2);
+    // second rotation -> additive inverse
     assertArrayEquals(times( v2_copy, -1), rotate90Equals(v2), EPSILON);
+    // third rotation -> additive inverse to first roration
     assertArrayEquals(times( v2_copy1rotate, -1), rotate90Equals(v2), EPSILON);
+    // forth rotation -> identity
     assertArrayEquals(v2_copy, rotate90Equals(v2), EPSILON);
     
   }
@@ -513,7 +516,7 @@ public final class VMathVectorTest {
    * {@link #testMinus}, {@link #testNormalize}, {@link #testPlus}, {@link #testTimes}, {@link #testRotate90Equals} 
    */
   @Test
-  public void testVectorReference() {
+  public void testReference() {
     final double[] v1 = {0}, v2 = {0};
     final double s1 = 0, s2  = 0;
     
