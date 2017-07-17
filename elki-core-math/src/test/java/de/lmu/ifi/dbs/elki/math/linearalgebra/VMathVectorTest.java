@@ -31,8 +31,6 @@ import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Test;
 
-
-
 /**
  * Test the V(ector)Math class.
  *
@@ -54,28 +52,7 @@ public final class VMathVectorTest {
    * A vector of length 5 for testing
    */
   protected static final double[] TESTVEC = {2,3,5,7,9};
-  
-  /**
-   * Testing the {@link VMath#unitVector(int, int)} method.
-   */
-  @Test
-  public void testUnitVector() { 
-    // test if unitVector is returned
-    // for dimension 3
-    assertArrayEquals(new double[] {1,0,0}, unitVector(3,0),0. );
-    assertArrayEquals(new double[] {0,1,0}, unitVector(3,1),0. );
-    assertArrayEquals(new double[] {0,0,1}, unitVector(3,2),0. );
-    
-    // for dimension 5
-    assertArrayEquals(new double[] {1,0,0,0,0}, unitVector(5,0),0. );
-    assertArrayEquals(new double[] {0,1,0,0,0}, unitVector(5,1),0. );
-    assertArrayEquals(new double[] {0,0,1,0,0}, unitVector(5,2),0. );
-    assertArrayEquals(new double[] {0,0,0,1,0}, unitVector(5,3),0. );
-    assertArrayEquals(new double[] {0,0,0,0,1}, unitVector(5,4),0. );
-   
-  }
 
-  
   @Deprecated
   @Test
   public void testplus() {
@@ -568,7 +545,6 @@ public final class VMathVectorTest {
     
     // testing methods as in testTimesTranspose is not needed
     // testing methods as in testTranspose is not needed
-    // testing methods as in testUnitVector is not needed
        
     // testing methods as in testRotate90Equals
     final double[] v4 = {1,0};
@@ -621,11 +597,6 @@ public final class VMathVectorTest {
     
     // test for methods as in testSum is not needed
     // test timesTranspose is no needed
-    
-    // unitVector only use index out of Bound exception in assertDimensionMismatch
-    assertDimensionMismatch("", () -> unitVector(0,0));
-    assertDimensionMismatch("", () -> unitVector(4,4));
-    assertDimensionMismatch("", () -> unitVector(10,15));
     
     // test rotate90
     assertDimensionMismatch("rotate90Equals is only valid for 2d vectors.", () -> rotate90Equals(v_len1));
