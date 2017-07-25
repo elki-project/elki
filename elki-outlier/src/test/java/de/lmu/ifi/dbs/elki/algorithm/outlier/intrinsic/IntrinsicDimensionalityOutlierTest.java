@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
 
 import org.junit.Test;
 
@@ -30,27 +30,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the KNNSOS Outlier algorithm.
+ * Tests the Intrinsic Dimensionality outlier detection algorithm.
  * 
  * @author Erich Schubert
  */
-public class KNNSOSTest extends AbstractOutlierAlgorithmTest {
+public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(KNNSOS.Parameterizer.KNN_ID, 150);
+    params.addParameter(IntrinsicDimensionalityOutlier.Parameterizer.K_ID, 100);
 
     // setup Algorithm
-    KNNSOS<DoubleVector> sos = ClassGenericsUtil.parameterizeOrAbort(KNNSOS.class, params);
+    IntrinsicDimensionalityOutlier<DoubleVector> ido = ClassGenericsUtil.parameterizeOrAbort(IntrinsicDimensionalityOutlier.class, params);
     testParameterizationOk(params);
 
-    // run SOS on database
-    OutlierResult result = sos.run(db);
+    // run KNNOutlier on database
+    OutlierResult result = ido.run(db);
 
-    testAUC(db, "Noise", result, 0.94435185);
-    testSingleScore(result, 945, 0.05163418);
+    testAUC(db, "Noise", result, 0.9167222);
+    testSingleScore(result, 945, 2.5368047);
   }
 }
