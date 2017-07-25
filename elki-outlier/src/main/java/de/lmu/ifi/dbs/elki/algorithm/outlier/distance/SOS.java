@@ -229,15 +229,18 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   /**
    * Estimate beta from the distances in a row.
    * 
-   * This lacks a mathematical argument, but is a handcrafted heuristic to avoid
-   * numerical problems. The average distance is usually too large, so we scale
-   * the average distance by 2*N/perplexity. Then estimate beta as 1/x.
+   * This lacks a thorough mathematical argument, but is a handcrafted heuristic
+   * to avoid numerical problems. The average distance is usually too large, so
+   * we scale the average distance by 2*N/perplexity. Then estimate beta as 1/x.
    *
    * @param ignore Object to skip
    * @param it Distance iterator
    * @param perplexity Desired perplexity
    * @return Estimated beta.
    */
+  @Reference(authors = "Erich Schubert and Michael Gertz", //
+      title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
+      booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
   protected static double estimateInitialBeta(DBIDRef ignore, DoubleDBIDListIter it, double perplexity) {
     double sum = 0.;
     int size = 0;
@@ -248,9 +251,8 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       sum += it.doubleValue() < Double.POSITIVE_INFINITY ? it.doubleValue() : 0.;
       ++size;
     }
-    // TODO: fail gracefully if all distances are zero.
-    assert (sum > 0. && sum < Double.POSITIVE_INFINITY);
-    return .5 / sum * perplexity * (size - 1.);
+    // In degenerate cases, simply return 1.
+    return (sum > 0. && sum < Double.POSITIVE_INFINITY) ? (.5 / sum * perplexity * (size - 1.)) : 1.;
   }
 
   /**
