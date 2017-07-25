@@ -183,8 +183,13 @@ subprojects {
         "http://www.w3.org/2003/01/dom2-javadoc/",
         "https://xmlgraphics.apache.org/batik/javadoc/"
       ]
-      addBooleanOption('-allow-script-in-comments').value = true
       addBooleanOption('Xdoclint:none', true)
+      // Add --allow-script-in-comments if available (some 1.8 versions only)
+      try {
+        if (Class.forName('com.sun.tools.doclets.formats.html.ConfigurationImpl').newInstance().optionLength('--allow-script-in-comments') > 0) {
+          addBooleanOption('-allow-script-in-comments').value = true
+        }
+      } catch (ignored) {}
     }
   }
   // Resources to copy to every javadoc
