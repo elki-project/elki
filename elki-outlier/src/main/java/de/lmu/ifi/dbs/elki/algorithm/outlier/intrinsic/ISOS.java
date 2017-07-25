@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDime
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,12 +57,20 @@ import net.jafama.FastMath;
  * Intrinsic stochastic outlier score.
  * 
  * Reference:
- * UNPUBLISHED. Please cite ELKI
+ * <p>
+ * Erich Schubert and Michael Gertz<br />
+ * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
+ * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
+ * </p>
  * 
  * @author Erich Schubert
  *
  * @param <O> Object type.
  */
+@Reference(authors = "Erich Schubert and Michael Gertz", //
+    title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
 public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

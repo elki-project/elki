@@ -58,8 +58,13 @@ import net.jafama.FastMath;
  * setting perplexity, we choose the number of neighbors k, and set perplexity
  * simply to k/3. Objects outside of the kNN are not considered anymore.
  * 
- * If you use this variant, please credit the ELKI version you used, as this was
- * not discussed in the original paper.
+ * Reference of the kNN variant:
+ * <p>
+ * Erich Schubert and Michael Gertz<br />
+ * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
+ * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
+ * </p>
  * 
  * Original reference:
  * <p>
@@ -72,10 +77,9 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type.
  */
-@Reference(authors = "J. Janssens, F. Huszár, E. Postma, J. van den Herik", //
-    title = "Stochastic Outlier Selection", //
-    booktitle = "TiCC TR 2012–001", //
-    url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf")
+@Reference(authors = "Erich Schubert and Michael Gertz", //
+    title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
 public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

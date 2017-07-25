@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -30,27 +30,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the KNNSOS Outlier algorithm.
+ * Tests the ISOS outlier detection algorithm.
  * 
  * @author Erich Schubert
  */
-public class KNNSOSTest extends AbstractSimpleAlgorithmTest {
+public class ISOSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(KNNSOS.Parameterizer.KNN_ID, 150);
+    params.addParameter(ISOS.Parameterizer.KNN_ID, 100);
 
     // setup Algorithm
-    KNNSOS<DoubleVector> sos = ClassGenericsUtil.parameterizeOrAbort(KNNSOS.class, params);
+    ISOS<DoubleVector> isos = ClassGenericsUtil.parameterizeOrAbort(ISOS.class, params);
     testParameterizationOk(params);
 
-    // run SOS on database
-    OutlierResult result = sos.run(db);
+    // run KNNOutlier on database
+    OutlierResult result = isos.run(db);
 
-    testAUC(db, "Noise", result, 0.94435185);
-    testSingleScore(result, 945, 0.56587157);
+    testAUC(db, "Noise", result, 0.946333);
+    testSingleScore(result, 945, 0.05128157);
   }
 }

@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Erich Schubert
  */
-public class SOSTest extends AbstractSimpleAlgorithmTest {
+public class SOSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

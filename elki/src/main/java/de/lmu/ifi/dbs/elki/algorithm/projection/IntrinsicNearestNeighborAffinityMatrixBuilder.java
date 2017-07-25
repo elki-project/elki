@@ -1,11 +1,8 @@
-package de.lmu.ifi.dbs.elki.algorithm.projection;
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2016
- * Ludwig-Maximilians-Universität München
- * Lehr- und Forschungseinheit für Datenbanksysteme
+ * Copyright (C) 2017
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +18,7 @@ package de.lmu.ifi.dbs.elki.algorithm.projection;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.projection;
 
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
@@ -40,6 +38,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHil
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,12 +47,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Build sparse affinity matrix using the nearest neighbors only.
+ * Build sparse affinity matrix using the nearest neighbors only, adjusting for
+ * intrinsic dimensionality. On data sets with high intrinsic dimensionality,
+ * this can give better results.
  * 
+ * Furthermore, this approach uses a different rule to combine affinities:
+ * rather than taking the arithmetic average of p_ij and p_ji, we use
+ * sqrt(p_ij * p_ji), which prevents outliers from attaching closely to nearby
+ * clusters.
+ * 
+ * Reference:
+ * <p>
+ * Erich Schubert and Michael Gertz<br />
+ * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
+ * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
+ * </p>
+ *
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
+@Reference(authors = "Erich Schubert and Michael Gertz", //
+    title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
 public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNeighborAffinityMatrixBuilder<O> {
   /**
    * Class logger.
@@ -77,21 +94,9 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     this.estimator = estimator;
   }
 
-  /**
-   * Average id, for logging.
-   */
-  Mean m = new Mean(), m2 = new Mean();
-
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
     DistanceQuery<T> dq = relation.getDistanceQuery(distanceFunction);
-    // ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    // Compute desired affinities.
-    // double[][] dist = buildDistanceMatrix(ids, dq);
-    // DenseAffinityMatrix ma = new DenseAffinityMatrix(computePij(dist,
-    // perplexity, initialScale), ids);
-    m.reset();
-    m2.reset();
     final int numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
     KNNQuery<T> knnq = relation.getKNNQuery(dq, numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
@@ -108,8 +113,6 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
-    LOG.statistics(new DoubleStatistic(getClass() + ".empiric-average-id", m.getMean()));
-    LOG.statistics(new DoubleStatistic(getClass() + ".adjusted-average-id", m2.getMean()));
     return mat;
   }
 
@@ -134,11 +137,12 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     // Compute nearest-neighbor sparse affinity matrix
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding neighbors and optimizing perplexity", ids.size(), LOG) : null;
     MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
+    Mean mid = LOG.isStatistics() ? new Mean() : null;
     for(DBIDArrayIter ix = ids.iter(); ix.valid(); ix.advance()) {
       dists.clear();
       inds.clear();
       KNNList neighbours = knnq.getKNNForDBID(ix, numberOfNeighbours + 1);
-      convertNeighbors(ids, ix, square, neighbours, dists, inds);
+      convertNeighbors(ids, ix, square, neighbours, dists, inds, mid);
       double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
           pij[ix.getOffset()] = new double[dists.size()]);
       if(mv != null) {
@@ -148,13 +152,16 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
+    if(mid != null) {
+      LOG.statistics(new DoubleStatistic(getClass() + ".average-original-id", mid.getMean()));
+    }
     // Sum of the sparse affinity matrix:
     double sum = 0.;
     for(int i = 0; i < pij.length; i++) {
       final double[] pij_i = pij[i];
       for(int offi = 0; offi < pij_i.length; offi++) {
         int j = indices[i][offi];
-        if (j > i) {
+        if(j > i) {
           continue; // Exploit symmetry.
         }
         assert (i != j);
@@ -204,18 +211,20 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param neighbours Neighbor list
    * @param dist Output distance array
    * @param ind Output index array
+   * @param m Mean id, for statistics.
    */
-  protected void convertNeighbors(DBIDRange ids, DBIDRef ix, boolean square, KNNList neighbours, DoubleArray dist, IntegerArray ind) {
+  protected void convertNeighbors(DBIDRange ids, DBIDRef ix, boolean square, KNNList neighbours, DoubleArray dist, IntegerArray ind, Mean m) {
     for(DoubleDBIDListIter iter = neighbours.iter(); iter.valid(); iter.advance()) {
       if(DBIDUtil.equal(iter, ix)) {
         continue; // Skip query point
       }
-      double d = iter.doubleValue();
-      dist.add(d);
+      dist.add(iter.doubleValue());
       ind.add(ids.getOffset(iter));
     }
     double id = estimator.estimate(dist.data, dist.size);
-    m.put(id);
+    if(m != null) {
+      m.put(id);
+    }
     double max = dist.data[dist.size - 1];
     if(max > 0) {
       double scaleexp = id * .5; // Generate squared distances.
@@ -223,7 +232,6 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
       for(int i = 0; i < dist.size; i++) {
         dist.data[i] = FastMath.pow(dist.data[i] * scalelin, scaleexp);
       }
-      m2.put(estimator.estimate(dist.data, dist.size));
     }
   }
 
