@@ -28,6 +28,9 @@ import net.jafama.FastMath;
 /**
  * Euclidean distance function, optimized for {@link SparseNumberVector}s.
  * 
+ * Euclidean distance is defined as:
+ * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum_i (x_i-y_i)^2} \]
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */

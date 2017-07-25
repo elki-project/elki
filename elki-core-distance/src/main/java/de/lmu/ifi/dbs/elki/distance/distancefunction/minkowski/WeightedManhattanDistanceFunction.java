@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * Weighted version of the Minkowski L_p metrics distance function for
  * {@link NumberVector}s.
  * 
+ * Weighted Manhattan distance is defined as:
+ * \[ \text{Manhattan}_{\vec{w}}(\vec{x},\vec{y}) := \sum_i w_i |x_i-y_i|\right \]
+ * 
  * @author Erich Schubert
  * @since 0.4.0
  */

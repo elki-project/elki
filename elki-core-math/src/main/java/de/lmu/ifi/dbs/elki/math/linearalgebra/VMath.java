@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -1381,6 +1383,9 @@ public final class VMath {
    * @param c Center vector
    * @return Matrix product, (a-c)<sup>T</sup> * B * (a-c)
    */
+  @Reference(authors = "P. C. Mahalanobis", //
+      title = "On the generalized distance in statistics", //
+      booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)")
   public static double mahalanobisDistance(final double[][] B, final double[] a, final double[] c) {
     final int rowdim = B.length, coldim = B[0].length;
     assert (rowdim == a.length && rowdim == c.length) : ERR_MATRIX_INNERDIM;

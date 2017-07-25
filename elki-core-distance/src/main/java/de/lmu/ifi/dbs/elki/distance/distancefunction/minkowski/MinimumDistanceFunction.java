@@ -30,7 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance for {@link NumberVector}s.
- * 
+ *
+ * Minimum distance is defined as:
+ * \[ \text{Minimum}_p(\vec{x},\vec{y}) := \min_i |x_i-y_i| \]
+ *
  * @author Erich Schubert
  * @since 0.3
  */

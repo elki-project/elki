@@ -27,8 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Weighted version of the Minkowski L_p metrics distance function for
+ * Weighted version of the maximum distance function for
  * {@link NumberVector}s.
+ * 
+ * Weighted maximum distance is defined as:
+ * \[ \text{Maximum}_{\vec{w}}(\vec{x},\vec{y}) := \max_i w_i |x_i-y_i| \]
  * 
  * @author Erich Schubert
  * @since 0.4.0

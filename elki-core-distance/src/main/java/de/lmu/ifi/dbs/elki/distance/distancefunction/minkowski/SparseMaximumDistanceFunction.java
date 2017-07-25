@@ -26,7 +26,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance, optimized for {@link SparseNumberVector}s.
- * 
+ *
+ * The maximum distance is defined as:
+ * \[ \text{Maximum}(\vec{x},\vec{y}) := \max_i |x_i-y_i| \]
+ *
+ * and can be seen as limiting case of the {@link LPNormDistanceFunction}
+ * for \( p \rightarrow \infty \).
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */

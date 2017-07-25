@@ -31,6 +31,9 @@ import net.jafama.FastMath;
 /**
  * Weighted Euclidean distance for {@link NumberVector}s.
  * 
+ * Weighted Euclidean distance is defined as:
+ * \[ \text{Euclidean}_{\vec{w}}(\vec{x},\vec{y}) := \sqrt{\sum_i w_i (x_i-y_i)^2} \]
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */

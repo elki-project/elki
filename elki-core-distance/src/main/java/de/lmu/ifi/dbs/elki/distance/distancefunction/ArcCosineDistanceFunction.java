@@ -28,10 +28,18 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Cosine distance function for feature vectors.
+ * Arcus cosine distance function for feature vectors.
  * 
- * The cosine distance is computed as the arcus from the cosine similarity
+ * The arc cosine distance is computed as the arcus from the cosine similarity
  * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
+ *
+ * Cosine similarity is defined as
+ * \[ \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \]
+ * Arcus cosine distance then is
+ * \[ \text{arccos} \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \in [0;\pi] \]
+ * 
+ * {@link CosineDistanceFunction} is a bit less expensive, and will yield the
+ * same ranking of neighbors.
  * 
  * @author Arthur Zimek
  * @since 0.2

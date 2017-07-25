@@ -31,9 +31,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import net.jafama.FastMath;
 
 /**
- * LP-Norm for {@link NumberVector}s, optimized version for integer values of p.
- * This will likely not have huge impact, but may vary from CPU and virtual
- * machine version.
+ * L<sub>p</sub>-Norm for {@link NumberVector}s, optimized version for integer
+ * values of p. This will likely not have huge impact, but may vary from CPU and
+ * virtual machine version.
+ * 
+ * When using the parameterization API, {@link LPNormDistanceFunction} will
+ * automatically use this class for integer values.
+ * 
+ * The L<sub>p</sub> distance is defined as:
+ * \[ L_p(\vec{x},\vec{y}) := \left(\sum_i (x_i-y_i)\right)^{1/p} \]
  * 
  * @author Erich Schubert
  * @since 0.6.0

@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedQuadraticDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
     title = "Efficient Color Histogram Indexing for Quadratic Form Distance Functions", //
     booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995", //
     url = "http://dx.doi.org/10.1109/34.391417")
-public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
+public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadraticDistanceFunction {
   /**
    * Constructor.
    * 

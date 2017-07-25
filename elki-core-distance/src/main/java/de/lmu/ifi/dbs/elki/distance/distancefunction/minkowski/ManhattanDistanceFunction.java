@@ -28,6 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Manhattan distance for {@link NumberVector}s.
  * 
+ * Manhattan distance is defined as:
+ * \[ \text{Manhattan}(\vec{x},\vec{y}) := \sum_i |x_i-y_i| \]
+ * 
  * @author Arthur Zimek
  * @since 0.2
  */

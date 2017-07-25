@@ -28,6 +28,9 @@ import net.jafama.FastMath;
 
 /**
  * Euclidean distance for {@link NumberVector}s.
+ * 
+ * Euclidean distance is defined as:
+ * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum_i (x_i-y_i)^2} \]
  *
  * @author Arthur Zimek
  * @since 0.2

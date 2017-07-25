@@ -35,6 +35,9 @@ import net.jafama.FastMath;
 /**
  * LP-Norm, optimized for {@link SparseNumberVector}s.
  * 
+ * The L_p distance is defined as:
+ * \[ L_p(\vec{x},\vec{y}) := \left(\sum_i (x_i-y_i)\right)^{1/p} \]
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */

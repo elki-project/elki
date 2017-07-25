@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.Arrays;
 
@@ -29,13 +30,20 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
- * Weighted distance for feature vectors.
+ * Matrix weighted quadratic distance, the squared form of
+ * {@link MahalanobisDistanceFunction}.
+ *
+ * For a weight matrix M, this distance is defined as
+ * \[ \text{Mahalanobis}^2_M(\vec{x},\vec{y}) := (\vec{x}-\vec{y})^T * M *
+ * (\vec{x}-\vec{y}) \]
  * 
+ * TODO: Add a factory with parameterizable weight matrix! Right now, this can
+ * only be used from Java and from subclasses, not from command line or MiniGUI.
+ *
  * @author Elke Achtert
  * @since 0.2
  */
-// TODO: Factory with parameterizable weight matrix?
-public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistanceFunction {
+public class MatrixWeightedQuadraticDistanceFunction extends AbstractNumberVectorDistanceFunction implements Norm<NumberVector> {
   /**
    * The weight matrix.
    */
@@ -46,7 +54,7 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
    * 
    * @param weightMatrix weight matrix
    */
-  public MatrixWeightedDistanceFunction(double[][] weightMatrix) {
+  public MatrixWeightedQuadraticDistanceFunction(double[][] weightMatrix) {
     super();
     this.weightMatrix = weightMatrix;
     assert (weightMatrix[0].length == weightMatrix.length);
@@ -59,9 +67,15 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   }
 
   @Override
+  public double norm(NumberVector obj) {
+    double[] v = obj.toArray();
+    return transposeTimesTimes(v, weightMatrix, v);
+  }
+
+  @Override
   public boolean equals(Object obj) {
     return this == obj || (obj != null && this.getClass().equals(obj.getClass()) && //
-        VMath.equals(this.weightMatrix, ((MatrixWeightedDistanceFunction) obj).weightMatrix));
+        VMath.equals(this.weightMatrix, ((MatrixWeightedQuadraticDistanceFunction) obj).weightMatrix));
   }
 
   // TODO: fairly expensive - cache the hash code?

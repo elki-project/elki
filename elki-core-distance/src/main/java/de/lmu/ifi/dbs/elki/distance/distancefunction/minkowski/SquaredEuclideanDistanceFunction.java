@@ -32,7 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Squared Euclidean distance, optimized for {@link SparseNumberVector}s. This
  * results in the same rankings as regular Euclidean distance, but saves
  * computing the square root.
- * 
+ *
+ * Squared Euclidean is defined as:
+ * \[ \text{Euclidean}^2(\vec{x},\vec{y}) := \sum_i (x_i-y_i)^2 \]
+ *
  * @author Arthur Zimek
  * @since 0.2
  */

@@ -36,7 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import net.jafama.FastMath;
 
 /**
- * LP-Norm for {@link NumberVector}s.
+ * L<sub>p</sub>-Norm (Minkowski norms) are a family of distances for
+ * {@link NumberVector}s.
+ * 
+ * The L<sub>p</sub> distance is defined as:
+ * \[ L_p(\vec{x},\vec{y}) := \left(\sum_i (x_i-y_i)\right)^{1/p} \]
+ * 
+ * For p >= 1 this is a metric. For p=1, this yields the well known
+ * {@link ManhattanDistanceFunction}, for p = 2 the standard
+ * {@link EuclideanDistanceFunction}.
  * 
  * @author Arthur Zimek
  * @since 0.2

@@ -33,6 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * The cosine distance is computed from the cosine similarity by
  * <code>1-(cosine similarity)</code>.
  * 
+ * Cosine similarity is defined as
+ * \[ \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \]
+ * Cosine distance then is defined as
+ * \[ 1 - \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
+ * 
+ * {@link ArcCosineDistanceFunction} may sometimes be more appropriate, but also
+ * more computationally expensive.
+ * 
  * @author Arthur Zimek
  * @since 0.2
  */
