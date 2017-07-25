@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
@@ -58,11 +59,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * 
  * Important note: from literature, the one-class SVM is trained as if 0 was the
  * only counterexample. Outliers will only be detected when they are close to
- * the origin!
+ * the origin in kernel space! In our experience, results from this method are
+ * rather mixed, in particular as you would likely need to tune hyperparameters.
+ * Results may be better if you have a training data set with positive examples
+ * only, then apply it only to new data (which is currently not supported in
+ * this implementation, it assumes a single-dataset scenario).
  * 
  * <p>
  * Reference:<br />
- * B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson<br />
+ * B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C.
+ * Williamson<br />
  * Estimating the support of a high-dimensional distribution<br />
  * Neural computation 13.7
  * </p>
@@ -73,8 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @param V vector type
  */
 @Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", //
-title = "Estimating the support of a high-dimensional distribution", //
-booktitle = "Neural computation 13.7")
+    title = "Estimating the support of a high-dimensional distribution", //
+    booktitle = "Neural computation 13.7")
 public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -100,13 +106,20 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
   protected SVMKernel kernel = SVMKernel.RBF;
 
   /**
+   * Nu parameter.
+   */
+  double nu = 0.05;
+
+  /**
    * Constructor.
    * 
    * @param kernel Kernel to use with SVM.
+   * @param nu Nu parameter
    */
-  public LibSVMOneClassOutlierDetection(SVMKernel kernel) {
+  public LibSVMOneClassOutlierDetection(SVMKernel kernel, double nu) {
     super();
     this.kernel = kernel;
+    this.nu = nu;
   }
 
   /**
@@ -147,10 +160,10 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
       throw new AbortException("Invalid kernel parameter: " + kernel);
     }
     // TODO: expose additional parameters to the end user!
-    param.nu = 0.05;
+    param.nu = nu;
     param.coef0 = 0.;
-    param.cache_size = 100;
-    param.C = 1e2;
+    param.cache_size = 10000;
+    param.C = 1;
     param.eps = 1e-4; // not used by one-class?
     param.p = 0.1; // not used by one-class?
     param.shrinking = 0;
@@ -158,7 +171,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     param.nr_weight = 0;
     param.weight_label = new int[0];
     param.weight = new double[0];
-    param.gamma = 1e-4 / dim;
+    param.gamma = 1. / dim;
 
     // Transform data:
     svm_problem prob = new svm_problem();
@@ -207,7 +220,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
           x[d].value = vec.doubleValue(d);
         }
         svm.svm_predict_values(model, x, buf);
-        double score = -buf[0] / param.gamma; // Heuristic rescaling, sorry.
+        double score = -buf[0]; // / param.gamma; // Heuristic rescaling, sorry.
         // Unfortunately, libsvm one-class currently yields a binary decision.
         scores.putDouble(iter, score);
         mm.put(score);
@@ -253,12 +266,22 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     /**
      * Parameter for kernel function.
      */
-    private static final OptionID KERNEL_ID = new OptionID("svm.kernel", "Kernel to use with SVM.");
+    public static final OptionID KERNEL_ID = new OptionID("svm.kernel", "Kernel to use with SVM.");
+
+    /**
+     * SVM nu parameter
+     */
+    public static final OptionID NU_ID = new OptionID("svm.nu", "SVM nu parameter.");
 
     /**
      * Kernel in use.
      */
     protected SVMKernel kernel = SVMKernel.RBF;
+
+    /**
+     * Nu parameter.
+     */
+    protected double nu = 0.05;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -268,11 +291,16 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
       if(config.grab(kernelP)) {
         kernel = kernelP.getValue();
       }
+
+      DoubleParameter nuP = new DoubleParameter(NU_ID, 0.05);
+      if(config.grab(nuP)) {
+        nu = nuP.doubleValue();
+      }
     }
 
     @Override
     protected LibSVMOneClassOutlierDetection<V> makeInstance() {
-      return new LibSVMOneClassOutlierDetection<>(kernel);
+      return new LibSVMOneClassOutlierDetection<>(kernel, nu);
     }
   }
 }
