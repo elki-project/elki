@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
@@ -35,6 +36,7 @@ import net.jafama.FastMath;
  * @author Simon Paradies
  * @since 0.2
  */
+@Priority(Priority.RECOMMENDED)
 public class LinearKernelFunction extends PolynomialKernelFunction {
   /**
    * Static instance.

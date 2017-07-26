@@ -27,12 +27,16 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanc
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Chi-Squared distance function, symmetric version.
- * 
+ *
+ * This implementation assumes that \( \sum_i \vec{x} = 1 \), and is defined as:
+ * \[ \chi^2(\vec{x},\vec{y}):= 2 \sum_i \frac{(x_i-x_i)^2}{x_i+y_i} \]
+ *
  * Reference:
  * <p>
  * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
@@ -44,10 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.4.0
  */
 @Alias("chisq")
+@Priority(Priority.IMPORTANT)
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
-title = "Empirical evaluation of dissimilarity measures for color and texture", //
-booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
-url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
+    title = "Empirical evaluation of dissimilarity measures for color and texture", //
+    booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
+    url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
 public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!

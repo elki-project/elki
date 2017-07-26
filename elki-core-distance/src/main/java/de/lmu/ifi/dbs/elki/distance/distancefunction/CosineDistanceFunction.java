@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,9 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <code>1-(cosine similarity)</code>.
  * 
  * Cosine similarity is defined as
- * \[ \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \]
+ * \[ \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \]
  * Cosine distance then is defined as
- * \[ 1 - \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
+ * \[ 1 - \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
  * 
  * {@link ArcCosineDistanceFunction} may sometimes be more appropriate, but also
  * more computationally expensive.
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  * @since 0.2
  */
+@Priority(Priority.IMPORTANT)
 @Alias({ "cosine" })
 public class CosineDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

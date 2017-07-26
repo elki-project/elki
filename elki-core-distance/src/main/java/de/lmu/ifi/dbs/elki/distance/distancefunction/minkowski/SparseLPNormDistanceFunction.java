@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import net.jafama.FastMath;
 
 /**
- * LP-Norm, optimized for {@link SparseNumberVector}s.
+ * L<sub>p</sub>-Norm, optimized for {@link SparseNumberVector}s.
  * 
- * The L_p distance is defined as:
+ * The L<sub>p</sub> distance is defined as:
  * \[ L_p(\vec{x},\vec{y}) := \left(\sum_i (x_i-y_i)\right)^{1/p} \]
  *
  * @author Erich Schubert

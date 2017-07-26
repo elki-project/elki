@@ -24,12 +24,17 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Canberra distance function, a variation of Manhattan distance.
- * 
+ *
+ * Canberra distance is defined as:
+ * \[ \text{Canberra}(\vec{x},\vec{y}) :=
+ * \sum_i \frac{|x_i-y_i|}{|x_i|+|y_i|} \]
+ *
  * <p>
  * Reference:<br />
  * G. N. Lance, W. T. Williams<br />
@@ -41,10 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Priority(Priority.RECOMMENDED)
 @Reference(authors = "G. N. Lance, W. T. Williams", //
-title = "Computer programs for hierarchical polythetic classification (similarity analyses)", //
-booktitle = "Computer Journal, Volume 9, Issue 1", //
-url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
+    title = "Computer programs for hierarchical polythetic classification (similarity analyses)", //
+    booktitle = "Computer Journal, Volume 9, Issue 1", //
+    url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
 @Alias({ "canberra" })
 public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

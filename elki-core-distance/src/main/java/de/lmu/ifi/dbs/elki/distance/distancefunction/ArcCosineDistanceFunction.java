@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,9 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
  *
  * Cosine similarity is defined as
- * \[ \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \]
+ * \[ \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \]
  * Arcus cosine distance then is
- * \[ \text{arccos} \frac{\vec{x}\dot\vec{y}}{||a||\cdot||b||} \in [0;\pi] \]
+ * \[ \text{arccos} \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \in [0;\pi] \]
  * 
  * {@link CosineDistanceFunction} is a bit less expensive, and will yield the
  * same ranking of neighbors.
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  * @since 0.2
  */
+@Priority(Priority.IMPORTANT)
 @Alias({ "arccos" })
 public class ArcCosineDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

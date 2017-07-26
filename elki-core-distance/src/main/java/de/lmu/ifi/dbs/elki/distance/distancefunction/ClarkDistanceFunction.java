@@ -23,13 +23,18 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
  * Clark distance function for vector spaces.
- * 
+ *
+ * Clark distance is defined as:
+ * \[ \text{Clark}(\vec{x},\vec{y}) :=
+ * \sqrt{\frac{1}{d}\sum_i \left(\frac{|x_i-y_i|}{|x_i|+|y_i|}\right)^2} \]
+ *
  * Reference:
  * <p>
  * M.-M. Deza and E. Deza<br />
@@ -39,9 +44,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Priority(Priority.RECOMMENDED)
 @Reference(authors = "M.-M. Deza and E. Deza", //
-title = "Dictionary of distances", //
-booktitle = "Dictionary of distances")
+    title = "Dictionary of distances", //
+    booktitle = "Dictionary of distances")
 public class ClarkDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.

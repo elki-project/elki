@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -37,6 +38,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  */
+@Priority(Priority.RECOMMENDED)
 @Alias("rbf")
 public class RadialBasisFunctionKernelFunction extends AbstractVectorSimilarityFunction {
   /**

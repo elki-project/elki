@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
@@ -35,6 +36,7 @@ import net.jafama.FastMath;
  * @author Arthur Zimek
  * @since 0.2
  */
+@Priority(300) // Everybody expects Euclidean to come first.
 @Alias({ "euclidean", "euclid", "l2", //
     "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
 public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
