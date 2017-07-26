@@ -137,7 +137,7 @@ public class WeibullDistribution extends AbstractDistribution {
   public double getTheta() {
     return theta;
   }
-  
+
   @Override
   public double pdf(double x) {
     return pdf(x, k, lambda, theta);
@@ -193,12 +193,9 @@ public class WeibullDistribution extends AbstractDistribution {
    * @return CDF at position x.
    */
   public static double cdf(double val, double k, double lambda, double theta) {
-    if(val > theta) {
-      return 1.0 - FastMath.exp(-FastMath.pow((val - theta) / lambda, k));
-    }
-    else {
-      return 0.0;
-    }
+    return (val > theta) ? //
+        (1.0 - FastMath.exp(-FastMath.pow((val - theta) / lambda, k))) //
+        : 0.0;
   }
 
   @Override

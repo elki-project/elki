@@ -154,8 +154,7 @@ public class LaplaceDistribution extends AbstractDistribution {
 
   @Override
   public double cdf(double val) {
-    final double v = .5 * FastMath.exp(-rate * (val - location));
-    return (val < location) ? v : 1 - v;
+    return cdf(val - location, rate);
   }
 
   /**
@@ -166,8 +165,9 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @return cumulative density
    */
   public static double cdf(double val, double rate) {
-    final double v = .5 * FastMath.exp(-rate * val);
-    return (val < 0.) ? v : 1 - v;
+    final double v = .5 * FastMath.exp(-rate * Math.abs(val));
+    return (v == Double.POSITIVE_INFINITY) ? ((val <= 0) ? 0 : 1) : //
+        (val < 0) ? v : 1 - v;
   }
 
   @Override

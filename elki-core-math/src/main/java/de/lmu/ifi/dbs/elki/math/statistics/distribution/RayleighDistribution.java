@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
- * Rayleigh distribution.
+ * Rayleigh distribution, a special case of the Weibull distribution.
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -112,11 +112,12 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double pdf(double x, double sigma) {
-    if(x <= 0.) {
+    if(x <= 0. || x == Double.POSITIVE_INFINITY) {
       return 0.;
     }
     final double xs = x / sigma;
-    return xs / sigma * FastMath.exp(-.5 * xs * xs);
+    final double v = FastMath.exp(-.5 * xs * xs);
+    return v > 0. ? xs / sigma * v : 0.;
   }
 
   @Override
@@ -132,11 +133,11 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double logpdf(double x, double sigma) {
-    if(x <= 0.) {
+    if(x <= 0. || x == Double.POSITIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double xs = x / sigma;
-    return FastMath.log(xs / sigma) - .5 * xs * xs;
+    final double xs = x / sigma, xs2 = xs * xs;
+    return xs2 < Double.POSITIVE_INFINITY ? FastMath.log(xs / sigma) - .5 * xs2 : Double.NEGATIVE_INFINITY;
   }
 
   @Override
@@ -175,15 +176,13 @@ public class RayleighDistribution extends AbstractDistribution {
     if(!(val >= 0.) || !(val <= 1.)) {
       return Double.NaN;
     }
-    else if(val == 0.) {
+    if(val == 0.) {
       return 0.;
     }
-    else if(val == 1.) {
+    if(val == 1.) {
       return Double.POSITIVE_INFINITY;
     }
-    else {
-      return sigma * FastMath.sqrt(-2. * FastMath.log(val));
-    }
+    return sigma * FastMath.sqrt(-2. * FastMath.log(1. - val));
   }
 
   @Override

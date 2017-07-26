@@ -3,7 +3,7 @@ import scipy.stats, numpy, subprocess, math, sys, gzip, re
 
 #
 # R requirements:
-# install.packages(c("statmod", "emg", "chi", "evir", "lmomco", "gumbel"))
+# install.packages(c("statmod", "emg", "chi", "evir", "lmomco", "gumbel", "bda"))
 #
 
 # Random variate samples
@@ -120,6 +120,12 @@ dfs = [
 	("chi", "10", scipy.stats.chi(10), "chi(x, 10 %s)", 101),
 	("emg", "1_3_05", None, "emg(x, 1, 3, 0.5 %s)", 102),
 ]
+dfs = [
+	("lap", "1_3", scipy.stats.laplace(3, 1), "lap(x, 3, 1 %s)", 103),
+	("lap", "4_05", scipy.stats.laplace(.5, 1./4), "lap(x, 0.5, 4 %s)", 104),
+	("ray", "1", scipy.stats.rayleigh(scale=1), "weibull(x, 2, 1*sqrt(2) %s)", 105),
+	("ray", "2", scipy.stats.rayleigh(scale=2), "weibull(x, 2, 2*sqrt(2) %s)", 106),
+]
 
 def fmt(x):
 	if isinstance(x, float): x = "%.17e" % x
@@ -165,6 +171,7 @@ library("chi")
 library("gumbel")
 library("evir")
 library("lmomco")
+library("bda")
 x <- c( %s )
 y <- p%s
 cat(formatC(y, digits=50, format="e"))
@@ -204,6 +211,7 @@ library("emg")
 library("chi")
 library("gumbel")
 library("lmomco")
+library("bda")
 x <- c( %s )
 y <- q%s
 cat(formatC(y, digits=50, format="e"))
