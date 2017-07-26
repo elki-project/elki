@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Generalized Extreme Value (GEV) distribution in ELKI.
  * 
@@ -167,5 +171,16 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "quant_gnur_1_05_05", 1e-13);
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "quant_gnur_2_05_05", 1e-13);
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "quant_gnur_4_05_05", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("gev.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.SHAPE_ID, .8);
+    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.LOCATION_ID, .2);
+    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.SCALE_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedExtremeValueDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_08_02_1", 1e-15);
   }
 }

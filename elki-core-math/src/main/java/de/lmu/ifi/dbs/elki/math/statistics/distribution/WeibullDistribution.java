@@ -278,7 +278,7 @@ public class WeibullDistribution extends AbstractDistribution {
 
     @Override
     protected WeibullDistribution makeInstance() {
-      return new WeibullDistribution(theta, k, lambda, rnd);
+      return new WeibullDistribution(k, lambda, theta, rnd);
     }
   }
 }

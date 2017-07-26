@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Chi distribution in ELKI.
  * 
@@ -77,5 +81,14 @@ public class ChiDistributionTest extends AbstractDistributionTest {
     checkCDF(new ChiDistribution(4.), "cdf_gnur_4", 1e-15);
     checkCDF(new ChiDistribution(10.), "cdf_gnur_10", 1e-14);
     checkCDF(new ChiDistribution(.1), "cdf_gnur_01", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("chi.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ChiDistribution.Parameterizer.DOF_ID, 2.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ChiDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2", 1e-15);
   }
 }

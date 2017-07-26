@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Chi Squared distribution in ELKI.
  * 
@@ -92,5 +96,14 @@ public class ChiSquaredDistributionTest extends AbstractDistributionTest {
     checkQuantile(new ChiSquaredDistribution(4.), "quant_gnur_4", 1e-13);
     checkQuantile(new ChiSquaredDistribution(10), "quant_gnur_10", 1e-13);
     checkQuantile(new ChiSquaredDistribution(.1), "quant_gnur_01", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("chisq.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ChiSquaredDistribution.Parameterizer.DOF_ID, 2.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ChiSquaredDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2", 1e-15);
   }
 }

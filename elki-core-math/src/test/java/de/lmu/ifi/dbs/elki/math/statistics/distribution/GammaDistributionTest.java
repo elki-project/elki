@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Gamma distribution in ELKI.
  * 
@@ -117,5 +121,15 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-14);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
     checkQuantile(new GammaDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("gamma.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(GammaDistribution.Parameterizer.K_ID, 2.);
+    params.addParameter(GammaDistribution.Parameterizer.THETA_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GammaDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 }

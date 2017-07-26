@@ -243,28 +243,52 @@ public class ExpGammaDistribution extends AbstractDistribution {
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /**
+     * Theta parameter, same as
+     * {@link GammaDistribution.Parameterizer#THETA_ID}.
+     */
+    public static final OptionID THETA_ID = GammaDistribution.Parameterizer.THETA_ID;
+
+    /**
+     * k parameter, same as {@link GammaDistribution.Parameterizer#K_ID}.
+     */
+    public static final OptionID K_ID = GammaDistribution.Parameterizer.K_ID;
+
+    /**
      * Shifting offset parameter.
      */
     public static final OptionID SHIFT_ID = new OptionID("distribution.expgamma.shift", "Shift offset parameter.");
 
-    /** Parameters. */
-    double k, theta, shift;
+    /**
+     * Alpha == k.
+     */
+    double k;
+
+    /**
+     * Theta == 1 / Beta.
+     */
+    double theta;
+
+    /**
+     * Translation offset.
+     */
+    double shift;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter kP = new DoubleParameter(GammaDistribution.Parameterizer.K_ID);
+      DoubleParameter kP = new DoubleParameter(K_ID);
       if(config.grab(kP)) {
         k = kP.doubleValue();
       }
 
-      DoubleParameter thetaP = new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID);
+      DoubleParameter thetaP = new DoubleParameter(THETA_ID);
       if(config.grab(thetaP)) {
         theta = thetaP.doubleValue();
       }
 
-      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID);
+      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID) //
+          .setDefaultValue(0.);
       if(config.grab(shiftP)) {
         shift = shiftP.doubleValue();
       }

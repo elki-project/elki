@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Normal distribution in ELKI.
  * 
@@ -41,5 +45,16 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
   public void testCDF() {
     load("emg.ascii.gz");
     checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_gnur_1_3_05", 1e-14);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("emg.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.LOCATION_ID, 1.);
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.SCALE_ID, 3);
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.RATE_ID, .5);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentiallyModifiedGaussianDistribution.class, params);
+    checkPDF(dist, "pdf_gnur_1_3_05", 1e-15);
   }
 }

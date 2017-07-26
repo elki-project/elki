@@ -24,6 +24,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
@@ -163,6 +164,12 @@ public class ChiDistribution extends AbstractDistribution {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Degrees of freedom parameter - same as
+     * {@link ChiSquaredDistribution.Parameterizer#DOF_ID}.
+     */
+    public static final OptionID DOF_ID = ChiSquaredDistribution.Parameterizer.DOF_ID;
+
     /** Parameters. */
     double dof;
 
@@ -170,7 +177,7 @@ public class ChiDistribution extends AbstractDistribution {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter dofP = new DoubleParameter(ChiSquaredDistribution.Parameterizer.DOF_ID);
+      DoubleParameter dofP = new DoubleParameter(DOF_ID);
       if(config.grab(dofP)) {
         dof = dofP.doubleValue();
       }

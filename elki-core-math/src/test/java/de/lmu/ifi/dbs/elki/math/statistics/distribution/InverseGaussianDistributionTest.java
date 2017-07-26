@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the inverse gaussian distribution in ELKI.
  * 
@@ -65,5 +69,15 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
     checkCDF(new InverseGaussianDistribution(1., 1.), "cdf_scipy_1_1", 1e-13);
     checkCDF(new InverseGaussianDistribution(.5, 1.), "cdf_scipy_05_1", 1e-12);
     checkCDF(new InverseGaussianDistribution(1., .5), "cdf_scipy_1_05", 1e-14);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("invgauss.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(InverseGaussianDistribution.Parameterizer.LOCATION_ID, .5);
+    params.addParameter(InverseGaussianDistribution.Parameterizer.SHAPE_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(InverseGaussianDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_05_1", 1e-15);
   }
 }

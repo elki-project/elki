@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Cauchy distribution in ELKI.
  * 
@@ -69,5 +73,15 @@ public class CauchyDistributionTest extends AbstractDistributionTest {
 
     checkQuantile(new CauchyDistribution(1., .5), "quant_scipy_1_05", 1e-12);
     checkQuantile(new CauchyDistribution(.5, 1.), "quant_scipy_05_1", 1e-12);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("cauchy.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CauchyDistribution.Parameterizer.LOCATION_ID, .5);
+    params.addParameter(CauchyDistribution.Parameterizer.SHAPE_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(CauchyDistribution.class, params);
+    checkPDF(dist, "pdf_gnur_05_1", 1e-15);
   }
 }

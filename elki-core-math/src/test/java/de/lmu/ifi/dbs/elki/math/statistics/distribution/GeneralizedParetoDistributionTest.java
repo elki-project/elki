@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Generalized Pareto Distribution (GPD) in ELKI.
  * 
@@ -57,5 +61,16 @@ public class GeneralizedParetoDistributionTest extends AbstractDistributionTest 
   public void testQuantile() {
     load("gpd.ascii.gz");
     checkQuantile(new GeneralizedParetoDistribution(.1, .5, .1), "quant_scipy_01_05_01", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("gpd.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(GeneralizedParetoDistribution.Parameterizer.LOCATION_ID, .1);
+    params.addParameter(GeneralizedParetoDistribution.Parameterizer.SCALE_ID, .5);
+    params.addParameter(GeneralizedParetoDistribution.Parameterizer.SHAPE_ID, .1);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedParetoDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_01_05_01", 1e-15);
   }
 }

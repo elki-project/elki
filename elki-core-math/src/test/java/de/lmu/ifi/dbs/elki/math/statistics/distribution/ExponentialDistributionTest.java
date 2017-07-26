@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the exponential distribution in ELKI.
  * 
@@ -93,5 +97,15 @@ public class ExponentialDistributionTest extends AbstractDistributionTest {
     checkQuantile(new ExponentialDistribution(1.), "quant_scipy_1", 1e-15);
     checkQuantile(new ExponentialDistribution(2.), "quant_scipy_2", 1e-15);
     checkQuantile(new ExponentialDistribution(4.), "quant_scipy_4", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("exp.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ExponentialDistribution.Parameterizer.LOCATION_ID, 0.);
+    params.addParameter(ExponentialDistribution.Parameterizer.RATE_ID, .1);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentialDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_01", 1e-15);
   }
 }

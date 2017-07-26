@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Normal distribution in ELKI.
  * 
@@ -73,5 +77,15 @@ public class NormalDistributionTest extends AbstractDistributionTest {
     checkQuantile(new NormalDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
     checkQuantile(new NormalDistribution(1., 3.), "quant_gnur_1_3", 1e-15);
     checkQuantile(new NormalDistribution(.1, .1), "quant_gnur_01_01", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("norm.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(NormalDistribution.Parameterizer.LOCATION_ID, 1.);
+    params.addParameter(NormalDistribution.Parameterizer.SCALE_ID, 3.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(NormalDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_1_3", 1e-15);
   }
 }

@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Uniform distribution in ELKI.
  *
@@ -63,5 +67,15 @@ public class UniformDistributionTest extends AbstractDistributionTest {
     checkQuantile(new UniformDistribution(-1., 2.), "quant_gnur_M1_2", 1e-15);
     checkQuantile(new UniformDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
     checkQuantile(new UniformDistribution(-1., 2.), "quant_scipy_M1_2", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("unif.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(UniformDistribution.Parameterizer.MIN_ID, 0.);
+    params.addParameter(UniformDistribution.Parameterizer.MAX_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(UniformDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_0_1", 1e-15);
   }
 }

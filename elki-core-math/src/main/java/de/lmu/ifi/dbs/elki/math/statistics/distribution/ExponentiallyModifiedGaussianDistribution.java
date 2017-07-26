@@ -25,6 +25,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
@@ -194,10 +195,10 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    * @return The CDF of the given exgauss distribution at x.
    */
   public static double cdf(double x, double mu, double sigma, double lambda) {
-    if (x == Double.NEGATIVE_INFINITY) {
+    if(x == Double.NEGATIVE_INFINITY) {
       return 0.;
     }
-    if (x == Double.POSITIVE_INFINITY) {
+    if(x == Double.POSITIVE_INFINITY) {
       return 1.;
     }
     final double u = lambda * (x - mu);
@@ -233,6 +234,12 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Rate option, same as
+     * {@link ExponentialDistribution.Parameterizer#RATE_ID}.
+     */
+    public static final OptionID RATE_ID = ExponentialDistribution.Parameterizer.RATE_ID;
+
     /** Parameters. */
     double mean, stddev, lambda;
 
@@ -240,7 +247,8 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID) //
+          .setDefaultValue(0.);
       if(config.grab(locP)) {
         mean = locP.doubleValue();
       }
@@ -250,7 +258,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
         stddev = scaleP.doubleValue();
       }
 
-      DoubleParameter rateP = new DoubleParameter(ExponentialDistribution.Parameterizer.RATE_ID);
+      DoubleParameter rateP = new DoubleParameter(RATE_ID);
       if(config.grab(rateP)) {
         lambda = rateP.doubleValue();
       }

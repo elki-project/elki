@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Logistic distribution in ELKI.
  * 
@@ -65,5 +69,15 @@ public class LogisticDistributionTest extends AbstractDistributionTest {
     checkQuantile(new LogisticDistribution(.5, 1.), "quant_scipy_05", 1e-15);
     checkQuantile(new LogisticDistribution(.1, 1.), "quant_gnur_01", 1e-15);
     checkQuantile(new LogisticDistribution(.5, 1.), "quant_gnur_05", 1e-15);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("logistic.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(LogisticDistribution.Parameterizer.LOCATION_ID, .1);
+    params.addParameter(LogisticDistribution.Parameterizer.SCALE_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogisticDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_01", 1e-15);
   }
 }

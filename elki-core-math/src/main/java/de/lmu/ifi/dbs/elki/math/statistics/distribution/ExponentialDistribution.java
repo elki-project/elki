@@ -239,7 +239,8 @@ public class ExponentialDistribution extends AbstractDistribution {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID) //
+          .setDefaultValue(0.);
       if(config.grab(locP)) {
         location = locP.doubleValue();
       }

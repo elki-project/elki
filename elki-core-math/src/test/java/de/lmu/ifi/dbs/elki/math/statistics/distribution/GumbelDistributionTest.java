@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Gumbel distribution in ELKI.
  * 
@@ -64,7 +68,7 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
     checkLogPDF(new GumbelDistribution(.1, 4.), "logpdf_scipy_01_4", 1e-15);
     checkLogPDF(new GumbelDistribution(.1, 10.), "logpdf_scipy_01_10", 1e-15);
     checkLogPDF(new GumbelDistribution(.1, 20.), "logpdf_scipy_01_20", 1e-15);
-    
+
     // Not in lmomco
   }
 
@@ -110,5 +114,15 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
     checkQuantile(new GumbelDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
     checkQuantile(new GumbelDistribution(.1, 10.), "quant_gnur_01_10", 1e-13);
     checkQuantile(new GumbelDistribution(.1, 20.), "quant_gnur_01_20", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("gumbel.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(GumbelDistribution.Parameterizer.LOCATION_ID, 2.);
+    params.addParameter(GumbelDistribution.Parameterizer.SHAPE_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GumbelDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 }

@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Weibull distribution in ELKI.
  * 
@@ -117,5 +121,15 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
     checkQuantile(new WeibullDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
     checkQuantile(new WeibullDistribution(.1, 10.), "quant_gnur_01_10", 1e-13);
     checkQuantile(new WeibullDistribution(.1, 20.), "quant_gnur_01_20", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("weibull.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(WeibullDistribution.Parameterizer.SHAPE_ID, .1);
+    params.addParameter(WeibullDistribution.Parameterizer.SCALE_ID, 4.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(WeibullDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_01_4", 1e-15);
   }
 }

@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the Beta distribution in ELKI.
  * 
@@ -255,5 +259,15 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new BetaDistribution(.1, .5), "quant_gnur_01_05", 1e-14);
     checkQuantile(new BetaDistribution(.5, .5), "quant_gnur_05_05", 1e-14);
     checkQuantile(new BetaDistribution(5000, 10000), "quant_gnur_5000_10000", 1e-13);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("beta.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(BetaDistribution.Parameterizer.ALPHA_ID, 2.);
+    params.addParameter(BetaDistribution.Parameterizer.BETA_ID, 1.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(BetaDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 }

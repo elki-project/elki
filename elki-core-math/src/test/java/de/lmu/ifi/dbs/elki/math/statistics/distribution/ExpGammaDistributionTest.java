@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 /**
  * Unit test for the ExpGamma distribution in ELKI.
  * 
@@ -85,5 +89,16 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
     // checkQuantile(new ExpGammaDistribution(.1, 20, 0.), "quant_scipy_01_20", 1e-14);
     // checkQuantile(new ExpGammaDistribution(.1, 4., 0.), "quant_scipy_01_4", 1e-14);
     // checkQuantile(new ExpGammaDistribution(.1, 1., 0.), "quant_scipy_01_1", 1e-14);
+  }
+
+  @Test
+  public void testParameterizer() throws ClassInstantiationException {
+    load("expgamma.ascii.gz");
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ExpGammaDistribution.Parameterizer.K_ID, 2.);
+    params.addParameter(ExpGammaDistribution.Parameterizer.THETA_ID, 1.);
+    params.addParameter(ExpGammaDistribution.Parameterizer.SHIFT_ID, 0.);
+    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExpGammaDistribution.class, params);
+    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 }
