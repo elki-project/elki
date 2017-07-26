@@ -25,58 +25,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedLogisticAlternateLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedParetoLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.InverseGaussianMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LMMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMADDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMOMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalBilkovaLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MADDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MOMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.*;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -230,214 +188,161 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Computing MADs.");
     }
-    double mad = computeMAD(x, median, scratch, len);
-    double logmad = computeMAD(logx, logmedian, scratch, len);
+    double mad = MADDistributionEstimator.computeMAD(x, len, median, scratch);
+    double logmad = MADDistributionEstimator.computeMAD(logx, len, logmedian, scratch);
 
-    Distribution best = null;
-    double bestscore = Double.POSITIVE_INFINITY;
-    DistributionEstimator<?> bestest = null;
-
-    final int numest = momests.size() + madests.size() + lmmests.size() + logmomests.size() + logmadests.size() + 2;
-    FiniteProgress prog = LOG.isDebuggingFine() ? new FiniteProgress("Finding best matching distribution", numest, LOG) : null;
+    BestFit best = new BestFit(x, scratch);
     for(MOMDistributionEstimator<?> est : momests) {
       try {
-        Distribution d = est.estimateFromStatisticalMoments(mom);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
+        best.test(est, est.estimateFromStatisticalMoments(mom));
       }
       catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
+        warnIfDebugging(e, est);
       }
-      LOG.incrementProcessed(prog);
     }
     for(MADDistributionEstimator<?> est : madests) {
       try {
-        Distribution d = est.estimateFromMedianMAD(median, mad);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
+        best.test(est, est.estimateFromMedianMAD(median, mad));
       }
       catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
+        warnIfDebugging(e, est);
       }
-      LOG.incrementProcessed(prog);
     }
     for(LMMDistributionEstimator<?> est : lmmests) {
       if(lmm != null) {
         try {
-          Distribution d = est.estimateFromLMoments(lmm);
-          double score = testFit(x, scratch, d);
-          if(LOG.isDebuggingFine()) {
-            LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-          }
-          if(score < bestscore) {
-            best = d;
-            bestscore = score;
-            bestest = est;
-          }
+          best.test(est, est.estimateFromLMoments(lmm));
         }
         catch(ArithmeticException e) {
-          if(LOG.isDebuggingFine()) {
-            LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-          }
+          warnIfDebugging(e, est);
         }
       }
-      LOG.incrementProcessed(prog);
     }
     for(LogMOMDistributionEstimator<?> est : logmomests) {
       try {
-        Distribution d = est.estimateFromLogStatisticalMoments(logmom, shift);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
+        best.test(est, est.estimateFromLogStatisticalMoments(logmom, shift));
       }
       catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
+        warnIfDebugging(e, est);
       }
-      LOG.incrementProcessed(prog);
     }
     for(LogMADDistributionEstimator<?> est : logmadests) {
       try {
-        Distribution d = est.estimateFromLogMedianMAD(logmedian, logmad, shift);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
+        best.test(est, est.estimateFromLogMedianMAD(logmedian, logmad, shift));
       }
       catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
+        warnIfDebugging(e, est);
       }
-      LOG.incrementProcessed(prog);
     }
     { // Uniform estimators.
       final UniformMinMaxEstimator est = UniformMinMaxEstimator.STATIC;
-      try {
-        Distribution d = est.estimate(min, max);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
-      }
-      LOG.incrementProcessed(prog);
+      best.test(est, est.estimate(min, max));
     }
     { // Uniform estimators.
       final UniformEnhancedMinMaxEstimator est = UniformEnhancedMinMaxEstimator.STATIC;
-      try {
-        Distribution d = est.estimate(min, max, len);
-        double score = testFit(x, scratch, d);
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
-        }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
-      }
-      LOG.incrementProcessed(prog);
+      best.test(est, est.estimate(min, max, len));
     }
-    LOG.ensureCompleted(prog);
 
     if(LOG.isVeryVerbose()) {
-      LOG.veryverbose("Best distribution fit: " + bestscore + " " + best.toString() + " via " + bestest);
+      LOG.veryverbose("Best distribution fit: " + best.score + " " + best.toString() + " via " + best.est);
     }
-
-    return best;
-  }
-
-  public double computeMAD(double[] data, double median, double[] scratch, final int len) {
-    // Compute LogMAD:
-    for(int i = 0; i < len; i++) {
-      scratch[i] = Math.abs(data[i] - median);
-    }
-    double logmad = QuickSelect.median(scratch);
-    // Adjust LogMAD if 0:
-    if(!(logmad > 0.)) {
-      double xmin = Double.POSITIVE_INFINITY;
-      for(int i = (len >> 1); i < len; i++) {
-        if(scratch[i] > 0. && scratch[i] < xmin) {
-          xmin = scratch[i];
-        }
-      }
-      if(!Double.isInfinite(xmin)) {
-        logmad = xmin;
-      }
-    }
-    return logmad;
+    return best.dist;
   }
 
   /**
-   * Test the quality of a fit.
-   * 
-   * @param x Input data
-   * @param test Scratch space for testing (will be overwritten!)
-   * @param dist Distribution
-   * @return K-S-Test score
-   * @throws ArithmeticException
+   * Class to track the best fit.
+   *
+   * @apiviz.exclude
+   *
+   * @author Erich Schubert
    */
-  private double testFit(double[] x, double[] test, Distribution dist) throws ArithmeticException {
-    for(int i = 0; i < test.length; i++) {
-      test[i] = dist.cdf(x[i]);
-      if(test[i] > 1.) {
-        test[i] = 1.;
+  private static class BestFit {
+    /**
+     * Best match.
+     */
+    Distribution dist = null;
+
+    /**
+     * Best score.
+     */
+    double score = Double.POSITIVE_INFINITY;
+
+    /**
+     * Best estimator.
+     */
+    DistributionEstimator<?> est = null;
+
+    /**
+     * Input data
+     */
+    private double[] x;
+
+    /**
+     * Scratch space
+     */
+    private double[] scratch;
+
+    /**
+     * Constructor.
+     *
+     * @param x Data
+     * @param scratch Scratch array of the same size
+     */
+    public BestFit(double[] x, double[] scratch) {
+      this.x = x;
+      this.scratch = scratch;
+    }
+
+    /**
+     * Test the quality of a fit.
+     * 
+     * @param x Input data
+     * @param test Scratch space for testing (will be overwritten!)
+     * @param dist Distribution
+     * @return K-S-Test score
+     * @throws ArithmeticException
+     */
+    private static double testFit(double[] x, double[] test, Distribution dist) throws ArithmeticException {
+      for(int i = 0; i < test.length; i++) {
+        double v = dist.cdf(x[i]);
+        if(Double.isNaN(v)) {
+          throw new ArithmeticException("Got NaN after fitting " + dist.toString());
+        }
+        test[i] = (v >= 1.) ? 1 : (v <= 0.) ? 0. : v;
       }
-      if(test[i] < 0.) {
-        test[i] = 0.;
+      Arrays.sort(test); // Supposedly not necessary, but to be safe.
+      return KolmogorovSmirnovTest.simpleTest(test);
+    }
+
+    /**
+     * Test the goodness of fit, keep the best.
+     * 
+     * @param est Estimator
+     * @param d Distribution
+     */
+    public void test(DistributionEstimator<?> est, Distribution d) {
+      double score = testFit(x, scratch, d);
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
       }
-      if(Double.isNaN(test[i])) {
-        throw new ArithmeticException("Got NaN after fitting " + dist.toString());
+      if(score < score) {
+        this.dist = d;
+        this.score = score;
+        this.est = est;
       }
     }
-    // Should actually be sorted already...
-    Arrays.sort(test);
-    return KolmogorovSmirnovTest.simpleTest(test);
+  }
+
+  /**
+   * Warn on arithmetic errors, if debug logging is enabled
+   *
+   * @param e Error
+   * @param est Estimator
+   */
+  private void warnIfDebugging(ArithmeticException e, DistributionEstimator<?> est) {
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
+    }
   }
 
   @Override

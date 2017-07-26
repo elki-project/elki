@@ -144,14 +144,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
     }
     LOG.ensureCompleted(prog);
     // Find minimum and maximum.
-    DoubleMinMax minmax = new DoubleMinMax();
-    double adj = (1 - phi) / phi;
-    for(DBIDIter it2 = relation.iterDBIDs(); it2.valid(); it2.advance()) {
-      double or = FastMath.exp(-scores.doubleValue(it2) * logPerp) * adj;
-      double s = 1. / (1 + or);
-      scores.putDouble(it2, s);
-      minmax.put(s);
-    }
+    DoubleMinMax minmax = ISOS.transformScores(scores, relation.getDBIDs(), logPerp, phi);
     DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Stoachastic Outlier Selection", "knnsos-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);

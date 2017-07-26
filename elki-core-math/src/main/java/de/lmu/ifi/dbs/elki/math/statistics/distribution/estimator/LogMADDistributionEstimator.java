@@ -60,32 +60,7 @@ public interface LogMADDistributionEstimator<D extends Distribution> extends Dis
       }
     }
     double median = QuickSelect.median(x);
-    double mad = computeMAD(x, median);
+    double mad = MADDistributionEstimator.computeMAD(x, x.length, median);
     return estimateFromLogMedianMAD(median, mad, min);
-  }
-
-  /**
-   * Compute the median absolute deviation from median.
-   * 
-   * @param x Input data <b>will be modified</b>
-   * @param median Median value.
-   * @return Median absolute deviation from median.
-   */
-  public static double computeMAD(double[] x, double median) {
-    // Compute deviations:
-    for(int i = 0; i < x.length; i++) {
-      x[i] = Math.abs(x[i] - median);
-    }
-    double mad = QuickSelect.median(x);
-    // Fallback if we have more than 50% ties to next largest.
-    if(!(mad > 0.)) {
-      double min = Double.POSITIVE_INFINITY;
-      for(double xi : x) {
-        min = (xi > 0. && xi < min) ? xi : min;
-      }
-      // Maybe all constant. No real value.
-      mad = (min < Double.POSITIVE_INFINITY) ? min : 1.0;
-    }
-    return mad;
   }
 }

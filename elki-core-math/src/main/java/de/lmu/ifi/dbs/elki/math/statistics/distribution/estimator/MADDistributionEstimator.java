@@ -53,39 +53,59 @@ public interface MADDistributionEstimator<D extends Distribution> extends Distri
       x[i] = adapter.getDouble(data, i);
     }
     double median = QuickSelect.median(x);
-    double mad = computeMAD(x, median);
+    double mad = computeMAD(x, x.length, median);
     return estimateFromMedianMAD(median, mad);
   }
 
   /**
    * Compute the median absolute deviation from median.
    * 
+   * @param data Input data
+   * @param len Length of input data to use
+   * @param median Median of input data
+   * @param scratch Scratch space, must be at least length len
+   * @return MAD
+   */
+  public static double computeMAD(double[] data, final int len, double median, double[] scratch) {
+    // Compute MAD:
+    for(int i = 0; i < len; i++) {
+      scratch[i] = Math.abs(data[i] - median);
+    }
+    double mad = QuickSelect.median(scratch);
+    // Adjust MAD if 0:
+    if(!(mad > 0.)) {
+      double min = Double.POSITIVE_INFINITY;
+      for(int i = (len >> 1); i < len; i++) {
+        min = (scratch[i] > 0. && scratch[i] < min) ? scratch[i] : min;
+      }
+      mad = (min < Double.POSITIVE_INFINITY) ? min : 1.0;
+    }
+    return mad;
+  }
+
+  /**
+   * Compute the median absolute deviation from median.
+   * 
    * @param x Input data <b>will be modified</b>
+   * @param len Length where x is valid
    * @param median Median value.
    * @return Median absolute deviation from median.
    */
-  public static double computeMAD(double[] x, double median) {
+  public static double computeMAD(double[] x, int len, double median) {
     // Compute deviations:
-    for(int i = 0; i < x.length; i++) {
+    for(int i = 0; i < len; i++) {
       x[i] = Math.abs(x[i] - median);
     }
     double mad = QuickSelect.median(x);
     // Fallback if we have more than 50% ties to next largest.
     if(!(mad > 0.)) {
       double min = Double.POSITIVE_INFINITY;
-      for(double xi : x) {
+      for(int i = 0; i < len; i++) {
+        double xi = x[i];
         min = (xi > 0. && xi < min) ? xi : min;
       }
       // Maybe all constant. No real value.
       mad = (min < Double.POSITIVE_INFINITY) ? min : 1.0;
-    }
-    if(mad == Double.POSITIVE_INFINITY) {
-      double max = 0.;
-      for(double xi : x) {
-        max = (xi < Double.POSITIVE_INFINITY && xi > max) ? xi : max;
-      }
-      // Maybe all constant. Give up.
-      mad = (max < Double.POSITIVE_INFINITY) ? mad : 1.0;
     }
     return mad;
   }

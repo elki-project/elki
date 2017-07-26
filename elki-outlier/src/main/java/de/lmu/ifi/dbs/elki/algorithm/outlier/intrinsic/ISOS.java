@@ -155,15 +155,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    // Find minimum and maximum.
-    DoubleMinMax minmax = new DoubleMinMax();
-    double adj = (1 - phi) / phi;
-    for(DBIDIter it2 = relation.iterDBIDs(); it2.valid(); it2.advance()) {
-      double or = FastMath.exp(-scores.doubleValue(it2) * logPerp) * adj;
-      double s = 1. / (1 + or);
-      scores.putDouble(it2, s);
-      minmax.put(s);
-    }
+    DoubleMinMax minmax = transformScores(scores, relation.getDBIDs(), logPerp, phi);
     DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic Stoachastic Outlier Selection", "isos-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);
@@ -225,6 +217,27 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       }
       scores.increment(di, FastMath.log1p(-v));
     }
+  }
+
+  /**
+   * Transform scores
+   * 
+   * @param scores Scores to transform
+   * @param ids DBIDs to process
+   * @param logPerp log perplexity
+   * @param phi Expected outlier rate
+   * @return Minimum and maximum scores
+   */
+  public static DoubleMinMax transformScores(WritableDoubleDataStore scores, DBIDs ids, double logPerp, double phi) {
+    DoubleMinMax minmax = new DoubleMinMax();
+    double adj = (1 - phi) / phi;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      double or = FastMath.exp(-scores.doubleValue(it) * logPerp) * adj;
+      double s = 1. / (1 + or);
+      scores.putDouble(it, s);
+      minmax.put(s);
+    }
+    return minmax;
   }
 
   @Override
