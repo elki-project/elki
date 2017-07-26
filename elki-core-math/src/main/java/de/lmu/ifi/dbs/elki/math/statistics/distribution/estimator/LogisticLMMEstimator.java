@@ -40,8 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogisticDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class LogisticLMMEstimator extends AbstractLMMEstimator<LogisticDistribution> {
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
+public class LogisticLMMEstimator implements LMMDistributionEstimator<LogisticDistribution> {
   /**
    * Static instance.
    */
@@ -70,6 +72,11 @@ public class LogisticLMMEstimator extends AbstractLMMEstimator<LogisticDistribut
   @Override
   public Class<? super LogisticDistribution> getDistributionClass() {
     return LogisticDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

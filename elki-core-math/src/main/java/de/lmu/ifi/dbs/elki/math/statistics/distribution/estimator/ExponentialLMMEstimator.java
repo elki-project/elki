@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J.R.M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
     booktitle = "IBM Research Technical Report")
-public class ExponentialLMMEstimator extends AbstractLMMEstimator<ExponentialDistribution> {
+public class ExponentialLMMEstimator implements LMMDistributionEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
@@ -75,6 +75,11 @@ public class ExponentialLMMEstimator extends AbstractLMMEstimator<ExponentialDis
   @Override
   public Class<? super ExponentialDistribution> getDistributionClass() {
     return ExponentialDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

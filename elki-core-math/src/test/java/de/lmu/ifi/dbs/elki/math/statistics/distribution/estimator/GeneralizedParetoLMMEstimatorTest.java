@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class GeneralizedParetoLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final GeneralizedParetoLMMEstimator est = GeneralizedParetoLMMEstimator.STATIC;
+    final GeneralizedParetoLMMEstimator est = instantiate(GeneralizedParetoLMMEstimator.class, GeneralizedParetoDistribution.class);
     load("gpd.ascii.gz");
     double[] data = this.data.get("random_01_05_01");
     GeneralizedParetoDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

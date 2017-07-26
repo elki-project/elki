@@ -48,8 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogNormalDistribution - - estimates
  */
-@Reference(authors = "F. R. Hampel", title = "The Influence Curve and Its Role in Robust Estimation", booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", url = "http://www.jstor.org/stable/10.2307/2285666")
-public class LogNormalLogMADEstimator extends AbstractLogMADEstimator<LogNormalDistribution> {
+@Reference(authors = "F. R. Hampel", //
+    title = "The Influence Curve and Its Role in Robust Estimation", //
+    booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", //
+    url = "http://www.jstor.org/stable/10.2307/2285666")
+public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<LogNormalDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.
    */
@@ -70,6 +73,11 @@ public class LogNormalLogMADEstimator extends AbstractLogMADEstimator<LogNormalD
   @Override
   public Class<? super LogNormalDistribution> getDistributionClass() {
     return LogNormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

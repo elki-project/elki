@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogGammaDistribution - - estimates
  */
-public class LogGammaLogMOMEstimator extends AbstractLogMOMEstimator<LogGammaDistribution> {
+public class LogGammaLogMOMEstimator implements LogMOMDistributionEstimator<LogGammaDistribution> {
   /**
    * Static estimation using just the mean and variance.
    */
@@ -68,6 +68,11 @@ public class LogGammaLogMOMEstimator extends AbstractLogMOMEstimator<LogGammaDis
   @Override
   public Class<? super LogGammaDistribution> getDistributionClass() {
     return LogGammaDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

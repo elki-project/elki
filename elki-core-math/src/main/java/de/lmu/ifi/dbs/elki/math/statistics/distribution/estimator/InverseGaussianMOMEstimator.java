@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has InverseGaussianDistribution
  */
 @Alias("de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator")
-public class InverseGaussianMOMEstimator extends AbstractMeanVarianceEstimator<InverseGaussianDistribution> {
+public class InverseGaussianMOMEstimator implements MeanVarianceDistributionEstimator<InverseGaussianDistribution> {
   /**
    * Static instance.
    */

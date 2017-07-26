@@ -39,8 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogisticDistribution
  */
-@Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
-public class LogisticMADEstimator extends AbstractMADEstimator<LogisticDistribution> {
+@Reference(title = "Robust Estimators for Transformed Location Scale Families", //
+    authors = "D. J. Olive", booktitle = "")
+public class LogisticMADEstimator implements MADDistributionEstimator<LogisticDistribution> {
   /**
    * Static instance.
    */
@@ -61,6 +62,11 @@ public class LogisticMADEstimator extends AbstractMADEstimator<LogisticDistribut
   @Override
   public Class<? super LogisticDistribution> getDistributionClass() {
     return LogisticDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

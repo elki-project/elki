@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class InverseGaussianMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final InverseGaussianMOMEstimator est = InverseGaussianMOMEstimator.STATIC;
+    final InverseGaussianMOMEstimator est = instantiate(InverseGaussianMOMEstimator.class, InverseGaussianDistribution.class);
     load("invgauss.ascii.gz");
     double[] data = this.data.get("random_05_1");
     InverseGaussianDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

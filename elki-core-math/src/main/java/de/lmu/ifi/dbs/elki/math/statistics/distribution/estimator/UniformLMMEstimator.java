@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has UniformDistribution
  */
-public class UniformLMMEstimator extends AbstractLMMEstimator<UniformDistribution> {
+public class UniformLMMEstimator implements LMMDistributionEstimator<UniformDistribution> {
   /**
    * Static instance
    */
@@ -58,6 +58,11 @@ public class UniformLMMEstimator extends AbstractLMMEstimator<UniformDistributio
   @Override
   public Class<? super UniformDistribution> getDistributionClass() {
     return UniformDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

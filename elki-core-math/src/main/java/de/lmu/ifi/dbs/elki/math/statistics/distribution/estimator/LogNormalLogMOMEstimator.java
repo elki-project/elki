@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogNormalDistribution - - estimates
  */
-public class LogNormalLogMOMEstimator extends AbstractLogMeanVarianceEstimator<LogNormalDistribution> {
+public class LogNormalLogMOMEstimator implements LogMeanVarianceEstimator<LogNormalDistribution> {
   /**
    * Static estimator, using mean and variance.
    */
@@ -55,6 +55,11 @@ public class LogNormalLogMOMEstimator extends AbstractLogMeanVarianceEstimator<L
   @Override
   public Class<? super LogNormalDistribution> getDistributionClass() {
     return LogNormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

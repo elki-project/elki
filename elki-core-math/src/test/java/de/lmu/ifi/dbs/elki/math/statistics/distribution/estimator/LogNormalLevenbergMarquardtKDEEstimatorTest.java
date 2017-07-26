@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class LogNormalLevenbergMarquardtKDEEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final LogNormalLevenbergMarquardtKDEEstimator est = LogNormalLevenbergMarquardtKDEEstimator.STATIC;
+    final LogNormalLevenbergMarquardtKDEEstimator est = instantiate(LogNormalLevenbergMarquardtKDEEstimator.class, LogNormalDistribution.class);
     load("lognorm.ascii.gz");
     LogNormalDistribution dist;
     double[] data;

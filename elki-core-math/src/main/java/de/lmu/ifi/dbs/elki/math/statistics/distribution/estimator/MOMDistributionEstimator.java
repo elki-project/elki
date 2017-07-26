@@ -22,9 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Distribuition estimators that use the method of moments (MOM), i.e. that only
+ * Distribution estimators that use the method of moments (MOM), i.e. that only
  * need the statistical moments of a data set.
  * 
  * @author Erich Schubert
@@ -40,4 +41,18 @@ public interface MOMDistributionEstimator<D extends Distribution> extends Distri
    * @return Estimated distribution
    */
   D estimateFromStatisticalMoments(StatisticalMoments moments);
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    final int size = adapter.size(data);
+    StatisticalMoments mv = new StatisticalMoments();
+    for (int i = 0; i < size; i++) {
+      final double val = adapter.getDouble(data, i);
+      if (Double.isInfinite(val) || Double.isNaN(val)) {
+        continue;
+      }
+      mv.put(val);
+    }
+    return estimateFromStatisticalMoments(mv);
+  }
 }

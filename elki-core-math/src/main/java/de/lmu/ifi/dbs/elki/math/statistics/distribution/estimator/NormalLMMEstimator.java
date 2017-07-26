@@ -41,8 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has NormalDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class NormalLMMEstimator extends AbstractLMMEstimator<NormalDistribution> {
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
+public class NormalLMMEstimator implements LMMDistributionEstimator<NormalDistribution> {
   /**
    * Static instance
    */
@@ -68,6 +70,11 @@ public class NormalLMMEstimator extends AbstractLMMEstimator<NormalDistribution>
   @Override
   public Class<? super NormalDistribution> getDistributionClass() {
     return NormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

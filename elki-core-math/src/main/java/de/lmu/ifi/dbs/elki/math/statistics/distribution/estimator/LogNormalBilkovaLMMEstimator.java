@@ -50,7 +50,7 @@ import net.jafama.FastMath;
     title = "Lognormal distribution and using L-moment method for estimating its parameters", //
     booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", //
     url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf")
-public class LogNormalBilkovaLMMEstimator extends AbstractLMMEstimator<LogNormalDistribution> {
+public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<LogNormalDistribution> {
   /**
    * Static instance.
    */
@@ -89,6 +89,11 @@ public class LogNormalBilkovaLMMEstimator extends AbstractLMMEstimator<LogNormal
   @Override
   public Class<? super LogNormalDistribution> getDistributionClass() {
     return LogNormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

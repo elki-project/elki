@@ -39,8 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LaplaceDistribution
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class LaplaceMADEstimator extends AbstractMADEstimator<LaplaceDistribution> {
+@Reference(title = "Applied Robust Statistics", //
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+public class LaplaceMADEstimator implements MADDistributionEstimator<LaplaceDistribution> {
   /**
    * Static instance.
    */
@@ -63,6 +66,11 @@ public class LaplaceMADEstimator extends AbstractMADEstimator<LaplaceDistributio
   @Override
   public Class<? super LaplaceDistribution> getDistributionClass() {
     return LaplaceDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

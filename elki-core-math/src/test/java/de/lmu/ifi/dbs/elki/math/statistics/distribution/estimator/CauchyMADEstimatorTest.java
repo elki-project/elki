@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class CauchyMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final CauchyMADEstimator est = CauchyMADEstimator.STATIC;
+    final CauchyMADEstimator est = instantiate(CauchyMADEstimator.class, CauchyDistribution.class);
     load("cauchy.ascii.gz");
     double[] data = this.data.get("random_05_1");
     CauchyDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

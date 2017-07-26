@@ -22,9 +22,12 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+
+import net.jafama.FastMath;
 
 /**
- * Distribuition estimators that use the method of moments (MOM) in logspace,
+ * Distribution estimators that use the method of moments (MOM) in logspace,
  * i.e. that only need the statistical moments of a data set after logarithms.
  * 
  * @author Erich Schubert
@@ -41,4 +44,47 @@ public interface LogMOMDistributionEstimator<D extends Distribution> extends Dis
    * @return Estimated distribution
    */
   D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift);
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    final int len = adapter.size(data);
+    double min = min(data, adapter, 0., 1e-10);
+    StatisticalMoments mv = new StatisticalMoments();
+    for(int i = 0; i < len; i++) {
+      final double val = adapter.getDouble(data, i) - min;
+      if(Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
+        continue;
+      }
+      mv.put(FastMath.log(val));
+    }
+    return estimateFromLogStatisticalMoments(mv, min);
+  }
+
+  /**
+   * Utility function to find minimum and maximum values.
+   * 
+   * @param <A> array type
+   * @param data Data array
+   * @param adapter Array adapter
+   * @param minmin Minimum value for minimum.
+   * @return Minimum
+   */
+  public static <A> double min(A data, NumberArrayAdapter<?, A> adapter, double minmin, double margin) {
+    final int len = adapter.size(data);
+    double min = adapter.getDouble(data, 0), max = min;
+    for(int i = 1; i < len; i++) {
+      final double val = adapter.getDouble(data, i);
+      if(val < min) {
+        min = val;
+      }
+      else if(val > max) {
+        max = val;
+      }
+    }
+    if(min > minmin) {
+      return minmin;
+    }
+    // Add some extra margin, to not have 0s.
+    return min - (max - min) * margin;
+  }
 }

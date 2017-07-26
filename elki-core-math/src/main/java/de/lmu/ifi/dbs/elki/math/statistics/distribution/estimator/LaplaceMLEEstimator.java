@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has LaplaceDistribution
  */
 @Reference(title = "The Double Exponential Distribution: Using Calculus to Find a Maximum Likelihood Estimator", //
-authors = "R. M. Norton", booktitle = "The American Statistician 38 (2)", //
-url = "http://dx.doi.org/10.2307/2683252")
+    authors = "R. M. Norton", booktitle = "The American Statistician 38 (2)", //
+    url = "http://dx.doi.org/10.2307/2683252")
 public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistribution> {
   /**
    * Static instance.
@@ -63,12 +63,12 @@ public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistrib
   public <A> LaplaceDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
     int len = adapter.size(data);
     double[] temp = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       temp[i] = adapter.getDouble(data, i);
     }
     double location = QuickSelect.median(temp);
     double meandev = 0.;
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       meandev += Math.abs(temp[i] - location);
     }
     return new LaplaceDistribution(len / meandev, location);
@@ -77,6 +77,11 @@ public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistrib
   @Override
   public Class<? super LaplaceDistribution> getDistributionClass() {
     return LaplaceDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

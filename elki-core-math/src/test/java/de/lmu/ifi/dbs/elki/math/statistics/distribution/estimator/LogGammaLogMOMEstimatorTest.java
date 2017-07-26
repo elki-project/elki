@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class LogGammaLogMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final LogGammaLogMOMEstimator est = LogGammaLogMOMEstimator.STATIC;
+    final LogGammaLogMOMEstimator est = instantiate(LogGammaLogMOMEstimator.class, LogGammaDistribution.class);
     // TODO: generate loggamma test data.
     load("gamma.ascii.gz");
     double[] data;

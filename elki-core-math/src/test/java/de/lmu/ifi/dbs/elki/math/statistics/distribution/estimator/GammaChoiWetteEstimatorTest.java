@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class GammaChoiWetteEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final GammaChoiWetteEstimator est = GammaChoiWetteEstimator.STATIC;
+    final GammaChoiWetteEstimator est = instantiate(GammaChoiWetteEstimator.class, GammaDistribution.class);
     load("gamma.ascii.gz");
     double[] data;
     GammaDistribution dist;

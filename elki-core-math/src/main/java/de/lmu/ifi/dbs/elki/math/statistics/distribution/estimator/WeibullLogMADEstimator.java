@@ -43,10 +43,10 @@ import net.jafama.FastMath;
  * @apiviz.has WeibullDistribution - - estimates
  */
 @Reference(title = "Applied Robust Statistics", //
-authors = "D. J. Olive", //
-booktitle = "Applied Robust Statistics", //
-url="http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistribution> {
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+public class WeibullLogMADEstimator implements LogMADDistributionEstimator<WeibullDistribution> {
   /**
    * The more robust median based estimator.
    */
@@ -70,6 +70,11 @@ public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistr
   @Override
   public Class<? super WeibullDistribution> getDistributionClass() {
     return WeibullDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

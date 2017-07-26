@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class GammaMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final GammaMOMEstimator est = GammaMOMEstimator.STATIC;
+    final GammaMOMEstimator est = instantiate(GammaMOMEstimator.class, GammaDistribution.class);
     load("gamma.ascii.gz");
     double[] data;
     GammaDistribution dist;

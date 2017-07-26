@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has ExponentialDistribution
  */
-public class ExponentialMOMEstimator extends AbstractMeanVarianceEstimator<ExponentialDistribution> {
+public class ExponentialMOMEstimator implements MeanVarianceDistributionEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
@@ -49,7 +49,7 @@ public class ExponentialMOMEstimator extends AbstractMeanVarianceEstimator<Expon
   @Override
   public ExponentialDistribution estimateFromMeanVariance(MeanVariance mv) {
     final double scale = mv.getMean();
-    if (!(scale > 0.)) {
+    if(!(scale > 0.)) {
       throw new ArithmeticException("Data with non-positive mean cannot be exponential distributed.");
     }
     return new ExponentialDistribution(1. / scale);
@@ -58,6 +58,11 @@ public class ExponentialMOMEstimator extends AbstractMeanVarianceEstimator<Expon
   @Override
   public Class<? super ExponentialDistribution> getDistributionClass() {
     return ExponentialDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

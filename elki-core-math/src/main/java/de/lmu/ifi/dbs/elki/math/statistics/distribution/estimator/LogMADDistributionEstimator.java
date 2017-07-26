@@ -21,6 +21,10 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+
+import net.jafama.FastMath;
 
 /**
  * Distribuition estimators that use the method of moments (MOM) in logspace.
@@ -40,4 +44,48 @@ public interface LogMADDistributionEstimator<D extends Distribution> extends Dis
    * @return Estimated distribution
    */
   D estimateFromLogMedianMAD(double median, double mad, double shift);
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    // TODO: detect pre-sorted data?
+    final int len = adapter.size(data);
+    double min = LogMOMDistributionEstimator.min(data, adapter, 0., 1e-10);
+    // Modifiable copy:
+    double[] x = new double[len];
+    for(int i = 0; i < len; i++) {
+      final double val = adapter.getDouble(data, i) - min;
+      x[i] = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
+      if(Double.isNaN(x[i])) {
+        throw new ArithmeticException("NaN value.");
+      }
+    }
+    double median = QuickSelect.median(x);
+    double mad = computeMAD(x, median);
+    return estimateFromLogMedianMAD(median, mad, min);
+  }
+
+  /**
+   * Compute the median absolute deviation from median.
+   * 
+   * @param x Input data <b>will be modified</b>
+   * @param median Median value.
+   * @return Median absolute deviation from median.
+   */
+  public static double computeMAD(double[] x, double median) {
+    // Compute deviations:
+    for(int i = 0; i < x.length; i++) {
+      x[i] = Math.abs(x[i] - median);
+    }
+    double mad = QuickSelect.median(x);
+    // Fallback if we have more than 50% ties to next largest.
+    if(!(mad > 0.)) {
+      double min = Double.POSITIVE_INFINITY;
+      for(double xi : x) {
+        min = (xi > 0. && xi < min) ? xi : min;
+      }
+      // Maybe all constant. No real value.
+      mad = (min < Double.POSITIVE_INFINITY) ? min : 1.0;
+    }
+    return mad;
+  }
 }

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has NormalDistribution - - estimates
  */
-public class NormalMOMEstimator extends AbstractMeanVarianceEstimator<NormalDistribution> {
+public class NormalMOMEstimator implements MeanVarianceDistributionEstimator<NormalDistribution> {
   /**
    * Static estimator, using mean and variance.
    */
@@ -57,6 +57,11 @@ public class NormalMOMEstimator extends AbstractMeanVarianceEstimator<NormalDist
   @Override
   public Class<? super NormalDistribution> getDistributionClass() {
     return NormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

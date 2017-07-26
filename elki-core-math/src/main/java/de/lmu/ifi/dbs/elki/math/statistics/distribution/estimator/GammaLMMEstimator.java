@@ -40,8 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GammaDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class GammaLMMEstimator extends AbstractLMMEstimator<GammaDistribution> {
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
+public class GammaLMMEstimator implements LMMDistributionEstimator<GammaDistribution> {
   /**
    * Static instance.
    */
@@ -49,13 +51,13 @@ public class GammaLMMEstimator extends AbstractLMMEstimator<GammaDistribution> {
 
   /** Coefficients for polynomial approximation */
   private static double //
-      A1 = -0.3080, //
+  A1 = -0.3080, //
       A2 = -0.05812, //
       A3 = 0.01765;
 
   /** Coefficients for polynomial approximation */
   private static double //
-      B1 = 0.7213, //
+  B1 = 0.7213, //
       B2 = -0.5947, //
       B3 = -2.1817, //
       B4 = 1.2113;
@@ -76,15 +78,16 @@ public class GammaLMMEstimator extends AbstractLMMEstimator<GammaDistribution> {
   public GammaDistribution estimateFromLMoments(double[] xmom) {
     double cv = xmom[1] / xmom[0];
     double alpha;
-    if (cv < .5) {
+    if(cv < .5) {
       double t = Math.PI * cv * cv;
       alpha = (1. + A1 * t) / (t * (1. + t * (A2 + t * A3)));
-    } else {
+    }
+    else {
       double t = 1. - cv;
       alpha = t * (B1 + t * B2) / (1. + t * (B3 + t * B4));
     }
     final double theta = alpha / xmom[0];
-    if (!(alpha > 0.0) || !(theta > 0.0)) {
+    if(!(alpha > 0.0) || !(theta > 0.0)) {
       throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + alpha + " theta=" + theta);
     }
     return new GammaDistribution(alpha, theta);
@@ -93,6 +96,11 @@ public class GammaLMMEstimator extends AbstractLMMEstimator<GammaDistribution> {
   @Override
   public Class<? super GammaDistribution> getDistributionClass() {
     return GammaDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

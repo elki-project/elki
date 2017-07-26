@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "G. Casella, R. L. Berger", //
     title = "Statistical inference. Vol. 70", //
     booktitle = "Statistical inference. Vol. 70")
-public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistribution> {
+public class GammaMOMEstimator implements MeanVarianceDistributionEstimator<GammaDistribution> {
   /**
    * Static estimation using just the mean and variance.
    */
@@ -76,6 +76,11 @@ public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistri
   @Override
   public Class<? super GammaDistribution> getDistributionClass() {
     return GammaDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J.R.M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
     booktitle = "IBM Research Technical Report")
-public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution> {
+public class GumbelLMMEstimator implements LMMDistributionEstimator<GumbelDistribution> {
   /**
    * Static instance.
    */
@@ -73,6 +73,11 @@ public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution>
   @Override
   public Class<? super GumbelDistribution> getDistributionClass() {
     return GumbelDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

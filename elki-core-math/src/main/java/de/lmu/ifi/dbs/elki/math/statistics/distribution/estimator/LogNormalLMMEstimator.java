@@ -46,7 +46,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J.R.M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
     booktitle = "IBM Research Technical Report")
-public class LogNormalLMMEstimator extends AbstractLMMEstimator<LogNormalDistribution> {
+public class LogNormalLMMEstimator implements LMMDistributionEstimator<LogNormalDistribution> {
   /**
    * Static instance.
    */
@@ -115,6 +115,11 @@ public class LogNormalLMMEstimator extends AbstractLMMEstimator<LogNormalDistrib
   @Override
   public Class<? super LogNormalDistribution> getDistributionClass() {
     return LogNormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

@@ -40,8 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogLogisticDistribution
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class LogLogisticMADEstimator extends AbstractMADEstimator<LogLogisticDistribution> {
+@Reference(title = "Applied Robust Statistics", //
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+public class LogLogisticMADEstimator implements MADDistributionEstimator<LogLogisticDistribution> {
   /**
    * Static instance.
    */
@@ -62,6 +65,11 @@ public class LogLogisticMADEstimator extends AbstractMADEstimator<LogLogisticDis
   @Override
   public Class<? super LogLogisticDistribution> getDistributionClass() {
     return LogLogisticDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

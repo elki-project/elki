@@ -43,9 +43,9 @@ import net.jafama.FastMath;
  * @apiviz.has GammaDistribution - - estimates
  */
 @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", //
-authors = "S. C. Choi, R. Wette", //
-booktitle = "Technometrics", //
-url = "http://www.jstor.org/stable/10.2307/1266892")
+    authors = "S. C. Choi, R. Wette", //
+    booktitle = "Technometrics", //
+    url = "http://www.jstor.org/stable/10.2307/1266892")
 public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistribution> {
   /**
    * Static estimation, using iterative refinement.
@@ -63,9 +63,9 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
   public <A> GammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
     double meanx = 0, meanlogx = 0;
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
-      if (val <= 0 || Double.isInfinite(val) || Double.isNaN(val)) {
+      if(val <= 0 || Double.isInfinite(val) || Double.isNaN(val)) {
         continue;
       }
       final double logx = (val > 0) ? FastMath.log(val) : meanlogx;
@@ -80,16 +80,16 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
     double k = (3 - diff + FastMath.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
 
     // Refine via newton iteration, based on Choi and Wette equation
-    while (true) {
+    while(true) {
       double kdelta = (FastMath.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
-      if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
+      if(Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
         break;
       }
       k += kdelta;
     }
     // Estimate theta:
     final double theta = k / meanx;
-    if (!(k > 0.0) || !(theta > 0.0)) {
+    if(!(k > 0.0) || !(theta > 0.0)) {
       throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
     return new GammaDistribution(k, theta);

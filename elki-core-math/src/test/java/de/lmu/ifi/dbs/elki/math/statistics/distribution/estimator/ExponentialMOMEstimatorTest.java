@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class ExponentialMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final ExponentialMOMEstimator est = ExponentialMOMEstimator.STATIC;
+    final ExponentialMOMEstimator est = instantiate(ExponentialMOMEstimator.class, ExponentialDistribution.class);
     load("exp.ascii.gz");
     double[] data = this.data.get("random_01");
     ExponentialDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

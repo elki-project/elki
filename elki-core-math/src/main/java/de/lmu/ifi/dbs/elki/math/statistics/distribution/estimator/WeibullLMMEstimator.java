@@ -35,7 +35,7 @@ import net.jafama.FastMath;
  * 
  * @apiviz.has WeibullDistribution
  */
-public class WeibullLMMEstimator extends AbstractLMMEstimator<WeibullDistribution> {
+public class WeibullLMMEstimator implements LMMDistributionEstimator<WeibullDistribution> {
   /**
    * Static instance.
    */
@@ -136,6 +136,11 @@ public class WeibullLMMEstimator extends AbstractLMMEstimator<WeibullDistributio
   @Override
   public Class<? super WeibullDistribution> getDistributionClass() {
     return WeibullDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

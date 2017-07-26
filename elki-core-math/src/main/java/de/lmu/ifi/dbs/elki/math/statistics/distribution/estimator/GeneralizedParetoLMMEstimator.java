@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
 booktitle = "Technometrics 27.3", //
 url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
-public class GeneralizedParetoLMMEstimator extends AbstractLMMEstimator<GeneralizedParetoDistribution> {
+public class GeneralizedParetoLMMEstimator implements LMMDistributionEstimator<GeneralizedParetoDistribution> {
   /**
    * Static instance.
    */
@@ -78,6 +78,11 @@ public class GeneralizedParetoLMMEstimator extends AbstractLMMEstimator<Generali
   @Override
   public Class<? super GeneralizedParetoDistribution> getDistributionClass() {
     return GeneralizedParetoDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

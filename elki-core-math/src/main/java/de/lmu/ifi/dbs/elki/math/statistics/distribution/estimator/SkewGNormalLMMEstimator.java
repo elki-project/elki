@@ -46,7 +46,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J.R.M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
     booktitle = "IBM Research Technical Report")
-public class SkewGNormalLMMEstimator extends AbstractLMMEstimator<SkewGeneralizedNormalDistribution> {
+public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGeneralizedNormalDistribution> {
   /**
    * Static instance.
    */
@@ -110,6 +110,11 @@ public class SkewGNormalLMMEstimator extends AbstractLMMEstimator<SkewGeneralize
   @Override
   public Class<? super SkewGeneralizedNormalDistribution> getDistributionClass() {
     return SkewGeneralizedNormalDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

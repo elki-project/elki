@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class NormalLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final NormalLMMEstimator est = NormalLMMEstimator.STATIC;
+    final NormalLMMEstimator est = instantiate(NormalLMMEstimator.class, NormalDistribution.class);
     load("norm.ascii.gz");
     double[] data = this.data.get("random_01_01");
     NormalDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

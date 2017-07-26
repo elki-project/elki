@@ -48,7 +48,7 @@ import net.jafama.FastMath;
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
     booktitle = "Technometrics 27.3", //
     url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
-public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<GeneralizedExtremeValueDistribution> {
+public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstimator<GeneralizedExtremeValueDistribution> {
   /**
    * Static instance.
    */
@@ -152,6 +152,11 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
   @Override
   public Class<? super GeneralizedExtremeValueDistribution> getDistributionClass() {
     return GeneralizedExtremeValueDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

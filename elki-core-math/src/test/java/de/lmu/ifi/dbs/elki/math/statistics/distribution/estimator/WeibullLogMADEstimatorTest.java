@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class WeibullLogMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final WeibullLogMADEstimator est = WeibullLogMADEstimator.STATIC;
+    final WeibullLogMADEstimator est = instantiate(WeibullLogMADEstimator.class, WeibullDistribution.class);
     load("weibull.ascii.gz");
     double[] data;
     WeibullDistribution dist;

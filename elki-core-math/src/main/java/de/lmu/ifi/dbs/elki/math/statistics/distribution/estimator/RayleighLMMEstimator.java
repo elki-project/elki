@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has RayleighDistribution - - estimates
  */
-public class RayleighLMMEstimator extends AbstractLMMEstimator<RayleighDistribution> {
+public class RayleighLMMEstimator implements LMMDistributionEstimator<RayleighDistribution> {
   /**
    * Static instance.
    */

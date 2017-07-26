@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class UniformEnhancedMinMaxEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final UniformEnhancedMinMaxEstimator est = UniformEnhancedMinMaxEstimator.STATIC;
+    final UniformEnhancedMinMaxEstimator est = instantiate(UniformEnhancedMinMaxEstimator.class, UniformDistribution.class);
     load("unif.ascii.gz");
     double[] data = this.data.get("random_0_1");
     UniformDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

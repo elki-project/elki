@@ -39,8 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has CauchyDistribution
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class CauchyMADEstimator extends AbstractMADEstimator<CauchyDistribution> {
+@Reference(title = "Applied Robust Statistics", //
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+public class CauchyMADEstimator implements MADDistributionEstimator<CauchyDistribution> {
   /**
    * Static instance.
    */
@@ -61,6 +64,11 @@ public class CauchyMADEstimator extends AbstractMADEstimator<CauchyDistribution>
   @Override
   public Class<? super CauchyDistribution> getDistributionClass() {
     return CauchyDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LaplaceDistribution
  */
-public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistribution> {
+public class LaplaceLMMEstimator implements LMMDistributionEstimator<LaplaceDistribution> {
   /**
    * Static instance.
    */
@@ -59,6 +59,11 @@ public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistributio
   @Override
   public Class<? super LaplaceDistribution> getDistributionClass() {
     return LaplaceDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

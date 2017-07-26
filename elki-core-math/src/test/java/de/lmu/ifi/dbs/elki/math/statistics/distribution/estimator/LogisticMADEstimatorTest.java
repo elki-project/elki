@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class LogisticMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final LogisticMADEstimator est = LogisticMADEstimator.STATIC;
+    final LogisticMADEstimator est = instantiate(LogisticMADEstimator.class, LogisticDistribution.class);
     load("logistic.ascii.gz");
     double[] data;
     LogisticDistribution dist;

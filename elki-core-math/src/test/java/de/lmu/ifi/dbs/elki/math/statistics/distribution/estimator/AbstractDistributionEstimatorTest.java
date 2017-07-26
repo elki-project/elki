@@ -31,9 +31,13 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.AbstractDistributionTest;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Abstract base class for estimator unit testing.
@@ -68,9 +72,35 @@ public class AbstractDistributionEstimatorTest {
 
   protected void assertStat(String stat, double observed, double desired, double expecterr) {
     if(expecterr != expecterr) {
-      System.err.println(this.getClass().getSimpleName() + " " + stat + " " + desired+" "+observed+ " -> " + (observed - desired));
+      System.err.println(this.getClass().getSimpleName() + " " + stat + " " + desired + " " + observed + " -> " + (observed - desired));
       return;
     }
     assertEquals(stat + " does not match.", desired + expecterr, observed, 1e-13);
+  }
+
+  /**
+   * This function is not strictly necessary, as all the estimators will have a
+   * {@code STATIC} instance that we can use. But this way, we also cover the
+   * parameterization API.
+   * 
+   * We also verify the {@link DistributionEstimator#getDistributionClass()}
+   * method here.
+   * 
+   * @param cls Class
+   * @param <D> Distribution
+   * @param <T> Estimator class
+   * @return Instance
+   */
+  protected static <D extends Distribution, T extends DistributionEstimator<D>> T instantiate(Class<T> cls, Class<D> dist) {
+    try {
+      T est = ClassGenericsUtil.tryInstantiate(cls, cls, new ListParameterization());
+      assertTrue("Estimator has default toString.", est.toString().indexOf('@') == -1);
+      assertEquals("Estimator returns unexpected distribution.", dist, est.getDistributionClass());
+      return est;
+    }
+    catch(ClassInstantiationException e) {
+      fail("Could not instantiate");
+      return null;
+    }
   }
 }

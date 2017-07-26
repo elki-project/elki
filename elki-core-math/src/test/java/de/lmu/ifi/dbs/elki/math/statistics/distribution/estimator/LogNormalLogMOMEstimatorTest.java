@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class LogNormalLogMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final LogNormalLogMOMEstimator est = LogNormalLogMOMEstimator.STATIC;
+    final LogNormalLogMOMEstimator est = instantiate(LogNormalLogMOMEstimator.class, LogNormalDistribution.class);
     load("lognorm.ascii.gz");
     LogNormalDistribution dist;
     double[] data;

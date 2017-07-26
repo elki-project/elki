@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class ExponentialMedianEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final ExponentialMedianEstimator est = ExponentialMedianEstimator.STATIC;
+    final ExponentialMedianEstimator est = instantiate(ExponentialMedianEstimator.class, ExponentialDistribution.class);
     load("exp.ascii.gz");
     double[] data = this.data.get("random_01");
     ExponentialDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class GumbelLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final GumbelLMMEstimator est = GumbelLMMEstimator.STATIC;
+    final GumbelLMMEstimator est = instantiate(GumbelLMMEstimator.class, GumbelDistribution.class);
     load("gumbel.ascii.gz");
     double[] data;
     GumbelDistribution dist;

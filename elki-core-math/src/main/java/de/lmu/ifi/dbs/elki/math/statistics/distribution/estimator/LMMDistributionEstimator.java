@@ -20,7 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Interface for distribution estimators based on the methods of L-Moments
@@ -46,4 +51,17 @@ public interface LMMDistributionEstimator<D extends Distribution> extends Distri
    * @return Moments needed.
    */
   int getNumMoments();
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    // Sort:
+    final int size = adapter.size(data);
+    double[] sorted = new double[size];
+    for(int i = 0; i < size; i++) {
+      sorted[i] = adapter.getDouble(data, i);
+    }
+    Arrays.sort(sorted);
+    double[] xmom = ProbabilityWeightedMoments.samLMR(sorted, DoubleArrayAdapter.STATIC, getNumMoments());
+    return estimateFromLMoments(xmom);
+  }
 }

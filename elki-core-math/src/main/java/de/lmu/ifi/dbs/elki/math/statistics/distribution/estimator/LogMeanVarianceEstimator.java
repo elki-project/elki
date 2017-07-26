@@ -35,22 +35,7 @@ import net.jafama.FastMath;
  * 
  * @param <D> Distribution to estimate.
  */
-public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> extends AbstractLogMOMEstimator<D> {
-  /**
-   * Constructor.
-   */
-  public AbstractLogMeanVarianceEstimator() {
-    super();
-  }
-
-  @Override
-  public D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift) {
-    if (!(moments.getCount() > 1.)) {
-      throw new ArithmeticException("Too small sample size to estimate variance.");
-    }
-    return estimateFromLogMeanVariance(moments, shift);
-  }
-
+public interface LogMeanVarianceEstimator<D extends Distribution> extends LogMOMDistributionEstimator<D> {
   /**
    * Estimate the distribution from mean and variance.
    * 
@@ -58,21 +43,29 @@ public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> e
    * @param shift Shift that was applied to avoid negative values.
    * @return Distribution
    */
-  public abstract D estimateFromLogMeanVariance(MeanVariance mv, double shift);
+  public D estimateFromLogMeanVariance(MeanVariance mv, double shift);
 
   @Override
-  public <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  public default D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift) {
+    if(!(moments.getCount() > 1.)) {
+      throw new ArithmeticException("Too small sample size to estimate variance.");
+    }
+    return estimateFromLogMeanVariance(moments, shift);
+  }
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
-    double min = AbstractLogMOMEstimator.min(data, adapter, 0., 1e-10);
+    double min = LogMOMDistributionEstimator.min(data, adapter, 0., 1e-10);
     MeanVariance mv = new MeanVariance();
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
-      if (Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
+      if(Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
         continue;
       }
       mv.put(FastMath.log(val));
     }
-    if (!(mv.getCount() > 1.)) {
+    if(!(mv.getCount() > 1.)) {
       throw new ArithmeticException("Too small sample size to estimate variance.");
     }
     return estimateFromLogMeanVariance(mv, min);

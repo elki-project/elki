@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -35,9 +36,9 @@ import net.jafama.FastMath;
  * @apiviz.has ExponentiallyModifiedGaussianDistribution - - estimates
  */
 @Reference(authors = "J. Olivier, M. M. Norberg", //
-title = "Positively skewed data: Revisiting the Box-Cox power transformation", //
-booktitle = "International Journal of Psychological Research Vol. 3 No. 1")
-public class EMGOlivierNorbergEstimator extends AbstractMOMEstimator<ExponentiallyModifiedGaussianDistribution> {
+    title = "Positively skewed data: Revisiting the Box-Cox power transformation", //
+    booktitle = "International Journal of Psychological Research Vol. 3 No. 1")
+public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<ExponentiallyModifiedGaussianDistribution> {
   /**
    * Static estimator class.
    */
@@ -66,6 +67,11 @@ public class EMGOlivierNorbergEstimator extends AbstractMOMEstimator<Exponential
   @Override
   public Class<? super ExponentiallyModifiedGaussianDistribution> getDistributionClass() {
     return ExponentiallyModifiedGaussianDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

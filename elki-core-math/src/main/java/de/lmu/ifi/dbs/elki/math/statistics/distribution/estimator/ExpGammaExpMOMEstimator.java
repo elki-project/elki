@@ -81,6 +81,11 @@ public class ExpGammaExpMOMEstimator implements DistributionEstimator<ExpGammaDi
     return ExpGammaDistribution.class;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
+
   /**
    * Parameterization class.
    * 

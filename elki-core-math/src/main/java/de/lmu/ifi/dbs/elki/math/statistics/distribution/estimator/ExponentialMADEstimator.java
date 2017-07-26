@@ -39,8 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has ExponentialDistribution
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class ExponentialMADEstimator extends AbstractMADEstimator<ExponentialDistribution> {
+@Reference(title = "Applied Robust Statistics", //
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+public class ExponentialMADEstimator implements MADDistributionEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
@@ -57,15 +60,20 @@ public class ExponentialMADEstimator extends AbstractMADEstimator<ExponentialDis
   public ExponentialDistribution estimateFromMedianMAD(double median, double mad) {
     final double location = median - 1.440 * mad;
     final double scale = 2.0781 * mad;
-    if (!(scale > 0.)) {
+    if(!(scale > 0.)) {
       throw new ArithmeticException("Data with non-positive MAD cannot be exponential distributed.");
     }
-    return new ExponentialDistribution(1./scale, location);
+    return new ExponentialDistribution(1. / scale, location);
   }
 
   @Override
   public Class<? super ExponentialDistribution> getDistributionClass() {
     return ExponentialDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

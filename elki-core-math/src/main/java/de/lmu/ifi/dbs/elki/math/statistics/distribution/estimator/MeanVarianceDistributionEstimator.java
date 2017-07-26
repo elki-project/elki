@@ -21,7 +21,9 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 
 /**
  * Interface for estimators that only need mean and variance.
@@ -41,4 +43,23 @@ public interface MeanVarianceDistributionEstimator<D extends Distribution> exten
    * @return Distribution
    */
   D estimateFromMeanVariance(MeanVariance mv);
+
+  @Override
+  public default D estimateFromStatisticalMoments(StatisticalMoments moments) {
+    return estimateFromMeanVariance(moments);
+  }
+
+  @Override
+  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    final int size = adapter.size(data);
+    MeanVariance mv = new MeanVariance();
+    for(int i = 0; i < size; i++) {
+      final double val = adapter.getDouble(data, i);
+      if(Double.isInfinite(val) || Double.isNaN(val)) {
+        continue;
+      }
+      mv.put(val);
+    }
+    return estimateFromMeanVariance(mv);
+  }
 }

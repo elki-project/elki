@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     authors = "D. J. Olive", //
     booktitle = "Applied Robust Statistics", //
     url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution> {
+public class GumbelMADEstimator implements MADDistributionEstimator<GumbelDistribution> {
   /**
    * Static instance.
    */
@@ -66,6 +66,11 @@ public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution>
   @Override
   public Class<? super GumbelDistribution> getDistributionClass() {
     return GumbelDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

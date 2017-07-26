@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 public class GeneralizedExtremeValueLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test
   public void testEstimator() {
-    final GeneralizedExtremeValueLMMEstimator est = GeneralizedExtremeValueLMMEstimator.STATIC;
+    final GeneralizedExtremeValueLMMEstimator est = instantiate(GeneralizedExtremeValueLMMEstimator.class, GeneralizedExtremeValueDistribution.class);
     load("gev.ascii.gz");
     GeneralizedExtremeValueDistribution dist;
     double[] data;
