@@ -79,7 +79,7 @@ public class KappaDistribution extends AbstractDistribution {
         throw new ArithmeticException("Invalid shape1 parameter - must be greater than -1 if shape2 >= 0.!");
       }
     }
-    else {
+    else if(shape1 != 0.) {
       if(shape1 < 1. || shape1 > 1. / shape2) {
         throw new ArithmeticException("Invalid shape1 parameter - must be -1 to +1/shape2 if shape2 < 0.!");
       }
@@ -124,16 +124,27 @@ public class KappaDistribution extends AbstractDistribution {
    * @return PDF
    */
   public static double pdf(double val, double loc, double scale, double shape1, double shape2) {
-    final double c = cdf(val, loc, scale, shape1, shape2);
     val = (val - loc) / scale;
-    if(shape1 != 0.) {
-      val = 1 - shape1 * val;
-      if(val < 1e-15) {
-        return 0.;
-      }
-      val = (1. - 1. / shape1) * FastMath.log(val);
+    final double logc = logcdf(val, shape1, shape2);
+    if(shape1 == 1.) {
+      // Then val will usually become 0.
+      return val >= 1 ? 0 : FastMath.exp(logc * (1. - shape2)) / scale;
     }
-    return FastMath.exp(-val) / scale * FastMath.pow(c, 1. - shape2);
+    if(shape1 != 0.) {
+      val = shape1 * val;
+      if(val >= 1) {
+        return 0;
+      }
+      val = (1. - 1. / shape1) * FastMath.log1p(-val);
+    }
+    if(Double.isInfinite(val)) {
+      return 0;
+    }
+    val = FastMath.exp(-val);
+    if(Double.isInfinite(val)) {
+      return 0;
+    }
+    return val / scale * FastMath.exp(logc * (1. - shape2));
   }
 
   @Override
@@ -152,16 +163,19 @@ public class KappaDistribution extends AbstractDistribution {
    * @return PDF
    */
   public static double logpdf(double val, double loc, double scale, double shape1, double shape2) {
-    final double c = cdf(val, loc, scale, shape1, shape2);
     val = (val - loc) / scale;
+    final double logc = logcdf(val, shape1, shape2);
     if(shape1 != 0.) {
-      val = 1 - shape1 * val;
-      if(val < 1e-15) {
+      val = shape1 * val;
+      if(val >= 1) {
         return Double.NEGATIVE_INFINITY;
       }
-      val = (1. - 1. / shape1) * FastMath.log(val);
+      val = (1. - 1. / shape1) * FastMath.log1p(-val);
     }
-    return -val - FastMath.log(scale) + FastMath.log(c) * (1. - shape2);
+    if(Double.isInfinite(val)) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return -val - FastMath.log(scale) + logc * (1. - shape2);
   }
 
   @Override
@@ -181,27 +195,79 @@ public class KappaDistribution extends AbstractDistribution {
    */
   public static double cdf(double val, double loc, double scale, double shape1, double shape2) {
     val = (val - loc) / scale;
-    if(shape1 != 0.) {
-      double tmp = 1. - shape1 * val;
-      if(tmp < 1e-15) {
-        return (shape1 < 0.) ? 0. : 1.;
-      }
-      val = FastMath.exp(FastMath.log(tmp) / shape1);
+    if(val == Double.NEGATIVE_INFINITY) {
+      return 0.;
     }
-    else {
+    if(val == Double.POSITIVE_INFINITY) {
+      return 1.;
+    }
+    if(shape1 == 0.) {
       val = FastMath.exp(-val);
     }
-    if(shape2 != 0.) {
-      double tmp = 1. - shape2 * val;
-      if(tmp < 1e-15) {
-        return 0.;
-      }
-      val = FastMath.exp(FastMath.log(tmp) / shape2);
-    }
     else {
+      double tmp = shape1 * val;
+      if(tmp == Double.NEGATIVE_INFINITY) {
+        return shape2 == 0 ? 1 : 0.;
+      }
+      if(tmp >= 1.) {
+        return shape2 == 0 ? 0 : 1.;
+      }
+      val = FastMath.exp(FastMath.log1p(-tmp) / shape1);
+    }
+    if(shape2 == 0.) {
+      return FastMath.exp(-val);
+    }
+    final double tmp = shape2 * val;
+    return tmp < 1. ? FastMath.exp(FastMath.log1p(-tmp) / shape2) : 0.;
+  }
+
+  /**
+   * Cumulative density function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @param shape1 Shape parameter
+   * @param shape2 Shape parameter
+   * @return CDF
+   */
+  public static double logcdf(double val, double loc, double scale, double shape1, double shape2) {
+    return logcdf((val - loc) / scale, shape1, shape2);
+  }
+
+  /**
+   * Cumulative density function, for location = 0, scale = 1
+   * 
+   * @param val Value
+   * @param shape1 Shape parameter
+   * @param shape2 Shape parameter
+   * @return CDF
+   */
+  public static double logcdf(double val, double shape1, double shape2) {
+    if(val == Double.NEGATIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(val == Double.POSITIVE_INFINITY) {
+      return 0.;
+    }
+    if(shape1 == 0.) {
       val = FastMath.exp(-val);
     }
-    return val;
+    else {
+      double tmp = shape1 * val;
+      if(tmp == Double.NEGATIVE_INFINITY) {
+        return shape2 == 0 ? 0. : Double.NEGATIVE_INFINITY;
+      }
+      if(tmp >= 1.) {
+        return shape2 == 0 ? Double.NEGATIVE_INFINITY : 0.;
+      }
+      val = FastMath.exp(FastMath.log1p(-tmp) / shape1);
+    }
+    if(shape2 == 0.) {
+      return -val;
+    }
+    final double tmp = shape2 * val;
+    return tmp < 1. ? FastMath.log1p(-tmp) / shape2 : Double.NEGATIVE_INFINITY;
   }
 
   @Override

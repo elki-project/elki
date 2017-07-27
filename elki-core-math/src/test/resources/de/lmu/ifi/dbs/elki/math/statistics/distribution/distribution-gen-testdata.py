@@ -119,12 +119,13 @@ dfs = [
 	("chi", "4", scipy.stats.chi(4), "chi(x, 4 %s)", 100),
 	("chi", "10", scipy.stats.chi(10), "chi(x, 10 %s)", 101),
 	("emg", "1_3_05", None, "emg(x, 1, 3, 0.5 %s)", 102),
-]
-dfs = [
 	("lap", "1_3", scipy.stats.laplace(3, 1), "lap(x, 3, 1 %s)", 103),
 	("lap", "4_05", scipy.stats.laplace(.5, 1./4), "lap(x, 0.5, 4 %s)", 104),
 	("ray", "1", scipy.stats.rayleigh(scale=1), "weibull(x, 2, 1*sqrt(2) %s)", 105),
 	("ray", "2", scipy.stats.rayleigh(scale=2), "weibull(x, 2, 2*sqrt(2) %s)", 106),
+]
+dfs = [
+	("kappa", "01_02_03_04", scipy.stats.kappa4(.4, .3, loc=.1, scale=.2), "kap(x, vec2par(c(.1,.2,.3,.4), type='kap') %s)", 107),
 ]
 
 def fmt(x):
@@ -172,6 +173,11 @@ library("gumbel")
 library("evir")
 library("lmomco")
 library("bda")
+
+pkap <- cdfkap
+dkap <- pdfkap
+qkap <- quakap
+
 x <- c( %s )
 y <- p%s
 cat(formatC(y, digits=50, format="e"))
@@ -212,6 +218,11 @@ library("chi")
 library("gumbel")
 library("lmomco")
 library("bda")
+
+pkap <- cdfkap
+dkap <- pdfkap
+qkap <- quakap
+
 x <- c( %s )
 y <- q%s
 cat(formatC(y, digits=50, format="e"))
