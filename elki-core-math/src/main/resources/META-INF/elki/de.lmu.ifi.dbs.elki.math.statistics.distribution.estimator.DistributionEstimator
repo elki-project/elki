@@ -1,6 +1,6 @@
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.TrimmedEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.WinsorisingEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.WinsorizingEstimator de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.WinsorisingEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMMEstimator

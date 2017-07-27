@@ -20,10 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -69,26 +68,46 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
 
   @Override
   public <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    // Clone the samples:
+    double[] x = toPrimitiveDoubleArray(data, adapter);
     // We first need the basic parameters:
-    int len = adapter.size(data);
-    final int cut = ((int) (len * trim)) >> 1;
-    // X positions of samples
+    final int len = x.length;
+    final int num = ((int) (len * trim));
+    final int cut1 = num >> 1, cut2 = num - cut1;
+    // Partially sort our copy.
+    QuickSelect.quickSelect(x, 0, len, cut1);
+    QuickSelect.quickSelect(x, cut1, len, len - 1 - cut2);
+    // Trimmed estimate:
+    return inner.estimate(x, new DoubleArrayAdapter() {
+      @Override
+      public double getDouble(double[] array, int off) throws IndexOutOfBoundsException {
+        return x[off + cut1];
+      }
+
+      @Override
+      public int size(double[] array) {
+        return len - num;
+      }
+    });
+  }
+
+  /**
+   * Local copy, see ArrayLikeUtil.toPrimitiveDoubleArray.
+   * 
+   * @param data Data
+   * @param adapter Adapter
+   * @return Copy of the data, as {@code double[]}
+   */
+  public static <A> double[] toPrimitiveDoubleArray(A data, NumberArrayAdapter<?, A> adapter) {
+    if(adapter == DoubleArrayAdapter.STATIC) {
+      return ((double[]) data).clone();
+    }
+    final int len = adapter.size(data);
     double[] x = new double[len];
     for(int i = 0; i < len; i++) {
-      final double val = adapter.getDouble(data, i);
-      x[i] = val;
+      x[i] = adapter.getDouble(data, i);
     }
-    // Sort our copy.
-    Arrays.sort(x);
-    { // Trim:
-      // TODO: is it more efficient to just copy, or instead use a trimmed array
-      // adapter?
-      double[] trimmed = new double[len - 2 * cut];
-      System.arraycopy(x, cut, trimmed, 0, trimmed.length);
-      x = trimmed;
-      len = trimmed.length;
-    }
-    return inner.estimate(x, DoubleArrayAdapter.STATIC);
+    return x;
   }
 
   @Override
@@ -139,9 +158,9 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
         inner = innerP.instantiateClass(config);
       }
 
-      DoubleParameter trimP = new DoubleParameter(TRIM_ID);
-      trimP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      trimP.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+      DoubleParameter trimP = new DoubleParameter(TRIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
       if(config.grab(trimP)) {
         trim = trimP.doubleValue();
       }
