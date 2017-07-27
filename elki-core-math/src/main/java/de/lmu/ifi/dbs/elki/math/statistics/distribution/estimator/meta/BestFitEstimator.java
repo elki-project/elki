@@ -64,27 +64,27 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**
    * Mean and variance based estimators.
    */
-  private Collection<MOMDistributionEstimator<?>> momests;
+  protected Collection<MOMDistributionEstimator<?>> momests;
 
   /**
    * Median average deviation from median estimators.
    */
-  private Collection<MADDistributionEstimator<?>> madests;
+  protected Collection<MADDistributionEstimator<?>> madests;
 
   /**
    * L-Moment estimators.
    */
-  private Collection<LMMDistributionEstimator<?>> lmmests;
+  protected Collection<LMMDistributionEstimator<?>> lmmests;
 
   /**
    * Logspace Method of Moments estimators.
    */
-  private Collection<LogMOMDistributionEstimator<?>> logmomests;
+  protected Collection<LogMOMDistributionEstimator<?>> logmomests;
 
   /**
    * Logspace Median average deviation from median estimators.
    */
-  private Collection<LogMADDistributionEstimator<?>> logmadests;
+  protected Collection<LogMADDistributionEstimator<?>> logmadests;
 
   /**
    * Constructor. Use static instance instead!
@@ -325,7 +325,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
       if(LOG.isDebuggingFine()) {
         LOG.debugFine(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
       }
-      if(score < score) {
+      if(score < this.score) {
         this.dist = d;
         this.score = score;
         this.est = est;
