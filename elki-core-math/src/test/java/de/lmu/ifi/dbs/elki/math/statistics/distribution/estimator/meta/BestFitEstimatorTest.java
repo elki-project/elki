@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -29,12 +30,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.*;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 public class BestFitEstimatorTest {
-  @Test
-  public void testNormalDistribution() {
+  private BestFitEstimator init() {
     BestFitEstimator est = new BestFitEstimator();
     // In order to not "cheat" our test coverage, only use normal and lognormal
     // distribution estimators:
@@ -43,6 +44,12 @@ public class BestFitEstimatorTest {
     est.lmmests = Arrays.asList(NormalLMMEstimator.STATIC);
     est.logmomests = Arrays.asList(LogNormalLogMOMEstimator.STATIC);
     est.logmadests = Arrays.asList(LogNormalLogMADEstimator.STATIC);
+    return est;
+  }
+
+  @Test
+  public void testNormalDistribution() {
+    BestFitEstimator est = init();
 
     Random r = new Random(0L);
     double[] data = new double[10000];
@@ -55,5 +62,46 @@ public class BestFitEstimatorTest {
     NormalDistribution good = (NormalDistribution) edist;
     assertEquals("Mean not as expected from trimmed estimator.", 2., good.getMean(), 2e-2);
     assertEquals("Stddev not as expected from trimmed estimator.", 3., good.getStddev(), 4e-2);
+  }
+
+  @Test
+  public void testConstant() {
+    BestFitEstimator est = init();
+    Distribution edist = est.estimate(new double[100], DoubleArrayAdapter.STATIC);
+    assertEquals("Wrong class of distribution", UniformDistribution.class, edist.getClass());
+  }
+
+  @Test
+  public void testExtreme() {
+    BestFitEstimator est = init();
+    Distribution edist = est.estimate(new double[] { Double.MAX_VALUE, -Double.MAX_VALUE }, DoubleArrayAdapter.STATIC);
+    assertNotNull("Wrong class of distribution", edist);
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty() {
+    BestFitEstimator est = init();
+    Distribution edist = est.estimate(new double[0], DoubleArrayAdapter.STATIC);
+    assertEquals("Wrong class of distribution", UniformDistribution.class, edist.getClass());
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testInf() {
+    BestFitEstimator est = init();
+    Distribution edist = est.estimate(new double[] { Double.POSITIVE_INFINITY }, DoubleArrayAdapter.STATIC);
+    assertEquals("Wrong class of distribution", UniformDistribution.class, edist.getClass());
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testNaN() {
+    BestFitEstimator est = init();
+    Distribution edist = est.estimate(new double[] { Double.NaN }, DoubleArrayAdapter.STATIC);
+    assertEquals("Wrong class of distribution", UniformDistribution.class, edist.getClass());
+  }
+
+  @Test
+  public void testParameterizer() {
+    BestFitEstimator est = AbstractDistributionEstimatorTest.instantiate(BestFitEstimator.class, Distribution.class);
+    assertEquals("Not static instance", BestFitEstimator.STATIC, est);
   }
 }

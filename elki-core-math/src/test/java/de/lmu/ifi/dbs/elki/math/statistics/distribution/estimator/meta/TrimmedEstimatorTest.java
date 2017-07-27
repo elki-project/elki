@@ -28,14 +28,21 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 public class TrimmedEstimatorTest {
   @Test
   public void testNormalDistribution() {
     final double trim = .01;
     NormalMOMEstimator mom = NormalMOMEstimator.STATIC;
-    TrimmedEstimator<NormalDistribution> est = new TrimmedEstimator<>(mom, trim);
+    // We could instantiate directly, but we also want to cover the
+    // parameterizer class.
+    ListParameterization config = new ListParameterization();
+    config.addParameter(TrimmedEstimator.Parameterizer.INNER_ID, mom);
+    config.addParameter(TrimmedEstimator.Parameterizer.TRIM_ID, trim);
+    TrimmedEstimator<NormalDistribution> est = ClassGenericsUtil.parameterizeOrAbort(TrimmedEstimator.class, config);
 
     Random r = new Random(0L);
     double[] data = new double[10000];
