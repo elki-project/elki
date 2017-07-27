@@ -61,8 +61,8 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * Constructor for Gamma distribution.
    * 
    * @param k k, alpha aka. "shape" parameter
-   * @param shift Location offset
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param shift Location offset
    * @param random Random generator
    */
   public ExpGammaDistribution(double k, double theta, double shift, Random random) {
@@ -80,8 +80,8 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * Constructor for Gamma distribution.
    * 
    * @param k k, alpha aka. "shape" parameter
-   * @param shift Location offset
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param shift Location offset
    * @param random Random generator
    */
   public ExpGammaDistribution(double k, double theta, double shift, RandomFactory random) {
@@ -128,7 +128,9 @@ public class ExpGammaDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return FastMath.log(GammaDistribution.nextRandom(k, 1., random)) / theta + shift;
+    return quantile(random.nextDouble(), k, theta, shift);
+    // return FastMath.log(GammaDistribution.nextRandom(k, 1., random)) / theta
+    // + shift;
   }
 
   /**
@@ -164,8 +166,11 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return cdf value
    */
   public static double cdf(double x, double k, double theta, double shift) {
-    if(x <= shift) {
+    if(x == Double.NEGATIVE_INFINITY) {
       return 0.;
+    }
+    if(x == Double.POSITIVE_INFINITY) {
+      return 1.;
     }
     final double e = FastMath.exp((x - shift) * theta);
     return e < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(k, e) : 1.;
@@ -180,9 +185,6 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return cdf value
    */
   public static double logcdf(double x, double k, double theta, double shift) {
-    if(x <= shift) {
-      return 0.;
-    }
     final double e = FastMath.exp((x - shift) * theta);
     return e < Double.POSITIVE_INFINITY ? GammaDistribution.logregularizedGammaP(k, e) : 0.;
   }
@@ -196,7 +198,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double x, double k, double theta, double shift) {
-    if(x <= shift || x == Double.POSITIVE_INFINITY) {
+    if(x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
       return 0.;
     }
     x = (x - shift) * theta;
@@ -213,7 +215,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return log probability density
    */
   public static double logpdf(double x, double k, double theta, double shift) {
-    if(x <= shift || x == Double.POSITIVE_INFINITY) {
+    if(x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
     x = (x - shift) * theta;
@@ -231,7 +233,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return Probit for ExpGamma distribution
    */
   public static double quantile(double p, double k, double theta, double shift) {
-    return FastMath.log(GammaDistribution.quantile(p, k, theta)) + shift;
+    return FastMath.log(GammaDistribution.quantile(p, k, 1)) / theta + shift;
   }
 
   /**

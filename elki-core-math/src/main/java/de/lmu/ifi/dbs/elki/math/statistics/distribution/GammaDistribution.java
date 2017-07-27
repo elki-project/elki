@@ -631,7 +631,7 @@ public class GammaDistribution extends AbstractDistribution {
       authors = "D.J. Best, D. E. Roberts", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
-    final double EPS1 = 1e-2; // Approximation quality
+    final double EPS1 = 1e-14; // Approximation quality
     // Sanity checks
     if(Double.isNaN(p) || Double.isNaN(nu)) {
       return Double.NaN;
@@ -685,7 +685,7 @@ public class GammaDistribution extends AbstractDistribution {
         final double t = -0.5 + (C7 + 2 * ch) / p1 - (C9 + ch * (C10 + 3 * ch)) / p2;
         final double delta = (1 - FastMath.exp(ag + 0.5 * ch) * p2 / p1) / t;
         ch -= delta;
-        if(Math.abs(delta) > EPS1 * Math.abs(ch)) {
+        if(Math.abs(delta) <= EPS1 * Math.abs(ch)) {
           return ch;
         }
       }

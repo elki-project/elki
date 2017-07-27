@@ -122,7 +122,7 @@ public class CauchyDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     final double r = random.nextDouble() - .5;
-    return FastMath.tan(Math.PI * r);
+    return location + shape / FastMath.tan(Math.PI * r);
   }
 
   /**
