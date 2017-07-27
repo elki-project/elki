@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -124,5 +126,12 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
     params.addParameter(GumbelDistribution.Parameterizer.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GumbelDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new GumbelDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GumbelDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GumbelDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
   }
 }

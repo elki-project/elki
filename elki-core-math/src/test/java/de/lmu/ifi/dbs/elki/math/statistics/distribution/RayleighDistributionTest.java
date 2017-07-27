@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -89,5 +91,12 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     params.addParameter(RayleighDistribution.Parameterizer.SCALE_ID, 2);
     dist = ClassGenericsUtil.parameterizeOrAbort(RayleighDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2", 1e-15);
-}
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new RayleighDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
+    checkRandom(new RayleighDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new RayleighDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
+  }
 }

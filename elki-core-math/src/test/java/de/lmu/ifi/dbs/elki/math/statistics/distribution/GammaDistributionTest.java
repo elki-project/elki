@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -109,7 +111,7 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new GammaDistribution(4., 1.), "quant_scipy_4_1", 1e-14);
     checkQuantile(new GammaDistribution(4., 10), "quant_scipy_4_10", 1e-14);
     checkQuantile(new GammaDistribution(.1, 10), "quant_scipy_01_10", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 20), "quant_scipy_01_20", 1e-14);
+    checkQuantile(new GammaDistribution(.1, 20), "quant_scipy_01_20", 1e-13);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_scipy_01_4", 1e-13);
     checkQuantile(new GammaDistribution(.1, 1.), "quant_scipy_01_1", 1e-13);
 
@@ -118,7 +120,7 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new GammaDistribution(4., 1.), "quant_gnur_4_1", 1e-14);
     checkQuantile(new GammaDistribution(4., 10), "quant_gnur_4_10", 1e-14);
     checkQuantile(new GammaDistribution(.1, 10), "quant_gnur_01_10", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-14);
+    checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-13);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
     checkQuantile(new GammaDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
   }
@@ -131,5 +133,12 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     params.addParameter(GammaDistribution.Parameterizer.THETA_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GammaDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new GammaDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GammaDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GammaDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
   }
 }

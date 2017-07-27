@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -88,5 +90,12 @@ public class GeneralizedLogisticDistributionTest extends AbstractDistributionTes
     params.addParameter(GeneralizedLogisticDistribution.Parameterizer.SHAPE_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedLogisticDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_05", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new GeneralizedLogisticDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedLogisticDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedLogisticDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
   }
 }

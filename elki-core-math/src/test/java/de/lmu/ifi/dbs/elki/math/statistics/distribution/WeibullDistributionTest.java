@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -131,5 +133,12 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
     params.addParameter(WeibullDistribution.Parameterizer.SCALE_ID, 4.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(WeibullDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01_4", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new WeibullDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
+    checkRandom(new WeibullDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new WeibullDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
   }
 }

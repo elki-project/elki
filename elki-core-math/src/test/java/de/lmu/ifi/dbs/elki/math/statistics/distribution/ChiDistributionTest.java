@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -90,5 +92,12 @@ public class ChiDistributionTest extends AbstractDistributionTest {
     params.addParameter(ChiDistribution.Parameterizer.DOF_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ChiDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new ChiDistribution(0.1, new Random(0L)), 10000, 1e-2);
+    checkRandom(new ChiDistribution(1.41, new Random(0L)), 10000, 1e-2);
+    checkRandom(new ChiDistribution(3.14, new Random(0L)), 10000, 1e-2);
   }
 }

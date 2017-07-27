@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -182,5 +184,12 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
     params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.SCALE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedExtremeValueDistribution.class, params);
     checkPDF(dist, "pdf_scipy_08_02_1", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new GeneralizedExtremeValueDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedExtremeValueDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedExtremeValueDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
   }
 }

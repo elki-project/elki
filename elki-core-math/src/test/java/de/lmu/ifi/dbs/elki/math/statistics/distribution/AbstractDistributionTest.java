@@ -20,16 +20,16 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
@@ -167,5 +167,24 @@ public class AbstractDistributionTest {
     }
     int given = (int) Math.floor(Math.log10(err * 1.1));
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
+  }
+
+  public void checkRandom(Distribution d, int size, double err) {
+    double[] data = new double[size];
+    for(int i = 0; i < size; i++) {
+      data[i] = d.nextRandom();
+    }
+    Arrays.sort(data);
+    final double q0 = d.cdf(data[0]);
+    final double q50 = d.cdf(data[size >> 1]);
+    final double q100 = d.cdf(data[size - 1]);
+    assertEquals("0% quantile not as expected.", .5 / size, q0, err);
+    assertEquals("50% quantile not as expected.", 0.5, q50, err);
+    assertEquals("100% quantile not as expected.", 1. - .5 / size, q100, err);
+    int errlev0 = (int) Math.ceil(Math.log10(Math.abs(.5 / size - q0)));
+    int errlev50 = (int) Math.ceil(Math.log10(Math.abs(0.5 - q50)));
+    int errlev100 = (int) Math.ceil(Math.log10(Math.abs(1 - .5 / size - q100)));
+    int errlev = MathUtil.max(errlev0, errlev50, errlev100);
+    assertEquals("Error magnitude is not tight", errlev, Math.log10(err), 0.1);
   }
 }

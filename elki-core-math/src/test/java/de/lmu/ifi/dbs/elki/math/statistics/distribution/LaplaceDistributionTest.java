@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -80,5 +82,12 @@ public class LaplaceDistributionTest extends AbstractDistributionTest {
     params.addParameter(LaplaceDistribution.Parameterizer.LOCATION_ID, 3);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LaplaceDistribution.class, params);
     checkPDF(dist, "pdf_scipy_1_3", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new LaplaceDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
+    checkRandom(new LaplaceDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new LaplaceDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
   }
 }

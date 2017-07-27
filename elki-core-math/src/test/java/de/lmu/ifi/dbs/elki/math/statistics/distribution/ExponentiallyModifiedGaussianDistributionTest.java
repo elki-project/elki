@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -47,6 +49,8 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
     checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_gnur_1_3_05", 1e-14);
   }
 
+  // TODO: once quantile() is implemented, add a test.
+
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("emg.ascii.gz");
@@ -56,5 +60,12 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
     params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.RATE_ID, .5);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentiallyModifiedGaussianDistribution.class, params);
     checkPDF(dist, "pdf_gnur_1_3_05", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new ExponentiallyModifiedGaussianDistribution(0.1, 0.9, 1., new Random(0L)), 10000, 1e-2);
+    checkRandom(new ExponentiallyModifiedGaussianDistribution(1.41, 3.14, 2., new Random(0L)), 10000, 1e-2);
+    checkRandom(new ExponentiallyModifiedGaussianDistribution(3.14, 1.41, 3., new Random(0L)), 10000, 1e-2);
   }
 }

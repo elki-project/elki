@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -87,5 +89,11 @@ public class NormalDistributionTest extends AbstractDistributionTest {
     params.addParameter(NormalDistribution.Parameterizer.SCALE_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(NormalDistribution.class, params);
     checkPDF(dist, "pdf_scipy_1_3", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new NormalDistribution(-1, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new NormalDistribution(1, 4, new Random(1L)), 10000, 1e-2);
   }
 }

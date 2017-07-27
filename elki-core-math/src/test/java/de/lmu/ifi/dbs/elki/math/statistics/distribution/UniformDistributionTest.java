@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -77,5 +79,11 @@ public class UniformDistributionTest extends AbstractDistributionTest {
     params.addParameter(UniformDistribution.Parameterizer.MAX_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(UniformDistribution.class, params);
     checkPDF(dist, "pdf_scipy_0_1", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new UniformDistribution(-1, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new UniformDistribution(1, 4, new Random(1L)), 10000, 1e-2);
   }
 }

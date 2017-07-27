@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -72,5 +74,12 @@ public class GeneralizedParetoDistributionTest extends AbstractDistributionTest 
     params.addParameter(GeneralizedParetoDistribution.Parameterizer.SHAPE_ID, .1);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedParetoDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01_05_01", 1e-15);
+  }
+
+  @Test
+  public void testRandom() {
+    checkRandom(new GeneralizedParetoDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedParetoDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GeneralizedParetoDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
   }
 }
