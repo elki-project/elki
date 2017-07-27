@@ -45,6 +45,8 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     checkPDF(new RayleighDistribution(MathUtil.SQRTHALF), "pdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
     checkPDF(new RayleighDistribution(1), "pdf_scipy_1", 1e-15);
+    checkPDF(new RayleighDistribution(2), "pdf_scipy_2", 1e-15);
+    checkPDF(new RayleighDistribution(1), "pdf_gnur_1", 1e-15);
     checkPDF(new RayleighDistribution(2), "pdf_gnur_2", 1e-15);
   }
 
@@ -55,6 +57,8 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     checkLogPDF(new RayleighDistribution(MathUtil.SQRTHALF), "logpdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
     checkLogPDF(new RayleighDistribution(1), "logpdf_scipy_1", 1e-15);
+    checkLogPDF(new RayleighDistribution(2), "logpdf_scipy_2", 1e-15);
+    checkLogPDF(new RayleighDistribution(1), "logpdf_gnur_1", 1e-15);
     checkLogPDF(new RayleighDistribution(2), "logpdf_gnur_2", 1e-15);
   }
 
@@ -65,6 +69,8 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     checkCDF(new RayleighDistribution(MathUtil.SQRTHALF), "cdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
     checkCDF(new RayleighDistribution(1), "cdf_scipy_1", 1e-14);
+    checkCDF(new RayleighDistribution(2), "cdf_scipy_2", 1e-14);
+    checkCDF(new RayleighDistribution(1), "cdf_gnur_1", 1e-15);
     checkCDF(new RayleighDistribution(2), "cdf_gnur_2", 1e-15);
   }
 
@@ -75,6 +81,8 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     checkQuantile(new RayleighDistribution(MathUtil.SQRTHALF), "quant_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
     checkQuantile(new RayleighDistribution(1), "quant_scipy_1", 1e-14);
+    checkQuantile(new RayleighDistribution(2), "quant_scipy_2", 1e-14);
+    checkQuantile(new RayleighDistribution(1), "quant_gnur_1", 1e-14);
     checkQuantile(new RayleighDistribution(2), "quant_gnur_2", 1e-14);
   }
 

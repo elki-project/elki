@@ -99,6 +99,24 @@ public class RayleighDistribution extends AbstractDistribution {
     this.sigma = sigma;
   }
 
+  /**
+   * Get the position parameter.
+   *
+   * @return Position
+   */
+  public double getMu() {
+    return mu;
+  }
+
+  /**
+   * Get the scale parameter.
+   *
+   * @return scale
+   */
+  public double getSigma() {
+    return sigma;
+  }
+
   @Override
   public double pdf(double x) {
     return pdf(x - mu, sigma);
