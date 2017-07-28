@@ -105,7 +105,6 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     madests.add(GumbelMADEstimator.STATIC);
     madests.add(CauchyMADEstimator.STATIC);
     madests.add(LogisticMADEstimator.STATIC);
-    madests.add(LogLogisticMADEstimator.STATIC);
     madests.add(RayleighMADEstimator.STATIC);
     madests.add(UniformMADEstimator.STATIC);
     lmmests = new ArrayList<>(15);
@@ -129,6 +128,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     logmomests.add(LogGammaLogMOMEstimator.STATIC);
     logmadests = new ArrayList<>(3);
     logmadests.add(LogNormalLogMADEstimator.STATIC);
+    logmadests.add(LogLogisticMADEstimator.STATIC);
     logmadests.add(WeibullLogMADEstimator.STATIC);
   }
 

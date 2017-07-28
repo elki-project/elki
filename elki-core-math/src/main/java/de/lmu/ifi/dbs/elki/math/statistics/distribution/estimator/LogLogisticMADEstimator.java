@@ -25,6 +25,8 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogLogisticDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
+import net.jafama.FastMath;
+
 /**
  * Estimate Logistic distribution parameters using Median and MAD.
  * 
@@ -44,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     authors = "D. J. Olive", //
     booktitle = "Applied Robust Statistics", //
     url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
-public class LogLogisticMADEstimator implements MADDistributionEstimator<LogLogisticDistribution> {
+public class LogLogisticMADEstimator implements LogMADDistributionEstimator<LogLogisticDistribution> {
   /**
    * Static instance.
    */
@@ -58,8 +60,8 @@ public class LogLogisticMADEstimator implements MADDistributionEstimator<LogLogi
   }
 
   @Override
-  public LogLogisticDistribution estimateFromMedianMAD(double median, double mad) {
-    return new LogLogisticDistribution(1. / median, MathUtil.LOG3 / mad);
+  public LogLogisticDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
+    return new LogLogisticDistribution(mad / MathUtil.LOG3, shift, FastMath.exp(median) - shift);
   }
 
   @Override

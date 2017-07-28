@@ -83,6 +83,33 @@ public class LogLogisticDistribution extends AbstractDistribution {
     this.location = location;
   }
 
+  /**
+   * Get the distribution shape.
+   * 
+   * @return Shape parameter
+   */
+  public double getShape() {
+    return shape;
+  }
+
+  /**
+   * Get the distribution location.
+   * 
+   * @return Location parameter
+   */
+  public double getLocation() {
+    return location;
+  }
+
+  /**
+   * Get the distribution scale.
+   * 
+   * @return Scale parameter
+   */
+  public double getScale() {
+    return scale;
+  }
+
   @Override
   public double pdf(double val) {
     return pdf(val, shape, location, scale);
