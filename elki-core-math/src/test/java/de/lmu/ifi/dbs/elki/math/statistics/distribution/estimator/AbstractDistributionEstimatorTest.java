@@ -94,7 +94,7 @@ public class AbstractDistributionEstimatorTest {
   public static <D extends Distribution, T extends DistributionEstimator<D>> T instantiate(Class<T> cls, Class<D> dist) {
     try {
       T est = ClassGenericsUtil.tryInstantiate(cls, cls, new ListParameterization());
-      assertTrue("Estimator has default toString.", est.toString().indexOf('@') == -1);
+      assertEquals("Estimator has default toString.", -1, est.toString().indexOf('@'));
       assertEquals("Estimator returns unexpected distribution.", dist, est.getDistributionClass());
       return est;
     }

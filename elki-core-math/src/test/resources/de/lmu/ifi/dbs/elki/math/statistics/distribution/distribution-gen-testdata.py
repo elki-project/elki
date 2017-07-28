@@ -123,9 +123,10 @@ dfs = [
 	("lap", "4_05", scipy.stats.laplace(.5, 1./4), "lap(x, 0.5, 4 %s)", 104),
 	("ray", "1", scipy.stats.rayleigh(scale=1), "weibull(x, 2, 1*sqrt(2) %s)", 105),
 	("ray", "2", scipy.stats.rayleigh(scale=2), "weibull(x, 2, 2*sqrt(2) %s)", 106),
-]
-dfs = [
 	("kappa", "01_02_03_04", scipy.stats.kappa4(.4, .3, loc=.1, scale=.2), "kap(x, vec2par(c(.1,.2,.3,.4), type='kap') %s)", 107),
+	("loglogistic", "1_1", scipy.stats.fisk(1, scale=1), None, 108),
+	("loglogistic", "2_05", scipy.stats.fisk(2, scale=.5), None, 109),
+	("loglogistic", "05_05", scipy.stats.fisk(.5, scale=.5), None, 110),
 ]
 
 def fmt(x):

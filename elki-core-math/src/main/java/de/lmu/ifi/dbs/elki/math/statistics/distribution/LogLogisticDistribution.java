@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -37,136 +38,154 @@ import net.jafama.FastMath;
 @Alias({ "fisk", "loglog" })
 public class LogLogisticDistribution extends AbstractDistribution {
   /**
-   * Parameters: scale and shape
+   * Parameters: scale, location, and shape
    */
-  double scale, shape;
+  double scale, location, shape;
 
   /**
    * Constructor.
    * 
-   * @param scale Scale
    * @param shape Shape
+   * @param location Location
+   * @param scale Scale
    */
-  public LogLogisticDistribution(double scale, double shape) {
-    this(scale, shape, (Random) null);
+  public LogLogisticDistribution(double shape, double location, double scale) {
+    this(shape, location, scale, (Random) null);
   }
 
   /**
    * Constructor.
    * 
-   * @param scale Scale
    * @param shape Shape
+   * @param location TODO
+   * @param scale Scale
    * @param random Random number generator
    */
-  public LogLogisticDistribution(double scale, double shape, Random random) {
+  public LogLogisticDistribution(double shape, double location, double scale, Random random) {
     super(random);
-    this.scale = scale;
     this.shape = shape;
+    this.scale = scale;
+    this.location = location;
   }
 
   /**
    * Constructor.
    * 
-   * @param scale Scale
    * @param shape Shape
+   * @param location TODO
+   * @param scale Scale
    * @param random Random number generator
    */
-  public LogLogisticDistribution(double scale, double shape, RandomFactory random) {
+  public LogLogisticDistribution(double shape, double location, double scale, RandomFactory random) {
     super(random);
-    this.scale = scale;
     this.shape = shape;
+    this.scale = scale;
+    this.location = location;
   }
 
   @Override
   public double pdf(double val) {
-    return pdf(val, scale, shape);
+    return pdf(val, shape, location, scale);
   }
 
   /**
    * Probability density function.
    * 
    * @param val Value
-   * @param scale Scale
    * @param shape Shape
+   * @param location TODO
+   * @param scale Scale
    * @return PDF
    */
-  public static double pdf(double val, double scale, double shape) {
-    if(val < 0) {
+  public static double pdf(double val, double shape, double location, double scale) {
+    if(val < location) {
       return 0;
     }
-    val = Math.abs(val / scale);
+    val = (val - location) / scale;
     double f = shape / scale * FastMath.pow(val, shape - 1.);
+    if(f == Double.POSITIVE_INFINITY) {
+      return 0;
+    }
     double d = 1. + FastMath.pow(val, shape);
     return f / (d * d);
   }
 
   @Override
   public double logpdf(double val) {
-    return logpdf(val, scale, shape);
+    return logpdf(val, shape, location, scale);
   }
 
   /**
    * Probability density function.
    * 
    * @param val Value
-   * @param scale Scale
    * @param shape Shape
+   * @param location Location
+   * @param scale Scale
    * @return logPDF
    */
-  public static double logpdf(double val, double scale, double shape) {
-    if(val < 0) {
+  public static double logpdf(double val, double shape, double location, double scale) {
+    if(val < location) {
       return Double.NEGATIVE_INFINITY;
     }
-    val = Math.abs(val / scale);
-    return FastMath.log(shape / scale) + (shape - 1.) * FastMath.log(val) - 2. * FastMath.log1p(FastMath.pow(val, shape));
+    val = (val - location) / scale;
+    final double lval = FastMath.log(val);
+    if(lval == Double.POSITIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return FastMath.log(shape / scale) + (shape - 1.) * lval //
+        - 2. * FastMath.log1p(FastMath.exp(lval * shape));
   }
 
   @Override
   public double cdf(double val) {
-    return cdf(val, scale, shape);
+    return cdf(val, shape, location, scale);
   }
 
   /**
    * Cumulative density function.
    * 
    * @param val Value
-   * @param scale Scale
    * @param shape Shape
+   * @param location Location
+   * @param scale Scale
    * @return CDF
    */
-  public static double cdf(double val, double scale, double shape) {
-    if(val < 0) {
+  public static double cdf(double val, double shape, double location, double scale) {
+    if(val < location) {
       return 0;
     }
-    return 1. / (1. + FastMath.pow(val / scale, -shape));
+    val = (val - location) / scale;
+    return 1. / (1. + FastMath.pow(val, -shape));
   }
 
   @Override
   public double quantile(double val) {
-    return quantile(val, scale, shape);
+    return quantile(val, shape, location, scale);
   }
 
   /**
    * Quantile function.
    * 
    * @param val Value
-   * @param scale Scale
    * @param shape Shape
+   * @param location TODO
+   * @param scale Scale
    * @return Quantile
    */
-  public static double quantile(double val, double scale, double shape) {
-    return scale * FastMath.pow(val / (1. - val), 1. / shape);
+  public static double quantile(double val, double shape, double location, double scale) {
+    return scale * FastMath.pow(val / (1. - val), 1. / shape) + location;
   }
 
   @Override
   public double nextRandom() {
     double u = random.nextDouble();
-    return scale * FastMath.pow(u / (1. - u), 1. / shape);
+    return scale * FastMath.pow(u / (1. - u), 1. / shape) + location;
   }
 
   @Override
   public String toString() {
-    return "LogLogisticDistribution(scale=" + scale + ", shape=" + shape + ")";
+    return "LogLogisticDistribution(shape=" + shape + ", location=" + location + ", scale=" + scale + ")";
   }
 
   /**
@@ -178,26 +197,31 @@ public class LogLogisticDistribution extends AbstractDistribution {
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /** Parameters. */
-    double scale, shape;
+    double shape, location, scale;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if(config.grab(scaleP)) {
-        scale = scaleP.doubleValue();
-      }
-
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
       if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
+      }
+
+      DoubleParameter locationP = new DoubleParameter(LOCATION_ID, 0.);
+      if(config.grab(locationP)) {
+        location = locationP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.);
+      if(config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
       }
     }
 
     @Override
     protected LogLogisticDistribution makeInstance() {
-      return new LogLogisticDistribution(scale, shape, rnd);
+      return new LogLogisticDistribution(shape, location, scale, rnd);
     }
   }
 }

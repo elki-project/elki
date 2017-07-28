@@ -52,19 +52,29 @@ public class ConstantDistribution implements Distribution {
     return c;
   }
 
+  /**
+   * Probability mass function.
+   *
+   * @param val Value
+   * @return
+   */
+  public double pmf(double val) {
+    return (val == c) ? 1. : 0;
+  }
+
   @Override
   public double pdf(double val) {
-    return (val == c) ? 1 : 0;
+    return (val == c) ? Double.MAX_VALUE : 0;
   }
-  
+
   @Override
   public double logpdf(double val) {
-    return (val == c) ? 0 : Double.NEGATIVE_INFINITY;
+    return (val == c) ? Double.MAX_VALUE : Double.NEGATIVE_INFINITY;
   }
 
   @Override
   public double cdf(double val) {
-    return (c < val) ? 0. : (c > val) ? 1. : .5;
+    return (val < c) ? 0. : 1.;
   }
 
   @Override
@@ -93,7 +103,7 @@ public class ConstantDistribution implements Distribution {
       super.makeOptions(config);
 
       DoubleParameter constP = new DoubleParameter(CONSTANT_ID);
-      if (config.grab(constP)) {
+      if(config.grab(constP)) {
         constant = constP.doubleValue();
       }
     }

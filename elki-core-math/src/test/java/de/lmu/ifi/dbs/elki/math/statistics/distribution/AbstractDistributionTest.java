@@ -67,8 +67,10 @@ public class AbstractDistributionTest {
   }
 
   public void checkPDF(Distribution d, String key, double err) {
+    // Also check that toString is meaningful.
+    assertEquals("No meaningful toString()", -1, d.toString().indexOf('@'));
     double[] data = this.data.get(key);
-    assertTrue("Key not in test data: " + key, data != null);
+    assertNotNull("Key not in test data: " + key, data);
     assertEquals("Not zero at neginf", 0., d.pdf(Double.NEGATIVE_INFINITY), 0.);
     assertEquals("Not zero at almost neginf", 0., d.pdf(-Double.MAX_VALUE), 0.);
     assertEquals("Not zero at posinf", 0., d.pdf(Double.POSITIVE_INFINITY), 0.);
@@ -94,7 +96,7 @@ public class AbstractDistributionTest {
 
   public void checkLogPDF(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
-    assertTrue("Key not in test data: " + key, data != null);
+    assertNotNull("Key not in test data: " + key, data);
     assertTrue("Not neginf at neginf: " + d.logpdf(Double.NEGATIVE_INFINITY), d.logpdf(Double.NEGATIVE_INFINITY) < -1e306);
     assertTrue("Not almost neginf at almost neginf: " + d.logpdf(-Double.MAX_VALUE), d.logpdf(-Double.MAX_VALUE) < -1024);
     assertTrue("Not neginf at posinf: " + d.logpdf(Double.POSITIVE_INFINITY), d.logpdf(Double.POSITIVE_INFINITY) < -1e306);
@@ -120,7 +122,7 @@ public class AbstractDistributionTest {
 
   public void checkCDF(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
-    assertTrue("Key not in test data: " + key, data != null);
+    assertNotNull("Key not in test data: " + key, data);
     assertEquals("Not zero at neginf", 0., d.cdf(Double.NEGATIVE_INFINITY), 0.);
     assertEquals("Not zero at almost neginf", 0., d.cdf(-Double.MAX_VALUE), 0.);
     assertEquals("Not one at posinf", 1., d.cdf(Double.POSITIVE_INFINITY), 0.);
@@ -146,7 +148,7 @@ public class AbstractDistributionTest {
 
   public void checkQuantile(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
-    assertTrue("Key not in test data: " + key, data != null);
+    assertNotNull("Key not in test data: " + key, data);
     int maxerrlev = -15;
     for(int i = 0; i < data.length;) {
       double x = data[i++], exp = data[i++];
