@@ -166,7 +166,7 @@ public class GumbelDistribution extends AbstractDistribution {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double mu, double beta) {
-    return mu + beta * FastMath.log(1 / FastMath.log(1 / val));
+    return mu - beta * FastMath.log(-FastMath.log(val));
   }
 
   @Override
@@ -176,7 +176,7 @@ public class GumbelDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return mu + beta * FastMath.log(1 / FastMath.log(1 / random.nextDouble()));
+    return mu - beta * FastMath.log(-FastMath.log(random.nextDouble()));
   }
 
   @Override

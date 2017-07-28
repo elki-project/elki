@@ -99,23 +99,23 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
   @Test
   public void testQuantile() {
     load("gumbel.ascii.gz");
-    checkQuantile(new GumbelDistribution(1., 1.), "quant_scipy_1_1", 1e-13);
-    checkQuantile(new GumbelDistribution(2., 1.), "quant_scipy_2_1", 1e-13);
-    checkQuantile(new GumbelDistribution(4., 1.), "quant_scipy_4_1", 1e-13);
-    checkQuantile(new GumbelDistribution(4., 10.), "quant_scipy_4_10", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 1.), "quant_scipy_01_1", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 4.), "quant_scipy_01_4", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 10.), "quant_scipy_01_10", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 20.), "quant_scipy_01_20", 1e-13);
+    checkQuantile(new GumbelDistribution(1., 1.), "quant_scipy_1_1", 1e-15);
+    checkQuantile(new GumbelDistribution(2., 1.), "quant_scipy_2_1", 1e-15);
+    checkQuantile(new GumbelDistribution(4., 1.), "quant_scipy_4_1", 1e-15);
+    checkQuantile(new GumbelDistribution(4., 10.), "quant_scipy_4_10", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 1.), "quant_scipy_01_1", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 4.), "quant_scipy_01_4", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 10.), "quant_scipy_01_10", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 20.), "quant_scipy_01_20", 1e-15);
 
-    checkQuantile(new GumbelDistribution(1., 1.), "quant_gnur_1_1", 1e-13);
-    checkQuantile(new GumbelDistribution(2., 1.), "quant_gnur_2_1", 1e-13);
-    checkQuantile(new GumbelDistribution(4., 1.), "quant_gnur_4_1", 1e-13);
-    checkQuantile(new GumbelDistribution(4., 10.), "quant_gnur_4_10", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 10.), "quant_gnur_01_10", 1e-13);
-    checkQuantile(new GumbelDistribution(.1, 20.), "quant_gnur_01_20", 1e-13);
+    checkQuantile(new GumbelDistribution(1., 1.), "quant_gnur_1_1", 1e-15);
+    checkQuantile(new GumbelDistribution(2., 1.), "quant_gnur_2_1", 1e-15);
+    checkQuantile(new GumbelDistribution(4., 1.), "quant_gnur_4_1", 1e-15);
+    checkQuantile(new GumbelDistribution(4., 10.), "quant_gnur_4_10", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 1.), "quant_gnur_01_1", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 4.), "quant_gnur_01_4", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 10.), "quant_gnur_01_10", 1e-15);
+    checkQuantile(new GumbelDistribution(.1, 20.), "quant_gnur_01_20", 1e-15);
   }
 
   @Test
