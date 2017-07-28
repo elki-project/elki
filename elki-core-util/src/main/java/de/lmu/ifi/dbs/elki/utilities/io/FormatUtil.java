@@ -496,7 +496,6 @@ public final class FormatUtil {
    *
    * @param d the float array to be formatted
    * @param sep separator between the single values of the array, e.g. ','
-   * @param nf the number format to be used for formatting
    * @return a String representing the double array d
    */
   public static String format(float[] d, String sep) {
