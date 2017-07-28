@@ -32,18 +32,20 @@ public class MeanVarianceMinMax extends MeanVariance {
   /**
    * Minimum value
    */
-  double min = Double.POSITIVE_INFINITY;
+  double min;
 
   /**
    * Maximum value
    */
-  double max = Double.NEGATIVE_INFINITY;
+  double max;
 
   /**
    * Constructor.
    */
   public MeanVarianceMinMax() {
     super();
+    min = Double.POSITIVE_INFINITY;
+    max = Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -67,6 +69,9 @@ public class MeanVarianceMinMax extends MeanVariance {
   @Override
   public void put(double val, double weight) {
     super.put(val, weight);
+    if(weight <= 0) {
+      return;
+    }
     min = val < min ? val : min;
     max = val > max ? val : max;
   }

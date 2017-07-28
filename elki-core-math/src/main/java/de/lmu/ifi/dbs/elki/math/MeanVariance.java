@@ -256,28 +256,6 @@ public class MeanVariance extends Mean {
   }
 
   /**
-   * Return the normalized value (centered at the mean, distance normalized by
-   * standard deviation)
-   * 
-   * @param val original value
-   * @return normalized value
-   */
-  public double normalizeValue(double val) {
-    return (val - getMean()) / getSampleStddev();
-  }
-
-  /**
-   * Return the unnormalized value (centered at the mean, distance normalized by
-   * standard deviation)
-   * 
-   * @param val normalized value
-   * @return de-normalized value
-   */
-  public double denormalizeValue(double val) {
-    return (val * getSampleStddev()) + getMean();
-  }
-
-  /**
    * Create and initialize a new array of MeanVariance
    * 
    * @param dimensionality Dimensionality

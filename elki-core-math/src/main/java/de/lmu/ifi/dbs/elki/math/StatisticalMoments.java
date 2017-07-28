@@ -62,7 +62,8 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * Empty constructor
    */
   public StatisticalMoments() {
-    // nothing to do here, initialization done above.
+    m3 = 0;
+    m4 = 0;
   }
 
   /**
@@ -97,7 +98,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     m2 += inc;
     m1 += delta_nn;
     n = nn;
-  
+
     min = Math.min(min, val);
     max = Math.max(max, val);
   }
@@ -110,16 +111,13 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   @Override
   public void put(double val, double weight) {
-    // TODO: any way of further simplifying this?
-    // Right now it is copy & paste from the merge formula.
+    if(weight <= 0) {
+      return;
+    }
     final double nn = weight + this.n;
     final double delta = val - this.m1;
 
     // Some factors used below:
-    final double otherm2 = val * val;
-    final double otherm3 = otherm2 * val;
-    final double otherm4 = otherm3 * val;
-
     final double delta_nn = delta / nn;
     final double delta_nn2 = delta_nn * delta_nn;
     final double delta_nn3 = delta_nn2 * delta_nn;
@@ -127,14 +125,14 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     final double nb2 = weight * weight;
     final double ntn = this.n * weight;
 
-    this.m4 += otherm4 + delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * (na2 * otherm2 + nb2 * this.m2) * delta_nn2 + 4. * (this.n * otherm3 - weight * this.m3) * delta_nn;
-    this.m3 += otherm3 + delta * delta_nn2 * ntn * (this.n - weight) + 3. * (this.n * otherm2 - weight * this.m2) * delta_nn;
-    this.m2 += otherm2 + delta * delta_nn * this.n * weight;
+    this.m4 += delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * nb2 * this.m2 * delta_nn2 - 4. * weight * this.m3 * delta_nn;
+    this.m3 += delta * delta_nn2 * ntn * (this.n - weight) - 3. * weight * this.m2 * delta_nn;
+    this.m2 += delta * delta_nn * this.n * weight;
     this.m1 += weight * delta_nn;
     this.n = nn;
 
-    min = Math.min(min, val);
-    max = Math.max(max, val);
+    min = val < min ? val : min;
+    max = val > max ? val : max;
   }
 
   /**
@@ -144,7 +142,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   @Override
   public void put(Mean other) {
-    if (other instanceof StatisticalMoments) {
+    if(other instanceof StatisticalMoments) {
       StatisticalMoments othe = (StatisticalMoments) other;
       final double nn = othe.n + this.n;
       final double delta = othe.m1 - this.m1;
@@ -162,12 +160,31 @@ public class StatisticalMoments extends MeanVarianceMinMax {
       this.m2 += othe.m2 + delta * delta_nn * this.n * othe.n;
       this.m1 += othe.n * delta_nn;
       this.n = nn;
-      
+
       min = Math.min(min, othe.min);
       max = Math.max(max, othe.max);
-    } else {
+    }
+    else {
       throw new AbortException("I cannot combine Mean or MeanVariance into to a StatisticalMoments class.");
     }
+  }
+
+  @Override
+  public StatisticalMoments put(double[] vals) {
+    for(double v : vals) {
+      put(v);
+    }
+    return this;
+  }
+
+  @Override
+  public StatisticalMoments put(double[] vals, double[] weights) {
+    assert (vals.length == weights.length);
+    for(int i = 0, end = vals.length; i < end; i++) {
+      // TODO: use two-pass update as above.
+      put(vals[i], weights[i]);
+    }
+    return this;
   }
 
   /**
@@ -201,7 +218,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   public double getSampleKurtosis() {
     assert (n > 3.) : "Cannot compute a reasonable sample kurtosis with weight <= 3.0!";
-    if (!(m2 > 0)) {
+    if(!(m2 > 0)) {
       throw new ArithmeticException("Kurtosis not defined when variance is 0!");
     }
     final double nm1 = n - 1.;
@@ -216,7 +233,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Kurtosis
    */
   public double getNaiveKurtosis() {
-    if (!(m2 > 0)) {
+    if(!(m2 > 0)) {
       throw new ArithmeticException("Kurtosis not defined when variance is 0!");
     }
     return (n * m4) / (m2 * m2);
@@ -232,7 +249,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   public double getSampleExcessKurtosis() {
     assert (n > 3.) : "Cannot compute a reasonable sample kurtosis with weight <= 3.0!";
-    if (!(m2 > 0)) {
+    if(!(m2 > 0)) {
       throw new ArithmeticException("Kurtosis not defined when variance is 0!");
     }
     final double nm1 = n - 1.;
@@ -247,7 +264,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Kurtosis
    */
   public double getNaiveExcessKurtosis() {
-    if (!(m2 > 0)) {
+    if(!(m2 > 0)) {
       throw new ArithmeticException("Kurtosis not defined when variance is 0!");
     }
     return (n * m4) / (m2 * m2) - 3;
@@ -261,7 +278,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   public static StatisticalMoments[] newArray(int dimensionality) {
     StatisticalMoments[] arr = new StatisticalMoments[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       arr[i] = new StatisticalMoments();
     }
     return arr;

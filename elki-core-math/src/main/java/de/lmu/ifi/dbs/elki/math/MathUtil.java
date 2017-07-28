@@ -282,16 +282,6 @@ public final class MathUtil {
    * Produce an array of random numbers in [0:1].
    *
    * @param len Length
-   * @return Array
-   */
-  public static double[] randomDoubleArray(int len) {
-    return randomDoubleArray(len, new Random());
-  }
-
-  /**
-   * Produce an array of random numbers in [0:1].
-   *
-   * @param len Length
    * @param r Random generator
    * @return Array
    */

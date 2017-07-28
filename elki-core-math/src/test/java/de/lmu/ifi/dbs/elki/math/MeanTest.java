@@ -45,7 +45,6 @@ public class MeanTest {
     assertEquals("Sensitive to infinity", Double.NEGATIVE_INFINITY, m.getMean(), 0);
   }
 
-
   /**
    * Note: this test tests an earlier bug with tiny arrays. Keep.
    */
@@ -59,5 +58,21 @@ public class MeanTest {
     m.put(new double[] { 0, 0, 0 });
     assertEquals("Count wrong.", 7, m.getCount(), 0.);
     assertEquals("Mean wrong.", 0, m.getMean(), 0.);
+    assertEquals("No toString", -1, m.toString().indexOf('@'));
+    assertEquals("Static helper", 2, Mean.of(1, 2, 3), 0.);
+  }
+
+  @Test
+  public void combine() {
+    Mean m1 = new Mean(), m2 = new Mean();
+    m1.put(new double[] { 1, 2, 3 });
+    m2.put(new double[] { 4, 5, 6, 7 });
+    Mean m3 = new Mean(m1);
+    m3.put(m2);
+    assertEquals("First mean", 2, m1.getMean(), 0.);
+    assertEquals("Second mean", 5.5, m2.getMean(), 0.);
+    assertEquals("Third mean", 4, m3.getMean(), 0.);
+    m2.put(new double[] { 1, 2, 3 }, new double[] { 3, 2, 1 });
+    assertEquals("Fourth mean", 3.2, m2.getMean(), 1e-15);
   }
 }

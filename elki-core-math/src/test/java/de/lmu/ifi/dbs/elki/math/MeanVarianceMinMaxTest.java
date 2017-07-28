@@ -30,12 +30,11 @@ import java.util.Random;
 import org.junit.Test;
 
 /**
- * Unit test {@link MeanVariance}.
+ * Unit test {@link MeanVarianceMinMax}.
  * 
  * @author Erich Schubert
- * @since 0.6.0
  */
-public class MeanVarianceTest {
+public class MeanVarianceMinMaxTest {
   /**
    * Size of test data set.
    */
@@ -48,8 +47,8 @@ public class MeanVarianceTest {
 
   @Test
   public void testSlidingWindowVariance() {
-    MeanVariance mv = new MeanVariance();
-    MeanVariance mc = new MeanVariance();
+    MeanVarianceMinMax mv = new MeanVarianceMinMax();
+    MeanVarianceMinMax mc = new MeanVarianceMinMax();
 
     Random r = new Random(0L);
     double[] data = new double[SIZE];
@@ -68,8 +67,12 @@ public class MeanVarianceTest {
       mv.put(data[i]);
 
       mc.reset(); // Reset statistics
+      double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
       for(int j = i + 1 - WINDOWSIZE; j <= i; j++) {
-        mc.put(data[j]);
+        final double v = data[j];
+        mc.put(v);
+        min = v < min ? v : min;
+        max = v > max ? v : max;
       }
       // Fully manual statistics, exact two-pass algorithm:
       double mean = 0.0;
@@ -83,8 +86,11 @@ public class MeanVarianceTest {
         var += v * v;
       }
       var /= (WINDOWSIZE - 1);
-      assertEquals("Variance does not agree at i=" + i, mv.getSampleVariance(), mc.getSampleVariance(), 1e-14);
-      assertEquals("Variance does not agree at i=" + i, mv.getSampleVariance(), var, 1e-14);
+      assertEquals("Variance does not agree at i=" + i, mc.getSampleVariance(), mv.getSampleVariance(), 1e-14);
+      assertEquals("Variance does not agree at i=" + i, var, mv.getSampleVariance(), 1e-14);
+      // We can only test mc here:
+      assertEquals("Min does not agree at i=" + i, min, mc.getMin(), 0);
+      assertEquals("Max does not agree at i=" + i, max, mc.getMax(), 0);
     }
   }
 
@@ -99,7 +105,7 @@ public class MeanVarianceTest {
     double estXsq = squareSum(evildata) / evildata.length;
     double badvar = estXsq - estX * estX;
     assertTrue(badvar < 0); // Variance should always be non-negative!
-    MeanVariance mv = new MeanVariance();
+    MeanVarianceMinMax mv = new MeanVarianceMinMax();
     mv.put(evildata);
     // Values will not be exactly zero, because 1000.0001 is not exactly
     // representable as float.
@@ -113,7 +119,7 @@ public class MeanVarianceTest {
    */
   @Test
   public void basic() {
-    MeanVariance mv = new MeanVariance();
+    MeanVarianceMinMax mv = new MeanVarianceMinMax();
     mv.put(0);
     mv.put(new double[] {});
     mv.put(new double[] { 0 });
@@ -127,20 +133,29 @@ public class MeanVarianceTest {
 
   @Test
   public void combine() {
-    MeanVariance m1 = new MeanVariance(), m2 = new MeanVariance();
+    MeanVarianceMinMax m1 = new MeanVarianceMinMax(), m2 = new MeanVarianceMinMax();
     m1.put(new double[] { 1, 2, 3 });
     m2.put(new double[] { 4, 5, 6, 7 });
-    MeanVariance m3 = new MeanVariance(m1);
+    MeanVarianceMinMax m3 = new MeanVarianceMinMax(m1);
     m3.put(m2);
     assertEquals("First mean", 2, m1.getMean(), 0.);
     assertEquals("First std", 1, m1.getSampleStddev(), 0.);
+    assertEquals("First min", 1, m1.getMin(), 0.);
+    assertEquals("First max", 3, m1.getMax(), 0.);
+    assertEquals("First max", 2, m1.getDiff(), 0.);
     assertEquals("Second mean", 5.5, m2.getMean(), 0.);
     assertEquals("Second std", Math.sqrt(1.25), m2.getNaiveStddev(), 0.);
+    assertEquals("Second min", 4, m2.getMin(), 0.);
+    assertEquals("Second max", 7, m2.getMax(), 0.);
     assertEquals("Third mean", 4, m3.getMean(), 0.);
     assertEquals("Third std", 4., m3.getNaiveVariance(), 0.);
+    assertEquals("Third min", 1, m3.getMin(), 0.);
+    assertEquals("Third max", 7, m3.getMax(), 0.);
     m2.put(new double[] { 1, 2, 3 }, new double[] { 4, 2, 1 });
     assertEquals("Fourth mean", 3.0, m2.getMean(), 0);
-    assertEquals("Fourth weight", 11, m2.getCount(), 0);
     assertEquals("Fourth stddev", 4.8, m2.getSampleVariance(), 0);
+    m2.put(new double[] { 0, 100, 9 }, new double[] { .01, 0, 99});
+    assertEquals("First min", 0, m2.getMin(), 0.);
+    assertEquals("First max", 9, m2.getMax(), 0.);
   }
 }

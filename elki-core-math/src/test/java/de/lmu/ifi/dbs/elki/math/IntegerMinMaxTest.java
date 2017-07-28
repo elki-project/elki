@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -44,5 +45,14 @@ public class IntegerMinMaxTest {
     assertEquals("Min wrong.", -1, m.getMin(), 0.);
     assertEquals("Max wrong.", +2, m.getMax(), 0.);
     assertEquals("Diff wrong.", 3, m.getDiff(), 0.);
+    m.reset();
+    assertFalse(m.isValid());
+    m.put(0);
+    m.put(new IntegerMinMax(-1, 2));
+    assertEquals("Min wrong.", -1, m.getMin(), 0.);
+    assertEquals("Max wrong.", +2, m.getMax(), 0.);
+    m.put(new IntegerMinMax(0, 1));
+    assertEquals("Min wrong.", -1, m.getMin(), 0.);
+    assertEquals("Max wrong.", +2, m.getMax(), 0.);
   }
 }

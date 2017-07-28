@@ -49,24 +49,25 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.4.0
  */
 @Reference(authors = "B. P. Welford", //
-title = "Note on a method for calculating corrected sums of squares and products", //
-booktitle = "Technometrics 4(3)")
+    title = "Note on a method for calculating corrected sums of squares and products", //
+    booktitle = "Technometrics 4(3)")
 public class Mean {
   /**
    * Mean of values - first moment.
    */
-  protected double m1 = 0.;
+  protected double m1;
 
   /**
    * Weight sum (number of samples).
    */
-  protected double n = 0;
+  protected double n;
 
   /**
    * Empty constructor
    */
   public Mean() {
-    // nothing to do here, initialization done above.
+    m1 = 0.;
+    n = 0;
   }
 
   /**
@@ -104,9 +105,12 @@ public class Mean {
    * @param weight weight
    */
   public void put(double val, double weight) {
+    if(weight == 0.) {
+      return;
+    }
     if(m1 == Double.POSITIVE_INFINITY || m1 == Double.NEGATIVE_INFINITY) {
       m1 += val;
-      n += 1.;
+      n += weight;
       return;
     }
     final double nwsum = weight + n;
@@ -122,6 +126,9 @@ public class Mean {
    * @param other Data to join with
    */
   public void put(Mean other) {
+    if(other.n == 0) {
+      return;
+    }
     final double nwsum = other.n + this.n;
 
     // this.mean += rval;
@@ -208,8 +215,8 @@ public class Mean {
    * @param data Data to compute the mean for.
    * @return Mean
    */
-  public static double of(double[] data) {
-    // FIXME: what is numerically best. Kahan summation?
+  public static double of(double... data) {
+    // FIXME: what is numerically good & fast? Kahan summation?
     double sum = 0.;
     for(double v : data) {
       sum += v;
