@@ -23,33 +23,45 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
- * Generalized Gaussian distribution by adding a skew term, similar to lognormal
+ * Generalized normal distribution by adding a skew term, similar to lognormal
  * distributions.
  * 
  * This is one kind of generalized normal distributions. Note that there are
- * multiple that go by the name of a "Generalized Normal Distribution".
+ * multiple that go by the name of a "Generalized Normal Distribution"; this is
+ * what is currently called "version 2" in English Wikipedia.
+ * 
+ * Reference:
+ * <p>
+ * J. R. M. Hosking and J. R. Wallis<br />
+ * Regional frequency analysis: an approach based on L-moments
+ * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
+@Reference(authors = "J. R. M. Hosking and J. R. Wallis", //
+    title = "Regional frequency analysis: an approach based on L-moments", //
+    booktitle = "")
 public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   /**
-   * Mean value for the generator
+   * Location.
    */
-  private double mean;
+  private double loc;
 
   /**
-   * Standard deviation
+   * Scale.
    */
-  private double stddev;
+  private double scale;
 
   /**
    * Skew.
@@ -58,63 +70,90 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
 
   /**
    * Constructor for Gaussian distribution
-   * 
-   * @param mean Mean
-   * @param stddev Standard Deviation
+   *
+   * @param loc Location
+   * @param scale Scale
    * @param skew Skew
    * @param random Random generator
    */
-  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, Random random) {
+  public SkewGeneralizedNormalDistribution(double log, double scale, double skew, Random random) {
     super(random);
-    this.mean = mean;
-    this.stddev = stddev;
+    this.loc = log;
+    this.scale = scale;
+    this.skew = skew;
+  }
+
+  /**
+   * Constructor for Gaussian distribution
+   *
+   * @param loc Location
+   * @param scale Scale
+   * @param skew Skew
+   * @param random Random generator
+   */
+  public SkewGeneralizedNormalDistribution(double loc, double scale, double skew, RandomFactory random) {
+    super(random);
+    this.loc = loc;
+    this.scale = scale;
     this.skew = skew;
   }
 
   /**
    * Constructor for Gaussian distribution
    * 
-   * @param mean Mean
-   * @param stddev Standard Deviation
+   * @param loc Location
+   * @param scale Scale
    * @param skew Skew
-   * @param random Random generator
    */
-  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, RandomFactory random) {
-    super(random);
-    this.mean = mean;
-    this.stddev = stddev;
-    this.skew = skew;
+  public SkewGeneralizedNormalDistribution(double loc, double scale, double skew) {
+    this(loc, scale, skew, (Random) null);
   }
 
   /**
-   * Constructor for Gaussian distribution
-   * 
-   * @param mean Mean
-   * @param stddev Standard Deviation
-   * @param skew Skew
+   * Get the location parameter
+   *
+   * @return Location
    */
-  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew) {
-    this(mean, stddev, skew, (Random) null);
+  public double getLocation() {
+    return loc;
+  }
+
+  /**
+   * Get the scale parameter
+   * 
+   * @return Scale
+   */
+  public double getScale() {
+    return scale;
+  }
+
+  /**
+   * Get the skew parameter.
+   *
+   * @return Skew parameter
+   */
+  public double getSkew() {
+    return skew;
   }
 
   @Override
   public double pdf(double val) {
-    return pdf(val, mean, stddev, skew);
+    return pdf(val, loc, scale, skew);
   }
 
   @Override
   public double logpdf(double val) {
-    return logpdf(val, mean, stddev, skew);
+    return logpdf(val, loc, scale, skew);
   }
 
   @Override
   public double cdf(double val) {
-    return cdf(val, mean, stddev, skew);
+    return cdf(val, loc, scale, skew);
   }
 
   @Override
   public double quantile(double q) {
-    return quantile(q, mean, stddev, skew);
+    return quantile(q, loc, scale, skew);
   }
 
   @Override
@@ -123,13 +162,13 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
     if(Math.abs(skew) > 0.) {
       y = (1. - FastMath.exp(-skew * y)) / skew;
     }
-    return mean + stddev * y;
+    return loc + scale * y;
 
   }
 
   @Override
   public String toString() {
-    return "SkewNormalDistribution(mean=" + mean + ", stddev=" + stddev + ", skew=" + skew + ")";
+    return "SkewNormalDistribution(mean=" + loc + ", stddev=" + scale + ", skew=" + skew + ")";
   }
 
   /**
@@ -141,11 +180,15 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma, double skew) {
-    x = (x - mu) / sigma;
-    if(Math.abs(skew) > 0.) {
-      x = -FastMath.log(1. - skew * x) / skew;
+    x = (x - mu) / sigma; // Scale
+    if(skew == 0.) {
+      return MathUtil.ONE_BY_SQRTTWOPI / sigma * FastMath.exp(-.5 * x * x);
     }
-    return MathUtil.SQRTHALF * FastMath.exp(-.5 * x * x) / sigma / (1 - skew * x);
+    final double y = -FastMath.log1p(-skew * x) / skew;
+    if(y != y || y == Double.POSITIVE_INFINITY || y == Double.NEGATIVE_INFINITY) { // NaN
+      return 0.;
+    }
+    return MathUtil.ONE_BY_SQRTTWOPI / sigma * FastMath.exp(-.5 * y * y) / (1 - skew * x);
   }
 
   /**
@@ -158,10 +201,14 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    */
   public static double logpdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
-    if(Math.abs(skew) > 0.) {
-      x = -FastMath.log(1. - skew * x) / skew;
+    if(skew == 0.) {
+      return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma) - .5 * x * x;
     }
-    return -.5 * x * x - FastMath.log(MathUtil.SQRTHALF * sigma * (1 - skew * x));
+    double y = -FastMath.log(1. - skew * x) / skew;
+    if(y != y || y == Double.NEGATIVE_INFINITY || y == Double.NEGATIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return -.5 * y * y - FastMath.log(MathUtil.ONE_BY_SQRTTWOPI * sigma * (1 - skew * x));
   }
 
   /**

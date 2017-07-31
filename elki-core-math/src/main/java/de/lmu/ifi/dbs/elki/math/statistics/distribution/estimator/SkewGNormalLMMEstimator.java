@@ -84,26 +84,19 @@ public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGen
     }
     // Generalized Normal Distribution estimation:
     double t3 = xmom[2];
-    final double location, scale, shape;
     if(Math.abs(t3) >= .95) {
       // Extreme skewness
-      location = 0.;
-      scale = -1.;
-      shape = 0.;
+      return new SkewGeneralizedNormalDistribution(0., -1., 0.);
     }
-    else if(Math.abs(t3) <= 1e-8) {
-      // t3 effectively zero.
-      location = xmom[0];
-      scale = xmom[1] * MathUtil.SQRTPI;
-      shape = 0.;
+    if(Math.abs(t3) <= 1e-8) {
+      // t3 effectively zero, this is a normal distribution.
+      return new SkewGeneralizedNormalDistribution(xmom[0], xmom[1] * MathUtil.SQRTPI, 0.);
     }
-    else {
-      final double tt = t3 * t3;
-      shape = -t3 * (A0 + tt * (A1 + tt * (A2 + tt * A3))) / (1. + tt * (B1 + tt * (B2 + tt * B3)));
-      final double e = FastMath.exp(.5 * shape * shape);
-      scale = xmom[1] * shape / (e * NormalDistribution.erf(.5 * shape));
-      location = xmom[0] + scale * (e - 1.) / shape;
-    }
+    final double tt = t3 * t3;
+    double shape = -t3 * (A0 + tt * (A1 + tt * (A2 + tt * A3))) / (1. + tt * (B1 + tt * (B2 + tt * B3)));
+    final double e = FastMath.exp(.5 * shape * shape);
+    double scale = xmom[1] * shape / (e * NormalDistribution.erf(.5 * shape));
+    double location = xmom[0] + scale * (e - 1.) / shape;
     return new SkewGeneralizedNormalDistribution(location, scale, shape);
   }
 

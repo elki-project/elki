@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Unit test for the Normal distribution in ELKI.
  * 
- * The reference values were computed using GNU R.
+ * The reference values were computed using SciPy and GNU R.
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -40,13 +40,19 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
   @Test
   public void testPDF() {
     load("emg.ascii.gz");
+    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_scipy_1_3_05", 1e-15);
+    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_scipy_1_3_01", 1e-15);
     checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_gnur_1_3_05", 1e-15);
+    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_gnur_1_3_01", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("emg.ascii.gz");
+    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_scipy_1_3_05", 1e-14);
+    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_scipy_1_3_01", 1e-14);
     checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_gnur_1_3_05", 1e-14);
+    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_gnur_1_3_01", 1e-14);
   }
 
   // TODO: once quantile() is implemented, add a test.

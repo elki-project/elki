@@ -34,6 +34,10 @@ import net.jafama.FastMath;
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
  * is a combination of a normal distribution and an exponential distribution.
+ * 
+ * Note that scipy uses a subtly different parameterization.
+ *
+ * TODO: implement quantile function!
  *
  * @author Erich Schubert
  * @since 0.6.0

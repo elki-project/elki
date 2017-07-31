@@ -38,15 +38,40 @@ public class EMGOlivierNorbergEstimatorTest extends AbstractDistributionEstimato
   @Test
   public void testEstimator() {
     final EMGOlivierNorbergEstimator est = instantiate(EMGOlivierNorbergEstimator.class, ExponentiallyModifiedGaussianDistribution.class);
-    ExponentiallyModifiedGaussianDistribution gen = new ExponentiallyModifiedGaussianDistribution(1, 2, .1, new Random(0L));
+    ExponentiallyModifiedGaussianDistribution dist, gen;
+
+    gen = new ExponentiallyModifiedGaussianDistribution(1, 2, .1, new Random(0L));
     double[] data = new double[10000];
     for(int i = 0; i < data.length; i++) {
       data[i] = gen.nextRandom();
     }
-    ExponentiallyModifiedGaussianDistribution dist;
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("mean", dist.getMean(), 1, -0.026544709107593434);
     assertStat("stddev", dist.getStddev(), 2, 0.17902812796064094);
     assertStat("lambda", dist.getLambda(), .1, -0.0010032987771384089);
+
+    gen = new ExponentiallyModifiedGaussianDistribution(5, 4, .3, new Random(0L));
+    data = new double[10000];
+    for(int i = 0; i < data.length; i++) {
+      data[i] = gen.nextRandom();
+    }
+    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    assertStat("mean", dist.getMean(), 5, 0.005239133140687358);
+    assertStat("stddev", dist.getStddev(), 4, 0.05032298704431959);
+    assertStat("lambda", dist.getLambda(), .3, 7.728347755092679E-4);
+
+    load("emg.ascii.gz");
+    data = this.data.get("random_1_3_01");
+    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    assertStat("mean", dist.getMean(), 1, 0.9742484598719088);
+    assertStat("stddev", dist.getStddev(), 3., 0.5404618548719853);
+    assertStat("lambda", dist.getLambda(), .1, 0.018125211915103898);
+
+    // This one is not fit correctly. :-( Too much skew? Negative L-kurtosis.
+    data = this.data.get("random_1_3_05");
+    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    assertStat("mean", dist.getMean(), 1, 2.2452576306758862);
+    assertStat("stddev", dist.getStddev(), 3, 0.5522898083602992);
+    assertStat("lambda", dist.getLambda(), .5, 0.5);
   }
 }
