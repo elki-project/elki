@@ -92,9 +92,7 @@ public class IntegerMinMax {
   public void put(int[] data) {
     final int l = data.length;
     for(int i = 0; i < l; i++) {
-      final int val = data[i];
-      min = val < min ? val : min;
-      max = val > max ? val : max;
+      put(data[i]);
     }
   }
 
