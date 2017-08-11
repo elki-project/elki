@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -48,16 +46,11 @@ public class LengthNormalizationTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     LengthNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(LengthNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
     // Verify that the length of each row vector is 1.
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       double len = 0.0;
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);

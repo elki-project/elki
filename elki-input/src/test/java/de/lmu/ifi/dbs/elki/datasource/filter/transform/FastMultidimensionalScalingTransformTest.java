@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -48,63 +46,53 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
   @Test
   public void parameters() {
     int pdim = 2;
-    int seed = 0;
     String filename = UNITTEST + "transformation-test-1.csv";
     // Allow loading test data from resources.
     ListParameterization config = new ListParameterization();
     config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim);
-    config.addParameter(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, seed);
+    config.addParameter(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, 0L);
     config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class);
     FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(FastMultidimensionalScalingTransform.class, config);
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(filteredBundle.meta(0)));
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
-    // This cast is now safe (vector field):
-    assertEquals("Test file interpreted incorrectly", ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality(), ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality());
-    // Verify that the filtered and unfiltered bundles have the same length.
-    assertEquals("Test file interpreted incorrectly", filteredBundle.dataLength(), unfilteredBundle.dataLength());
-    int dim = ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality();
-    
-    // Caution: this verification is naturally O(n^2), don't test with too much test data.
-    // Verify that the euclidean distance between any two points is identical before and after the MDS transform is performed.
-    
-    //Calculate the covariance matricies of the filtered and unfiltered bundles.
-    CovarianceMatrix cmUnfil = new CovarianceMatrix(dim);
-    CovarianceMatrix cmFil = new CovarianceMatrix(dim);
+    int dimu = getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+    int dimf = getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+    assertEquals("Dimensionality not as requested", pdim, dimf);
+
+    // Verify that the Euclidean distance between any two points is identical
+    // before and after the MDS transform is performed - O(n^2)!
+
+    // Calculate the covariance matricies of the filtered and unfiltered
+    // bundles.
+    CovarianceMatrix cmUnfil = new CovarianceMatrix(dimu);
+    CovarianceMatrix cmFil = new CovarianceMatrix(dimf);
 
     for(int outer = 0; outer < filteredBundle.dataLength(); outer++) {
-      Object objFiltered_1 = filteredBundle.data(outer, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objFiltered_1.getClass());
-      Object objUnfiltered_1 = unfilteredBundle.data(outer, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objUnfiltered_1.getClass());
-      DoubleVector dFil_1 = (DoubleVector) objFiltered_1;
-      DoubleVector dUnfil_1 = (DoubleVector) objUnfiltered_1;
+      DoubleVector dFil_1 = get(filteredBundle, outer, 0, DoubleVector.class);
+      DoubleVector dUnfil_1 = get(unfilteredBundle, outer, 0, DoubleVector.class);
       cmUnfil.put(dUnfil_1);
       cmFil.put(dFil_1);
-      
-      for(int row = 0; row < filteredBundle.dataLength(); row++) {
-        Object objFiltered_2 = filteredBundle.data(row, 0);
-        assertEquals("Unexpected data type", DoubleVector.class, objFiltered_2.getClass());
-        Object objUnfiltered_2 = unfilteredBundle.data(row, 0);
-        assertEquals("Unexpected data type", DoubleVector.class, objUnfiltered_2.getClass());
-        DoubleVector dFil_2 = (DoubleVector) objFiltered_2;
-        DoubleVector dUnfil_2 = (DoubleVector) objUnfiltered_2;
-        assertEquals("Expected same distance", EuclideanDistanceFunction.STATIC.distance(dFil_1, dFil_2), EuclideanDistanceFunction.STATIC.distance(dUnfil_1, dUnfil_2), 1e-8);
-      } 
+
+      for(int row = outer + 1; row < filteredBundle.dataLength(); row++) {
+        DoubleVector dFil_2 = get(filteredBundle, row, 0, DoubleVector.class);
+        DoubleVector dUnfil_2 = get(unfilteredBundle, row, 0, DoubleVector.class);
+        final double distF = EuclideanDistanceFunction.STATIC.distance(dFil_1, dFil_2);
+        final double distU = EuclideanDistanceFunction.STATIC.distance(dUnfil_1, dUnfil_2);
+        assertEquals("Expected same distance", distU, distF, 1e-10);
+      }
     }
-    
+
     // Calculate the SVD of the covariance matrix of the unfiltered data.
-    // Verify that this SVD represents the diagonals of the covariance matrix of the filtered data.
-    
+    // Verify that this SVD represents the diagonals of the covariance matrix of
+    // the filtered data.
+
     double[][] ncmUnfil = cmUnfil.destroyToPopulationMatrix();
     double[][] ncmFil = cmFil.destroyToPopulationMatrix();
-    
+
     SingularValueDecomposition svd = new SingularValueDecomposition(ncmUnfil);
     double[] dia = svd.getSingularValues();
-    
+
     for(int ii = 0; ii < dia.length; ii++) {
       assertEquals("Unexpected covariance", dia[ii], ncmFil[ii][ii], 1e-8);
     }

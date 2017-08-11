@@ -43,7 +43,7 @@ public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
   @Test
   public void parameters() {
     final double p = .5;
-    final double seed = 0.;
+    final long seed = 0;
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
     ListParameterization config = new ListParameterization();
@@ -58,6 +58,6 @@ public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
 
     // Verify that approximately p% of the values were sampled.
-    assertEquals("Unexpected bundle length", 1., unfilteredBundle.dataLength() / (filteredBundle.dataLength() / p), .05);
+    assertEquals("Unexpected bundle length", 1., unfilteredBundle.dataLength() * p / filteredBundle.dataLength(), .05);
   }
 }

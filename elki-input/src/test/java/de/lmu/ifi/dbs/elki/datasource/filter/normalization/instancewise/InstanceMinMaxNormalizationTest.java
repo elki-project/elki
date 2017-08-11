@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -49,26 +47,18 @@ public class InstanceMinMaxNormalizationTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     InstanceMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceMinMaxNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
     // Verify that, in each row, the min value is 0 and the max value 1.
-    DoubleMinMax[] mms = DoubleMinMax.newArray(bundle.dataLength());
+    DoubleMinMax mms = new DoubleMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      mms.reset();
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
-        final double v = d.doubleValue(col);
-        mms[row].put(v);
+        mms.put(d.doubleValue(col));
       }
-    }
-    
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      assertEquals("Min value is not 0", 0., mms[row].getMin(), 1e-8);
-      assertEquals("Max value is not 1", 1., mms[row].getMax(), 1e-8);     
+      assertEquals("Min value is not 0", 0., mms.getMin(), 0);
+      assertEquals("Max value is not 1", 1., mms.getMax(), 1e-15);
     }
   }
 }

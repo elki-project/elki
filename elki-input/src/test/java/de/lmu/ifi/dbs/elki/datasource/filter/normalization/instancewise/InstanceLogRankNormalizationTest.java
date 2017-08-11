@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -51,30 +49,27 @@ public class InstanceLogRankNormalizationTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     InstanceLogRankNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceLogRankNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
-    MeanVariance mvs = new MeanVariance();
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
+    // Compute the expected mean and variances..
+    MeanVariance expected = new MeanVariance();
     for(int ii = 0; ii < dim; ii++) {
-      mvs.put(Math.log1p(ii / (double)(dim - 1 )) * MathUtil.ONE_BY_LOG2);
+      expected.put(Math.log1p(ii / (double) (dim - 1)) * MathUtil.ONE_BY_LOG2);
     }
-    
-    // TODO: EXPLAIN WHAT IS BEING VERIFIED
+
+    // The smallest value (except for ties) must be mapped to 0, the largest to
+    // 1. And (again, except for ties), the mean and variance must match above
+    // expected values of a uniform distribution.
     MeanVarianceMinMax mms = new MeanVarianceMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
-        final double v = d.doubleValue(col);
-        mms.put(v);
+        mms.put(d.doubleValue(col));
       }
-      assertEquals("Min value is not 0", 0., mms.getMin(), 1e-8);
-      assertEquals("Max value is not 1", 1., mms.getMax(), 1e-8);
-      assertEquals("Mean value is not as expected", mvs.getMean(), mms.getMean(), 1e-8);
-      assertEquals("Variance is not as expected", mvs.getNaiveVariance(), mms.getNaiveVariance(), 1e-8);
+      assertEquals("Min value is not 0", 0., mms.getMin(), 0);
+      assertEquals("Max value is not 1", 1., mms.getMax(), 0);
+      assertEquals("Mean value is not as expected", expected.getMean(), mms.getMean(), 1e-14);
+      assertEquals("Variance is not as expected", expected.getNaiveVariance(), mms.getNaiveVariance(), 1e-14);
       mms.reset();
     }
   }

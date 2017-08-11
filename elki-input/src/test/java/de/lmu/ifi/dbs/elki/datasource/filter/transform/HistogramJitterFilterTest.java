@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -56,26 +54,18 @@ public class HistogramJitterFilterTest extends AbstractDataSourceTest {
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(filteredBundle.meta(0)));
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
-    // This cast is now safe (vector field):
-    assertEquals("Test file interpreted incorrectly", ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality(), ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality());
-    int dim = ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality();
+    int dim = getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+    assertEquals("Dimensionality changed", dim, getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
     // Verify that the filtered and unfiltered bundles have the same length.
     assertEquals("Test file interpreted incorrectly", filteredBundle.dataLength(), unfilteredBundle.dataLength());
-        
-    // Verify that at least p% of the values are within a% of the unfiltered value.
-    final double p = .9;
-    final double a = .1;
+
+    // Verify that at least p% of the values are within a% of the unfiltered
+    // value.
+    final double p = .9, a = .1;
     int withinRange = 0;
     for(int row = 0; row < filteredBundle.dataLength(); row++) {
-      Object objFiltered = filteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objFiltered.getClass());
-      Object objUnfiltered = unfilteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objUnfiltered.getClass());
-      DoubleVector dFil = (DoubleVector) objFiltered;
-      DoubleVector dUnfil = (DoubleVector) objUnfiltered;      
+      DoubleVector dFil = get(filteredBundle, row, 0, DoubleVector.class);
+      DoubleVector dUnfil = get(unfilteredBundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double vFil = dFil.doubleValue(col);
         final double vUnfil = dUnfil.doubleValue(col);

@@ -49,17 +49,13 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
     // Allow loading test data from resources.
     AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
-    // We verify that the resulting data has mean 0 and variance 1 in each column:
+    // We verify that the resulting data has mean 0 and variance 1 in each
+    // column:
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
@@ -68,11 +64,11 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
       }
     }
     for(int col = 0; col < dim; col++) {
-      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-8);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-8);
+      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-15);
+      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-14);
     }
   }
-  
+
   /**
    * Test with default parameters and for correcting handling of NaN and Inf.
    */
@@ -87,12 +83,10 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that the resulting data has mean 0 and variance 1 in each column:
+    // Verify that the resulting data has mean 0 and variance 1 in each column:
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
@@ -101,8 +95,8 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
       }
     }
     for(int col = 0; col < dim; col++) {
-      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-8);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-8);
+      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-15);
+      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-15);
     }
   }
 }

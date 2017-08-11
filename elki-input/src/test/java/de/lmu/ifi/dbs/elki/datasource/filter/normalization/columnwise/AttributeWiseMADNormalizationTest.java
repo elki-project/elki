@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -49,39 +47,29 @@ public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     AttributeWiseMADNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMADNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
-    // Count how many values in each column are positive, how many are negative, and how many are greater than 1
-    // or less than -1.
-    int[] countNotPositive = new int[dim];
-    int[] countPositive = new int[dim];
-    int[] countAbsGreaterOne = new int[dim];
-    
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
+    // Count how many values in each column are positive, how many are negative,
+    // and how many are greater than 1, or less than -1.
+    int[][] counts = new int[dim][4];
+
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
-        if(val > 0.0){
-          countPositive[col]++;
-        } else {
-          countNotPositive[col]++;
-        }
-        if(Math.abs(val) >= NormalDistribution.PHIINV075){
-          countAbsGreaterOne[col]++;
-        }
+        counts[col][val > 0. ? 0 : 1]++;
+        counts[col][Math.abs(val) >= NormalDistribution.PHIINV075 ? 2 : 3]++;
       }
     }
 
-    // Verify that ~50% of the values in each column are negative (=> ~50% of the values are positive).
+    // Verify that ~50% of the values in each column are negative (=> ~50% of
+    // the values are positive).
     // Verify that ~50% of the values are either greater than 1 or less than -1.
     for(int col = 0; col < dim; col++) {
-      assertEquals("~50% of the values in each column should be positive", .5, (double)countPositive[col] / (double)bundle.dataLength(), 0.);
-      assertEquals("~50% of the values in each column should be > 1 or < -1", .5, (double)countAbsGreaterOne[col] / (double)bundle.dataLength(), 0.);
+      assertEquals("~50% of the values in each column should be positive", .5, counts[col][0] / (double) bundle.dataLength(), 0.);
+      assertEquals("~50% of the values in each column should be negative", .5, counts[col][1] / (double) bundle.dataLength(), 0.);
+      assertEquals("~50% of the values in each column should be > 1 or < -1", .5, counts[col][2] / (double) bundle.dataLength(), 0.);
+      assertEquals("~50% of the values in each column should be -1 to +1", .5, counts[col][3] / (double) bundle.dataLength(), 0.);
     }
   }
 }

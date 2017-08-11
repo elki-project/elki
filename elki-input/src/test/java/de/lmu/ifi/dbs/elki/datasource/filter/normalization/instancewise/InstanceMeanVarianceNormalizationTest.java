@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -49,28 +47,21 @@ public class InstanceMeanVarianceNormalizationTest extends AbstractDataSourceTes
     // Allow loading test data from resources.
     InstanceMeanVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceMeanVarianceNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
     // Verify that the resulting data has mean 0 and variance 1 in each row.
-    MeanVariance[] mvs = MeanVariance.newArray(bundle.dataLength());
+    MeanVariance mvs = new MeanVariance();
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      mvs.reset();
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
-          mvs[row].put(v);
+          mvs.put(v);
         }
       }
-    }
-    
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      assertEquals("Mean is not 0", 0., mvs[row].getMean(), 1);
-      assertEquals("Variance is not 1", 1., mvs[row].getNaiveVariance(), 1);     
+      assertEquals("Mean is not 0", 0., mvs.getMean(), 1e-14);
+      assertEquals("Variance is not 1", 1., mvs.getNaiveVariance(), 1e-14);
     }
   }
 }

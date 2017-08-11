@@ -51,21 +51,22 @@ public class ExternalIDFilterTest extends AbstractDataSourceTest {
     config.addParameter(ExternalIDFilter.Parameterizer.EXTERNALID_INDEX_ID, c);
     ExternalIDFilter filter = ClassGenericsUtil.parameterizeOrAbort(ExternalIDFilter.class, config);
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    
+
     // Ensure that the filter has correctly formed the bundle.
     // We expect that the bundle's first column is a number vector field.
-    // We expect that the bundle's second column is a list of ExternalID objects.
-    // We expect that the bundle's third column is a list of LabelList objects.
-    
+    // We expect that the bundle's second column is an ExternalID
+    // We expect that the bundle's third column is a LabelList object.
+
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    
+
     // Ensure that the second column are the ExternalID objects.
     Object obj = bundle.data(0, 1);
     assertEquals("Unexpected data type", ExternalID.class, obj.getClass());
-    // Ensure that the length of the list of ExternalID objects has the correct length.
+    // Ensure that the length of the list of ExternalID objects has the correct
+    // length.
     assertEquals("Unexpected data length", bundle.dataLength(), bundle.getColumn(1).size());
-    
+
     // Ensure that the third column are the LabelList objects.
     obj = bundle.data(0, 2);
     assertEquals("Unexpected data type", LabelList.class, obj.getClass());

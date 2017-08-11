@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class SplitNumberVectorFilterTest extends AbstractDataSourceTest {
   /**
-   * Test with parameter s as a list of the columns to split into the first bundle column.
+   * Test with parameter s as a list of the columns to split into the first
+   * bundle column.
    */
   @Test
   public void parameters() {
@@ -56,8 +57,9 @@ public class SplitNumberVectorFilterTest extends AbstractDataSourceTest {
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(filteredBundle.meta(0)));
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
-    
-    // Verify that the filter has split the columns represented by s into the bundle's first column.
+
+    // Verify that the filter has split the columns represented by s into the
+    // bundle's first column.
     Object obj = filteredBundle.data(0, 0);
     assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
     DoubleVector d = (DoubleVector) obj;

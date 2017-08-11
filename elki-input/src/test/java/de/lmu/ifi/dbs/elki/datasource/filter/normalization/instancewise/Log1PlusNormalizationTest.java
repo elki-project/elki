@@ -21,19 +21,16 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-
 import net.jafama.FastMath;
 
 /**
@@ -52,18 +49,13 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
     InstanceMinMaxNormalization<DoubleVector> minMaxFilter = ClassGenericsUtil.parameterizeOrAbort(InstanceMinMaxNormalization.class, new ListParameterization());
     Log1PlusNormalization<DoubleVector> log1plusFilter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, minMaxFilter, log1plusFilter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-    
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
     // We verify that minimum and maximum values in each row are 0 and 1:
     DoubleMinMax mms = new DoubleMinMax();
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
       mms.reset();
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
         if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
@@ -74,14 +66,14 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
       assertEquals("Maximum not expected", 1., mms.getMax(), 1e-15);
     }
   }
-  
+
   /**
-   * Test with non-default parameters to ensure that both branches of the filter are tested.
+   * Test with non-default parameters to ensure that both branches of the filter
+   * are tested.
    */
   @Test
   public void parameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
     // Use the value of b as the boost value.
     double b = 15.;
     ListParameterization config = new ListParameterization();
@@ -90,23 +82,17 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(filteredBundle.meta(0)));
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
-    // This cast is now safe (vector field):
-    assertEquals("Test file interpreted incorrectly", ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality(), ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality());
-    int dim = ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality();
+    // Check dimensionalities
+    int dim = getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+    assertEquals("Dimensionality changed", dim, getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
     // Verify that the filtered and unfiltered bundles have the same length.
-    assertEquals("Test file interpreted incorrectly", filteredBundle.dataLength(), unfilteredBundle.dataLength());
+    assertEquals("Length changed", filteredBundle.dataLength(), unfilteredBundle.dataLength());
 
-    // Verify that the filter correctly applies the specified mathematical method.
+    // Verify that the filter correctly applies the specified mathematical
+    // method.
     for(int row = 0; row < filteredBundle.dataLength(); row++) {
-      Object objFiltered = filteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objFiltered.getClass());
-      Object objUnfiltered = unfilteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objUnfiltered.getClass());
-      DoubleVector dFil = (DoubleVector) objFiltered;
-      DoubleVector dUnfil = (DoubleVector) objUnfiltered;      
+      DoubleVector dFil = get(filteredBundle, row, 0, DoubleVector.class);
+      DoubleVector dUnfil = get(unfilteredBundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double vFil = dFil.doubleValue(col);
         final double vUnfil = dUnfil.doubleValue(col);

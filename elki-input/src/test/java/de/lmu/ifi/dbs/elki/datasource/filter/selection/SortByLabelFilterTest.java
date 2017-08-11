@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.selection;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class SortByLabelFilterTest extends AbstractDataSourceTest {
   /**
-   * Test with default parameters. 
+   * Test with default parameters.
    */
   @Test
   public void defaultParameters() {
@@ -47,17 +46,13 @@ public class SortByLabelFilterTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     SortByLabelFilter filter = ClassGenericsUtil.parameterizeOrAbort(SortByLabelFilter.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
+    // Expect vectors to come first, labels second.
+    getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
     // Verify that the vectors are in alphabetical order.
     for(int row = 0; row < bundle.dataLength() - 1; row++) {
-      Object objFirst = bundle.data(row, 1);
-      assertEquals("Unexpected data type", LabelList.class, objFirst.getClass());
-      LabelList llFirst = (LabelList) objFirst;
-      Object objSecond = bundle.data(row + 1, 1);
-      assertEquals("Unexpected data type", LabelList.class, objSecond.getClass());
-      LabelList llSecond = (LabelList) objSecond;
+      LabelList llFirst = get(bundle, row, 1, LabelList.class);
+      LabelList llSecond = get(bundle, row + 1, 1, LabelList.class);
       assertTrue("Expected alphabetical order", llFirst.get(0).compareToIgnoreCase(llSecond.get(0)) <= 0);
     }
   }

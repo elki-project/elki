@@ -21,16 +21,17 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -50,23 +51,20 @@ public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
     // Allow loading test data from resources.
     ListParameterization config = new ListParameterization();
     config.addParameter(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p);
+    // Avoid cross-testing too many estimators.
+    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC));
     AttributeWiseBetaNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseBetaNormalization.class, config);
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
     BetaDistribution dist = new BetaDistribution(p, p);
     final double quantile = dist.quantile(p);
-    
+
     // Verify that p% of the values in each column are less than the quantile.
     int[] countUnderQuantile = new int[dim];
-    
+
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
@@ -76,9 +74,10 @@ public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
         }
       }
     }
-    
+
     for(int col = 0; col < dim; col++) {
-          assertEquals("p% of the values should be under the quantile", p, (double)countUnderQuantile[col] / (double)bundle.dataLength(), .1);
+      double actual = countUnderQuantile[col] / (double) bundle.dataLength();
+      assertEquals("p% of the values should be under the quantile", p, actual, .05);
     }
   }
 }

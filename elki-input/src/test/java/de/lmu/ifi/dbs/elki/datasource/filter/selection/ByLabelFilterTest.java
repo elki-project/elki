@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class ByLabelFilterTest extends AbstractDataSourceTest {
   /**
-   * Test with parameter s as the label to look for. 
+   * Test with parameter s as the label to look for.
    */
   @Test
   public void parameters() {
@@ -59,15 +59,13 @@ public class ByLabelFilterTest extends AbstractDataSourceTest {
     // Verify that the filter selected all vectors which match the pattern.
     int count_match = 0;
     for(int row = 0; row < unfilteredBundle.dataLength(); row++) {
-      Object obj = unfilteredBundle.data(row, 1);
-      assertEquals("Unexpected data type", LabelList.class, obj.getClass());
-      LabelList ll = (LabelList) obj;
-      if(ll.get(0).equals(s))
+      LabelList ll = get(unfilteredBundle, row, 1, LabelList.class);
+      if(ll.get(0).equals(s)) {
         count_match++;
+      }
     }
-    
+
     assertTrue("Expected at least one match", count_match > 0);
-    
     assertEquals("Unexpected number of matches", count_match, filteredBundle.dataLength());
   }
 }

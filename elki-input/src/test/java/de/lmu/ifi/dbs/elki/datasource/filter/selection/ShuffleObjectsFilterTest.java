@@ -20,12 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.selection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -50,44 +50,30 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
     // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(filteredBundle.meta(0)));
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(unfilteredBundle.meta(0)));
-    assertEquals("Dimensionality 1 expected for input data", 1, ((FieldTypeInformation) filteredBundle.meta(0)).getDimensionality());
-    assertEquals("Dimensionality 1 expected for input data", 1, ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality());
-    
+    assertEquals("Dimensionality 1 expected for input data", 1, getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
+    assertEquals("Dimensionality 1 expected for input data", 1, getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
+    assertEquals("Length changed", unfilteredBundle.dataLength(), filteredBundle.dataLength());
+
     // Verify that the elements of the unfiltered bundle are in sorted order.
-    for(int row = 0; row < unfilteredBundle.dataLength() - 1; row++) {
-      Object objFirst = unfilteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objFirst.getClass());
-      DoubleVector dFirst = (DoubleVector) objFirst;
-      final double vFirst = dFirst.doubleValue(0);
-      Object objSecond = unfilteredBundle.data(row + 1, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objSecond.getClass());
-      DoubleVector dSecond = (DoubleVector) objSecond;
-      final double vSecond = dSecond.doubleValue(0);
-      
-      assertTrue("Values are expected to be in sorted order", vFirst <= vSecond);
+    double prev = get(unfilteredBundle, 0, 0, DoubleVector.class).doubleValue(0);
+    for(int row = 1; row < unfilteredBundle.dataLength(); row++) {
+      final double next = get(unfilteredBundle, row, 0, DoubleVector.class).doubleValue(0);
+
+      assertTrue("Values are expected to be in sorted order", prev <= next);
+      prev = next;
     }
-    
+
     // Verify that the elements of the filtered bundle are not in sorted order.
     // By verifying this, we can ascertain that the vectors have been shuffled.
-    boolean isSorted = true;
-    for(int row = 0; row < filteredBundle.dataLength() - 1; row++) {
-      Object objFirst = filteredBundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objFirst.getClass());
-      DoubleVector dFirst = (DoubleVector) objFirst;
-      final double vFirst = dFirst.doubleValue(0);
-      Object objSecond = filteredBundle.data(row + 1, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, objSecond.getClass());
-      DoubleVector dSecond = (DoubleVector) objSecond;
-      final double vSecond = dSecond.doubleValue(0);
-      
-      if(vFirst > vSecond) {
-        isSorted = false;
+    prev = get(filteredBundle, 0, 0, DoubleVector.class).doubleValue(0);
+    boolean shuffled = false;
+    for(int row = 1; row < filteredBundle.dataLength(); row++) {
+      final double next = get(filteredBundle, row, 0, DoubleVector.class).doubleValue(0);
+      if(prev > next) {
+        shuffled = true;
         break;
       }
     }
-    
-    assertFalse("Elements are not shuffled", isSorted);
+    assertTrue("Elements are not shuffled.", shuffled);
   }
 }

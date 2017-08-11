@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -50,19 +48,14 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
     // Allow loading test data from resources.
     GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(GlobalPrincipalComponentAnalysisTransform.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
-    // We verify that the resulting data has mean 0 and variance 1 in each column.
+    // We verify that the result has mean 0 and variance 1 in each column.
     // We also expect that covariances of any two columns are 0.
     CovarianceMatrix cm = new CovarianceMatrix(dim);
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       cm.put(d);
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
@@ -76,8 +69,8 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
       for(int row = 0; row < dim; row++) {
         assertEquals("Unexpected covariance", col == row ? 1. : 0., ncm[row][col], 1e-15);
       }
-      assertEquals("Mean not as expected", 0., mvs[col].getMean(), .1);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), .1);
+      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-15);
+      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-15);
     }
   }
 }

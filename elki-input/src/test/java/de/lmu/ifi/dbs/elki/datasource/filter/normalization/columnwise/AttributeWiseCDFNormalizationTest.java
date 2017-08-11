@@ -21,15 +21,16 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -45,46 +46,31 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseCDFNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseCDFNormalization.class, new ListParameterization());
+    final ListParameterization config = new ListParameterization();
+    // Avoid cross-testing too many estimators.
+    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC));
+    AttributeWiseCDFNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseCDFNormalization.class, config);
     MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
-    // We expect that approximately 25% of the values in each row are 0 - 0.25,
-    // 25% between 0.25 and 0.5, 25% between 0.5 and 0.75, and 25% between 0.75 and 1.
-    
-    int[] countFirstQuarter = new int[dim];
-    int[] countSecondQuarter = new int[dim];
-    int[] countThirdQuarter = new int[dim];
-    
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
+    // We expect that approximately 25% of the values in each row are 0-0.25,
+    // 25% in 0.25-0.5, 25% in 0.5-0.75, and 25% in 0.75-1 for each dimension
+    int[][] counts = new int[dim][4];
+
+    final int size = bundle.dataLength();
+    for(int row = 0; row < size; row++) {
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          if(val <= .5) {
-            if(val <= .25) {
-              countFirstQuarter[col]++;
-            } else {
-              countSecondQuarter[col]++;
-            }
-          } else {
-            if(val <= .75) {
-              countThirdQuarter[col]++;
-            }
-          }
-        }
+        int q = (int) (val * 4);
+        counts[col][q]++;
       }
     }
     for(int col = 0; col < dim; col++) {
-      assertEquals("~25% of the values in each column should be between 0 and 0.25", .25, (double)countFirstQuarter[col] / (double)bundle.dataLength(), .1);
-      assertEquals("~25% of the values in each column should be between 0.25 and 0.5", .25, (double)countSecondQuarter[col] / (double)bundle.dataLength(), .1);
-      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, (double)countThirdQuarter[col] / (double)bundle.dataLength(), .1);
+      assertEquals("~25% of the values in each column should be between 0 and 0.25", .25, counts[col][0] / (double) size, .02);
+      assertEquals("~25% of the values in each column should be between 0.25 and 0.5", .25, counts[col][1] / (double) size, .02);
+      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, counts[col][2] / (double) size, .02);
+      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, counts[col][3] / (double) size, .02);
     }
   }
 }
