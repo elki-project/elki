@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * A filter to replace all NaN values.
+ * A filter to replace all NaN values with random values.
  * 
  * Note: currently, only dense vector columns are supported.
  * 

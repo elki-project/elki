@@ -41,6 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 /**
  * Split an existing column into two types.
  * 
+ * Note: Parameterisation of this class requires that SELECTED_ATTRIBUTES_ID be
+ * specified as a String type and not as an integer. For example: to keep the
+ * first 5 attributes, pass ("0,1,2,3,4") rather than (5).
+ * 
  * @author Erich Schubert
  * @since 0.4.0
  * 

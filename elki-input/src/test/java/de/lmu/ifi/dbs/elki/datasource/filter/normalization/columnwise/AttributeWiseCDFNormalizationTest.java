@@ -30,32 +30,36 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the min-max normalization filter.
+ * Test the CDF normalization filter.
  *
- * @author Erich Schubert
+ * @author Matthew Arcifa
  */
-public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest {
+public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
   /**
    * Test with default parameters.
    */
   @Test
   public void defaultParameters() {
-    String filename = UNITTEST + "normalization-test-1.csv";
+    String filename = UNITTEST + "normally-distributed-data-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    AttributeWiseCDFNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseCDFNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+    // We expect that approximately 25% of the values in each row are 0 - 0.25,
+    // 25% between 0.25 and 0.5, 25% between 0.5 and 0.75, and 25% between 0.75 and 1.
+    
+    int[] countFirstQuarter = new int[dim];
+    int[] countSecondQuarter = new int[dim];
+    int[] countThirdQuarter = new int[dim];
+    
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
@@ -63,46 +67,24 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
         if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
+          if(val <= .5) {
+            if(val <= .25) {
+              countFirstQuarter[col]++;
+            } else {
+              countSecondQuarter[col]++;
+            }
+          } else {
+            if(val <= .75) {
+              countThirdQuarter[col]++;
+            }
+          }
         }
       }
     }
     for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
-    }
-  }
-  
-  /**
-   * Test with default parameters and for correcting handling of NaN and Inf.
-   */
-  @Test
-  public void NaNParameters() {
-    String filename = UNITTEST + "nan-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
-    MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-
-    // We verify that minimum and maximum values in each column are 0 and 1:
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
-    for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
-      for(int col = 0; col < dim; col++) {
-        final double val = d.doubleValue(col);
-        if(val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
-          mms[col].put(val);
-        }
-      }
-    }
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Minimum not expected", 0., mms[col].getMin(), 0.);
-      assertEquals("Maximum not expected", 1., mms[col].getMax(), 0.);
+      assertEquals("~25% of the values in each column should be between 0 and 0.25", .25, (double)countFirstQuarter[col] / (double)bundle.dataLength(), .1);
+      assertEquals("~25% of the values in each column should be between 0.25 and 0.5", .25, (double)countSecondQuarter[col] / (double)bundle.dataLength(), .1);
+      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, (double)countThirdQuarter[col] / (double)bundle.dataLength(), .1);
     }
   }
 }

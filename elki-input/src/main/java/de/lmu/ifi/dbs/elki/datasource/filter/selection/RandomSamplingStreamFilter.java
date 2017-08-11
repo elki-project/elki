@@ -102,12 +102,12 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     /**
      * Option ID for sampling probability
      */
-    private static final OptionID PROB_ID = new OptionID("sampling.p", "Sampling probability. Each object has a chance of being samples with this probability.");
+    public static final OptionID PROB_ID = new OptionID("sampling.p", "Sampling probability. Each object has a chance of being sampled with this probability.");
 
     /**
      * Option ID for random seed
      */
-    private static final OptionID SEED_ID = new OptionID("sampling.seed", "Random generator seed for sampling.");
+    public static final OptionID SEED_ID = new OptionID("sampling.seed", "Random generator seed for sampling.");
 
     /**
      * Probability

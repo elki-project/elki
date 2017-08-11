@@ -33,7 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Normalize vectors such that the smallest attribute is 0, the largest is 1.
+ * Normalize vectors with respect to a given minimum and maximum in each
+ * dimension. By default, minimum 0 and maximum 1 is used. This class
+ * performs a linear scaling on the data.
  * 
  * @author Erich Schubert
  * @since 0.7.0

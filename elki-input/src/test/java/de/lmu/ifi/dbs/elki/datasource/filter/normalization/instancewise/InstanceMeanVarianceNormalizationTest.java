@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the variance-max normalization filter.
+ * Test the mean-variance normalization filter.
  *
- * @author Erich Schubert
+ * @author Matthew Arcifa
  */
-public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTest {
+public class InstanceMeanVarianceNormalizationTest extends AbstractDataSourceTest {
   /**
    * Test with default parameters.
    */
@@ -47,15 +47,15 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
+    InstanceMeanVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceMeanVarianceNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-
-    // We verify that the resulting data has mean 0 and variance 1 in each column:
-    MeanVariance[] mvs = MeanVariance.newArray(dim);
+    
+    // Verify that the resulting data has mean 0 and variance 1 in each row.
+    MeanVariance[] mvs = MeanVariance.newArray(bundle.dataLength());
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
@@ -63,46 +63,14 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
       for(int col = 0; col < dim; col++) {
         final double v = d.doubleValue(col);
         if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
-          mvs[col].put(v);
+          mvs[row].put(v);
         }
       }
     }
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-8);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-8);
-    }
-  }
-  
-  /**
-   * Test with default parameters and for correcting handling of NaN and Inf.
-   */
-  @Test
-  public void NaNParameters() {
-    String filename = UNITTEST + "nan-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
-    MultipleObjectsBundle bundle = readBundle(filename, filter);
-    // Ensure the first column are the vectors.
-    assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
-    // This cast is now safe (vector field):
-    int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
-
-    // We verify that the resulting data has mean 0 and variance 1 in each column:
-    MeanVariance[] mvs = MeanVariance.newArray(dim);
+    
     for(int row = 0; row < bundle.dataLength(); row++) {
-      Object obj = bundle.data(row, 0);
-      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
-      DoubleVector d = (DoubleVector) obj;
-      for(int col = 0; col < dim; col++) {
-        final double v = d.doubleValue(col);
-        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
-          mvs[col].put(v);
-        }
-      }
-    }
-    for(int col = 0; col < dim; col++) {
-      assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-8);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-8);
+      assertEquals("Mean is not 0", 0., mvs[row].getMean(), 1);
+      assertEquals("Variance is not 1", 1., mvs[row].getNaiveVariance(), 1);     
     }
   }
 }
