@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.math;
 
-import java.util.Collection;
-
 /**
  * Class to find the minimum and maximum double values in data.
  * 
@@ -91,28 +89,7 @@ public class DoubleMinMax {
   public void put(double[] data) {
     final int l = data.length;
     for (int i = 0; i < l; i++) {
-      final double val = data[i];
-      min = val < min ? val : min;
-      max = val > max ? val : max;
-    }
-  }
-
-  /**
-   * Process a whole collection of double values.
-   * 
-   * If any of the values is smaller than the current minimum, it will become
-   * the new minimum.
-   * 
-   * If any of the values is larger than the current maximum, it will become the
-   * new maximum.
-   * 
-   * @param data Data to process
-   * @deprecated {@code Collection<Double>} is expensive. Avoid.
-   */
-  @Deprecated
-  public void put(Collection<Double> data) {
-    for(Double value : data) {
-      this.put(value.doubleValue());
+      put(data[i]);
     }
   }
 
