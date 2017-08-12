@@ -120,7 +120,7 @@ public class MinimumDistanceFunction extends AbstractNumberVectorDistanceFunctio
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof MinimumDistanceFunction;
   }
 
   @Override

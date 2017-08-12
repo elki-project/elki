@@ -106,7 +106,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null || getClass() != obj.getClass()) {
+    if(!(obj instanceof DiskCacheBasedDoubleDistanceFunction)) {
       return false;
     }
     DiskCacheBasedDoubleDistanceFunction other = (DiskCacheBasedDoubleDistanceFunction) obj;

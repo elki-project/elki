@@ -252,7 +252,7 @@ public class Subspace {
     if(this == obj) {
       return true;
     }
-    if(obj == null || getClass() != obj.getClass()) {
+    if(!(obj instanceof Subspace)) {
       return false;
     }
     Subspace other = (Subspace) obj;

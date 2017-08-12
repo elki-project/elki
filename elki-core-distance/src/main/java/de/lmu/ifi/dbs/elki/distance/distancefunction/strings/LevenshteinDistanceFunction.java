@@ -190,7 +190,7 @@ public class LevenshteinDistanceFunction implements PrimitiveDistanceFunction<St
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof LevenshteinDistanceFunction;
   }
 
   @Override

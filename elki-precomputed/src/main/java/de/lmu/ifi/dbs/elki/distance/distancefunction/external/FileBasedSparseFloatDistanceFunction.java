@@ -185,12 +185,10 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if(!(obj instanceof FileBasedSparseFloatDistanceFunction)) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
+
     FileBasedSparseFloatDistanceFunction other = (FileBasedSparseFloatDistanceFunction) obj;
     return this.cache.equals(other.cache);
   }

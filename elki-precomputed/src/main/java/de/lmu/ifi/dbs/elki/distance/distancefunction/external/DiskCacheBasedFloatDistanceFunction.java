@@ -99,12 +99,10 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if(!(obj instanceof DiskCacheBasedFloatDistanceFunction)) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
+
     DiskCacheBasedFloatDistanceFunction other = (DiskCacheBasedFloatDistanceFunction) obj;
     return this.cache.equals(other.cache);
   }

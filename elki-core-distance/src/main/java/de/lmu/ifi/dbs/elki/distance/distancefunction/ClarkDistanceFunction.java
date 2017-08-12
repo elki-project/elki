@@ -135,7 +135,7 @@ public class ClarkDistanceFunction implements SpatialPrimitiveDistanceFunction<N
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof ClarkDistanceFunction;
   }
 
   @Override

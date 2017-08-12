@@ -136,7 +136,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+    return obj == this || (obj instanceof SubspaceEuclideanDistanceFunction && //
         Arrays.equals(this.dimensions, ((SubspaceEuclideanDistanceFunction) obj).dimensions));
   }
 

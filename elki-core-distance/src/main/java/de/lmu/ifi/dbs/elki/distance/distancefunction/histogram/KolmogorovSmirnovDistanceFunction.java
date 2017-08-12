@@ -69,7 +69,7 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDista
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof KolmogorovSmirnovDistanceFunction;
   }
 
   @Override

@@ -151,7 +151,7 @@ public abstract class AbstractExternalizablePage implements Externalizable, Page
    */
   @Override
   public boolean equals(Object o) {
-    return this == o || (o != null && getClass() == o.getClass() //
+    return this == o || (o instanceof AbstractExternalizablePage //
         && id == ((AbstractExternalizablePage) o).getPageID());
   }
 

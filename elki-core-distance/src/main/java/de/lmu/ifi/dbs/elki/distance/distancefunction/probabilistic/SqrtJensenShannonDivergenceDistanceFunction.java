@@ -95,7 +95,7 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberV
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof SqrtJensenShannonDivergenceDistanceFunction;
   }
 
   @Override

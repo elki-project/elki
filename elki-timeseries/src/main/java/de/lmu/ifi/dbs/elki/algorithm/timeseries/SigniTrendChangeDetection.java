@@ -190,7 +190,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
      * @return absolute maximum deviation.
      */
     private double processRow(DBIDRef iter, NumberVector row, ChangePoints changepoints) {
-      if(!(weight > 0.)) {
+      if(Double.compare(weight,0) != 1) {
         // Cold start.
         for(int d = 0; d < row.getDimensionality(); d++) {
           double v = ewma[d] = row.doubleValue(d);

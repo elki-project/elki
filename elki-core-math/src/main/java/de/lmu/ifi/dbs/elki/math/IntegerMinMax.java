@@ -126,7 +126,7 @@ public class IntegerMinMax {
    * Return the difference between minimum and maximum.
    * 
    * Returns a long, as the difference may exceed integer bounds.
-   * 
+   *
    * @return Difference of current Minimum and Maximum.
    */
   public long getDiff() {

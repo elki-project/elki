@@ -158,7 +158,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+    return obj == this || (obj instanceof SubspaceLPNormDistanceFunction && //
         Arrays.equals(this.dimensions, ((SubspaceLPNormDistanceFunction) obj).dimensions) //
         && this.p == ((SubspaceLPNormDistanceFunction) obj).p);
   }

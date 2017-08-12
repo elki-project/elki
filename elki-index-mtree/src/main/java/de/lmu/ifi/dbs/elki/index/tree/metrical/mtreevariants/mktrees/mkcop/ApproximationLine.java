@@ -168,7 +168,7 @@ public class ApproximationLine implements Externalizable {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof ApproximationLine)) {
       return false;
     }
 

@@ -80,7 +80,7 @@ public class AbsolutePearsonCorrelationDistanceFunction extends AbstractNumberVe
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && this.getClass().equals(obj.getClass());
+    return obj instanceof AbsolutePearsonCorrelationDistanceFunction;
   }
 
   @Override

@@ -101,7 +101,7 @@ public class IndexTreePath<E extends Entry> {
     if(o == this) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if(!(o instanceof IndexTreePath)) {
       return false;
     }
 
