@@ -78,7 +78,7 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+    return obj == this || (obj instanceof AbstractDimensionsSelectingDistanceFunction && //
         Arrays.equals(this.dimensions, ((AbstractDimensionsSelectingDistanceFunction<?>) obj).dimensions));
   }
 

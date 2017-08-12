@@ -139,7 +139,7 @@ public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunctio
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof CanberraDistanceFunction;
   }
 
   @Override

@@ -117,7 +117,7 @@ public class Pair<FIRST, SECOND> {
     if(this == obj) {
       return true;
     }
-    if(obj == null || this.getClass() != obj.getClass()) {
+    if(!(obj instanceof Pair)) {
       return false;
     }
     Pair<?, ?> other = (Pair<?, ?>) obj;

@@ -63,7 +63,7 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
     if(this == obj) {
       return true;
     }
-    if(obj == null || getClass() != obj.getClass()) {
+    if(!(obj instanceof IntDoublePair)) {
       return false;
     }
 

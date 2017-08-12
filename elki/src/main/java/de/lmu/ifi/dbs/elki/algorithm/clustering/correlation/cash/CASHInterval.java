@@ -242,26 +242,16 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     if(this.equals(other)) {
       return 0;
     }
-
-    if(this.priority() < other.priority()) {
-      return -1;
-    }
-    if(this.priority() > other.priority()) {
-      return 1;
+    if (this.priority() != other.priority()) {
+      return Integer.compare(this.priority(), other.priority());
     }
 
-    if(this.level < other.level) {
-      return -1;
-    }
-    if(this.level > other.level) {
-      return 1;
+    if (this.level != other.level) {
+      return Integer.compare(this.level, other.level);
     }
 
-    if(this.maxSplitDimension < other.maxSplitDimension) {
-      return -1;
-    }
-    if(this.maxSplitDimension > other.maxSplitDimension) {
-      return 1;
+    if (this.maxSplitDimension != other.maxSplitDimension) {
+      return Integer.compare(this.maxSplitDimension, other.maxSplitDimension);
     }
 
     return Integer.compare(other.intervalID, this.intervalID);
@@ -272,7 +262,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     if(this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if(!(o instanceof CASHInterval)) {
       return false;
     }
 

@@ -63,7 +63,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
     if(this == obj) {
       return true;
     }
-    if(obj == null || getClass() != obj.getClass()) {
+    if(!(obj instanceof DoubleIntPair)) {
       return false;
     }
 

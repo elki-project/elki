@@ -60,12 +60,10 @@ public final class ExternalID {
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
+    if(!(obj instanceof ExternalID)) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
+
     ExternalID other = (ExternalID) obj;
     return name.equals(other.name);
   }

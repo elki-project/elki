@@ -78,7 +78,7 @@ public class NormalizedLevenshteinDistanceFunction implements PrimitiveDistanceF
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+    return obj instanceof NormalizedLevenshteinDistanceFunction;
   }
 
   @Override

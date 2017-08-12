@@ -87,7 +87,7 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
 
   @Override
   public boolean equals(Object obj) {
-    return this == obj || (obj != null && this.getClass().equals(obj.getClass()) && //
+    return this == obj || (obj instanceof WeightedSquaredPearsonCorrelationDistanceFunction && //
         Arrays.equals(this.weights, ((WeightedSquaredPearsonCorrelationDistanceFunction) obj).weights));
   }
 

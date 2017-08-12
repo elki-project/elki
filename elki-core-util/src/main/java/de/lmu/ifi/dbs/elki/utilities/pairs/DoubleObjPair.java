@@ -60,7 +60,7 @@ public class DoubleObjPair<O> implements Comparable<DoubleObjPair<O>> {
     if(this == obj) {
       return true;
     }
-    if(obj == null || this.getClass() != obj.getClass()) {
+    if(!(obj instanceof DoubleObjPair)) {
       return false;
     }
     DoubleObjPair<?> other = (DoubleObjPair<?>) obj;

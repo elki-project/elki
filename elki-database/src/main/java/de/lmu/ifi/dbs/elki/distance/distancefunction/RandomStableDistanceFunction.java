@@ -114,12 +114,10 @@ public class RandomStableDistanceFunction extends AbstractDatabaseDistanceFuncti
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if(!(obj instanceof RandomStableDistanceFunction)) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
+
     return this.seed == ((RandomStableDistanceFunction) obj).seed;
   }
 

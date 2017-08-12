@@ -119,7 +119,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+    return obj == this || (obj instanceof SubspaceManhattanDistanceFunction && //
         Arrays.equals(this.dimensions, ((SubspaceManhattanDistanceFunction) obj).dimensions));
   }
 

@@ -126,7 +126,7 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && this.getClass().equals(obj.getClass());
+    return obj instanceof UncenteredCorrelationDistanceFunction;
   }
 
   @Override

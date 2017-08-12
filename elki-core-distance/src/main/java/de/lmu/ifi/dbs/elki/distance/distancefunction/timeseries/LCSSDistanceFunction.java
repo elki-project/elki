@@ -160,7 +160,7 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //
+    return obj == this || (obj instanceof LCSSDistanceFunction //
         && this.pDelta == ((LCSSDistanceFunction) obj).pDelta //
         && this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
   }

@@ -168,7 +168,7 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //
+    return obj == this || (obj instanceof LPIntegerNormDistanceFunction  //
         && this.intp == ((LPIntegerNormDistanceFunction) obj).intp);
   }
 

@@ -76,7 +76,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
 
   @Override
   public boolean equals(Object obj) {
-    return this == obj || (obj != null && this.getClass().equals(obj.getClass()) //
+    return this == obj || (obj instanceof AbstractEditDistanceFunction //
         && this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize);
   }
 

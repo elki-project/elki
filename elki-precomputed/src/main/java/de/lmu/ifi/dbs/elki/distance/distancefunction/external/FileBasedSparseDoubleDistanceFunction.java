@@ -187,12 +187,10 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if(!(obj instanceof FileBasedSparseDoubleDistanceFunction)) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
+    
     FileBasedSparseDoubleDistanceFunction other = (FileBasedSparseDoubleDistanceFunction) obj;
     return this.cache.equals(other.cache);
   }

@@ -100,7 +100,7 @@ public class SimpleClassLabel extends ClassLabel {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof SimpleClassLabel)) {
       return false;
     }
     if (!super.equals(o)) {

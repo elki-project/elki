@@ -67,7 +67,7 @@ public class SquaredUncenteredCorrelationDistanceFunction extends AbstractNumber
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && this.getClass().equals(obj.getClass());
+    return obj instanceof SquaredUncenteredCorrelationDistanceFunction;
   }
 
   @Override

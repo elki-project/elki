@@ -81,7 +81,7 @@ public class PearsonCorrelationDistanceFunction extends AbstractNumberVectorDist
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && this.getClass().equals(obj.getClass());
+    return obj instanceof PearsonCorrelationDistanceFunction;
   }
 
   @Override
