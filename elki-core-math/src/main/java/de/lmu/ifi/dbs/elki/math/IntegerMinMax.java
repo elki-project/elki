@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.math;
 
-import java.util.Collection;
-
 /**
  * Class to find the minimum and maximum int values in data.
  * 
@@ -97,27 +95,6 @@ public class IntegerMinMax {
   }
 
   /**
-   * Process a whole collection of Integer values.
-   * 
-   * If any of the values is smaller than the current minimum, it will become
-   * the new minimum.
-   * 
-   * If any of the values is larger than the current maximum, it will become the
-   * new maximum.
-   * 
-   * @param data Data to process
-   * @deprecated {@code Collection<Integer>} is expensive. Avoid.
-   */
-  @Deprecated
-  public void put(Collection<Integer> data) {
-    for(Integer value : data) {
-      final int val = value.intValue();
-      min = val < min ? val : min;
-      max = val > max ? val : max;
-    }
-  }
-
-  /**
    * Process a MinMax pair.
    * 
    * @param val New value
@@ -148,10 +125,12 @@ public class IntegerMinMax {
   /**
    * Return the difference between minimum and maximum.
    * 
+   * Returns a long, as the difference may exceed integer bounds.
+   *
    * @return Difference of current Minimum and Maximum.
    */
-  public int getDiff() {
-    return this.max - this.min;
+  public long getDiff() {
+    return this.max - (long) this.min;
   }
 
   /**

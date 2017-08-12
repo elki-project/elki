@@ -20,12 +20,18 @@
  */
 package de.lmu.ifi.dbs.elki.datasource;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
@@ -75,5 +81,35 @@ public abstract class AbstractDataSourceTest {
     catch(IOException e) {
       throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
+  }
+
+  /**
+   * Type-checked get a value from a bundle.
+   *
+   * @param bundle Bundle
+   * @param row Row
+   * @param col Column
+   * @param kind Type
+   * @return Object
+   */
+  protected static <T> T get(MultipleObjectsBundle bundle, int row, int col, Class<T> kind) {
+    Object obj = bundle.data(row, col);
+    assertTrue("Unexpected data type", kind.isInstance(obj));
+    return kind.cast(obj);
+  }
+
+  /**
+   * Assert that we have a (vector-) field, and get the dimensionality.
+   * 
+   * @param bundle Bundle
+   * @param col Column
+   * @param type Type restriction of the column to check
+   * @return Dimensionality
+   */
+  protected static int getFieldDimensionality(MultipleObjectsBundle bundle, int col, TypeInformation type) {
+    SimpleTypeInformation<?> meta = bundle.meta(col);
+    assertTrue("Column type not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(meta));
+    assertTrue("Expected a vector field", meta instanceof FieldTypeInformation);
+    return ((FieldTypeInformation) meta).getDimensionality();
   }
 }

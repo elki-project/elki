@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
- * given minimum and maximum in each dimension.
+ * a given minimum and maximum in each dimension. This class performs a linear
+ * scaling on the data.
  * 
  * @author Elke Achtert
  * @since 0.4.0

@@ -254,11 +254,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
           dbf.setIgnoringElementContentWhitespace(true);
         }
         catch(Exception e) {
-          LOG.warning("Could not set up XML Schema validation for speciciation file.", e);
+          LOG.warning("Could not set up XML Schema validation for specification file.", e);
         }
       }
       else {
-        LOG.warning("Could not set up XML Schema validation for speciciation file.");
+        LOG.warning("Could not set up XML Schema validation for specification file.");
       }
       Document doc = dbf.newDocumentBuilder().parse(specfile);
       Node root = doc.getDocumentElement();
