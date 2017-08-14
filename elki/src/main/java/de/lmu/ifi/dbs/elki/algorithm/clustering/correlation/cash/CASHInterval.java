@@ -20,13 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
-import java.util.logging.Logger;
-
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Provides a unique interval represented by its id, a hyper bounding box
@@ -35,10 +33,15 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * 
  * @author Elke Achtert
  * @since 0.2
- * 
+ *        O
  * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit
  */
 public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInterval> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(CASHInterval.class);
+
   /**
    * Serial version number.
    */
@@ -117,7 +120,6 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
    */
   public CASHInterval(double[] min, double[] max, CASHIntervalSplit split, ModifiableDBIDs ids, int maxSplitDimension, int level, double d_min, double d_max) {
     super(min, max);
-    // this.debug = true;
     this.intervalID = ++ID;
     this.split = split;
     this.ids = ids;
@@ -154,11 +156,6 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     return ids.size();
   }
 
-  /**
-   * Returns a String representation of the HyperBoundingBox.
-   * 
-   * @return String
-   */
   @Override
   public String toString() {
     return super.toString() + ", ids: " + ids.size() + ", d_min: " + d_min + ", d_max " + d_max;
@@ -229,58 +226,22 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     return d_max;
   }
 
-  /**
-   * Compares this object with the specified object for order. Returns a
-   * negative integer, zero, or a positive integer as this object is less than,
-   * equal to, or greater than the specified object.
-   * 
-   * @param other Object to compare to
-   * @return comparison result
-   */
   @Override
   public int compareTo(CASHInterval other) {
     if(this.equals(other)) {
       return 0;
     }
-
-    if(this.priority() < other.priority()) {
-      return -1;
-    }
-    if(this.priority() > other.priority()) {
-      return 1;
-    }
-
-    if(this.level < other.level) {
-      return -1;
-    }
-    if(this.level > other.level) {
-      return 1;
-    }
-
-    if(this.maxSplitDimension < other.maxSplitDimension) {
-      return -1;
-    }
-    if(this.maxSplitDimension > other.maxSplitDimension) {
-      return 1;
-    }
-
-    return Integer.compare(other.intervalID, this.intervalID);
+    int c = Integer.compare(this.priority(), other.priority());
+    c = c == 0 ? Integer.compare(this.level, other.level) : c;
+    c = c == 0 ? Integer.compare(this.maxSplitDimension, other.maxSplitDimension) : c;
+    return c == 0 ? Integer.compare(other.intervalID, this.intervalID) : c;
   }
 
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final CASHInterval interval = (CASHInterval) o;
-    if(intervalID != interval.intervalID) {
-      return false;
-    }
-    return super.equals(o);
+    return this == o || (o != null && getClass() == o.getClass() //
+        && this.intervalID == ((CASHInterval) o).intervalID //
+        && super.equals(o));
   }
 
   @Override
@@ -337,16 +298,16 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
       }
     }
 
-    if(LoggingConfiguration.DEBUG) {
+    if(LOG.isDebuggingFine()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("\nchild level ").append(childLevel).append(",  split Dim   ").append(splitDim);
+      msg.append("Child level ").append(childLevel).append(",  split Dim   ").append(splitDim);
       if(leftChild != null) {
         msg.append("\nleft   ").append(leftChild);
       }
       if(rightChild != null) {
         msg.append("\nright   ").append(rightChild);
       }
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      LOG.fine(msg.toString());
     }
   }
 }

@@ -54,8 +54,8 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.TAU_ID, "0.1");
-    params.addParameter(CLIQUE.XSI_ID, 20);
+    params.addParameter(CLIQUE.Parameterizer.TAU_ID, "0.1");
+    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 20);
 
     // setup algorithm
     CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
@@ -81,8 +81,8 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.TAU_ID, 0.2);
-    params.addParameter(CLIQUE.XSI_ID, 6);
+    params.addParameter(CLIQUE.Parameterizer.TAU_ID, 0.2);
+    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 6);
     CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
     testParameterizationOk(params);
 
@@ -105,9 +105,9 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.TAU_ID, 0.2);
-    params.addParameter(CLIQUE.XSI_ID, 6);
-    params.addFlag(CLIQUE.PRUNE_ID);
+    params.addParameter(CLIQUE.Parameterizer.TAU_ID, 0.2);
+    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 6);
+    params.addFlag(CLIQUE.Parameterizer.PRUNE_ID);
     CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
     testParameterizationOk(params);
 
