@@ -176,14 +176,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @return Clustering result
    */
   public Clustering<Model> run(Database database, Relation<V> vrel) {
-    this.fulldatabase = preprocess(database, vrel);
-    if(LOG.isVerbose()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("DB size: ").append(fulldatabase.size());
-      msg.append("\nmin Dim: ").append(minDim);
-      LOG.verbose(msg.toString());
-    }
-
+    fulldatabase = preprocess(database, vrel);
     processedIDs = DBIDUtil.newHashSet(fulldatabase.size());
     noiseDim = dimensionality(fulldatabase);
 
@@ -192,7 +185,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     LOG.ensureCompleted(progress);
 
     if(LOG.isVerbose()) {
-      StringBuilder msg = new StringBuilder();
+      StringBuilder msg = new StringBuilder(1000);
       for(Cluster<Model> c : result.getAllClusters()) {
         if(c.getModel() instanceof LinearEquationModel) {
           LinearEquationModel s = (LinearEquationModel) c.getModel();
@@ -223,9 +216,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       prep.put(iter, new ParameterizationFunction(vrel.get(iter)));
     }
-
-    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
-    return prel;
+    return new MaterializedRelation<>(type, ids, null, prep);
   }
 
   /**
@@ -238,7 +229,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    */
   private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) {
     Clustering<Model> res = new Clustering<>("CASH clustering", "cash-clustering");
-
     final int dim = dimensionality(relation);
 
     // init heap
@@ -246,27 +236,14 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
     initHeap(heap, relation, dim, noiseIDs);
 
-    if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      msg.append("\nXXXX dim ").append(dim);
-      msg.append("\nXXXX database.size ").append(relation.size());
-      msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      LOG.debugFine(msg.toString());
-    }
-    else if(LOG.isVerbose()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("XXXX dim ").append(dim).append(" database.size ").append(relation.size());
-      LOG.verbose(msg.toString());
+    if(LOG.isVerbose()) {
+      LOG.verbose(new StringBuilder().append("dim ").append(dim).append(" database.size ").append(relation.size()).toString());
     }
 
     // get the ''best'' d-dimensional intervals at max level
     while(!heap.isEmpty()) {
       CASHInterval interval = determineNextIntervalAtMaxLevel(heap);
-      if(LOG.isDebugging()) {
-        LOG.debugFine("next interval in dim " + dim + ": " + interval);
-      }
-      else if(LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("next interval in dim " + dim + ": " + interval);
       }
 
@@ -333,14 +310,12 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // put noise to clusters
     if(!noiseIDs.isEmpty()) {
       if(dim == noiseDim) {
-        Cluster<Model> c = new Cluster<Model>(noiseIDs, true, ClusterModel.CLUSTER);
-        res.addToplevelCluster(c);
+        res.addToplevelCluster(new Cluster<Model>(noiseIDs, true, ClusterModel.CLUSTER));
         processedIDs.addDBIDs(noiseIDs);
       }
       else if(noiseIDs.size() >= minPts) {
         LinearEquationSystem les = runDerivator(fulldatabase, dim - 1, noiseIDs);
-        Cluster<Model> c = new Cluster<Model>(noiseIDs, true, new LinearEquationModel(les));
-        res.addToplevelCluster(c);
+        res.addToplevelCluster(new Cluster<Model>(noiseIDs, true, new LinearEquationModel(les)));
         processedIDs.addDBIDs(noiseIDs);
       }
     }
@@ -351,12 +326,12 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
       for(Cluster<Model> c : res.getAllClusters()) {
         if(c.getModel() instanceof LinearEquationModel) {
-          LinearEquationModel s = (LinearEquationModel) c.getModel();
-          msg.append("\n Cluster: Dim: " + s.getLes().subspacedim() + " size: " + c.size());
+          msg.append("\n Cluster: Dim: ").append(((LinearEquationModel) c.getModel()).getLes().subspacedim());
         }
         else {
-          msg.append("\n Cluster: " + c.getModel().getClass().getName() + " size: " + c.size());
+          msg.append("\n Cluster: ").append(c.getModel().getClass().getName());
         }
+        msg.append(" size: ").append(c.size());
       }
       LOG.debugFine(msg.toString());
     }
@@ -391,50 +366,27 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // determine minimum and maximum function value of all functions
     double[] minMax = determineMinMaxDistance(relation, dim);
 
-    double d_min = minMax[0];
-    double d_max = minMax[1];
+    double d_min = minMax[0], d_max = minMax[1];
     double dIntervalLength = d_max - d_min;
     int numDIntervals = (int) FastMath.ceil(dIntervalLength / jitter);
     double dIntervalSize = dIntervalLength / numDIntervals;
-    double[] d_mins = new double[numDIntervals];
-    double[] d_maxs = new double[numDIntervals];
+    double[] d_mins = new double[numDIntervals],
+        d_maxs = new double[numDIntervals];
 
-    if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("d_min ").append(d_min);
-      msg.append("\nd_max ").append(d_max);
-      msg.append("\nnumDIntervals ").append(numDIntervals);
-      msg.append("\ndIntervalSize ").append(dIntervalSize);
-      LOG.debugFine(msg.toString());
-    }
-    else if(LOG.isVerbose()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("d_min ").append(d_min);
-      msg.append("\nd_max ").append(d_max);
-      msg.append("\nnumDIntervals ").append(numDIntervals);
-      msg.append("\ndIntervalSize ").append(dIntervalSize);
-      LOG.verbose(msg.toString());
+    if(LOG.isVerbose()) {
+      LOG.verbose(new StringBuilder().append("d_min ").append(d_min)//
+          .append("\nd_max ").append(d_max)//
+          .append("\nnumDIntervals ").append(numDIntervals)//
+          .append("\ndIntervalSize ").append(dIntervalSize).toString());
     }
 
     // alpha intervals
-    double[] alphaMin = new double[dim - 1];
-    double[] alphaMax = new double[dim - 1];
+    double[] alphaMin = new double[dim - 1], alphaMax = new double[dim - 1];
     Arrays.fill(alphaMax, Math.PI);
 
     for(int i = 0; i < numDIntervals; i++) {
-      if(i == 0) {
-        d_mins[i] = d_min;
-      }
-      else {
-        d_mins[i] = d_maxs[i - 1];
-      }
-
-      if(i < numDIntervals - 1) {
-        d_maxs[i] = d_mins[i] + dIntervalSize;
-      }
-      else {
-        d_maxs[i] = d_max - d_mins[i];
-      }
+      d_mins[i] = (i == 0) ? d_min : d_maxs[i - 1];
+      d_maxs[i] = (i < numDIntervals - 1) ? d_mins[i] + dIntervalSize : d_max - d_mins[i];
 
       HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
       ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
@@ -445,9 +397,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     }
 
     if(LOG.isDebuggingFiner()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("heap.size ").append(heap.size());
-      LOG.debugFiner(msg.toString());
+      LOG.debugFiner(new StringBuilder().append("heap.size: ").append(heap.size()).toString());
     }
   }
 
@@ -477,7 +427,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     }
     MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
     proxy.addRelation(prel);
-
     return prel;
   }
 
@@ -508,8 +457,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // Primary vector:
     double[] nn = new double[dim + 1];
     for(int i = 0; i < nn.length; i++) {
-        double alpha_i = i == alpha.length ? 0 : alpha[i];
-        nn[i] = ParameterizationFunction.sinusProduct(0, i, alpha) * FastMath.cos(alpha_i);
+      double alpha_i = i == alpha.length ? 0 : alpha[i];
+      nn[i] = ParameterizationFunction.sinusProduct(0, i, alpha) * FastMath.cos(alpha_i);
     }
     timesEquals(nn, 1. / euclideanLength(nn)); // Normalize
     // Find orthogonal system, in transposed form:
@@ -523,7 +472,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       double len = euclideanLength(e_i);
       // Make orthogonal to earlier (normal) basis vectors:
       for(int j = 0; j < found; j++) {
-        if (len < 1e-9) { // Disappeared, probably linear dependent
+        if(len < 1e-9) { // Disappeared, probably linear dependent
           break;
         }
         minusTimesEquals(e_i, basis[j], scalarProduct(e_i, basis[j]));
@@ -535,9 +484,9 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       timesEquals(e_i, 1. / len); // Normalize
       basis[found++] = e_i;
     }
-    if (found < dim) {
+    if(found < dim) {
       // Likely some numerical instability, should not happen.
-      for (int i = found; i < dim; i++) {
+      for(int i = found; i < dim; i++) {
         basis[i] = new double[nn.length]; // Append zero vectors
       }
     }
@@ -560,7 +509,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       }
       next = doDetermineNextIntervalAtMaxLevel(heap);
     }
-
     return next;
   }
 
@@ -585,7 +533,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       }
 
       if(heap.size() >= 40000) {
-        LOG.warning("Heap size > 40.000!!!");
+        LOG.warning("Heap size > 40.000! Stopping.");
         heap.clear();
         return null;
       }
@@ -638,8 +586,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     Arrays.fill(max, Math.PI);
     HyperBoundingBox box = new HyperBoundingBox(min, max);
 
-    double d_min = Double.POSITIVE_INFINITY;
-    double d_max = Double.NEGATIVE_INFINITY;
+    double d_min = Double.POSITIVE_INFINITY, d_max = Double.NEGATIVE_INFINITY;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ParameterizationFunction f = relation.get(iditer);
       HyperBoundingBox minMax = f.determineAlphaMinMax(box);
@@ -766,10 +713,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DoubleVector v = DoubleVector.wrap(relation.get(iter).getColumnVector());
-      prep.insert(iter, v);
+      prep.insert(iter, DoubleVector.wrap(relation.get(iter).getColumnVector()));
     }
-
     return proxy;
   }
 
@@ -867,23 +812,23 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter minptsP = new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minPts = minptsP.getValue();
       }
-      IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID);
-      maxlevelP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(maxlevelP)) {
         maxLevel = maxlevelP.getValue();
       }
-      IntParameter mindimP = new IntParameter(MINDIM_ID, 1);
-      mindimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter mindimP = new IntParameter(MINDIM_ID, 1)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(mindimP)) {
         minDim = mindimP.getValue();
       }
-      DoubleParameter jitterP = new DoubleParameter(JITTER_ID);
-      jitterP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter jitterP = new DoubleParameter(JITTER_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(jitterP)) {
         jitter = jitterP.getValue();
       }

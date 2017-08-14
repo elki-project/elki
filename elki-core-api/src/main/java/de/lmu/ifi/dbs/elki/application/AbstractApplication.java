@@ -100,14 +100,14 @@ public abstract class AbstractApplication {
    * Information for citation and version.
    */
   @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
-  title = "A Framework for Clustering Uncertain Data", //
-  booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
-  url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
+      title = "A Framework for Clustering Uncertain Data", //
+      booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
+      url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
   public static final String REFERENCE = "ELKI Release 0.7.0 (2015, August) published in:" + NEWLINE + NEWLINE //
-  + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
-  + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //
-  + "A Framework for Clustering Uncertain Data." + NEWLINE //
-  + "In Proceedings of the VLDB Endowment, 8(12), 2015." + NEWLINE;
+      + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
+      + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //
+      + "A Framework for Clustering Uncertain Data." + NEWLINE //
+      + "In Proceedings of the VLDB Endowment, 8(12), 2015." + NEWLINE;
 
   /**
    * Constructor.
@@ -210,10 +210,10 @@ public abstract class AbstractApplication {
     usage.append(REFERENCE);
 
     // Collect options
-    usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
-    OptionUtil.formatForConsole(usage, FormatUtil.getConsoleWidth(), "   ", options);
+    OptionUtil.formatForConsole(usage.append(NEWLINE).append("Parameters:").append(NEWLINE), //
+        FormatUtil.getConsoleWidth(), "   ", options);
 
-    // FIXME: re-add global constraints!
+    // FIXME: re-add output of global constraints!
     return usage.toString();
   }
 

@@ -114,13 +114,11 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
           }
           if(vec.getDimensionality() != dim) {
             if(LOG.isVeryVerbose()) {
-              StringBuilder buf = new StringBuilder();
-              buf.append("Skipping vector of wrong dimensionality ");
-              buf.append(vec.getDimensionality());
-              buf.append(':');
+              StringBuilder buf = new StringBuilder(1000) //
+                  .append("Skipping vector of wrong dimensionality ") //
+                  .append(vec.getDimensionality()).append(':');
               for(int i = 0; i < meta.size(); i++) {
-                buf.append(' ');
-                buf.append(source.data(i));
+                buf.append(' ').append(source.data(i));
               }
               LOG.veryverbose(buf.toString());
             }
@@ -202,8 +200,8 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter dimP = new IntParameter(DIM_P)//
-      .setOptional(true)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .setOptional(true)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       dim = config.grab(dimP) ? dimP.intValue() : -1;
     }
 

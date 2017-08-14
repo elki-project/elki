@@ -24,6 +24,8 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setMatrix;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.format;
+import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.formatTo;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -52,7 +54,6 @@ import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -62,15 +63,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * <p>
  * Dependency derivator computes quantitatively linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
- * </p>
  *
+ * Reference:
  * <p>
- * Reference: <br>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek: Deriving
- * Quantitative Dependencies for Correlation Clusters. <br>
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek:<br>
+ * Deriving Quantitative Dependencies for Correlation Clusters. <br>
  * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
  * Philadelphia, PA 2006.
  * </p>
@@ -215,22 +214,18 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
     else {
       double[][] transposedWeakEigenvectors = transpose(weakEigenvectors);
       if(LOG.isDebugging()) {
-        StringBuilder log = new StringBuilder();
-        log.append("Strong Eigenvectors:\n");
-        FormatUtil.formatTo(log, pcares.getStrongEigenvectors(), " [", "]\n", ", ", nf).append('\n');
-        log.append("Transposed weak Eigenvectors:\n");
-        FormatUtil.formatTo(log, transposedWeakEigenvectors, " [", "]\n", ", ", nf).append('\n');
-        log.append("Eigenvalues:\n");
-        log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
-        LOG.debugFine(log.toString());
+        StringBuilder msg = new StringBuilder(1000);
+        formatTo(msg.append("Strong Eigenvectors:\n"), pcares.getStrongEigenvectors(), " [", "]\n", ", ", nf);
+        formatTo(msg.append("\nTransposed weak Eigenvectors:\n"), transposedWeakEigenvectors, " [", "]\n", ", ", nf);
+        formatTo(msg.append("\nEigenvalues:\n"), pcares.getEigenvalues(), ", ", nf);
+        LOG.debugFine(msg.toString());
       }
       double[] b = times(transposedWeakEigenvectors, centroid);
       if(LOG.isDebugging()) {
-        StringBuilder log = new StringBuilder();
-        log.append("Centroid:\n").append(centroid).append('\n');
-        log.append("tEV * Centroid\n");
-        log.append(FormatUtil.format(b));
-        LOG.debugFine(log.toString());
+        StringBuilder msg = new StringBuilder(1000);
+        formatTo(msg.append("Centroid:\n"), centroid, ", ", nf);
+        formatTo(msg.append("\ntEV * Centroid\n"), b, ", ", nf);
+        LOG.debugFine(msg.toString());
       }
 
       // +1 == + B[0].length
@@ -239,7 +234,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       setCol(gaussJordan, transposedWeakEigenvectors[0].length, b);
 
       if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, " [", "]\n", ", ", nf));
+        LOG.debugFiner("Gauss-Jordan-Elimination of " + format(gaussJordan, " [", "]\n", ", ", nf));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length];
@@ -252,9 +247,9 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
 
       if(LOG.isDebuggingFine()) {
         StringBuilder log = new StringBuilder();
-        log.append("Solution:\n");
-        log.append("Standard deviation ").append(sol.getStandardDeviation());
-        log.append(lq.equationsToString(nf.getMaximumFractionDigits()));
+        log.append("Solution:\n") //
+            .append("Standard deviation ").append(sol.getStandardDeviation()) //
+            .append(lq.equationsToString(nf.getMaximumFractionDigits()));
         LOG.debugFine(log.toString());
       }
     }
@@ -329,15 +324,15 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4);
-      outputAccuracyP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(outputAccuracyP)) {
         outputAccuracy = outputAccuracyP.getValue();
       }
 
-      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID);
-      sampleSizeP.setOptional(true);
-      sampleSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID) //
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleSizeP)) {
         sampleSize = sampleSizeP.getValue();
       }

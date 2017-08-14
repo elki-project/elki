@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotSame;
 
 import org.junit.Test;
 
@@ -71,7 +71,7 @@ public class IntegerRankTieNormalizationTest extends AbstractDataSourceTest {
           f++;
         }
         // Only iff the frequencies is even, the values will be odd.
-        assertTrue("Even/odd rule", ((f & 1) == 1) == ((v & 1) == 0));
+        assertNotSame("Even/odd rule", (f & 1), (v & 1));
         assertEquals("Bad value at position " + s, s + i - 1, v);
         assertEquals("Bad frequency at position " + s, i - s, f);
       }

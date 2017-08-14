@@ -61,23 +61,21 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import net.jafama.FastMath;
 
 /**
- * <p/>
  * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify
  * dense clusters in subspaces of maximum dimensionality.
- * </p>
- * <p/>
+ * 
  * The implementation consists of two steps: <br>
  * 1. Identification of subspaces that contain clusters <br>
  * 2. Identification of clusters
- * </p>
- * <p/>
+ * 
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
- * </p>
+ * 
+ * Reference:
  * <p>
- * Reference: <br>
- * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: Automatic Subspace
- * Clustering of High Dimensional Data for Data Mining Applications. <br>
+ * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan:<br>
+ * Automatic Subspace Clustering of High Dimensional Data for Data Mining
+ * Applications. <br>
  * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
  * </p>
  * 
@@ -92,41 +90,15 @@ import net.jafama.FastMath;
  */
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
-@Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
+@Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", //
+    title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", //
+    booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", //
+    url = "http://dx.doi.org/10.1145/276304.276314")
 public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(CLIQUE.class);
-
-  /**
-   * Parameter to specify the number of intervals (units) in each dimension,
-   * must be an integer greater than 0.
-   * <p>
-   * Key: {@code -clique.xsi}
-   * </p>
-   */
-  public static final OptionID XSI_ID = new OptionID("clique.xsi", "The number of intervals (units) in each dimension.");
-
-  /**
-   * Parameter to specify the density threshold for the selectivity of a unit,
-   * where the selectivity is the fraction of total feature vectors contained in
-   * this unit, must be a double greater than 0 and less than 1.
-   * <p>
-   * Key: {@code -clique.tau}
-   * </p>
-   */
-  public static final OptionID TAU_ID = new OptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
-
-  /**
-   * Flag to indicate that only subspaces with large coverage (i.e. the fraction
-   * of the database that is covered by the dense units) are selected, the rest
-   * will be pruned.
-   * <p>
-   * Key: {@code -clique.prune}
-   * </p>
-   */
-  public static final OptionID PRUNE_ID = new OptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
    * Holds the value of {@link #XSI_ID}.
@@ -311,9 +283,9 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
     if(LOG.isDebuggingFiner()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("   minima: ").append(FormatUtil.format(minima, ", ", FormatUtil.NF2));
-      msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", FormatUtil.NF2));
-      msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", FormatUtil.NF2));
+      msg.append("   minima: ").append(FormatUtil.format(minima, ", ", FormatUtil.NF2)) //
+          .append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", FormatUtil.NF2)) //
+          .append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", FormatUtil.NF2));
       LOG.debugFiner(msg.toString());
     }
 
@@ -581,6 +553,38 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the number of intervals (units) in each dimension,
+     * must be an integer greater than 0.
+     * <p>
+     * Key: {@code -clique.xsi}
+     * </p>
+     */
+    public static final OptionID XSI_ID = new OptionID("clique.xsi", "The number of intervals (units) in each dimension.");
+
+    /**
+     * Parameter to specify the density threshold for the selectivity of a unit,
+     * where the selectivity is the fraction of total feature vectors contained
+     * in
+     * this unit, must be a double greater than 0 and less than 1.
+     * <p>
+     * Key: {@code -clique.tau}
+     * </p>
+     */
+    public static final OptionID TAU_ID = new OptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
+
+    /**
+     * Flag to indicate that only subspaces with large coverage (i.e. the
+     * fraction
+     * of the database that is covered by the dense units) are selected, the
+     * rest
+     * will be pruned.
+     * <p>
+     * Key: {@code -clique.prune}
+     * </p>
+     */
+    public static final OptionID PRUNE_ID = new OptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
+
     protected int xsi;
 
     protected double tau;

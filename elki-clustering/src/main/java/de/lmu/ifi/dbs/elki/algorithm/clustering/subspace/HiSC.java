@@ -204,11 +204,11 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         if(dist1 > alpha || dist2 > alpha) {
           subspaceDim++;
           if(LOG.isDebugging()) {
-            StringBuilder msg = new StringBuilder();
-            msg.append("dist1 ").append(dist1);
-            msg.append("\ndist2 ").append(dist2);
-            msg.append("\nsubspaceDim ").append(subspaceDim);
-            msg.append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
+            StringBuilder msg = new StringBuilder(100);
+            msg.append("dist1 ").append(dist1) //
+                .append("\ndist2 ").append(dist2) //
+                .append("\nsubspaceDim ").append(subspaceDim) //
+                .append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
             LOG.debugFine(msg.toString());
           }
         }

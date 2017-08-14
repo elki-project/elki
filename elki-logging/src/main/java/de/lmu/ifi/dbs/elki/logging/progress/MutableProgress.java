@@ -53,21 +53,10 @@ public class MutableProgress extends AbstractProgress {
   @Override
   public StringBuilder appendToBuffer(StringBuilder buf) {
     int percentage = (int) (getProcessed() * 100.0 / total);
-    buf.append(getTask());
-    buf.append(": ");
-    buf.append(getProcessed());
-    buf.append("/");
-    buf.append(total);
-    buf.append(" [");
-    if (percentage < 100) {
-      buf.append(' ');
-    }
-    if (percentage < 10) {
-      buf.append(' ');
-    }
-    buf.append(percentage);
-    buf.append("%]");
-    return buf;
+    return buf.append(getTask()).append(": ")//
+        .append(getProcessed()).append('/').append(total).append(" [") //
+        .append(percentage < 100 ? "  " : percentage < 10 ? " " : "") //
+        .append(percentage).append("%]");
   }
 
   /**
@@ -87,7 +76,7 @@ public class MutableProgress extends AbstractProgress {
    * @throws IllegalArgumentException
    */
   public void setTotal(int total) throws IllegalArgumentException {
-    if (getProcessed() > total) {
+    if(getProcessed() > total) {
       throw new IllegalArgumentException(getProcessed() + " exceeds total: " + total);
     }
     this.total = total;

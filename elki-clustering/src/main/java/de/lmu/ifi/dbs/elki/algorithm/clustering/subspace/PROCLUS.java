@@ -73,14 +73,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
- * <p/>
  * The PROCLUS algorithm, an algorithm to find subspace clusters in high
  * dimensional spaces.
- * </p>
- * <p/>
- * Reference: <br>
- * C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park: Fast
- * Algorithms for Projected Clustering. <br>
+ * 
+ * Reference:
+ * <p>
+ * C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park:<br>
+ * Fast Algorithms for Projected Clustering. <br>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  * </p>
  *
@@ -94,9 +93,9 @@ import net.jafama.FastMath;
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", //
-title = "Fast Algorithms for Projected Clustering", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
-url = "http://dx.doi.org/10.1145/304181.304188")
+    title = "Fast Algorithms for Projected Clustering", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+    url = "http://dx.doi.org/10.1145/304181.304188")
 public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<SubspaceModel>, V> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
@@ -155,13 +154,10 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     ArrayDBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append('\n');
-      msg.append("sampleSize ").append(sampleSize).append('\n');
-      msg.append("sampleSet ").append(sampleSet).append('\n');
-      msg.append("medoidSize ").append(medoidSize).append('\n');
-      msg.append("m ").append(medoids).append('\n');
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(new StringBuilder().append("sampleSize ").append(sampleSize).append('\n') //
+          .append("sampleSet ").append(sampleSet).append('\n') //
+          .append("medoidSize ").append(medoidSize).append('\n') //
+          .append("m ").append(medoids).toString());
     }
 
     // iterative phase
@@ -174,10 +170,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     ArrayDBIDs m_current = initialSet(medoids, k, random);
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append('\n');
-      msg.append("m_c ").append(m_current).append('\n');
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(new StringBuilder().append("m_c ").append(m_current).toString());
     }
 
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
@@ -440,11 +433,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       BitsUtil.setI(dims_i, z_ij.dimj);
 
       if(LOG.isDebugging()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append('\n');
-        msg.append("z_ij ").append(z_ij).append('\n');
-        msg.append("D_i ").append(BitsUtil.toString(dims_i)).append('\n');
-        LOG.debugFiner(msg.toString());
+        LOG.debugFiner(new StringBuilder().append("z_ij ").append(z_ij).append('\n') //
+            .append("D_i ").append(BitsUtil.toString(dims_i)).toString());
       }
     }
     return dimensionMap;
@@ -514,11 +504,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       BitsUtil.setI(dims_i, z_ij.dimj);
 
       if(LOG.isDebugging()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append('\n');
-        msg.append("z_ij ").append(z_ij).append('\n');
-        msg.append("D_i ").append(BitsUtil.toString(dims_i)).append('\n');
-        LOG.debugFiner(msg.toString());
+        LOG.debugFiner(new StringBuilder().append("z_ij ").append(z_ij).append('\n') //
+            .append("D_i ").append(BitsUtil.toString(dims_i)).toString());
       }
     }
 
@@ -529,8 +516,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       if(dims_i == null) {
         continue;
       }
-      PROCLUSCluster c_i = clusters.get(i);
-      result.add(new Pair<>(c_i.centroid, dims_i));
+      result.add(new Pair<>(clusters.get(i).centroid, dims_i));
     }
     return result;
   }
@@ -565,8 +551,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       }
       // add p to cluster with mindist
       assert best >= 0;
-      ModifiableDBIDs ids = clusterIDs[best];
-      ids.add(it);
+      clusterIDs[best].add(it);
     }
 
     ArrayList<PROCLUSCluster> clusters = new ArrayList<>(m_current.size());
@@ -583,10 +568,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append('\n');
-      msg.append("clusters ").append(clusters).append('\n');
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(new StringBuilder().append("clusters ").append(clusters).toString());
     }
     return clusters;
   }
@@ -619,8 +601,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       }
       // add p to cluster with mindist
       assert minDist >= 0.;
-      ModifiableDBIDs ids = clusterIDs.get(best);
-      ids.add(it);
+      clusterIDs.get(best).add(it);
     }
 
     List<PROCLUSCluster> clusters = new ArrayList<>();
@@ -634,10 +615,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append('\n');
-      msg.append("clusters ").append(clusters).append('\n');
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(new StringBuilder().append("clusters ").append(clusters).toString());
     }
     return clusters;
   }
@@ -782,13 +760,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     @Override
     public int compareTo(DoubleIntInt o) {
-      if(this.first < o.first) {
-        return -1;
-      }
-      if(this.first > o.first) {
-        return +1;
-      }
-      return 0;
+      return this.first < o.first ? -1 : this.first > o.first ? 1 : 0;
     }
   }
 
@@ -835,14 +807,11 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         if(notFirst) {
           result.append(',');
         }
-        else {
-          notFirst = true;
-        }
+        notFirst = true;
         result.append(d);
       }
-      result.append(']');
-
-      result.append("\nCentroid: ").append(centroid);
+      result.append(']') //
+          .append("\nCentroid: ").append(centroid);
       return result.toString();
     }
 
@@ -895,24 +864,24 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      IntParameter k_iP = new IntParameter(K_I_ID, 30);
-      k_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter k_iP = new IntParameter(K_I_ID, 30) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(k_iP)) {
         k_i = k_iP.getValue();
       }
-      IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter lP = new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         l = lP.getValue();
       }
 
       IntParameter m_iP = new IntParameter(M_I_ID, 10) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(m_iP)) {
         m_i = m_iP.getValue();
       }

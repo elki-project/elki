@@ -574,13 +574,11 @@ public class KMLOutputHandler implements ResultHandler {
    * @return Buffer
    */
   private StringBuilder makeDescription(Cluster<?> c) {
-    StringBuilder buf = new StringBuilder();
-    buf.append("<div>");
-    buf.append(c.getNameAutomatic());
-    buf.append("<br />");
-    buf.append("Size: " + c.size());
-    buf.append("</div>");
-    return buf;
+    return new StringBuilder(200).append("<div>")//
+        .append(c.getNameAutomatic())//
+        .append("<br />")//
+        .append("Size: ").append(c.size()) //
+        .append("</div>");
   }
 
   /**

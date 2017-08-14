@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -132,11 +131,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("\n eps ").append(Arrays.asList(epsilon));
-      msg.append("\n minpts ").append(minpts);
-      msg.append("\n strategy ").append(strategy);
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(new StringBuilder().append("eps ").append(Arrays.asList(epsilon)) //
+          .append("\n minpts ").append(minpts) //
+          .append("\n strategy ").append(strategy).toString());
     }
 
     long start = System.currentTimeMillis();
@@ -153,10 +150,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     // epsilons as string
     RangeQuery<V>[] rangeQueries = initRangeQueries(relation, dim);
 
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      StringBuilder msg = new StringBuilder();
-
-      if(LOG.isDebugging()) {
+      if(msg != null) {
+        msg.setLength(0);
         msg.append("\nid = ").append(DBIDUtil.toString(it));
         // msg.append(" ").append(database.get(id));
         // msg.append(" ").append(database.getObjectLabelQuery().get(id));
@@ -165,31 +162,28 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       // determine neighbors in each dimension
       ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
       for(int d = 0; d < dim; d++) {
-        DoubleDBIDList qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
-        allNeighbors[d] = DBIDUtil.newHashSet(qrList);
+        allNeighbors[d] = DBIDUtil.newHashSet(rangeQueries[d].getRangeForDBID(it, epsilon[d]));
       }
 
-      if(LOG.isDebugging()) {
+      if(msg != null) {
         for(int d = 0; d < dim; d++) {
-          msg.append("\n neighbors [").append(d).append(']');
-          msg.append(" (").append(allNeighbors[d].size()).append(") = ");
-          msg.append(allNeighbors[d]);
+          msg.append("\n neighbors [").append(d).append(']') //
+              .append(" (").append(allNeighbors[d].size()).append(") = ").append(allNeighbors[d]);
         }
       }
 
       storage.put(it, determinePreferenceVector(relation, allNeighbors, msg));
 
-      if(LOG.isDebugging()) {
+      if(msg != null) {
         LOG.debugFine(msg.toString());
       }
-
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
 
-    long end = System.currentTimeMillis();
     // TODO: re-add timing code!
     if(LOG.isVerbose()) {
+      long end = System.currentTimeMillis();
       long elapsedTime = end - start;
       LOG.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
@@ -207,12 +201,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(relation, neighborIDs, msg);
     }
-    else if(strategy.equals(Strategy.MAX_INTERSECTION)) {
+    if(strategy.equals(Strategy.MAX_INTERSECTION)) {
       return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
     }
-    else {
-      throw new IllegalStateException("Should never happen!");
-    }
+    throw new IllegalStateException("Should never happen!");
   }
 
   /**
@@ -249,7 +241,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     // result of apriori
     List<Itemset> frequentItemsets = aprioriResult.getItemsets();
-    if(LOG.isDebugging()) {
+    if(msg != null) {
       msg.append("\n Frequent itemsets: ").append(frequentItemsets);
     }
     int maxSupport = 0;
@@ -263,10 +255,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       }
     }
 
-    if(LOG.isDebugging()) {
-      msg.append("\n preference ");
-      msg.append(BitsUtil.toStringLow(preferenceVector, dimensionality));
-      msg.append('\n');
+    if(msg != null) {
+      msg.append("\n preference ") //
+          .append(BitsUtil.toStringLow(preferenceVector, dimensionality)) //
+          .append('\n');
       LOG.debugFine(msg.toString());
     }
 
@@ -291,7 +283,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         candidates.put(i, s_i);
       }
     }
-    if(LOG.isDebugging()) {
+    if(msg != null) {
       msg.append("\n candidates ").append(candidates.keySet());
     }
 
@@ -310,16 +302,12 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         if(intersection.size() < minpts) {
           break;
         }
-        else {
-          BitsUtil.setI(preferenceVector, i);
-        }
+        BitsUtil.setI(preferenceVector, i);
       }
     }
 
-    if(LOG.isDebugging()) {
-      msg.append("\n preference ");
-      msg.append(BitsUtil.toStringLow(preferenceVector, dimensionality));
-      msg.append('\n');
+    if(msg != null) {
+      msg.append("\n preference ").append(BitsUtil.toStringLow(preferenceVector, dimensionality));
       LOG.debug(msg.toString());
     }
 
@@ -549,7 +537,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter minptsP = new IntParameter(MINPTS_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           minpts = minptsP.getValue();
         }
@@ -557,7 +545,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         // parameter epsilon
         // todo: constraint auf positive werte
         final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true) //
-        .setDefaultValue(new double[] { DEFAULT_EPSILON });
+            .setDefaultValue(new double[] { DEFAULT_EPSILON });
         if(config.grab(epsilonP)) {
           epsilon = epsilonP.getValue().clone();
 

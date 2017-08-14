@@ -116,6 +116,25 @@ public class TextWriterStream {
   }
 
   /**
+   * Print an object into the comments section
+   * 
+   * @param line object to print into commments
+   */
+  public void commentPrint(CharSequence line) {
+    comment.append(line);
+  }
+
+  /**
+   * Print an object into the comments section with trailing newline.
+   * 
+   * @param line object to print into comments
+   */
+  public void commentPrintLn(CharSequence line) {
+    comment.append(line);
+    comment.append(NEWLINE);
+  }
+
+  /**
    * Print an object into the comments section with trailing newline.
    * 
    * @param line object to print into comments
@@ -147,11 +166,11 @@ public class TextWriterStream {
    * @param o object to print
    */
   public void inlinePrint(Object o) {
-    if (forceincomments) {
+    if(forceincomments) {
       commentPrint(o);
       return;
     }
-    if (inline.length() > 0) {
+    if(inline.length() > 0) {
       inline.append(SEPARATOR);
     }
     // remove newlines
@@ -159,7 +178,7 @@ public class TextWriterStream {
     // escaping
     str = str.replace("\\", "\\\\").replace("\"", "\\\"");
     // when needed, add quotes.
-    if (str.contains(SEPARATOR)) {
+    if(str.contains(SEPARATOR)) {
       str = "\"" + str + "\"";
     }
     inline.append(str);
@@ -172,11 +191,11 @@ public class TextWriterStream {
    * @param o object to print.
    */
   public void inlinePrintNoQuotes(Object o) {
-    if (forceincomments) {
+    if(forceincomments) {
       commentPrint(o);
       return;
     }
-    if (inline.length() > 0) {
+    if(inline.length() > 0) {
       inline.append(SEPARATOR);
     }
     // remove newlines
@@ -190,11 +209,11 @@ public class TextWriterStream {
    * Flush output: write inline data, then write comment section. Reset streams.
    */
   public void flush() {
-    if (inline.length() > 0) {
+    if(inline.length() > 0) {
       outStream.println(inline);
     }
     inline.setLength(0);
-    if (comment.length() > 0) {
+    if(comment.length() > 0) {
       quotePrintln(outStream, comment.toString());
     }
     comment.setLength(0);
@@ -208,10 +227,11 @@ public class TextWriterStream {
    */
   private void quotePrintln(PrintStream outStream, String data) {
     String[] lines = data.split("\r\n|\r|\n");
-    for (String line : lines) {
-      if (line.equals(COMMENTSEP)) {
+    for(String line : lines) {
+      if(line.equals(COMMENTSEP)) {
         outStream.println(COMMENTSEP);
-      } else {
+      }
+      else {
         outStream.println(QUOTE + line);
       }
     }
@@ -224,16 +244,17 @@ public class TextWriterStream {
    * @return appropriate write, if available
    */
   public TextWriterWriterInterface<?> getWriterFor(Object o) {
-    if (o == null) {
+    if(o == null) {
       return null;
     }
     TextWriterWriterInterface<?> writer = writers.getHandler(o);
-    if (writer == null) {
+    if(writer == null) {
       try {
-        if (o.getClass().getMethod("toString").getDeclaringClass() != Object.class) {
+        if(o.getClass().getMethod("toString").getDeclaringClass() != Object.class) {
           return fallbackwriter;
         }
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         return null;
       }
     }

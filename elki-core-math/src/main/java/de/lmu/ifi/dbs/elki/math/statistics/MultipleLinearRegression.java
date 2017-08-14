@@ -142,13 +142,12 @@ public class MultipleLinearRegression {
    */
   @Override
   public String toString() {
-    StringBuilder msg = new StringBuilder();
-    msg.append("x = ").append(FormatUtil.format(x, 9, 4, "[", "]\n", ", "));
-    msg.append("\ny = ").append(FormatUtil.format(y, 9, 4));
-    msg.append("\nb = ").append(FormatUtil.format(b, 9, 4));
-    msg.append("\ne = ").append(FormatUtil.format(e, 9, 4));
-    msg.append("error variance = ").append(FormatUtil.NF4.format(variance));
-    return msg.toString();
+    StringBuilder msg = new StringBuilder(1000);
+    FormatUtil.formatTo(msg.append("x = "), x, "[", "]\n", ", ", FormatUtil.NF8);
+    FormatUtil.formatTo(msg.append("\ny = "), y, ", ", FormatUtil.NF8);
+    FormatUtil.formatTo(msg.append("\nb = "), b, ", ", FormatUtil.NF8);
+    FormatUtil.formatTo(msg.append("\ne = "), e, ", ", FormatUtil.NF8);
+    return msg.append("error variance = ").append(FormatUtil.NF4.format(variance)).toString();
   }
 
   /**

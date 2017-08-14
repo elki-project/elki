@@ -73,7 +73,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
    * Test with default parameters and for correcting handling of NaN and Inf.
    */
   @Test
-  public void NaNParameters() {
+  public void testNaNParameters() {
     String filename = UNITTEST + "nan-test-1.csv";
     // Allow loading test data from resources.
     AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());

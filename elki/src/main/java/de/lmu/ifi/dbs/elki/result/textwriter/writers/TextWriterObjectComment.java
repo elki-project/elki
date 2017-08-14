@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * 
  * @author Erich Schubert
  * @since 0.2
- * 
  */
 public class TextWriterObjectComment extends TextWriterWriterInterface<Object> {
   /**
@@ -37,13 +36,13 @@ public class TextWriterObjectComment extends TextWriterWriterInterface<Object> {
    */
   @Override
   public void write(TextWriterStream out, String label, Object object) {
-    String res = "";
+    StringBuilder buf = new StringBuilder(100);
     if(label != null) {
-      res = res + label + "=";
+      buf.append(label).append('=');
     }
     if(object != null) {
-      res = res + object.toString();
+      buf.append(object.toString());
     }
-    out.commentPrintLn(res);
+    out.commentPrintLn(buf);
   }
 }
