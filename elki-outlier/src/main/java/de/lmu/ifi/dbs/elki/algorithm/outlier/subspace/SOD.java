@@ -311,7 +311,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     public void writeToText(TextWriterStream out, String label) {
       out.commentPrintLn(this.getClass().getSimpleName() + ":");
       out.commentPrintLn("relevant attributes (starting with 0): " + BitsUtil.toString(weightVector, ", ", 0));
-      out.commentPrintLn("center of neighborhood: " + out.normalizationRestore(center).toString());
+      out.commentPrintLn("center of neighborhood: " + center.toString());
       out.commentPrintSeparator();
     }
   }

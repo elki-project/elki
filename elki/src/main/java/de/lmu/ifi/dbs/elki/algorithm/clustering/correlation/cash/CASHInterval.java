@@ -240,8 +240,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
   @Override
   public boolean equals(Object o) {
     return this == o || (o != null && getClass() == o.getClass() //
-        && this.intervalID == ((CASHInterval) o).intervalID //
-        && super.equals(o));
+        && this.intervalID == ((CASHInterval) o).intervalID);
   }
 
   @Override

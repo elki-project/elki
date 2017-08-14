@@ -381,10 +381,10 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     final int dim = RelationUtil.dimensionality(database);
-    double[][] averageDistances = new double[medoids.size()][];
+    final int numc = medoids.size();
+    double[][] averageDistances = new double[numc][];
 
-    int i = 0;
-    for(DBIDArrayIter iter = medoids.iter(); iter.valid(); iter.advance(), i++) {
+    for(DBIDArrayIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       V medoid_i = database.get(iter);
       DBIDs l_i = localities.get(iter);
       double[] x_i = new double[dim];
@@ -397,47 +397,11 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       for(int d = 0; d < dim; d++) {
         x_i[d] /= l_i.size();
       }
-      averageDistances[i] = x_i;
+      averageDistances[iter.getOffset()] = x_i;
     }
 
-    long[][] dimensionMap = new long[medoids.size()][((dim - 1) >> 6) + 1];
-    List<DoubleIntInt> z_ijs = new ArrayList<>();
-    for(i = 0; i < medoids.size(); i++) {
-      double[] x_i = averageDistances[i];
-      // y_i
-      double y_i = 0;
-      for(int j = 0; j < dim; j++) {
-        y_i += x_i[j];
-      }
-      y_i /= dim;
-
-      // sigma_i
-      double sigma_i = 0;
-      for(int j = 0; j < dim; j++) {
-        double diff = x_i[j] - y_i;
-        sigma_i += diff * diff;
-      }
-      sigma_i /= (dim - 1);
-      sigma_i = FastMath.sqrt(sigma_i);
-
-      for(int j = 0; j < dim; j++) {
-        z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));
-      }
-    }
-    Collections.sort(z_ijs);
-
-    int max = Math.max(k * l, 2);
-    for(int m = 0; m < max; m++) {
-      DoubleIntInt z_ij = z_ijs.get(m);
-      long[] dims_i = dimensionMap[z_ij.dimi];
-      BitsUtil.setI(dims_i, z_ij.dimj);
-
-      if(LOG.isDebugging()) {
-        LOG.debugFiner(new StringBuilder().append("z_ij ").append(z_ij).append('\n') //
-            .append("D_i ").append(BitsUtil.toString(dims_i)).toString());
-      }
-    }
-    return dimensionMap;
+    List<DoubleIntInt> z_ijs = computeZijs(averageDistances, dim);
+    return computeDimensionMap(z_ijs, dim, numc);
   }
 
   /**
@@ -470,8 +434,31 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       averageDistances[i] = x_i;
     }
 
-    List<DoubleIntInt> z_ijs = new ArrayList<>();
+    List<DoubleIntInt> z_ijs = computeZijs(averageDistances, dim);
+    long[][] dimensionMap = computeDimensionMap(z_ijs, dim, numc);
+
+    // mapping cluster -> dimensions
+    List<Pair<double[], long[]>> result = new ArrayList<>(numc);
     for(int i = 0; i < numc; i++) {
+      long[] dims_i = dimensionMap[i];
+      if(dims_i == null) {
+        continue;
+      }
+      result.add(new Pair<>(clusters.get(i).centroid, dims_i));
+    }
+    return result;
+  }
+
+  /**
+   * Compute the z_ij values.
+   *
+   * @param averageDistances Average distances
+   * @param dim Dimensions
+   * @return z_ij values
+   */
+  private List<DoubleIntInt> computeZijs(double[][] averageDistances, final int dim) {
+    List<DoubleIntInt> z_ijs = new ArrayList<>(averageDistances.length * dim);
+    for(int i = 0; i < averageDistances.length; i++) {
       double[] x_i = averageDistances[i];
       // y_i
       double y_i = 0;
@@ -494,7 +481,18 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       }
     }
     Collections.sort(z_ijs);
+    return z_ijs;
+  }
 
+  /**
+   * Compute the dimension map.
+   *
+   * @param z_ijs z_ij values
+   * @param dim Number of dimensions
+   * @param numc Number of clusters
+   * @return Bitmap of dimensions used
+   */
+  private long[][] computeDimensionMap(List<DoubleIntInt> z_ijs, final int dim, final int numc) {
     // mapping cluster index -> dimensions
     long[][] dimensionMap = new long[numc][((dim - 1) >> 6) + 1];
     int max = Math.max(k * l, 2);
@@ -508,17 +506,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
             .append("D_i ").append(BitsUtil.toString(dims_i)).toString());
       }
     }
-
-    // mapping cluster -> dimensions
-    List<Pair<double[], long[]>> result = new ArrayList<>();
-    for(int i = 0; i < numc; i++) {
-      long[] dims_i = dimensionMap[i];
-      if(dims_i == null) {
-        continue;
-      }
-      result.add(new Pair<>(clusters.get(i).centroid, dims_i));
-    }
-    return result;
+    return dimensionMap;
   }
 
   /**

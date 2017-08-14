@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.HandlerList;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory oneway - -
- *              wraps
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory
  */
 public class TextWriterStream {
   /**
@@ -81,12 +80,6 @@ public class TextWriterStream {
   public static final String SER_MARKER = "Serialization class:";
 
   /**
-   * Force incomments flag
-   */
-  // TODO: solve this more gracefully
-  private boolean forceincomments = false;
-
-  /**
    * Fallback writer, using toString.
    */
   private TextWriterWriterInterface<?> fallbackwriter;
@@ -130,8 +123,7 @@ public class TextWriterStream {
    * @param line object to print into comments
    */
   public void commentPrintLn(CharSequence line) {
-    comment.append(line);
-    comment.append(NEWLINE);
+    comment.append(line).append(NEWLINE);
   }
 
   /**
@@ -140,8 +132,7 @@ public class TextWriterStream {
    * @param line object to print into comments
    */
   public void commentPrintLn(Object line) {
-    comment.append(line);
-    comment.append(NEWLINE);
+    comment.append(line).append(NEWLINE);
   }
 
   /**
@@ -155,7 +146,7 @@ public class TextWriterStream {
    * Print a separator line in the comments section.
    */
   public void commentPrintSeparator() {
-    comment.append(COMMENTSEP + NEWLINE);
+    comment.append(COMMENTSEP).append(NEWLINE);
   }
 
   /**
@@ -166,10 +157,6 @@ public class TextWriterStream {
    * @param o object to print
    */
   public void inlinePrint(Object o) {
-    if(forceincomments) {
-      commentPrint(o);
-      return;
-    }
     if(inline.length() > 0) {
       inline.append(SEPARATOR);
     }
@@ -191,10 +178,6 @@ public class TextWriterStream {
    * @param o object to print.
    */
   public void inlinePrintNoQuotes(Object o) {
-    if(forceincomments) {
-      commentPrint(o);
-      return;
-    }
     if(inline.length() > 0) {
       inline.append(SEPARATOR);
     }
@@ -226,14 +209,12 @@ public class TextWriterStream {
    * @param data data to print
    */
   private void quotePrintln(PrintStream outStream, String data) {
-    String[] lines = data.split("\r\n|\r|\n");
+    String[] lines = data.split("\n");
     for(String line : lines) {
-      if(line.equals(COMMENTSEP)) {
-        outStream.println(COMMENTSEP);
+      if(!line.equals(COMMENTSEP)) {
+        outStream.append(QUOTE);
       }
-      else {
-        outStream.println(QUOTE + line);
-      }
+      outStream.append(line).append(NEWLINE);
     }
   }
 
@@ -248,47 +229,19 @@ public class TextWriterStream {
       return null;
     }
     TextWriterWriterInterface<?> writer = writers.getHandler(o);
-    if(writer == null) {
-      try {
-        if(o.getClass().getMethod("toString").getDeclaringClass() != Object.class) {
-          return fallbackwriter;
-        }
-      }
-      catch(Exception e) {
-        return null;
-      }
+    if(writer != null) {
+      return writer;
     }
-    return writer;
-  }
-
-  /**
-   * Restore a vector undoing any normalization that was applied. (This class
-   * does not support normalization, it is only provided by derived classes,
-   * which will then have to use generics.)
-   * 
-   * @param <O> Object class
-   * @param v vector to restore
-   * @return restored value.
-   */
-  public <O> O normalizationRestore(O v) {
-    return v;
-  }
-
-  /**
-   * Test force-in-comments flag.
-   * 
-   * @return flag value
-   */
-  protected boolean isForceincomments() {
-    return forceincomments;
-  }
-
-  /**
-   * Set the force-in-comments flag.
-   * 
-   * @param forceincomments the new flag value
-   */
-  protected void setForceincomments(boolean forceincomments) {
-    this.forceincomments = forceincomments;
+    try {
+      final Class<?> decl = o.getClass().getMethod("toString").getDeclaringClass();
+      if(decl == Object.class) {
+        return null; // TODO: cache this, too
+      }
+      writers.insertHandler(decl, fallbackwriter);
+      return fallbackwriter;
+    }
+    catch(NoSuchMethodException | SecurityException e) {
+      return null;
+    }
   }
 }
