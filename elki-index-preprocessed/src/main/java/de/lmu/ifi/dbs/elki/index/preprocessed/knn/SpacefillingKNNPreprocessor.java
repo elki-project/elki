@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
-import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -200,7 +199,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       }
 
       // Sort spatially
-      final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+      final double[] mms = SpatialSorter.computeMinMax(curves.get(0));
       // Find maximum extend.
       double extend = 0;
       for(int d2 = 0; d2 < mms.length; d2 += 2) {

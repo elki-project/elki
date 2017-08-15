@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "D. Hilbert", //
     title = "Über die stetige Abbildung einer Linie auf ein Flächenstück", //
     booktitle = "Mathematische Annalen, 38(3)")
-public class HilbertSpatialSorter extends AbstractSpatialSorter {
+public class HilbertSpatialSorter implements SpatialSorter {
   /**
    * Static instance.
    */
@@ -64,12 +64,12 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
+  public void sort(List<? extends SpatialComparable> objs, int start, int end, double[] minmax, int[] dims) {
     final int dim = (dims != null) ? dims.length : (minmax.length >> 1);
-    List<HilbertRef<T>> tmp = new ArrayList<>(end - start);
+    List<HilbertRef> tmp = new ArrayList<>(end - start);
     int[] buf = new int[dim];
     for(int i = start; i < end; i++) {
-      T v = objs.get(i);
+      SpatialComparable v = objs.get(i);
       // Convert into integers
       for(int d = 0; d < dim; d++) {
         final int ed = (dims != null) ? dims[d] : d, ed2 = ed << 1;
@@ -77,12 +77,14 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         val = Integer.MAX_VALUE * ((val - minmax[ed2]) / (minmax[ed2 + 1] - minmax[ed2]));
         buf[d] = (int) val;
       }
-      tmp.add(new HilbertRef<>(v, coordinatesToHilbert(buf, Integer.SIZE - 1, 1)));
+      tmp.add(new HilbertRef(v, coordinatesToHilbert(buf, Integer.SIZE - 1, 1)));
     }
     // Sort and copy back
     Collections.sort(tmp);
+    @SuppressWarnings("unchecked") // Hack, to allow reordering.
+    List<SpatialComparable> cobjs = (List<SpatialComparable>) objs;
     for(int i = start; i < end; i++) {
-      objs.set(i, tmp.get(i - start).vec);
+      cobjs.set(i, tmp.get(i - start).vec);
     }
   }
 
@@ -92,11 +94,11 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    * 
    * @author Erich Schubert
    */
-  private static class HilbertRef<T extends SpatialComparable> implements Comparable<HilbertRef<T>> {
+  private static class HilbertRef implements Comparable<HilbertRef> {
     /**
      * The referenced object.
      */
-    protected T vec;
+    protected SpatialComparable vec;
 
     /**
      * Hilbert representation.
@@ -109,14 +111,14 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
      * @param vec Vector
      * @param bits Bit representation
      */
-    protected HilbertRef(T vec, long[] bits) {
+    protected HilbertRef(SpatialComparable vec, long[] bits) {
       super();
       this.vec = vec;
       this.bits = bits;
     }
 
     @Override
-    public int compareTo(HilbertRef<T> o) {
+    public int compareTo(HilbertRef o) {
       return BitsUtil.compare(this.bits, o.bits);
     }
   }

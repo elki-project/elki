@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Multidimensional binary search trees used for associative searching", //
     booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
     url = "http://dx.doi.org/10.1145/361002.361007")
-public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
+public class BinarySplitSpatialSorter implements SpatialSorter {
   /**
    * Static instance.
    */
@@ -66,7 +66,7 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
+  public void sort(List<? extends SpatialComparable> objs, int start, int end, double[] minmax, int[] dims) {
     final int numdim = (dims != null) ? dims.length : (minmax.length >>> 1);
     binarySplitSort(objs, start, end, 0, numdim, dims, new Sorter(0));
   }
@@ -82,9 +82,8 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
    * @param numdim Number of dimensions
    * @param dims Dimension indexes to sort by.
    * @param comp Comparator to use
-   * @param <T> Object type
    */
-  private <T extends SpatialComparable> void binarySplitSort(List<T> objs, final int start, final int end, int depth, final int numdim, int[] dims, Sorter comp) {
+  private void binarySplitSort(List<? extends SpatialComparable> objs, final int start, final int end, int depth, final int numdim, int[] dims, Sorter comp) {
     final int mid = start + ((end - start) >>> 1);
     // Make invariant
     comp.setDimension(dims != null ? dims[depth] : depth);

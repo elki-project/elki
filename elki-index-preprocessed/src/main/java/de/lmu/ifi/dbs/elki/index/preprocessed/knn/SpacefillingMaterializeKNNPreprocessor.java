@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -152,7 +151,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
     }
 
     // Sort spatially
-    final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final double[] mms = SpatialSorter.computeMinMax(curves.get(0));
     final double[] mmscratch = new double[mms.length];
     final int numdim = mms.length >>> 1;
     final int[] permutation = new int[numdim];

@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 
+import static de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter.pivotizeList1D;
+
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -72,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "G. Peano", //
     title = "Sur une courbe, qui remplit toute une aire plane", //
     booktitle = "Mathematische Annalen, 36(1)")
-public class PeanoSpatialSorter extends AbstractSpatialSorter {
+public class PeanoSpatialSorter implements SpatialSorter {
   /**
    * Static instance.
    */
@@ -86,7 +88,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
+  public void sort(List<? extends SpatialComparable> objs, int start, int end, double[] minmax, int[] dims) {
     peanoSort(objs, start, end, minmax, dims, 0, BitsUtil.zero(minmax.length >> 1), false);
   }
 
@@ -102,7 +104,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
    * @param bits Bit set for inversions
    * @param desc Current ordering
    */
-  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int[] dims, int depth, long[] bits, boolean desc) {
+  protected void peanoSort(List<? extends SpatialComparable> objs, int start, int end, double[] mms, int[] dims, int depth, long[] bits, boolean desc) {
     final int numdim = (dims != null) ? dims.length : (mms.length >> 1);
     final int edim = (dims != null) ? dims[depth] : depth;
     // Find the splitting points.
