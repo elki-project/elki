@@ -94,7 +94,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
   @Override
   public void initialize() {
     TreeIndexHeader header = createHeader();
-    if (this.file.initialize(header)) {
+    if(this.file.initialize(header)) {
       initializeFromFile(header, file);
     }
     rootEntry = createRootEntry();
@@ -151,7 +151,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return Page ID
    */
   protected int getPageID(Entry entry) {
-    if (entry instanceof LeafEntry) {
+    if(entry instanceof LeafEntry) {
       throw new AbortException("Leafs do not have page ids!");
     }
     return ((DirectoryEntry) entry).getPageID();
@@ -164,9 +164,10 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return the node with the specified id
    */
   public N getNode(int nodeID) {
-    if (nodeID == getPageID(rootEntry)) {
+    if(nodeID == getPageID(rootEntry)) {
       return getRoot();
-    } else {
+    }
+    else {
       return file.readPage(nodeID);
     }
   }
@@ -222,7 +223,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
     this.dirMinimum = header.getDirMinimum();
     this.leafMinimum = header.getLeafMinimum();
 
-    if (getLogger().isDebugging()) {
+    if(getLogger().isDebugging()) {
       StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
@@ -244,7 +245,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
     createEmptyRoot(exampleLeaf);
 
     final Logging log = getLogger();
-    if (log.isStatistics()) {
+    if(log.isStatistics()) {
       String cls = this.getClass().getName();
       log.statistics(new LongStatistic(cls + ".directory.capacity", dirCapacity));
       log.statistics(new LongStatistic(cls + ".directory.minfill", dirMinimum));
@@ -332,6 +333,24 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    */
   protected int getPageSize() {
     return file.getPageSize();
+  }
+
+  /**
+   * Get the minimum fill of a directory page (except root).
+   *
+   * @return Minimum fill
+   */
+  public int getDirMinimum() {
+    return dirMinimum;
+  }
+
+  /**
+   * Get the minimum fill of a leaf page (except root).
+   *
+   * @return Minimum fill
+   */
+  public int getLeafMinimum() {
+    return leafMinimum;
   }
 
   /**

@@ -27,6 +27,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Sort object along the Hilbert Space Filling curve by mapping them to their
@@ -46,10 +47,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @apiviz.composedOf HilbertRef
  */
-@Reference(authors = "D. Hilbert", title = "Über die stetige Abbildung einer Linie auf ein Flächenstück", booktitle = "Mathematische Annalen, 38(3)")
+@Reference(authors = "D. Hilbert", //
+    title = "Über die stetige Abbildung einer Linie auf ein Flächenstück", //
+    booktitle = "Mathematische Annalen, 38(3)")
 public class HilbertSpatialSorter extends AbstractSpatialSorter {
   /**
-   * Constructor.
+   * Static instance.
+   */
+  public static final HilbertSpatialSorter STATIC = new HilbertSpatialSorter();
+
+  /**
+   * Constructor, use {@link #STATIC} instead.
    */
   public HilbertSpatialSorter() {
     super();
@@ -60,10 +68,10 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int dim = (dims != null) ? dims.length : (minmax.length >> 1);
     List<HilbertRef<T>> tmp = new ArrayList<>(end - start);
     int[] buf = new int[dim];
-    for (int i = start; i < end; i++) {
+    for(int i = start; i < end; i++) {
       T v = objs.get(i);
       // Convert into integers
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         final int ed = (dims != null) ? dims[d] : d, ed2 = ed << 1;
         double val = (v.getMin(ed) + v.getMax(ed)) * .5;
         val = Integer.MAX_VALUE * ((val - minmax[ed2]) / (minmax[ed2 + 1] - minmax[ed2]));
@@ -73,7 +81,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     }
     // Sort and copy back
     Collections.sort(tmp);
-    for (int i = start; i < end; i++) {
+    for(int i = start; i < end; i++) {
       objs.set(i, tmp.get(i - start).vec);
     }
   }
@@ -129,7 +137,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for (int i = 0; i < bitsperdim; i++) {
+    for(int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -143,7 +151,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if (!BitsUtil.get(bits, 0)) {
+      if(!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -168,7 +176,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for (int i = 0; i < bitsperdim; i++) {
+    for(int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -182,7 +190,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if (!BitsUtil.get(bits, 0)) {
+      if(!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -207,7 +215,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for (int i = 0; i < bitsperdim; i++) {
+    for(int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -221,7 +229,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if (!BitsUtil.get(bits, 0)) {
+      if(!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -246,7 +254,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for (int i = 0; i < bitsperdim; i++) {
+    for(int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -260,7 +268,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if (!BitsUtil.get(bits, 0)) {
+      if(!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -281,8 +289,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 63 - iter;
-    for (int dim = 0; dim < numdim; dim++) {
-      if ((coords[dim] & mask) != 0) {
+    for(int dim = 0; dim < numdim; dim++) {
+      if((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -301,8 +309,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 31 - iter;
-    for (int dim = 0; dim < numdim; dim++) {
-      if ((coords[dim] & mask) != 0) {
+    for(int dim = 0; dim < numdim; dim++) {
+      if((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -321,8 +329,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 15 - iter;
-    for (int dim = 0; dim < numdim; dim++) {
-      if ((coords[dim] & mask) != 0) {
+    for(int dim = 0; dim < numdim; dim++) {
+      if((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -341,11 +349,25 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 7 - iter;
-    for (int dim = 0; dim < numdim; dim++) {
-      if ((coords[dim] & mask) != 0) {
+    for(int dim = 0; dim < numdim; dim++) {
+      if((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
     return bitset;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected HilbertSpatialSorter makeInstance() {
+      return STATIC;
+    }
   }
 }

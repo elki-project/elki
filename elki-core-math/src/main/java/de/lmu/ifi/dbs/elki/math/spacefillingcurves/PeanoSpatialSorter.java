@@ -25,6 +25,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
@@ -69,11 +70,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.5.0
  */
 @Reference(authors = "G. Peano", //
-title = "Sur une courbe, qui remplit toute une aire plane", //
-booktitle = "Mathematische Annalen, 36(1)")
+    title = "Sur une courbe, qui remplit toute une aire plane", //
+    booktitle = "Mathematische Annalen, 36(1)")
 public class PeanoSpatialSorter extends AbstractSpatialSorter {
   /**
-   * Constructor.
+   * Static instance.
+   */
+  public static final PeanoSpatialSorter STATIC = new PeanoSpatialSorter();
+
+  /**
+   * Constructor, use {@link #STATIC} instead.
    */
   public PeanoSpatialSorter() {
     super();
@@ -150,5 +156,19 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
     // Restore ranges
     mms[2 * edim] = min;
     mms[2 * edim + 1] = max;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected PeanoSpatialSorter makeInstance() {
+      return STATIC;
+    }
   }
 }

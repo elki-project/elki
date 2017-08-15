@@ -21,9 +21,9 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
@@ -127,6 +127,26 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   }
 
   /**
+   * Set the bounding box to the same as some other spatial object.
+   *
+   * @param obj Spatial object to set to.
+   */
+  public void set(SpatialComparable obj) {
+    final int dim = min.length;
+    assert (obj.getDimensionality() == dim);
+    if(obj instanceof ModifiableHyperBoundingBox) {
+      ModifiableHyperBoundingBox ho = (ModifiableHyperBoundingBox) obj;
+      System.arraycopy(ho.getMinRef(), 0, min, 0, dim);
+      System.arraycopy(ho.getMaxRef(), 0, max, 0, dim);
+      return;
+    }
+    for(int i = 0; i < dim; i++) {
+      min[i] = obj.getMin(i);
+      max[i] = obj.getMax(i);
+    }
+  }
+
+  /**
    * Extend the bounding box by some other spatial object.
    *
    * @param obj Spatial object to extend with
@@ -134,7 +154,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    */
   public boolean extend(SpatialComparable obj) {
     final int dim = min.length;
-    assert(!LoggingConfiguration.DEBUG || (obj.getDimensionality() == dim));
+    assert (obj.getDimensionality() == dim);
     boolean extended = false;
     for(int i = 0; i < dim; i++) {
       final double omin = obj.getMin(i);

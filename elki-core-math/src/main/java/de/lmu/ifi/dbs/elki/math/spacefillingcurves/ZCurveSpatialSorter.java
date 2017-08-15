@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Class to sort the data set by their Z-index, without doing a full
@@ -32,7 +33,22 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * @since 0.5.0
  */
 public class ZCurveSpatialSorter extends AbstractSpatialSorter {
+  /**
+   * Static instance.
+   */
+  public static final ZCurveSpatialSorter STATIC = new ZCurveSpatialSorter();
+
+  /**
+   * Stopping threshold.
+   */
   private static final double STOPVAL = 1E-10;
+
+  /**
+   * Constructor, use {@link #STATIC} instead.
+   */
+  public ZCurveSpatialSorter() {
+    super();
+  }
 
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
@@ -56,28 +72,28 @@ public class ZCurveSpatialSorter extends AbstractSpatialSorter {
     final double min = mms[2 * edim], max = mms[2 * edim + 1];
     double spos = (min + max) / 2.;
     // Safeguard against duplicate points:
-    if (max - spos < STOPVAL || spos - min < STOPVAL) {
+    if(max - spos < STOPVAL || spos - min < STOPVAL) {
       boolean ok = false;
-      for (int d = 0; d < numdim; d++) {
+      for(int d = 0; d < numdim; d++) {
         int d2 = ((dims != null) ? dims[d] : d) << 1;
-        if (mms[d2 + 1] - mms[d2] >= STOPVAL) {
+        if(mms[d2 + 1] - mms[d2] >= STOPVAL) {
           ok = true;
           break;
         }
       }
-      if (!ok) {
+      if(!ok) {
         return;
       }
     }
     int split = pivotizeList1D(objs, start, end, edim, spos, false);
     assert (start <= split && split <= end);
     int nextdim = (depth + 1) % numdim;
-    if (start < split - 1) {
+    if(start < split - 1) {
       mms[2 * edim] = min;
       mms[2 * edim + 1] = spos;
       zSort(objs, start, split, mms, dims, nextdim);
     }
-    if (split < end - 1) {
+    if(split < end - 1) {
       mms[2 * edim] = spos;
       mms[2 * edim + 1] = max;
       zSort(objs, split, end, mms, dims, nextdim);
@@ -85,5 +101,19 @@ public class ZCurveSpatialSorter extends AbstractSpatialSorter {
     // Restore ranges
     mms[2 * edim] = min;
     mms[2 * edim + 1] = max;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ZCurveSpatialSorter makeInstance() {
+      return STATIC;
+    }
   }
 }
