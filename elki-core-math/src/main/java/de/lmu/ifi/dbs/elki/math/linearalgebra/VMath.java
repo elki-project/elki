@@ -99,11 +99,8 @@ public final class VMath {
    * @return Matrix
    */
   public static double[][] transpose(final double[] v) {
-    double[][] re = new double[v.length][1];
-    for(int i = 0; i < v.length; i++) {
-      re[i][0] = v[i];
-    }
-    return re;
+    final double[][] result = {v};
+    return result;
   }
 
   /**
@@ -275,6 +272,7 @@ public final class VMath {
    * @return v1 - v2
    */
   public static double[] minus(final double[] v1, final double[] v2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i];
@@ -291,6 +289,7 @@ public final class VMath {
    * @return v1 - v2 * s2
    */
   public static double[] minusTimes(final double[] v1, final double[] v2, final double s2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i] * s2;
@@ -307,6 +306,7 @@ public final class VMath {
    * @return v1 * s1 - v2
    */
   public static double[] timesMinus(final double[] v1, final double s1, final double[] v2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i];
@@ -324,6 +324,7 @@ public final class VMath {
    * @return v1 * s1 - v2 * s2
    */
   public static double[] timesMinusTimes(final double[] v1, final double s1, final double[] v2, final double s2) {
+    assert (v1.length == v2.length): ERR_VEC_DIMENSIONS;
     final double[] sub = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i] * s2;
@@ -455,6 +456,9 @@ public final class VMath {
 
   /**
    * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>)
+   * <br>
+   * This method is equivalent to the {@link #timesTranspose(double[], double[])} method
+   * with m2 being the second vector as matrix, but transposed.
    * 
    * @param v1 vector
    * @param m2 other matrix, must have one row.
@@ -498,10 +502,10 @@ public final class VMath {
    * 
    * @param v1 vector
    * @param v2 other vector
-   * @return Matrix product, v1<sup>T</sup> * v2
+   * @return scalar result of matrix product, v1<sup>T</sup> * v2
    */
   public static double transposeTimes(final double[] v1, final double[] v2) {
-    assert (v2.length == v1.length) : ERR_MATRIX_INNERDIM;
+    assert (v2.length == v1.length) : ERR_VEC_DIMENSIONS;
     double s = 0;
     for(int k = 0; k < v1.length; k++) {
       s += v1[k] * v2[k];
@@ -511,6 +515,9 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, v1 * m2^T
+   * <br>
+   * This method is equivalent to the {@link #timesTranspose(double[], double[])} method
+   * with m2 being the second vector as matrix.
    * 
    * @param v1 vector
    * @param m2 other matrix
@@ -1550,7 +1557,7 @@ public final class VMath {
    * @return Equality
    */
   public static boolean equals(final double[][] m1, final double[][] m2) {
-    return Arrays.equals(m1, m2);
+    return Arrays.deepEquals(m1, m2);
   }
 
   /**
