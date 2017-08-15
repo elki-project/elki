@@ -88,7 +88,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   
   @Override
   public void forEach(Consumer<? super DBIDRef> action) {
-    return; // Empty
+    // Empty
   }
 
   /**

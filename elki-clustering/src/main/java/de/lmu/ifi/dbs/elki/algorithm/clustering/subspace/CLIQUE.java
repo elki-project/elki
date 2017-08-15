@@ -307,7 +307,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @param maxima the array of maxima
    */
   private void updateMinMax(V featureVector, double[] minima, double[] maxima) {
-    assert (minima.length != featureVector.getDimensionality());
+    assert (minima.length == featureVector.getDimensionality());
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       double v = featureVector.doubleValue(d);
       if(v == v) { // Avoid NaN.

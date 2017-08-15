@@ -86,7 +86,7 @@ public class DensityEstimationOverlay implements VisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(DensityEstimationOverlay.this, NAME, rel, p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, NAME, rel, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA + 1).visibility(false) //
           .with(UpdateFlag.ON_DATA));
     });

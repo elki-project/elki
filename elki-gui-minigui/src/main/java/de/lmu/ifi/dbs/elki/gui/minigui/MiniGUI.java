@@ -669,16 +669,15 @@ public class MiniGUI extends AbstractApplication {
    * @param config Parameterization
    */
   protected void reportErrors(SerializedParameterization config) {
-    StringBuilder buf = new StringBuilder();
-    buf.append("Task is not completely configured:" + NEWLINE + NEWLINE);
+    StringBuilder buf = new StringBuilder(500).append("Task is not completely configured:" + NEWLINE + NEWLINE);
     for(ParameterException e : config.getErrors()) {
       if(e instanceof UnspecifiedParameterException) {
-        buf.append("The parameter ");
-        buf.append(((UnspecifiedParameterException) e).getParameterName());
-        buf.append(" is required.").append(NEWLINE);
+        buf.append("The parameter ") //
+            .append(((UnspecifiedParameterException) e).getParameterName()) //
+            .append(" is required.").append(NEWLINE);
       }
       else {
-        buf.append(e.getMessage() + NEWLINE);
+        buf.append(e.getMessage()).append(NEWLINE);
       }
     }
     LOG.warning(buf.toString());
@@ -703,8 +702,7 @@ public class MiniGUI extends AbstractApplication {
       clz.getMethod("newHashSet").invoke(null);
     }
     catch(ReflectiveOperationException e) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("Your Java class path is incomplete.\n");
+      StringBuilder msg = new StringBuilder(500).append("Your Java class path is incomplete.\n");
       if(e.getCause() != null) {
         for(Throwable t = e.getCause(); t != null; t = t.getCause()) {
           msg.append(t.toString()).append("\n");
@@ -713,17 +711,14 @@ public class MiniGUI extends AbstractApplication {
       else {
         msg.append(e.toString()).append("\n");
       }
-      msg.append("Make sure you have all the required jars on the classpath.\n");
-      msg.append("On the home page, you can find a 'elki-bundle' which should include everything.");
+      msg.append("Make sure you have all the required jars on the classpath.\nOn the home page, you can find a 'elki-bundle' which should include everything.");
       JOptionPane.showMessageDialog(null, msg, "ClassPath incomplete", JOptionPane.ERROR_MESSAGE);
       return;
     }
     // Detect the broken Ubuntu jAyatana hack;
     String toolopt = System.getenv("JAVA_TOOL_OPTION");
     if(toolopt != null && toolopt.indexOf("jayatana") >= 0) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("The Ubuntu JAyatana 'global menu support' hack is known to cause problems with many Java applications.\n");
-      msg.append("Please unset JAVA_TOOL_OPTION.");
+      String msg = "The Ubuntu JAyatana 'global menu support' hack is known to cause problems with many Java applications.\nPlease unset JAVA_TOOL_OPTION.";
       JOptionPane.showMessageDialog(null, msg, "Incompatible with JAyatana", JOptionPane.ERROR_MESSAGE);
       return;
     }

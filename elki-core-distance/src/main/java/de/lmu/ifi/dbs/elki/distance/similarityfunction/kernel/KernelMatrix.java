@@ -249,11 +249,6 @@ public class KernelMatrix {
     return times(plusEquals(minusEquals(minus(matrix, times(normalizingMatrix, matrix)), times(matrix, normalizingMatrix)), times(normalizingMatrix, matrix)), normalizingMatrix);
   }
 
-  @Override
-  public String toString() {
-    return super.toString();
-  }
-
   /**
    * Centers the Kernel Matrix in Feature Space according to Smola et.
    * Schoelkopf, Learning with Kernels p. 431 Alters the input matrix. If you

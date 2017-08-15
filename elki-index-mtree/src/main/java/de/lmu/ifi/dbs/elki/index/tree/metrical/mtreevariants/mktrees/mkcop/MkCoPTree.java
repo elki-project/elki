@@ -350,21 +350,19 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
    *        (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry entry, KNNList knnDistances) {
-    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;
     if(msg != null) {
-      msg.append("\nknnDistances ").append(knnDistances);
+      msg.append("knnDistances ").append(knnDistances);
     }
 
     // count the zero distances
     int k_0 = 0;
     for(int i = 0; i < settings.kmax; i++) {
       double dist = knnDistances.get(i).doubleValue();
-      if(dist == 0) {
-        k_0++;
-      }
-      else {
+      if(dist != 0) {
         break;
       }
+      k_0++;
     }
 
     // init variables
@@ -391,15 +389,15 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     }
 
     if(msg != null) {
-      msg.append("\nk_0 ").append(k_0);
-      msg.append("\nk_max ").append(settings.kmax);
-      msg.append("\nlog_k(").append(log_k.length).append(") ").append(FormatUtil.format(log_k));
-      msg.append("\nsum_log_k ").append(sum_log_k);
-      msg.append("\nsum_log_k^2 ").append(sum_log_k2);
-      msg.append("\nkDists ").append(knnDistances);
-      msg.append("\nlog_kDist(").append(log_kDist.length).append(") ").append(FormatUtil.format(log_kDist));
-      msg.append("\nsum_log_kDist ").append(sum_log_kDist);
-      msg.append("\nsum_log_k_kDist ").append(sum_log_k_kDist);
+      msg.append("\nk_0 ").append(k_0) //
+          .append("\nk_max ").append(settings.kmax) //
+          .append("\nlog_k(").append(log_k.length).append(") ").append(FormatUtil.format(log_k)) //
+          .append("\nsum_log_k ").append(sum_log_k) //
+          .append("\nsum_log_k^2 ").append(sum_log_k2) //
+          .append("\nkDists ").append(knnDistances) //
+          .append("\nlog_kDist(").append(log_kDist.length).append(") ").append(FormatUtil.format(log_kDist)) //
+          .append("\nsum_log_kDist ").append(sum_log_kDist) //
+          .append("\nsum_log_k_kDist ").append(sum_log_k_kDist);
     }
 
     // lower and upper hull
@@ -414,29 +412,28 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     double err2 = ssqerr(k_0, settings.kmax, log_k, log_kDist, c2.getM(), c2.getT());
 
     if(msg != null) {
-      msg.append("err1 ").append(err1);
-      msg.append("err2 ").append(err2);
+      msg.append("err1 ").append(err1).append("err2 ").append(err2);
     }
 
     if(err1 > err2 && err1 - err2 > 0.000000001) {
       // if (err1 > err2) {
 
-      StringBuilder warning = new StringBuilder();
+      StringBuilder warning = new StringBuilder(10000);
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
-      warning.append("\nentry ").append(entry.getRoutingObjectID());
-      warning.append("\nlower Hull ").append(convexHull.getNumberOfPointsInLowerHull()).append(' ').append(FormatUtil.format(convexHull.getLowerHull()));
-      warning.append("\nupper Hull ").append(convexHull.getNumberOfPointsInUpperHull()).append(' ').append(FormatUtil.format(convexHull.getUpperHull()));
-      warning.append("\nerr1 ").append(err1);
-      warning.append("\nerr2 ").append(err2);
-      warning.append("\nconservative1 ").append(conservative);
-      warning.append("\nconservative2 ").append(c2);
+      warning.append("\nentry ").append(entry.getRoutingObjectID()) //
+          .append("\nlower Hull ").append(convexHull.getNumberOfPointsInLowerHull()).append(' ').append(FormatUtil.format(convexHull.getLowerHull())) //
+          .append("\nupper Hull ").append(convexHull.getNumberOfPointsInUpperHull()).append(' ').append(FormatUtil.format(convexHull.getUpperHull())) //
+          .append("\nerr1 ").append(err1) //
+          .append("\nerr2 ").append(err2) //
+          .append("\nconservative1 ").append(conservative) //
+          .append("\nconservative2 ").append(c2);
 
       for(int i = 0; i < u; i++) {
-        warning.append("\nlog_k[").append(upperHull[i]).append("] = ").append(log_k[upperHull[i]]);
-        warning.append("\nlog_kDist[").append(upperHull[i]).append("] = ").append(log_kDist[upperHull[i]]);
+        warning.append("\nlog_k[").append(upperHull[i]).append("] = ").append(log_k[upperHull[i]]) //
+            .append("\nlog_kDist[").append(upperHull[i]).append("] = ").append(log_kDist[upperHull[i]]);
       }
-      // warning(warning.toString());
+      LOG.warning(warning.toString());
     }
 
     // approximate lower hull
@@ -459,14 +456,13 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
    * @param sum_log_k_kDist
    */
   private ApproximationLine approximateLowerHull(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-
-    StringBuilder msg = new StringBuilder();
+    // StringBuilder msg = new StringBuilder(1000);
     int[] lowerHull = convexHull.getLowerHull();
     int l = convexHull.getNumberOfPointsInLowerHull();
     int k_0 = settings.kmax - lowerHull.length + 1;
 
     // linear search on all line segments on the lower convex hull
-    msg.append("lower hull l = ").append(l).append('\n');
+    // msg.append("lower hull l = ").append(l).append('\n');
     double low_error = Double.MAX_VALUE;
     double low_m = 0.0;
     double low_t = 0.0;
@@ -475,7 +471,9 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       double cur_m = (log_kDist[lowerHull[i]] - log_kDist[lowerHull[i - 1]]) / (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]]);
       double cur_t = log_kDist[lowerHull[i]] - cur_m * log_k[lowerHull[i]];
       double cur_error = ssqerr(k_0, settings.kmax, log_k, log_kDist, cur_m, cur_t);
-      msg.append("  Segment = ").append(i).append(" m = ").append(cur_m).append(" t = ").append(cur_t).append(" lowerror = ").append(cur_error).append('\n');
+      // msg.append(" Segment = ").append(i).append(" m =
+      // ").append(cur_m).append(" t = ").append(cur_t).append(" lowerror =
+      // ").append(cur_error).append('\n');
       if(cur_error < low_error) {
         low_error = cur_error;
         low_m = cur_m;
@@ -506,13 +504,11 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
         }
       }
     }
-
-    ApproximationLine lowerApproximation = new ApproximationLine(k_0, low_m, low_t);
-    return lowerApproximation;
+    return new ApproximationLine(k_0, low_m, low_t);
   }
 
   private ApproximationLine approximateUpperHull(ConvexHull convexHull, double[] log_k, double[] log_kDist) {
-    StringBuilder msg = new StringBuilder();
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -527,13 +523,13 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       double current_t = log_kDist[ii] - current_m * log_k[ii];
       ApproximationLine current_approx = new ApproximationLine(k_0, current_m, current_t);
 
-      if(LOG.isDebugging()) {
-        msg.append("\nlog_kDist[").append(jj).append("] ").append(log_kDist[jj]);
-        msg.append("\nlog_kDist[").append(ii).append("] ").append(log_kDist[ii]);
-        msg.append("\nlog_k[").append(jj).append("] ").append(log_k[jj]);
-        msg.append("\nlog_k[").append(ii).append("] ").append(log_k[ii]);
-        msg.append('\n').append((log_kDist[jj] - log_kDist[ii]));
-        msg.append("\ncurrent_approx_").append(i).append(' ').append(current_approx);
+      if(msg != null) {
+        msg.append("\nlog_kDist[").append(jj).append("] ").append(log_kDist[jj]) //
+            .append("\nlog_kDist[").append(ii).append("] ").append(log_kDist[ii]) //
+            .append("\nlog_k[").append(jj).append("] ").append(log_k[jj]) //
+            .append("\nlog_k[").append(ii).append("] ").append(log_k[ii]) //
+            .append('\n').append((log_kDist[jj] - log_kDist[ii])) //
+            .append("\ncurrent_approx_").append(i).append(' ').append(current_approx);
       }
 
       boolean ok = true;
@@ -553,15 +549,14 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       }
     }
 
-    if(LOG.isDebugging()) {
-      msg.append("\nupper Approx ").append(approx);
-      LOG.debugFine(msg.toString());
+    if(msg != null) {
+      LOG.debugFine(msg.append("\nupper Approx ").append(approx).toString());
     }
     return approx;
   }
 
   private ApproximationLine approximateUpperHullPaper(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -580,8 +575,8 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       double t_a = y_a - m_a * x_a;
 
       if(msg != null) {
-        msg.append("\na=").append(a).append(" m_a=").append(m_a).append(", t_a=").append(t_a);
-        msg.append("\n err ").append(ssqerr(k_0, settings.kmax, log_k, log_kDist, m_a, m_a));
+        msg.append("\na=").append(a).append(" m_a=").append(m_a).append(", t_a=").append(t_a) //
+            .append("\n err ").append(ssqerr(k_0, settings.kmax, log_k, log_kDist, m_a, m_a));
       }
 
       double x_p = a == 0 ? Double.NaN : log_k[upperHull[a - 1]];
@@ -595,8 +590,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       if(lessThanPre && lessThanSuc) {
         ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
         if(msg != null) {
-          msg.append("\n1 anchor = ").append(a);
-          LOG.debugFine(msg.toString());
+          LOG.debugFine(msg.append("\n1 anchor = ").append(a).toString());
         }
         return appr;
       }
@@ -610,13 +604,12 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
 
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
           if(msg != null) {
-            msg.append("2 anchor = ").append(a);
-            msg.append(" appr1 ").append(appr);
-            msg.append(" x_a ").append(x_a).append(", y_a ").append(y_a);
-            msg.append(" x_p ").append(x_p).append(", y_p ").append(y_p);
-            msg.append(" a ").append(a);
-            msg.append(" upperHull ").append(FormatUtil.format(upperHull));
-            LOG.debugFine(msg.toString());
+            LOG.debugFine(msg.append("2 anchor = ").append(a) //
+                .append(" appr1 ").append(appr) //
+                .append(" x_a ").append(x_a).append(", y_a ").append(y_a) //
+                .append(" x_p ").append(x_p).append(", y_p ").append(y_p) //
+                .append(" a ").append(a) //
+                .append(" upperHull ").append(FormatUtil.format(upperHull)).toString());
           }
           return appr;
         }
@@ -634,9 +627,8 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
 
           if(msg != null) {
-            msg.append("3 anchor = ").append(a).append(" -- ").append((a + 1));
-            msg.append(" appr2 ").append(appr);
-            LOG.debugFine(msg.toString());
+            LOG.debugFine(msg.append("3 anchor = ").append(a).append(" -- ").append((a + 1)) //
+                .append(" appr2 ").append(appr).toString());
           }
           return appr;
         }
@@ -653,7 +645,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
   // TODO: cleanup.
   @SuppressWarnings("unused")
   private ApproximationLine approximateUpperHullOld(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuilder msg = new StringBuilder();
+    StringBuilder msg = new StringBuilder(10000);
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
     int k_0 = settings.kmax - upperHull.length + 1;
@@ -696,9 +688,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
         is_left = false;
       }
     }
-
-    ApproximationLine upperApproximation = new ApproximationLine(k_0, upp_m, upp_t);
-    return upperApproximation;
+    return new ApproximationLine(k_0, upp_m, upp_t);
   }
 
   /**

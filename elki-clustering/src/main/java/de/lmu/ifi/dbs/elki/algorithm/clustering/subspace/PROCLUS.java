@@ -139,7 +139,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     final Random random = rnd.getSingleThreadedRandom();
 
     if(RelationUtil.dimensionality(relation) < l) {
-      throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + RelationUtil.dimensionality(relation) + " < " + l + ")");
+      throw new IllegalStateException("Dimensionality of data < parameter l! (" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
 
     // TODO: use a StepProgress!
@@ -625,8 +625,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       result += Math.abs(o1.doubleValue(d) - o2.doubleValue(d));
       ++card;
     }
-    result /= card;
-    return result;
+    return result / card;
   }
 
   /**
@@ -646,8 +645,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       result += Math.abs(o1.doubleValue(d) - o2[d]);
       ++card;
     }
-    result /= card;
-    return result;
+    return result / card;
   }
 
   /**
@@ -788,8 +786,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     @Override
     public String toString() {
-      StringBuilder result = new StringBuilder();
-      result.append("Dimensions: [");
+      StringBuilder result = new StringBuilder(500).append("Dimensions: [");
       boolean notFirst = false;
       for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
         if(notFirst) {
@@ -798,9 +795,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         notFirst = true;
         result.append(d);
       }
-      result.append(']') //
-          .append("\nCentroid: ").append(centroid);
-      return result.toString();
+      return result.append("]\nCentroid: ").append(centroid).toString();
     }
 
     /**

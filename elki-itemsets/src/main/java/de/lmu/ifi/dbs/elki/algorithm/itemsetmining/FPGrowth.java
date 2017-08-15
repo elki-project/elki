@@ -138,13 +138,12 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
       tree.logStatistics();
     }
     if(LOG.isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("FP-tree:\n");
+      StringBuilder buf = new StringBuilder(10000).append("FP-tree:\n");
       tree.appendTo(buf, new FPNode.Translator() {
         @Override
-        public void appendTo(StringBuilder buf, int i) {
+        public StringBuilder appendTo(StringBuilder buf, int i) {
           String l = meta.getLabel(idx[i]);
-          buf.append(l != null ? l : Integer.toString(i));
+          return (l != null) ? buf.append(l) : buf.append(i);
         }
       });
       LOG.debugFinest(buf.toString());
@@ -600,9 +599,10 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      *
      * @param buf Output buffer
      * @param t Translator to user-understandable items
+     * @return Buffer
      */
-    public void appendTo(StringBuilder buf, Translator t) {
-      appendTo(buf, t, 0);
+    public StringBuilder appendTo(StringBuilder buf, Translator t) {
+      return appendTo(buf, t, 0);
     }
 
     /**
@@ -616,19 +616,20 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * @param buf Output buffer
      * @param t Translator to user-understandable items
      * @param depth Current depth
+     * @return Buffer
      */
-    private void appendTo(StringBuilder buf, Translator t, int depth) {
+    private StringBuilder appendTo(StringBuilder buf, Translator t, int depth) {
       if(key >= 0) {
-        t.appendTo(buf, key);
-        buf.append(": ");
+        t.appendTo(buf, key).append(": ");
       }
-      buf.append(count).append("\n");
+      buf.append(count).append('\n');
       for(int i = 0; i < numchildren; i++) {
         for(int j = depth; j > 0; j -= SPACES.length) {
           buf.append(SPACES, 0, Math.min(j, SPACES.length));
         }
         children[i].appendTo(buf, t, depth + 1);
       }
+      return buf;
     }
 
     /**
@@ -659,8 +660,9 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
        *
        * @param buf Buffer to append to
        * @param i Item number
+       * @return Buffer
        */
-      public void appendTo(StringBuilder buf, int i);
+      public StringBuilder appendTo(StringBuilder buf, int i);
     }
   }
 

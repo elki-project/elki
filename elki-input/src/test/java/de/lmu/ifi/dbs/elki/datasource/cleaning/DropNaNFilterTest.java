@@ -57,7 +57,7 @@ public class DropNaNFilterTest extends AbstractDataSourceTest {
     // Ensure that at least a single NaN exists in the unfiltered bundle.
     boolean NaNfound = false;
     for(int row = 0; row < unfilteredBundle.dataLength(); row++) {
-      DoubleVector d = get(filteredBundle, row, 0, DoubleVector.class);
+      DoubleVector d = get(unfilteredBundle, row, 0, DoubleVector.class);
       for(int col = 0; col < dimUnfiltered; col++) {
         final double v = d.doubleValue(col);
         if(Double.isNaN(v)) {

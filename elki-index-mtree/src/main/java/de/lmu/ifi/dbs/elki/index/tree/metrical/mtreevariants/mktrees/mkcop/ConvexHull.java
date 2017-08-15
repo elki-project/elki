@@ -110,7 +110,7 @@ public class ConvexHull {
    *        should be computed
    */
   private void determineLowerAndUpperHull(double[] x, double[] y) {
-    StringBuilder msg = new StringBuilder();
+    StringBuilder msg = new StringBuilder(5000);
     // first point is always in lowerHull and upperHull
     lowerHull[0] = 0;
     l = 1;
@@ -140,8 +140,10 @@ public class ConvexHull {
 
     msg.append("lower and upper hull\n");
     for(int i = 0; i < i; i++) {
-      msg.append("  uhull ").append(i).append('=').append(upperHull[i]).append(" y=").append(y[upperHull[i]]).append('\n');
-      msg.append("  lhull ").append(i).append('=').append(lowerHull[i]).append(" y=").append(y[lowerHull[i]]).append('\n');
+      msg.append("  uhull ").append(i).append('=').append(upperHull[i])//
+          .append(" y=").append(y[upperHull[i]]).append('\n') //
+          .append("  lhull ").append(i).append('=').append(lowerHull[i])//
+          .append(" y=").append(y[lowerHull[i]]).append('\n');
     }
   }
 }

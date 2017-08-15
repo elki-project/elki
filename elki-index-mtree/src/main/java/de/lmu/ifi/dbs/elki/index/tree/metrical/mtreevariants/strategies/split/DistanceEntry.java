@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
+
 /**
  * Helper class: encapsulates an entry in an Index and a distance value
  * belonging to this entry.
@@ -100,12 +101,8 @@ public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<
   @Override
   public int compareTo(DistanceEntry<E> o) {
     int comp = Double.compare(distance, o.distance);
-    if (comp != 0) {
-      return comp;
-    }
-
-    // return entry.getEntryID().compareTo(o.entry.getEntryID());
-    return 0;
+    return comp;
+    // return comp != 0 ? comp : entry.getEntryID().compareTo(o.entry.getEntryID());
   }
 
   /**
@@ -115,6 +112,6 @@ public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<
    */
   @Override
   public String toString() {
-    return "" + entry.toString() + "(" + distance + ")";
+    return entry.toString() + "(" + distance + ")";
   }
 }
