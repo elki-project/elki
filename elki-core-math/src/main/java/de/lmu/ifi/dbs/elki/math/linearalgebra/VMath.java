@@ -45,22 +45,22 @@ public final class VMath {
   /**
    * Error message (in assertions!) when vector dimensionalities do not agree.
    */
-  private static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
+  protected static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
 
   /**
    * Error message (in assertions!) when matrix dimensionalities do not agree.
    */
-  private static final String ERR_MATRIX_DIMENSIONS = "Matrix dimensions do not agree.";
+  protected static final String ERR_MATRIX_DIMENSIONS = "Matrix dimensions do not agree.";
 
   /**
    * Error message (in assertions!) when matrix dimensionalities do not agree.
    */
-  private static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions do not agree.";
+  protected static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions do not agree.";
 
   /**
    * Error message (in assertions!) when dimensionalities do not agree.
    */
-  private static final String ERR_DIMENSIONS = "Dimensionalities do not agree.";
+  protected static final String ERR_DIMENSIONS = "Dimensionalities do not agree.";
 
   /**
    * Fake constructor. Static class.
@@ -93,17 +93,13 @@ public final class VMath {
   }
 
   /**
-   * Transpose vector to a matrix.
+   * Transpose vector to a matrix (without copying).
    * 
    * @param v Vector
    * @return Matrix
    */
   public static double[][] transpose(final double[] v) {
-    double[][] re = new double[v.length][1];
-    for(int i = 0; i < v.length; i++) {
-      re[i][0] = v[i];
-    }
-    return re;
+    return new double[][] { v };
   }
 
   /**
@@ -1550,7 +1546,7 @@ public final class VMath {
    * @return Equality
    */
   public static boolean equals(final double[][] m1, final double[][] m2) {
-    return Arrays.equals(m1, m2);
+    return Arrays.deepEquals(m1, m2);
   }
 
   /**
