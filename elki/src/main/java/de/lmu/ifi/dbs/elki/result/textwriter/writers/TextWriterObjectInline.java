@@ -36,16 +36,13 @@ public class TextWriterObjectInline extends TextWriterWriterInterface<Object> {
    */
   @Override
   public void write(TextWriterStream out, String label, Object object) {
-    String res = "";
-    if(label != null) {
-      res = res + label + "=";
-    }
+    String res = (label != null) ? label + "=" : "";
     if(object != null) {
       if(label != null) {
-        res = res + object.toString().replace(" ", "");
+        res += object.toString().replace(" ", "");
       }
       else {
-        res = res + object.toString();
+        res += object.toString();
       }
     }
     out.inlinePrintNoQuotes(res);

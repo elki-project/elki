@@ -68,7 +68,7 @@ public class AffineTransformationTest {
   public void testTranslation() {
     int testdim = 5;
     AffineTransformation t = new AffineTransformation(testdim);
-    assertTrue(t.getDimensionality() == testdim);
+    assertEquals("Dimensionality does not match.", testdim, t.getDimensionality());
     double[][] tm = t.getTransformation();
     assertTrue("initial transformation matrix should be unity", VMath.almostEquals(tm, unitMatrix(testdim + 1)));
 

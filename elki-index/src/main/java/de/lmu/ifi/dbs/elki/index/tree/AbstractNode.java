@@ -303,21 +303,19 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public final void splitTo(AbstractNode<E> newNode, List<E> sorting, int splitPoint) {
     assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
-    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder("\n") : null;
+    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder(1000) : null;
 
     for(int i = 0; i < splitPoint; i++) {
       addEntry(sorting.get(i));
       if(msg != null) {
-        msg.append("n_").append(getPageID()).append(" ");
-        msg.append(sorting.get(i)).append("\n");
+        msg.append("n_").append(getPageID()).append(' ').append(sorting.get(i)).append('\n');
       }
     }
 
     for(int i = splitPoint; i < sorting.size(); i++) {
       newNode.addEntry(sorting.get(i));
       if(msg != null) {
-        msg.append("n_").append(newNode.getPageID()).append(" ");
-        msg.append(sorting.get(i)).append("\n");
+        msg.append("n_").append(newNode.getPageID()).append(' ').append(sorting.get(i)).append('\n');
       }
     }
     if(msg != null) {
@@ -335,12 +333,12 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public final void splitTo(AbstractNode<E> newNode, List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
     assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
-    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder() : null;
+    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder(1000) : null;
 
     // assignments to this node
     for(E entry : assignmentsToFirst) {
       if(msg != null) {
-        msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
+        msg.append("n_").append(getPageID()).append(' ').append(entry).append('\n');
       }
       addEntry(entry);
     }
@@ -348,7 +346,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     // assignments to the new node
     for(E entry : assignmentsToSecond) {
       if(msg != null) {
-        msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
+        msg.append("n_").append(newNode.getPageID()).append(' ').append(entry).append('\n');
       }
       newNode.addEntry(entry);
     }

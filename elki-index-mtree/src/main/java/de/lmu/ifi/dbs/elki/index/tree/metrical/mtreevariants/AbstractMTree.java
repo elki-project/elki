@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
@@ -122,8 +123,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       }
       else {
         node = getNode(entry);
-        result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries());
-        result.append('\n').append(entry.toString());
+        result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries()) //
+            .append('\n').append(entry.toString());
 
         if(node.isLeaf()) {
           leafNodes++;
@@ -134,12 +135,12 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       }
     }
 
-    result.append(getClass().getName()).append(" hat ").append((levels + 1)).append(" Ebenen \n");
-    result.append("DirCapacity = ").append(dirCapacity).append('\n');
-    result.append("LeafCapacity = ").append(leafCapacity).append('\n');
-    result.append(dirNodes).append(" Directory Nodes \n");
-    result.append(leafNodes).append(" Leaf Nodes \n");
-    result.append(objects).append(" Objects \n");
+    result.append(getClass().getName()).append(" hat ").append((levels + 1)).append(" Ebenen \n") //
+        .append("DirCapacity = ").append(dirCapacity).append('\n') //
+        .append("LeafCapacity = ").append(leafCapacity).append('\n') //
+        .append(dirNodes).append(" Directory Nodes \n") //
+        .append(leafNodes).append(" Leaf Nodes \n") //
+        .append(objects).append(" Objects \n");
 
     // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     return result.toString();
@@ -154,8 +155,9 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    */
   // todo: implement a bulk load for M-Tree and remove this method
   public void insert(E entry, boolean withPreInsert) {
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + entry.getRoutingObjectID() + "\n");
+    final Logging log = getLogger();
+    if(log.isDebugging()) {
+      log.debugFine("insert " + entry.getRoutingObjectID());
     }
 
     if(!initialized) {
@@ -164,14 +166,13 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
     // choose subtree for insertion
     IndexTreePath<E> subtree = settings.insertStrategy.choosePath(this, entry);
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insertion-subtree " + subtree + "\n");
+    if(log.isDebugging()) {
+      log.debugFine("insertion-subtree " + subtree);
     }
 
     // determine parent distance
     E parentEntry = subtree.getEntry();
-    double parentDistance = distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID());
-    entry.setParentDistance(parentDistance);
+    entry.setParentDistance(distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID()));
 
     // create leaf entry and do pre insert
     if(withPreInsert) {
@@ -208,8 +209,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
   @Override
   protected final void createEmptyRoot(E exampleLeaf) {
-    N root = createNewLeafNode();
-    writeNode(root);
+    writeNode(createNewLeafNode());
   }
 
   /**
@@ -273,8 +273,9 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    * @param subtree the subtree to be adjusted
    */
   private void adjustTree(IndexTreePath<E> subtree) {
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("Adjust tree " + subtree + "\n");
+    final Logging log = getLogger();
+    if(log.isDebugging()) {
+      log.debugFine("Adjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree
@@ -306,16 +307,16 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       writeNode(node);
       writeNode(newNode);
 
-      if(getLogger().isDebuggingFine()) {
-        String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + //
-        "      newNode " + newNode.getPageID() + "\n" + //
-        "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + //
-        "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + //
-        "      firstCR " + assignments.computeFirstCover(node.isLeaf()) + "\n" + //
-        "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + //
-        "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + //
-        "      secondCR " + assignments.computeSecondCover(node.isLeaf()) + "\n";
-        getLogger().debugFine(msg);
+      if(log.isDebuggingFine()) {
+        log.debugFine(new StringBuilder(1000)//
+            .append("Split Node ").append(node.getPageID()).append(" (").append(this.getClass()).append(')').append(FormatUtil.NEWLINE)//
+            .append("      newNode ").append(newNode.getPageID()).append(FormatUtil.NEWLINE)//
+            .append("      firstPromoted ").append(assignments.getFirstRoutingObject()).append(FormatUtil.NEWLINE)//
+            .append("      firstAssignments(").append(node.getPageID()).append(") ").append(assignments.getFirstAssignments()).append(FormatUtil.NEWLINE)//
+            .append("      firstCR ").append(assignments.computeFirstCover(node.isLeaf())).append(FormatUtil.NEWLINE)//
+            .append("      secondPromoted ").append(assignments.getSecondRoutingObject()).append(FormatUtil.NEWLINE)//
+            .append("      secondAssignments(").append(newNode.getPageID()).append(") ").append(assignments.getSecondAssignments()).append(FormatUtil.NEWLINE)//
+            .append("      secondCR ").append(assignments.computeSecondCover(node.isLeaf())).append(FormatUtil.NEWLINE));
       }
 
       // if root was split: create a new root that points the two split nodes
@@ -329,8 +330,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
         // get the parent and add the new split node
         E parentEntry = subtree.getParentPath().getEntry();
         N parent = getNode(parentEntry);
-        if(getLogger().isDebugging()) {
-          getLogger().debugFine("parent " + parent);
+        if(log.isDebugging()) {
+          log.debugFine("parent " + parent);
         }
         double parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
         // logger.warning("parent: "+parent.toString()+" split: " +
@@ -353,8 +354,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       if(!isRoot(node)) {
         E parentEntry = subtree.getParentPath().getEntry();
         N parent = getNode(parentEntry);
-        int index = subtree.getIndex();
-        E entry = parent.getEntry(index);
+        E entry = parent.getEntry(subtree.getIndex());
         boolean changed = node.adjustEntry(entry, entry.getRoutingObjectID(), entry.getParentDistance(), this);
         // write changes in parent to file
         if(changed) {
@@ -379,11 +379,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    *         otherwise
    */
   private boolean hasOverflow(N node) {
-    if(node.isLeaf()) {
-      return node.getNumEntries() == leafCapacity;
-    }
-
-    return node.getNumEntries() == dirCapacity;
+    return node.getNumEntries() == (node.isLeaf() ? leafCapacity : dirCapacity);
   }
 
   /**
@@ -408,8 +404,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     if(!oldRoot.isLeaf()) {
       // FIXME: what is happening here?
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
-        N node = getNode(oldRoot.getEntry(i));
-        writeNode(node);
+        writeNode(getNode(oldRoot.getEntry(i)));
       }
     }
 
@@ -432,10 +427,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     writeNode(oldRoot);
     writeNode(newNode);
     if(getLogger().isDebugging()) {
-      String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot;
-      msg += "\nchild2 " + newNode;
-      getLogger().debugFine(msg);
+      getLogger().debugFine("Create new Root: ID=" + root.getPageID() + "\nchild1 " + oldRoot + "\nchild2 " + newNode);
     }
 
     return new IndexTreePath<>(null, getRootEntry(), -1);
@@ -450,8 +442,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       E entry = path.getEntry();
       if(!(entry instanceof LeafEntry)) {
         // TODO: any way to skip unnecessary reads?
-        N node = getNode(entry);
-        if(node.isLeaf()) {
+        if(getNode(entry).isLeaf()) {
           result.add(entry);
         }
       }
@@ -470,8 +461,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {
-        E entry = node.getEntry(0);
-        node = getNode(entry);
+        node = getNode(node.getEntry(0));
         levels++;
       }
     }

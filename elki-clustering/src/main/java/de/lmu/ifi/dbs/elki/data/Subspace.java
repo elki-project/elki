@@ -131,8 +131,7 @@ public class Subspace {
       }
       result.append(d + 1);
     }
-    result.append("]");
-    return result.toString();
+    return result.append("]").toString();
   }
 
   /**
@@ -211,8 +210,8 @@ public class Subspace {
     int last1 = -1, last2 = -1;
 
     for(int d1 = BitsUtil.nextSetBit(this.dimensions, 0), d2 = BitsUtil.nextSetBit(other.dimensions, 0); //
-    d1 >= 0 && d2 >= 0; //
-    d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
+        d1 >= 0 && d2 >= 0; //
+        d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
       if(d1 == d2) {
         BitsUtil.setI(resultDimensions, d1);
       }

@@ -138,11 +138,10 @@ public class IndexTreePath<E extends Entry> {
    */
   @Override
   public String toString() {
-    StringBuilder buffer = new StringBuilder("[");
-
+    StringBuilder buffer = new StringBuilder(200).append('[');
     ArrayList<String> c = new ArrayList<>();
     for(IndexTreePath<E> p = this; p != null; p = p.getParentPath()) {
-      c.add("@" + index + ":" + entry.toString());
+      c.add("@" + p.index + ":" + entry.toString());
     }
     for(int counter = c.size() - 1; counter >= 0; --counter) {
       buffer.append(c.get(counter));
@@ -150,7 +149,6 @@ public class IndexTreePath<E extends Entry> {
         buffer.append(", ");
       }
     }
-    buffer.append("]");
-    return buffer.toString();
+    return buffer.append(']').toString();
   }
 }

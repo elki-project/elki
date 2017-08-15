@@ -737,7 +737,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       return null;
     }
     final double test = PoissonDistribution.rawProbability(support, expect);
-    if((poissonThreshold) <= test) {
+    if(poissonThreshold <= test) {
       return null;
     }
     // Create merged signature.
@@ -824,16 +824,15 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
           p++;
         }
       }
-      StringBuilder buf = new StringBuilder();
-      buf.append(p).append("-signature: ");
+      StringBuilder buf = new StringBuilder(1000) //
+          .append(p).append("-signature: ");
       for(int i = 0; i < spec.length; i += 2) {
         if(spec[i] >= 0) {
-          buf.append(i >>> 1).append(':');
-          buf.append(spec[i]).append('-').append(spec[i + 1]).append(' ');
+          buf.append(i >>> 1).append(':') //
+              .append(spec[i]).append('-').append(spec[i + 1]).append(' ');
         }
       }
-      buf.append(" size: ").append(ids.size());
-      return buf.toString();
+      return buf.append(" size: ").append(ids.size()).toString();
     }
   }
 

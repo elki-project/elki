@@ -66,8 +66,7 @@ import gnu.trove.list.array.TIntArrayList;
  * Reference: <br />
  * Outlier detection for high dimensional data<br />
  * C.C. Aggarwal, P. S. Yu <br />
- * Proceedings of the 2001 ACM SIGMOD international conference on Management of
- * data 2001, Santa Barbara, California, United States
+ * Proc. 2001 ACM SIGMOD international conference on Management of data
  * </p>
  * 
  * @author Ahmed Hettab
@@ -82,7 +81,10 @@ import gnu.trove.list.array.TIntArrayList;
 // TODO: progress logging!
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", //
+    title = "Outlier detection for high dimensional data", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
+    url = "http://dx.doi.org/10.1145/375663.375668")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary")
 public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAggarwalYuOutlier<V> {
   /**
@@ -246,8 +248,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
           bestSol.add(ind);
         }
         if(LOG.isDebuggingFinest()) {
-          StringBuilder buf = new StringBuilder();
-          buf.append("Top solutions:\n");
+          StringBuilder buf = new StringBuilder(1000).append("Top solutions:\n");
           for(Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
             buf.append(it.get().toString()).append('\n');
           }
@@ -627,21 +628,19 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     @Override
     public String toString() {
-      StringBuilder buf = new StringBuilder();
-      buf.append("I(f=").append(fitness);
-      buf.append(",g=");
+      StringBuilder buf = new StringBuilder(200).append("I(f=").append(fitness).append(",g=");
       for(int i = 0; i < gene.length; i++) {
         if(i > 0) {
-          buf.append(",");
+          buf.append(',');
         }
         if(gene[i] == DONT_CARE) {
-          buf.append("*");
+          buf.append('*');
         }
         else {
           buf.append(gene[i]);
         }
       }
-      buf.append(")");
+      buf.append(')');
       return buf.toString();
     }
 

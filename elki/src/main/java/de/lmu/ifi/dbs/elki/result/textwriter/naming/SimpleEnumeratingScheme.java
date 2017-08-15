@@ -26,10 +26,15 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 /**
- * Simple enumerating naming scheme. Cluster names are generated as follows: -
- * if the cluster has a name assigned, use it - otherwise use getNameAutomatic()
- * as name, and add an enumeration postfix
+ * Simple enumerating naming scheme. Cluster names are generated as follows:
+ * <ol>
+ * <li>if the cluster has a name assigned, use it
+ * <li>otherwise use getNameAutomatic() as name, and add an enumeration postfix
+ * </ol>
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -43,20 +48,20 @@ public class SimpleEnumeratingScheme implements NamingScheme {
   private Clustering<?> clustering;
 
   /**
-   * count how often each name occurred so far.
+   * Count how often each name occurred so far.
    */
-  private Map<String, Integer> namecount = new HashMap<>();
+  private TObjectIntHashMap<String> namefreq;
 
   /**
    * Assigned cluster names.
    */
-  private Map<Cluster<?>, String> names = new HashMap<>();
+  private Map<Cluster<?>, String> names;
 
   /**
    * This is the postfix added to the first cluster, which will be removed when
    * there is only one cluster of this name.
    */
-  private static final String nullpostfix = " " + Integer.toString(0);
+  private static final String NULLPOSTFIX = " 0";
 
   /**
    * Constructor.
@@ -65,6 +70,8 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    */
   public SimpleEnumeratingScheme(Clustering<?> clustering) {
     super();
+    this.namefreq = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 0);
+    this.names = new HashMap<>();
     this.clustering = clustering;
     updateNames();
   }
@@ -74,16 +81,12 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    */
   private void updateNames() {
     for(Cluster<?> cluster : clustering.getAllClusters()) {
-      if(names.get(cluster) == null) {
-        String sugname = cluster.getNameAutomatic();
-        Integer count = namecount.get(sugname);
-        if(count == null) {
-          count = new Integer(0);
-        }
-        names.put(cluster, sugname + " " + count.toString());
-        count++;
-        namecount.put(sugname, count);
+      if(names.get(cluster) != null) {
+        continue;
       }
+      String sugname = cluster.getNameAutomatic();
+      int count = namefreq.adjustOrPutValue(sugname, 1, 1);
+      names.put(cluster, sugname + " " + count);
     }
   }
 
@@ -98,9 +101,10 @@ public class SimpleEnumeratingScheme implements NamingScheme {
       updateNames();
       nam = names.get(cluster);
     }
-    if(nam.endsWith(nullpostfix)) {
-      if(namecount.get(nam.substring(0, nam.length() - nullpostfix.length())) == 1) {
-        nam = nam.substring(0, nam.length() - nullpostfix.length());
+    if(nam.endsWith(NULLPOSTFIX)) {
+      String basename = nam.substring(0, nam.length() - NULLPOSTFIX.length());
+      if(namefreq.get(basename) == 1) {
+        nam = basename;
       }
     }
     return nam;

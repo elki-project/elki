@@ -42,7 +42,7 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
    * Test with default parameters.
    */
   @Test
-  public void DefaultParameters() {
+  public void defaultParameters() {
     String filename = UNITTEST + "sorted-data-1.csv";
     // Allow loading test data from resources.
     ShuffleObjectsFilter filter = ClassGenericsUtil.parameterizeOrAbort(ShuffleObjectsFilter.class, new ListParameterization());

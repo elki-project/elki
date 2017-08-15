@@ -194,8 +194,8 @@ public class CheckELKIServices {
       // TODO: sort by package, then classname
       Collections.sort(sorted);
       if(update == null) {
-        StringBuilder message = new StringBuilder();
-        message.append("Class ").append(prop).append(" lacks suggestions:").append(FormatUtil.NEWLINE);
+        StringBuilder message = new StringBuilder().append("Class ").append(prop)//
+            .append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
           message.append("# ").append(remaining).append(FormatUtil.NEWLINE);
         }
@@ -237,10 +237,10 @@ public class CheckELKIServices {
     Alias ann = c.getAnnotation(Alias.class);
     if(ann == null) {
       if(parts.length > 1) {
-        StringBuilder buf = new StringBuilder();
-        buf.append("Class ").append(classname);
-        buf.append(" in ").append(parent.getCanonicalName());
-        buf.append(" has the following extraneous aliases:");
+        StringBuilder buf = new StringBuilder() //
+            .append("Class ").append(classname) //
+            .append(" in ").append(parent.getCanonicalName()) //
+            .append(" has the following extraneous aliases:");
         for(int i = 1; i < parts.length; i++) {
           buf.append(' ').append(parts[i]);
         }
@@ -256,10 +256,10 @@ public class CheckELKIServices {
     for(String a : ann.value()) {
       if(!aliases.remove(a)) {
         if(buf == null) {
-          buf = new StringBuilder();
-          buf.append("Class ").append(classname);
-          buf.append(" in ").append(parent.getCanonicalName());
-          buf.append(" is missing the following aliases:");
+          buf = new StringBuilder() //
+              .append("Class ").append(classname) //
+              .append(" in ").append(parent.getCanonicalName()) //
+              .append(" is missing the following aliases:");
         }
         buf.append(' ').append(a);
       }
@@ -269,11 +269,11 @@ public class CheckELKIServices {
         buf = new StringBuilder();
       }
       else {
-        buf.append('\n');
+        buf.append(FormatUtil.NEWLINE);
       }
-      buf.append("Class ").append(classname);
-      buf.append(" in ").append(parent.getCanonicalName());
-      buf.append(" has the following extraneous aliases:");
+      buf.append("Class ").append(classname) //
+          .append(" in ").append(parent.getCanonicalName()) //
+          .append(" has the following extraneous aliases:");
       for(String a : aliases) {
         buf.append(' ').append(a);
       }

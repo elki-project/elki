@@ -236,10 +236,10 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    */
   @Override
   public String toString(String pre) {
-    StringBuilder result = new StringBuilder();
-    result.append(super.toString(pre));
-    result.append('\n').append(pre).append("Coverage: ").append(coverage);
-    result.append('\n').append(pre).append("Units: " + "\n");
+    StringBuilder result = new StringBuilder() //
+        .append(super.toString(pre)) //
+        .append('\n').append(pre).append("Coverage: ").append(coverage) //
+        .append('\n').append(pre).append("Units: \n");
     for(CLIQUEUnit<V> denseUnit : getDenseUnits()) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }
@@ -254,6 +254,8 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * equals.
    * 
    * @author Elke Achtert
+   * 
+   * @apiviz.exclude
    */
   public static class CoverageComparator implements Comparator<CLIQUESubspace<?>> {
     /**
@@ -274,7 +276,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
      */
     @Override
     public int compare(CLIQUESubspace<?> s1, CLIQUESubspace<?> s2) {
-      return -(s1.getCoverage() - s2.getCoverage());
+      return Integer.compare(s2.getCoverage(), s1.getCoverage());
     }
   }
 }

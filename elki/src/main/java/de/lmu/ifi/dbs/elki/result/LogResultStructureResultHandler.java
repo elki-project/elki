@@ -75,10 +75,10 @@ public class LogResultStructureResultHandler implements ResultHandler {
       return;
     }
     for(int i = 0; i < depth; i++) {
-      buf.append(" ");
+      buf.append(' ');
     }
-    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName());
-    buf.append(" (").append(result.getShortName()).append(")\n");
+    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()) //
+        .append(" (").append(result.getShortName()).append(")\n");
     if(hier.numChildren(result) > 0) {
       for(It<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
         recursiveLogResult(buf, hier, iter.get(), depth + 1);

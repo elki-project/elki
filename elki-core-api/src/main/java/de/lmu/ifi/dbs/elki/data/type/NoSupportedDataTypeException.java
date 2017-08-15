@@ -68,7 +68,7 @@ public class NoSupportedDataTypeException extends IllegalStateException {
     if(types != null) {
       buf.append("\nAvailable types:");
       for(TypeInformation type : types) {
-        buf.append(" ").append(type.toString());
+        buf.append(' ').append(type.toString());
       }
     }
     return buf.toString();
