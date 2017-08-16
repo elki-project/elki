@@ -44,6 +44,7 @@ public class ZCurveSpatialSorterTest {
   public void testBasic() {
     ArrayList<V> vs = new ArrayList<>();
     vs.add(new V(0, 0, 0));
+    vs.add(new V(0, 0, .1));
     vs.add(new V(0, .1, 0));
     vs.add(new V(0, .1, .1));
     vs.add(new V(0, 0, .25));
@@ -57,8 +58,34 @@ public class ZCurveSpatialSorterTest {
     vs.add(new V(0, 3, 0));
     vs.add(new V(2, 0, 0));
     vs.add(new V(3, 0, 0));
-    ArrayList<V> x = new ArrayList<>(vs);
-    Collections.shuffle(x, new Random(0L));
+    ArrayList<V> x = shuffle(vs, new Random(0L));
+    ZCurveSpatialSorter.STATIC.sort(x);
+    assertSameOrder("Z-order incorrect", vs, x);
+  }
+
+  /**
+   * Compare two lists for the same order.
+   * 
+   * @param msg Assertion message.
+   * @param vs Correct order
+   * @param x Test order
+   */
+  public static <X> void assertSameOrder(String msg, ArrayList<X> vs, ArrayList<X> x) {
+    for(int i = 0; i < vs.size(); i++) {
+      assertSame(msg + ", at position " + i, vs.get(i), x.get(i));
+    }
+  }
+
+  /**
+   * Shuffle a list, and ensure it has a different order.
+   *
+   * @param vs List
+   * @param rnd Random
+   * @return Shuffled list
+   */
+  public static <X> ArrayList<X> shuffle(ArrayList<X> vs, Random rnd) {
+    ArrayList<X> x = new ArrayList<>(vs);
+    Collections.shuffle(x, rnd);
     boolean shuffled = false;
     for(int i = 0; i < vs.size(); i++) {
       if(vs.get(i) != x.get(i)) {
@@ -67,10 +94,7 @@ public class ZCurveSpatialSorterTest {
       }
     }
     assertTrue("Data was not shuffled.", shuffled);
-    ZCurveSpatialSorter.STATIC.sort(x);
-    for(int i = 0; i < vs.size(); i++) {
-      assertSame("Data was not ordered correctly, at position " + i, vs.get(i), x.get(i));
-    }
+    return x;
   }
 
   /**
@@ -78,8 +102,10 @@ public class ZCurveSpatialSorterTest {
    * we do not have access to our usual DoubleVector here!
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  private static class V implements SpatialComparable {
+  public static class V implements SpatialComparable {
     double[] data;
 
     public V(double... data) {
