@@ -20,8 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.almostEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -98,5 +97,15 @@ public final class CholeskyDecompositionTest {
         { 2, 12 }, //
     };
     assertFalse(new CholeskyDecomposition(A4).isSPD());
+  }
+
+  @Test
+  public void testJamaSolve() {
+    double[][] p = { { 4., 1., 1. }, { 1., 2., 3. }, { 1., 3., 6. } };
+    CholeskyDecomposition c = new CholeskyDecomposition(p);
+    double[][] l = c.getL();
+    assertTrue(almostEquals(p, timesTranspose(l, l), 1e-15));
+    double[][] o = c.solve(unitMatrix(3));
+    assertTrue("Not solved.", almostEquals(unitMatrix(3), times(p, o), 1e-14));
   }
 }

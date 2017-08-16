@@ -43,6 +43,19 @@ public final class QRDecompositionTest {
   }
 
   @Test
+  public void testJamaSolve() {
+    double[][] s = { { 5., 8. }, { 6., 9. } };
+    double[][] in = { { 13 }, { 15 } };
+    double[][] sol = { { 1 }, { 1 } };
+    double[][] o = new QRDecomposition(s).solve(in);
+    assertTrue("Not solved.", almostEquals(sol, o, 1e-14));
+
+    double[][] p = { { 4., 1., 1. }, { 1., 2., 3. }, { 1., 3., 6. } };
+    double[][] o2 = new QRDecomposition(p).solve(unitMatrix(3));
+    assertTrue("Not solved.", almostEquals(unitMatrix(3), times(p, o2), 1e-14));
+  }
+
+  @Test
   public void testWikipedia() {
     double[][] m = { //
         { 12, -51, 4 }, //
@@ -67,8 +80,8 @@ public final class QRDecompositionTest {
   }
 
   @Test
-  public void testRank5() {
-    double delta = 1e-7;
+  public void testRank4() {
+    double delta = 1e-14;
     double[][] m = transpose(new double[][] { //
         { 1, 1, 1, 1 + delta, 1, 1 }, //
         { 1, 1, 1, delta, 0, 0 }, //
@@ -82,6 +95,6 @@ public final class QRDecompositionTest {
     assertTrue(almostEquals(unitMatrix(q[0].length), transposeTimes(q, q)));
     checkTriangular(r);
     assertTrue("Not a proper decomposition.", almostEquals(m, times(q, r), 1e-14));
-    assertEquals(5, qr.rank());
+    assertEquals("Rank not as expected", 4, qr.rank(1e-14));
   }
 }

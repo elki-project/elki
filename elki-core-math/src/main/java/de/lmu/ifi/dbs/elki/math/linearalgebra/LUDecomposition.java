@@ -20,22 +20,24 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 /**
  * LU Decomposition.
- * <P>
+ *
  * For an m-by-n matrix A with m >= n, the LU decomposition is an m-by-n unit
  * lower triangular matrix L, an n-by-n upper triangular matrix U, and a
  * permutation vector piv of length m so that A(piv,:) = L*U. If m &lt; n, then
  * L is m-by-m and U is m-by-n.
- * <P>
+ *
  * The LU decompostion with pivoting always exists, even if the matrix is
  * singular, so the constructor will never fail. The primary use of the LU
  * decomposition is in the solution of square systems of simultaneous linear
  * equations. This will fail if isNonsingular() returns false.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.uses Matrix - - transforms
  */
 public class LUDecomposition implements java.io.Serializable {
@@ -67,10 +69,6 @@ public class LUDecomposition implements java.io.Serializable {
    */
   private int[] piv;
 
-  /*
-   * ------------------------ Constructor ------------------------
-   */
-
   /**
    * LU Decomposition
    * 
@@ -88,58 +86,48 @@ public class LUDecomposition implements java.io.Serializable {
    * @param n column dimensionality
    */
   public LUDecomposition(double[][] LU, int m, int n) {
-    LU = VMath.copy(LU);
-    this.LU = LU;
+    this.LU = LU = copy(LU);
     this.m = m;
     this.n = n;
     // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
     piv = new int[m];
-    for (int i = 0; i < m; i++) {
+    for(int i = 0; i < m; i++) {
       piv[i] = i;
     }
     pivsign = 1;
-    double[] LUrowi;
+    // Copy of column
     double[] LUcolj = new double[m];
 
     // Outer loop.
-
-    for (int j = 0; j < n; j++) {
+    for(int j = 0; j < n; j++) {
       // Make a copy of the j-th column to localize references.
-
-      for (int i = 0; i < m; i++) {
+      for(int i = 0; i < m; i++) {
         LUcolj[i] = LU[i][j];
       }
 
       // Apply previous transformations.
-
-      for (int i = 0; i < m; i++) {
-        LUrowi = LU[i];
-
+      for(int i = 0; i < m; i++) {
         // Most of the time is spent in the following dot product.
-
         int kmax = Math.min(i, j);
         double s = 0.0;
-        for (int k = 0; k < kmax; k++) {
+        double[] LUrowi = LU[i];
+        for(int k = 0; k < kmax; k++) {
           s += LUrowi[k] * LUcolj[k];
         }
-
         LUrowi[j] = LUcolj[i] -= s;
       }
 
       // Find pivot and exchange if necessary.
-
       int p = j;
-      for (int i = j + 1; i < m; i++) {
-        if (Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
+      for(int i = j + 1; i < m; i++) {
+        if(Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
           p = i;
         }
       }
-      if (p != j) {
-        for (int k = 0; k < n; k++) {
-          double t = LU[p][k];
-          LU[p][k] = LU[j][k];
-          LU[j][k] = t;
-        }
+      if(p != j) {
+        double[] tmp = LU[j];
+        LU[j] = LU[p];
+        LU[p] = tmp;
         int k = piv[p];
         piv[p] = piv[j];
         piv[j] = k;
@@ -147,18 +135,14 @@ public class LUDecomposition implements java.io.Serializable {
       }
 
       // Compute multipliers.
-
-      if (j < m && LU[j][j] != 0.0) {
-        for (int i = j + 1; i < m; i++) {
-          LU[i][j] /= LU[j][j];
+      final double LUjj = LU[j][j];
+      if(j < m && LUjj != 0.0) {
+        for(int i = j + 1; i < m; i++) {
+          LU[i][j] /= LUjj;
         }
       }
     }
   }
-
-  /*
-   * ------------------------ Public Methods ------------------------
-   */
 
   /**
    * Is the matrix nonsingular?
@@ -166,8 +150,8 @@ public class LUDecomposition implements java.io.Serializable {
    * @return true if U, and hence A, is nonsingular.
    */
   public boolean isNonsingular() {
-    for (int j = 0; j < n; j++) {
-      if (LU[j][j] == 0) {
+    for(int j = 0; j < n; j++) {
+      if(LU[j][j] == 0) {
         return false;
       }
     }
@@ -181,16 +165,10 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[][] getL() {
     double[][] L = new double[m][n];
-    for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
-        if (i > j) {
-          L[i][j] = LU[i][j];
-        } else if (i == j) {
-          L[i][j] = 1.0;
-        } else {
-          L[i][j] = 0.0;
-        }
-      }
+    for(int i = 0; i < m; i++) {
+      final double[] Li = L[i];
+      System.arraycopy(LU[i], 0, Li, 0, Math.min(i, n));
+      Li[i] = 1.0;
     }
     return L;
   }
@@ -202,14 +180,8 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[][] getU() {
     double[][] U = new double[n][n];
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        if (i <= j) {
-          U[i][j] = LU[i][j];
-        } else {
-          U[i][j] = 0.0;
-        }
-      }
+    for(int i = 0; i < n; i++) {
+      System.arraycopy(LU[i], i, U[i], i, n - i);
     }
     return U;
   }
@@ -220,9 +192,7 @@ public class LUDecomposition implements java.io.Serializable {
    * @return piv
    */
   public int[] getPivot() {
-    int[] p = new int[m];
-    System.arraycopy(piv, 0, p, 0, m);
-    return p;
+    return piv.clone();
   }
 
   /**
@@ -232,11 +202,11 @@ public class LUDecomposition implements java.io.Serializable {
    * @exception IllegalArgumentException Matrix must be square
    */
   public double det() {
-    if (m != n) {
+    if(m != n) {
       throw new IllegalArgumentException("Matrix must be square.");
     }
     double d = pivsign;
-    for (int j = 0; j < n; j++) {
+    for(int j = 0; j < n; j++) {
       d *= LU[j][j];
     }
     return d;
@@ -251,17 +221,14 @@ public class LUDecomposition implements java.io.Serializable {
    * @exception ArithmeticException Matrix is singular.
    */
   public double[][] solve(double[][] B) {
-    int mx = B.length;
-    int nx = B[0].length;
-    if (mx != m) {
+    int mx = B.length, nx = B[0].length;
+    if(mx != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
-    if (!this.isNonsingular()) {
+    if(!this.isNonsingular()) {
       throw new ArithmeticException("Matrix is singular.");
     }
-    double[][] Xmat = VMath.getMatrix(B, piv, 0, nx);
-    solveInplace(Xmat, nx);
-    return Xmat;
+    return solveInplace(getMatrix(B, piv, 0, nx), nx);
   }
 
   /**
@@ -269,26 +236,24 @@ public class LUDecomposition implements java.io.Serializable {
    * 
    * @param B A Matrix with as many rows as A and any number of columns.
    * @param nx Number of columns
+   * @return B
    */
-  private void solveInplace(double[][] B, int nx) {
+  private double[][] solveInplace(double[][] B, int nx) {
     // Solve L*Y = B(piv,:)
-    for (int k = 0; k < n; k++) {
-      for (int i = k + 1; i < n; i++) {
-        for (int j = 0; j < nx; j++) {
-          B[i][j] -= B[k][j] * LU[i][k];
-        }
+    for(int k = 0; k < n; k++) {
+      final double[] Bk = B[k];
+      for(int i = k + 1; i < n; i++) {
+        minusTimesEquals(B[i], Bk, LU[i][k]);
       }
     }
     // Solve U*X = Y;
-    for (int k = n - 1; k >= 0; k--) {
-      for (int j = 0; j < nx; j++) {
-        B[k][j] /= LU[k][k];
-      }
-      for (int i = 0; i < k; i++) {
-        for (int j = 0; j < nx; j++) {
-          B[i][j] -= B[k][j] * LU[i][k];
-        }
+    for(int k = n - 1; k >= 0; k--) {
+      final double[] Bk = B[k];
+      timesEquals(Bk, 1. / LU[k][k]);
+      for(int i = 0; i < k; i++) {
+        minusTimesEquals(B[i], Bk, LU[i][k]);
       }
     }
+    return B;
   }
 }

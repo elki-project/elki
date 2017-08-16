@@ -86,7 +86,7 @@ public class QRDecomposition implements java.io.Serializable {
    * @param n column dimensionality
    */
   public QRDecomposition(double[][] A, int m, int n) {
-    this.QR = VMath.copy(A);
+    this.QR = copy(A);
     if(m < n) {
       throw new IllegalArgumentException("Matrix does not satisfy rows >= columns!");
     }
@@ -118,10 +118,10 @@ public class QRDecomposition implements java.io.Serializable {
             final double[] QRi = QR[i];
             s += QRi[k] * QRi[j];
           }
-          s = -s / QRk[k];
+          s /= QRk[k];
           for(int i = k; i < m; i++) {
             final double[] QRi = QR[i];
-            QRi[j] += s * QRi[k];
+            QRi[j] -= s * QRi[k];
           }
         }
       }
@@ -146,15 +146,17 @@ public class QRDecomposition implements java.io.Serializable {
   /**
    * Get the matrix rank?
    * 
+   * @param t Tolerance threshold
    * @return Rank of R
    */
-  public int rank() {
+  public int rank(double t) {
+    int rank = n;
     for(int j = 0; j < n; j++) {
-      if(Rdiag[j] == 0) {
-        return j;
+      if(Math.abs(Rdiag[j]) <= t) {
+        --rank;
       }
     }
-    return n;
+    return rank;
   }
 
   /**
@@ -202,9 +204,9 @@ public class QRDecomposition implements java.io.Serializable {
           for(int i = k; i < m; i++) {
             s += QR[i][k] * Q[i][j];
           }
-          s = -s / QR[k][k];
+          s /= QR[k][k];
           for(int i = k; i < m; i++) {
-            Q[i][j] += s * QR[i][k];
+            Q[i][j] -= s * QR[i][k];
           }
         }
       }
@@ -244,9 +246,9 @@ public class QRDecomposition implements java.io.Serializable {
         for(int i = k; i < m; i++) {
           s += QR[i][k] * X[i][j];
         }
-        s = -s / QR[k][k];
+        s /= QR[k][k];
         for(int i = k; i < m; i++) {
-          X[i][j] += s * QR[i][k];
+          X[i][j] -= s * QR[i][k];
         }
       }
     }

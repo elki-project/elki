@@ -61,13 +61,22 @@ public class CholeskyDecomposition {
     final int n = A.length;
     L = new double[n][n];
     isspd = (A[0].length == n);
+    { // First iteration
+      double d = A[0][0];
+      isspd &= (d > 0.0);
+      L[0][0] = d > 0 ? FastMath.sqrt(d) : 0;
+      Arrays.fill(L[0], 1, n, 0.0);
+    }
     // Main loop.
-    for(int j = 0; j < n; j++) {
+    for(int j = 1; j < n; j++) {
       final double[] Lj = L[j], Aj = A[j];
       double d = 0.0;
       for(int k = 0; k < j; k++) {
         final double[] Lk = L[k];
-        double s = transposeTimes(Lk, Lj);
+        double s = 0.0;
+        for(int i = 0; i < k; i++) {
+          s += Lk[i] * Lj[i];
+        }
         Lj[k] = s = (Aj[k] - s) / Lk[k];
         d += s * s;
         isspd &= (A[k][j] == Aj[k]);
@@ -124,12 +133,17 @@ public class CholeskyDecomposition {
    */
   private double[][] solveL(double[][] X) {
     final int n = L.length;
-    for(int k = 0; k < n; k++) {
-      final double[] Xk = X[k];
-      for(int i = k + 1; i < n; i++) {
-        plusTimesEquals(X[i], Xk, -L[i][k]);
+    X[0][0] /= L[0][0]; // First iteration, simplified.
+    for(int k = 1; k < n; k++) {
+      final double[] Xk = X[k], Lk = L[k];
+      final double iLkk = 1. / Lk[k];
+      for(int j = 0; j < n; j++) {
+        double Xkj = Xk[j];
+        for(int i = 0; i < k; i++) {
+          Xkj -= X[i][j] * Lk[i];
+        }
+        Xk[j] = Xkj *= iLkk;
       }
-      timesEquals(Xk, 1. / L[k][k]);
     }
     return X;
   }
