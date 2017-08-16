@@ -1322,7 +1322,7 @@ public final class VMath {
     final int rowdim2 = m2.length;
     assert (coldim1 == getColumnDimensionality(m2)) : ERR_MATRIX_INNERDIM;
     final double[][] re = new double[rowdim1][rowdim2];
-    for(int j = 0; j < re.length; j++) {
+    for(int j = 0; j < rowdim2; j++) {
       final double[] Browj = m2[j];
       // multiply it with each row from A
       for(int i = 0; i < rowdim1; i++) {

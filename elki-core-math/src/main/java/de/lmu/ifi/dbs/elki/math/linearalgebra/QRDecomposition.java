@@ -176,9 +176,9 @@ public class QRDecomposition implements java.io.Serializable {
    * @return R
    */
   public double[][] getR() {
-    double[][] R = new double[m][n];
-    for(int i = 0; i < m; i++) {
-      System.arraycopy(QR[i], 0, R[i], 0, i);
+    double[][] R = new double[n][n];
+    for(int i = 0; i < n; i++) {
+      System.arraycopy(QR[i], i + 1, R[i], i + 1, n - i - 1);
       R[i][i] = Rdiag[i];
     }
     return R;

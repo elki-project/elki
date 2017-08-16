@@ -36,8 +36,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 public class SingularValueDecompositionTest {
   @Test
   public void testJamaExample() {
-    double[][] A = new double[][] { { 1., 2., 3., 4. }, { 5., 6., 7., 8. }, { 9., 10., 11., 12. } };
-    double[][] M = transpose(A);
+    double[][] M = transpose(new double[][] { { 1., 2., 3., 4. }, { 5., 6., 7., 8. }, { 9., 10., 11., 12. } });
     SingularValueDecomposition svd = new SingularValueDecomposition(M);
     // M = U * S * V^T
     double[][] M2 = times(svd.getU(), timesTranspose(svd.getS(), svd.getV()));
