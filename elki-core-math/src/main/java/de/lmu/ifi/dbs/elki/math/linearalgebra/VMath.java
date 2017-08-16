@@ -815,15 +815,15 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index (inclusive!)
+   * @param r1 Final row index (exclusive!)
    * @param c0 Initial column index
-   * @param c1 Final column index (inclusive!)
-   * @return m1(r0:r1,c0:c1)
+   * @param c1 Final column index (exclusive!)
+   * @return m1(r0:r1-1,c0:c1-1)
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1) {
-    final int rowdim = r1 - r0 + 1, coldim = c1 - c0 + 1;
+    final int rowdim = r1 - r0, coldim = c1 - c0;
     final double[][] X = new double[rowdim][coldim];
-    for(int i = r0; i <= r1; i++) {
+    for(int i = r0; i < r1; i++) {
       System.arraycopy(m1[i], c0, X[i - r0], 0, coldim);
     }
     return X;
@@ -855,11 +855,11 @@ public final class VMath {
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
-   * @param c1 Final column index (inclusive!)
+   * @param c1 Final column index (exclusive!)
    * @return m1(r(:),c0:c1)
    */
   public static double[][] getMatrix(final double[][] m1, final int[] r, final int c0, final int c1) {
-    final int rowdim = r.length, coldim = c1 - c0 + 1;
+    final int rowdim = r.length, coldim = c1 - c0;
     final double[][] X = new double[rowdim][coldim];
     for(int i = 0; i < rowdim; i++) {
       System.arraycopy(m1[r[i]], c0, X[i], 0, coldim);
@@ -872,17 +872,18 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index (inclusive!)
+   * @param r1 Final row index (exclusive!)
    * @param c Array of column indices.
    * @return m1(r0:r1,c(:))
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int[] c) {
-    final int rowdim = r1 - r0 + 1, coldim = c.length;
+    final int rowdim = r1 - r0, coldim = c.length;
     final double[][] X = new double[rowdim][coldim];
-    for(int i = r0; i <= r1; i++) {
+    for(int i = r0; i < r1; i++) {
       final double[] row = m1[i];
+      final double[] Xi = X[i - r0];
       for(int j = 0; j < coldim; j++) {
-        X[i - r0][j] = row[c[j]];
+        Xi[j] = row[c[j]];
       }
     }
     return X;
@@ -893,14 +894,14 @@ public final class VMath {
    * 
    * @param m1 Original matrix
    * @param r0 Initial row index
-   * @param r1 Final row index
+   * @param r1 Final row index (exclusive)
    * @param c0 Initial column index
-   * @param c1 Final column index
-   * @param m2 New values for m1(r0:r1,c0:c1)
+   * @param c1 Final column index (exclusive)
+   * @param m2 New values for m1(r0:r1-1,c0:c1-1)
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1, final double[][] m2) {
-    final int coldim = c1 - c0 + 1;
-    for(int i = r0; i <= r1; i++) {
+    final int coldim = c1 - c0;
+    for(int i = r0; i < r1; i++) {
       System.arraycopy(m2[i - r0], 0, m1[i], c0, coldim);
     }
   }
@@ -947,7 +948,7 @@ public final class VMath {
    * @param m2 New values for m1(r0:r1,c(:))
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int[] c, final double[][] m2) {
-    for(int i = r0; i <= r1; i++) {
+    for(int i = r0; i < r1; i++) {
       final double[] row1 = m1[i], row2 = m2[i - r0];
       for(int j = 0; j < c.length; j++) {
         row1[c[j]] = row2[j];

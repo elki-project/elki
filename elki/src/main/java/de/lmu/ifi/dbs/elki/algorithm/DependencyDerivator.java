@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setMatrix;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.format;
 import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.formatTo;
 
@@ -230,27 +227,22 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
 
       // +1 == + B[0].length
       double[][] gaussJordan = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length + 1];
-      setMatrix(gaussJordan, 0, transposedWeakEigenvectors.length - 1, 0, transposedWeakEigenvectors[0].length - 1, transposedWeakEigenvectors);
+      setMatrix(gaussJordan, 0, transposedWeakEigenvectors.length, 0, transposedWeakEigenvectors[0].length, transposedWeakEigenvectors);
       setCol(gaussJordan, transposedWeakEigenvectors[0].length, b);
 
       if(LOG.isDebuggingFiner()) {
         LOG.debugFiner("Gauss-Jordan-Elimination of " + format(gaussJordan, " [", "]\n", ", ", nf));
       }
 
-      double[][] a = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length];
-      System.arraycopy(transposedWeakEigenvectors, 0, a, 0, transposedWeakEigenvectors.length);
-
-      LinearEquationSystem lq = new LinearEquationSystem(a, b);
+      LinearEquationSystem lq = new LinearEquationSystem(copy(transposedWeakEigenvectors), b);
       lq.solveByTotalPivotSearch();
 
       sol = new CorrelationAnalysisSolution<>(lq, relation, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
 
       if(LOG.isDebuggingFine()) {
-        StringBuilder log = new StringBuilder();
-        log.append("Solution:\n") //
+        LOG.debugFine(new StringBuilder().append("Solution:\n") //
             .append("Standard deviation ").append(sol.getStandardDeviation()) //
-            .append(lq.equationsToString(nf.getMaximumFractionDigits()));
-        LOG.debugFine(log.toString());
+            .append(lq.equationsToString(nf.getMaximumFractionDigits())).toString());
       }
     }
     return sol;

@@ -226,19 +226,6 @@ public class LUDecomposition implements java.io.Serializable {
   }
 
   /**
-   * Return pivot permutation vector as a one-dimensional double array
-   * 
-   * @return (double) piv
-   */
-  public double[] getDoublePivot() {
-    double[] vals = new double[m];
-    for (int i = 0; i < m; i++) {
-      vals[i] = (double) piv[i];
-    }
-    return vals;
-  }
-
-  /**
    * Determinant
    * 
    * @return det(A)
@@ -272,7 +259,7 @@ public class LUDecomposition implements java.io.Serializable {
     if (!this.isNonsingular()) {
       throw new ArithmeticException("Matrix is singular.");
     }
-    double[][] Xmat = VMath.getMatrix(B, piv, 0, nx - 1);
+    double[][] Xmat = VMath.getMatrix(B, piv, 0, nx);
     solveInplace(Xmat, nx);
     return Xmat;
   }

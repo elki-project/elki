@@ -634,7 +634,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     }
 
     double[][] basis = model.getStrongEigenvectors();
-    return getMatrix(basis, 0, basis.length - 1, 0, dim - 2);
+    return getMatrix(basis, 0, basis.length, 0, dim - 1);
   }
 
   /**

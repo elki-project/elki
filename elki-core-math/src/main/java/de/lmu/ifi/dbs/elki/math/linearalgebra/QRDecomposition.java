@@ -221,8 +221,7 @@ public class QRDecomposition implements java.io.Serializable {
    * @exception ArithmeticException Matrix is rank deficient.
    */
   public double[][] solve(double[][] B) {
-    int rows = B.length;
-    int cols = B[0].length;
+    int rows = B.length, cols = B[0].length;
     if(rows != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
@@ -234,7 +233,7 @@ public class QRDecomposition implements java.io.Serializable {
     double[][] X = copy(B);
 
     solveInplace(X, cols);
-    return getMatrix(X, 0, n - 1, 0, cols - 1);
+    return getMatrix(X, 0, n, 0, cols);
   }
 
   private void solveInplace(double[][] X, int nx) {
