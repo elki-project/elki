@@ -247,10 +247,7 @@ public final class BitsUtil {
    */
   public static long[] grayI(long[] v) {
     // TODO: copy less
-    long[] t = copy(v);
-    shiftRightI(t, 1);
-    xorI(v, t);
-    return v;
+    return xorI(v, shiftRightI(copy(v), 1));
   }
 
   /**
@@ -342,8 +339,7 @@ public final class BitsUtil {
    * @param off Offset to flip
    */
   public static long flipC(long v, int off) {
-    v ^= (1L << off);
-    return v;
+    return v ^ (1L << off);
   }
 
   /**
@@ -367,8 +363,7 @@ public final class BitsUtil {
    * @param off Offset to set
    */
   public static long setC(long v, int off) {
-    v |= (1L << off);
-    return v;
+    return v | (1L << off);
   }
 
   /**
@@ -408,8 +403,7 @@ public final class BitsUtil {
    * @param off Offset to clear
    */
   public static long clearC(long v, int off) {
-    v &= ~(1L << off);
-    return v;
+    return v & ~(1L << off);
   }
 
   /**
@@ -845,10 +839,7 @@ public final class BitsUtil {
    */
   public static long[] cycleRightI(long[] v, int shift, int len) {
     long[] t = copy(v, len, len - shift);
-    truncateI(t, len);
-    shiftRightI(v, shift);
-    orI(v, t);
-    return v;
+    return orI(shiftRightI(v, shift), truncateI(t, len));
   }
 
   /**
@@ -896,10 +887,7 @@ public final class BitsUtil {
    */
   public static long[] cycleLeftI(long[] v, int shift, int len) {
     long[] t = copy(v, len, shift);
-    truncateI(t, len);
-    shiftRightI(v, len - shift);
-    orI(v, t);
-    return v;
+    return orI(shiftRightI(v, len - shift), truncateI(t, len));
   }
 
   /**
@@ -1147,7 +1135,7 @@ public final class BitsUtil {
    * @return Position of first set bit, -1 if no set bit was found.
    */
   public static int numberOfTrailingZerosSigned(long v) {
-    return Long.numberOfTrailingZeros(v);
+    return v == 0 ? -1 : Long.numberOfTrailingZeros(v);
   }
 
   /**
@@ -1181,14 +1169,12 @@ public final class BitsUtil {
    * @return Position of first set bit, -1 if no set bit was found.
    */
   public static int numberOfLeadingZerosSigned(long[] v) {
-    for(int p = 0, ip = v.length - 1;; p++, ip--) {
-      if(p == v.length) {
-        return -1;
-      }
+    for(int p = 0, ip = v.length - 1; p < v.length; p++, ip--) {
       if(v[ip] != 0) {
         return Long.numberOfLeadingZeros(v[ip]) + p * Long.SIZE;
       }
     }
+    return -1;
   }
 
   /**
@@ -1218,10 +1204,7 @@ public final class BitsUtil {
    * @return Position of first set bit, -1 if no set bit was found.
    */
   public static int numberOfLeadingZerosSigned(long v) {
-    if(v == 0) {
-      return -1;
-    }
-    return Long.numberOfLeadingZeros(v);
+    return v == 0 ? -1 : Long.numberOfLeadingZeros(v);
   }
 
   /**
@@ -1234,10 +1217,7 @@ public final class BitsUtil {
    * @return Position of first set bit, -1 if no set bit was found.
    */
   public static int numberOfLeadingZerosSigned(int v) {
-    if(v == 0) {
-      return -1;
-    }
-    return Integer.numberOfLeadingZeros(v);
+    return v == 0 ? -1 : Integer.numberOfLeadingZeros(v);
   }
 
   /**
@@ -1267,19 +1247,17 @@ public final class BitsUtil {
   /**
    * Find the previous set bit.
    * 
-   * @param v Values to process
+   * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of previous set bit, or -1.
    */
   public static int previousSetBit(long v, int start) {
-    if(start == -1 || start >= Long.SIZE) {
+    if(start < 0 || start >= Long.SIZE) {
       return -1;
     }
-    long cur = v & (LONG_ALL_BITS >>> start);
-    if(cur == 0) {
-      return -1;
-    }
-    return Long.SIZE - 1 - Long.numberOfLeadingZeros(cur);
+    long cur = v & (LONG_ALL_BITS >>> -(start + 1));
+    return (cur == 0) ? -1 : (cur == LONG_ALL_BITS) ? 0 : //
+        63 - Long.numberOfLeadingZeros(cur);
   }
 
   /**
@@ -1290,7 +1268,7 @@ public final class BitsUtil {
    * @return Position of previous set bit, or -1.
    */
   public static int previousSetBit(long[] v, int start) {
-    if(start == -1) {
+    if(start < 0) {
       return -1;
     }
     int wordindex = start >>> LONG_LOG2_SIZE;
@@ -1298,17 +1276,16 @@ public final class BitsUtil {
       return magnitude(v) - 1;
     }
     // Initial word
-    final int off = Long.SIZE - 1 - (start & LONG_LOG2_MASK);
+    final int off = 63 - (start & LONG_LOG2_MASK);
     long cur = v[wordindex] & (LONG_ALL_BITS >>> off);
     for(;;) {
       if(cur != 0) {
-        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfLeadingZeros(cur);
+        return wordindex * Long.SIZE + 63 - ((cur == LONG_ALL_BITS) ? 0 : Long.numberOfLeadingZeros(cur));
       }
       if(wordindex == 0) {
         return -1;
       }
-      wordindex--;
-      cur = v[wordindex];
+      cur = v[--wordindex];
     }
   }
 
@@ -1323,11 +1300,9 @@ public final class BitsUtil {
     if(start < 0 || start >= Long.SIZE) {
       return -1;
     }
-    long cur = ~v & (LONG_ALL_BITS >>> start);
-    if(cur == 0) {
-      return -1;
-    }
-    return Long.SIZE - 1 - Long.numberOfTrailingZeros(cur);
+    long cur = ~v & (LONG_ALL_BITS >>> -(start + 1));
+    return (cur == 0) ? -1 : //
+        63 - Long.numberOfLeadingZeros(cur);
   }
 
   /**
@@ -1338,25 +1313,24 @@ public final class BitsUtil {
    * @return Position of previous clear bit, or -1.
    */
   public static int previousClearBit(long[] v, int start) {
-    if(start == -1) {
+    if(start < 0) {
       return -1;
     }
     int wordindex = start >>> LONG_LOG2_SIZE;
     if(wordindex >= v.length) {
-      return magnitude(v);
+      return magnitude(v) - 1;
     }
-    final int off = Long.SIZE + 1 - (start & LONG_LOG2_MASK);
     // Initial word
+    final int off = 63 - (start & LONG_LOG2_MASK);
     long cur = ~v[wordindex] & (LONG_ALL_BITS >>> off);
     for(;;) {
       if(cur != 0) {
-        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfTrailingZeros(cur);
+        return wordindex * Long.SIZE + 63 - ((cur == LONG_ALL_BITS) ? 0 : Long.numberOfLeadingZeros(cur));
       }
       if(wordindex == 0) {
         return -1;
       }
-      wordindex--;
-      cur = ~v[wordindex];
+      cur = ~v[--wordindex];
     }
   }
 
@@ -1368,14 +1342,12 @@ public final class BitsUtil {
    * @return Position of next set bit, or -1.
    */
   public static int nextSetBit(long v, int start) {
-    if(start >= Long.SIZE) {
+    if(start < 0 || start >= Long.SIZE) {
       return -1;
     }
     long cur = v & (LONG_ALL_BITS << start);
-    if(cur == 0) {
-      return -1;
-    }
-    return Long.numberOfTrailingZeros(cur);
+    return (cur == 0) ? -1 : (cur == LONG_ALL_BITS) ? 0 : //
+        Long.numberOfTrailingZeros(cur);
   }
 
   /**
@@ -1397,8 +1369,7 @@ public final class BitsUtil {
       if(cur != 0) {
         return (wordindex * Long.SIZE) + Long.numberOfTrailingZeros(cur);
       }
-      wordindex++;
-      if(wordindex == v.length) {
+      if(++wordindex == v.length) {
         return -1;
       }
       cur = v[wordindex];
@@ -1417,10 +1388,7 @@ public final class BitsUtil {
       return -1;
     }
     long cur = ~v & (LONG_ALL_BITS << start);
-    if(cur == 0) {
-      return -1;
-    }
-    return Long.numberOfTrailingZeros(cur);
+    return cur == 0 ? -1 : Long.numberOfTrailingZeros(cur);
   }
 
   /**
@@ -1438,14 +1406,15 @@ public final class BitsUtil {
 
     // Initial word
     long cur = ~v[wordindex] & (LONG_ALL_BITS << start);
-    for(; wordindex < v.length;) {
+    for(;;) {
       if(cur != 0) {
         return (wordindex * Long.SIZE) + Long.numberOfTrailingZeros(cur);
       }
-      wordindex++;
+      if(++wordindex == v.length) {
+        return -1;
+      }
       cur = ~v[wordindex];
     }
-    return -1;
   }
 
   /**
@@ -1455,8 +1424,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long[] v) {
-    final int l = numberOfLeadingZeros(v);
-    return capacity(v) - l;
+    return capacity(v) - numberOfLeadingZeros(v);
   }
 
   /**
@@ -1622,6 +1590,17 @@ public final class BitsUtil {
    * @param y Second bitset
    * @return {@code true} when the bitsets are equal
    */
+  public static boolean equal(long x, long y) {
+    return x == y;
+  }
+
+  /**
+   * Test two bitsets for equality
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return {@code true} when the bitsets are equal
+   */
   public static boolean equal(long[] x, long[] y) {
     if(x == null || y == null) {
       return (x == null) && (y == null);
@@ -1652,6 +1631,17 @@ public final class BitsUtil {
    * @param y Second bitset
    * @return Comparison result
    */
+  public static int compare(long x, long y) {
+    return Long.compare(x, y);
+  }
+
+  /**
+   * Compare two bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Comparison result
+   */
   public static int compare(long[] x, long[] y) {
     if(x == null) {
       return (y == null) ? 0 : -1;
@@ -1671,25 +1661,11 @@ public final class BitsUtil {
       }
     }
     for(; p >= 0; p--) {
-      final long xp = x[p];
-      final long yp = y[p];
+      final long xp = x[p], yp = y[p];
       if(xp != yp) {
-        if(xp < 0) {
-          if(yp < 0) {
-            return (yp < xp) ? -1 : ((yp == xp) ? 0 : 1);
-          }
-          else {
-            return +1;
-          }
-        }
-        else {
-          if(yp < 0) {
-            return -1;
-          }
-          else {
-            return (xp < yp) ? -1 : ((xp == yp) ? 0 : 1);
-          }
-        }
+        return (xp < 0) //
+            ? (yp < 0) ? (yp < xp) ? -1 : ((yp == xp) ? 0 : 1) : +1 //
+            : (yp < 0) ? -1 : (xp < yp) ? -1 : ((xp == yp) ? 0 : 1);
       }
     }
     return 0;

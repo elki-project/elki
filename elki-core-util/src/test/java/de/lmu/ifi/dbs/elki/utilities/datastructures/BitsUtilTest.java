@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
+import static de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,47 +40,72 @@ public class BitsUtilTest {
   @Test
   public void testAgainstBigInteger() {
     BigInteger bigint = new BigInteger("123");
-    long[] bituti = BitsUtil.make(Long.SIZE, 123);
+    long[] bituti = make(Long.SIZE, 123);
     assertEquals("Bit strings do not agree.", bigint.toString(2), BitsUtil.toString(bituti));
 
     bigint = bigint.shiftLeft(13);
-    BitsUtil.shiftLeftI(bituti, 13);
+    shiftLeftI(bituti, 13);
     assertEquals("Bit strings do not agree.", bigint.toString(2), BitsUtil.toString(bituti));
 
     bigint = bigint.shiftRight(15);
-    BitsUtil.shiftRightI(bituti, 15);
+    shiftRightI(bituti, 15);
     assertEquals("Bit strings do not agree.", bigint.toString(2), BitsUtil.toString(bituti));
   }
 
   @Test
   public void testSimpleOperations() {
-    long[] test = BitsUtil.zero(128);
-    BitsUtil.setI(test, 5);
-    BitsUtil.setI(test, 7);
+    long[] test = zero(128);
+    long tmp = setC(test[0], 5);
+    setI(test, 5);
+    assertEquals(tmp, test[0]);
+    tmp = setC(test[0], 7);
+    setI(test, 7);
+    assertEquals(tmp, test[0]);
     assertEquals(BitsUtil.toString(test), "10100000");
-    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
-    BitsUtil.truncateI(test, 7);
+    assertEquals(BitsUtil.toStringLow(test), "00000101");
+    assertEquals(BitsUtil.toString(tmp), "10100000");
+    assertEquals(BitsUtil.toStringLow(tmp), "00000101");
+    assertEquals(5, numberOfTrailingZerosSigned(test));
+    truncateI(test, 7);
     assertEquals(BitsUtil.toString(test), "100000");
-    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
-    BitsUtil.setI(test, 7);
+    assertEquals(BitsUtil.toStringLow(test), "000001");
+    assertEquals(5, numberOfTrailingZerosSigned(test));
+    setI(test, 7);
     assertEquals(BitsUtil.toString(test), "10100000");
-    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
-    BitsUtil.cycleRightI(test, 6, 8);
+    assertEquals(BitsUtil.toStringLow(test), "00000101");
+    assertEquals(5, numberOfTrailingZerosSigned(test));
+    tmp = cycleRightC(test[0], 6, 8);
+    cycleRightI(test, 6, 8);
+    assertEquals(tmp, test[0]);
     assertEquals(BitsUtil.toString(test), "10000010");
-    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 1);
-    assertEquals(BitsUtil.numberOfTrailingZeros(test), 1);
+    assertEquals(BitsUtil.toStringLow(test), "01000001");
+    assertEquals(1, numberOfTrailingZerosSigned(test));
+    assertEquals(1, numberOfTrailingZeros(test));
+    assertEquals(1, numberOfTrailingZerosSigned(tmp));
+    assertEquals(1, numberOfTrailingZeros(tmp));
+    assertEquals(2, cardinality(test));
+    assertEquals(2, cardinality(test[0]));
 
-    BitsUtil.zeroI(test);
-    BitsUtil.setI(test, 125);
-    BitsUtil.setI(test, 60);
-    BitsUtil.cycleRightI(test, 70, 128);
-    assertTrue(BitsUtil.get(test, 55));
-    assertTrue(BitsUtil.get(test, 118));
-    assertEquals(BitsUtil.cardinality(test), 2);
-    BitsUtil.cycleLeftI(test, 70, 128);
-    assertTrue(BitsUtil.get(test, 125));
-    assertTrue(BitsUtil.get(test, 60));
-    assertEquals(BitsUtil.cardinality(test), 2);
+    // Longer tests
+    zeroI(test);
+    setI(test, 125);
+    setI(test, 60);
+    cycleRightI(test, 70, 128);
+    assertTrue(get(test, 55));
+    assertTrue(get(test, 118));
+    assertEquals(2, cardinality(test));
+    assertEquals(1, cardinality(test[0]));
+    cycleLeftI(test, 70, 128);
+    assertTrue(get(test, 125));
+    assertTrue(get(test, 60));
+    assertTrue(get(test[0], 60));
+    assertEquals(2, cardinality(test));
+    assertEquals(1, cardinality(test[0]));
+
+    long[] test2 = ones(327);
+    assertEquals(327, cardinality(test2));
+    invertI(test2);
+    assertEquals(64 * 6 - 327, cardinality(test2));
   }
 
   @Test
@@ -90,106 +116,174 @@ public class BitsUtilTest {
     long[][] bits = new long[cnt][];
     for(int i = 0; i < cnt; i++) {
       rnds[i] = Math.abs(r.nextLong());
-      bits[i] = BitsUtil.make(Long.SIZE, rnds[i]);
+      bits[i] = make(Long.SIZE, rnds[i]);
     }
 
     for(int i = 0; i < cnt; i++) {
       for(int j = 0; j < cnt; j++) {
-        assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(bits[i], bits[j]));
+        assertEquals(Long.compare(rnds[i], rnds[j]), compare(bits[i], bits[j]));
       }
     }
 
     for(int i = 0; i < cnt; i++) {
-      long[] btmp = BitsUtil.copy(bits[i], 64 + r.nextInt(500));
-      assertEquals(BitsUtil.compare(btmp, bits[i]), 0);
+      long[] btmp = copy(bits[i], 64 + r.nextInt(500));
+      assertEquals(0, compare(btmp, bits[i]));
       for(int j = 0; j < cnt; j++) {
-        assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(Long.compare(rnds[i], rnds[j]), compare(btmp, bits[j]));
       }
     }
 
     for(int i = 0; i < cnt; i++) {
-      long[] btmp = BitsUtil.truncateI(BitsUtil.copy(bits[i]), 47);
+      long[] btmp = truncateI(copy(bits[i]), 47);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(compare(rnds[i] & ((1 << 48) - 1), rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(Long.compare(rnds[i] & ((1 << 48) - 1), rnds[j]), compare(btmp, bits[j]));
       }
     }
 
     for(int i = 0; i < cnt; i++) {
-      long[] btmp = BitsUtil.cycleRightI(BitsUtil.copy(bits[i]), 13, Long.SIZE - 32);
-      long ltmp = BitsUtil.cycleRightC(rnds[i], 13, Long.SIZE - 32);
+      long[] btmp = cycleRightI(copy(bits[i]), 13, Long.SIZE - 32);
+      long ltmp = cycleRightC(rnds[i], 13, Long.SIZE - 32);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(compare(ltmp, rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(Long.compare(ltmp, rnds[j]), compare(btmp, bits[j]));
       }
     }
-  }
-
-  /**
-   * Not jet in Java 6. To come in JDK7 as Long.copmare
-   * 
-   * @param x
-   * @param y
-   * @return
-   */
-  public static int compare(long x, long y) {
-    return (x < y) ? -1 : ((x == y) ? 0 : 1);
   }
 
   @Test
   public void testAgainstBitSet() {
     BitSet bitset = new BitSet();
-    long[] bituti = BitsUtil.zero(Long.SIZE);
+    long[] bituti = zero(Long.SIZE);
     for(int i = 0; i >= 0;) {
-      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
-    // Java 7:
-    // assertEquals("Bit strings do not agree.",
-    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(4);
-    BitsUtil.setI(bituti, 4);
+    setI(bituti, 4);
     for(int i = 0; i >= 0;) {
-      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
-    // Java 7:
-    // assertEquals("Bit strings do not agree.",
-    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(15);
-    BitsUtil.setI(bituti, 15);
+    setI(bituti, 15);
     for(int i = 0; i >= 0;) {
-      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
-    // Java 7:
-    // assertEquals("Bit strings do not agree.",
-    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
-    assertEquals(bitset.nextSetBit(0), BitsUtil.nextSetBit(bituti, 0));
-    assertEquals(bitset.nextSetBit(4), BitsUtil.nextSetBit(bituti, 4));
-    assertEquals(bitset.nextSetBit(5), BitsUtil.nextSetBit(bituti, 5));
-    // previousSetBit is not in JDK6.
-    // assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti,
-    // 64));
-    // assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti,
-    // 15));
-    // assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti,
-    // 14));
+    assertEquals(bitset.nextSetBit(0), nextSetBit(bituti, 0));
+    assertEquals(bitset.nextSetBit(4), nextSetBit(bituti, 4));
+    assertEquals(bitset.nextSetBit(5), nextSetBit(bituti, 5));
+    assertEquals(bitset.previousSetBit(64), previousSetBit(bituti, 64));
+    assertEquals(bitset.previousSetBit(15), previousSetBit(bituti, 15));
+    assertEquals(bitset.previousSetBit(14), previousSetBit(bituti, 14));
+  }
+
+  @Test
+  public void testIteration() {
+    // All zero
+    assertEquals(-1, nextSetBit(0, 0));
+    assertEquals(-1, previousSetBit(0, 0));
+    assertEquals(-1, nextSetBit(0, 13));
+    assertEquals(-1, previousSetBit(0, 13));
+    assertEquals(0, nextClearBit(0, 0));
+    assertEquals(0, previousClearBit(0, 0));
+    assertEquals(13, nextClearBit(0, 13));
+    assertEquals(13, previousClearBit(0, 13));
+
+    // All one
+    assertEquals(0, nextSetBit(~0, 0));
+    assertEquals(0, previousSetBit(~0, 0));
+    assertEquals(13, nextSetBit(~0, 13));
+    assertEquals(13, previousSetBit(~0, 13));
+    assertEquals(-1, nextClearBit(~0, 0));
+    assertEquals(-1, previousClearBit(~0, 0));
+    assertEquals(-1, nextClearBit(~0, 13));
+    assertEquals(-1, previousClearBit(~0, 13));
+
+    // Two bits set.
+    long two = (1L << 42) | (1L << 13);
+    assertEquals(13, nextSetBit(two, 0));
+    assertEquals(13, nextSetBit(two, 13));
+    assertEquals(42, nextSetBit(two, 14));
+    assertEquals(42, nextSetBit(two, 42));
+    assertEquals(-1, nextSetBit(two, 43));
+    assertEquals(13, nextClearBit(~two, 12));
+    assertEquals(13, nextClearBit(~two, 13));
+    assertEquals(42, nextClearBit(~two, 14));
+    assertEquals(42, nextClearBit(~two, 42));
+    assertEquals(-1, nextClearBit(~two, 43));
+    assertEquals(-1, previousSetBit(two, 0));
+    assertEquals(-1, previousSetBit(two, 12));
+    assertEquals(13, previousSetBit(two, 13));
+    assertEquals(13, previousSetBit(two, 14));
+    assertEquals(13, previousSetBit(two, 41));
+    assertEquals(42, previousSetBit(two, 42));
+    assertEquals(42, previousSetBit(two, 43));
+    assertEquals(-1, previousClearBit(~two, 12));
+    assertEquals(13, previousClearBit(~two, 13));
+    assertEquals(13, previousClearBit(~two, 14));
+    assertEquals(13, previousClearBit(~two, 41));
+    assertEquals(42, previousClearBit(~two, 42));
+    assertEquals(42, previousClearBit(~two, 43));
+
+    long[] zero = zero(512), ones = ones(512);
+    // All zeros
+    assertEquals(-1, nextSetBit(zero, 0));
+    assertEquals(-1, nextSetBit(zero, 71));
+    assertEquals(0, nextClearBit(zero, 0));
+    assertEquals(71, nextClearBit(zero, 71));
+    assertEquals(-1, previousSetBit(zero, 0));
+    assertEquals(-1, previousSetBit(zero, 71));
+    assertEquals(0, previousClearBit(zero, 0));
+    assertEquals(71, previousClearBit(zero, 71));
+
+    // All ones
+    assertEquals(0, nextSetBit(ones, 0));
+    assertEquals(71, nextSetBit(ones, 71));
+    assertEquals(-1, nextClearBit(ones, 0));
+    assertEquals(-1, nextClearBit(ones, 71));
+    assertEquals(0, previousSetBit(ones, 0));
+    assertEquals(71, previousSetBit(ones, 71));
+    assertEquals(-1, previousClearBit(ones, 0));
+    assertEquals(-1, previousClearBit(ones, 71));
+
+    // One bit set
+    long[] set = zero(512);
+    setI(set, 391);
+    assertEquals(391, nextSetBit(set, 0));
+    assertEquals(391, nextSetBit(set, 391));
+    assertEquals(-1, nextSetBit(set, 392));
+    assertEquals(-1, previousSetBit(set, 0));
+    assertEquals(-1, previousSetBit(set, 390));
+    assertEquals(391, previousSetBit(set, 391));
+    assertEquals(391, previousSetBit(set, 511));
+    assertEquals(0, nextClearBit(set, 0));
+    assertEquals(390, nextClearBit(set, 390));
+    assertEquals(392, nextClearBit(set, 391));
+    assertEquals(392, nextClearBit(set, 392));
+    assertEquals(0, previousClearBit(set, 0));
+    assertEquals(390, previousClearBit(set, 390));
+    assertEquals(390, previousClearBit(set, 391));
+    assertEquals(392, previousClearBit(set, 392));
   }
 
   @Test
   public void testGrayCoding() {
-    long[] bits = BitsUtil.zero(123);
-    long[] ones = BitsUtil.ones(123);
-    BitsUtil.flipI(bits, 122);
-    BitsUtil.invgrayI(bits);
-    BitsUtil.xorI(bits, ones);
-    assertTrue(BitsUtil.isZero(bits));
-    BitsUtil.xorI(bits, ones);
-    BitsUtil.grayI(bits);
-    assertTrue(BitsUtil.get(bits, 122));
-    assertEquals(1, BitsUtil.cardinality(bits));
+    long[] bits = zero(123);
+    long[] ones = ones(123);
+    flipI(bits, 122);
+    invgrayI(bits);
+    xorI(bits, ones);
+    assertTrue(isZero(bits));
+    xorI(bits, ones);
+    grayI(bits);
+    assertTrue(get(bits, 122));
+    assertEquals(1, cardinality(bits));
   }
 
   @Test
@@ -198,35 +292,35 @@ public class BitsUtilTest {
     int[] truli = new int[] { 29, 3, 2, 1, 0, 0 };
     int[] truti = new int[] { 0, 3, 0, 8, 24, 16 };
     for(int i = 0; i < testi.length; i++) {
-      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testi[i]), truli[i], BitsUtil.numberOfLeadingZeros(testi[i]));
-      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testi[i]), truti[i], BitsUtil.numberOfTrailingZeros(testi[i]));
+      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testi[i]), truli[i], numberOfLeadingZeros(testi[i]));
+      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testi[i]), truti[i], numberOfTrailingZeros(testi[i]));
     }
 
     long[] testl = new long[] { 0x7L, 0x12345678L, 0x23456789L, 0x45678900L, 0x89000000L, 0x1FFFF0000L, 0x123456789ABCDEFL, 0x0011001188008800L };
     int[] trull = new int[] { 61, 35, 34, 33, 32, 31, 7, 11 };
     int[] trutl = new int[] { 0, 3, 0, 8, 24, 16, 0, 11 };
     for(int i = 0; i < testl.length; i++) {
-      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testl[i]), trull[i], BitsUtil.numberOfLeadingZeros(testl[i]));
-      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testl[i]), trutl[i], BitsUtil.numberOfTrailingZeros(testl[i]));
+      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testl[i]), trull[i], numberOfLeadingZeros(testl[i]));
+      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testl[i]), trutl[i], numberOfTrailingZeros(testl[i]));
     }
   }
 
   @Test
   public void testCardinality() {
-    long[] ones = BitsUtil.ones(128);
+    long[] ones = ones(128);
     assertEquals("Ones not correct", 2, ones.length);
     assertEquals("Ones not correct", -1L, ones[0]);
     assertEquals("Ones not correct", -1L, ones[1]);
-    assertEquals("Cardinality not correct.", 128, BitsUtil.cardinality(ones));
+    assertEquals("Cardinality not correct.", 128, cardinality(ones));
   }
 
   @Test
   public void testRandomBitset() {
     for(int card : new int[] { 0, 1, 7, 13, 63, 110, 126, 128 }) {
       for(long seed = 0; seed < 5; seed++) {
-        long[] set = BitsUtil.random(card, 128, new Random(seed));
+        long[] set = random(card, 128, new Random(seed));
         assertEquals("Bitset too large", 2, set.length);
-        assertEquals("Wrong cardinality", card, BitsUtil.cardinality(set));
+        assertEquals("Wrong cardinality", card, cardinality(set));
       }
     }
   }
