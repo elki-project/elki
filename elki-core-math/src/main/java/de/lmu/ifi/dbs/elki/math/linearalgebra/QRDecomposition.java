@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getMatrix;
+
 import net.jafama.FastMath;
 
 /**
@@ -66,10 +69,6 @@ public class QRDecomposition implements java.io.Serializable {
    */
   private double[] Rdiag;
 
-  /*
-   * ------------------------ Constructor ------------------------
-   */
-
   /**
    * QR Decomposition, computed by Householder reflections.
    * 
@@ -88,8 +87,11 @@ public class QRDecomposition implements java.io.Serializable {
    */
   public QRDecomposition(double[][] A, int m, int n) {
     this.QR = VMath.copy(A);
-    this.m = QR.length;
-    this.n = QR[0].length;
+    if(m < n) {
+      throw new IllegalArgumentException("Matrix does not satisfy rows >= columns!");
+    }
+    this.m = m;
+    this.n = n;
     Rdiag = new double[n];
 
     // Main loop.
@@ -127,10 +129,6 @@ public class QRDecomposition implements java.io.Serializable {
     }
   }
 
-  /*
-   * ------------------------ Public Methods ------------------------
-   */
-
   /**
    * Is the matrix full rank?
    * 
@@ -143,6 +141,20 @@ public class QRDecomposition implements java.io.Serializable {
       }
     }
     return true;
+  }
+
+  /**
+   * Get the matrix rank?
+   * 
+   * @return Rank of R
+   */
+  public int rank() {
+    for(int j = 0; j < n; j++) {
+      if(Rdiag[j] == 0) {
+        return j;
+      }
+    }
+    return n;
   }
 
   /**
@@ -164,8 +176,8 @@ public class QRDecomposition implements java.io.Serializable {
    * @return R
    */
   public double[][] getR() {
-    double[][] R = new double[n][n];
-    for(int i = 0; i < n; i++) {
+    double[][] R = new double[m][n];
+    for(int i = 0; i < m; i++) {
       System.arraycopy(QR[i], 0, R[i], 0, i);
       R[i][i] = Rdiag[i];
     }
@@ -173,7 +185,7 @@ public class QRDecomposition implements java.io.Serializable {
   }
 
   /**
-   * Generate and return the (economy-sized) orthogonal factor
+   * Generate and return the (economy-sized, m by n) orthogonal factor
    * 
    * @return Q
    */
@@ -219,10 +231,10 @@ public class QRDecomposition implements java.io.Serializable {
     }
 
     // Copy right hand side
-    double[][] X = VMath.copy(B);
+    double[][] X = copy(B);
 
     solveInplace(X, cols);
-    return VMath.getMatrix(X, 0, n - 1, 0, cols - 1);
+    return getMatrix(X, 0, n - 1, 0, cols - 1);
   }
 
   private void solveInplace(double[][] X, int nx) {
@@ -241,12 +253,14 @@ public class QRDecomposition implements java.io.Serializable {
     }
     // Solve R*X = Y;
     for(int k = n - 1; k >= 0; k--) {
+      final double[] Xk = X[k];
       for(int j = 0; j < nx; j++) {
-        X[k][j] /= Rdiag[k];
+        Xk[j] /= Rdiag[k];
       }
       for(int i = 0; i < k; i++) {
+        final double[] Xi = X[i], QRi = QR[i];
         for(int j = 0; j < nx; j++) {
-          X[i][j] -= X[k][j] * QR[i][k];
+          Xi[j] -= Xk[j] * QRi[k];
         }
       }
     }

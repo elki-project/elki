@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract base class for dependence measures.
@@ -226,10 +225,10 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
   public static <A, B> int size(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = adapter1.size(data1);
     if(len != adapter2.size(data2)) {
-      throw new AbortException("Array sizes do not match!");
+      throw new IllegalArgumentException("Array sizes do not match!");
     }
     if(len == 0) {
-      throw new AbortException("Empty array!");
+      throw new IllegalArgumentException("Empty array!");
     }
     return len;
   }
@@ -243,17 +242,17 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    */
   public static <A> int size(NumberArrayAdapter<?, A> adapter, Collection<? extends A> data) {
     if(data.size() < 2) {
-      throw new AbortException("Need at least two axes to compute dependence measures.");
+      throw new IllegalArgumentException("Need at least two axes to compute dependence measures.");
     }
     Iterator<? extends A> iter = data.iterator();
     final int len = adapter.size(iter.next());
     while(iter.hasNext()) {
       if(len != adapter.size(iter.next())) {
-        throw new AbortException("Array sizes do not match!");
+        throw new IllegalArgumentException("Array sizes do not match!");
       }
     }
     if(len == 0) {
-      throw new AbortException("Empty array!");
+      throw new IllegalArgumentException("Empty array!");
     }
     return len;
   }

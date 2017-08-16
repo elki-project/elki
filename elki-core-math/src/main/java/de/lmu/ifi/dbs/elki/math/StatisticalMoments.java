@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 import net.jafama.FastMath;
 
 /**
@@ -145,31 +145,29 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   @Override
   public void put(Mean other) {
-    if(other instanceof StatisticalMoments) {
-      StatisticalMoments othe = (StatisticalMoments) other;
-      final double nn = othe.n + this.n;
-      final double delta = othe.m1 - this.m1;
-
-      // Some factors used below:
-      final double delta_nn = delta / nn;
-      final double delta_nn2 = delta_nn * delta_nn;
-      final double delta_nn3 = delta_nn2 * delta_nn;
-      final double na2 = this.n * this.n;
-      final double nb2 = othe.n * othe.n;
-      final double ntn = this.n * othe.n;
-
-      this.m4 += othe.m4 + delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * (na2 * othe.m2 + nb2 * this.m2) * delta_nn2 + 4. * (this.n * othe.m3 - othe.n * this.m3) * delta_nn;
-      this.m3 += othe.m3 + delta * delta_nn2 * ntn * (this.n - othe.n) + 3. * (this.n * othe.m2 - othe.n * this.m2) * delta_nn;
-      this.m2 += othe.m2 + delta * delta_nn * this.n * othe.n;
-      this.m1 += othe.n * delta_nn;
-      this.n = nn;
-
-      min = Math.min(min, othe.min);
-      max = Math.max(max, othe.max);
+    if(!(other instanceof StatisticalMoments)) {
+      throw new IllegalArgumentException("I cannot combine Mean or MeanVariance into to a StatisticalMoments class.");
     }
-    else {
-      throw new AbortException("I cannot combine Mean or MeanVariance into to a StatisticalMoments class.");
-    }
+    StatisticalMoments othe = (StatisticalMoments) other;
+    final double nn = othe.n + this.n;
+    final double delta = othe.m1 - this.m1;
+
+    // Some factors used below:
+    final double delta_nn = delta / nn;
+    final double delta_nn2 = delta_nn * delta_nn;
+    final double delta_nn3 = delta_nn2 * delta_nn;
+    final double na2 = this.n * this.n;
+    final double nb2 = othe.n * othe.n;
+    final double ntn = this.n * othe.n;
+
+    this.m4 += othe.m4 + delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * (na2 * othe.m2 + nb2 * this.m2) * delta_nn2 + 4. * (this.n * othe.m3 - othe.n * this.m3) * delta_nn;
+    this.m3 += othe.m3 + delta * delta_nn2 * ntn * (this.n - othe.n) + 3. * (this.n * othe.m2 - othe.n * this.m2) * delta_nn;
+    this.m2 += othe.m2 + delta * delta_nn * this.n * othe.n;
+    this.m1 += othe.n * delta_nn;
+    this.n = nn;
+
+    min = Math.min(min, othe.min);
+    max = Math.max(max, othe.max);
   }
 
   @Override

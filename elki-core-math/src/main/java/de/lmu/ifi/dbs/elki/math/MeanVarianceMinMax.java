@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.math;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
 /**
  * Class collecting mean, variance, minimum and maximum statistics.
  * 
@@ -78,14 +76,12 @@ public class MeanVarianceMinMax extends MeanVariance {
 
   @Override
   public void put(Mean other) {
-    if(other instanceof MeanVarianceMinMax) {
-      super.put(other);
-      min = Math.min(min, ((MeanVarianceMinMax) other).min);
-      max = Math.max(max, ((MeanVarianceMinMax) other).max);
+    if(!(other instanceof MeanVarianceMinMax)) {
+      throw new IllegalArgumentException("Cannot aggregate into a minmax statistic: " + other.getClass());
     }
-    else {
-      throw new AbortException("Cannot aggregate into a minmax statistic: " + other.getClass());
-    }
+    super.put(other);
+    min = Math.min(min, ((MeanVarianceMinMax) other).min);
+    max = Math.max(max, ((MeanVarianceMinMax) other).max);
   }
 
   /**

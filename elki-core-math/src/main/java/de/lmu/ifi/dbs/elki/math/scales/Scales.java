@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Scales helper class. Currently, this will just compute a linear scale for
@@ -49,21 +48,18 @@ public final class Scales {
   /**
    * Compute a linear scale for each dimension.
    *
-   * @param db Database
+   * @param rel Relation
    * @return Scales, indexed starting with 0 (like Vector, not database
    *         objects!)
    */
-  public static LinearScale[] calcScales(Relation<? extends SpatialComparable> db) {
-    if(db == null) {
-      throw new AbortException("No database was given to Scales.calcScales.");
-    }
-    int dim = RelationUtil.dimensionality(db);
+  public static LinearScale[] calcScales(Relation<? extends SpatialComparable> rel) {
+    int dim = RelationUtil.dimensionality(rel);
     DoubleMinMax[] minmax = DoubleMinMax.newArray(dim);
     LinearScale[] scales = new LinearScale[dim];
 
     // analyze data
-    for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      SpatialComparable v = db.get(iditer);
+    for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      SpatialComparable v = rel.get(iditer);
       if(v instanceof NumberVector) {
         for(int d = 0; d < dim; d++) {
           final double mi = v.getMin(d);

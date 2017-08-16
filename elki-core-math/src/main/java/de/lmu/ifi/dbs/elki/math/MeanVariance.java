@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 import net.jafama.FastMath;
 
 /**
@@ -139,7 +139,7 @@ public class MeanVariance extends Mean {
       this.n = nwsum;
     }
     else {
-      throw new AbortException("I cannot combine Mean and MeanVariance to a MeanVariance.");
+      throw new IllegalArgumentException("I cannot combine Mean and MeanVariance to a MeanVariance.");
     }
   }
 

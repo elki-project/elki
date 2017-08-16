@@ -22,11 +22,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -525,7 +525,7 @@ public class BetaDistribution extends AbstractDistribution {
       }
     }
     // Not converged in Newton-Raphson
-    throw new AbortException("Beta quantile computation did not converge.");
+    throw new ArithmeticException("Beta quantile computation did not converge.");
   }
 
   /**
