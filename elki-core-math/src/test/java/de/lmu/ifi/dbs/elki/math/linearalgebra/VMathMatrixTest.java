@@ -171,7 +171,7 @@ public class VMathMatrixTest {
     assertTrue(almostEquals(res_minusTimes, minusTimes(m1, m2, s), EPSILON));
     assertTrue(almostEquals(res_minusTimes, minusTimesEquals(copy(m1), m2, s), EPSILON));
     // via plusTimes (this is a test for plusTimes as well)
-    assertTrue(almostEquals( plusTimes(m1, m2, -1), minusTimes(m1, m2, s), EPSILON));
+    assertTrue(almostEquals( plusTimes(m1, m2, -s), minusTimes(m1, m2, s), EPSILON));
   
   }
   
