@@ -54,5 +54,8 @@ public class DoubleMinMaxTest {
     m.put(new DoubleMinMax(-.5, 1));
     assertEquals("Min wrong.", -1, m.getMin(), 0.);
     assertEquals("Max wrong.", +2, m.getMax(), 0.);
+    double[] a = m.asDoubleArray();
+    assertEquals("Min wrong.", -1, a[0], 0.);
+    assertEquals("Max wrong.", +2, a[1], 0.);
   }
 }

@@ -54,5 +54,8 @@ public class IntegerMinMaxTest {
     m.put(new IntegerMinMax(0, 1));
     assertEquals("Min wrong.", -1, m.getMin(), 0.);
     assertEquals("Max wrong.", +2, m.getMax(), 0.);
+    int[] a = m.asIntArray();
+    assertEquals("Min wrong.", -1, a[0], 0.);
+    assertEquals("Max wrong.", +2, a[1], 0.);
   }
 }

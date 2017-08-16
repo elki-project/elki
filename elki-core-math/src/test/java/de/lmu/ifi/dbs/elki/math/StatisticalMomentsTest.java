@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -145,5 +146,37 @@ public class StatisticalMomentsTest {
     assertEquals("Fourth stddev", 4.8, m2.getSampleVariance(), 0);
     assertEquals("Fourth skew", 0.658231136582482, m2.getNaiveSkewness(), 1e-15);
     assertEquals("Fourth kurt", 6.015625 / 3, m2.getNaiveKurtosis(), 0.);
+
+    m2.reset();
+    assertEquals("Reset", 0., m2.getCount(), 0);
+  }
+
+  public void testEmpty1() {
+    assertTrue(Double.isNaN(new StatisticalMoments().put(new double[0]).getNaiveSkewness()));
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty2() {
+    new StatisticalMoments().put(new double[0]).getSampleSkewness();
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty3() {
+    new StatisticalMoments().put(new double[0]).getNaiveExcessKurtosis();
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty4() {
+    new StatisticalMoments().put(new double[0]).getSampleExcessKurtosis();
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty5() {
+    new StatisticalMoments().put(new double[0]).getNaiveKurtosis();
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty6() {
+    new StatisticalMoments().put(new double[0]).getSampleKurtosis();
   }
 }

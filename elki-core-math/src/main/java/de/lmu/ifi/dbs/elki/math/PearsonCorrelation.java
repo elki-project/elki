@@ -270,6 +270,9 @@ public class PearsonCorrelation {
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: arrays differ in length.");
     }
+    if(xdim == 0) {
+      throw new IllegalArgumentException("Empty vector.");
+    }
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0.;
@@ -314,6 +317,9 @@ public class PearsonCorrelation {
     final int ydim = y.getDimensionality();
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
+    }
+    if(xdim == 0) {
+      throw new IllegalArgumentException("Empty vector.");
     }
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
@@ -364,6 +370,9 @@ public class PearsonCorrelation {
     if(xdim != weights.length) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
+    if(xdim == 0) {
+      throw new IllegalArgumentException("Empty vector.");
+    }
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
@@ -412,6 +421,9 @@ public class PearsonCorrelation {
     if(xdim != weights.length) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
+    if(xdim == 0) {
+      throw new IllegalArgumentException("Empty vector.");
+    }
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
@@ -451,7 +463,7 @@ public class PearsonCorrelation {
    * @param weights Weights
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static double weightedPearsonCorrelationCoefficient(NumberVector x, NumberVector y, NumberVector weights) {
+  public static double weightedCoefficient(NumberVector x, NumberVector y, NumberVector weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
     if(xdim != ydim) {
@@ -459,6 +471,9 @@ public class PearsonCorrelation {
     }
     if(xdim != weights.getDimensionality()) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    if(xdim == 0) {
+      throw new IllegalArgumentException("Empty vector.");
     }
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.

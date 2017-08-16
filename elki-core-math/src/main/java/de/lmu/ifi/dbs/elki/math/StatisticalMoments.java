@@ -46,7 +46,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "T. B. Terriberry", title = "Computing Higher-Order Moments Online", booktitle = "Online - Technical Note", url = "http://people.xiph.org/~tterribe/notes/homs.html")
+@Reference(authors = "T. B. Terriberry", //
+    title = "Computing Higher-Order Moments Online", //
+    booktitle = "Online - Technical Note", //
+    url = "http://people.xiph.org/~tterribe/notes/homs.html")
 public class StatisticalMoments extends MeanVarianceMinMax {
   /**
    * Third moment.
@@ -193,9 +196,10 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Skewness
    */
   public double getSampleSkewness() {
-    assert (n > 2.) : "Cannot compute a reasonable sample skewness with weight <= 2.0!";
-    double sigma2 = getSampleVariance();
-    return (m3 * n / (n - 1) / (n - 2)) / FastMath.pow(sigma2, 1.5);
+    if(!(m2 > 0) || !(n > 2)) {
+      throw new ArithmeticException("Skewness not defined when variance is 0 or weight <= 2.0!");
+    }
+    return (m3 * n / (n - 1) / (n - 2)) / FastMath.pow(getSampleVariance(), 1.5);
   }
 
   /**
@@ -204,8 +208,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Skewness
    */
   public double getNaiveSkewness() {
-    double sigma2 = getNaiveVariance();
-    return (m3 / n) / FastMath.pow(sigma2, 1.5);
+    return (m3 / n) / FastMath.pow(getNaiveVariance(), 1.5);
   }
 
   /**
@@ -217,9 +220,8 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Kurtosis
    */
   public double getSampleKurtosis() {
-    assert (n > 3.) : "Cannot compute a reasonable sample kurtosis with weight <= 3.0!";
-    if(!(m2 > 0)) {
-      throw new ArithmeticException("Kurtosis not defined when variance is 0!");
+    if(!(m2 > 0) || !(n > 3)) {
+      throw new ArithmeticException("Kurtosis not defined when variance is 0 or weight <= 3.0!");
     }
     final double nm1 = n - 1.;
     return (nm1 / ((n - 2.) * (n - 3.))) * (n * (n + 1) * m4 / (m2 * m2) - 3 * nm1) + 3;
@@ -248,9 +250,8 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Kurtosis
    */
   public double getSampleExcessKurtosis() {
-    assert (n > 3.) : "Cannot compute a reasonable sample kurtosis with weight <= 3.0!";
-    if(!(m2 > 0)) {
-      throw new ArithmeticException("Kurtosis not defined when variance is 0!");
+    if(!(m2 > 0) || !(n > 3)) {
+      throw new ArithmeticException("Kurtosis not defined when variance is 0 or weight <= 3.0!");
     }
     final double nm1 = n - 1.;
     return (nm1 / ((n - 2.) * (n - 3.))) * (n * (n + 1) * m4 / (m2 * m2) - 3 * nm1);

@@ -143,4 +143,9 @@ public class MeanVarianceTest {
     assertEquals("Fourth weight", 11, m2.getCount(), 0);
     assertEquals("Fourth stddev", 4.8, m2.getSampleVariance(), 0);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testEmpty() {
+    new MeanVariance().put(new double[0]).getSampleVariance();
+  }
 }

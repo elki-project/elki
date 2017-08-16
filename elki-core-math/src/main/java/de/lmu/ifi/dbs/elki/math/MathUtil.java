@@ -271,11 +271,11 @@ public final class MathUtil {
   /**
    * Compute the sum of the i first integers.
    *
-   * @param i maximum summand
+   * @param i maximum summand (inclusive)
    * @return Sum
    */
   public static long sumFirstIntegers(final long i) {
-    return ((i - 1L) * i) >> 1;
+    return ((i + 1L) * i) >> 1;
   }
 
   /**
