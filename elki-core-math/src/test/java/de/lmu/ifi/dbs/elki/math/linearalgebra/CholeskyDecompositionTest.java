@@ -26,7 +26,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Unit test for Cholesky decomposition.
@@ -59,7 +61,6 @@ public final class CholeskyDecompositionTest {
       { 4547.638194970525, 9171.289509833565, 1701.224402453252, 9691.325885593764, -1347.9994226315175, -4794.137302478112, 9140.72950573163, 8432.893607777965, 8708.357809689789, 0, }, //
       { 7187.132905478913, -2018.6217701736368, 2434.896101267208, 5357.489474821838, 2065.6526281452225, -4048.3345966106144, -3528.384894203782, 6580.45600445064, 5616.0250457222355, 5532.960015167152, }, //
   };
-
   @Test
   public void testMatrixL1() {
     CholeskyDecomposition CholL1 = new CholeskyDecomposition(timesTranspose(TESTMATRIX_L1, TESTMATRIX_L1));
@@ -107,5 +108,74 @@ public final class CholeskyDecompositionTest {
     assertTrue(almostEquals(p, timesTranspose(l, l), 1e-15));
     double[][] o = c.solve(unitMatrix(3));
     assertTrue("Not solved.", almostEquals(unitMatrix(3), times(p, o), 1e-14));
+  }
+  
+  /**
+   * Testing the Solve method of the CholeskyDecomposition class. 
+   */
+  @Test
+  public void testSolve() {
+    final double[][] b1 = { //
+        {-2, 3}, //
+        { 3, 7}, //
+        { 5, 7}, //
+        { 1, 7}, //
+        { 8,-7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+    };
+    
+    final double[][] b2 = { //
+        {-2}, //
+        { 3}, //
+        { 5}, //
+        { 1}, //
+        { 8}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+    };
+    
+    final double[][] A1 = timesTranspose(TESTMATRIX_L1, TESTMATRIX_L1);
+    final double[][] A2 = timesTranspose(TESTMATRIX_L2, TESTMATRIX_L2);
+    
+    CholeskyDecomposition CholL1 = new CholeskyDecomposition(A1);
+    CholeskyDecomposition CholL2 = new CholeskyDecomposition(A2);
+    
+    final double[][] x1 = CholL1.solve(b1);
+    final double[][] x2 = CholL2.solve(b2);
+    // FIXME
+    assertTrue(almostEquals(times(A1, x1), b1));
+    assertTrue(almostEquals(times(A2, x2), b2));
+  }
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  /**
+   * Testing that the solve method of the CholeskyDecomposition class raises an exception if
+   * the row dimensions do not agree.
+   */
+  @Test
+  public void testSolveIsNonSingular() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("Matrix row dimensions must agree.");
+    new CholeskyDecomposition(new double[][] {{1,1},{1,1}}).solve(new double[][] {{}});
+  }
+  
+  /**
+   * Testing that the solve method of the CholeskyDecomposition class raises an exception if
+   * isSPD returns false, so if the matrix is not symmetric and positive definite.
+   */
+  @Test
+  public void testSolveRowDimensionMismatch() {
+    thrown.expect(RuntimeException.class);
+    thrown.expectMessage("Matrix is not symmetric positive definite.");
+    new CholeskyDecomposition(new double[][] { { 1, -13}, { 2,  12} }).solve(new double[][] {{1},{1}});
   }
 }
