@@ -26,8 +26,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Rule;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
