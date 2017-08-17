@@ -1618,11 +1618,12 @@ public final class VMath {
   }
 
   /**
-   * Compute the angle between two vectors.
-   *
+   * Compute the cosine of the angle between two vectors, 
+   * where the smaller angle between those vectors is viewed.
+   * 
    * @param v1 first vector
    * @param v2 second vector
-   * @return Angle
+   * @return cosine of the smaller angle
    */
   public static double angle(double[] v1, double[] v2) {
     final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
@@ -1649,12 +1650,13 @@ public final class VMath {
   }
 
   /**
-   * Compute the angle between two vectors.
+   * Compute the cosine of the angle between two vectors, 
+   * where the smaller angle between those vectors is viewed.
    *
    * @param v1 first vector
    * @param v2 second vector
    * @param o Origin
-   * @return Angle
+   * @return cosine of the smaller angle
    */
   public static double angle(double[] v1, double[] v2, double[] o) {
     final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
