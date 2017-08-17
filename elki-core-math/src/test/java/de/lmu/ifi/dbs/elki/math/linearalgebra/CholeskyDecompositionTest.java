@@ -21,20 +21,22 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
+ * Class testing the {@link CholekyDecomposition} class.
  * 
  * @author Merlin Dietrich
  *
  */
-public final class  CholeskyDecompositionTest {
+public final class CholeskyDecompositionTest {
 
   private static double[][] TESTMATRIX_L1 = {
       { 1,    0,   0,   0,   0,   0,   0,   0,  0, 0,}, // 
@@ -60,9 +62,14 @@ public final class  CholeskyDecompositionTest {
     {-9587.321218537803 ,  2090.916311928586  , -1463.761225539749 , -2616.0553607241345, -8948.257909568407 ,  5722.836886508077 , -9373.774396775283, 8588.838590029674,     0              ,     0             ,}, //
     { 4547.638194970525 ,  9171.289509833565  ,  1701.224402453252 ,  9691.325885593764 , -1347.9994226315175, -4794.137302478112 ,  9140.72950573163 , 8432.893607777965,  8708.357809689789 ,     0             ,}, //
     { 7187.132905478913 , -2018.6217701736368 ,  2434.896101267208 ,  5357.489474821838 ,  2065.6526281452225, -4048.3345966106144, -3528.384894203782, 6580.45600445064 ,  5616.0250457222355,  5532.960015167152,}, //
-};
+  };
+  
   /**
-   * TODO Comment and test solve method
+   * Testing the constructor to work properly.
+   * <p>
+   * This is tested by providing two cholesky decompositions in {@link TESTMATRIX_L1} 
+   * and {@link TESTMATRIX_L1} recalculating the start matrixes with the timesTranspose method and
+   * then testing if the constructor of the CholeskyDecomposition class is calculating correctly.
    */
   @Test
   public void testConstructor() {
@@ -105,4 +112,91 @@ public final class  CholeskyDecompositionTest {
     assertFalse(CholL4.isSPD());
   }
   
+  /**
+   * Testing the Solve method of the CholeskyDecomposition class. 
+   */
+  @Test
+  public void testSolve() {
+    
+    final double[][] b1 = {
+        {-2, 3}, //
+        { 3, 7}, //
+        { 5, 7}, //
+        { 1, 7}, //
+        { 8,-7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+        { 1, 7}, //
+    };
+    
+    final double[][] b2 = {
+        {-2}, //
+        { 3}, //
+        { 5}, //
+        { 1}, //
+        { 8}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+        { 1}, //
+    };
+    
+    final double[][] A1 = timesTranspose(TESTMATRIX_L1, TESTMATRIX_L1);
+    final double[][] A2 = timesTranspose(TESTMATRIX_L2, TESTMATRIX_L2);
+    
+    CholeskyDecomposition CholL1 = new CholeskyDecomposition(A1);
+    CholeskyDecomposition CholL2 = new CholeskyDecomposition(A1);
+    
+    final double[][] x1 = CholL1.solve(b1);
+    final double[][] x2 = CholL2.solve(b2);
+    // FIXME
+    assertTrue(almostEquals(times(A1, x1), b1));
+    assertTrue(almostEquals(times(A2, x2), b2));
+  }
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+  
+  /**
+   * Testing that the solve method of the CholeskyDecomposition class raises an exception if
+   * the row dimensions do not agree.
+   */
+  @Test
+  public void testSolveIsNonSingular() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("Matrix row dimensions must agree.");
+    
+    final double[][] A = {
+        {1,1}, //
+        {1,1}, //
+    };
+    final double[][] B = {{}};
+    CholeskyDecomposition Chol = new CholeskyDecomposition(A);
+    
+    Chol.solve(B);
+  }
+  
+  /**
+   * 
+   * Testing that the solve method of the CholeskyDecomposition class raises an exception if
+   * isSPD returns false, so if the matrix is not symmetric and positive definite.
+   */
+  @Test
+  public void testSolveRowDimensionMismatch() {
+    thrown.expect(RuntimeException.class);
+    thrown.expectMessage("Matrix is not symmetric positive definite.");
+       
+    final double[][] A = {
+        { 1, -13}, //
+        { 2,  12}, //
+    };
+    
+    CholeskyDecomposition Chol = new CholeskyDecomposition(A);
+    
+    final double[][] B = {{1},{1}};
+    
+    Chol.solve(B);
+  }
 }
