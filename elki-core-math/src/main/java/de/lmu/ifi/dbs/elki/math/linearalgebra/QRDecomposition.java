@@ -153,7 +153,11 @@ public class QRDecomposition implements java.io.Serializable {
   public double[][] getH() {
     double[][] H = new double[m][n];
     for(int i = 0; i < m; i++) {
-      System.arraycopy(QR[i], i, H[i], i, n - i);
+      if (i <n){
+        System.arraycopy(QR[i], 0, H[i], 0, i);
+      } else {
+        System.arraycopy(QR[i], 0, H[i], 0, n-1);
+      }
     }
     return H;
   }
@@ -166,7 +170,7 @@ public class QRDecomposition implements java.io.Serializable {
   public double[][] getR() {
     double[][] R = new double[n][n];
     for(int i = 0; i < n; i++) {
-      System.arraycopy(QR[i], 0, R[i], 0, i);
+      System.arraycopy(QR[i], i, R[i], i, n-i);
       R[i][i] = Rdiag[i];
     }
     return R;
