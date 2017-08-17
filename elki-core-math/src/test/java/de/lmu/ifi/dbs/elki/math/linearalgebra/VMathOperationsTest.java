@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMathOperationsTest.assertDimensionMismatch;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -49,11 +48,11 @@ public final class VMathOperationsTest {
    *    
    * This test caches Assertion Errors with a given Message if the -ea option is set or rather if assertions are executed. 
    * If the -ea option is not set, an ArrayIndexOutOfBoundsException may occur, but out of optimization 
-   * considerations we don't want to guarantee for an exception. So in this case we can't decide 
+   * considerations we don't want to guarantee this exception. So in this case we can't decide 
    * if a dimension mismatch has occurred. This is why we need the {@link failWrapper} method. <p>
    * Let's make an example of usage: <br> 
    * Let's take two Vectors v1, v2 with  different lengths. 
-   * So v1 + v2 should not be possible, so we want v1.length to equal v2.length and assert with the 
+   * So v1 + v2 should not be possible to compute, so we want v1.length to equal v2.length and assert with the 
    * {@link VMath#ERR_VEC_DIMENSIONS} error Message. If we think of any implementation of a plus(v1, v2) 
    * method with vectors as arrays e.g. {@link VMath#plus(double[], double[])}, 
    * we are going to iterate either over the length of v1 or v2. But with assertions turned of (no -ea set)
@@ -105,8 +104,7 @@ public final class VMathOperationsTest {
   @Test
   public void testCopy() {
     
-    // testing copy(vector) method
-    
+    // testing copy(vector) method 
     final double[] v1 = {1,2,3,4};
     final double[] v1_res = copy(v1);
     assertArrayEquals(v1, v1_res,0.);
@@ -123,8 +121,9 @@ public final class VMathOperationsTest {
     assertThat(m1, is(equalTo(m1_copy)));
     assertNotSame(m1, m1_copy);
     
-    final double[][] m2 = {{0, 1, 0.123451234512345, 2},
-                           {2, 3, 4.123451234512345,-1}};
+    final double[][] m2 = {{0, 1, 0.123451234512345, 2}, //
+                           {2, 3, 4.123451234512345,-1}, //
+    };
     final double[][] m2_res = copy(m2);
     assertThat(m2, is(equalTo(m2_res)));
     assertNotSame(m2, m2_res);
@@ -145,7 +144,7 @@ public final class VMathOperationsTest {
   
 
   /**
-   * Testing the hashcode() method of VMath class.
+   * Testing the hashcode() methods of VMath class.
    */
   @Test
   public void testHashcode() {
@@ -180,7 +179,7 @@ public final class VMathOperationsTest {
   }
 
   /**
-   * Testing the Equals methods on vectors an matrixes of VMath class.
+   * Testing the equals methods of VMath class, which compare vectors or matrixes.
    */
   @Test
   public void testEquals() {
@@ -196,21 +195,23 @@ public final class VMathOperationsTest {
     
     // equals(Matrix)
     final double[][] m1 = {
-        { 1, 2, 3},
-        { 7, 3, 9},
-        { 0, 2, 1},
-        {20,-5, 4},
-        {-3, 0, 3},
-        { 1, 1, 1}};
+        { 1, 2, 3}, //
+        { 7, 3, 9}, //
+        { 0, 2, 1}, //
+        {20,-5, 4}, //
+        {-3, 0, 3}, //
+        { 1, 1, 1}, //
+    };
     
     // make copy of by hand to be independent of copy module
     final double[][] m1_copy = {
-        { 1, 2, 3},
-        { 7, 3, 9},
-        { 0, 2, 1},
-        {20,-5, 4},
-        {-3, 0, 3},
-        { 1, 1, 1}};
+        { 1, 2, 3}, //
+        { 7, 3, 9}, //
+        { 0, 2, 1}, //
+        {20,-5, 4}, //
+        {-3, 0, 3}, //
+        { 1, 1, 1}, //
+    };
         
     assertThat(m1, is(equalTo(m1)));
     assertThat(m1, is(equalTo(m1_copy)));
@@ -225,43 +226,43 @@ public final class VMathOperationsTest {
   @Test
   public void testMatrixAlmosteq() {
 
-    final double[][] m = copy(VMathMatrixTest.TESTMATRIX);
-    
+    final double[][] m1 = copy(VMathMatrixTest.TESTMATRIX);
+    final double[][] m2 = copy(VMathMatrixTest.TESTMATRIX);
+
     // TODO: make copy by hand to be independent of copy. Update structure.
     
     // basic function test
-    assertTrue(almostEquals(m , VMathMatrixTest.TESTMATRIX));
-    assertTrue(almostEquals(m , VMathMatrixTest.TESTMATRIX, 0.));
-    assertFalse(almostEquals(m, identity(4, 5)));
-    assertFalse(almostEquals(m, identity(4, 5), EPSILON));
-    
+    assertTrue(almostEquals(m1 , m2));
+    assertTrue(almostEquals(m1 , m2, 0.));
+    assertFalse(almostEquals(m1, identity(4, 5)));
+    assertFalse(almostEquals(m1, identity(4, 5), EPSILON));
     
     // fail if dimensions mismatch
-    assertFalse(almostEquals(m, new double[][] {{1}}));
+    assertFalse(almostEquals(m1, new double[][] {{1}}));
     
-    // fail if difference d > maxdelta with increasing maxdelta
+    // testing that assert fails if difference d > maxdelta else not
+    // we test with increasing maxdelta and work on the same data
     // maxdelta = EPSILON
-    double[][] res_diff = copy(VMathMatrixTest.TESTMATRIX); res_diff[3][3] += 1.5*EPSILON;
-    assertFalse(almostEquals(m, res_diff, EPSILON));
+    double[][] res_diff = copy(m1); res_diff[3][3] += 1.5*EPSILON;
+    assertFalse(almostEquals(m1, res_diff, EPSILON));
     res_diff[3][3] -= EPSILON;
-    assertTrue(almostEquals(m, res_diff, EPSILON));
+    assertTrue(almostEquals(m1, res_diff, EPSILON));
     
     // maxdelta DELTA of VMath respectively 1E-5
     res_diff[0][4] += 1.5E-5;
-    assertFalse(almostEquals(m, res_diff));
+    assertFalse(almostEquals(m1, res_diff));
     res_diff[0][4] -= 1E-5;
-    assertTrue(almostEquals(m, res_diff));
+    assertTrue(almostEquals(m1, res_diff));
     
-    // maxdelta = EPSILON
-    res_diff[2][1] = 1E20; res_diff[2][1] += 1.5E9;
-    assertFalse(almostEquals(m, res_diff, 1E10));
-    res_diff[2][1] -= 1E9;
-    assertTrue(almostEquals(m, res_diff, 1E10));
-    // TODO QUEST: What is this case getClass() for? why is this test failing?
-    
+    // maxdelta = 1E10
+    res_diff[2][1] += 1.5E10;
+    assertFalse(almostEquals(m1, res_diff, 1E10));
+    res_diff[2][1] -= 1E10;
+    assertTrue(almostEquals(m1, res_diff, 1E10));
   }
-  
-  // ----------- initialization get and set methods ----------------
+  /*
+   * ----------- testing initialization get and set methods ----------------
+   */ 
   
   /**
    * Testing the {@link VMath#unitVector(int, int)} method.
@@ -289,19 +290,21 @@ public final class VMathOperationsTest {
   @Test
   public void testUnitMatrixAndIdentity() {
     // test unitMatrix(dim) and unitMatrix(dim) equals identity(dim, dim)
-    final double[][] m_unit = {{1,0,0,0,0},
-                               {0,1,0,0,0},
-                               {0,0,1,0,0},
-                               {0,0,0,1,0},
-                               {0,0,0,0,1} };
+    final double[][] m_unit = {{1,0,0,0,0}, //
+                               {0,1,0,0,0}, //
+                               {0,0,1,0,0}, //
+                               {0,0,0,1,0}, //
+                               {0,0,0,0,1}, //
+    };
 
     assertThat(unitMatrix(5), is(equalTo(m_unit)));
     assertThat(identity(5, 5), is(equalTo(m_unit)));
  
     // test identity with dimensions 3x5 and  5x3
-    final double[][] m_identity3x5 = {{1,0,0,0,0},
-                                      {0,1,0,0,0},
-                                      {0,0,1,0,0}};
+    final double[][] m_identity3x5 = {{1,0,0,0,0}, //
+                                      {0,1,0,0,0}, //
+                                      {0,0,1,0,0}, //
+    };
 
     assertThat(identity(3, 5), is(equalTo(m_identity3x5)));   
     assertThat(identity(5, 3), is(equalTo(transpose(m_identity3x5))));  
@@ -315,13 +318,14 @@ public final class VMathOperationsTest {
    
    // testmatrix with dimensions 7x10  where every entry is unique
    final double[][] m1 = {
-       {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9},
-       { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
-       { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29},
-       { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39},
-       { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49},
-       { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59},
-       { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69} };
+       {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9}, //
+       { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, //
+       { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}, //
+       { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39}, //
+       { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49}, //
+       { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59}, //
+       { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69}, //
+   };
   
    // array of row indices
    final int[] r = {0,3,5};
@@ -330,34 +334,38 @@ public final class VMathOperationsTest {
    
    // test getMatrix(Matrix, rows, columns)
    final double[][] sub1 = {
-       {m1[r[0]][c[0]], m1[r[0]][c[1]], m1[r[0]][c[2]], m1[r[0]][c[3]]},
-       {m1[r[1]][c[0]], m1[r[1]][c[1]], m1[r[1]][c[2]], m1[r[1]][c[3]]},
-       {m1[r[2]][c[0]], m1[r[2]][c[1]], m1[r[2]][c[2]], m1[r[2]][c[3]]} };
+       {m1[r[0]][c[0]], m1[r[0]][c[1]], m1[r[0]][c[2]], m1[r[0]][c[3]]}, //
+       {m1[r[1]][c[0]], m1[r[1]][c[1]], m1[r[1]][c[2]], m1[r[1]][c[3]]}, //
+       {m1[r[2]][c[0]], m1[r[2]][c[1]], m1[r[2]][c[2]], m1[r[2]][c[3]]}, //
+   };
   
    assertThat(getMatrix(m1, r, c) , is(equalTo(sub1))); 
    
    // test getMatrix(Matrix, rowstart, rowend , columns)
    final double[][] sub2 = {
-       {m1[2][c[0]], m1[2][c[1]], m1[2][c[2]], m1[2][c[3]]},
-       {m1[3][c[0]], m1[3][c[1]], m1[3][c[2]], m1[3][c[3]]},
-       {m1[4][c[0]], m1[4][c[1]], m1[4][c[2]], m1[4][c[3]]},
-       {m1[5][c[0]], m1[5][c[1]], m1[5][c[2]], m1[5][c[3]]} };
+       {m1[2][c[0]], m1[2][c[1]], m1[2][c[2]], m1[2][c[3]]}, //
+       {m1[3][c[0]], m1[3][c[1]], m1[3][c[2]], m1[3][c[3]]}, //
+       {m1[4][c[0]], m1[4][c[1]], m1[4][c[2]], m1[4][c[3]]}, //
+       {m1[5][c[0]], m1[5][c[1]], m1[5][c[2]], m1[5][c[3]]}, //
+   };
    
    assertThat(getMatrix(m1, 2, 5, c) , is(equalTo(sub2)));
    
    // test getMatrix(Matrix, rows, columnstart, columnend)
    final double[][] sub3 = {
-       {m1[r[0]][4], m1[r[0]][5], m1[r[0]][6], m1[r[0]][7]},
-       {m1[r[1]][4], m1[r[1]][5], m1[r[1]][6], m1[r[1]][7]},
-       {m1[r[2]][4], m1[r[2]][5], m1[r[2]][6], m1[r[2]][7]} };
+       {m1[r[0]][4], m1[r[0]][5], m1[r[0]][6], m1[r[0]][7]}, //
+       {m1[r[1]][4], m1[r[1]][5], m1[r[1]][6], m1[r[1]][7]}, //
+       {m1[r[2]][4], m1[r[2]][5], m1[r[2]][6], m1[r[2]][7]}, //
+   };
   
    assertThat(getMatrix(m1, r, 4, 7) , is(equalTo(sub3)));
    
    // test getMatrix(Matrix, rowstart, rowend, columnstart, columnend)
    final double[][] sub4 = {
-   {m1[0][6], m1[0][7], m1[0][8]},
-   {m1[1][6], m1[1][7], m1[1][8]},
-   {m1[2][6], m1[2][7], m1[2][8]} };
+   {m1[0][6], m1[0][7], m1[0][8]}, //
+   {m1[1][6], m1[1][7], m1[1][8]}, //
+   {m1[2][6], m1[2][7], m1[2][8]}, //
+   };
     
    assertThat(getMatrix(m1, 0, 2, 6, 8) , is(equalTo(sub4)));
    
@@ -369,7 +377,6 @@ public final class VMathOperationsTest {
    assertThat(getMatrix(m1, riter[0], riter[riter.length-1], citer[0], citer[citer.length-1]) , is(equalTo(getMatrix(m1, riter, citer))));
    assertThat(getMatrix(m1, riter, citer[0], citer[citer.length-1]) , is(equalTo(getMatrix(m1, riter, citer))));
    assertThat(getMatrix(m1, riter[0], riter[riter.length-1], citer) , is(equalTo(getMatrix(m1, riter, citer))));
-  
   
    // test getCol and getRow 
    // we assume transpose to be correct
@@ -387,9 +394,10 @@ public final class VMathOperationsTest {
   @Test
   public void testGetDimensionality() {
    final double[][] m3 = {
-       {0,0,0,0,0},
-       {0,0,0,0,0},
-       {0,0,0,0,0} };
+       {0,0,0,0,0}, //
+       {0,0,0,0,0}, //
+       {0,0,0,0,0}, //
+   };
    
    assertEquals(3, getRowDimensionality(m3));
    assertEquals(3, getColumnDimensionality(transpose(m3) ));
@@ -407,11 +415,12 @@ public final class VMathOperationsTest {
    
    final double[] m = VMathVectorTest.TESTVEC;
    
-   final double[][] m_diag = {{m[0],0,0,0,0},
-                              {0,m[1],0,0,0},
-                              {0,0,m[2],0,0},
-                              {0,0,0,m[3],0},
-                              {0,0,0,0,m[4]}};
+   final double[][] m_diag = {{m[0],0,0,0,0}, //
+                              {0,m[1],0,0,0}, //
+                              {0,0,m[2],0,0}, //
+                              {0,0,0,m[3],0}, //
+                              {0,0,0,0,m[4]}, //
+   };
    assertThat(diagonal(m), is(equalTo(m_diag)));
    
    final double[] dia_TEST = { VMathMatrixTest.TESTMATRIX[0][0],VMathMatrixTest.TESTMATRIX[1][1],VMathMatrixTest.TESTMATRIX[2][2],VMathMatrixTest.TESTMATRIX[3][3] };
@@ -436,29 +445,31 @@ public final class VMathOperationsTest {
    final double[][] m1 = new double[20][25];
    
    // test setMatrix(Matrix, rows, columns, tosetMatrix)
-   // column an row indexes. Assert that you don't address the same column/row twice  TODO: question assert not same colum row in index see below?
+   // column an row indexes. Assert that you don't address the same column/row twice.
    final int[] row_index = {3, 5,10, 2,11,19, 8};
    final int[] col_index = {0,10, 7,19, 3, 6, 23, 5,4};
-   // inputmatix with dimesions  7x9
+   // inputmatix with dimensions  7x9
    final double[][] sub1 = {
-       {  0,  1,  2,  3,  4,  5,  6,  7,  8},
-       { 10, 11, 12, 13, 14, 15, 16, 17, 18},
-       { 20, 21, 22, 23, 24, 25, 26, 27, 28},
-       { 30, 31, 32, 33, 34, 35, 36, 37, 38},
-       { 40, 41, 42, 43, 44, 45, 46, 47, 48},
-       { 50, 51, 52, 53, 54, 55, 56, 57, 58},
-       { 60, 61, 62, 63, 64, 65, 66, 67, 68} };
+       {  0,  1,  2,  3,  4,  5,  6,  7,  8}, //
+       { 10, 11, 12, 13, 14, 15, 16, 17, 18}, //
+       { 20, 21, 22, 23, 24, 25, 26, 27, 28}, //
+       { 30, 31, 32, 33, 34, 35, 36, 37, 38}, //
+       { 40, 41, 42, 43, 44, 45, 46, 47, 48}, //
+       { 50, 51, 52, 53, 54, 55, 56, 57, 58}, //
+       { 60, 61, 62, 63, 64, 65, 66, 67, 68}, //
+   };
    setMatrix(m1, row_index, col_index, sub1);
    assertThat(getMatrix(m1, row_index, col_index), is(equalTo(sub1)));
    
    // test setMatrix(Matrix, rowstart, rowend, columns, tosetMatrix)
-   // testmatix with dimesions  5x9
+   // testmatix with dimensions  5x9
    final double[][] sub2 = {        
-       {  0,  1,  2,  3,  4,  5,  6,  7,  8},
-       { 10, 11, 12, 13, 14, 15, 16, 17, 18},
-       { 20, 21, 22, 23, 24, 25, 26, 27, 28},
-       { 30, 31, 32, 33, 34, 35, 36, 37, 38},
-       { 40, 41, 42, 43, 44, 45, 46, 47, 48}, };
+       {  0,  1,  2,  3,  4,  5,  6,  7,  8}, //
+       { 10, 11, 12, 13, 14, 15, 16, 17, 18}, //
+       { 20, 21, 22, 23, 24, 25, 26, 27, 28}, //
+       { 30, 31, 32, 33, 34, 35, 36, 37, 38}, //
+       { 40, 41, 42, 43, 44, 45, 46, 47, 48}, //
+   };
    setMatrix(m1, 4, 8, col_index, sub2);
    assertThat(getMatrix(m1, 4, 8, col_index), is(equalTo(sub2)));
    
@@ -466,29 +477,31 @@ public final class VMathOperationsTest {
    clear(m1);
    
    // test setMatrix(Matrix, rows, colstart, colend, tosetMatrix)
-   // testmatix with dimesions  7x15
+   // testmatix with dimensions  7x15
    final double[][] sub3 = {
-       {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14},
-       { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 110, 111, 112, 113, 114},
-       { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 210, 211, 212, 213, 214},
-       { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 310, 311, 312, 313, 314},
-       { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 410, 411, 412, 413, 414},
-       { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 510, 511, 512, 513, 514},
-       { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 610, 611, 612, 613, 614}, };
+       {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14}, //
+       { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 110, 111, 112, 113, 114}, //
+       { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 210, 211, 212, 213, 214}, //
+       { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 310, 311, 312, 313, 314}, //
+       { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 410, 411, 412, 413, 414}, //
+       { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 510, 511, 512, 513, 514}, //
+       { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 610, 611, 612, 613, 614}, //
+   };
    
    setMatrix(m1, row_index, 2, 16, sub3);
    assertThat(getMatrix(m1, row_index, 2, 16), is(equalTo(sub3)));
   
    // test setMatrix(Matrix, rowstart, rowend, colstart, colend, tosetMatrix)
-   // testmatix with dimesions  7x3
+   // testmatix with dimensions  7x3
    final double[][] sub4 = {
-       {  0,  1,  2},
-       { 10, 11, 12},
-       { 20, 21, 22},
-       { 30, 31, 32},
-       { 40, 41, 42},
-       { 50, 51, 52},
-       { 60, 61, 62}, };
+       {  0,  1,  2}, //
+       { 10, 11, 12}, //
+       { 20, 21, 22}, //
+       { 30, 31, 32}, //
+       { 40, 41, 42}, //
+       { 50, 51, 52}, //
+       { 60, 61, 62}, //
+   };
    
    setMatrix(m1, 0, 6, 16, 18, sub4);
    assertThat(getMatrix(m1, 0, 6, 16, 18), is(equalTo(sub4)));
@@ -540,51 +553,45 @@ public final class VMathOperationsTest {
   
   /**
   * Testing the appendColums method of VMath class.
-  * 
-  * FIXME: Question maybe better name appendMatrix? or document to complicated?
   */
   @Test
   public void testAppendColums() {
    
    final double[][] m1 = {
-       {1,2,3},
-       {1,2,3},
-       {1,2,3} };
+       {1,2,3}, //
+       {1,2,3}, //
+       {1,2,3}, //
+   };
    
    final double[][] m2 = {
-       {4,5,6,7},
-       {4,5,6,7},
-       {4,5,6,7} };
+       {4,5,6,7}, //
+       {4,5,6,7}, //
+       {4,5,6,7}, //
+   };
   
    final double[][] m1_res = {
-       {m1[0][0], m1[0][1], m1[0][2],   m2[0][0], m2[0][1], m2[0][2], m2[0][3]},
-       {m1[1][0], m1[1][1], m1[1][2],   m2[1][0], m2[1][1], m2[1][2], m2[1][3]},
-       {m1[2][0], m1[2][1], m1[2][2],   m2[2][0], m2[2][1], m2[2][2], m2[2][3]},
+       {m1[0][0], m1[0][1], m1[0][2],   m2[0][0], m2[0][1], m2[0][2], m2[0][3]}, //
+       {m1[1][0], m1[1][1], m1[1][2],   m2[1][0], m2[1][1], m2[1][2], m2[1][3]}, //
+       {m1[2][0], m1[2][1], m1[2][2],   m2[2][0], m2[2][1], m2[2][2], m2[2][3]}, //
    };
    
    assertThat(appendColumns(m1, m2), is(equalTo(m1_res)));
   }
   
   /**
-   * Testing that *Equals vector-operations of the {@link VMath} class work in place and testing that other vector-operations create a new instance.
-   * 
-   * Tests of vector-methods where the class of the instance returned differs form class of input method are reasonably omitted,
-   * when testing reference e.g. transposed.
-   * <p>
-   * For a complete list of tested methods: <br>
-   * {@link #testMinus}, {@link #testNormalize}, {@link #testPlus}, {@link #testTimes}, {@link #testRotate90Equals} 
-   */
+   * Testing that the *Equals methods tested in this class work in place and that the other
+   * methods tested create a new instance.
+  * 
+  * Tests of methods where the class of the instance returned differs form the class of input are reasonably omitted,
+  * when testing reference. We omit the copy methods as well because the only testing made there is the reference.
+  */
   @Test
   public void testReference() {
 
     final double[][] m1 = {{1}};
-    
-    // testing the methods as in testUnitMatrix omitted
-    
+
     // testing the appendColums method as it is now: not working in place
     assertNotSame(m1, appendColumns(m1, m1));
-    
-    // testing the methods as in Diagonal omitted
     
     // testing that methods as in testGet return new copys of the submatrix to get
     final double[] inner = {1};
@@ -601,8 +608,7 @@ public final class VMathOperationsTest {
     assertNotSame(inner, getMatrix(m2, r0, r1, c0, c1)[0]);
     
     assertNotSame(inner, getRow(m2, r0));
-    // getCol reasonably omitted
-    
+
     // testing that the methods as in testSet, set the rows in the submatrix to refer to a new instance.
     final double[][] m3 = new double[1][1];
     
@@ -617,13 +623,13 @@ public final class VMathOperationsTest {
     
     setRow(m3, r0, inner);
     assertNotSame(inner, m3[0]);
-    // setCol reasonably omitted
-    
-    // testing the methods as in testGetDimensionality omitted
   }
   
   /**
    * Testing that correct Error is raised when dimension of the input data mismatch the needs of the method.
+   * Methods where no error is to be raised are omitted. 
+   * <p>
+   * See {@link assertDimensionMismatch} for details.
    */
   @Test
   public void testDimensionMismatch() {
@@ -632,9 +638,7 @@ public final class VMathOperationsTest {
     assertDimensionMismatch("", () -> unitVector(0,0));
     assertDimensionMismatch("", () -> unitVector(4,4));
     assertDimensionMismatch("", () -> unitVector(10,15));
-    
-    // testing the methods as in Diagonal omitted
-    
+
     // testing the methods as in testGet 
     final int[] r = {5}, c = {5};
     final int r1 = 5, c1 = 5;
@@ -652,8 +656,7 @@ public final class VMathOperationsTest {
     assertDimensionMismatch("", () -> setMatrix(unitMatrix(2), 0, r1, 0, c1, unitMatrix(6)));
     assertDimensionMismatch("Dimensionalities do not agree.", () -> setCol(unitMatrix(2), c1, unitVector(6,0)));
     assertDimensionMismatch("Dimensionalities do not agree.", () -> setRow(unitMatrix(2), r1, unitVector(6,0)));
-    
-    // testing the methods as in testGetDimensionality omitted
+
   }
 
   
