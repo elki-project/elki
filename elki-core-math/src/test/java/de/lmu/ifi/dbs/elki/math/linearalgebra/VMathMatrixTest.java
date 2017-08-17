@@ -30,7 +30,8 @@ import org.junit.Test;
 
 
 /**
- * Class testing the methods VMath class, which provide mathematical operations and have two dimensional double arrays as Input.
+ * Class testing the methods of the {@link VMath} class,
+ * which provide mathematical operations and have two dimensional double arrays as input.
  * <p>
  * Two dimensional double arrays are interpreted as rows x columns matrixes.
  *
@@ -49,7 +50,7 @@ public class VMathMatrixTest {
   private static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions do not agree.";
   
   /**
-   * A non symmetric 4 x 5 (rows x columns) matrix as testdata.
+   * A non symmetric 4 x 5 (rows x columns) matrix as test-data.
    */
   protected static final double[][] TESTMATRIX = {
       {1,2,3,4,5}, // 
@@ -397,8 +398,8 @@ public class VMathMatrixTest {
   }
   
   /**
-   * Testing that *Equals Matrix-operations of the {@link VMath} 
-   * class work in place and testing that other methods tested in this class
+   * Testing that the *Equals methods tested in this class 
+   * class work in place and that other methods tested
    * create a new instance.
    * 
    * Methods where the class of the instance 
