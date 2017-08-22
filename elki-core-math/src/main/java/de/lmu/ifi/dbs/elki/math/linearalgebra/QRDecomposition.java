@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
 
 import net.jafama.FastMath;
 
@@ -219,26 +219,29 @@ public class QRDecomposition implements java.io.Serializable {
    * 
    * @param B A Matrix with as many rows as A and any number of columns.
    * @return X that minimizes the two norm of Q*R*X-B.
-   * @exception IllegalArgumentException Matrix row dimensions must agree.
-   * @exception ArithmeticException Matrix is rank deficient.
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is rank deficient.
    */
   public double[][] solve(double[][] B) {
-    int rows = B.length, cols = B[0].length;
+    return solveInplace(copy(B));
+  }
+
+  /**
+   * Least squares solution of A*X = B
+   * 
+   * @param B A Matrix with as many rows as A and any number of columns.
+   * @return X that minimizes the two norm of Q*R*X-B.
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is rank deficient.
+   */
+  private double[][] solveInplace(double[][] X) {
+    int rows = X.length, nx = X[0].length;
     if(rows != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
     if(!this.isFullRank()) {
       throw new ArithmeticException("Matrix is rank deficient.");
     }
-
-    // Copy right hand side
-    double[][] X = copy(B);
-
-    solveInplace(X, cols);
-    return getMatrix(X, 0, n, 0, cols);
-  }
-
-  private void solveInplace(double[][] X, int nx) {
     // Compute Y = transpose(Q)*B
     for(int k = 0; k < n; k++) {
       for(int j = 0; j < nx; j++) {
@@ -259,11 +262,72 @@ public class QRDecomposition implements java.io.Serializable {
         Xk[j] /= Rdiag[k];
       }
       for(int i = 0; i < k; i++) {
-        final double[] Xi = X[i], QRi = QR[i];
+        final double[] Xi = X[i];
+        final double QRik = QR[i][k];
         for(int j = 0; j < nx; j++) {
-          Xi[j] -= Xk[j] * QRi[k];
+          Xi[j] -= Xk[j] * QRik;
         }
       }
     }
+    return X;
+  }
+
+  /**
+   * Least squares solution of A*X = b
+   * 
+   * @param b A column vector with as many rows as A.
+   * @return X that minimizes the two norm of Q*R*X-b.
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is rank deficient.
+   */
+  public double[] solve(double[] b) {
+    return solveInplace(copy(b));
+  }
+
+  /**
+   * Least squares solution of A*X = b
+   * 
+   * @param b A column vector with as many rows as A.
+   * @return X that minimizes the two norm of Q*R*X-b.
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is rank deficient.
+   */
+  public double[] solveInplace(double[] x) {
+    if(x.length != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isFullRank()) {
+      throw new ArithmeticException("Matrix is rank deficient.");
+    }
+    // Compute Y = transpose(Q)*B
+    for(int k = 0; k < n; k++) {
+      double s = 0.0;
+      for(int i = k; i < m; i++) {
+        s += QR[i][k] * x[i];
+      }
+      s /= QR[k][k];
+      for(int i = k; i < m; i++) {
+        x[i] -= s * QR[i][k];
+      }
+    }
+    // Solve R*X = Y;
+    for(int k = n - 1; k >= 0; k--) {
+      x[k] /= Rdiag[k];
+      for(int i = 0; i < k; i++) {
+        final double QRik = QR[i][k];
+        x[i] -= x[k] * QRik;
+      }
+    }
+    return x;
+  }
+
+  /**
+   * Find the inverse matrix.
+   *
+   * @return Inverse matrix
+   * @throws ArithmeticException Matrix is rank deficient.
+   */
+  public double[][] inverse() {
+    return solveInplace(unitMatrix(m));
   }
 }

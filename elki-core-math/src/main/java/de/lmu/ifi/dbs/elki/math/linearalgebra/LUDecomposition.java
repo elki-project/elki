@@ -217,28 +217,29 @@ public class LUDecomposition implements java.io.Serializable {
    * 
    * @param B A Matrix with as many rows as A and any number of columns.
    * @return X so that L*U*X = B(piv,:)
-   * @exception IllegalArgumentException Matrix row dimensions must agree.
-   * @exception ArithmeticException Matrix is singular.
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is singular.
    */
   public double[][] solve(double[][] B) {
-    int mx = B.length, nx = B[0].length;
-    if(mx != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
-    }
-    if(!this.isNonsingular()) {
-      throw new ArithmeticException("Matrix is singular.");
-    }
-    return solveInplace(getMatrix(B, piv, 0, nx), nx);
+    return solveInplace(getMatrix(B, piv, 0, B[0].length));
   }
 
   /**
    * Solve A*X = B
    * 
    * @param B A Matrix with as many rows as A and any number of columns.
-   * @param nx Number of columns
    * @return B
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is singular.
    */
-  private double[][] solveInplace(double[][] B, int nx) {
+  private double[][] solveInplace(double[][] B) {
+    int mx = B.length;
+    if(mx != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isNonsingular()) {
+      throw new ArithmeticException("Matrix is singular.");
+    }
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {
       final double[] Bk = B[k];
@@ -255,5 +256,73 @@ public class LUDecomposition implements java.io.Serializable {
       }
     }
     return B;
+  }
+
+  /**
+   * Solve A*X = b
+   * 
+   * @param B A column vector with as many rows as A
+   * @return X so that L*U*X = b(piv)
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is singular.
+   */
+  public double[] solve(double[] b) {
+    if(b.length != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isNonsingular()) {
+      throw new ArithmeticException("Matrix is singular.");
+    }
+    double[] bc = new double[piv.length];
+    for(int i = 0; i < piv.length; i++) {
+      bc[i] = b[piv[i]];
+    }
+    return solveInplace(bc);
+  }
+
+  /**
+   * Solve A*X = b
+   * 
+   * @param b A vector
+   * @return b
+   * @throws IllegalArgumentException Matrix row dimensions must agree.
+   * @throws ArithmeticException Matrix is singular.
+   */
+  public double[] solveInplace(double[] b) {
+    if(b.length != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isNonsingular()) {
+      throw new ArithmeticException("Matrix is singular.");
+    }
+    // Solve L*Y = B(piv,:)
+    for(int k = 0; k < n; k++) {
+      for(int i = k + 1; i < n; i++) {
+        b[i] -= b[k] * LU[i][k];
+      }
+    }
+    // Solve U*X = Y;
+    for(int k = n - 1; k >= 0; k--) {
+      b[k] /= LU[k][k];
+      for(int i = 0; i < k; i++) {
+        b[i] -= b[k] * LU[i][k];
+      }
+    }
+    return b;
+  }
+
+  /**
+   * Find the inverse matrix.
+   *
+   * @return Inverse matrix
+   * @throws ArithmeticException Matrix is rank deficient.
+   */
+  public double[][] inverse() {
+    // Build permuted identity matrix efficiently:
+    double[][] b = new double[piv.length][m];
+    for(int i = 0; i < piv.length; i++) {
+      b[piv[i]][i] = 1.;
+    }
+    return solveInplace(b);
   }
 }

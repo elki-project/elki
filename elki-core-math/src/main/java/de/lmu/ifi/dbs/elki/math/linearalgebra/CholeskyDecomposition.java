@@ -142,7 +142,7 @@ public class CholeskyDecomposition {
         for(int i = 0; i < k; i++) {
           Xkj -= X[i][j] * Lk[i];
         }
-        Xk[j] = Xkj *= iLkk;
+        Xk[j] = Xkj * iLkk;
       }
     }
     return X;
@@ -159,7 +159,62 @@ public class CholeskyDecomposition {
       final double[] Lk = L[k], Xk = X[k];
       timesEquals(Xk, 1. / Lk[k]);
       for(int i = 0; i < k; i++) {
-        plusTimesEquals(X[i], Xk, -Lk[i]);
+        minusTimesEquals(X[i], Xk, Lk[i]);
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Solve A*X = b
+   * 
+   * @param b A column vector with as many rows as A.
+   * @return X so that L*L^T*X = b
+   * @exception IllegalArgumentException Matrix row dimensions must agree.
+   * @exception RuntimeException Matrix is not symmetric positive definite.
+   */
+  public double[] solve(double[] b) {
+    if(b.length != L.length) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!isspd) {
+      throw new ArithmeticException("Matrix is not symmetric positive definite.");
+    }
+    // Work on a copy!
+    return solveLtransposed(solveL(copy(b)));
+  }
+
+  /**
+   * Solve L*Y = b
+   * 
+   * @param X Copy of b.
+   * @return X
+   */
+  private double[] solveL(double[] X) {
+    final int n = L.length;
+    X[0] /= L[0][0]; // First iteration, simplified.
+    for(int k = 1; k < n; k++) {
+      final double[] Lk = L[k];
+      for(int i = 0; i < k; i++) {
+        X[k] -= X[i] * Lk[i];
+      }
+      X[k] /= Lk[k];
+    }
+    return X;
+  }
+
+  /**
+   * Solve L^T*X = Y
+   *
+   * @param X Solution of L*Y=b
+   * @return X
+   */
+  private double[] solveLtransposed(double[] X) {
+    for(int k = L.length - 1; k >= 0; k--) {
+      final double[] Lk = L[k];
+      X[k] /= Lk[k];
+      for(int i = 0; i < k; i++) {
+        X[i] -= X[k] * Lk[i];
       }
     }
     return X;

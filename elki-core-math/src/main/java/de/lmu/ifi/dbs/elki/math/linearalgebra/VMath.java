@@ -1498,16 +1498,35 @@ public final class VMath {
    */
   public static double[][] solve(double[][] A, double[][] B) {
     final int rows = A.length, cols = A[0].length;
-    return (rows == cols ? (new LUDecomposition(A, rows, cols)).solve(B) : (new QRDecomposition(A, rows, cols)).solve(B));
+    return rows == cols //
+        ? (new LUDecomposition(A, rows, cols)).solve(B) //
+        : (new QRDecomposition(A, rows, cols)).solve(B);
+  }
+
+  /**
+   * Solve A*X = b
+   *
+   * @param b right hand side
+   * @return solution if A is square, least squares solution otherwise
+   */
+  public static double[] solve(double[][] A, double[] b) {
+    final int rows = A.length, cols = A[0].length;
+    return rows == cols //
+        ? (new LUDecomposition(A, rows, cols)).solve(b) //
+        : (new QRDecomposition(A, rows, cols)).solve(b);
   }
 
   /**
    * Matrix inverse or pseudoinverse
    *
+   * @param A matrix to invert
    * @return inverse(A) if A is square, pseudoinverse otherwise.
    */
-  public static double[][] inverse(double[][] elements) {
-    return solve(elements, identity(elements.length, elements.length));
+  public static double[][] inverse(double[][] A) {
+    final int rows = A.length, cols = A[0].length;
+    return rows == cols //
+        ? (new LUDecomposition(A, rows, cols)).inverse() //
+        : (new QRDecomposition(A, rows, cols)).inverse();
   }
 
   /**
@@ -1589,6 +1608,46 @@ public final class VMath {
    * @return almost equals with delta {@link #DELTA}
    */
   public static boolean almostEquals(final double[][] m1, final double[][] m2) {
+    return almostEquals(m1, m2, DELTA);
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param m1 Input matrix
+   * @param m2 other matrix to compare with
+   * @param maxdelta maximum delta allowed
+   * @return true if delta smaller than maximum
+   */
+  public static boolean almostEquals(final double[] m1, final double[] m2, final double maxdelta) {
+    if(m1 == m2) {
+      return true;
+    }
+    if(m2 == null) {
+      return false;
+    }
+    final int rowdim = m1.length;
+    if(rowdim != m2.length) {
+      return false;
+    }
+    for(int i = 0; i < rowdim; i++) {
+      if(Math.abs(m1[i] - m2[i]) > maxdelta) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param m1 Input matrix
+   * @param m2 other matrix to compare with
+   * @return almost equals with delta {@link #DELTA}
+   */
+  public static boolean almostEquals(final double[] m1, final double[] m2) {
     return almostEquals(m1, m2, DELTA);
   }
 

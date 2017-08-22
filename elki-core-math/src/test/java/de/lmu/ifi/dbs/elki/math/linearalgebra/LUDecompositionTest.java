@@ -52,9 +52,14 @@ public final class LUDecompositionTest {
     double[][] o = new LUDecomposition(s).solve(in);
     assertTrue("Not solved.", almostEquals(sol, o, 1e-15));
 
+    double[] in2 = { 13, 15 };
+    double[] sol2 = { 1, 1 };
+    double[] o2 = new LUDecomposition(s).solve(in2);
+    assertTrue("Not solved.", almostEquals(sol2, o2, 1e-15));
+
     double[][] p = { { 4., 1., 1. }, { 1., 2., 3. }, { 1., 3., 6. } };
-    double[][] o2 = new LUDecomposition(p).solve(unitMatrix(3));
-    assertTrue("Not solved.", almostEquals(unitMatrix(3), times(p, o2), 1e-14));
+    double[][] o3 = new LUDecomposition(p).solve(unitMatrix(3));
+    assertTrue("Not solved.", almostEquals(unitMatrix(3), times(p, o3), 1e-14));
   }
 
   @Test
