@@ -318,7 +318,7 @@ public class ArffParser implements Parser {
         double[] cur = new double[dimsize[out]];
         for(int k = 0; k < dimsize[out]; k++) {
           if(tokenizer.ttype == '?') {
-            tokenizer.nval = Double.NaN;
+            cur[k] = Double.NaN;
           }
           else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
             try {

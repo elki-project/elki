@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import gnu.trove.map.hash.TIntDoubleHashMap;
-
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -37,6 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 /**
  * <p>
@@ -74,7 +74,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> vector type
  */
 @Title("Sparse Vector Label Parser")
-@Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
+@Description("Parser for the following line format:\n" //
+    + "A single line provides a single point. Entries are separated by whitespace. " //
+    + "The values will be parsed as floats (resulting in a set of SparseFloatVectors).\n"//
+    + "A line is expected in the following format:\n"//
+    + "The first entry of each line is the number of attributes with coordinate value not zero. "//
+    + "Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, "//
+    + "and value is the value of the corresponding attribute. " //
+    + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. "//
+    + "If this fails for the first of the pair (interpreted ans index), it will be appended to a label. "//
+    + "(Thus, any label must not be parseable as Integer.) "//
+    + "If the float component is not parseable, an exception will be thrown. "//
+    + "Empty lines and lines beginning with \"#\" will be ignored.")
 public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends NumberVectorLabelParser<V> {
   /**
    * Class logger.
@@ -125,25 +136,33 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   @Override
   protected boolean parseLineInternal() {
     /* tokenizer initialized by nextLineExceptComments() */
-    int cardinality = tokenizer.getIntBase10();
+    int cardinality;
+    try {
+      cardinality = tokenizer.getIntBase10();
+    }
+    catch(NumberFormatException e) {
+      throw new NumberFormatException("Expected the number of values at the beginning of line " + reader.getLineNumber() + ", read '" + tokenizer.getSubstring() + "'");
+    }
     tokenizer.advance();
 
-    int thismax = 0;
+    int thismax = 0, index = -1;
 
     while(tokenizer.valid()) {
       if(values.size() < cardinality) {
         try {
-          int index = tokenizer.getIntBase10();
-          tokenizer.advance();
-          // Respect labelIndices.
+          // Try reading the next index:
+          if(index < 0) {
+            index = tokenizer.getIntBase10();
+            tokenizer.advance();
+            continue;
+          }
+          // Read the next value, but respect labelIndices.
           if(!isLabelColumn(index)) {
-            if(!tokenizer.valid()) {
-              throw new AbortException("Parser expected double value, but line ended too early: " + reader.getLineNumber());
-            }
             double attribute = tokenizer.getDouble();
             thismax = index >= thismax ? index + 1 : thismax;
             values.put(index, attribute);
             tokenizer.advance();
+            index = -1;
             continue;
           }
         }
@@ -155,6 +174,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
       haslabels = true;
       labels.add(tokenizer.getSubstring());
       tokenizer.advance();
+    }
+    if(index >= 0 && !tokenizer.valid()) {
+      throw new IllegalArgumentException("Parser expected double value, but line ended too early: " + reader.getLineNumber());
     }
     curvec = sparsefactory.newNumberVector(values, thismax);
     curlbl = LabelList.make(labels);

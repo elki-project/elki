@@ -1,0 +1,12 @@
+% ARFF example file, inspired by Weka ARFF documentation.
+@RELATION iris_sparse
+
+@ATTRIBUTE sepallength  NUMERIC
+@ATTRIBUTE sepalwidth   NUMERIC
+@ATTRIBUTE petallength  NUMERIC
+@ATTRIBUTE petalwidth   NUMERIC
+@ATTRIBUTE class        {Iris-setosa,Iris-versicolor,Iris-virginica}
+
+@DATA
+{0, 5.1, 1, 3.5, 2, 1.4, 3, 0.2, 4, Iris-setosa}
+{1, 3.0, 3, 0.2, 4, Iris-setosa}

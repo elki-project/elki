@@ -220,7 +220,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
         }
       }
       if(maxdim == 0) {
-        throw new AbortException("No numeric data was read. Verify the column separator; for textual data use other parsers.");
+        throw new AbortException("No numeric data was read in line " + reader.getLineNumber() + ". Verify the column separator; for textual data use other parsers.");
       }
       return Event.END_OF_STREAM;
     }
