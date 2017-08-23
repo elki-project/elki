@@ -44,16 +44,15 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  */
 public class TermFrequencyParserTest extends AbstractDataSourceTest {
   @Test
-  public void parameters() {
+  public void parameters() throws IOException {
     String filename = UNITTEST + "parsertest.tf";
-    Parser parser = new ELKIBuilder<>(TermFrequencyParser.class).build();
+    Parser parser = new ELKIBuilder<>(TermFrequencyParser.class)//
+        .with(TermFrequencyParser.Parameterizer.NORMALIZE_FLAG) //
+        .build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
       bundle = dbc.loadData();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
 
     // Ensure that the filter has correctly formed the bundle.

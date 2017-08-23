@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  */
 public class SparseNumberVectorLabelParserTest extends AbstractDataSourceTest {
   @Test
-  public void parameters() {
+  public void parameters() throws IOException {
     String filename = UNITTEST + "parsertest.sparse";
     Parser parser = new ELKIBuilder<>(SparseNumberVectorLabelParser.class) //
         .with(NumberVectorLabelParser.Parameterizer.VECTOR_TYPE_ID, SparseDoubleVector.Factory.class)//
@@ -53,9 +53,6 @@ public class SparseNumberVectorLabelParserTest extends AbstractDataSourceTest {
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
       bundle = dbc.loadData();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
 
     // Ensure that the filter has correctly formed the bundle.

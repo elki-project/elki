@@ -79,7 +79,7 @@ public abstract class AbstractDataSourceTest {
       return dbc.loadData();
     }
     catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
+      throw new AssertionError(e); // Fail the test.
     }
   }
 

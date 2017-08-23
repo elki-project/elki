@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  */
 public class LibSVMFormatParserTest extends AbstractDataSourceTest {
   @Test
-  public void parameters() {
+  public void parameters() throws IOException {
     String filename = UNITTEST + "parsertest.libsvm";
     Parser parser = new ELKIBuilder<>(LibSVMFormatParser.class) //
         .build();
@@ -52,9 +52,6 @@ public class LibSVMFormatParserTest extends AbstractDataSourceTest {
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
       bundle = dbc.loadData();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
 
     // Ensure that the filter has correctly formed the bundle.

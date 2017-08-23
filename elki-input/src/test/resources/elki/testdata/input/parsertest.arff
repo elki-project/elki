@@ -6,17 +6,19 @@
 @ATTRIBUTE petallength  NUMERIC
 @ATTRIBUTE petalwidth   NUMERIC
 @ATTRIBUTE class        {Iris-setosa,Iris-versicolor,Iris-virginica}
+@ATTRIBUTE comment		STRING
+@ATTRIBUTE external-id	STRING
 
 @DATA
-5.1,3.5,1.4,0.2,Iris-setosa
-4.9,3.0,1.4,0.2,Iris-setosa
-4.7,3.2,1.3,0.2,Iris-setosa
-4.6,3.1,1.5,0.2,Iris-setosa
-5.0,3.6,1.4,0.2,Iris-setosa
-5.4,3.9,1.7,0.4,Iris-setosa
-4.6,3.4,1.4,0.3,Iris-setosa
-5.0,3.4,1.5,0.2,Iris-setosa
-4.4,2.9,1.4,0.2,Iris-setosa
-4.9,3.1,1.5,0.1,Iris-setosa
+5.1,3.5,1.4,0.2,Iris-setosa,line1,1
+4.9,3.0,1.4,0.2,Iris-setosa,line2,line2
+4.7,3.2,1.3,0.2,Iris-setosa,line3,this
+4.6,3.1,1.5,0.2,Iris-setosa,line4,does
+5.0,3.6,1.4,0.2,Iris-setosa,line5,not
+5.4,3.9,1.7,0.4,Iris-setosa,line6,need
+4.6,3.4,1.4,0.3,Iris-setosa,line7,to
+5.0,3.4,1.5,0.2,Iris-setosa,line8,be
+4.4,2.9,1.4,0.2,Iris-setosa,line9,an
+4.9,3.1,1.5,0.1,Iris-setosa,line10,integer
 % Missing data:
-4.4,?,1.5,?,Iris-setosa
+4.4,?,1.5,?,Iris-setosa,line11,missing

@@ -20,8 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,16 +44,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  */
 public class ArffParserTest extends AbstractDataSourceTest {
   @Test
-  public void dense() {
+  public void dense() throws IOException {
     String filename = UNITTEST + "parsertest.arff";
     Parser parser = new ELKIBuilder<>(ArffParser.class).build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
       bundle = dbc.loadData();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
 
     // Ensure that the filter has correctly formed the bundle.
@@ -64,6 +60,8 @@ public class ArffParserTest extends AbstractDataSourceTest {
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     assertTrue("Test file not as expected", TypeUtil.CLASSLABEL.isAssignableFromType(bundle.meta(1)));
+    assertTrue("Test file not as expected", TypeUtil.LABELLIST.isAssignableFromType(bundle.meta(2)));
+    assertTrue("Test file not as expected", TypeUtil.EXTERNALID.isAssignableFromType(bundle.meta(3)));
 
     assertEquals("Length", 11, bundle.dataLength());
     assertEquals("Length", 4, ((NumberVector) bundle.data(0, 0)).getDimensionality());
@@ -79,16 +77,13 @@ public class ArffParserTest extends AbstractDataSourceTest {
   }
 
   @Test
-  public void sparse() {
+  public void sparse() throws IOException {
     String filename = UNITTEST + "parsertest.sparse.arff";
     Parser parser = new ELKIBuilder<>(ArffParser.class).build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
       bundle = dbc.loadData();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e); // Fail the test, no need to catch this.
     }
 
     // Ensure that the filter has correctly formed the bundle.
