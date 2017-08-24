@@ -208,10 +208,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
   @Override
   public String toString() {
     return new StringBuilder(200) //
-        .append("normalization class: ").append(getClass().getName())//
-        .append('\n')//
-        .append("normalization means: ").append(FormatUtil.format(mean))//
-        .append('\n')//
+        .append("normalization class: ").append(getClass().getName()).append('\n')//
+        .append("normalization means: ").append(FormatUtil.format(mean)).append('\n')//
         .append("normalization stddevs: ").append(FormatUtil.format(stddev))//
         .toString();
   }

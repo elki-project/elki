@@ -31,21 +31,19 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -63,21 +61,11 @@ import net.jafama.FastMath;
  * @apiviz.uses NumberVector
  * @apiviz.uses DistributionEstimator
  */
-public class AttributeWiseBetaNormalization<V extends NumberVector> implements Normalization<V> {
+public class AttributeWiseBetaNormalization<V extends NumberVector> extends AttributeWiseCDFNormalization<V> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(AttributeWiseBetaNormalization.class);
-
-  /**
-   * Stores the distribution estimators
-   */
-  private List<DistributionEstimator<?>> estimators;
-
-  /**
-   * Stores the estimated distributions
-   */
-  private List<Distribution> dists;
 
   /**
    * Number vector factory.
@@ -95,8 +83,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
    * @param estimators Distribution estimators
    */
   public AttributeWiseBetaNormalization(List<DistributionEstimator<?>> estimators, double alpha) {
-    super();
-    this.estimators = estimators;
+    super(estimators);
     this.alpha = alpha;
   }
 
@@ -129,47 +116,11 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
       Adapter adapter = new Adapter();
       for(int d = 0; d < dim; d++) {
         adapter.dim = d;
-        if(estimators.size() == 1) {
-          dists.add(estimators.get(0).estimate(castColumn, adapter));
-          continue;
-        }
-        Distribution best = null;
-        double bestq = Double.POSITIVE_INFINITY;
-        trials: for(DistributionEstimator<?> est : estimators) {
-          try {
-            Distribution dist = est.estimate(castColumn, adapter);
-            for(int i = 0; i < test.length; i++) {
-              test[i] = dist.cdf(castColumn.get(i).doubleValue(d));
-              if(Double.isNaN(test[i])) {
-                LOG.warning("Got NaN after fitting " + est.toString() + ": " + dist.toString());
-                continue trials;
-              }
-              if(Double.isInfinite(test[i])) {
-                LOG.warning("Got infinite value after fitting " + est.toString() + ": " + dist.toString());
-                continue trials;
-              }
-            }
-            Arrays.sort(test);
-            double q = KolmogorovSmirnovTest.simpleTest(test);
-            if(LOG.isVeryVerbose()) {
-              LOG.veryverbose("Estimator " + est.toString() + " (" + dist.toString() + ") has maximum deviation " + q + " for dimension " + d);
-            }
-            if(best == null || q < bestq) {
-              best = dist;
-              bestq = q;
-            }
-          }
-          catch(ArithmeticException e) {
-            if(LOG.isVeryVerbose()) {
-              LOG.veryverbose("Fitting distribution " + est + " failed: " + e.getMessage());
-            }
-            continue;
-          }
-        }
+        Distribution dist = findBestFit(castColumn, adapter, d, test);
         if(LOG.isVerbose()) {
-          LOG.verbose("Best fit for dimension " + d + ": " + best.toString());
+          LOG.verbose("Best fit for dimension " + d + ": " + dist.toString());
         }
-        dists.add(best);
+        dists.add(dist);
       }
 
       // Beta distribution for projection
@@ -199,76 +150,6 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
     throw new NotImplementedException();
   }
 
-  @Override
-  public String toString() {
-    StringBuilder result = new StringBuilder(200);
-    result.append("normalization class: ").append(getClass().getName()).append('\n')//
-        .append("normalization distributions: ");
-    boolean first = true;
-    for(DistributionEstimator<?> est : estimators) {
-      if(!first) {
-        result.append(',');
-      }
-      first = false;
-      result.append(est.getClass().getSimpleName());
-    }
-    return result.toString();
-  }
-
-  /**
-   * Array adapter class for vectors.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
-    /**
-     * Dimension to process.
-     */
-    int dim;
-
-    @Override
-    public int size(List<? extends NumberVector> array) {
-      return array.size();
-    }
-
-    @Override
-    public Double get(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return getDouble(array, off);
-    }
-
-    @Override
-    public double getDouble(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).doubleValue(dim);
-    }
-
-    @Override
-    public float getFloat(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).floatValue(dim);
-    }
-
-    @Override
-    public int getInteger(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).intValue(dim);
-    }
-
-    @Override
-    public short getShort(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).shortValue(dim);
-    }
-
-    @Override
-    public long getLong(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).longValue(dim);
-    }
-
-    @Override
-    public byte getByte(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
-      return array.get(off).byteValue(dim);
-    }
-  }
-
   /**
    * Parameterization class.
    *
@@ -280,12 +161,12 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
     /**
      * Parameter for distribution estimators.
      */
-    public static final OptionID DISTRIBUTIONS_ID = new OptionID("betanormalize.distributions", "A list of the distribution estimators to try.");
+    public static final OptionID DISTRIBUTIONS_ID = AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID;
 
     /**
      * Shape parameter.
      */
-    public static final OptionID ALPHA_ID = new OptionID("betanormalize.alpha", "Alpha parameter to control the shape of the output distribution.");
+    public static final OptionID ALPHA_ID = new OptionID("normalize.beta.alpha", "Alpha parameter to control the shape of the output distribution.");
 
     /**
      * Stores the distribution estimators
@@ -301,9 +182,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectListParameter<DistributionEstimator<?>> estP = new ObjectListParameter<>(DISTRIBUTIONS_ID, DistributionEstimator.class);
-      List<Class<? extends DistributionEstimator<?>>> def = new ArrayList<>(1);
-      def.add(BestFitEstimator.class);
-      estP.setDefaultValue(def);
+      estP.setDefaultValue(Arrays.asList(BestFitEstimator.class));
       if(config.grab(estP)) {
         estimators = estP.instantiateClasses(config);
       }

@@ -50,15 +50,13 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
     // Ensure the first column are the vectors.
-    assertEquals("Dimensionality 1 expected for input data", 1, getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
-    assertEquals("Dimensionality 1 expected for input data", 1, getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
+    assertEquals("Dimensionality", getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD), getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
     assertEquals("Length changed", unfilteredBundle.dataLength(), filteredBundle.dataLength());
 
     // Verify that the elements of the unfiltered bundle are in sorted order.
     double prev = get(unfilteredBundle, 0, 0, DoubleVector.class).doubleValue(0);
     for(int row = 1; row < unfilteredBundle.dataLength(); row++) {
       final double next = get(unfilteredBundle, row, 0, DoubleVector.class).doubleValue(0);
-
       assertTrue("Values are expected to be in sorted order", prev <= next);
       prev = next;
     }

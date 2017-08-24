@@ -125,10 +125,10 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    double[] values = new double[featureVector.getDimensionality()];
     if(minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
     }
+    double[] values = new double[featureVector.getDimensionality()];
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       values[d] = (featureVector.doubleValue(d) - minima[d]) / factor(d);
     }
@@ -149,11 +149,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
 
   /**
    * Returns a factor for normalization in a certain dimension.
-   * <p/>
+   *
    * The provided factor is the maximum-minimum in the specified dimension, if
    * these two values differ, otherwise it is the maximum if this value differs
    * from 0, otherwise it is 1.
-   * 
+   *
    * @param dimension the dimension to get a factor for normalization
    * @return a factor for normalization in a certain dimension
    */
@@ -182,11 +182,9 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
 
   @Override
   public String toString() {
-    return new StringBuilder() //
-        .append("normalization class: ").append(getClass().getName()) //
-        .append('\n') //
-        .append("normalization minima: ").append(FormatUtil.format(minima)) //
-        .append('\n') //
+    return new StringBuilder(1000) //
+        .append("normalization class: ").append(getClass().getName()).append('\n') //
+        .append("normalization minima: ").append(FormatUtil.format(minima)).append('\n') //
         .append("normalization maxima: ").append(FormatUtil.format(maxima)) //
         .toString();
   }

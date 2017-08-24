@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -48,7 +49,7 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
     final ListParameterization config = new ListParameterization();
     // Avoid cross-testing too many estimators.
-    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC));
+    config.addParameter(AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC));
     AttributeWiseCDFNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseCDFNormalization.class, config);
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
@@ -69,7 +70,7 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
     for(int col = 0; col < dim; col++) {
       assertEquals("~25% of the values in each column should be between 0 and 0.25", .25, counts[col][0] / (double) size, .02);
       assertEquals("~25% of the values in each column should be between 0.25 and 0.5", .25, counts[col][1] / (double) size, .02);
-      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, counts[col][2] / (double) size, .02);
+      assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, counts[col][2] / (double) size, .03);
       assertEquals("~25% of the values in each column should be between 0.5 and 0.75", .25, counts[col][3] / (double) size, .02);
     }
   }

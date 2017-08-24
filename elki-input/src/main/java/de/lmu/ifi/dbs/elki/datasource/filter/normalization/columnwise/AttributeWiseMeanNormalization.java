@@ -186,8 +186,7 @@ public class AttributeWiseMeanNormalization<V extends NumberVector> extends Abst
   @Override
   public String toString() {
     return new StringBuilder(200) //
-        .append("normalization class: ").append(getClass().getName())//
-        .append('\n')//
+        .append("normalization class: ").append(getClass().getName()).append('\n')//
         .append("normalization means: ").append(FormatUtil.format(mean))//
         .toString();
   }

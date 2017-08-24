@@ -32,11 +32,9 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesExc
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
@@ -55,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization"})
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization" })
 public class AttributeWiseMADNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.
@@ -120,8 +118,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
         median[d] = med;
         int zeros = 0;
         for(int i = 0; i < test.length; i++) {
-          test[i] = Math.abs(test[i] - med);
-          if(test[i] == 0.) {
+          if((test[i] = Math.abs(test[i] - med)) == 0.) {
             zeros++;
           }
         }
@@ -163,21 +160,14 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    if(featureVector.getDimensionality() == median.length) {
-      double[] values = new double[featureVector.getDimensionality()];
-      for(int d = 0; d < featureVector.getDimensionality(); d++) {
-        values[d] = restore(d, featureVector.doubleValue(d));
-      }
-      return factory.newNumberVector(values);
-    }
-    else {
+    if(featureVector.getDimensionality() != median.length) {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + median.length);
     }
-  }
-
-  @Override
-  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
-    throw new NotImplementedException();
+    double[] values = new double[featureVector.getDimensionality()];
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      values[d] = restore(d, featureVector.doubleValue(d));
+    }
+    return factory.newNumberVector(values);
   }
 
   /**
@@ -204,12 +194,8 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("normalization class: ").append(getClass().getName());
-    result.append('\n');
-    result.append("normalization median: ").append(FormatUtil.format(median));
-    result.append('\n');
-    result.append("normalization scaling factor: ").append(FormatUtil.format(imadsigma));
-    return result.toString();
+    return new StringBuilder(1000).append("normalization class: ").append(getClass().getName()).append('\n') //
+        .append("normalization median: ").append(FormatUtil.format(median)).append('\n') //
+        .append("normalization scaling factor: ").append(FormatUtil.format(imadsigma)).toString();
   }
 }

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.datasource.filter.selection;
+package de.lmu.ifi.dbs.elki.datasource.filter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,29 +31,25 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the random sampling filter.
+ * Test the pass-through dummy filter.
  *
- * @author Matthew Arcifa
+ * @author Erich Schubert
  */
-public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
-  /**
-   * Test with parameters p as the probability and seed as the random seed.
-   */
+public class NoOpFilterTest extends AbstractDataSourceTest {
   @Test
-  public void parameters() {
+  public void passthrough() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
     ListParameterization config = new ListParameterization();
-    config.addParameter(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .5);
-    config.addParameter(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0);
-    RandomSamplingStreamFilter filter = ClassGenericsUtil.parameterizeOrAbort(RandomSamplingStreamFilter.class, config);
+    NoOpFilter filter = ClassGenericsUtil.parameterizeOrAbort(NoOpFilter.class, config);
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
-    // Ensure the first column are the vectors.
+
+    // Check dimensionality
     assertEquals("Dimensionality", getFieldDimensionality(unfilteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD), getFieldDimensionality(filteredBundle, 0, TypeUtil.NUMBER_VECTOR_FIELD));
 
     // Verify that approximately p% of the values were sampled.
-    assertEquals("Unexpected bundle length", unfilteredBundle.dataLength() * .5, filteredBundle.dataLength(), .05 * filteredBundle.dataLength());
+    assertEquals("Unexpected bundle length", unfilteredBundle.dataLength(), filteredBundle.dataLength());
   }
 }
