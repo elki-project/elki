@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author Merlin Dietrich
  */
 public final class CholeskyDecompositionTest {
-  private static double[][] TESTMATRIX_L1 = { //
+  public static double[][] TESTMATRIX_L1 = { //
       { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, }, //
       { 7, 65, 0, 0, 0, 0, 0, 0, 0, 0, }, //
       { 62, -78, 90, 0, 0, 0, 0, 0, 0, 0, }, //
@@ -47,7 +47,7 @@ public final class CholeskyDecompositionTest {
       { -88, -39, 23, 81, 52, -95, 16, -90, 14, 0, }, //
       { 20, -80, -57, 14, -95, -47, -43, -26, 29, 5, } };
 
-  private static double[][] TESTMATRIX_L2 = { //
+  public static double[][] TESTMATRIX_L2 = { //
       { 1969.5249057431356, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //
       { -3778.931190321073, 2130.195233591261, 0, 0, 0, 0, 0, 0, 0, 0 }, //
       { 7897.304228880785, 4761.858130790322, 6641.458678884961, 0, 0, 0, 0, 0, 0, 0 }, //

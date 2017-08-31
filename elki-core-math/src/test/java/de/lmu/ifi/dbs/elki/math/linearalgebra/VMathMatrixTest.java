@@ -334,6 +334,14 @@ public class VMathMatrixTest {
     assertTrue(VMath.equals(identity(5, 3), transpose(m_identity3x5)));
   }
 
+  @Test
+  public void testFrobenius() {
+    final double[][] m = identity(4, 6);
+    assertEquals(2, normF(m), 0.);
+    m[0][5] = 5;
+    assertEquals(Math.sqrt(29), normF(m), 0.);
+  }
+
   /**
    * Testing the project(vector, matrix) method of VMath class.
    */
@@ -433,45 +441,45 @@ public class VMathMatrixTest {
     assertDimensionMismatch("m.getRowDimension() != column.getRowDimension()", () -> appendColumns(identity(3, 2), identity(2, 2)));
 
     // testing the methods as in testMatrixMatrixMultiplication
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> times(unitMatrix(3), identity(2, 3)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimesTranspose(unitMatrix(3), identity(3, 2)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> timesTranspose(unitMatrix(3), identity(3, 2)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimes(unitMatrix(3), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(unitMatrix(3), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTranspose(unitMatrix(3), identity(3, 2)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> timesTranspose(unitMatrix(3), identity(3, 2)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(unitMatrix(3), identity(2, 3)));
 
     // testing the methods as in testMatrixVectorMultiplication
     // vector length and number of rows in matrix differ
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> times(identity(2, 3), unitVector(2, 0)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(identity(2, 3), unitVector(2, 0)));
 
     // vector length and number of columns in matrix differ
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimes(identity(2, 3), unitVector(3, 0)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(identity(2, 3), unitVector(3, 0)));
 
     // first vector has wrong length
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(3, 0), identity(2, 3), unitVector(3, 0)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(3, 0), identity(2, 3), unitVector(3, 0)));
     // second vector has wrong length
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(2, 0), identity(2, 3), unitVector(2, 0)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimesTimes(unitVector(2, 0), identity(2, 3), unitVector(2, 0)));
 
     // matrix has more than one row
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> times(unitVector(3, 0), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> times(unitVector(3, 0), identity(2, 3)));
 
     // matrix has more than one column
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> timesTranspose(unitVector(3, 0), identity(3, 2)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> timesTranspose(unitVector(3, 0), identity(3, 2)));
 
     // vector length and number of rows in matrix differ
-    assertDimensionMismatch(VMath.ERR_MATRIX_INNERDIM, () -> transposeTimes(unitVector(3, 0), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_INNERDIM, () -> transposeTimes(unitVector(3, 0), identity(2, 3)));
 
     // testing the methods as in testMinus
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> minus(identity(3, 3), identity(2, 3)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> minusEquals(identity(2, 2), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> minus(identity(3, 3), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> minusEquals(identity(2, 2), identity(2, 3)));
 
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> minusTimes(identity(3, 3), identity(2, 3), 1));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> minusTimesEquals(identity(2, 2), identity(2, 3), 1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> minusTimes(identity(3, 3), identity(2, 3), 1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> minusTimesEquals(identity(2, 2), identity(2, 3), 1));
 
     // testing the methods as in testPlus
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> plus(identity(3, 3), identity(2, 3)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> plusEquals(identity(2, 2), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plus(identity(3, 3), identity(2, 3)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plusEquals(identity(2, 2), identity(2, 3)));
 
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> plusTimes(identity(3, 3), identity(2, 3), 1));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> plusTimesEquals(identity(2, 2), identity(2, 3), 1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plusTimes(identity(3, 3), identity(2, 3), 1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> plusTimesEquals(identity(2, 2), identity(2, 3), 1));
 
     // testSolve, testTraspose, testUnitMatrix are tested in separate classes
   }

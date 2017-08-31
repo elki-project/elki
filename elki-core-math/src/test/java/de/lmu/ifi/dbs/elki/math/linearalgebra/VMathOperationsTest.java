@@ -20,10 +20,15 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecompositionTest.TESTMATRIX_L1;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecompositionTest.TESTMATRIX_L2;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMathMatrixTest.TESTMATRIX;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMathVectorTest.TESTVEC;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -48,7 +53,7 @@ public final class VMathOperationsTest {
    * Let's make an example of usage: <br>
    * Let's take two Vectors v1, v2 with different lengths.
    * So v1 + v2 should not be possible to compute, so we want v1.length to equal
-   * v2.length and assert with the {@link VMath#ERR_VEC_DIMENSIONS} error
+   * v2.length and assert with the {@link ERR_VEC_DIMENSIONS} error
    * Message. If we think of any implementation of a plus(v1, v2) method with
    * vectors as arrays e.g. {@link VMath#plus(double[], double[])},
    * we are going to iterate either over the length of v1 or v2. But with
@@ -106,12 +111,12 @@ public final class VMathOperationsTest {
     assertArrayEquals(v1, v1_res, 0.);
     assertNotSame(v1, v1_res);
 
-    final double[] v2 = VMathVectorTest.TESTVEC, v2_res = copy(v2);
+    final double[] v2 = TESTVEC, v2_res = copy(v2);
     assertArrayEquals(v2, v2_res, 0.);
     assertNotSame(v2, v2_res);
 
     // testing copy(Matrix) method
-    final double[][] m1 = VMathMatrixTest.TESTMATRIX, m1_res = copy(m1);
+    final double[][] m1 = TESTMATRIX, m1_res = copy(m1);
     assertTrue(Arrays.deepEquals(m1, m1_res));
     assertNotSame(m1, m1_res);
     for(int i = 0; i < m1.length; i++) {
@@ -145,8 +150,8 @@ public final class VMathOperationsTest {
    */
   @Test
   public void testHashcode() {
-    final double[] v = VMathVectorTest.TESTVEC;
-    final double[][] m = VMathMatrixTest.TESTMATRIX;
+    final double[] v = TESTVEC;
+    final double[][] m = TESTMATRIX;
     assertEquals(Arrays.hashCode(v), VMath.hashCode(v), 0.);
     assertEquals(Arrays.deepHashCode(m), VMath.hashCode(m), 0.);
   }
@@ -157,28 +162,22 @@ public final class VMathOperationsTest {
   @Test
   public void testClear() {
     // test clear(vector)
-    final double[] v = copy(VMathVectorTest.TESTVEC);
+    final double[] v = copy(TESTVEC);
     clear(v);
     for(double x : v) {
       assertEquals(0., x, 0.);
     }
-    assertTrue(Arrays.equals(v, new double[] { 0, 0, 0, 0, 0 }));
+    assertTrue(VMath.equals(v, new double[5]));
 
     // test clear(matrix)
-    final double[][] m = copy(VMathMatrixTest.TESTMATRIX);
+    final double[][] m = copy(TESTMATRIX);
     clear(m);
     for(double[] row : m) {
       for(double x : row) {
         assertEquals(0., x, 0.);
       }
     }
-
-    final double[][] zeros4x5 = { //
-        { 0, 0, 0, 0, 0 }, //
-        { 0, 0, 0, 0, 0 }, //
-        { 0, 0, 0, 0, 0 }, //
-        { 0, 0, 0, 0, 0 } };
-    assertTrue(Arrays.deepEquals(zeros4x5, m));
+    assertTrue(VMath.equals(new double[4][5], m));
   }
 
   /**
@@ -222,14 +221,20 @@ public final class VMathOperationsTest {
    */
   @Test
   public void testMatrixAlmosteq() {
-    final double[][] m1 = copy(VMathMatrixTest.TESTMATRIX);
-    final double[][] m2 = copy(VMathMatrixTest.TESTMATRIX);
+    final double[][] m1 = copy(TESTMATRIX);
+    final double[][] m2 = copy(TESTMATRIX);
     assertNotSame(m1, m2);
 
     // basic function test
-    assertTrue(almostEquals(m1, m2));
+    assertTrue(VMath.equals(m1, m1));
+    assertTrue(VMath.equals(m1, m2));
+    assertFalse(VMath.equals(m1, null));
+    assertFalse(VMath.equals(null, m2));
+    assertTrue(almostEquals(m1, m1, 0.));
     assertTrue(almostEquals(m1, m2, 0.));
-    assertFalse(almostEquals(m1, identity(4, 5)));
+    assertFalse(almostEquals(null, m2, 0.));
+    assertFalse(almostEquals(m1, null, 0.));
+    assertFalse(VMath.equals(m1, identity(4, 5)));
     assertFalse(almostEquals(m1, identity(4, 5), 0.));
     assertTrue(almostEquals(m1, identity(4, 5), 5)); // 5 = max difference.
 
@@ -275,28 +280,6 @@ public final class VMathOperationsTest {
     assertArrayEquals(new double[] { 0, 0, 1, 0, 0 }, unitVector(5, 2), 0.);
     assertArrayEquals(new double[] { 0, 0, 0, 1, 0 }, unitVector(5, 3), 0.);
     assertArrayEquals(new double[] { 0, 0, 0, 0, 1 }, unitVector(5, 4), 0.);
-  }
-
-  /**
-   * Testing the unitMatrix and the identity method of VMath class.
-   */
-  @Test
-  public void testUnitMatrixAndIdentity() {
-    // test unitMatrix(dim) and unitMatrix(dim) equals identity(dim, dim)
-    final double[][] m_unit = { { 1, 0, 0, 0, 0 }, //
-        { 0, 1, 0, 0, 0 }, //
-        { 0, 0, 1, 0, 0 }, //
-        { 0, 0, 0, 1, 0 }, //
-        { 0, 0, 0, 0, 1 } };
-    assertTrue(VMath.equals(unitMatrix(5), m_unit));
-    assertTrue(VMath.equals(identity(5, 5), m_unit));
-
-    // test identity with dimensions 3x5 and 5x3
-    final double[][] m_identity3x5 = { { 1, 0, 0, 0, 0 }, //
-        { 0, 1, 0, 0, 0 }, //
-        { 0, 0, 1, 0, 0 } };
-    assertTrue(VMath.equals(identity(3, 5), m_identity3x5));
-    assertTrue(VMath.equals(identity(5, 3), transpose(m_identity3x5)));
   }
 
   /**
@@ -359,11 +342,11 @@ public final class VMathOperationsTest {
 
     // test getCol and getRow
     // we assume transpose to be correct
-    for(int i = 0; i < VMathMatrixTest.TESTMATRIX.length; i++) {
-      double[] v = VMathMatrixTest.TESTMATRIX[i];
-      assertArrayEquals(v, getRow(VMathMatrixTest.TESTMATRIX, i), 0.);
-      assertNotSame(v, getRow(VMathMatrixTest.TESTMATRIX, i));
-      assertArrayEquals(v, getCol(transpose(VMathMatrixTest.TESTMATRIX), i), 0.);
+    for(int i = 0; i < TESTMATRIX.length; i++) {
+      double[] v = TESTMATRIX[i];
+      assertArrayEquals(v, getRow(TESTMATRIX, i), 0.);
+      assertNotSame(v, getRow(TESTMATRIX, i));
+      assertArrayEquals(v, getCol(transpose(TESTMATRIX), i), 0.);
     }
   }
 
@@ -373,10 +356,7 @@ public final class VMathOperationsTest {
    */
   @Test
   public void testGetDimensionality() {
-    final double[][] m3 = { //
-        { 0, 0, 0, 0, 0 }, //
-        { 0, 0, 0, 0, 0 }, //
-        { 0, 0, 0, 0, 0 } };
+    final double[][] m3 = new double[3][5];
     assertEquals(3, getRowDimensionality(m3));
     assertEquals(3, getColumnDimensionality(transpose(m3)));
     assertEquals(5, getColumnDimensionality(m3));
@@ -388,7 +368,7 @@ public final class VMathOperationsTest {
    */
   @Test
   public void testDiagonal() {
-    final double[] m = VMathVectorTest.TESTVEC;
+    final double[] m = TESTVEC;
     final double[][] m_diag = { //
         { m[0], 0, 0, 0, 0 }, //
         { 0, m[1], 0, 0, 0 }, //
@@ -397,8 +377,8 @@ public final class VMathOperationsTest {
         { 0, 0, 0, 0, m[4] } };
     assertTrue(almostEquals(diagonal(m), m_diag));
 
-    final double[] dia_TEST = { VMathMatrixTest.TESTMATRIX[0][0], VMathMatrixTest.TESTMATRIX[1][1], VMathMatrixTest.TESTMATRIX[2][2], VMathMatrixTest.TESTMATRIX[3][3] };
-    assertArrayEquals(dia_TEST, getDiagonal(VMathMatrixTest.TESTMATRIX), 0.);
+    final double[] dia_TEST = { TESTMATRIX[0][0], TESTMATRIX[1][1], TESTMATRIX[2][2], TESTMATRIX[3][3] };
+    assertArrayEquals(dia_TEST, getDiagonal(TESTMATRIX), 0.);
 
     // if diagonal is correct this is a test for getDiagonal
     // if getDiagonal is correct a test for diagonal
@@ -424,25 +404,13 @@ public final class VMathOperationsTest {
     final int[] row_index = { 3, 5, 10, 2, 11, 19, 8 };
     final int[] col_index = { 0, 10, 7, 19, 3, 6, 23, 5, 4 };
     // inputmatix with dimensions 7x9
-    final double[][] sub1 = { //
-        { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, //
-        { 10, 11, 12, 13, 14, 15, 16, 17, 18 }, //
-        { 20, 21, 22, 23, 24, 25, 26, 27, 28 }, //
-        { 30, 31, 32, 33, 34, 35, 36, 37, 38 }, //
-        { 40, 41, 42, 43, 44, 45, 46, 47, 48 }, //
-        { 50, 51, 52, 53, 54, 55, 56, 57, 58 }, //
-        { 60, 61, 62, 63, 64, 65, 66, 67, 68 } };
+    final double[][] sub1 = randomMatrix(7, 9, 0L);
     setMatrix(m1, row_index, col_index, sub1);
     assertTrue(VMath.equals(getMatrix(m1, row_index, col_index), sub1));
 
     // test setMatrix(Matrix, rowstart, rowend, columns, tosetMatrix)
     // testmatix with dimensions 5x9
-    final double[][] sub2 = { //
-        { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, //
-        { 10, 11, 12, 13, 14, 15, 16, 17, 18 }, //
-        { 20, 21, 22, 23, 24, 25, 26, 27, 28 }, //
-        { 30, 31, 32, 33, 34, 35, 36, 37, 38 }, //
-        { 40, 41, 42, 43, 44, 45, 46, 47, 48 } };
+    final double[][] sub2 = randomMatrix(5, 9, 3L);
     setMatrix(m1, 4, 9, col_index, sub2);
     assertTrue(VMath.equals(getMatrix(m1, 4, 9, col_index), sub2));
 
@@ -451,34 +419,20 @@ public final class VMathOperationsTest {
 
     // test setMatrix(Matrix, rows, colstart, colend, tosetMatrix)
     // testmatix with dimensions 7x15
-    final double[][] sub3 = { //
-        { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, //
-        { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 110, 111, 112, 113, 114 }, //
-        { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 210, 211, 212, 213, 214 }, //
-        { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 310, 311, 312, 313, 314 }, //
-        { 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 410, 411, 412, 413, 414 }, //
-        { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 510, 511, 512, 513, 514 }, //
-        { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 610, 611, 612, 613, 614 } };
+    final double[][] sub3 = randomMatrix(7, 15, 2L);
 
     setMatrix(m1, row_index, 2, 17, sub3);
     assertTrue(VMath.equals(getMatrix(m1, row_index, 2, 17), sub3));
 
     // test setMatrix(Matrix, rowstart, rowend, colstart, colend, tosetMatrix)
     // testmatix with dimensions 7x3
-    final double[][] sub4 = { //
-        { 0, 1, 2 }, //
-        { 10, 11, 12 }, //
-        { 20, 21, 22 }, //
-        { 30, 31, 32 }, //
-        { 40, 41, 42 }, //
-        { 50, 51, 52 }, //
-        { 60, 61, 62 } };
+    final double[][] sub4 = randomMatrix(7, 3, 1L);
 
     setMatrix(m1, 0, 7, 16, 19, sub4);
     assertTrue(almostEquals(getMatrix(m1, 0, 7, 16, 19), sub4));
 
     // check that setting a full matrix
-    final double[][] m2 = VMathMatrixTest.TESTMATRIX;
+    final double[][] m2 = TESTMATRIX;
     final double[][] res1 = new double[getRowDimensionality(m2)][getColumnDimensionality(m2)];
     setMatrix(res1, 0, getRowDimensionality(m2), 0, getColumnDimensionality(m2), m2);
     assertTrue(VMath.equals(res1, m2));
@@ -500,8 +454,7 @@ public final class VMathOperationsTest {
     assertTrue(VMath.equals(res2, getMatrix(m2, riter, citer)));
 
     // testing setCol and setRow
-    final double[] col = VMathVectorTest.TESTVEC;
-    final double[] row = VMathVectorTest.TESTVEC;
+    final double[] col = TESTVEC, row = TESTVEC;
 
     final double[][] m3 = new double[row.length][col.length];
 
@@ -518,6 +471,25 @@ public final class VMathOperationsTest {
       // assert that row r of m is row via getRow
       assertArrayEquals(row, getRow(m3, r), 0.);
     }
+  }
+
+  /**
+   * Generate a matrix with random values.
+   * 
+   * @param rows Number of rows
+   * @param cols Number of cols
+   * @param seed Random seed
+   * @return Matrix
+   */
+  private double[][] randomMatrix(int rows, int cols, long seed) {
+    Random rnd = new Random(seed);
+    double[][] m = new double[rows][cols];
+    for(int r = 0; r < rows; r++) {
+      for(int c = 0; c < cols; c++) {
+        m[r][c] = rnd.nextDouble();
+      }
+    }
+    return m;
   }
 
   /**
@@ -609,18 +581,50 @@ public final class VMathOperationsTest {
     final int[] r = { 5 }, c = { 5 };
     final int r1 = 5, c1 = 5;
     assertDimensionMismatch("5", () -> getMatrix(unitMatrix(2), r, c));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), 0, r1, c));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), r, 0, c1));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), 0, r1, 0, c1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), 0, r1, c));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), r, 0, c1));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> getMatrix(unitMatrix(2), 0, r1, 0, c1));
     assertDimensionMismatch("5", () -> getCol(unitMatrix(2), c1));
     assertDimensionMismatch("5", () -> getRow(unitMatrix(2), r1));
 
     // testing the methods as in testSet
     assertDimensionMismatch("5", () -> setMatrix(unitMatrix(2), r, c, unitMatrix(6)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), 0, r1, c, unitMatrix(6)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), r, 0, c1, unitMatrix(6)));
-    assertDimensionMismatch(VMath.ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), 0, r1, 0, c1, unitMatrix(6)));
-    assertDimensionMismatch(VMath.ERR_DIMENSIONS, () -> setCol(unitMatrix(2), c1, unitVector(6, 0)));
-    assertDimensionMismatch(VMath.ERR_DIMENSIONS, () -> setRow(unitMatrix(2), r1, unitVector(6, 0)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), 0, r1, c, unitMatrix(6)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), r, 0, c1, unitMatrix(6)));
+    assertDimensionMismatch(ERR_MATRIX_DIMENSIONS, () -> setMatrix(unitMatrix(2), 0, r1, 0, c1, unitMatrix(6)));
+    assertDimensionMismatch(ERR_DIMENSIONS, () -> setCol(unitMatrix(2), c1, unitVector(6, 0)));
+    assertDimensionMismatch(ERR_DIMENSIONS, () -> setRow(unitMatrix(2), r1, unitVector(6, 0)));
+  }
+
+  @Test
+  public void testSolve() {
+    final double[] a = { 3, 7, 7, 7, -7, 7, 7, 7, 7, 7 };
+    final double[] b = { -2, 3, 5, 1, 8, 1, 1, 1, 1, 1 };
+    final double[][] m = transpose(new double[][] { a, b });
+
+    final double[][] A1 = timesTranspose(TESTMATRIX_L1, TESTMATRIX_L1);
+    final double[][] A2 = timesTranspose(TESTMATRIX_L2, TESTMATRIX_L2);
+
+    final double[] a1 = solve(A1, a);
+    final double[] a2 = solve(A2, a);
+    final double[][] a1t = solve(A1, transpose(transpose(a)));
+    final double[][] a2t = solve(A2, transpose(transpose(a)));
+    final double[] b1 = solve(A1, b);
+    final double[] b2 = solve(A2, b);
+    final double[][] b1t = solve(A1, transpose(transpose(b)));
+    final double[][] b2t = solve(A2, transpose(transpose(b)));
+    final double[][] m1 = solve(A1, m);
+    final double[][] m2 = solve(A2, m);
+
+    assertTrue(almostEquals(times(A1, a1), a));
+    assertTrue(almostEquals(times(A2, a2), a));
+    assertTrue(almostEquals(times(A1, a1t), transpose(transpose(a))));
+    assertTrue(almostEquals(times(A2, a2t), transpose(transpose(a))));
+    assertTrue(almostEquals(times(A1, b1), b));
+    assertTrue(almostEquals(times(A2, b2), b));
+    assertTrue(almostEquals(times(A1, b1t), transpose(transpose(b))));
+    assertTrue(almostEquals(times(A2, b2t), transpose(transpose(b))));
+    assertTrue(almostEquals(times(A1, m1), m));
+    assertTrue(almostEquals(times(A2, m2), m));
   }
 }

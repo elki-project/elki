@@ -1612,7 +1612,7 @@ public final class VMath {
     if(m1 == m2) {
       return true;
     }
-    if(m2 == null) {
+    if(m1 == null || m2 == null) {
       return false;
     }
     final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
@@ -1654,7 +1654,7 @@ public final class VMath {
     if(m1 == m2) {
       return true;
     }
-    if(m2 == null) {
+    if(m1 == null || m2 == null) {
       return false;
     }
     final int rowdim = m1.length;
@@ -1710,7 +1710,7 @@ public final class VMath {
    * @return cosine of the smaller angle
    */
   public static double angle(double[] v1, double[] v2) {
-    final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
+    final int mindim = (v1.length <= v2.length) ? v1.length : v2.length;
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
@@ -1743,7 +1743,7 @@ public final class VMath {
    * @return cosine of the smaller angle
    */
   public static double angle(double[] v1, double[] v2, double[] o) {
-    final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
+    final int mindim = (v1.length <= v2.length) ? v1.length : v2.length;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());

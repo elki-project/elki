@@ -26,6 +26,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Class testing the methods of the {@link VMath} class, which provide
  * mathematical operations and have
@@ -317,27 +319,29 @@ public final class VMathVectorTest {
   @Test
   public void testAngle() {
     // test case I
-    final double[] v1_I = { 1, 0 }, v2_I = { 1, 1 }, v3_I = { 2, 0 };
-    assertEquals(Math.cos(Math.PI / 4), angle(v2_I, v1_I), 0.);
-    assertEquals(Math.cos(Math.PI / 4), angle(v1_I, v2_I), 0.);
+    final double[] v1_I = { 1, 0 }, v2_I = { 1, 1 }, v3_I = { 2, 0, 0 };
+    assertEquals(MathUtil.SQRTHALF, angle(v2_I, v1_I), 0.);
+    assertEquals(MathUtil.SQRTHALF, angle(v1_I, v2_I), 0.);
     assertEquals(1., angle(v3_I, v1_I), 0.);
     assertEquals(1., angle(v1_I, v3_I), 0.);
 
     // set the origin, no change of data needed
     final double[] origin_I = { 0, 1 };
-    assertEquals(Math.cos(Math.PI / 4), angle(v2_I, v1_I, origin_I), 0.);
-    assertEquals(Math.cos(Math.PI / 4), angle(v1_I, v2_I, origin_I), 0.);
+    assertEquals(MathUtil.SQRTHALF, angle(v2_I, v1_I, origin_I), 0.);
+    assertEquals(MathUtil.SQRTHALF, angle(v1_I, v2_I, origin_I), 0.);
+    assertEquals(Math.sqrt(0.8), angle(v3_I, v2_I, origin_I), 0.);
+    assertEquals(Math.sqrt(0.8), angle(v2_I, v3_I, origin_I), 0.);
 
     // test case II
     final double[] v1_II = { 1, 0 }, v2_II = { 1, Math.tan(Math.PI / 3) };
-    assertEquals(Math.cos(Math.PI / 3), angle(v2_II, v1_II), 0.);
-    assertEquals(Math.cos(Math.PI / 3), angle(v1_II, v2_II), 0.);
+    assertEquals(Math.sqrt(.25), angle(v2_II, v1_II), 1e-15);
+    assertEquals(Math.sqrt(.25), angle(v1_II, v2_II), 1e-15);
 
     // change the origin
     final double[] v3_II = { 2, 3 }, v4_II = { 2, 3 + Math.tan(Math.PI / 3) };
     final double[] origin_II = { 1, 3 };
-    assertEquals(Math.cos(Math.PI / 3), angle(v3_II, v4_II, origin_II), 0.);
-    assertEquals(Math.cos(Math.PI / 3), angle(v4_II, v3_II, origin_II), 0.);
+    assertEquals(Math.sqrt(.25), angle(v3_II, v4_II, origin_II), 1e-15);
+    assertEquals(Math.sqrt(.25), angle(v4_II, v3_II, origin_II), 1e-15);
   }
 
   /**
@@ -480,34 +484,34 @@ public final class VMathVectorTest {
     double s1 = 1, s2 = 1;
 
     // methods as in testPlus
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> plus(v_len1, v_len2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> plusEquals(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plus(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusEquals(v_len1, v_len2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesPlus(v_len1, s1, v_len2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesPlusEquals(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlus(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusEquals(v_len1, s1, v_len2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> plusTimes(v_len1, v_len2, s2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> plusTimesEquals(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimes(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> plusTimesEquals(v_len1, v_len2, s2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesPlusTimes(v_len1, s1, v_len2, s2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesPlusTimesEquals(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimes(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesPlusTimesEquals(v_len1, s1, v_len2, s2));
 
     // methods as in testMinus
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> minus(v_len1, v_len2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> minusEquals(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minus(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusEquals(v_len1, v_len2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesMinus(v_len1, s1, v_len2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesMinusEquals(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinus(v_len1, s1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusEquals(v_len1, s1, v_len2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> minusTimes(v_len1, v_len2, s2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> minusTimesEquals(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimes(v_len1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> minusTimesEquals(v_len1, v_len2, s2));
 
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesMinusTimes(v_len1, s1, v_len2, s2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> timesMinusTimesEquals(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimes(v_len1, s1, v_len2, s2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> timesMinusTimesEquals(v_len1, s1, v_len2, s2));
 
     // methods as in testScalarProduct
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> scalarProduct(v_len1, v_len2));
-    assertDimensionMismatch(VMath.ERR_VEC_DIMENSIONS, () -> transposeTimes(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> scalarProduct(v_len1, v_len2));
+    assertDimensionMismatch(ERR_VEC_DIMENSIONS, () -> transposeTimes(v_len1, v_len2));
 
     // test rotate90
     assertDimensionMismatch("rotate90Equals is only valid for 2d vectors.", () -> rotate90Equals(v_len1));
