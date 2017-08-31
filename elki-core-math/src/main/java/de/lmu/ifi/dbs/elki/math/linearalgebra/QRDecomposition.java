@@ -20,8 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
@@ -44,6 +43,11 @@ import net.jafama.FastMath;
  * @apiviz.uses Matrix - - transforms
  */
 public class QRDecomposition implements java.io.Serializable {
+  /**
+   * When a matrix is rank deficient.
+   */
+  protected static final String ERR_MATRIX_RANK_DEFICIENT = "Matrix is rank deficient.";
+
   /**
    * Serial version
    */
@@ -251,10 +255,10 @@ public class QRDecomposition implements java.io.Serializable {
   private double[][] solveInplace(double[][] X) {
     int rows = X.length, nx = X[0].length;
     if(rows != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isFullRank()) {
-      throw new ArithmeticException("Matrix is rank deficient.");
+      throw new ArithmeticException(ERR_MATRIX_RANK_DEFICIENT);
     }
     // Compute Y = transpose(Q)*B
     for(int k = 0; k < n; k++) {
@@ -309,10 +313,10 @@ public class QRDecomposition implements java.io.Serializable {
    */
   public double[] solveInplace(double[] x) {
     if(x.length != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isFullRank()) {
-      throw new ArithmeticException("Matrix is rank deficient.");
+      throw new ArithmeticException(ERR_MATRIX_RANK_DEFICIENT);
     }
     // Compute Y = transpose(Q)*B
     for(int k = 0; k < n; k++) {

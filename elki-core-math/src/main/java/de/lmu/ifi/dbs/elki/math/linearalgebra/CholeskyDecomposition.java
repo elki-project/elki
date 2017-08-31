@@ -60,10 +60,10 @@ public class CholeskyDecomposition {
   public CholeskyDecomposition(double[][] A) {
     final int n = A.length;
     L = new double[n][n];
-    isspd = (A[0].length == n);
+    isspd = A[0].length == n;
     { // First iteration
       double d = A[0][0];
-      isspd &= (d > 0.0);
+      isspd &= d > 0.0;
       L[0][0] = d > 0 ? FastMath.sqrt(d) : 0;
       Arrays.fill(L[0], 1, n, 0.0);
     }
@@ -82,7 +82,7 @@ public class CholeskyDecomposition {
         isspd &= (A[k][j] == Aj[k]);
       }
       d = Aj[j] - d;
-      isspd &= (d > 0.0);
+      isspd &= d > 0.0;
       Lj[j] = d > 0 ? FastMath.sqrt(d) : 0;
       Arrays.fill(Lj, j + 1, n, 0.0);
     }
@@ -116,10 +116,10 @@ public class CholeskyDecomposition {
    */
   public double[][] solve(double[][] B) {
     if(B.length != L.length) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!isspd) {
-      throw new ArithmeticException("Matrix is not symmetric positive definite.");
+      throw new ArithmeticException(ERR_MATRIX_NOT_SPD);
     }
     // Work on a copy!
     return solveLtransposed(solveL(copy(B)));
@@ -180,10 +180,10 @@ public class CholeskyDecomposition {
    */
   public double[] solve(double[] b) {
     if(b.length != L.length) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!isspd) {
-      throw new ArithmeticException("Matrix is not symmetric positive definite.");
+      throw new ArithmeticException(ERR_MATRIX_NOT_SPD);
     }
     // Work on a copy!
     return solveLtransposed(solveL(copy(b)));

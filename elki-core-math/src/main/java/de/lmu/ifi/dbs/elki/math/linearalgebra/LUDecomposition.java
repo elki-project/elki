@@ -208,7 +208,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double det() {
     if(m != n) {
-      throw new IllegalArgumentException("Matrix must be square.");
+      throw new IllegalArgumentException(ERR_MATRIX_NONSQUARE);
     }
     double d = pivsign;
     for(int j = 0; j < n; j++) {
@@ -227,7 +227,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[][] solve(double[][] B) {
     if(B.length != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     double[][] sol = solveInplace(getMatrix(B, piv, 0, B[0].length));
     return n < sol.length ? Arrays.copyOf(sol, n) : sol;
@@ -244,10 +244,10 @@ public class LUDecomposition implements java.io.Serializable {
   private double[][] solveInplace(double[][] B) {
     int mx = B.length;
     if(mx != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isNonsingular()) {
-      throw new ArithmeticException("Matrix is singular.");
+      throw new ArithmeticException(ERR_SINGULAR);
     }
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {
@@ -277,10 +277,10 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[] solve(double[] b) {
     if(b.length != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isNonsingular()) {
-      throw new ArithmeticException("Matrix is singular.");
+      throw new ArithmeticException(ERR_SINGULAR);
     }
     double[] bc = new double[piv.length];
     for(int i = 0; i < piv.length; i++) {
@@ -300,10 +300,10 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[] solveInplace(double[] b) {
     if(b.length != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isNonsingular()) {
-      throw new ArithmeticException("Matrix is singular.");
+      throw new ArithmeticException(ERR_SINGULAR);
     }
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {
