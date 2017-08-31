@@ -63,6 +63,11 @@ public final class VMath {
   protected static final String ERR_DIMENSIONS = "Dimensionalities do not agree.";
 
   /**
+   * Error message (in assertions!) when min > max is given as a range.
+   */
+  protected static final String ERR_INVALID_RANGE = "Invalid range parameters.";
+
+  /**
    * Fake constructor. Static class.
    */
   private VMath() {
@@ -827,12 +832,14 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index (exclusive!)
+   * @param r1 Final row index (exclusive)
    * @param c0 Initial column index
-   * @param c1 Final column index (exclusive!)
+   * @param c1 Final column index (exclusive)
    * @return m1(r0:r1-1,c0:c1-1)
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1) {
+    assert r0 <= r1 && c0 <= c1 : ERR_INVALID_RANGE;
+    assert r1 <= m1.length && c1 <= m1[0].length : ERR_MATRIX_DIMENSIONS;
     final int rowdim = r1 - r0, coldim = c1 - c0;
     final double[][] X = new double[rowdim][coldim];
     for(int i = r0; i < r1; i++) {
@@ -867,10 +874,12 @@ public final class VMath {
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
-   * @param c1 Final column index (exclusive!)
-   * @return m1(r(:),c0:c1)
+   * @param c1 Final column index (exclusive)
+   * @return m1(r(:),c0:c1-1)
    */
   public static double[][] getMatrix(final double[][] m1, final int[] r, final int c0, final int c1) {
+    assert c0 <= c1 : ERR_INVALID_RANGE;
+    assert c1 <= m1[0].length : ERR_MATRIX_DIMENSIONS;
     final int rowdim = r.length, coldim = c1 - c0;
     final double[][] X = new double[rowdim][coldim];
     for(int i = 0; i < rowdim; i++) {
@@ -884,11 +893,13 @@ public final class VMath {
    * 
    * @param m1 Input matrix
    * @param r0 Initial row index
-   * @param r1 Final row index (exclusive!)
+   * @param r1 Final row index (exclusive)
    * @param c Array of column indices.
-   * @return m1(r0:r1,c(:))
+   * @return m1(r0:r1-1,c(:))
    */
   public static double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int[] c) {
+    assert r0 <= r1 : ERR_INVALID_RANGE;
+    assert r1 <= m1.length : ERR_MATRIX_DIMENSIONS;
     final int rowdim = r1 - r0, coldim = c.length;
     final double[][] X = new double[rowdim][coldim];
     for(int i = r0; i < r1; i++) {
@@ -912,6 +923,8 @@ public final class VMath {
    * @param m2 New values for m1(r0:r1-1,c0:c1-1)
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1, final double[][] m2) {
+    assert r0 <= r1 && c0 <= c1 : ERR_INVALID_RANGE;
+    assert r1 <= m1.length && c1 <= m1[0].length : ERR_MATRIX_DIMENSIONS;
     final int coldim = c1 - c0;
     for(int i = r0; i < r1; i++) {
       System.arraycopy(m2[i - r0], 0, m1[i], c0, coldim);
@@ -941,12 +954,14 @@ public final class VMath {
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
-   * @param c1 Final column index
-   * @param m2 New values for m1(r(:),c0:c1)
+   * @param c1 Final column index (exclusive)
+   * @param m2 New values for m1(r(:),c0:c1-1)
    */
   public static void setMatrix(final double[][] m1, final int[] r, final int c0, final int c1, final double[][] m2) {
+    assert c0 <= c1 : ERR_INVALID_RANGE;
+    assert c1 <= m1[0].length : ERR_MATRIX_DIMENSIONS;
     for(int i = 0; i < r.length; i++) {
-      System.arraycopy(m2[i], 0, m1[r[i]], c0, c1 - c0 + 1);
+      System.arraycopy(m2[i], 0, m1[r[i]], c0, c1 - c0);
     }
   }
 
@@ -957,9 +972,11 @@ public final class VMath {
    * @param r0 Initial row index
    * @param r1 Final row index
    * @param c Array of column indices.
-   * @param m2 New values for m1(r0:r1,c(:))
+   * @param m2 New values for m1(r0:r1-1,c(:))
    */
   public static void setMatrix(final double[][] m1, final int r0, final int r1, final int[] c, final double[][] m2) {
+    assert r0 <= r1 : ERR_INVALID_RANGE;
+    assert r1 <= m1.length : ERR_MATRIX_DIMENSIONS;
     for(int i = r0; i < r1; i++) {
       final double[] row1 = m1[i], row2 = m2[i - r0];
       for(int j = 0; j < c.length; j++) {
@@ -1311,6 +1328,7 @@ public final class VMath {
   public static double transposeTimesTimes(final double[] a, final double[][] B, final double[] c) {
     final int rowdim = B.length, coldim = getColumnDimensionality(B);
     assert (rowdim == a.length) : ERR_MATRIX_INNERDIM;
+    assert (coldim == c.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
     for(int j = 0; j < coldim; j++) {
       // multiply it with each row from A
@@ -1684,7 +1702,7 @@ public final class VMath {
   }
 
   /**
-   * Compute the cosine of the angle between two vectors, 
+   * Compute the cosine of the angle between two vectors,
    * where the smaller angle between those vectors is viewed.
    * 
    * @param v1 first vector
@@ -1716,7 +1734,7 @@ public final class VMath {
   }
 
   /**
-   * Compute the cosine of the angle between two vectors, 
+   * Compute the cosine of the angle between two vectors,
    * where the smaller angle between those vectors is viewed.
    *
    * @param v1 first vector

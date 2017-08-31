@@ -20,8 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
+import java.util.Arrays;
 
 import net.jafama.FastMath;
 
@@ -223,7 +224,8 @@ public class QRDecomposition implements java.io.Serializable {
    * @throws ArithmeticException Matrix is rank deficient.
    */
   public double[][] solve(double[][] B) {
-    return solveInplace(copy(B));
+    final double[][] sol = solveInplace(copy(B));
+    return n < sol.length ? Arrays.copyOf(sol, n) : sol;
   }
 
   /**
@@ -281,7 +283,8 @@ public class QRDecomposition implements java.io.Serializable {
    * @throws ArithmeticException Matrix is rank deficient.
    */
   public double[] solve(double[] b) {
-    return solveInplace(copy(b));
+    final double[] sol = solveInplace(copy(b));
+    return n < sol.length ? Arrays.copyOf(sol, n) : sol;
   }
 
   /**

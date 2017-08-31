@@ -132,12 +132,17 @@ public class CholeskyDecomposition {
    * @return X
    */
   private double[][] solveL(double[][] X) {
-    final int n = L.length;
-    X[0][0] /= L[0][0]; // First iteration, simplified.
+    final int n = L.length, m = X[0].length;
+    { // First iteration, simplified.
+      final double[] X0 = X[0], L0 = L[0];
+      for(int j = 0; j < m; j++) {
+        X0[j] /= L0[0];
+      }
+    }
     for(int k = 1; k < n; k++) {
       final double[] Xk = X[k], Lk = L[k];
       final double iLkk = 1. / Lk[k];
-      for(int j = 0; j < n; j++) {
+      for(int j = 0; j < m; j++) {
         double Xkj = Xk[j];
         for(int i = 0; i < k; i++) {
           Xkj -= X[i][j] * Lk[i];

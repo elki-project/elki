@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
+import java.util.Arrays;
+
 /**
  * LU Decomposition.
  *
@@ -165,10 +167,13 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[][] getL() {
     double[][] L = new double[m][n];
-    for(int i = 0; i < m; i++) {
+    L[0][0] = 1.;
+    for(int i = 1; i < m; i++) {
       final double[] Li = L[i];
       System.arraycopy(LU[i], 0, Li, 0, Math.min(i, n));
-      Li[i] = 1.0;
+      if (i < n) {
+        Li[i] = 1.;
+      }
     }
     return L;
   }
@@ -221,7 +226,11 @@ public class LUDecomposition implements java.io.Serializable {
    * @throws ArithmeticException Matrix is singular.
    */
   public double[][] solve(double[][] B) {
-    return solveInplace(getMatrix(B, piv, 0, B[0].length));
+    if(B.length != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    double[][] sol = solveInplace(getMatrix(B, piv, 0, B[0].length));
+    return n < sol.length ? Arrays.copyOf(sol, n) : sol;
   }
 
   /**
@@ -277,7 +286,8 @@ public class LUDecomposition implements java.io.Serializable {
     for(int i = 0; i < piv.length; i++) {
       bc[i] = b[piv[i]];
     }
-    return solveInplace(bc);
+    solveInplace(bc);
+    return n < bc.length ? Arrays.copyOf(bc, n) : bc;
   }
 
   /**
