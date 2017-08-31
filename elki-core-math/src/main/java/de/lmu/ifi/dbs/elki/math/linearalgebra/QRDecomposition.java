@@ -20,7 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
 
 import java.util.Arrays;
 
@@ -136,8 +137,19 @@ public class QRDecomposition implements java.io.Serializable {
    * @return true if R, and hence A, has full rank.
    */
   public boolean isFullRank() {
+    // Find maximum:
+    double t = 0.;
     for(int j = 0; j < n; j++) {
-      if(Rdiag[j] == 0) {
+      double v = Rdiag[j];
+      if(v == 0) {
+        return false;
+      }
+      v = Math.abs(v);
+      t = v > t ? v : t;
+    }
+    t *= 1e-15; // Numerical precision threshold.
+    for(int j = 1; j < n; j++) {
+      if(Math.abs(Rdiag[j]) < t) {
         return false;
       }
     }

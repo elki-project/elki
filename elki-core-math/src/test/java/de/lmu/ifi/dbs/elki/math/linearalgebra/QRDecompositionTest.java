@@ -250,7 +250,7 @@ public final class QRDecompositionTest {
    */
   @Test(expected = ArithmeticException.class)
   public void testSolveIsFullRank() {
-    new QRDecomposition(new double[][] { { 1, 1 }, { 1, 1 }, }).solve(new double[][] { { 1 }, { 1 }, });
+    new QRDecomposition(new double[][] { { 1, 1 }, { 1, 1 } }).solve(new double[][] { { 1 }, { 1 } });
   }
 
   /**
