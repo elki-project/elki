@@ -43,7 +43,7 @@ public interface IndexBasedSimilarityFunction<O> extends SimilarityFunction<O> {
    * @return Actual distance query.
    */
   @Override
-  abstract <T extends O> Instance<T, ?> instantiate(Relation<T> database);
+  <T extends O> Instance<T, ?> instantiate(Relation<T> database);
 
   /**
    * Instance interface for index/preprocessor based distance functions.
@@ -52,7 +52,7 @@ public interface IndexBasedSimilarityFunction<O> extends SimilarityFunction<O> {
    * 
    * @param <T> Object type
    */
-  public static interface Instance<T, I extends Index> extends DatabaseSimilarityQuery<T> {
+  interface Instance<T, I extends Index> extends DatabaseSimilarityQuery<T> {
     /**
      * Get the index used.
      * 

@@ -40,5 +40,5 @@ public interface OPTICSTypeAlgorithm extends Algorithm {
    *
    * @return minpts value
    */
-  public int getMinPts();
+  int getMinPts();
 }

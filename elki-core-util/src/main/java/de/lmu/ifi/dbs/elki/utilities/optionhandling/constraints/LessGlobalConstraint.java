@@ -64,10 +64,9 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
    */
   @Override
   public void test() throws ParameterException {
-    if(first.isDefined() && second.isDefined()) {
-      if(first.getValue().doubleValue() >= second.getValue().doubleValue()) {
-        throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \"" + first.getName() + "\" has to be less than the" + "value of parameter \"" + second.getName() + "\"" + "(Current values: " + first.getName() + ": " + first.getValue().doubleValue() + ", " + second.getName() + ": " + second.getValue().doubleValue() + ")\n");
-      }
+    if(first.isDefined() && second.isDefined() //
+        && first.getValue().doubleValue() >= second.getValue().doubleValue()) {
+      throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \"" + first.getName() + "\" has to be less than the" + "value of parameter \"" + second.getName() + "\"" + "(Current values: " + first.getName() + ": " + first.getValue().doubleValue() + ", " + second.getName() + ": " + second.getValue().doubleValue() + ")\n");
     }
   }
 

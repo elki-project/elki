@@ -279,10 +279,9 @@ public class SelectionToolAxisRangeVisualization implements VisFactory {
           NumberVector dbTupel = relation.get(iditer);
           for(int d = 0; d < dim; d++) {
             final double min = ranges.getMin(d), max = ranges.getMax(d);
-            if(max < Double.POSITIVE_INFINITY && min > Double.NEGATIVE_INFINITY) {
-              if(dbTupel.doubleValue(d) < min || dbTupel.doubleValue(d) > max) {
-                continue candidates;
-              }
+            if(max < Double.POSITIVE_INFINITY && min > Double.NEGATIVE_INFINITY //
+                && (dbTupel.doubleValue(d) < min || dbTupel.doubleValue(d) > max)) {
+              continue candidates;
             }
           }
           selection.add(iditer);

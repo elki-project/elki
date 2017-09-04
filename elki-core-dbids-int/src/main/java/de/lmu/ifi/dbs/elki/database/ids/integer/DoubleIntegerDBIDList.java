@@ -248,8 +248,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("DoubleDBIDList[");
+    StringBuilder buf = new StringBuilder(20 + size * 20).append("DoubleDBIDList[");
     for(DoubleDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
       iter.advance();
@@ -257,8 +256,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
         buf.append(',');
       }
     }
-    buf.append(']');
-    return buf.toString();
+    return buf.append(']').toString();
   }
 
   /**

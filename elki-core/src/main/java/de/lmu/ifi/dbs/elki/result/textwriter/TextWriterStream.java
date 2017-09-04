@@ -166,9 +166,11 @@ public class TextWriterStream {
     str = str.replace("\\", "\\\\").replace("\"", "\\\"");
     // when needed, add quotes.
     if(str.contains(SEPARATOR)) {
-      str = "\"" + str + "\"";
+      inline.append('"').append(str).append('"');
     }
-    inline.append(str);
+    else {
+      inline.append(str);
+    }
   }
 
   /**

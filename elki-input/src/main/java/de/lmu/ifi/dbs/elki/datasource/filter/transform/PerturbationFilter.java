@@ -207,7 +207,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
 
   @Override
   protected void prepareComplete() {
-    StringBuilder buf = LOG.isDebuggingFine() ? new StringBuilder() : null;
+    StringBuilder buf = LOG.isDebuggingFine() ? new StringBuilder(1000) : null;
     scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
     if(scalingreference == ScalingReference.STDDEV) {
@@ -221,7 +221,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
         if(buf != null) {
-          buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
+          buf.append(' ').append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
     }
@@ -236,7 +236,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
         if(buf != null) {
-          buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
+          buf.append(' ').append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
     }

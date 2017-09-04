@@ -66,9 +66,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <N> Node type
  */
 @Reference(authors = "S. Berchtold, D. A. Keim, H.-P. Kriegel", //
-title = "The X-tree: An Index Structure for High-Dimensional Data", //
-booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
-url = "http://www.vldb.org/conf/1996/P028.PDF")
+    title = "The X-tree: An Index Structure for High-Dimensional Data", //
+    booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
+    url = "http://www.vldb.org/conf/1996/P028.PDF")
 public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends AbstractRStarTree<N, SpatialEntry, XTreeSettings> {
   /**
    * If <code>true</code>, the expensive call of
@@ -76,7 +76,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    * omitted for supernodes. This may lead to longer query times, however, is
    * necessary for enabling the construction of the tree for some
    * parameterizations.
-   * */
+   */
   public boolean OMIT_OVERLAP_INCREASE_4_SUPERNODES = true;
 
   /**
@@ -370,10 +370,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     long superNodeOffset = header.getSupernode_offset();
 
     if(getLogger().isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append(getClass());
-      msg.append("\n file = ").append(file.getClass());
-      getLogger().debugFine(msg.toString());
+      getLogger().debugFine(new StringBuilder(200).append(getClass()).append("\n file = ").append(file.getClass()).toString());
     }
 
     // reset page id maintenance
@@ -446,10 +443,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     super.height = computeHeight();
 
     if(getLogger().isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append(getClass());
-      msg.append("\n height = ").append(height);
-      getLogger().debugFine(msg.toString());
+      getLogger().debugFine(new StringBuilder(100).append(getClass()).append("\n height = ").append(height).toString());
     }
   }
 
@@ -546,7 +540,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    * minimum multi-overlap increase.</li>
    * <li>Else, or the multi-overlap increase leads to ties, the child with the
    * minimum volume increase is selected.</li>
-   * <li>If there are still ties, the child with the minimum volume is chosen.</li>
+   * <li>If there are still ties, the child with the minimum volume is
+   * chosen.</li>
    * </ol>
    * 
    * @param subtree the subtree to be tested for insertion
@@ -585,7 +580,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     double optOverlapInc = 0;
     boolean isLeafContainer = false; // test overlap increase?
     if((!OMIT_OVERLAP_INCREASE_4_SUPERNODES // also test supernodes
-    || (OMIT_OVERLAP_INCREASE_4_SUPERNODES && !node.isSuperNode())) // don't
+        || (OMIT_OVERLAP_INCREASE_4_SUPERNODES && !node.isSuperNode())) // don't
         && getNode(node.getEntry(0)).isLeaf()) { // children are leafs
       // overlap increase is to be tested
       optOverlapInc = Double.POSITIVE_INFINITY;
@@ -595,7 +590,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     double optVolumeInc = Double.POSITIVE_INFINITY;
     double tempVolume, volume;
 
-    for (int index = 0; index < node.getNumEntries(); index++) {
+    for(int index = 0; index < node.getNumEntries(); index++) {
       SpatialEntry child = node.getEntry(index);
       SpatialComparable childMBR = child;
       HyperBoundingBox testMBR = SpatialUtil.union(childMBR, mbr);
@@ -703,7 +698,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
-    for (int j = 0; j < node.getNumEntries(); j++) {
+    for(int j = 0; j < node.getNumEntries(); j++) {
       SpatialEntry ej = node.getEntry(j);
       if(getPageID(ej) != getPageID(ei)) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
@@ -790,14 +785,14 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
       splitAxis[0] = split.getSplitAxis();
       if(getLogger().isDebugging()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
-        msg.append("      splitAxis ").append(splitAxis[0]).append("\n");
-        msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
-        msg.append("      newNode ").append(newNode.getPageID()).append("\n");
+        StringBuilder msg = new StringBuilder(1000) //
+            .append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n") //
+            .append("      splitAxis ").append(splitAxis[0]).append('\n') //
+            .append("      splitPoint ").append(split.getSplitPoint()).append('\n') //
+            .append("      newNode ").append(newNode.getPageID()).append('\n'); //
         if(getLogger().isVerbose()) {
-          msg.append("      first: ").append(newNode.getChildren()).append("\n");
-          msg.append("      second: ").append(node.getChildren()).append("\n");
+          msg.append("      first: ").append(newNode.getChildren()).append('\n') //
+              .append("      second: ").append(node.getChildren()).append('\n');
         }
         getLogger().debugFine(msg.toString());
       }
@@ -809,11 +804,10 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
       writeNode(node);
       splitAxis[0] = -1;
       if(getLogger().isDebugging()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
-        msg.append("      new capacity ").append(node.getCapacity()).append("\n");
-        msg.append("      minimum overlap: ").append(minOv).append("\n");
-        getLogger().debugFine(msg.toString());
+        getLogger().debugFine(new StringBuilder(1000) //
+            .append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()).append(")\n") //
+            .append("      new capacity ").append(node.getCapacity()).append('\n') //
+            .append("      minimum overlap: ").append(minOv).append('\n').toString());
       }
       return null;
     }
@@ -909,9 +903,9 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (isRoot(parent) || // is root
-    // below: no changes in the MBR
-    SpatialUtil.contains(subtree.getEntry(), entry))) {
+        (isRoot(parent) || // is root
+        // below: no changes in the MBR
+            SpatialUtil.contains(subtree.getEntry(), entry))) {
       return; // no need to adapt subtree
     }
 
@@ -940,9 +934,9 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (isRoot(parent) || // is root
-    // below: no changes in the MBR
-    SpatialUtil.contains(subtree.getEntry(), entry))) {
+        (isRoot(parent) || // is root
+        // below: no changes in the MBR
+            SpatialUtil.contains(subtree.getEntry(), entry))) {
       return; // no need to adapt subtree
     }
 
@@ -1053,7 +1047,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
         node.adjustEntry(e);
 
         if(node.isLeaf() || // we already know that mbr is extended
-        !SpatialUtil.equals(mbr, e)) { // MBR has changed
+            !SpatialUtil.equals(mbr, e)) { // MBR has changed
           // write changes in parent to file
           writeNode(parent);
           adjustTree(subtree.getParentPath());
@@ -1120,11 +1114,9 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     writeNode(oldRoot);
     writeNode(newNode);
     if(getLogger().isDebugging()) {
-      String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRootEntry);
-      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNodeEntry);
-      msg += "\n";
-      getLogger().debugFine(msg);
+      getLogger().debugFine(new StringBuilder(1000).append("Create new Root: ID=").append(root.getPageID()) //
+          .append("\nchild1 ").append(oldRoot).append(' ').append(new HyperBoundingBox(oldRootEntry)) //
+          .append("\nchild2 ").append(newNode).append(' ').append(new HyperBoundingBox(newNodeEntry)));
     }
     // the root entry still needs to be set to the new root node's MBR
     return new IndexTreePath<>(null, getRootEntry(), 0);
@@ -1137,7 +1129,6 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
     long dirNodes = 0;
     long superNodes = 0;
     long leafNodes = 0;
@@ -1187,15 +1178,15 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
       }
     }
     assert objects == num_elements : "objects=" + objects + ", size=" + num_elements;
-    result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
-    result.append(dirNodes).append(" Directory Nodes (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
-    result.append(superNodes).append(" Supernodes (max = ").append(maxSuperCapacity - 1).append(", min = ").append(minSuperCapacity - 1).append(")\n");
-    result.append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
-    result.append(objects).append(" ").append(dimensionality).append("-dim. points in the tree \n");
-    result.append("min_fanout = ").append(settings.min_fanout).append(", max_overlap = ").append(settings.max_overlap).append((settings.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n");
-    // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
-    result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
-
-    return result.toString();
+    return new StringBuilder(10000).append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n") //
+        .append(dirNodes).append(" Directory Nodes (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n") //
+        .append(superNodes).append(" Supernodes (max = ").append(maxSuperCapacity - 1).append(", min = ").append(minSuperCapacity - 1).append(")\n") //
+        .append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n") //
+        .append(objects).append(' ').append(dimensionality).append("-dim. points in the tree \n") //
+        .append("min_fanout = ").append(settings.min_fanout).append(", max_overlap = ").append(settings.max_overlap).append((settings.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n") //
+        // PageFileUtil.appendPageFileStatistics(result,
+        // getPageFileStatistics());
+        .append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n") //
+        .toString();
   }
 }

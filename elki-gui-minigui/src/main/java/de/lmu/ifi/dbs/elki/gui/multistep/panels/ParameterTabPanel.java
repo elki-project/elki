@@ -168,9 +168,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
 
     {
       // Create parameter table
-      parameterTable = new ConfiguratorPanel(); // new
-                                                // ParameterTable(parameterModel,
-                                                // parameters);
+      parameterTable = new ConfiguratorPanel();
       parameterTable.addChangeListener(this);
       // Create the scroll pane and add the table to it.
       JScrollPane scrollPane = new JScrollPane(parameterTable);
@@ -310,10 +308,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    */
   public boolean canRun() {
     Status status = getStatus();
-    if (Status.STATUS_READY.equals(status) || Status.STATUS_COMPLETE.equals(status)) {
-      return true;
-    }
-    return false;
+    return Status.STATUS_READY.equals(status) || Status.STATUS_COMPLETE.equals(status);
   }
 
   /**
@@ -322,11 +317,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * @return completeness status
    */
   public boolean isComplete() {
-    Status status = getStatus();
-    if (Status.STATUS_COMPLETE.equals(status)) {
-      return true;
-    }
-    return false;
+    return Status.STATUS_COMPLETE.equals(getStatus());
   }
 
   /**

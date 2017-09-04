@@ -364,12 +364,12 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
       return (d1 > d2 ? 1 : (d1 < d2 ? -1 : 0));
     }
 
-    public final void set(int dimension, boolean lb) {
+    public void set(int dimension, boolean lb) {
       this.lb = lb;
       this.dimension = dimension;
     }
 
-    public final void setLb(boolean lb) {
+    public void setLb(boolean lb) {
       this.lb = lb;
     }
   }

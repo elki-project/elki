@@ -165,9 +165,9 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
   public int binarySearch(DBIDRef key) {
     int v = key.internalGetIndex();
     return (v == first) ? 0 //
-    : (v == second) ? 1 //
-    : (v < first) ? -1 //
-    : (v < second) ? -2 : -3;
+        : (v == second) ? 1 //
+            : (v < first) ? -1 //
+                : (v < second) ? -2 : -3;
   }
 
   @Override
@@ -274,13 +274,8 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
     @Override
     public boolean contains(DBIDRef o) {
       int oid = o.internalGetIndex();
-      if(begin == 0 && end > 0 && first == oid) {
-        return true;
-      }
-      if(begin <= 1 && end > 1 && second == oid) {
-        return true;
-      }
-      return false;
+      return (begin == 0 && end > 0 && first == oid) //
+          || (begin <= 1 && end > 1 && second == oid);
     }
 
     @Override

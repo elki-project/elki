@@ -515,11 +515,8 @@ public final class ParseUtil {
     if(len == 3 && firstchar == -0x1E && str[start + 1] == -0x78 && str[start + 2] == -0x62) {
       return true;
     }
-    if(len != 3 && len != INFINITY_LENGTH) {
-      return false;
-    }
-    // Test beginning: "inf"
-    if(firstchar != 'I' && firstchar != 'i') {
+    if((len != 3 && len != INFINITY_LENGTH) //
+        || (firstchar != 'I' && firstchar != 'i')) {
       return false;
     }
     for(int i = 1, j = INFINITY_LENGTH + 1; i < INFINITY_LENGTH; i++, j++) {
@@ -549,11 +546,8 @@ public final class ParseUtil {
     if(len == 1 && firstchar == '\u221E') {
       return true;
     }
-    if(len != 3 && len != INFINITY_LENGTH) {
-      return false;
-    }
-    // Test beginning: "inf"
-    if(firstchar != 'I' && firstchar != 'i') {
+    if((len != 3 && len != INFINITY_LENGTH) //
+        || (firstchar != 'I' && firstchar != 'i')) {
       return false;
     }
     for(int i = 1, j = INFINITY_LENGTH + 1; i < INFINITY_LENGTH; i++, j++) {
@@ -579,10 +573,7 @@ public final class ParseUtil {
    */
   private static boolean matchNaN(byte[] str, byte firstchar, int start, int end) {
     final int len = end - start;
-    if(len < 2 || len > 3) {
-      return false;
-    }
-    if(firstchar != 'N' && firstchar != 'n') {
+    if(len < 2 || len > 3 || (firstchar != 'N' && firstchar != 'n')) {
       return false;
     }
     final byte c1 = str[start + 1];
@@ -594,10 +585,7 @@ public final class ParseUtil {
       return true;
     }
     final byte c2 = str[start + 2];
-    if(c2 != 'N' && c2 != 'n') {
-      return false;
-    }
-    return true;
+    return c2 == 'N' || c2 == 'n';
   }
 
   /**
@@ -611,10 +599,7 @@ public final class ParseUtil {
    */
   private static boolean matchNaN(CharSequence str, char firstchar, int start, int end) {
     final int len = end - start;
-    if(len < 2 || len > 3) {
-      return false;
-    }
-    if(firstchar != 'N' && firstchar != 'n') {
+    if(len < 2 || len > 3 || (firstchar != 'N' && firstchar != 'n')) {
       return false;
     }
     final char c1 = str.charAt(start + 1);
@@ -626,9 +611,6 @@ public final class ParseUtil {
       return true;
     }
     final char c2 = str.charAt(start + 2);
-    if(c2 != 'N' && c2 != 'n') {
-      return false;
-    }
-    return true;
+    return c2 == 'N' || c2 == 'n';
   }
 }

@@ -53,7 +53,7 @@ public interface WeightedNeighborSetPredicate {
    * 
    * @param <O> Input relation object type restriction
    */
-  static interface Factory<O> {
+  interface Factory<O> {
     /**
      * Instantiation method.
      * 

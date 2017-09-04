@@ -68,7 +68,7 @@ public class KernelMatrix {
    * @author Erich Schubert
    * @apiviz.exclude
    */
-  private static interface DBIDMap {
+  private interface DBIDMap {
     /**
      * Get the offset of the DBID in the range.
      * 
@@ -91,7 +91,7 @@ public class KernelMatrix {
    * @author Erich Schubert
    * @apiviz.exclude
    */
-  private static class RangeMap implements DBIDMap {
+  private class RangeMap implements DBIDMap {
     DBIDRange range;
 
     public RangeMap(DBIDRange range) {
@@ -116,7 +116,7 @@ public class KernelMatrix {
    * @author Erich Schubert
    * @apiviz.exclude
    */
-  private static class SortedArrayMap implements DBIDMap {
+  private class SortedArrayMap implements DBIDMap {
     ArrayModifiableDBIDs ids;
 
     public SortedArrayMap(DBIDs ids) {

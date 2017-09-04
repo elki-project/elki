@@ -77,9 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.composedOf Segment
  */
 @Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
-authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
-url = "http://dx.doi.org/10.1109/ICDE.2012.128")
+    authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+    url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Class logger
@@ -293,22 +293,15 @@ public class Segments extends BasicResult implements Iterable<Segment> {
     segments: for(Segment segment : this) {
       // if mismatch except at unpaired Clustering index => exclude.
       for(int i = 0; i < clusteringsCount; i++) {
-        if(unpairedSegment.get(i) != Segment.UNCLUSTERED) {
-          // mismatch
-          if(segment.get(i) != unpairedSegment.get(i)) {
-            continue segments;
-          }
-        }
-        // do not add wildcard
-        if(segment.get(i) == Segment.UNCLUSTERED) {
+        // mismatch, but lso do not add wildcard
+        if((unpairedSegment.get(i) != Segment.UNCLUSTERED && segment.get(i) != unpairedSegment.get(i)) //
+            || segment.get(i) == Segment.UNCLUSTERED) {
           continue segments;
         }
       }
-
       // add segment to list
       pairedSegments.add(segment);
     }
-
     return pairedSegments;
   }
 

@@ -35,5 +35,5 @@ public interface FixedSizeByteBufferSerializer<T> extends ByteBufferSerializer<T
    * 
    * @return Size
    */
-  public int getFixedByteSize();
+  int getFixedByteSize();
 }

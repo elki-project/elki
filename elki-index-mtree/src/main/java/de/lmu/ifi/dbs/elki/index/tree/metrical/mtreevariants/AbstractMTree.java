@@ -97,7 +97,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
     int dirNodes = 0;
     int leafNodes = 0;
     int objects = 0;
@@ -113,6 +112,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       }
     }
 
+    StringBuilder result = new StringBuilder(1000);
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while(enumeration.hasNext()) {
       IndexTreePath<E> path = enumeration.next();
@@ -141,7 +141,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
         .append(dirNodes).append(" Directory Nodes \n") //
         .append(leafNodes).append(" Leaf Nodes \n") //
         .append(objects).append(" Objects \n");
-
     // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     return result.toString();
   }

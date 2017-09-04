@@ -134,13 +134,12 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param relation Relation to process
    */
   public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
-    RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
-    final Random random = rnd.getSingleThreadedRandom();
-
     if(RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! (" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
+    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
+    RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
+    final Random random = rnd.getSingleThreadedRandom();
 
     // TODO: use a StepProgress!
     // initialization phase

@@ -70,7 +70,6 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
   public double distance(NumberVector v1, NumberVector v2) {
     // Dimensionality, and last valid value in second vector:
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int m2 = dim2 - 1;
 
     // bandsize is the maximum allowed distance to the diagonal
     final int band = effectiveBandSize(dim1, dim2);
@@ -85,6 +84,7 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
     // Fill first row:
     firstRow(buf, band, v1, v2, dim2);
 
+    final int m2 = dim2 - 1;
     // Active buffer offsets (cur = read, nxt = write)
     int cur = 0, nxt = dim2;
     // Fill remaining rows:

@@ -669,7 +669,7 @@ public class MiniGUI extends AbstractApplication {
    * @param config Parameterization
    */
   protected void reportErrors(SerializedParameterization config) {
-    StringBuilder buf = new StringBuilder(500).append("Task is not completely configured:" + NEWLINE + NEWLINE);
+    StringBuilder buf = new StringBuilder(500).append("Task is not completely configured:").append(NEWLINE).append(NEWLINE);
     for(ParameterException e : config.getErrors()) {
       if(e instanceof UnspecifiedParameterException) {
         buf.append("The parameter ") //
@@ -705,11 +705,11 @@ public class MiniGUI extends AbstractApplication {
       StringBuilder msg = new StringBuilder(500).append("Your Java class path is incomplete.\n");
       if(e.getCause() != null) {
         for(Throwable t = e.getCause(); t != null; t = t.getCause()) {
-          msg.append(t.toString()).append("\n");
+          msg.append(t.toString()).append('\n');
         }
       }
       else {
-        msg.append(e.toString()).append("\n");
+        msg.append(e.toString()).append('\n');
       }
       msg.append("Make sure you have all the required jars on the classpath.\nOn the home page, you can find a 'elki-bundle' which should include everything.");
       JOptionPane.showMessageDialog(null, msg, "ClassPath incomplete", JOptionPane.ERROR_MESSAGE);

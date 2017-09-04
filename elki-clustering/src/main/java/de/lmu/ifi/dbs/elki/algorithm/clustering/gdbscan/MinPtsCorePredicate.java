@@ -52,9 +52,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has Instance
  */
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
-title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
-booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
+    title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
+    url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
 public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
   /**
    * Class logger.
@@ -83,13 +83,8 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
 
   @Override
   public boolean acceptsType(SimpleTypeInformation<? extends DBIDs> type) {
-    if(TypeUtil.DBIDS.isAssignableFromType(type)) {
-      return true;
-    }
-    if(TypeUtil.NEIGHBORLIST.isAssignableFromType(type)) {
-      return true;
-    }
-    return false;
+    return TypeUtil.DBIDS.isAssignableFromType(type) //
+        || TypeUtil.NEIGHBORLIST.isAssignableFromType(type);
   }
 
   /**
@@ -137,7 +132,7 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
       super.makeOptions(config);
       // Get the minpts parameter
       IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
         if(minpts <= 2) {

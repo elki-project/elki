@@ -141,10 +141,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
     }
     // Additionally check that mindim == maxdim.
     VectorTypeInformation<?> other = (VectorTypeInformation<?>) type;
-    if(other.mindim != other.maxdim) {
-      return false;
-    }
-    return true;
+    return other.mindim == other.maxdim;
   }
 
   @Override
@@ -157,7 +154,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder(getRestrictionClass().getSimpleName());
+    StringBuilder buf = new StringBuilder(1000).append(getRestrictionClass().getSimpleName());
     if(mindim == maxdim) {
       buf.append(",dim=").append(mindim);
     }
@@ -180,10 +177,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @return Label
    */
   public String getLabel(int col) {
-    if(labels == null) {
-      return null;
-    }
-    return labels[col];
+    return labels == null ? null : labels[col];
   }
 
   /**

@@ -55,7 +55,8 @@ public class UpdatableHeapTest {
         for(IntegerPriorityObject<Integer> ent : simulate) {
           if(ent.getObject().equals(id)) {
             if(score > ent.priority) {
-              // System.err.println("Updating in ArrayList: " + ent + " to " + score);
+              // System.err.println("Updating in ArrayList: " + ent + " to " +
+              // score);
               ent.priority = score;
             }
             found = true;
@@ -75,13 +76,11 @@ public class UpdatableHeapTest {
         // System.out.println(heap.toString());
         IntegerPriorityObject<Integer> fromheap = heap.poll();
         IntegerPriorityObject<Integer> fromsim = simulate.remove(simulate.size() - 1);
-        //System.out.println(fromheap+" <=> "+fromsim);
+        // System.out.println(fromheap+" <=> "+fromsim);
         assertEquals("Priority doesn't agree.", fromheap.priority, fromsim.priority);
-        if(fromheap.getObject() != fromsim.getObject()) {
-          // Ties
-          if(j + 1 == remove && heap.size() > 0) {
-            j++;
-          }
+        // Careful with ties!
+        if(fromheap.getObject() != fromsim.getObject() && j + 1 == remove && heap.size() > 0) {
+          j++;
         }
       }
     }

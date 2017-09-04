@@ -130,7 +130,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   }
 
   @Override
-  public final int mapDBIDToOffset(DBIDRef dbid) {
+  public int mapDBIDToOffset(DBIDRef dbid) {
     return dbid.internalGetIndex() - start;
   }
 

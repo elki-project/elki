@@ -288,10 +288,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-      if(columnIndex == 0) {
-        return false;
-      }
-      return true;
+      return columnIndex > 0;
     }
 
     @Override

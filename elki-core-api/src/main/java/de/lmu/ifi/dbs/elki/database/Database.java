@@ -60,7 +60,7 @@ public interface Database extends HierarchicalResult {
    * Initialize the database, for example by loading the input data. (Since this
    * should NOT be done on construction time!)
    */
-  public void initialize();
+  void initialize();
 
   /**
    * Get all relations of a database.

@@ -242,7 +242,7 @@ public class PrimsMinimumSpanningTree {
    * 
    * @author Erich Schubert
    */
-  public static interface Collector {
+  public interface Collector {
     /**
      * Add a new edge to the output.
      * 

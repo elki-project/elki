@@ -152,7 +152,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *
    * @apiviz.exclude
    */
-  public static interface CellVisitor {
+  protected interface CellVisitor {
     /** Different modes of operation. */
     int ALL = 0, SELECTED = 1, NOT_SELECTED = 2;
 

@@ -95,23 +95,20 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   @Override
   public final double insert(final double distance, final DBIDRef id) {
-    final int iid = id.internalGetIndex();
     if(heap.size() < k) {
-      heap.add(distance, iid);
-      if(heap.size() >= k) {
-        kdist = heap.peekKey();
-      }
-      return kdist;
+      heap.add(distance, id.internalGetIndex());
+      // Update kdist if size == k!
+      return (heap.size() >= k) ? kdist = heap.peekKey() : kdist;
     }
     // Tied with top:
     if(distance >= kdist) {
       if(distance == kdist) {
-        addToTies(iid);
+        addToTies(id.internalGetIndex());
       }
       return kdist;
     }
     // Old top element: (kdist, previd)
-    updateHeap(distance, iid);
+    updateHeap(distance, id.internalGetIndex());
     return kdist;
   }
 

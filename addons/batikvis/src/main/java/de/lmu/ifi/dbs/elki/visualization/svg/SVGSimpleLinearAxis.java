@@ -191,11 +191,9 @@ public final class SVGSimpleLinearAxis {
         // Try proper divisors first.
         if(sw * tlen / numticks < minl) {
           for(int i = 2; i <= (numticks >> 1); i++) {
-            if(numticks % i == 0) {
-              if(i * tlen / numticks >= minl) {
-                sw = i;
-                break;
-              }
+            if(numticks % i == 0 && i * tlen / numticks >= minl) {
+              sw = i;
+              break;
             }
           }
         }

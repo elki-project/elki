@@ -105,11 +105,8 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
     // This validates the base type V
-    if(!super.isAssignableFromType(type)) {
-      return false;
-    }
     // Other type must also be a vector type
-    if(!(type instanceof VectorTypeInformation)) {
+    if(!super.isAssignableFromType(type) || !(type instanceof VectorTypeInformation)) {
       return false;
     }
     VectorTypeInformation<?> othertype = (VectorTypeInformation<?>) type;
@@ -119,10 +116,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
       return false;
     }
     // ... or a higher maximum dimensionality.
-    if(othertype.maxdim > this.maxdim) {
-      return false;
-    }
-    return true;
+    return othertype.maxdim <= this.maxdim;
   }
 
   @Override
@@ -133,13 +127,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
     }
     // Get the object dimensionality
     final int odim = cast(other).getDimensionality();
-    if(odim < mindim) {
-      return false;
-    }
-    if(odim > maxdim) {
-      return false;
-    }
-    return true;
+    return odim >= mindim && odim <= maxdim;
   }
 
   /**
@@ -189,8 +177,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder(super.toString());
-    buf.append(",variable");
+    StringBuilder buf = new StringBuilder(1000).append(super.toString()).append(",variable");
     if(mindim >= 0) {
       buf.append(",mindim=").append(mindim);
     }

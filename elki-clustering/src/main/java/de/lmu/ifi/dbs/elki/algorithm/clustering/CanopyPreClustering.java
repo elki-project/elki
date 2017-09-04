@@ -64,9 +64,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <O> Object type
  */
 @Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", //
-title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
-booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining",//
-url = "http://dx.doi.org/10.1145%2F347090.347123")
+    title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
+    booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", //
+    url = "http://dx.doi.org/10.1145%2F347090.347123")
 public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
@@ -103,15 +103,14 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
    * @param relation Relation to process
    */
   public Clustering<PrototypeModel<O>> run(Database database, Relation<O> relation) {
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
-    ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
-    ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
-    final int size = relation.size();
-
     if(!(t1 >= t2)) {
       throw new AbortException("T1 must be at least as large as T2.");
     }
 
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
+    ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
+    final int size = relation.size();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Canopy clustering", size, LOG) : null;
 
     DBIDVar first = DBIDUtil.newVar();

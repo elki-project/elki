@@ -122,8 +122,7 @@ public class Subspace {
    * @return a string representation of this subspace
    */
   public String toString(String pre) {
-    StringBuilder result = new StringBuilder();
-    result.append(pre).append("Dimensions: [");
+    StringBuilder result = new StringBuilder(100).append(pre).append("Dimensions: [");
     int start = BitsUtil.nextSetBit(dimensions, 0);
     for(int d = start; d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       if(d != start) {
@@ -131,7 +130,7 @@ public class Subspace {
       }
       result.append(d + 1);
     }
-    return result.append("]").toString();
+    return result.append(']').toString();
   }
 
   /**
@@ -151,8 +150,7 @@ public class Subspace {
    * @return a string representation of the dimensions of this subspace
    */
   public String dimensonsToString(String sep) {
-    StringBuilder result = new StringBuilder();
-    result.append("[");
+    StringBuilder result = new StringBuilder(100).append('[');
     for(int dim = BitsUtil.nextSetBit(dimensions, 0); dim >= 0; dim = BitsUtil.nextSetBit(dimensions, dim + 1)) {
       if(result.length() == 1) {
         result.append(dim + 1);
@@ -161,9 +159,7 @@ public class Subspace {
         result.append(sep).append(dim + 1);
       }
     }
-    result.append("]");
-
-    return result.toString();
+    return result.append(']').toString();
   }
 
   /**

@@ -36,7 +36,7 @@ public interface Result {
    * @return result name
    */
   // TODO: turn this into an optional annotation? But: no inheritance?
-  public String getLongName();
+  String getLongName();
 
   /**
    * A short name for the result, useful for file names.
@@ -44,5 +44,5 @@ public interface Result {
    * @return result name
    */
   // TODO: turn this into an optional annotation? But: no inheritance?
-  public String getShortName();
+  String getShortName();
 }

@@ -40,5 +40,5 @@ public interface InsertionStrategy {
    * @param depth Insertion depth (depth == height - 1 indicates leaf level)
    * @return Subtree index in array.
    */
-  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth);
+  <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth);
 }

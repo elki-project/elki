@@ -103,12 +103,8 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
         if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {
           continue;
         }
-        StringBuilder buf = new StringBuilder();
-        buf.append("Neighbor distances do not agree: ");
-        buf.append(lin_knn.toString());
-        buf.append(" got: ");
-        buf.append(pre_knn.toString());
-        fail(buf.toString());
+        fail(new StringBuilder(1000).append("Neighbor distances do not agree: ") //
+            .append(lin_knn.toString()).append(" got: ").append(pre_knn.toString()).toString());
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {

@@ -67,7 +67,7 @@ public interface NeighborPredicate<T> {
    * 
    * @author Erich Schubert
    */
-  public static interface Instance<T> {
+  interface Instance<T> {
     /**
      * Get the neighbors of a reference object for DBSCAN.
      * 

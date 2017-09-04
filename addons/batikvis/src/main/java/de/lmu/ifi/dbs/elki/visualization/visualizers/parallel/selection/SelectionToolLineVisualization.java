@@ -308,10 +308,7 @@ public class SelectionToolLineVisualization implements VisFactory {
         return true;
       }
       Line2D.Double rectline4 = new Line2D.Double(x1, y1, x1, y2);
-      if(idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3)) {
-        return true;
-      }
-      return false;
+      return idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3);
     }
 
     /**

@@ -125,18 +125,15 @@ public abstract class AbstractApplication {
    * @param args the arguments to run this application with
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
-    final Flag helpF = new Flag(Parameterizer.HELP_ID);
-    final Flag helpLongF = new Flag(Parameterizer.HELP_LONG_ID);
-    final ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class, true);
-    final StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID);
-    final Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
-    debugP.setOptional(true);
-
     SerializedParameterization params = new SerializedParameterization(args);
+    Flag helpF = new Flag(Parameterizer.HELP_ID);
+    params.grab(helpF);
+    Flag helpLongF = new Flag(Parameterizer.HELP_LONG_ID);
+    params.grab(helpLongF);
     try {
-      params.grab(helpF);
-      params.grab(helpLongF);
+      ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class, true);
       params.grab(descriptionP);
+      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
       params.grab(debugP);
       if(descriptionP.isDefined()) {
         params.clearErrors();
@@ -158,15 +155,11 @@ public abstract class AbstractApplication {
     }
     try {
       TrackParameters config = new TrackParameters(params);
+      Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
       if(config.grab(verboseF) && verboseF.isTrue()) {
         // Extra verbosity by repeating the flag:
-        final Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
-        if(config.grab(verbose2F) && verbose2F.isTrue()) {
-          LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
-        }
-        else {
-          LoggingConfiguration.setVerbose(Level.VERBOSE);
-        }
+        Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
+        LoggingConfiguration.setVerbose((config.grab(verbose2F) && verbose2F.isTrue()) ? Level.VERYVERBOSE : Level.VERBOSE);
       }
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
@@ -182,8 +175,7 @@ public abstract class AbstractApplication {
           for(ParameterException e : params.getErrors()) {
             LOG.verbose(e.getMessage());
           }
-          LOG.verbose("\n");
-          LOG.verbose("Stopping execution because of configuration errors.");
+          LOG.verbose("\nStopping execution because of configuration errors.");
           System.exit(1);
         }
         else {
@@ -203,7 +195,7 @@ public abstract class AbstractApplication {
    * @return a usage message explaining all known options
    */
   public static String usage(Collection<TrackedParameter> options) {
-    StringBuilder usage = new StringBuilder();
+    StringBuilder usage = new StringBuilder(10000);
     if(!REFERENCE_VERSION.equals(VERSION)) {
       usage.append("ELKI build: " + VERSION + NEWLINE + NEWLINE);
     }

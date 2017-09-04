@@ -58,16 +58,14 @@ public final class OptionUtil {
    * @return the names of the options
    */
   public static <O extends Parameter<?>> String optionsNamesToString(List<O> options) {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append('[');
+    StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < options.size(); i++) {
       buffer.append(options.get(i).getName());
       if(i != options.size() - 1) {
         buffer.append(',');
       }
     }
-    buffer.append(']');
-    return buffer.toString();
+    return buffer.append(']').toString();
   }
 
   /**
@@ -79,16 +77,14 @@ public final class OptionUtil {
    * @return the names of the options
    */
   public static <O extends Parameter<?>> String optionsNamesToString(O[] options) {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append('[');
+    StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < options.length; i++) {
       buffer.append(options[i].getName());
       if(i != options.length - 1) {
         buffer.append(',');
       }
     }
-    buffer.append(']');
-    return buffer.toString();
+    return buffer.append(']').toString();
   }
 
   /**
@@ -100,18 +96,15 @@ public final class OptionUtil {
    * @return the names and the values of the parameters
    */
   public static <N extends Parameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append('[');
+    StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < parameters.size(); i++) {
-      buffer.append(parameters.get(i).getName());
-      buffer.append(':');
-      buffer.append(parameters.get(i).getValueAsString());
+      buffer.append(parameters.get(i).getName()).append(':') //
+          .append(parameters.get(i).getValueAsString());
       if(i != parameters.size() - 1) {
         buffer.append(", ");
       }
     }
-    buffer.append(']');
-    return buffer.toString();
+    return buffer.append(']').toString();
   }
 
   /**
@@ -125,16 +118,10 @@ public final class OptionUtil {
    */
   public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<TrackedParameter> options) {
     for(TrackedParameter pair : options) {
-      String currentOption = pair.getParameter().getName();
-      String syntax = pair.getParameter().getSyntax();
-      String longDescription = pair.getParameter().getFullDescription();
-
-      buf.append(SerializedParameterization.OPTION_PREFIX);
-      buf.append(currentOption);
-      buf.append(' ');
-      buf.append(syntax);
-      buf.append(FormatUtil.NEWLINE);
-      println(buf, width, longDescription, indent);
+      println(buf//
+          .append(SerializedParameterization.OPTION_PREFIX).append(pair.getParameter().getName()) //
+          .append(' ').append(pair.getParameter().getSyntax()).append(FormatUtil.NEWLINE), //
+          width, pair.getParameter().getFullDescription(), indent);
     }
   }
 
@@ -148,8 +135,7 @@ public final class OptionUtil {
    */
   public static void println(StringBuilder buf, int width, String data, String indent) {
     for(String line : FormatUtil.splitAtLastBlank(data, width - indent.length())) {
-      buf.append(indent);
-      buf.append(line);
+      buf.append(indent).append(line);
       if(!line.endsWith(FormatUtil.NEWLINE)) {
         buf.append(FormatUtil.NEWLINE);
       }
@@ -205,8 +191,7 @@ public final class OptionUtil {
     }
     catch(Exception e) {
       LoggingUtil.exception("Error instantiating class to describe.", e.getCause());
-      buf.append("No description available: ").append(e);
-      return buf;
+      return buf.append("No description available: ").append(e);
     }
   }
 }

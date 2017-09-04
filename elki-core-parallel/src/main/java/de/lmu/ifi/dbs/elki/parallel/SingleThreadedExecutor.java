@@ -52,7 +52,7 @@ public final class SingleThreadedExecutor {
    * @param ids IDs to process
    * @param procs Processors to run
    */
-  public static final void run(DBIDs ids, Processor... procs) {
+  public static void run(DBIDs ids, Processor... procs) {
     new SingleThreadedRunner(ids, procs).run();
   }
 

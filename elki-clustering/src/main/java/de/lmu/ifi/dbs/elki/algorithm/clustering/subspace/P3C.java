@@ -513,8 +513,6 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @return Position of maximum, or -1 when uniform.
    */
   private int chiSquaredUniformTest(SetDBIDs[] parts, long[] marked, int card) {
-    // Remaining number of bins.
-    final int binCount = parts.length - card;
     // Get global mean over all unmarked bins.
     int max = 0, maxpos = -1;
     MeanVariance mv = new MeanVariance();
@@ -535,11 +533,9 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
     // ChiSquare statistic is the naive variance of the sizes!
     final double chiSquare = mv.getNaiveVariance() / mv.getMean();
+    final int binCount = parts.length - card;
     final double test = ChiSquaredDistribution.cdf(chiSquare, Math.max(1, binCount - card - 1));
-    if((1. - alpha) < test) {
-      return maxpos;
-    }
-    return -1;
+    return ((1. - alpha) < test) ? maxpos : -1;
   }
 
   /**
@@ -793,10 +789,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
      */
     public boolean isSuperset(Signature other) {
       for(int i = 0; i < spec.length; i += 2) {
-        if(spec[i] != other.spec[i] || spec[i + 1] != other.spec[i]) {
-          if(other.spec[i] != -1) {
-            return false;
-          }
+        if((spec[i] != other.spec[i] || spec[i + 1] != other.spec[i]) && other.spec[i] != -1) {
+          return false;
         }
       }
       return true;

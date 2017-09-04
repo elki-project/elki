@@ -66,22 +66,6 @@ public class EvaluateClustering implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateClustering.class);
 
   /**
-   * Parameter to obtain the reference clustering. Defaults to a flat label
-   * clustering.
-   */
-  public static final OptionID REFERENCE_ID = new OptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
-
-  /**
-   * Parameter flag for special noise handling.
-   */
-  public static final OptionID NOISE_ID = new OptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
-
-  /**
-   * Parameter flag to disable self-pairing
-   */
-  public static final OptionID SELFPAIR_ID = new OptionID("paircounting.selfpair", "Enable self-pairing for cluster comparison.");
-
-  /**
    * Reference algorithm.
    */
   private ClusteringAlgorithm<?> referencealg;
@@ -109,7 +93,7 @@ public class EvaluateClustering implements Evaluator {
     this.noiseSpecialHandling = noiseSpecialHandling;
     this.selfPairing = selfPairing;
   }
-  
+
   /**
    * Evaluate given a cluster (of positive elements) and a scoring list.
    *
@@ -203,19 +187,10 @@ public class EvaluateClustering implements Evaluator {
    */
   private boolean isReferenceResult(Clustering<?> t) {
     // FIXME: don't hard-code strings
-    if("bylabel-clustering".equals(t.getShortName())) {
-      return true;
-    }
-    if("bymodel-clustering".equals(t.getShortName())) {
-      return true;
-    }
-    if("allinone-clustering".equals(t.getShortName())) {
-      return true;
-    }
-    if("allinnoise-clustering".equals(t.getShortName())) {
-      return true;
-    }
-    return false;
+    return "bylabel-clustering".equals(t.getShortName()) //
+        || "bymodel-clustering".equals(t.getShortName()) //
+        || "allinone-clustering".equals(t.getShortName()) //
+        || "allinnoise-clustering".equals(t.getShortName());
   }
 
   /**
@@ -301,11 +276,36 @@ public class EvaluateClustering implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected ClusteringAlgorithm<?> referencealg = null;
+    /**
+     * Parameter to obtain the reference clustering. Defaults to a flat label
+     * clustering.
+     */
+    public static final OptionID REFERENCE_ID = new OptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
 
-    protected boolean noiseSpecialHandling = false;
+    /**
+     * Parameter flag for special noise handling.
+     */
+    public static final OptionID NOISE_ID = new OptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
 
-    protected boolean selfPairing = false;
+    /**
+     * Parameter flag to disable self-pairing
+     */
+    public static final OptionID SELFPAIR_ID = new OptionID("paircounting.selfpair", "Enable self-pairing for cluster comparison.");
+
+    /**
+     * Reference algorithm.
+     */
+    private ClusteringAlgorithm<?> referencealg;
+
+    /**
+     * Apply special handling to noise "clusters".
+     */
+    private boolean noiseSpecialHandling;
+
+    /**
+     * Use self-pairing in pair-counting measures
+     */
+    private boolean selfPairing;
 
     @Override
     protected void makeOptions(Parameterization config) {

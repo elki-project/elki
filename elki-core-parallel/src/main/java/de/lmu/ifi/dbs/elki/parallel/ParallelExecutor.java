@@ -60,7 +60,7 @@ public final class ParallelExecutor {
    * @param ids IDs to process
    * @param procs Processors to run
    */
-  public static final void run(DBIDs ids, Processor... procs) {
+  public static void run(DBIDs ids, Processor... procs) {
     ParallelCore core = ParallelCore.getCore();
     core.connect();
     try {

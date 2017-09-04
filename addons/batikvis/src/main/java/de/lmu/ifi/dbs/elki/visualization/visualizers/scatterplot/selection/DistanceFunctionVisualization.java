@@ -130,13 +130,8 @@ public class DistanceFunctionVisualization implements VisFactory {
    */
   public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?> kNN) {
     DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
-    if(CosineDistanceFunction.class.isInstance(distanceFunction)) {
-      return true;
-    }
-    if(ArcCosineDistanceFunction.class.isInstance(distanceFunction)) {
-      return true;
-    }
-    return false;
+    return CosineDistanceFunction.class.isInstance(distanceFunction) //
+        || ArcCosineDistanceFunction.class.isInstance(distanceFunction);
   }
 
   /**
