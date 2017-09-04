@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
     url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
-public interface LinkageMethod {
+public interface Linkage {
   /**
    * Initialization of the distance matrix.
    *

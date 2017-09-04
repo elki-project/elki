@@ -21,6 +21,9 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.Linkage;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.SingleLinkage;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.WardLinkage;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -104,7 +107,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   /**
    * Current linkage method in use.
    */
-  LinkageMethod linkage = WardLinkageMethod.STATIC;
+  Linkage linkage = WardLinkage.STATIC;
 
   /**
    * Constructor.
@@ -112,7 +115,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public AGNES(DistanceFunction<? super O> distanceFunction, LinkageMethod linkage) {
+  public AGNES(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -134,7 +137,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    if(SingleLinkageMethod.class.isInstance(linkage)) {
+    if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     final DBIDs ids = relation.getDBIDs();
@@ -188,7 +191,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param dq Distance query
    * @param linkage Linkage method
    */
-  protected static void initializeDistanceMatrix(MatrixParadigm mat, DistanceQuery<?> dq, LinkageMethod linkage) {
+  protected static void initializeDistanceMatrix(MatrixParadigm mat, DistanceQuery<?> dq, Linkage linkage) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] matrix = mat.matrix;
     final boolean issquare = dq.getDistanceFunction().isSquared();
@@ -356,7 +359,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     /**
      * Current linkage in use.
      */
-    protected LinkageMethod linkage;
+    protected Linkage linkage;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -366,8 +369,8 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
 
-      ObjectParameter<LinkageMethod> linkageP = new ObjectParameter<>(LINKAGE_ID, LinkageMethod.class);
-      linkageP.setDefaultValue(WardLinkageMethod.class);
+      ObjectParameter<Linkage> linkageP = new ObjectParameter<>(LINKAGE_ID, Linkage.class);
+      linkageP.setDefaultValue(WardLinkage.class);
       if(config.grab(linkageP)) {
         linkage = linkageP.instantiateClass(config);
       }

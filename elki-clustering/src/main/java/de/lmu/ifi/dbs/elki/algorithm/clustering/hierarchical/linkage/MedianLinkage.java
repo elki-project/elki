@@ -18,23 +18,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Complete-linkage clustering method.
+ * Median-linkage clustering method: Weighted pair group method using centroids
+ * (WPGMC).
+ * 
+ * Reference:
+ * <p>
+ * J.C. Gower<br/>
+ * A comparison of some methods of cluster analysis<br/>
+ * Biometrics (1967): 623-637.
+ * </p>
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.3
  */
-@Alias({ "complete", "clink", "complete-link", "farthest-neighbor" })
-public class CompleteLinkageMethod implements LinkageMethod {
+@Reference(authors = "J. C. Gower", //
+    title = "A comparison of some methods of cluster analysis", //
+    booktitle = "Biometrics (1967)", //
+    url = "http://www.jstor.org/stable/10.2307/2528417")
+@Alias({ "wpgmc", "WPGMC", "weighted-centroid", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MedianLinkageMethod" })
+public class MedianLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final CompleteLinkageMethod STATIC = new CompleteLinkageMethod();
+  public static final MedianLinkage STATIC = new MedianLinkage();
 
   /**
    * Constructor.
@@ -42,13 +55,13 @@ public class CompleteLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public CompleteLinkageMethod() {
+  public MedianLinkage() {
     super();
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return dx > dy ? dx : dy;
+    return .5 * (dx + dy) - .25 * dxy;
   }
 
   /**
@@ -62,7 +75,7 @@ public class CompleteLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected CompleteLinkageMethod makeInstance() {
+    protected MedianLinkage makeInstance() {
       return STATIC;
     }
   }

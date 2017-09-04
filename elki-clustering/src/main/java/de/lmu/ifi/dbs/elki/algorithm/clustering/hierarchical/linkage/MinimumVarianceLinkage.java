@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -28,7 +28,7 @@ import net.jafama.FastMath;
 /**
  * Minimum variance linkage.
  *
- * This is subtly different from Ward's method ({@link WardLinkageMethod}),
+ * This is subtly different from Ward's method ({@link WardLinkage}),
  * because variance is normalized by the cluster size; and Ward minimizes the
  * increase in sum of squares (without normalization).
  *
@@ -50,12 +50,12 @@ import net.jafama.FastMath;
     title = "New Combinatorial Clustering Methods", //
     booktitle = "Vegetatio 81(1/2)", //
     url = "http://dx.doi.org/10.1007/978-94-009-2432-1_5")
-@Alias({ "variance" })
-public class MinimumVarianceLinkageMethod implements LinkageMethod {
+@Alias({ "variance", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MinimumVarianceLinkageMethod" })
+public class MinimumVarianceLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final MinimumVarianceLinkageMethod STATIC = new MinimumVarianceLinkageMethod();
+  public static final MinimumVarianceLinkage STATIC = new MinimumVarianceLinkage();
 
   /**
    * Additional reference.
@@ -71,7 +71,7 @@ public class MinimumVarianceLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public MinimumVarianceLinkageMethod() {
+  public MinimumVarianceLinkage() {
     super();
   }
 
@@ -104,7 +104,7 @@ public class MinimumVarianceLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected MinimumVarianceLinkageMethod makeInstance() {
+    protected MinimumVarianceLinkage makeInstance() {
       return STATIC;
     }
   }

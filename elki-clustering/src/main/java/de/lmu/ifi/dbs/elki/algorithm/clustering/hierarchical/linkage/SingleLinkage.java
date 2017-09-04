@@ -18,39 +18,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Weighted average linkage clustering method.
- * 
- * This is somewhat a misnomer, as it actually ignores that the clusters should
- * likely be weighted differently according to their size when computing the
- * average linkage. See {@link GroupAverageLinkageMethod} for the UPGMA method
- * that uses the group size to weight the objects the same way.
+ * Single-linkage clustering method.
  * 
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S.
+ * Zubrzycki<br/>
+ * Sur la liaison et la division des points d'un ensemble fini<br />
+ * In Colloquium Mathematicae (Vol. 2, No. 3-4)
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.3
  */
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-title = "Algorithms for Clustering Data", //
-booktitle = "Algorithms for Clustering Data, Prentice-Hall")
-@Alias({ "wpgma", "WPGMA" })
-public class WeightedAverageLinkageMethod implements LinkageMethod {
+@Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", //
+    title = "Sur la liaison et la division des points d'un ensemble fini", //
+    booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
+@Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SingleLinkageMethod" })
+public class SingleLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final WeightedAverageLinkageMethod STATIC = new WeightedAverageLinkageMethod();
+  public static final SingleLinkage STATIC = new SingleLinkage();
 
   /**
    * Constructor.
@@ -58,13 +54,13 @@ public class WeightedAverageLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public WeightedAverageLinkageMethod() {
+  public SingleLinkage() {
     super();
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return .5 * (dx + dy);
+    return dx < dy ? dx : dy;
   }
 
   /**
@@ -78,7 +74,7 @@ public class WeightedAverageLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WeightedAverageLinkageMethod makeInstance() {
+    protected SingleLinkage makeInstance() {
       return STATIC;
     }
   }

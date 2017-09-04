@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.Linkage;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.SingleLinkage;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -74,7 +76,7 @@ public class NNChain<O> extends AGNES<O> {
    *
    * @param distanceFunction Distance function
    */
-  public NNChain(DistanceFunction<? super O> distanceFunction, LinkageMethod linkage) {
+  public NNChain(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction, linkage);
   }
 
@@ -86,7 +88,7 @@ public class NNChain<O> extends AGNES<O> {
    * @return Clustering result
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    if(SingleLinkageMethod.class.isInstance(linkage)) {
+    if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());

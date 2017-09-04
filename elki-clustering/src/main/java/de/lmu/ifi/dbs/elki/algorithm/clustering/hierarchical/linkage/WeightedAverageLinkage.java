@@ -18,36 +18,39 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Median-linkage clustering method: Weighted pair group method using centroids
- * (WPGMC).
+ * Weighted average linkage clustering method.
+ * 
+ * This is somewhat a misnomer, as it actually ignores that the clusters should
+ * likely be weighted differently according to their size when computing the
+ * average linkage. See {@link GroupAverageLinkage} for the UPGMA method
+ * that uses the group size to weight the objects the same way.
  * 
  * Reference:
  * <p>
- * J.C. Gower<br/>
- * A comparison of some methods of cluster analysis<br/>
- * Biometrics (1967): 623-637.
+ * A. K. Jain and R. C. Dubes<br />
+ * Algorithms for Clustering Data<br />
+ * Prentice-Hall
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
-@Reference(authors = "J. C. Gower", //
-    title = "A comparison of some methods of cluster analysis", //
-    booktitle = "Biometrics (1967)", //
-    url = "http://www.jstor.org/stable/10.2307/2528417")
-@Alias({ "wpgmc", "WPGMC", "weighted-centroid" })
-public class MedianLinkageMethod implements LinkageMethod {
+@Reference(authors = "A. K. Jain and R. C. Dubes", //
+title = "Algorithms for Clustering Data", //
+booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Alias({ "wpgma", "WPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMethod" })
+public class WeightedAverageLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final MedianLinkageMethod STATIC = new MedianLinkageMethod();
+  public static final WeightedAverageLinkage STATIC = new WeightedAverageLinkage();
 
   /**
    * Constructor.
@@ -55,13 +58,13 @@ public class MedianLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public MedianLinkageMethod() {
+  public WeightedAverageLinkage() {
     super();
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return .5 * (dx + dy) - .25 * dxy;
+    return .5 * (dx + dy);
   }
 
   /**
@@ -75,7 +78,7 @@ public class MedianLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected MedianLinkageMethod makeInstance() {
+    protected WeightedAverageLinkage makeInstance() {
       return STATIC;
     }
   }

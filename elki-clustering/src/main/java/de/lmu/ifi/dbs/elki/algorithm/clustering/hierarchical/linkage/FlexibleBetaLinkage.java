@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -49,8 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
     url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
-@Alias({ "flex", "beta" })
-public class FlexibleBetaLinkageMethod implements LinkageMethod {
+@Alias({ "flex", "beta", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod" })
+public class FlexibleBetaLinkage implements Linkage {
   /**
    * Alpha parameter, derived from beta.
    */
@@ -66,7 +66,7 @@ public class FlexibleBetaLinkageMethod implements LinkageMethod {
    *
    * @param beta Beta parameter
    */
-  public FlexibleBetaLinkageMethod(double beta) {
+  public FlexibleBetaLinkage(double beta) {
     this.alpha = 0.5 * (1. - beta);
     this.beta = beta;
   }
@@ -105,8 +105,8 @@ public class FlexibleBetaLinkageMethod implements LinkageMethod {
     }
 
     @Override
-    protected FlexibleBetaLinkageMethod makeInstance() {
-      return new FlexibleBetaLinkageMethod(beta);
+    protected FlexibleBetaLinkage makeInstance() {
+      return new FlexibleBetaLinkage(beta);
     }
   }
 }

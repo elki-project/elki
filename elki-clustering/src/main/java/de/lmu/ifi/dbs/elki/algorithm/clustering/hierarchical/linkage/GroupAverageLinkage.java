@@ -18,39 +18,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import net.jafama.FastMath;
 
 /**
- * Ward's method clustering method.
- * 
- * This criterion minimizes the increase of squared errors, and should be used
- * with <em>squared Euclidean</em> distance.
+ * Group-average linkage clustering method.
  * 
  * Reference:
  * <p>
- * Ward Jr, Joe H.<br />
- * Hierarchical grouping to optimize an objective function<br />
- * Journal of the American statistical association 58.301 (1963): 236-244.
+ * A. K. Jain and R. C. Dubes<br />
+ * Algorithms for Clustering Data<br />
+ * Prentice-Hall
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.3
  */
-@Reference(authors = "J. H. Ward Jr", //
-    title = "Hierarchical grouping to optimize an objective function", //
-    booktitle = "Journal of the American statistical association 58.301", //
-    url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
-@Alias({ "ward", "ssq" })
-public class WardLinkageMethod implements LinkageMethod {
+@Reference(authors = "A. K. Jain and R. C. Dubes", //
+    title = "Algorithms for Clustering Data", //
+    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod" })
+public class GroupAverageLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final WardLinkageMethod STATIC = new WardLinkageMethod();
+  public static final GroupAverageLinkage STATIC = new GroupAverageLinkage();
 
   /**
    * Constructor.
@@ -58,23 +53,13 @@ public class WardLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public WardLinkageMethod() {
+  public GroupAverageLinkage() {
     super();
   }
 
   @Override
-  public double initial(double d, boolean issquare) {
-    return .5 * (issquare ? d : (d * d));
-  }
-
-  @Override
-  public double restore(double d, boolean issquare) {
-    return issquare ? 2. * d : FastMath.sqrt(2. * d);
-  }
-
-  @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
+    return (sizex * dx + sizey * dy) / (double) (sizex + sizey);
   }
 
   /**
@@ -88,7 +73,7 @@ public class WardLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WardLinkageMethod makeInstance() {
+    protected GroupAverageLinkage makeInstance() {
       return STATIC;
     }
   }

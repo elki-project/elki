@@ -25,6 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.*;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -52,7 +53,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -75,7 +76,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WardLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WardLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -98,7 +99,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -121,7 +122,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WeightedAverageLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WeightedAverageLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -144,7 +145,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -166,7 +167,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CentroidLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CentroidLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -189,7 +190,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MedianLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MedianLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
@@ -212,7 +213,7 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MinimumVarianceLinkageMethod.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MinimumVarianceLinkage.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
   
@@ -235,8 +236,8 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkageMethod.class);
-    params.addParameter(FlexibleBetaLinkageMethod.Parameterizer.BETA_ID, -.33);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkage.class);
+    params.addParameter(FlexibleBetaLinkage.Parameterizer.BETA_ID, -.33);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 

@@ -18,35 +18,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Single-linkage clustering method.
- * 
- * Reference:
- * <p>
- * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S.
- * Zubrzycki<br/>
- * Sur la liaison et la division des points d'un ensemble fini<br />
- * In Colloquium Mathematicae (Vol. 2, No. 3-4)
- * </p>
+ * Complete-linkage clustering method.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.0
  */
-@Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", //
-    title = "Sur la liaison et la division des points d'un ensemble fini", //
-    booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
-@Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor" })
-public class SingleLinkageMethod implements LinkageMethod {
+@Alias({ "complete", "clink", "complete-link", "farthest-neighbor", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CompleteLinkageMethod" })
+public class CompleteLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final SingleLinkageMethod STATIC = new SingleLinkageMethod();
+  public static final CompleteLinkage STATIC = new CompleteLinkage();
 
   /**
    * Constructor.
@@ -54,13 +42,13 @@ public class SingleLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public SingleLinkageMethod() {
+  public CompleteLinkage() {
     super();
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return dx < dy ? dx : dy;
+    return dx > dy ? dx : dy;
   }
 
   /**
@@ -74,7 +62,7 @@ public class SingleLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected SingleLinkageMethod makeInstance() {
+    protected CompleteLinkage makeInstance() {
       return STATIC;
     }
   }

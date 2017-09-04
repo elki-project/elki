@@ -18,14 +18,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Group-average linkage clustering method.
+ * Centroid linkage clustering method, aka UPGMC: Unweighted Pair-Group Method
+ * using Centroids.
  * 
  * Reference:
  * <p>
@@ -35,17 +36,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
-@Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
 @Reference(authors = "A. K. Jain and R. C. Dubes", //
     title = "Algorithms for Clustering Data", //
     booktitle = "Algorithms for Clustering Data, Prentice-Hall")
-public class GroupAverageLinkageMethod implements LinkageMethod {
+@Alias({ "centroid", "upgmc", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod" })
+public class CentroidLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final GroupAverageLinkageMethod STATIC = new GroupAverageLinkageMethod();
+  public static final CentroidLinkage STATIC = new CentroidLinkage();
 
   /**
    * Constructor.
@@ -53,13 +54,14 @@ public class GroupAverageLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public GroupAverageLinkageMethod() {
+  public CentroidLinkage() {
     super();
   }
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return (sizex * dx + sizey * dy) / (double) (sizex + sizey);
+    final double f = 1. / (sizex + sizey);
+    return (sizex * dx + sizey * dy - (sizex * sizey) * f * dxy) * f;
   }
 
   /**
@@ -73,8 +75,8 @@ public class GroupAverageLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected GroupAverageLinkageMethod makeInstance() {
+    protected CentroidLinkage makeInstance() {
       return STATIC;
     }
   }
-}
+} // Sokal and Michener (1958), Gower (1967)

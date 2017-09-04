@@ -18,35 +18,39 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
- * Centroid linkage clustering method, aka UPGMC: Unweighted Pair-Group Method
- * using Centroids.
+ * Ward's method clustering method.
+ * 
+ * This criterion minimizes the increase of squared errors, and should be used
+ * with <em>squared Euclidean</em> distance.
  * 
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * Ward Jr, Joe H.<br />
+ * Hierarchical grouping to optimize an objective function<br />
+ * Journal of the American statistical association 58.301 (1963): 236-244.
  * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Alias({ "centroid", "upgmc" })
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-    title = "Algorithms for Clustering Data", //
-    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
-public class CentroidLinkageMethod implements LinkageMethod {
+@Reference(authors = "J. H. Ward Jr", //
+    title = "Hierarchical grouping to optimize an objective function", //
+    booktitle = "Journal of the American statistical association 58.301", //
+    url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
+@Alias({ "ward", "ssq", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
+public class WardLinkage implements Linkage {
   /**
    * Static instance of class.
    */
-  public static final CentroidLinkageMethod STATIC = new CentroidLinkageMethod();
+  public static final WardLinkage STATIC = new WardLinkage();
 
   /**
    * Constructor.
@@ -54,14 +58,23 @@ public class CentroidLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public CentroidLinkageMethod() {
+  public WardLinkage() {
     super();
   }
 
   @Override
+  public double initial(double d, boolean issquare) {
+    return .5 * (issquare ? d : (d * d));
+  }
+
+  @Override
+  public double restore(double d, boolean issquare) {
+    return issquare ? 2. * d : FastMath.sqrt(2. * d);
+  }
+
+  @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    final double f = 1. / (sizex + sizey);
-    return (sizex * dx + sizey * dy - (sizex * sizey) * f * dxy) * f;
+    return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
   }
 
   /**
@@ -75,8 +88,8 @@ public class CentroidLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected CentroidLinkageMethod makeInstance() {
+    protected WardLinkage makeInstance() {
       return STATIC;
     }
   }
-} // Sokal and Michener (1958), Gower (1967)
+}
