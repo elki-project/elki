@@ -24,17 +24,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -105,34 +95,35 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @return Hierarchical result
    */
   public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+    final DBIDs ids = relation.getDBIDs();
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     if(dq == null && ids instanceof DBIDRange) {
       LOG.verbose("Adding a distance matrix index to accelerate MiniMax.");
       PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, getDistanceFunction());
       idx.initialize();
       dq = idx.getDistanceQuery(getDistanceFunction());
     }
-
     if(dq == null) {
       throw new AbortException("This implementation only supports StaticArrayDatabase.");
     }
+
     final int size = ids.size();
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
 
-    double[] dists = new double[AGNES.triangleSize(size)];
-    ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
+    // Allocate working space:
+    MatrixParadigm mat = new MatrixParadigm(ids);
+    ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(size));
+    initializeMatrices(mat, prots, dq);
+
     DBIDArrayMIter protiter = prots.iter();
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-
-    initializeMatrices(dists, prots, dq, ix, iy);
-
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("MiniMax clustering", size - 1, LOG) : null;
-    for(int i = 1; i < size; i++) {
-      findMerge(size, dists, protiter, ix, iy, builder, clusters, dq);
+    DBIDArrayIter ix = mat.ix;
+    for(int i = 1, end = size; i < size; i++) {
+      end = AGNES.shrinkActiveSet(ix, builder, end, //
+          findMerge(end, mat, protiter, builder, clusters, dq));
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -142,12 +133,12 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
   /**
    * Initializes the inter-cluster distance matrix of possible merges
    * 
-   * @param distances The cluster distance matrix
+   * @param mat Matrix
    * @param dq The distance query
-   * @param ix An iterator over the data base
-   * @param iy Another iterator over the data base
    */
-  protected static <O> void initializeMatrices(double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
+  protected static <O> void initializeMatrices(MatrixParadigm mat, ArrayModifiableDBIDs prots, DistanceQuery<O> dq) {
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+    final double[] distances = mat.matrix;
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
@@ -162,24 +153,25 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
   /**
    * Find the best merge.
    * 
-   * @param size Size
-   * @param distances Distances array
+   * @param mat Matrix view
    * @param prots Prototypes
-   * @param ix Iterator (reused)
-   * @param iy Iterator (reused)
    * @param builder Result builder
    * @param clusters Current clusters
    * @param dq Distance query
+   * @return x, for shrinking the working set.
    */
-  protected static void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
+  protected static int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+    final double[] distances = mat.matrix;
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
 
-    for(int dx = 0; dx < size; dx++) {
+    for(int dx = 0; dx < end; dx++) {
       // Skip if object is already linked
       if(builder.isLinked(ix.seek(dx))) {
         continue;
       }
+      final int xoffset = MatrixParadigm.triangleSize(dx);
 
       for(int dy = 0; dy < dx; dy++) {
         // Skip if object is already linked
@@ -187,16 +179,18 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
           continue;
         }
 
-        int offset = AGNES.triangleSize(dx) + dy;
-        if(distances[offset] < mindist) {
-          mindist = distances[offset];
+        double dist = distances[xoffset + dy];
+        if(dist < mindist) {
+          mindist = dist;
           x = dx;
           y = dy;
         }
       }
     }
 
-    merge(size, distances, prots, ix, iy, builder, clusters, dq, x, y);
+    assert (y < x);
+    merge(end, mat, prots, builder, clusters, dq, x, y);
+    return x;
   }
 
   /**
@@ -204,22 +198,20 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * keep
    * 
    * @param size number of ids in the data set
-   * @param distances distance matrix
+   * @param mat distance matrix
    * @param prots calculated prototypes
-   * @param ix iterator to reuse
-   * @param iy iterator to reuse
    * @param builder Result builder
    * @param clusters the clusters
    * @param dq distance query of the data set
    * @param x first cluster to merge
    * @param y second cluster to merge
    */
-  protected static void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);
-    int offset = AGNES.triangleSize(x) + y;
+    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
+    final double[] distances = mat.matrix;
+    int offset = MatrixParadigm.triangleSize(x) + y;
 
-    ix.seek(x);
-    iy.seek(y);
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + distances[offset]);
     }
@@ -243,7 +235,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     // parent of x is set to y
     builder.add(ix, distances[offset], iy, prots.seek(offset));
 
-    updateMatrices(size, distances, prots, ix, iy, builder, clusters, dq, y);
+    updateMatrices(size, mat, prots, builder, clusters, dq, y);
   }
 
   /**
@@ -251,16 +243,15 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * merged cluster.
    * 
    * @param size number of ids in the data set
-   * @param distances distance matrix
+   * @param mat matrix paradigm
    * @param prots calculated prototypes
-   * @param ix iterator to reuse
-   * @param iy iterator to reuse
    * @param builder Result builder
    * @param clusters the clusters
    * @param dq distance query of the data set
    * @param c the cluster to update distances to
    */
-  protected static <O> void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
+  protected static <O> void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     // c is the new cluster.
     // Update entries (at (x,y) with x > y) in the matrix where x = c or y = c
 
@@ -271,7 +262,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
       if(builder.isLinked(iy)) {
         continue;
       }
-      updateEntry(distances, prots, ix, iy, clusters, dq, c, iy.getOffset());
+      updateEntry(mat, prots, clusters, dq, c, iy.getOffset());
     }
 
     // Update entries at (x,c) with x > c
@@ -281,49 +272,48 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
       if(builder.isLinked(ix)) {
         continue;
       }
-      updateEntry(distances, prots, ix, iy, clusters, dq, ix.getOffset(), c);
+      updateEntry(mat, prots, clusters, dq, ix.getOffset(), c);
     }
   }
 
   /**
    * Update entry at x,y for distance matrix distances
    * 
-   * @param distances distance matrix
+   * @param mat distance matrix
    * @param prots calculated prototypes
-   * @param ix iterator to reuse
-   * @param iy iterator to reuse
    * @param clusters the clusters
-   * @param dq distancequery on the data set
+   * @param dq distance query on the data set
    * @param x index of cluster, x > y
    * @param y index of cluster, y < x
    * @param dimensions number of dimensions
    */
-  protected static void updateEntry(double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void updateEntry(MatrixParadigm mat, DBIDArrayMIter prots, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+    final double[] distances = mat.matrix;
     ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
 
     DBIDVar prototype = DBIDUtil.newVar(ix.seek(x)); // Default prototype
-    double minMaxDist = Double.POSITIVE_INFINITY;
-
+    double minMaxDist;
     // Two "real" clusters:
     if(cx != null && cy != null) {
-      minMaxDist = findPrototype(dq, cx, cy, prototype, minMaxDist);
+      minMaxDist = findPrototype(dq, cx, cy, prototype, Double.POSITIVE_INFINITY);
       minMaxDist = findPrototype(dq, cy, cx, prototype, minMaxDist);
     }
     else if(cx != null) {
       // cy is singleton.
-      minMaxDist = findPrototypeSingleton(dq, cx, iy.seek(y), prototype, minMaxDist);
+      minMaxDist = findPrototypeSingleton(dq, cx, iy.seek(y), prototype);
     }
     else if(cy != null) {
       // cx is singleton.
-      minMaxDist = findPrototypeSingleton(dq, cy, ix.seek(x), prototype, minMaxDist);
+      minMaxDist = findPrototypeSingleton(dq, cy, ix.seek(x), prototype);
     }
     else {
       minMaxDist = dq.distance(ix.seek(x), iy.seek(y));
       prototype.set(ix);
     }
 
-    final int offset = AGNES.triangleSize(x) + y;
+    final int offset = MatrixParadigm.triangleSize(x) + y;
     distances[offset] = minMaxDist;
     prots.seek(offset).setDBID(prototype);
   }
@@ -340,12 +330,10 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    */
   private static double findPrototype(DistanceQuery<?> dq, DBIDs cx, DBIDs cy, DBIDVar prototype, double minMaxDist) {
     for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
-      double maxDist = 0.;
-
       // Maximum distance of i to all elements in cy
-      maxDist = findMax(dq, i, cy, maxDist, minMaxDist);
-      if(maxDist >= minMaxDist) { // We already have an at least equally good
-                                  // candidate.
+      double maxDist = findMax(dq, i, cy, 0., minMaxDist);
+      if(maxDist >= minMaxDist) {
+        // We already have an at least equally good candidate.
         continue;
       }
       // Maximum distance of i to all elements in cx
@@ -367,18 +355,17 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param cx First set
    * @param cy Singleton object
    * @param prototype Prototype output variable
-   * @param minMaxDist Previously best distance.
    * @return New best distance
    */
-  private static double findPrototypeSingleton(DistanceQuery<?> dq, DBIDs cx, DBIDRef cy, DBIDVar prototype, double minMaxDist) {
-    double maxDisty = 0.;
+  private static double findPrototypeSingleton(DistanceQuery<?> dq, DBIDs cx, DBIDRef cy, DBIDVar prototype) {
+    double maxDisty = 0., minMaxDist = Double.POSITIVE_INFINITY;
     for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
       // Maximum distance of i to the element in cy
       double maxDist = dq.distance(i, cy);
       // Maximum of distances from cy.
       maxDisty = (maxDist > maxDisty) ? maxDist : maxDisty;
-      // We know a better solution already.
       if(maxDist >= minMaxDist) {
+        // We know a better solution already.
         continue;
       }
       // Maximum distance of i to all other elements in cx
@@ -424,7 +411,6 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
-
   }
 
   @Override
@@ -432,13 +418,18 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Julian Erhard
+   * @author Erich Schubert
+   *
+   * @param <O> Object type
+   */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
-
     @Override
     protected MiniMax<O> makeInstance() {
       return new MiniMax<>(distanceFunction);
     }
-
   }
-
 }

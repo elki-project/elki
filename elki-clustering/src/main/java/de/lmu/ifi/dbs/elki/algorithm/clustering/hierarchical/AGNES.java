@@ -24,9 +24,9 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -135,38 +134,27 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final int size = ids.size();
-
-    if(size > 0x10000) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + //
-          0x10000 // = 65535
-          + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
-    }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
+    final DBIDs ids = relation.getDBIDs();
+    final int size = ids.size();
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
 
     // Compute the initial (lower triangular) distance matrix.
-    double[] scratch = new double[triangleSize(size)];
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
+    MatrixParadigm mat = new MatrixParadigm(ids);
+    initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    int wsize = size;
-    for(int i = 1; i < size; i++) {
-      int x = findMerge(wsize, scratch, ix, iy, builder);
-      if(x == wsize - 1) {
-        --wsize;
-        for(ix.seek(wsize - 1); builder.isLinked(ix); ix.retract()) {
-          --wsize;
-        }
-      }
+    // Use end to shrink the matrix virtually as the tailing objects disappear
+    DBIDArrayIter ix = mat.ix;
+    for(int i = 1, end = size; i < size; i++) {
+      end = shrinkActiveSet(ix, builder, end, //
+          findMerge(end, mat, builder));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -175,34 +163,42 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   }
 
   /**
-   * Compute the size of a complete x by x triangle (minus diagonal)
-   *
-   * @param x Offset
-   * @return Size of complete triangle
+   * Shrink the active set: if the last x objects are all merged, we can reduce
+   * the working size accordingly.
+   * 
+   * @param ix Object iterator
+   * @param builder Builder to detect merged status
+   * @param end Current active set size
+   * @param x Last merged object
+   * @return New active set size
    */
-  protected static int triangleSize(int x) {
-    return (x * (x - 1)) >>> 1;
+  protected static int shrinkActiveSet(DBIDArrayIter ix, PointerHierarchyRepresentationBuilder builder, int end, int x) {
+    if(x == end - 1) { // Can truncate active set.
+      while(builder.isLinked(ix.seek(--end - 1))) {
+        // Everything happens in while condition already.
+      }
+    }
+    return end;
   }
 
   /**
    * Initialize a distance matrix.
    *
-   * @param scratch Scratch space to be used.
+   * @param mat Matrix
    * @param dq Distance query
    * @param linkage Linkage method
-   * @param ix Data iterator
-   * @param iy Data iterator
    */
-  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, LinkageMethod linkage, DBIDArrayIter ix, DBIDArrayIter iy) {
+  protected static void initializeDistanceMatrix(MatrixParadigm mat, DistanceQuery<?> dq, LinkageMethod linkage) {
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+    final double[] matrix = mat.matrix;
     final boolean issquare = dq.getDistanceFunction().isSquared();
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", matrix.length, LOG) : null;
     int pos = 0;
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", scratch.length, LOG) : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       final int x = ix.getOffset();
-      assert (pos == triangleSize(x));
+      assert (pos == MatrixParadigm.triangleSize(x));
       for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
-        scratch[pos] = linkage.initial(dq.distance(ix, iy), issquare);
-        pos++;
+        matrix[pos++] = linkage.initial(dq.distance(ix, iy), issquare);
       }
       if(prog != null) {
         prog.setProcessed(pos, LOG);
@@ -210,7 +206,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     }
     // Avoid logging errors in case scratch space was too large:
     if(prog != null) {
-      prog.setProcessed(scratch.length, LOG);
+      prog.setProcessed(matrix.length, LOG);
     }
     LOG.ensureCompleted(prog);
   }
@@ -218,57 +214,56 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   /**
    * Perform the next merge step in AGNES.
    *
-   * @param size Data set size
+   * @param end Avtive set size
    * @param scratch Scratch space.
-   * @param ix First iterator
-   * @param iy Second iterator
    * @param builder Pointer representation builder
    * @return x, for shrinking the working set.
    */
-  protected int findMerge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder) {
+  protected int findMerge(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {
+    assert (end > 0);
+    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+    final double[] matrix = mat.matrix;
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
-    for(int ox = 0, xbase = 0; ox < size; xbase += ox++) {
+    for(int ox = 0, xbase = 0; ox < end; xbase += ox++) {
       // Skip if object has already joined a cluster:
       if(builder.isLinked(ix.seek(ox))) {
         continue;
       }
-      assert (xbase == triangleSize(ox));
+      assert (xbase == MatrixParadigm.triangleSize(ox));
       for(int oy = 0; oy < ox; oy++) {
         // Skip if object has already joined a cluster:
         if(builder.isLinked(iy.seek(oy))) {
           continue;
         }
-        final int idx = xbase + oy;
-        if(scratch[idx] <= mindist) {
-          mindist = scratch[idx];
+        final double dist = matrix[xbase + oy];
+        if(dist <= mindist) { // Prefer later on ==, to truncate more often.
+          mindist = dist;
           x = ox;
           y = oy;
         }
       }
     }
     assert (x >= 0 && y >= 0);
-    merge(size, scratch, ix, iy, builder, mindist, x, y);
+    assert (y < x); // We could swap otherwise, but this shouldn't arise.
+    merge(end, mat, builder, mindist, x, y);
     return x;
   }
 
   /**
    * Execute the cluster merge.
    *
-   * @param size Data set size
-   * @param scratch Scratch space.
-   * @param ix First iterator
-   * @param iy Second iterator
+   * @param end Active set size
+   * @param mat Matrix paradigm
    * @param builder Hierarchy builder
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y) {
+  protected void merge(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
-    ix.seek(x);
-    iy.seek(y);
+    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
@@ -279,27 +274,27 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
-
-    // Note: this changes iy.
-    updateMatrix(size, scratch, iy, builder, mindist, x, y, sizex, sizey);
+    updateMatrix(end, mat, builder, mindist, x, y, sizex, sizey);
   }
 
   /**
    * Update the scratch distance matrix.
    *
-   * @param size Data set size
-   * @param scratch Scratch matrix.
-   * @param ij Iterator to reuse
-   * @param builder Hierarchy builder
+   * @param end Active set size
+   * @param mat Matrix view
+   * @param builder Hierarchy builder (to get cluster sizes)
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    * @param sizex Old size of first cluster
    * @param sizey Old size of second cluster
    */
-  protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
+  protected void updateMatrix(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: y < x
-    final int xbase = triangleSize(x), ybase = triangleSize(y);
+    final int xbase = MatrixParadigm.triangleSize(x);
+    final int ybase = MatrixParadigm.triangleSize(y);
+    double[] scratch = mat.matrix;
+    DBIDArrayIter ij = mat.ix;
 
     // Write to (y, j), with j < y
     int j = 0;
@@ -313,7 +308,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
-    int jbase = triangleSize(j);
+    int jbase = MatrixParadigm.triangleSize(j);
     for(; j < x; jbase += j++) {
       if(builder.isLinked(ij.seek(j))) {
         continue;
@@ -323,11 +318,12 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     }
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
-    for(; j < size; jbase += j++) {
+    for(; j < end; jbase += j++) {
       if(builder.isLinked(ij.seek(j))) {
         continue;
       }
-      scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], builder.getSize(ij), mindist);
+      final int jb = jbase + y;
+      scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], builder.getSize(ij), mindist);
     }
   }
 

@@ -26,9 +26,9 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -104,44 +103,31 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final int size = ids.size();
-
-    if(size > 0x10000) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + //
-          0x10000 // = 65535
-          + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
-    }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    final DBIDs ids = relation.getDBIDs();
+    MatrixParadigm mat = new MatrixParadigm(ids);
+    final int size = ids.size();
 
-    // Compute the initial (lower triangular) distance matrix.
-    double[] scratch = new double[AGNES.triangleSize(size)];
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
-    AGNES.initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
+    AGNES.initializeDistanceMatrix(mat, dq, linkage);
 
     // Arrays used for caching:
     double[] bestd = new double[size];
     int[] besti = new int[size];
-    initializeNNCache(scratch, bestd, besti);
+    initializeNNCache(mat.matrix, bestd, besti);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    int wsize = size;
-    for(int i = 1; i < size; i++) {
-      int x = findMerge(wsize, scratch, ix, iy, bestd, besti, builder);
-      if(x == wsize - 1) {
-        --wsize;
-        for(ix.seek(wsize - 1); builder.isLinked(ix); ix.retract()) {
-          --wsize;
-        }
-      }
+    DBIDArrayIter ix = mat.ix;
+    for(int i = 1, end = size; i < size; i++) {
+      end = AGNES.shrinkActiveSet(ix, builder, end, //
+          findMerge(end, mat, bestd, besti, builder));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -152,7 +138,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
   /**
    * Initialize the NN cache.
    *
-   * @param scratch Scatch space
+   * @param scratch Scratch space
    * @param bestd Best distance
    * @param besti Best index
    */
@@ -161,7 +147,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
     for(int x = 0, p = 0; x < size; x++) {
-      assert (p == AGNES.triangleSize(x));
+      assert (p == MatrixParadigm.triangleSize(x));
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
       for(int y = 0; y < x; y++, p++) {
@@ -186,31 +172,32 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * Due to the cache, this is now O(n) each time, instead of O(n*n).
    *
    * @param size Data set size
-   * @param scratch Scratch space.
-   * @param ix First iterator
-   * @param iy Second iterator
+   * @param mat Matrix paradigm
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
    * @return x, for shrinking the working set.
    */
-  protected int findMerge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder) {
+  protected int findMerge(int size, MatrixParadigm mat, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
     for(int cx = 0; cx < size; cx++) {
       // Skip if object has already joined a cluster:
-      if(besti[cx] < 0) {
+      final int cy = besti[cx];
+      if(cy < 0) {
         continue;
       }
-      if(bestd[cx] < mindist) {
-        mindist = bestd[cx];
+      final double dist = bestd[cx];
+      if(dist <= mindist) { // Prefer later on ==, to truncate more often.
+        mindist = dist;
         x = cx;
-        y = besti[cx];
+        y = cy;
       }
     }
     assert (x >= 0 && y >= 0);
-    merge(size, scratch, ix, iy, bestd, besti, builder, mindist, x < y ? y : x, x < y ? x : y);
+    assert (y < x); // We could swap otherwise, but this shouldn't arise.
+    merge(size, mat, bestd, besti, builder, mindist, x, y);
     return x;
   }
 
@@ -218,9 +205,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * Execute the cluster merge.
    *
    * @param size Data set size
-   * @param scratch Scratch space.
-   * @param ix First iterator
-   * @param iy Second iterator
+   * @param mat Matrix paradigm
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
@@ -228,10 +213,9 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y) {
+  protected void merge(int size, MatrixParadigm mat, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
-    ix.seek(x);
-    iy.seek(y);
+    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
@@ -247,9 +231,9 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     besti[x] = -1;
 
     // Note: this changes iy.
-    updateMatrix(size, scratch, iy, bestd, besti, builder, mindist, x, y, sizex, sizey);
+    updateMatrix(size, mat.matrix, iy, bestd, besti, builder, mindist, x, y, sizex, sizey);
     if(besti[y] == x) {
-      findBest(size, scratch, bestd, besti, y);
+      findBest(size, mat.matrix, bestd, besti, y);
     }
   }
 
@@ -270,7 +254,8 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    */
   protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: miny < minx
-    final int xbase = AGNES.triangleSize(x), ybase = AGNES.triangleSize(y);
+    final int xbase = MatrixParadigm.triangleSize(x);
+    final int ybase = MatrixParadigm.triangleSize(y);
 
     // Write to (y, j), with j < y
     int j = 0;
@@ -285,7 +270,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
-    int jbase = AGNES.triangleSize(j);
+    int jbase = MatrixParadigm.triangleSize(j);
     for(; j < x; jbase += j++) {
       if(builder.isLinked(ij.seek(j))) {
         continue;
@@ -302,7 +287,8 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
         continue;
       }
       final int sizej = builder.getSize(ij);
-      final double d = scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
+      final int jb = jbase + y;
+      final double d = scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], sizej, mindist);
       updateCache(size, scratch, bestd, besti, x, y, j, d);
     }
   }
@@ -326,14 +312,14 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
       besti[j] = y;
       return;
     }
-    // Needs slow upate.
+    // Needs slow update.
     if(besti[j] == x || besti[j] == y) {
       findBest(size, scratch, bestd, besti, j);
     }
   }
 
   protected void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
-    final int jbase = AGNES.triangleSize(j);
+    final int jbase = MatrixParadigm.triangleSize(j);
     // The distance has increased, we may no longer be the best merge.
     double bestdj = Double.POSITIVE_INFINITY;
     int bestij = -1;
@@ -341,18 +327,20 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
       if(besti[i] < 0) {
         continue;
       }
-      if(scratch[o] < bestdj) {
-        bestdj = scratch[o];
+      final double dist = scratch[o];
+      if(dist <= bestdj) {
+        bestdj = dist;
         bestij = i;
       }
     }
     for(int i = j + 1, o = jbase + j + j; i < size; o += i, i++) {
-      // assert(o == AGNES.triangleSize(i) + j);
+      // assert(o == MatrixParadigm.triangleSize(i) + j);
       if(besti[i] < 0) {
         continue;
       }
-      if(scratch[o] < bestdj) {
-        bestdj = scratch[o];
+      final double dist = scratch[o];
+      if(dist <= bestdj) {
+        bestdj = dist;
         bestij = i;
       }
     }

@@ -94,15 +94,14 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @return Clustering result
    */
   public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+    final DBIDs ids = relation.getDBIDs();
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     if(dq == null && ids instanceof DBIDRange) {
       LOG.verbose("Adding a distance matrix index to accelerate MiniMax.");
       PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, getDistanceFunction());
       idx.initialize();
       dq = idx.getDistanceQuery(getDistanceFunction());
     }
-
     if(dq == null) {
       throw new AbortException("This implementation only supports StaticArrayDatabase.");
     }
@@ -111,62 +110,45 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
 
-    final int size = ids.size();
-    double[] dists = new double[AGNES.triangleSize(size)];
-    ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
-    DBIDArrayMIter protiter = prots.iter();
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
+    MatrixParadigm mat = new MatrixParadigm(ids);
+    ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(ids.size()));
 
-    MiniMax.initializeMatrices(dists, prots, dq, ix, iy);
+    MiniMax.initializeMatrices(mat, prots, dq);
 
-    nnChainCore(size, dists, protiter, dq, ix, iy, builder, clusters);
+    nnChainCore(mat, prots.iter(), dq, builder, clusters);
 
     return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
   }
 
-  
   /**
    * Uses NNChain as in "Modern hierarchical, agglomerative clustering
    * algorithms" by Daniel Müllner
    * 
-   * @param size number of ids in the data set
-   * @param distances distance matrix
+   * @param mat distance matrix
    * @param prots computed prototypes
    * @param dq distance query of the data set
-   * @param ix iterator to reuse
-   * @param iy another iterator to reuse
    * @param builder Result builder
    * @param clusters current clusters
    */
-  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
+    final DBIDArrayIter ix = mat.ix;
+    final double[] distances = mat.matrix;
+    final int size = mat.size;
     // The maximum chain size = number of ids + 1
     IntegerArray chain = new IntegerArray(size + 1);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
-    for(int k = 0; k < size - 1; k++) {
+    for(int k = 1, end = size; k < size; k++) {
       int a = -1, b = -1;
       if(chain.size() <= 3) {
         // Accessing two arbitrary not yet merged elements could be optimized to
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        for(ix.seek(0); ix.valid(); ix.advance()) {
-          if(!builder.isLinked(ix)) {
-            a = ix.getOffset();
-            break;
-          }
-        }
-
+        a = NNChain.findUnlinked(0, end, ix, builder);
+        b = NNChain.findUnlinked(a + 1, end, ix, builder);
         chain.clear();
         chain.add(a);
-
-        for(ix.advance(); ix.valid(); ix.advance()) {
-          if(!builder.isLinked(ix)) {
-            b = ix.getOffset();
-            assert(a != b);
-            break;
-          }
-        }
       }
       else {
         // Chain is expected to look like (.... a, b, c, b) with b and c merged.
@@ -182,10 +164,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         chain.size -= 3;
       }
       // For ties, always prefer the second-last element b:
-      double minDist = NNChain.getDistance(distances, a, b);
+      double minDist = mat.get(a, b);
       do {
         int c = b;
-        final int ta = NNChain.triangleSize(a);
+        final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
           if(i != b && !builder.isLinked(ix.seek(i))) {
             double dist = distances[ta + i];
@@ -197,7 +179,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         }
         for(int i = a + 1; i < size; i++) {
           if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[NNChain.triangleSize(i) + a];
+            double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -218,8 +200,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         a = b;
         b = tmp;
       }
-      assert(minDist == NNChain.getDistance(distances, a, b));
-      MiniMax.merge(size, distances, prots, ix, iy, builder, clusters, dq, a, b);
+      assert (minDist == mat.get(a, b));
+      assert (b < a);
+      MiniMax.merge(size, mat, prots, builder, clusters, dq, a, b);
+      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -228,7 +212,6 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
-
   }
 
   @Override

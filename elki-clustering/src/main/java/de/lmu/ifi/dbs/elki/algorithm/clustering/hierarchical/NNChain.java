@@ -20,12 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -33,7 +30,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * NNchain clustering algorithm.
@@ -90,29 +86,20 @@ public class NNChain<O> extends AGNES<O> {
    * @return Clustering result
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final int size = ids.size();
-    if(size > 0x10000) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + //
-          0x10000 // = 65535
-          + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
-    }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    final DBIDs ids = relation.getDBIDs();
+    MatrixParadigm mat = new MatrixParadigm(ids);
 
     // Compute the initial (lower triangular) distance matrix.
-    double[] scratch = new double[triangleSize(size)];
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    // Position counter - must agree with computeOffset!
-    initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
+    initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
-    nnChainCore(size, scratch, ix, iy, builder);
-
+    nnChainCore(mat, builder);
     return builder.complete();
   }
 
@@ -120,42 +107,29 @@ public class NNChain<O> extends AGNES<O> {
    * Uses NNChain as in "Modern hierarchical, agglomerative clustering
    * algorithms" by Daniel Müllner
    * 
-   * @param size number of ids in the data set
-   * @param distances distance matrix
+   * @param mat Matrix view
    * @param dq distance query of the data set
-   * @param ix iterator to reuse
-   * @param iy another iterator to reuse
    * @param builder Result builder
    */
-  private void nnChainCore(int size, double[] distances, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder) {
+  private void nnChainCore(MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {
+    final DBIDArrayIter ix = mat.ix;
+    final double[] distances = mat.matrix;
+    final int size = mat.size;
     // The maximum chain size = number of ids + 1
     IntegerArray chain = new IntegerArray(size + 1);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
-    for(int k = 0; k < size - 1; k++) {
+    for(int k = 1, end = size; k < size; k++) {
       int a = -1, b = -1;
       if(chain.size() <= 3) {
         // Accessing two arbitrary not yet merged elements could be optimized to
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        for(ix.seek(0); ix.valid(); ix.advance()) {
-          if(!builder.isLinked(ix)) {
-            a = ix.getOffset();
-            break;
-          }
-        }
-
+        a = findUnlinked(0, end, ix, builder);
+        b = findUnlinked(a + 1, end, ix, builder);
         chain.clear();
         chain.add(a);
-
-        for(ix.advance(); ix.valid(); ix.advance()) {
-          if(!builder.isLinked(ix)) {
-            b = ix.getOffset();
-            assert (a != b);
-            break;
-          }
-        }
       }
       else {
         // Chain is expected to look like (.... a, b, c, b) with b and c merged.
@@ -171,10 +145,10 @@ public class NNChain<O> extends AGNES<O> {
         chain.size -= 3;
       }
       // For ties, always prefer the second-last element b:
-      double minDist = getDistance(distances, a, b);
+      double minDist = mat.get(a, b);
       do {
         int c = b;
-        final int ta = triangleSize(a);
+        final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
           if(i != b && !builder.isLinked(ix.seek(i))) {
             double dist = distances[ta + i];
@@ -186,7 +160,7 @@ public class NNChain<O> extends AGNES<O> {
         }
         for(int i = a + 1; i < size; i++) {
           if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[triangleSize(i) + a];
+            double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -207,30 +181,32 @@ public class NNChain<O> extends AGNES<O> {
         a = b;
         b = tmp;
       }
-      assert (minDist == getDistance(distances, a, b));
-      merge(size, distances, ix, iy, builder, minDist, a, b);
+      assert (minDist == mat.get(a, b));
+      assert (b < a);
+      merge(size, mat, builder, minDist, a, b);
+      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
   }
 
   /**
-   * Get a value from the (upper triangular) distance matrix.
-   * 
-   * @param distances Distance matrix
-   * @param x First object
-   * @param y Second object
-   * @return Distance
+   * Find an unlinked object.
+   *
+   * @param pos Starting position
+   * @param end End position
+   * @param ix Iterator to translate into DBIDs
+   * @param builder Linkage information
+   * @return Position
    */
-  protected static double getDistance(double[] distances, int x, int y) {
-    return (x == y) ? 0 : //
-        (x < y) ? distances[triangleSize(y) + x] : distances[triangleSize(x) + y];
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
-
+  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyRepresentationBuilder builder) {
+    while(pos < end) {
+      if(!builder.isLinked(ix.seek(pos))) {
+        return pos;
+      }
+      ++pos;
+    }
+    return -1;
   }
 
   @Override
