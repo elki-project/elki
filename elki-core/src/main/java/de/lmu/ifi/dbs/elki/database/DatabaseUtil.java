@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -38,7 +39,9 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Class with Database-related utility functions such as centroid computation,
@@ -188,13 +191,14 @@ public final class DatabaseUtil {
    */
   public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceQuery<O> dq, int k) {
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     // No optimized kNN query - use a preprocessor!
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
     MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
     preproc.initialize();
+    // TODO: attach weakly persistent to the relation?
     return preproc.getKNNQuery(dq, k);
   }
 
@@ -210,13 +214,42 @@ public final class DatabaseUtil {
   public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, int k) {
     DistanceQuery<O> dq = database.getDistanceQuery(relation, distf);
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     // No optimized kNN query - use a preprocessor!
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
     MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
     preproc.initialize();
+    // TODO: attach weakly persistent to the relation?
     return preproc.getKNNQuery(dq, k);
+  }
+
+  /**
+   * Get (or create) a precomputed distance query for the database.
+   * 
+   * This will usually force computing a distance matrix, unless there already
+   * is one.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @param distf Distance function
+   * @param log Logger
+   * @return KNNQuery for the given relation, that is precomputed.
+   */
+  public static <O> DistanceQuery<O> precomputedDistanceQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, Logging log) {
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    if(dq == null && relation.getDBIDs() instanceof DBIDRange) {
+      log.verbose("Adding a distance matrix index to accelerate MiniMax.");
+      PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, distf);
+      idx.initialize();
+      // TODO: attach weakly persistent to the relation?
+      dq = idx.getDistanceQuery(distf);
+    }
+    if(dq == null) {
+      dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE);
+      log.warning("PAM may be slow, because we do not have a precomputed distance matrix available.");
+    }
+    return dq;
   }
 }

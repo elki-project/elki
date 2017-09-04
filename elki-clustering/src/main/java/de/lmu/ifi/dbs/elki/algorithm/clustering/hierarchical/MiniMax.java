@@ -24,16 +24,14 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.ids.*;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -95,18 +93,8 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @return Hierarchical result
    */
   public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistanceFunction(), LOG);
     final DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    if(dq == null && ids instanceof DBIDRange) {
-      LOG.verbose("Adding a distance matrix index to accelerate MiniMax.");
-      PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, getDistanceFunction());
-      idx.initialize();
-      dq = idx.getDistanceQuery(getDistanceFunction());
-    }
-    if(dq == null) {
-      throw new AbortException("This implementation only supports StaticArrayDatabase.");
-    }
-
     final int size = ids.size();
 
     // Initialize space for result:

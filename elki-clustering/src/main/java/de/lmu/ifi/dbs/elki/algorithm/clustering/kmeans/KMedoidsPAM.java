@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -33,23 +33,15 @@ import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -138,18 +130,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     if(relation.size() <= 0) {
       return new Clustering<>("PAM Clustering", "pam-clustering");
     }
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
     DBIDs ids = relation.getDBIDs();
-    if(distQ == null && ids instanceof DBIDRange) {
-      LOG.verbose("Adding a distance matrix index to accelerate PAM.");
-      PrecomputedDistanceMatrix<V> idx = new PrecomputedDistanceMatrix<V>(relation, getDistanceFunction());
-      idx.initialize();
-      distQ = idx.getDistanceQuery(getDistanceFunction());
-    }
-    if(distQ == null) {
-      distQ = database.getDistanceQuery(relation, getDistanceFunction());
-      LOG.warning("PAM may be slow, because we do not have a precomputed distance matrix available.");
-    }
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));

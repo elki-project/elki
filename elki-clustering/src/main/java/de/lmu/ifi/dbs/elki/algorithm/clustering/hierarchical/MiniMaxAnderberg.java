@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -84,7 +85,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistanceFunction(), LOG);
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 

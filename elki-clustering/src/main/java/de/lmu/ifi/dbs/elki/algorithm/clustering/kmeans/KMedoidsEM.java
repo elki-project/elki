@@ -34,18 +34,11 @@ import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -131,15 +124,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     DistanceQuery<V> distQ = null;
     // Only enforce a distance matrix for PAM initialization, which is slow.
     if(initializer instanceof PAMInitialMeans) {
-      distQ = database.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
-      if(distQ == null) {
-        LOG.verbose("Adding a distance matrix index to accelerate PAM.");
-        PrecomputedDistanceMatrix<V> idx = new PrecomputedDistanceMatrix<V>(relation, getDistanceFunction());
-        idx.initialize();
-        distQ = idx.getDistanceQuery(getDistanceFunction());
-      }
-    }
-    if(distQ == null) {
+      distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
+    } else {
       distQ = database.getDistanceQuery(relation, getDistanceFunction());
     }
     // Choose initial medoids
