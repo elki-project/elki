@@ -85,13 +85,8 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * <<<<<<< HEAD
  * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A.
  * Zimek:<br />
- * =======
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek:
- * <br />
- * >>>>>>> Migration to fastutil.
  * Detection and Visualization of Subspace Cluster Hierarchies. <br />
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
@@ -175,34 +170,11 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     // extract clusters
     Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = extractClusters(database, clusterOrder);
-
-    if(LOG.isVerbose()) {
-      final StringBuilder msg = new StringBuilder("Step 1: extract clusters\n");
-      for(ObjectIterator<Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>>> iter = clustersMap.object2ObjectEntrySet().fastIterator(); iter.hasNext();) {
-        Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>> entry = iter.next();
-        msg.append(BitsUtil.toStringLow(entry.getKey(), dimensionality)).append(" sizes:");
-        for(ArrayModifiableDBIDs c : entry.getValue()) {
-          msg.append(' ').append(c.size());
-        }
-        msg.append('\n');
-      }
-      LOG.verbose(msg.toString());
-    }
+    logClusterSizes("Step 1: extract clusters", dimensionality, clustersMap);
 
     // check if there are clusters < minpts
     checkClusters(database, clustersMap);
-    if(LOG.isVerbose()) {
-      final StringBuilder msg = new StringBuilder("Step 2: check clusters\n");
-      for(ObjectIterator<Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>>> iter = clustersMap.object2ObjectEntrySet().fastIterator(); iter.hasNext();) {
-        Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>> entry = iter.next();
-        msg.append(BitsUtil.toStringLow(entry.getKey(), dimensionality)).append(" sizes:");
-        for(ArrayModifiableDBIDs c : entry.getValue()) {
-          msg.append(' ').append(c.size());
-        }
-        msg.append('\n');
-      }
-      LOG.verbose(msg.toString());
-    }
+    logClusterSizes("Step 2: check clusters", dimensionality, clustersMap);
 
     // sort the clusters
     List<Cluster<SubspaceModel>> clusters = sortClusters(database, clustersMap);
@@ -238,6 +210,28 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       }
     }
     return clustering;
+  }
+
+  /**
+   * Log cluster sizes in verbose mode.
+   * 
+   * @param msg Log message
+   * @param dimensionality Dimensionality
+   * @param clustersMap Cluster map
+   */
+  private void logClusterSizes(String m, int dimensionality, Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+    if(LOG.isVerbose()) {
+      final StringBuilder msg = new StringBuilder(1000).append(m).append('\n');
+      for(ObjectIterator<Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>>> iter = clustersMap.object2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+        Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>> entry = iter.next();
+        msg.append(BitsUtil.toStringLow(entry.getKey(), dimensionality)).append(" sizes:");
+        for(ArrayModifiableDBIDs c : entry.getValue()) {
+          msg.append(' ').append(c.size());
+        }
+        msg.append('\n');
+      }
+      LOG.verbose(msg.toString());
+    }
   }
 
   /**

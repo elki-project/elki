@@ -56,6 +56,11 @@ public class SparseFloatVector implements SparseNumberVector {
   public static final ByteBufferSerializer<SparseFloatVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
+   * Float constant, for missing values in (inefficient) {@link #getValue} API.
+   */
+  private static final float FLOAT0 = 0.f;
+
+  /**
    * Indexes of values.
    */
   private final int[] indexes;
@@ -128,12 +133,7 @@ public class SparseFloatVector implements SparseNumberVector {
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
-    if(this.indexes.length == 0) {
-      return 0;
-    }
-    else {
-      return this.indexes[this.indexes.length - 1];
-    }
+    return (this.indexes.length == 0) ? 0 : this.indexes[this.indexes.length - 1];
   }
 
   /**
@@ -201,42 +201,28 @@ public class SparseFloatVector implements SparseNumberVector {
   @Deprecated
   public Float getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return values[pos];
-    }
-    else {
-      return 0.0f;
-    }
+    return (pos >= 0) ? values[pos] : FLOAT0;
   }
 
   @Override
   @Deprecated
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return values[pos];
-    }
-    else {
-      return 0.0;
-    }
+    return (pos >= 0) ? values[pos] : 0.;
   }
 
   @Override
   @Deprecated
   public float floatValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return values[pos];
-    }
-    else {
-      return 0.0f;
-    }
+    return (pos >= 0) ? values[pos] : 0.f;
   }
 
   @Override
   @Deprecated
   public long longValue(int dimension) {
-    return (long) floatValue(dimension);
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    return (pos >= 0) ? (long) values[pos] : 0L;
   }
 
   @Override
@@ -266,15 +252,12 @@ public class SparseFloatVector implements SparseNumberVector {
    */
   @Override
   public String toString() {
-    StringBuilder featureLine = new StringBuilder();
-    featureLine.append(this.indexes.length);
+    StringBuilder featureLine = new StringBuilder(15 * this.indexes.length)//
+        .append(this.indexes.length);
     for(int i = 0; i < this.indexes.length; i++) {
-      featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(this.indexes[i]);
-      featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(this.values[i]);
+      featureLine.append(ATTRIBUTE_SEPARATOR).append(this.indexes[i])//
+          .append(ATTRIBUTE_SEPARATOR).append(this.values[i]);
     }
-
     return featureLine.toString();
   }
 

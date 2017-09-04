@@ -150,7 +150,6 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
         buf1.clear();
         lbl.clear();
         Int2IntOpenHashMap csize = new Int2IntOpenHashMap();
-        Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
         String name = null;
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           try {
@@ -179,6 +178,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
           throw new AbortException("Clusterings do not contain the same number of elements!");
         }
         // Build clustering to store in the relation.
+        Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(csize.size());
         curclu = new Clustering<>(name, name);
         for(ObjectIterator<Int2IntMap.Entry> iter = csize.int2IntEntrySet().fastIterator(); iter.hasNext();) {
           Int2IntMap.Entry entry = iter.next();

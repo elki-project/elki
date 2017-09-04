@@ -292,7 +292,7 @@ public class BitVector implements SparseNumberVector {
    */
   @Override
   public String toString() {
-    StringBuilder representation = new StringBuilder();
+    StringBuilder representation = new StringBuilder(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
       if(i > 0) {
         representation.append(ATTRIBUTE_SEPARATOR);

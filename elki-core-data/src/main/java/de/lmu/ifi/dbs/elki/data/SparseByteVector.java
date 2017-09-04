@@ -126,12 +126,7 @@ public class SparseByteVector implements SparseNumberVector {
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
-    if(this.indexes.length == 0) {
-      return 0;
-    }
-    else {
-      return this.indexes[this.indexes.length - 1];
-    }
+    return (this.indexes.length == 0) ? 0 : this.indexes[this.indexes.length - 1];
   }
 
   /**
@@ -195,40 +190,30 @@ public class SparseByteVector implements SparseNumberVector {
     this.dimensionality = dimensionality;
   }
 
+  /**
+   * Value to return for missing entires.
+   */
+  private static final Byte BYTE0 = Byte.valueOf((byte) 0);
+
   @Override
   @Deprecated
   public Byte getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return values[pos];
-    }
-    else {
-      return 0;
-    }
+    return (pos >= 0) ? values[pos] : BYTE0;
   }
 
   @Override
   @Deprecated
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return values[pos];
-    }
-    else {
-      return 0.;
-    }
+    return (pos >= 0) ? values[pos] : 0.;
   }
 
   @Override
   @Deprecated
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
-      return (long) values[pos];
-    }
-    else {
-      return 0;
-    }
+    return (pos >= 0) ? values[pos] : 0L;
   }
 
   @Override
@@ -266,15 +251,12 @@ public class SparseByteVector implements SparseNumberVector {
    */
   @Override
   public String toString() {
-    StringBuilder featureLine = new StringBuilder();
-    featureLine.append(this.indexes.length);
+    StringBuilder featureLine = new StringBuilder(8 * this.indexes.length)//
+        .append(this.indexes.length);
     for(int i = 0; i < this.indexes.length; i++) {
-      featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(this.indexes[i]);
-      featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(this.values[i]);
+      featureLine.append(ATTRIBUTE_SEPARATOR).append(this.indexes[i])//
+          .append(ATTRIBUTE_SEPARATOR).append(this.values[i]);
     }
-
     return featureLine.toString();
   }
 

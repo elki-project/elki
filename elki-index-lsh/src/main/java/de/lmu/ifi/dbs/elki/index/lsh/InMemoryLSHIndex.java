@@ -198,12 +198,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
           for(DBIDs set : table.values()) {
             final int size = set.size();
-            if(size < min) {
-              min = size;
-            }
-            if(size > max) {
-              max = size;
-            }
+            min = size < min ? size : min;
+            max = size > max ? size : max;
           }
         }
         LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.min", min));
@@ -246,6 +242,34 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     }
 
     /**
+     * Get the candidates: points which have at least one hash bucket in common.
+     * 
+     * @param obj Query object
+     * @return Candidates
+     */
+    protected DBIDs getCandidates(V obj) {
+      ModifiableDBIDs candidates = null;
+      final int numhash = hashtables.size();
+      double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
+      for(int i = 0; i < numhash; i++) {
+        final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
+        final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
+        // Get the initial (unbounded) hash code:
+        int hash = hashfunc.hashObject(obj, buf);
+        // Reduce to hash table size
+        int bucket = hash % numberOfBuckets;
+        DBIDs cur = table.get(bucket);
+        if(cur != null) {
+          if(candidates == null) {
+            candidates = DBIDUtil.newHashSet(cur.size() * numhash);
+          }
+          candidates.addDBIDs(cur);
+        }
+      }
+      return (candidates == null) ? DBIDUtil.EMPTYDBIDS : candidates;
+    }
+
+    /**
      * Class for handling kNN queries against the LSH index.
      *
      * @author Erich Schubert
@@ -264,28 +288,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
       @Override
       public KNNList getKNNForObject(V obj, int k) {
-        ModifiableDBIDs candidates = null;
-        final int numhash = hashtables.size();
-        double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
-        for(int i = 0; i < numhash; i++) {
-          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
-          final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
-          // Get the initial (unbounded) hash code:
-          int hash = hashfunc.hashObject(obj, buf);
-          // Reduce to hash table size
-          int bucket = hash % numberOfBuckets;
-          DBIDs cur = table.get(bucket);
-          if(cur != null) {
-            if(candidates == null) {
-              candidates = DBIDUtil.newHashSet(cur.size() * numhash + k);
-            }
-            candidates.addDBIDs(cur);
-          }
-        }
-        if(candidates == null) {
-          candidates = DBIDUtil.newArray();
-        }
-
+        DBIDs candidates = getCandidates(obj);
         // Refine.
         KNNHeap heap = DBIDUtil.newHeap(k);
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
@@ -316,22 +319,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
       @Override
       public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
-        ModifiableDBIDs candidates = DBIDUtil.newHashSet();
-        final int numhash = hashtables.size();
-        double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
-        for(int i = 0; i < numhash; i++) {
-          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
-          final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
-          // Get the initial (unbounded) hash code:
-          int hash = hashfunc.hashObject(obj, buf);
-          // Reduce to hash table size
-          int bucket = hash % numberOfBuckets;
-          DBIDs cur = table.get(bucket);
-          if(cur != null) {
-            candidates.addDBIDs(cur);
-          }
-        }
-
+        DBIDs candidates = getCandidates(obj);
         // Refine.
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final double dist = distanceQuery.distance(obj, iter);
