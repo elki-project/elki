@@ -43,7 +43,7 @@ public interface Uncertainifier<UO extends UncertainObject> {
    * Shared parameter: to force centering the uncertain region on the exact
    * vector.
    */
-  static final OptionID SYMMETRIC_ID = new OptionID("uo.symmetric", "Generate a symetric uncertain region, centered around the exact data.");
+  OptionID SYMMETRIC_ID = new OptionID("uo.symmetric", "Generate a symetric uncertain region, centered around the exact data.");
 
   /**
    * Generate a new uncertain object. This interface is specialized to numerical

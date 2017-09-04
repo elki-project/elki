@@ -46,7 +46,7 @@ public interface LogMOMDistributionEstimator<D extends Distribution> extends Dis
   D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift);
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
     double min = min(data, adapter, 0., 1e-10);
     StatisticalMoments mv = new StatisticalMoments();
@@ -69,7 +69,7 @@ public interface LogMOMDistributionEstimator<D extends Distribution> extends Dis
    * @param minmin Minimum value for minimum.
    * @return Minimum
    */
-  public static <A> double min(A data, NumberArrayAdapter<?, A> adapter, double minmin, double margin) {
+  static <A> double min(A data, NumberArrayAdapter<?, A> adapter, double minmin, double margin) {
     final int len = adapter.size(data);
     double min = adapter.getDouble(data, 0), max = min;
     for(int i = 1; i < len; i++) {

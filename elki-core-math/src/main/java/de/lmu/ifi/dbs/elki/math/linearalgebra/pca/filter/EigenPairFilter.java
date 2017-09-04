@@ -40,7 +40,7 @@ public interface EigenPairFilter {
    * Key: {@code -pca.filter}
    * </p>
    */
-  public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
+  OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
 
   /**
    * Filters the specified eigenvalues into strong and weak eigenvalues, where

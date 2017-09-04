@@ -42,5 +42,5 @@ public interface StylingPolicy extends VisualizationItem {
    * @param id Object ID
    * @return Color value
    */
-  public int getColorForDBID(DBIDRef id);
+  int getColorForDBID(DBIDRef id);
 }

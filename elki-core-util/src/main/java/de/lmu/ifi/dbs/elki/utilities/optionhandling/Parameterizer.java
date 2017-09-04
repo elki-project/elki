@@ -39,5 +39,5 @@ public interface Parameterizer {
    * 
    * @param config Parameterization
    */
-  public void configure(Parameterization config);
+  void configure(Parameterization config);
 }

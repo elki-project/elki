@@ -39,5 +39,5 @@ public interface Projector extends VisualizationItem {
    * @param context Visualization context
    * @return Arrangement.
    */
-  public Collection<PlotItem> arrange(VisualizerContext context);
+  Collection<PlotItem> arrange(VisualizerContext context);
 }

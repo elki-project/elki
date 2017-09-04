@@ -38,7 +38,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectDataToRenderSpace(double[] data);
+  double fastProjectDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -46,7 +46,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectDataToRenderSpace(NumberVector data);
+  double fastProjectDataToRenderSpace(NumberVector data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -54,7 +54,7 @@ public interface Projection1D extends Projection {
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double fastProjectScaledToRender(double[] v);
+  double fastProjectScaledToRender(double[] v);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -62,7 +62,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeDataToRenderSpace(double[] data);
+  double fastProjectRelativeDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -70,7 +70,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeDataToRenderSpace(NumberVector data);
+  double fastProjectRelativeDataToRenderSpace(NumberVector data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -78,5 +78,5 @@ public interface Projection1D extends Projection {
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeScaledToRender(double[] v);
+  double fastProjectRelativeScaledToRender(double[] v);
 }

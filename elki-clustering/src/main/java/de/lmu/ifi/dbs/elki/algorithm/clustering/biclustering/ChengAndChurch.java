@@ -166,7 +166,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
      * @param selcol Boolean, whether column is selected
      * @return Stop flag, return {@code true} to stop visiting
      */
-    public boolean visit(double val, int row, int col, boolean selrow, boolean selcol);
+    boolean visit(double val, int row, int col, boolean selrow, boolean selcol);
   }
 
   /**

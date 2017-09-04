@@ -208,7 +208,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    *
    * @apiviz.exclude
    */
-  public static enum OutputFormat {
+  enum OutputFormat {
     TABULAR, TSV
   }
 
@@ -219,7 +219,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    *
    * @apiviz.exclude
    */
-  public static enum Aggregate {
+  enum Aggregate {
     /**
      * Aggregate using the mean only.
      */

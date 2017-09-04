@@ -50,5 +50,5 @@ public interface MarkerLibrary {
    * @param size size
    * @return Element node generated.
    */
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
 }

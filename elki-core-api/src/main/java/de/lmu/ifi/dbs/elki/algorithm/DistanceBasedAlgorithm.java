@@ -35,7 +35,7 @@ public interface DistanceBasedAlgorithm<O> extends Algorithm {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_ID}.
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
+  OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Returns the distanceFunction.

@@ -46,7 +46,7 @@ public interface LogMADDistributionEstimator<D extends Distribution> extends Dis
   D estimateFromLogMedianMAD(double median, double mad, double shift);
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     // TODO: detect pre-sorted data?
     final int len = adapter.size(data);
     double min = LogMOMDistributionEstimator.min(data, adapter, 0., 1e-10);

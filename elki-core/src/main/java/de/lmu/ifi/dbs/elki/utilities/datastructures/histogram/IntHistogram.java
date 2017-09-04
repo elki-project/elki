@@ -35,22 +35,22 @@ public interface IntHistogram extends Histogram {
    * @param coord Coordinate
    * @param value Value to increment by
    */
-  public void increment(double coord, int value);
+  void increment(double coord, int value);
   
   @Override
-  public Iter iter();
+  Iter iter();
   
   /**
    * Iterator interface.
    *
    * @author Erich Schubert
    */
-  public static interface Iter extends Histogram.Iter {
+  interface Iter extends Histogram.Iter {
     /**
      * Get the value of the bin.
      * 
      * @return Bin value
      */
-    public int getValue();
+    int getValue();
   }
 }

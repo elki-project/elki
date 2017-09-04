@@ -42,7 +42,7 @@ public interface ScalingFunction {
    * @param value Original value
    * @return Scaled value
    */
-  public double getScaled(double value);
+  double getScaled(double value);
 
   /**
    * Get minimum resulting value. May be {@link Double#NaN} or
@@ -50,7 +50,7 @@ public interface ScalingFunction {
    * 
    * @return Minimum resulting value.
    */
-  public double getMin();
+  double getMin();
 
   /**
    * Get maximum resulting value. May be {@link Double#NaN} or
@@ -58,5 +58,5 @@ public interface ScalingFunction {
    * 
    * @return Maximum resulting value.
    */
-  public double getMax();
+  double getMax();
 }

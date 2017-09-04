@@ -81,14 +81,14 @@ public interface ObjectHeap<K> {
    * 
    * @return Size
    */
-  public int size();
+  int size();
   
   /**
    * Is the heap empty?
    * 
    * @return {@code true} when the size is 0.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
@@ -111,7 +111,7 @@ public interface ObjectHeap<K> {
    * @author Erich Schubert
    * @param <K> Key type
    */
-  public static interface UnsortedIter<K> extends Iter {
+  interface UnsortedIter<K> extends Iter {
     /**
      * Get the iterators current object.
      * 

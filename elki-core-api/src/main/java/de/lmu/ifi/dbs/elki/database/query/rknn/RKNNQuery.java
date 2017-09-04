@@ -45,7 +45,7 @@ public interface RKNNQuery<O> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k);
+  DoubleDBIDList getRKNNForDBID(DBIDRef id, int k);
 
   /**
    * Get the reverse k nearest neighbors for a particular object.
@@ -54,7 +54,7 @@ public interface RKNNQuery<O> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public DoubleDBIDList getRKNNForObject(O obj, int k);
+  DoubleDBIDList getRKNNForObject(O obj, int k);
 
   /**
    * Bulk query method for reverse k nearest neighbors for ids.
@@ -63,5 +63,5 @@ public interface RKNNQuery<O> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
+  List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 }

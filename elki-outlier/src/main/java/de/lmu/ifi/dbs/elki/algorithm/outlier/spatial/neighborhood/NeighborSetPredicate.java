@@ -40,7 +40,7 @@ public interface NeighborSetPredicate extends Result {
    * @param reference Reference object
    * @return Neighborhood
    */
-  public DBIDs getNeighborDBIDs(DBIDRef reference);
+  DBIDs getNeighborDBIDs(DBIDRef reference);
 
   /**
    * Factory interface to produce instances.
@@ -52,7 +52,7 @@ public interface NeighborSetPredicate extends Result {
    * 
    * @param <O> Input relation object type restriction
    */
-  public static interface Factory<O> {
+  interface Factory<O> {
     /**
      * Instantiation method.
      * 
@@ -60,13 +60,13 @@ public interface NeighborSetPredicate extends Result {
      * @param relation Relation to instantiate for.
      * @return instance
      */
-    public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
+    NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
 
     /**
      * Get the input type information
      * 
      * @return input type
      */
-    public TypeInformation getInputTypeRestriction();
+    TypeInformation getInputTypeRestriction();
   }
 }

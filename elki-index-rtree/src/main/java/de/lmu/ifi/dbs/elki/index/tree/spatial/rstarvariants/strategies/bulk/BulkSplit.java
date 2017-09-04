@@ -40,5 +40,5 @@ public interface BulkSplit {
    * @param maxEntries the maximum number of entries in a partition
    * @return the partition of the specified spatial objects
    */
-  public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries);
+  <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries);
 }

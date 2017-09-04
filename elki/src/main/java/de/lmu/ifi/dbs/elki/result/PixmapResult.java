@@ -35,12 +35,12 @@ public interface PixmapResult extends Result {
    * 
    * @return the image pixmap
    */
-  public RenderedImage getImage();
+  RenderedImage getImage();
   
   /**
    * Get the image result as file (usually a temporary file).
    * 
    * @return Image file
    */
-  public File getAsFile();
+  File getAsFile();
 }

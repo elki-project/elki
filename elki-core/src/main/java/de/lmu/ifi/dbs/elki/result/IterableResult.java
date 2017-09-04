@@ -40,5 +40,5 @@ public interface IterableResult<O> extends Result, Iterable<O> {
    * @return iterator
    */
   @Override
-  public Iterator<O> iterator();
+  Iterator<O> iterator();
 }

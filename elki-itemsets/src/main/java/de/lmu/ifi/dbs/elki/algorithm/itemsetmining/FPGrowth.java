@@ -486,7 +486,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      *
      * @apiviz.exclude
      */
-    public static interface Collector {
+    interface Collector {
       /**
        * Collect a single frequent itemset
        *
@@ -495,7 +495,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
        * @param start First valid buffer position
        * @param end End of valid buffer
        */
-      public void collect(int support, int[] buf, int start, int end);
+      void collect(int support, int[] buf, int start, int end);
     }
 
     /**
@@ -654,7 +654,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      *
      * @apiviz.exclude
      */
-    public static interface Translator {
+    interface Translator {
       /**
        * Append a single item to a buffer.
        *
@@ -662,7 +662,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
        * @param i Item number
        * @return Buffer
        */
-      public StringBuilder appendTo(StringBuilder buf, int i);
+      StringBuilder appendTo(StringBuilder buf, int i);
     }
   }
 

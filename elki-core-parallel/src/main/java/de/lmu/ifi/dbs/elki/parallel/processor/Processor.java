@@ -39,26 +39,26 @@ public interface Processor {
    * @param executor Job executor
    * @return Instance
    */
-  public Instance instantiate(Executor executor);
+  Instance instantiate(Executor executor);
 
   /**
    * Invoke cleanup.
    * 
    * @param inst Instance to cleanup.
    */
-  public void cleanup(Instance inst);
+  void cleanup(Instance inst);
 
   /**
    * Instance.
    * 
    * @author Erich Schubert
    */
-  public interface Instance {
+  interface Instance {
     /**
      * Process ("map") a single object
      * 
      * @param id Object to map.
      */
-    public void map(DBIDRef id);
+    void map(DBIDRef id);
   }
 }

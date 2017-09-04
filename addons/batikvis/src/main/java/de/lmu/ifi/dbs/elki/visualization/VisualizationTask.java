@@ -40,7 +40,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    *
    * @author Erich Schubert
    */
-  public static enum RenderFlag {
+  public enum RenderFlag {
     /** Do not use thumbnails for easy visualizations. */
     NO_THUMBNAIL(1),
     /** Do not allow full-screening this task */
@@ -53,7 +53,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     /**
      * Bit.
      */
-    public final int bit;
+    final int bit;
 
     /**
      * Constructor.
@@ -72,7 +72,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    *
    * @author Erich Schubert
    */
-  public static enum UpdateFlag {
+  public enum UpdateFlag {
     /** When data changes */
     ON_DATA(1),
     /** When selection changes */
@@ -85,7 +85,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     /**
      * Bit.
      */
-    public final int bit;
+    final int bit;
 
     /**
      * Constructor.

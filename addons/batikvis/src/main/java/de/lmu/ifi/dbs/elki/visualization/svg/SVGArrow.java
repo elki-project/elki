@@ -47,7 +47,7 @@ public final class SVGArrow {
    * 
    * @apiviz.exclude
    */
-  public static enum Direction {
+  public enum Direction {
     LEFT, DOWN, RIGHT, UP, // SWAPWITH, INSERT
   }
 

@@ -53,7 +53,7 @@ public interface LMMDistributionEstimator<D extends Distribution> extends Distri
   int getNumMoments();
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     // Sort:
     final int size = adapter.size(data);
     double[] sorted = new double[size];

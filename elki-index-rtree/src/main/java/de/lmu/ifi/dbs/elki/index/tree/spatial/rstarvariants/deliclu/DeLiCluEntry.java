@@ -39,7 +39,7 @@ public interface DeLiCluEntry extends SpatialEntry {
    *         contains handled data objects,
    *         false otherwise.
    */
-  public boolean hasHandled();
+  boolean hasHandled();
 
   /**
    * Returns true, if the node (or its child nodes) which is represented by this entry
@@ -49,7 +49,7 @@ public interface DeLiCluEntry extends SpatialEntry {
    *         contains unhandled data objects,
    *         false otherwise.
    */
-  public boolean hasUnhandled();
+  boolean hasUnhandled();
 
   /**
    * Sets the flag to marks the node (or its child nodes) which is represented by this entry
@@ -57,7 +57,7 @@ public interface DeLiCluEntry extends SpatialEntry {
    *
    * @param hasHandled the flag to be set
    */
-  public void setHasHandled(boolean hasHandled);
+  void setHasHandled(boolean hasHandled);
 
   /**
    * Sets the flag to marks the node (or its child nodes) which is represented by this entry
@@ -65,5 +65,5 @@ public interface DeLiCluEntry extends SpatialEntry {
    *
    * @param hasUnhandled the flag to be set
    */
-  public void setHasUnhandled(boolean hasUnhandled);
+  void setHasUnhandled(boolean hasUnhandled);
 }

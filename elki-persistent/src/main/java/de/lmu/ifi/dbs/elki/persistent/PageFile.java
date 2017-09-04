@@ -37,7 +37,7 @@ public interface PageFile<P extends Page> {
    * @param page the page to set the id
    * @return the page id
    */
-  public int setPageID(P page);
+  int setPageID(P page);
 
   /**
    * Writes a page into this file. The method tests if the page has already an
@@ -46,7 +46,7 @@ public interface PageFile<P extends Page> {
    * @param page the page to be written
    * @return the id of the page
    */
-  public int writePage(P page);
+  int writePage(P page);
 
   /**
    * Reads the page with the given id from this file.
@@ -54,45 +54,45 @@ public interface PageFile<P extends Page> {
    * @param pageID the id of the page to be returned
    * @return the page with the given pageId
    */
-  public P readPage(int pageID);
+  P readPage(int pageID);
 
   /**
    * Deletes the node with the specified id from this file.
    * 
    * @param pageID the id of the node to be deleted
    */
-  public void deletePage(int pageID);
+  void deletePage(int pageID);
 
   /**
    * Closes this file.
    */
-  public void close();
+  void close();
 
   /**
    * Clears this PageFile.
    */
-  public void clear();
+  void clear();
 
   /**
    * Returns the next page id.
    * 
    * @return the next page id
    */
-  public int getNextPageID();
+  int getNextPageID();
 
   /**
    * Sets the next page id.
    * 
    * @param nextPageID the next page id to be set
    */
-  public void setNextPageID(int nextPageID);
+  void setNextPageID(int nextPageID);
 
   /**
    * Get the page size of this page file.
    * 
    * @return page size
    */
-  public int getPageSize();
+  int getPageSize();
 
   /**
    * Initialize the page file with the given header - return "true" if the file
@@ -101,10 +101,10 @@ public interface PageFile<P extends Page> {
    * @param header Header
    * @return true when the file already existed.
    */
-  public boolean initialize(PageHeader header);
+  boolean initialize(PageHeader header);
 
   /**
    * Log some statistics to the appropriate logger.
    */
-  public void logStatistics();
+  void logStatistics();
 }

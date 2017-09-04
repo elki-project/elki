@@ -48,7 +48,7 @@ public interface RandomProjectionFamily {
    *
    * @author Erich Schubert
    */
-  static interface Projection {
+  interface Projection {
     /**
      * Project a single vector.
      *

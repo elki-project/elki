@@ -36,68 +36,68 @@ public interface Histogram {
    * This parameter controls the cache size used for dynamic histograms before
    * setting the initial thresholds.
    */
-  public final static int CACHE_SHIFT = 2;
+  int CACHE_SHIFT = 2;
 
   /**
    * Get the number of bins actually in use.
    * 
    * @return number of bins
    */
-  public abstract int getNumBins();
+  int getNumBins();
 
   /**
    * Get the size (width) of a bin.
    * 
    * @return bin size
    */
-  public abstract double getBinsize();
+  double getBinsize();
 
   /**
    * Get minimum (covered by bins, not data!)
    * 
    * @return minimum
    */
-  public abstract double getCoverMinimum();
+  double getCoverMinimum();
 
   /**
    * Get maximum (covered by bins, not data!)
    * 
    * @return maximum
    */
-  public abstract double getCoverMaximum();
+  double getCoverMaximum();
 
   /**
    * Get an iterator over all histogram bins.
    * 
    * @return Iterator
    */
-  public abstract Iter iter();
+  Iter iter();
 
   /**
    * Array iterator.
    * 
    * @author Erich Schubert
    */
-  public static interface Iter extends ArrayIter {
+  interface Iter extends ArrayIter {
     /**
      * Get the bin center.
      * 
      * @return bin center value
      */
-    public double getCenter();
+    double getCenter();
 
     /**
      * Get the bin minimum.
      * 
      * @return bin left value
      */
-    public double getLeft();
+    double getLeft();
 
     /**
      * Get the bin maximum.
      * 
      * @return bin right value
      */
-    public double getRight();
+    double getRight();
   }
 }

@@ -34,7 +34,7 @@ public interface SimilarityBasedLayouter3DPC extends Layouter3DPC<NumberVector> 
   /**
    * Option for similarity measure.
    */
-  public static final OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
+  OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
 
   /**
    * Get the similarity measure to use.

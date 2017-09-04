@@ -41,7 +41,7 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
    * @param id Object ID
    * @return Matrix
    */
-  public long[] getPreferenceVector(DBIDRef id);
+  long[] getPreferenceVector(DBIDRef id);
 
   /**
    * Factory interface
@@ -54,7 +54,7 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
    * @param <V> vector type
    * @param <I> index type
    */
-  public static interface Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
+  interface Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
     /**
      * Instantiate the index for a given database.
      * 
@@ -63,6 +63,6 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
      * @return Index
      */
     @Override
-    public I instantiate(Relation<V> relation);
+    I instantiate(Relation<V> relation);
   }
 }

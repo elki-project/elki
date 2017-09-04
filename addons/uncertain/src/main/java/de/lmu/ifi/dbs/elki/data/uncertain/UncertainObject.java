@@ -44,12 +44,12 @@ public interface UncertainObject extends SpatialComparable, FeatureVector<Double
   /**
    * Uncertain objects.
    */
-  public static final VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
+  VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
 
   /**
    * Uncertain objects.
    */
-  public static final VectorFieldTypeInformation<DiscreteUncertainObject> DISCRETE_UNCERTAIN_OBJECT = VectorFieldTypeInformation.typeRequest(DiscreteUncertainObject.class);
+  VectorFieldTypeInformation<DiscreteUncertainObject> DISCRETE_UNCERTAIN_OBJECT = VectorFieldTypeInformation.typeRequest(DiscreteUncertainObject.class);
 
   /**
    * Draw a random sampled instance.

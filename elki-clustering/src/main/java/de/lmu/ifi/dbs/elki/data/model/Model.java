@@ -35,7 +35,7 @@ public interface Model {
   /**
    * Type information, for relation selection.
    */
-  public static final SimpleTypeInformation<Model> TYPE = new SimpleTypeInformation<>(Model.class);
+  SimpleTypeInformation<Model> TYPE = new SimpleTypeInformation<>(Model.class);
 
   /**
    * Default implementation of

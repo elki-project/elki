@@ -736,7 +736,7 @@ public class SweepHullDelaunay2D {
    *
    * @apiviz.exclude
    */
-  static enum Orientation {
+  private enum Orientation {
     ORIENT_AB_BA, ORIENT_AB_CB, ORIENT_AB_AC, ORIENT_BC_BA, ORIENT_BC_CB, ORIENT_BC_AC, ORIENT_CA_BA, ORIENT_CA_CB, ORIENT_CA_AC
   }
 

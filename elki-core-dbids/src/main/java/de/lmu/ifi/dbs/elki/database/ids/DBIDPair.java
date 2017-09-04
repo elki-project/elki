@@ -38,7 +38,7 @@ public interface DBIDPair extends ArrayDBIDs {
    *             recommended when many such accesses are needed.
    */
   @Deprecated
-  public DBID getFirst();
+  DBID getFirst();
 
   /**
    * Getter for second element in pair
@@ -48,5 +48,5 @@ public interface DBIDPair extends ArrayDBIDs {
    *             recommended when many such accesses are needed.
    */
   @Deprecated
-  public DBID getSecond();
+  DBID getSecond();
 }

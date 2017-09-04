@@ -35,7 +35,7 @@ public interface OrderingResult extends Result {
    * 
    * @return DBIDs
    */
-  public DBIDs getDBIDs();
+  DBIDs getDBIDs();
   
   /**
    * Sort the given ids according to this ordering and return an iterator.
@@ -43,5 +43,5 @@ public interface OrderingResult extends Result {
    * @param ids Collection of ids.
    * @return iterator for sorted array of ids
    */
-  public ArrayModifiableDBIDs order(DBIDs ids);
+  ArrayModifiableDBIDs order(DBIDs ids);
 }

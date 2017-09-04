@@ -48,17 +48,17 @@ public interface LineStyleLibrary {
   /**
    * Meta flag to request a 'stronger' version of the style
    */
-  public static final String FLAG_STRONG = "strong";
+  String FLAG_STRONG = "strong";
 
   /**
    * Meta flag to request a 'weaker' version of the style
    */
-  public static final String FLAG_WEAK = "weak";
+  String FLAG_WEAK = "weak";
 
   /**
    * Meta flag to request an 'interpolated' version of the style
    */
-  public static final String FLAG_INTERPOLATED = "interpolated";
+  String FLAG_INTERPOLATED = "interpolated";
 
   /**
    * Add the formatting statements to the given CSS class.
@@ -70,5 +70,5 @@ public interface LineStyleLibrary {
    * @param width line width
    * @param meta meta objects to request line variants
    */
-  public void formatCSSClass(CSSClass cls, int style, double width, Object... meta);
+  void formatCSSClass(CSSClass cls, int style, double width, Object... meta);
 }

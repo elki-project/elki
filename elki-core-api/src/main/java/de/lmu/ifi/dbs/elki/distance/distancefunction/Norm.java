@@ -35,5 +35,5 @@ public interface Norm<O> extends PrimitiveDistanceFunction<O> {
    * @param obj Object
    * @return Norm
    */
-  public double norm(O obj);
+  double norm(O obj);
 }

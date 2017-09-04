@@ -87,14 +87,14 @@ public interface DoubleObjectHeap<V> {
    * 
    * @return Size
    */
-  public int size();
-  
+  int size();
+
   /**
    * Is the heap empty?
    * 
    * @return {@code true} when the size is 0.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
@@ -107,9 +107,9 @@ public interface DoubleObjectHeap<V> {
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
    * @author Erich Schubert
- * @param <V> Value type
+   * @param <V> Value type
    */
-  public static interface UnsortedIter<V> extends Iter {
+  interface UnsortedIter<V> extends Iter {
     /**
      * Get the current key
      * 

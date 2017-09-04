@@ -46,7 +46,7 @@ public interface KNNQuery<O> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public KNNList getKNNForDBID(DBIDRef id, int k);
+  KNNList getKNNForDBID(DBIDRef id, int k);
 
   /**
    * Bulk query method
@@ -55,7 +55,7 @@ public interface KNNQuery<O> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
+  List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 
   /**
    * Get the k nearest neighbors for a particular id.
@@ -64,5 +64,5 @@ public interface KNNQuery<O> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public KNNList getKNNForObject(O obj, int k);
+  KNNList getKNNForObject(O obj, int k);
 }

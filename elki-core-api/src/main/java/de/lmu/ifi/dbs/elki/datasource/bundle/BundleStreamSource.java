@@ -36,7 +36,7 @@ public interface BundleStreamSource {
    * 
    * @author Erich Schubert
    */
-  public static enum Event {
+  enum Event {
     // Metadata has changed
     META_CHANGED,
     // Next object available
@@ -50,7 +50,7 @@ public interface BundleStreamSource {
    * 
    * @return Metadata
    */
-  public BundleMeta getMeta();
+  BundleMeta getMeta();
 
   /**
    * Access a particular object and representation.
@@ -58,14 +58,14 @@ public interface BundleStreamSource {
    * @param rnum Representation number
    * @return Contained data
    */
-  public Object data(int rnum);
+  Object data(int rnum);
 
   /**
    * Indicate whether the stream contains DBIDs.
    * 
    * @return {@code true} if the stream contains DBIDs.
    */
-  public boolean hasDBIDs();
+  boolean hasDBIDs();
 
   /**
    * Assign the current object ID to a {@link DBIDVar}.
@@ -73,19 +73,19 @@ public interface BundleStreamSource {
    * @param var Variable to assign the object id to
    * @return {@code false} when no object id is available
    */
-  public boolean assignDBID(DBIDVar var);
+  boolean assignDBID(DBIDVar var);
 
   /**
    * Get the next event
    * 
    * @return Event type
    */
-  public Event nextEvent();
+  Event nextEvent();
 
   /**
    * Return (or collect) the stream as bundle.
    * 
    * @return Bundle
    */
-  public MultipleObjectsBundle asMultipleObjectsBundle();
+  MultipleObjectsBundle asMultipleObjectsBundle();
 }

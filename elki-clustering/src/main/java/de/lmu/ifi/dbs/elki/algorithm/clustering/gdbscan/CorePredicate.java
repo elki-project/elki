@@ -61,7 +61,7 @@ public interface CorePredicate<T> {
    * 
    * @param <T> actual type
    */
-  public static interface Instance<T> {
+  interface Instance<T> {
     /**
      * Decide whether the point is a core point, based on its neighborhood.
      * 

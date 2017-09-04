@@ -39,5 +39,5 @@ public interface ProjectorFactory extends VisualizationProcessor {
    * @param start Result to process
    */
   @Override
-  public void processNewResult(VisualizerContext context, Object start);
+  void processNewResult(VisualizerContext context, Object start);
 }

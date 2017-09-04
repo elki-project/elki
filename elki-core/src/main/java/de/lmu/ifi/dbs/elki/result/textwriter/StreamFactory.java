@@ -41,7 +41,7 @@ public interface StreamFactory {
    * @return stream object for the given label
    * @throws IOException on IO error
    */
-  public PrintStream openStream(String label) throws IOException;
+  PrintStream openStream(String label) throws IOException;
 
   /**
    * Close the given output stream (Note: when writing to a single stream
@@ -49,5 +49,5 @@ public interface StreamFactory {
    * 
    * @param stream Stream to close
    */
-  public void closeStream(PrintStream stream);
+  void closeStream(PrintStream stream);
 }

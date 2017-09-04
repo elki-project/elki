@@ -86,14 +86,14 @@ public interface DoubleLongHeap {
    * 
    * @return Size
    */
-  public int size();
+  int size();
   
   /**
    * Is the heap empty?
    * 
    * @return {@code true} when the size is 0.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
@@ -107,7 +107,7 @@ public interface DoubleLongHeap {
    * 
    * @author Erich Schubert
    */
-  public static interface UnsortedIter extends Iter {
+  interface UnsortedIter extends Iter {
     /**
      * Get the current key
      * 

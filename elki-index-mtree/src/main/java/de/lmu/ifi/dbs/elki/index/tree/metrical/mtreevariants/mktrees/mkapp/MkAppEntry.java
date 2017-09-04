@@ -32,26 +32,26 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @apiviz.composedOf PolynomialApproximation
  */
-interface MkAppEntry extends MTreeEntry {
+public interface MkAppEntry extends MTreeEntry {
   /**
    * Returns the approximated value at the specified k.
    * 
    * @param k the parameter k of the knn distance
    * @return the approximated value at the specified k
    */
-  public double approximatedValueAt(int k);
+  double approximatedValueAt(int k);
 
   /**
    * Returns the polynomial approximation.
    * 
    * @return the polynomial approximation
    */
-  public PolynomialApproximation getKnnDistanceApproximation();
+  PolynomialApproximation getKnnDistanceApproximation();
 
   /**
    * Sets the polynomial approximation.
    * 
    * @param approximation the polynomial approximation to be set
    */
-  public void setKnnDistanceApproximation(PolynomialApproximation approximation);
+  void setKnnDistanceApproximation(PolynomialApproximation approximation);
 }

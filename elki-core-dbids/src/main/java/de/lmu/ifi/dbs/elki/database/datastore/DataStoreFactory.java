@@ -42,32 +42,32 @@ public interface DataStoreFactory {
   /**
    * Static storage factory
    */
-  public static DataStoreFactory FACTORY = new MemoryDataStoreFactory();
+  DataStoreFactory FACTORY = new MemoryDataStoreFactory();
 
   /**
    * Storage will be used only temporary.
    */
-  public static final int HINT_TEMP = 0x01;
+  int HINT_TEMP = 0x01;
 
   /**
    * "Hot" data, that will be used a lot, preferring memory storage.
    */
-  public static final int HINT_HOT = 0x02;
+  int HINT_HOT = 0x02;
 
   /**
    * "static" data, that will not change often
    */
-  public static final int HINT_STATIC = 0x04;
+  int HINT_STATIC = 0x04;
 
   /**
    * Data that might require sorted access (so hashmaps are suboptimal)
    */
-  public static final int HINT_SORTED = 0x08;
+  int HINT_SORTED = 0x08;
 
   /**
    * Data that is the main database. Includes HOT, STATIC, SORTED
    */
-  public static final int HINT_DB = 0x1E;
+  int HINT_DB = 0x1E;
 
   /**
    * Make a new storage, to associate the given ids with an object of class
@@ -79,7 +79,7 @@ public interface DataStoreFactory {
    * @param dataclass class to store
    * @return new data store
    */
-  public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass);
+  <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass);
 
   /**
    * Make a new storage, to associate the given ids with an object of class
@@ -89,7 +89,7 @@ public interface DataStoreFactory {
    * @param hints Hints for the storage manager
    * @return new data store
    */
-  public WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints);
+  WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints);
 
   /**
    * Make a new storage, to associate the given ids with an object of class
@@ -99,28 +99,7 @@ public interface DataStoreFactory {
    * @param hints Hints for the storage manager
    * @return new data store
    */
-  public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints);
-
-  /**
-   * Make a new storage, to associate the given ids with an object of class
-   * dataclass.
-   * 
-   * @param ids DBIDs to store data for
-   * @param hints Hints for the storage manager
-   * @param def Default value
-   * @return new data store
-   */
-  public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def);
-
-  /**
-   * Make a new storage, to associate the given ids with an object of class
-   * dataclass.
-   * 
-   * @param ids DBIDs to store data for
-   * @param hints Hints for the storage manager
-   * @return new data store
-   */
-  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints);
+   WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints);
 
   /**
    * Make a new storage, to associate the given ids with an object of class
@@ -131,7 +110,28 @@ public interface DataStoreFactory {
    * @param def Default value
    * @return new data store
    */
-  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def);
+   WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def);
+
+  /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @return new data store
+   */
+   WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints);
+
+  /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @param def Default value
+   * @return new data store
+   */
+   WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def);
 
   /**
    * Make a new record storage, to associate the given ids with an object of
@@ -142,5 +142,5 @@ public interface DataStoreFactory {
    * @param dataclasses classes to store
    * @return new record store
    */
-  public WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses);
+   WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses);
 }

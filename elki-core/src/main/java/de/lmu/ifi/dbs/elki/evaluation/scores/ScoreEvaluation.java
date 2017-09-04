@@ -76,7 +76,7 @@ public interface ScoreEvaluation {
    *
    * @author Erich Schubert
    */
-  public static interface ScoreIter extends Iter {
+  interface ScoreIter extends Iter {
     /**
      * Test whether the score is the same as the previous objects score.
      *
@@ -94,7 +94,7 @@ public interface ScoreEvaluation {
    *
    * @param <T> Data type
    */
-  public static interface Predicate<T> {
+  interface Predicate<T> {
     /**
      * Test a result.
      *

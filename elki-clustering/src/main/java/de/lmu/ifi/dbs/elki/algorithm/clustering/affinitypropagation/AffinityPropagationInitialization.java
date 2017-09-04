@@ -36,7 +36,7 @@ public interface AffinityPropagationInitialization<O> {
   /**
    * Quantile to use for the diagonal entries.
    */
-  public static final OptionID QUANTILE_ID = new OptionID("ap.quantile", "Quantile to use for diagonal entries.");
+  OptionID QUANTILE_ID = new OptionID("ap.quantile", "Quantile to use for diagonal entries.");
 
   /**
    * Compute the initial similarity matrix.

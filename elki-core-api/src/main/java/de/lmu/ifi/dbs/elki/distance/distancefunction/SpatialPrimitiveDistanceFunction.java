@@ -45,7 +45,7 @@ public interface SpatialPrimitiveDistanceFunction<V extends SpatialComparable> e
   double minDist(SpatialComparable mbr1, SpatialComparable mbr2);
 
   @Override
-  default public <T extends V> SpatialPrimitiveDistanceQuery<T> instantiate(Relation<T> relation) {
+  default <T extends V> SpatialPrimitiveDistanceQuery<T> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 }

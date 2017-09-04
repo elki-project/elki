@@ -43,10 +43,10 @@ public interface LogMeanVarianceEstimator<D extends Distribution> extends LogMOM
    * @param shift Shift that was applied to avoid negative values.
    * @return Distribution
    */
-  public D estimateFromLogMeanVariance(MeanVariance mv, double shift);
+  D estimateFromLogMeanVariance(MeanVariance mv, double shift);
 
   @Override
-  public default D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift) {
+  default D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift) {
     if(!(moments.getCount() > 1.)) {
       throw new ArithmeticException("Too small sample size to estimate variance.");
     }
@@ -54,7 +54,7 @@ public interface LogMeanVarianceEstimator<D extends Distribution> extends LogMOM
   }
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
     double min = LogMOMDistributionEstimator.min(data, adapter, 0., 1e-10);
     MeanVariance mv = new MeanVariance();

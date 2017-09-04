@@ -30,19 +30,19 @@ public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {
    * 
    * @return the split history of this entry's node
    */
-  public SplitHistory getSplitHistory();
+  SplitHistory getSplitHistory();
 
   /**
    * Add a dimension to this entry's split history.
    * 
    * @param dimension dimension to be added to split history
    */
-  public void addSplitDimension(int dimension);
+  void addSplitDimension(int dimension);
 
   /**
    * Set the split history of this entry's node.
    * 
    * @param splitHistory
    */
-  public void setSplitHistory(SplitHistory splitHistory);
+  void setSplitHistory(SplitHistory splitHistory);
 }

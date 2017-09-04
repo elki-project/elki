@@ -39,5 +39,5 @@ public interface StreamFilter extends ObjectFilter, BundleStreamSource {
    * 
    * @param source Stream source
    */
-  public BundleStreamSource init(BundleStreamSource source);
+  BundleStreamSource init(BundleStreamSource source);
 }

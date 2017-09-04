@@ -45,7 +45,7 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  final static DBIDFactory FACTORY = ClassGenericsUtil.instantiateLowlevel(DBIDFactory.class);
+  DBIDFactory FACTORY = ClassGenericsUtil.instantiateLowlevel(DBIDFactory.class);
 
   /**
    * Make a new DBID variable.

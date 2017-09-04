@@ -42,27 +42,27 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    * The String to separate attribute values in a String that represents the
    * values.
    */
-  public static final String ATTRIBUTE_SEPARATOR = " ";
+  String ATTRIBUTE_SEPARATOR = " ";
 
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final VectorTypeInformation<NumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
+  VectorTypeInformation<NumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<NumberVector> FIELD = VectorFieldTypeInformation.typeRequest(NumberVector.class);
+  VectorFieldTypeInformation<NumberVector> FIELD = VectorFieldTypeInformation.typeRequest(NumberVector.class);
 
   /**
    * Type request for two-dimensional number vectors
    */
-  public static final VectorFieldTypeInformation<NumberVector> FIELD_1D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 1, 1);
+  VectorFieldTypeInformation<NumberVector> FIELD_1D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 1, 1);
 
   /**
    * Type request for two-dimensional number vectors
    */
-  public static final VectorFieldTypeInformation<NumberVector> FIELD_2D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 2, 2);
+  VectorFieldTypeInformation<NumberVector> FIELD_2D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 2, 2);
 
   @Deprecated
   @Override

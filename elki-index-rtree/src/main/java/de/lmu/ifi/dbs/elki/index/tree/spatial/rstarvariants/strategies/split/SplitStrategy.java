@@ -38,5 +38,5 @@ public interface SplitStrategy {
    * @param minEntries Minimum number of entries in each part
    * @return BitSet containing the assignment.
    */
-  public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries);
+  <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries);
 }

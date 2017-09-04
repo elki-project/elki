@@ -30,18 +30,18 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-interface RdKNNEntry extends SpatialEntry {
+public interface RdKNNEntry extends SpatialEntry {
   /**
    * Returns the knn distance of this entry.
    * 
    * @return the knn distance of this entry
    */
-  public double getKnnDistance();
+  double getKnnDistance();
 
   /**
    * Sets the knn distance of this entry.
    * 
    * @param knnDistance the knn distance to be set
    */
-  public void setKnnDistance(double knnDistance);
+  void setKnnDistance(double knnDistance);
 }

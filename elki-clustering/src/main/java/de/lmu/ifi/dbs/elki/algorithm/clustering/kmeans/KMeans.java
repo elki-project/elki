@@ -44,24 +44,24 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
   /**
    * Parameter to specify the initialization method
    */
-  public static final OptionID INIT_ID = new OptionID("kmeans.initialization", "Method to choose the initial means.");
+  OptionID INIT_ID = new OptionID("kmeans.initialization", "Method to choose the initial means.");
 
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
    */
-  public static final OptionID K_ID = new OptionID("kmeans.k", "The number of clusters to find.");
+  OptionID K_ID = new OptionID("kmeans.k", "The number of clusters to find.");
 
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater or equal to 0, where 0 means no limit.
    */
-  public static final OptionID MAXITER_ID = new OptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
+  OptionID MAXITER_ID = new OptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
 
   /**
    * Parameter to specify the random generator seed.
    */
-  public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
+  OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
 
   /**
    * Run the clustering algorithm.

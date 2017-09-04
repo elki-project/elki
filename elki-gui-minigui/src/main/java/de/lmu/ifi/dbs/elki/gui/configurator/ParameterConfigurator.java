@@ -40,26 +40,26 @@ public interface ParameterConfigurator {
    * @param param Parameter
    * @param track Parameter tracker
    */
-  public void addParameter(Object owner, Parameter<?> param, TrackParameters track);
+  void addParameter(Object owner, Parameter<?> param, TrackParameters track);
 
   /**
    * Add a change listener
    * 
    * @param listener Change listener
    */
-  public void addChangeListener(ChangeListener listener);
+  void addChangeListener(ChangeListener listener);
 
   /**
    * Remove a change listener
    * 
    * @param listener Change listener
    */
-  public void removeChangeListener(ChangeListener listener);
+  void removeChangeListener(ChangeListener listener);
 
   /**
    * Append the parameters to a list.
    * 
    * @param params Parameter list (output)
    */
-  public void appendParameters(ListParameterization params);
+  void appendParameters(ListParameterization params);
 }

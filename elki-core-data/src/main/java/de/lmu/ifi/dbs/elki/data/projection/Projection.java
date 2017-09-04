@@ -38,7 +38,7 @@ public interface Projection<IN, OUT> {
    * 
    * @param in Data type to use for projecting.
    */
-  public void initialize(SimpleTypeInformation<IN> in);
+  void initialize(SimpleTypeInformation<IN> in);
 
   /**
    * Project a single instance.
@@ -46,19 +46,19 @@ public interface Projection<IN, OUT> {
    * @param data Data to project
    * @return Projected data
    */
-  public OUT project(IN data);
+  OUT project(IN data);
 
   /**
    * Input type information.
    * 
    * @return Type restriction
    */
-  public TypeInformation getInputDataTypeInformation();
+  TypeInformation getInputDataTypeInformation();
 
   /**
    * Output type restriction
    * 
    * @return Output type
    */
-  public SimpleTypeInformation<OUT> getOutputDataTypeInformation();
+  SimpleTypeInformation<OUT> getOutputDataTypeInformation();
 }

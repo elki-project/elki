@@ -80,5 +80,5 @@ public interface PageHeader {
    * 
    * @return the number of pages
    */
-  public int getReservedPages();
+  int getReservedPages();
 }

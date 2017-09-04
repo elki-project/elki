@@ -35,7 +35,7 @@ public interface OverflowTreatment {
   /**
    * Reinitialize the reinsertion treatment (for a new primary insertion).
    */
-  public void reinitialize();
+  void reinitialize();
 
   /**
    * Handle overflow in the given node.

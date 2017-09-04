@@ -68,7 +68,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
    * 
    * @apiviz.exclude
    */
-  public static enum Mode {
+  public enum Mode {
     BALLOON, // Balloon estimator
     SAMPLE, // Sample-point estimator
   }

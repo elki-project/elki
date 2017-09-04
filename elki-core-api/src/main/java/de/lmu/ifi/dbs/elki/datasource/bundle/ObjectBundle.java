@@ -39,7 +39,7 @@ public interface ObjectBundle {
    * 
    * @return metadata
    */
-  public BundleMeta meta();
+  BundleMeta meta();
 
   /**
    * Access the meta data.
@@ -47,21 +47,21 @@ public interface ObjectBundle {
    * @param i component
    * @return metadata of component i
    */
-  public SimpleTypeInformation<?> meta(int i);
+  SimpleTypeInformation<?> meta(int i);
 
   /**
    * Get the metadata length.
    * 
    * @return length of metadata
    */
-  public int metaLength();
+  int metaLength();
 
   /**
    * Get the number of objects contained.
    * 
    * @return Number of objects
    */
-  public int dataLength();
+  int dataLength();
 
   /**
    * Access a particular object and representation.
@@ -70,7 +70,7 @@ public interface ObjectBundle {
    * @param rnum Representation number
    * @return Contained data
    */
-  public Object data(int onum, int rnum);
+  Object data(int onum, int rnum);
 
   /**
    * Assign the object DBID to a variable
@@ -79,5 +79,5 @@ public interface ObjectBundle {
    * @param var Variable
    * @return {@code false} if there was no predefined DBID.
    */
-  public boolean assignDBID(int onum, DBIDVar var);
+  boolean assignDBID(int onum, DBIDVar var);
 }

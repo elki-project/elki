@@ -44,7 +44,7 @@ public interface MADDistributionEstimator<D extends Distribution> extends Distri
   D estimateFromMedianMAD(double median, double mad);
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     // TODO: detect pre-sorted data?
     final int len = adapter.size(data);
     // Modifiable copy:
@@ -66,7 +66,7 @@ public interface MADDistributionEstimator<D extends Distribution> extends Distri
    * @param scratch Scratch space, must be at least length len
    * @return MAD
    */
-  public static double computeMAD(double[] data, final int len, double median, double[] scratch) {
+  static double computeMAD(double[] data, final int len, double median, double[] scratch) {
     // Compute MAD:
     for(int i = 0; i < len; i++) {
       scratch[i] = Math.abs(data[i] - median);
@@ -91,7 +91,7 @@ public interface MADDistributionEstimator<D extends Distribution> extends Distri
    * @param median Median value.
    * @return Median absolute deviation from median.
    */
-  public static double computeMAD(double[] x, int len, double median) {
+  static double computeMAD(double[] x, int len, double median) {
     // Compute deviations:
     for(int i = 0; i < len; i++) {
       x[i] = Math.abs(x[i] - median);

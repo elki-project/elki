@@ -227,14 +227,14 @@ public class PrimsMinimumSpanningTree {
      * @param j Second index
      * @return Distance of objects number i and number j.
      */
-    public double distance(T data, int i, int j);
+    double distance(T data, int i, int j);
 
     /**
      * Get number of objects in dataset
      * 
      * @return Size
      */
-    public int size(T data);
+    int size(T data);
   }
 
   /**
@@ -250,7 +250,7 @@ public class PrimsMinimumSpanningTree {
      * @param i Source node
      * @param j Destination node
      */
-    public void addEdge(double length, int i, int j);
+    void addEdge(double length, int i, int j);
   }
 
   /**

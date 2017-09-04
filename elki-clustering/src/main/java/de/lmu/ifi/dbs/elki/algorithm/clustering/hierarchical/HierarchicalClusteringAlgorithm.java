@@ -36,5 +36,5 @@ import de.lmu.ifi.dbs.elki.database.Database;
  */
 public interface HierarchicalClusteringAlgorithm extends Algorithm {
   @Override
-  public PointerHierarchyRepresentationResult run(Database db);
+  PointerHierarchyRepresentationResult run(Database db);
 }

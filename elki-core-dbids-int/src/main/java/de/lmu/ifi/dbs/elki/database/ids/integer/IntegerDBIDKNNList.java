@@ -34,5 +34,5 @@ public interface IntegerDBIDKNNList extends KNNList, DoubleDBIDList, IntegerDBID
   DoubleIntegerDBIDListIter iter();
 
   @Override
-  public DoubleIntegerDBIDPair get(int index);
+  DoubleIntegerDBIDPair get(int index);
 }

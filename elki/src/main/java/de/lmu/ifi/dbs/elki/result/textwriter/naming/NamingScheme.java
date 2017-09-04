@@ -37,5 +37,5 @@ public interface NamingScheme {
    * @param cluster cluster to get a name for
    * @return cluster name
    */
-  public String getNameFor(Cluster<?> cluster);
+  String getNameFor(Cluster<?> cluster);
 }

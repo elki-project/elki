@@ -33,7 +33,7 @@ public interface PrototypeModel<V> extends Model {
   /**
    * @return prototype
    */
-  abstract V getPrototype();
+  V getPrototype();
 
   /**
    * Implementation of {@link TextWriteable} interface.
@@ -52,5 +52,5 @@ public interface PrototypeModel<V> extends Model {
    * 
    * @return String name
    */
-  abstract String getPrototypeType();
+  String getPrototypeType();
 }

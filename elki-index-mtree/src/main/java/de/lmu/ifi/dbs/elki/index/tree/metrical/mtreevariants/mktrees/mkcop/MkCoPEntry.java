@@ -32,21 +32,21 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @apiviz.composedOf ApproximationLine
  */
-interface MkCoPEntry extends MTreeEntry {
+public interface MkCoPEntry extends MTreeEntry {
   /**
    * Returns the conservative approximated knn distance of the entry.
    * 
    * @param k the parameter k of the knn distance
    * @return the conservative approximated knn distance of the entry
    */
-  public double approximateConservativeKnnDistance(int k);
+  double approximateConservativeKnnDistance(int k);
 
   /**
    * Returns the conservative approximation line.
    * 
    * @return the conservative approximation line
    */
-  public ApproximationLine getConservativeKnnDistanceApproximation();
+  ApproximationLine getConservativeKnnDistanceApproximation();
 
   /**
    * Sets the conservative approximation line
@@ -54,5 +54,5 @@ interface MkCoPEntry extends MTreeEntry {
    * @param conservativeApproximation the conservative approximation line to be
    *        set
    */
-  public void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation);
+  void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation);
 }

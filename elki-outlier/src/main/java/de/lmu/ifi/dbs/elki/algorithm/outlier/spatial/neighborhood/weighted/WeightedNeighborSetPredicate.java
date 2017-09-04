@@ -41,7 +41,7 @@ public interface WeightedNeighborSetPredicate {
    * @param reference Reference object
    * @return Weighted Neighborhood
    */
-  public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference);
+  Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference);
 
   /**
    * Factory interface to produce instances.
@@ -53,7 +53,7 @@ public interface WeightedNeighborSetPredicate {
    * 
    * @param <O> Input relation object type restriction
    */
-  public static interface Factory<O> {
+  static interface Factory<O> {
     /**
      * Instantiation method.
      * 
@@ -61,13 +61,13 @@ public interface WeightedNeighborSetPredicate {
      * @param relation Relation to instantiate for.
      * @return instance
      */
-    public WeightedNeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
+    WeightedNeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
 
     /**
      * Get the input type information
      * 
      * @return input type
      */
-    public TypeInformation getInputTypeRestriction();
+    TypeInformation getInputTypeRestriction();
   }
 }

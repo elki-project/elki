@@ -40,7 +40,7 @@ public interface IndexBasedDistanceFunction<O> extends DistanceFunction<O> {
   /**
    * OptionID for the index parameter
    */
-  public static final OptionID INDEX_ID = new OptionID("distancefunction.index", "Distance index to use.");
+  OptionID INDEX_ID = new OptionID("distancefunction.index", "Distance index to use.");
 
   /**
    * Instance interface for Index based distance functions.
@@ -49,7 +49,7 @@ public interface IndexBasedDistanceFunction<O> extends DistanceFunction<O> {
    * 
    * @param <T> Object type
    */
-  public static interface Instance<T, I extends Index> extends DatabaseDistanceQuery<T> {
+  interface Instance<T, I extends Index> extends DatabaseDistanceQuery<T> {
     /**
      * Get the index used.
      * 

@@ -81,7 +81,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @apiviz.exclude
    */
-  public static enum Style {
+  public enum Style {
     RECTANGULAR, //
     TRIANGULAR, //
   }

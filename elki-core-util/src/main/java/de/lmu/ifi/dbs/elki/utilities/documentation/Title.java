@@ -41,5 +41,5 @@ public @interface Title {
    * 
    * @return Title
    */
-  public String value();
+  String value();
 }

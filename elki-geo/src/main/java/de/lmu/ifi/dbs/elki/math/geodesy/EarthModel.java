@@ -34,7 +34,7 @@ public interface EarthModel {
   /**
    * Parameter to choose the earth model to use.
    */
-  public static final OptionID MODEL_ID = new OptionID("geo.model", "Earth model to use for projection. Default: spherical model.");
+  OptionID MODEL_ID = new OptionID("geo.model", "Earth model to use for projection. Default: spherical model.");
 
   /**
    * Map a degree latitude, longitude pair to 3D X-Y-Z coordinates, using a

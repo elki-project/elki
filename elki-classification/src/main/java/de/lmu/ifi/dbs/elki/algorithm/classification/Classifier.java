@@ -41,7 +41,7 @@ public interface Classifier<O> extends Algorithm {
    * @param database the database to build the model on
    * @param classLabels the classes to be learned
    */
-  public void buildClassifier(Database database, Relation<? extends ClassLabel> classLabels);
+  void buildClassifier(Database database, Relation<? extends ClassLabel> classLabels);
 
   /**
    * Classify a single instance.
@@ -49,12 +49,12 @@ public interface Classifier<O> extends Algorithm {
    * @param instance an instance to classify
    * @return predicted class label of the given instance
    */
-  public ClassLabel classify(O instance);
+  ClassLabel classify(O instance);
 
   /**
    * Produce a String representation of the classification model.
    * 
    * @return a String representation of the classification model
    */
-  public String model();
+  String model();
 }

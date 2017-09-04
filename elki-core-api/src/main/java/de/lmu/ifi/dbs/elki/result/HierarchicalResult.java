@@ -37,12 +37,12 @@ public interface HierarchicalResult extends Result {
    * 
    * @return current hierarchy. May be {@code null}!
    */
-  public ResultHierarchy getHierarchy();
+  ResultHierarchy getHierarchy();
 
   /**
    * Set (exchange) the hierarchy implementation (e.g. after merging!)
    * 
    * @param hierarchy New hierarchy
    */
-  public void setHierarchy(ResultHierarchy hierarchy);
+  void setHierarchy(ResultHierarchy hierarchy);
 }

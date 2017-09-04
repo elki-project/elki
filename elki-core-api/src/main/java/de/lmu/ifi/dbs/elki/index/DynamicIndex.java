@@ -38,21 +38,21 @@ public interface DynamicIndex extends Index {
    * @param id Object to remove
    * @return true if this index did contain the object, false otherwise
    */
-  public boolean delete(DBIDRef id);
+  boolean delete(DBIDRef id);
 
   /**
    * Inserts the specified object into this index.
    * 
    * @param id the object to be inserted
    */
-  public void insert(DBIDRef id);
+  void insert(DBIDRef id);
 
   /**
    * Deletes the specified objects from this index.
    * 
    * @param ids Objects to remove
    */
-  public void deleteAll(DBIDs ids);
+  void deleteAll(DBIDs ids);
 
   /**
    * Inserts the specified objects into this index. If a bulk load mode is
@@ -60,5 +60,5 @@ public interface DynamicIndex extends Index {
    * 
    * @param ids the objects to be inserted
    */
-  public void insertAll(DBIDs ids);
+  void insertAll(DBIDs ids);
 }

@@ -38,5 +38,5 @@ public interface ReferencePointsHeuristic {
    * @param db Database
    * @return Collection of reference points.
    */
-  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db);
+  Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db);
 }

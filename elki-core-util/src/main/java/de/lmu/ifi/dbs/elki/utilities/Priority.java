@@ -45,26 +45,26 @@ public @interface Priority {
   /**
    * Supplementary priority.
    */
-  public static final int SUPPLEMENTARY = -100;
+  int SUPPLEMENTARY = -100;
 
   /**
    * Default priority.
    */
-  public static final int DEFAULT = 0;
+  int DEFAULT = 0;
 
   /**
    * Important implementations.
    */
-  public static final int IMPORTANT = 100;
+  int IMPORTANT = 100;
 
   /**
    * Recommended implementations.
    */
-  public static final int RECOMMENDED = 200;
+  int RECOMMENDED = 200;
 
   /**
    * Users are suggested to use this, so their own extensions show up at the
    * top.
    */
-  public static final int USER = 1000;
+  int USER = 1000;
 }

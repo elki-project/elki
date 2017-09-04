@@ -41,5 +41,5 @@ public @interface Description {
    * 
    * @return Description
    */
-  public String value();
+  String value();
 }

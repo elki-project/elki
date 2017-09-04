@@ -40,7 +40,7 @@ public interface OutlierScalingFunction extends ScalingFunction {
    * 
    * @param or Outlier result to use
    */
-  public void prepare(OutlierResult or);
+  void prepare(OutlierResult or);
 
   /**
    * Prepare is called once for each data set, before getScaled() will be
@@ -53,5 +53,5 @@ public interface OutlierScalingFunction extends ScalingFunction {
    * @param array Data to process
    * @param adapter Array adapter 
    */
-  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter);
+  <A> void prepare(A array, NumberArrayAdapter<?, A> adapter);
 }

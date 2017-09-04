@@ -41,7 +41,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis (reordered) position
    * @return Inversion flag
    */
-  public boolean isAxisInverted(int axis);
+  boolean isAxisInverted(int axis);
 
   /**
    * Set inversion flag of axis.
@@ -49,14 +49,14 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis (reordered) position
    * @param bool Value of inversion flag
    */
-  public void setAxisInverted(int axis, boolean bool);
+  void setAxisInverted(int axis, boolean bool);
 
   /**
    * Toggle inverted flag of axis.
    * 
    * @param axis Axis (reordered) position
    */
-  public void toggleAxisInverted(int axis);
+  void toggleAxisInverted(int axis);
 
   /**
    * Get inversion flag of dimension.
@@ -64,7 +64,7 @@ public interface ProjectionParallel extends Projection {
    * @param truedim Dimension in original numbering
    * @return Inversion flag
    */
-  public boolean isDimInverted(int truedim);
+  boolean isDimInverted(int truedim);
 
   /**
    * Set inversion flag of a dimension.
@@ -72,14 +72,14 @@ public interface ProjectionParallel extends Projection {
    * @param truedim Dimension in original numbering
    * @param bool Value of inversion flag
    */
-  public void setDimInverted(int truedim, boolean bool);
+  void setDimInverted(int truedim, boolean bool);
 
   /**
    * Toggle inverted flag of dimension.
    * 
    * @param truedim Dimension in original numbering
    */
-  public void toggleDimInverted(int truedim);
+  void toggleDimInverted(int truedim);
 
   /**
    * Get scale for the given axis
@@ -87,7 +87,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis (reordered) position
    * @return Axis scale
    */
-  public LinearScale getAxisScale(int axis);
+  LinearScale getAxisScale(int axis);
 
   /**
    * Test whether the current axis is visible
@@ -95,7 +95,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis (reordered) position
    * @return Visibility of axis
    */
-  public boolean isAxisVisible(int axis);
+  boolean isAxisVisible(int axis);
 
   /**
    * Set the visibility of the axis.
@@ -103,28 +103,28 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis number
    * @param vis Visibility status
    */
-  public void setAxisVisible(int axis, boolean vis);
+  void setAxisVisible(int axis, boolean vis);
 
   /**
    * Toggle visibility of the axis.
    * 
    * @param axis Axis number
    */
-  public void toggleAxisVisible(int axis);
+  void toggleAxisVisible(int axis);
 
   /**
    * Get the number of visible dimension.
    * 
    * @return Number of visible dimensions
    */
-  public int getVisibleDimensions();
+  int getVisibleDimensions();
 
   /**
    * Exchange axes A and B
    * @param a First axis
    * @param b Second axis
    */
-  public void swapAxes(int a, int b);
+  void swapAxes(int a, int b);
 
   /**
    * shift a dimension to another position
@@ -132,7 +132,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis axis to shift
    * @param rn new position
    */
-  public void moveAxis(int axis, int rn);
+  void moveAxis(int axis, int rn);
 
   /**
    * Get the dimension for the given axis number
@@ -140,7 +140,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis number
    * @return Dimension
    */
-  public int getDimForAxis(int axis);
+  int getDimForAxis(int axis);
 
   /**
    * Get the dimension for the given visible axis
@@ -148,7 +148,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis number (visible axes only)
    * @return Dimension
    */
-  public int getDimForVisibleAxis(int axis);
+  int getDimForVisibleAxis(int axis);
 
   /**
    * Fast project a vector from data to render space
@@ -156,7 +156,7 @@ public interface ProjectionParallel extends Projection {
    * @param v Input vector
    * @return Vector with reordering, inversions and scales applied.
    */
-  public double[] fastProjectDataToRenderSpace(double[] v);
+  double[] fastProjectDataToRenderSpace(double[] v);
 
   /**
    * Fast project a vector from data to render space
@@ -164,7 +164,7 @@ public interface ProjectionParallel extends Projection {
    * @param v Input vector
    * @return Vector with reordering, inversions and scales applied.
    */
-  public double[] fastProjectDataToRenderSpace(NumberVector v);
+  double[] fastProjectDataToRenderSpace(NumberVector v);
 
   /**
    * Project the value of a single axis to its display value
@@ -173,7 +173,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis to use for scaling and inversion
    * @return Transformed value
    */
-  public double fastProjectDataToRenderSpace(double value, int axis);
+  double fastProjectDataToRenderSpace(double value, int axis);
 
   /**
    * Project a display value back to the original data space
@@ -182,7 +182,7 @@ public interface ProjectionParallel extends Projection {
    * @param axis Axis to use for scaling and inversion
    * @return Original value
    */
-  public double fastProjectRenderToDataSpace(double value, int axis);
+  double fastProjectRenderToDataSpace(double value, int axis);
 
   /**
    * Find the axis assigned to the given dimension.
@@ -190,5 +190,5 @@ public interface ProjectionParallel extends Projection {
    * @param truedim Dimension
    * @return Axis number
    */
-  public int getAxisForDim(int truedim);
+  int getAxisForDim(int truedim);
 }

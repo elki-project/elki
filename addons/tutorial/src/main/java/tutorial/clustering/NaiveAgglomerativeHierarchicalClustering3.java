@@ -88,7 +88,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    *
    * @apiviz.exclude
    */
-  public static enum Linkage {//
+  public enum Linkage {//
     SINGLE {
       @Override
       public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {

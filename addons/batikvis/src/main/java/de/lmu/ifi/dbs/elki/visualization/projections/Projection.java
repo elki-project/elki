@@ -43,19 +43,19 @@ public interface Projection extends VisualizationItem {
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
    */
-  public static final double SCALE = StyleLibrary.SCALE;
+  static final double SCALE = StyleLibrary.SCALE;
 
   /**
    * Inverse scaling constant.
    */
-  public static final double INVSCALE = 1. / SCALE;
+  static final double INVSCALE = 1. / SCALE;
 
   /**
    * Get the input dimensionality of the projection.
    *
    * @return Input dimensionality
    */
-  public int getInputDimensionality();
+  int getInputDimensionality();
 
   /**
    * Get the scale class for a particular dimension.
@@ -63,12 +63,12 @@ public interface Projection extends VisualizationItem {
    * @param d Dimension
    * @return Scale class
    */
-  public LinearScale getScale(int d);
+  LinearScale getScale(int d);
 
   /**
    * Projector used for generating this projection.
    *
    * @return Projector
    */
-  public Projector getProjector();
+  Projector getProjector();
 }

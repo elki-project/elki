@@ -34,7 +34,7 @@ public interface EnsembleVoting {
    * @param scores Scores to combine
    * @return combined score.
    */
-  public double combine(double[] scores);
+  double combine(double[] scores);
 
   /**
    * Combine scores function. Note: it is assumed that the scores are
@@ -44,5 +44,5 @@ public interface EnsembleVoting {
    * @param count Number of entries to use.
    * @return combined score.
    */
-  public double combine(double[] scores, int count);
+  double combine(double[] scores, int count);
 }

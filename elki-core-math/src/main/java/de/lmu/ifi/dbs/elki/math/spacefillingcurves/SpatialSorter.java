@@ -61,7 +61,7 @@ public interface SpatialSorter {
    * @param objs Objects
    * @return Array of min, max pairs (length = 2 * dim)
    */
-  public static double[] computeMinMax(Iterable<? extends SpatialComparable> objs) {
+  static double[] computeMinMax(Iterable<? extends SpatialComparable> objs) {
     Iterator<? extends SpatialComparable> it = objs.iterator();
     if(!it.hasNext()) {
       throw new IllegalArgumentException("Cannot compute minimum and maximum of empty list.");

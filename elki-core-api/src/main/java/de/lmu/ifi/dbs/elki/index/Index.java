@@ -37,7 +37,7 @@ public interface Index extends Result {
    * Initialize the index. For static indexes, this is the moment the index is
    * bulk loaded.
    */
-  public void initialize();
+  void initialize();
 
   /**
    * Send statistics to the logger, if enabled.
@@ -46,5 +46,5 @@ public interface Index extends Result {
    * the index! Otherwise, the index might not have collected the desired
    * statistics.
    */
-  public void logStatistics();
+  void logStatistics();
 }

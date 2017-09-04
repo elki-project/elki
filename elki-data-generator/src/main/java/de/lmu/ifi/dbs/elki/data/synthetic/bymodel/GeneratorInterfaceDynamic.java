@@ -35,17 +35,17 @@ public interface GeneratorInterfaceDynamic extends GeneratorInterface {
    * 
    * @return number of discarded points
    */
-  public int getDiscarded();
+  int getDiscarded();
 
   /**
    * Retrieve remaining number of retries.
    * 
    * @return remaining number of retries
    */
-  public int getRetries();
+  int getRetries();
 
   /**
    * Increment the number of elements discarded.
    */
-  public void incrementDiscarded();
+  void incrementDiscarded();
 }

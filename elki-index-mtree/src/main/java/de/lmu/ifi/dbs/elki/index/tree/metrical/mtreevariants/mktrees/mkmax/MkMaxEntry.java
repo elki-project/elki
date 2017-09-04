@@ -31,18 +31,18 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-interface MkMaxEntry extends MTreeEntry {
+public interface MkMaxEntry extends MTreeEntry {
   /**
    * Returns the knn distance of the entry.
    * 
    * @return the knn distance of the entry
    */
-  public double getKnnDistance();
+  double getKnnDistance();
 
   /**
    * Sets the knn distance of the entry.
    * 
    * @param knnDistance the knn distance to be set
    */
-  public void setKnnDistance(double knnDistance);
+  void setKnnDistance(double knnDistance);
 }

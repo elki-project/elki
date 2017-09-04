@@ -34,12 +34,12 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
   /**
    * Input data type: Sparse vectors with variable length.
    */
-  public static final VectorTypeInformation<SparseNumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(SparseNumberVector.class);
+  VectorTypeInformation<SparseNumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(SparseNumberVector.class);
 
   /**
    * Input data type: Sparse vector field.
    */
-  public static final VectorFieldTypeInformation<SparseNumberVector> FIELD = VectorFieldTypeInformation.typeRequest(SparseNumberVector.class);
+  VectorFieldTypeInformation<SparseNumberVector> FIELD = VectorFieldTypeInformation.typeRequest(SparseNumberVector.class);
 
   /**
    * Iterator over non-zero features only, <em>ascendingly</em>.

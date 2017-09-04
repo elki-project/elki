@@ -45,12 +45,12 @@ public interface MeanVarianceDistributionEstimator<D extends Distribution> exten
   D estimateFromMeanVariance(MeanVariance mv);
 
   @Override
-  public default D estimateFromStatisticalMoments(StatisticalMoments moments) {
+  default D estimateFromStatisticalMoments(StatisticalMoments moments) {
     return estimateFromMeanVariance(moments);
   }
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int size = adapter.size(data);
     MeanVariance mv = new MeanVariance();
     for(int i = 0; i < size; i++) {

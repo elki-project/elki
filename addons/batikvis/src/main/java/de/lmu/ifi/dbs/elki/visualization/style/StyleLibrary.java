@@ -40,149 +40,149 @@ public interface StyleLibrary {
   /**
    * Default
    */
-  final static String DEFAULT = "";
+  String DEFAULT = "";
 
   /**
    * Page
    */
-  final static String PAGE = "page";
+  String PAGE = "page";
 
   /**
    * Plot
    */
-  final static String PLOT = "plot";
+  String PLOT = "plot";
 
   /**
    * Axis
    */
-  final static String AXIS = "axis";
+  String AXIS = "axis";
 
   /**
    * Axis tick
    */
-  final static String AXIS_TICK = "axis.tick";
+  String AXIS_TICK = "axis.tick";
 
   /**
    * Axis minor tick
    */
-  final static String AXIS_TICK_MINOR = "axis.tick.minor";
+  String AXIS_TICK_MINOR = "axis.tick.minor";
 
   /**
    * Axis label
    */
-  final static String AXIS_LABEL = "axis.label";
+  String AXIS_LABEL = "axis.label";
 
   /**
    * Key
    */
-  final static String KEY = "key";
+  String KEY = "key";
 
   /**
    * Clusterorder
    */
-  final static String CLUSTERORDER = "plot.clusterorder";
+  String CLUSTERORDER = "plot.clusterorder";
 
   /**
    * Margin
    */
-  final static String MARGIN = "margin";
+  String MARGIN = "margin";
 
   /**
    * Bubble size
    */
-  final static String BUBBLEPLOT = "plot.bubble";
+  String BUBBLEPLOT = "plot.bubble";
 
   /**
    * Marker size
    */
-  final static String MARKERPLOT = "plot.marker";
+  String MARKERPLOT = "plot.marker";
 
   /**
    * Dot size
    */
-  final static String DOTPLOT = "plot.dot";
+  String DOTPLOT = "plot.dot";
 
   /**
    * Grayed out objects
    */
-  final static String PLOTGREY = "plot.grey";
+  String PLOTGREY = "plot.grey";
 
   /**
    * Reference points color and size
    */
-  final static String REFERENCE_POINTS = "plot.referencepoints";
+  String REFERENCE_POINTS = "plot.referencepoints";
 
   /**
    * Polygons style
    */
-  final static String POLYGONS = "plot.polygons";
+  String POLYGONS = "plot.polygons";
 
   /**
    * Selection color and opacity
    */
-  final static String SELECTION = "plot.selection";
+  String SELECTION = "plot.selection";
 
   /**
    * Selection color and opacity during selecting process
    */
-  final static String SELECTION_ACTIVE = "plot.selection.active";
+  String SELECTION_ACTIVE = "plot.selection.active";
 
   /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.projections.Projection#SCALE}
    */
-  public static final double SCALE = 100.0;
+  double SCALE = 100.0;
 
   /* ** Property types ** */
   /**
    * Color
    */
-  final static String COLOR = "color";
+  String COLOR = "color";
 
   /**
    * Background color
    */
-  final static String BACKGROUND_COLOR = "background-color";
+  String BACKGROUND_COLOR = "background-color";
 
   /**
    * Text color
    */
-  final static String TEXT_COLOR = "text-color";
+  String TEXT_COLOR = "text-color";
 
   /**
    * Color set
    */
-  final static String COLORSET = "colorset";
+  String COLORSET = "colorset";
 
   /**
    * Line width
    */
-  final static String LINE_WIDTH = "line-width";
+  String LINE_WIDTH = "line-width";
 
   /**
    * Text size
    */
-  final static String TEXT_SIZE = "text-size";
+  String TEXT_SIZE = "text-size";
 
   /**
    * Font family
    */
-  final static String FONT_FAMILY = "font-family";
+  String FONT_FAMILY = "font-family";
 
   /**
    * Generic size
    */
-  final static String GENERIC_SIZE = "size";
+  String GENERIC_SIZE = "size";
 
   /**
    * Opacity (transparency)
    */
-  final static String OPACITY = "opacity";
+  String OPACITY = "opacity";
 
   /**
    * XY curve styling.
    */
-  static final String XYCURVE = "xycurve";
+  String XYCURVE = "xycurve";
 
   /**
    * Retrieve a color for an item
@@ -191,7 +191,7 @@ public interface StyleLibrary {
    * @return color in CSS/SVG valid format: hexadecimal (#aabbcc) or names such
    *         as "red"
    */
-  public String getColor(String name);
+  String getColor(String name);
 
   /**
    * Retrieve background color for an item
@@ -200,7 +200,7 @@ public interface StyleLibrary {
    * @return color in CSS/SVG valid format: hexadecimal (#aabbcc) or names such
    *         as "red"
    */
-  public String getBackgroundColor(String name);
+  String getBackgroundColor(String name);
 
   /**
    * Retrieve text color for an item
@@ -209,7 +209,7 @@ public interface StyleLibrary {
    * @return color in CSS/SVG valid format: hexadecimal (#aabbcc) or names such
    *         as "red"
    */
-  public String getTextColor(String name);
+  String getTextColor(String name);
 
   /**
    * Retrieve colorset for an item
@@ -217,7 +217,7 @@ public interface StyleLibrary {
    * @param name Reference name
    * @return color library
    */
-  public ColorLibrary getColorSet(String name);
+  ColorLibrary getColorSet(String name);
 
   /**
    * Get line width
@@ -225,7 +225,7 @@ public interface StyleLibrary {
    * @param key Key
    * @return line width as double
    */
-  public double getLineWidth(String key);
+  double getLineWidth(String key);
 
   /**
    * Get generic size
@@ -233,7 +233,7 @@ public interface StyleLibrary {
    * @param key Key
    * @return size as double
    */
-  public double getSize(String key);
+  double getSize(String key);
 
   /**
    * Get text size
@@ -241,7 +241,7 @@ public interface StyleLibrary {
    * @param key Key
    * @return line width as double
    */
-  public double getTextSize(String key);
+  double getTextSize(String key);
 
   /**
    * Get font family
@@ -249,7 +249,7 @@ public interface StyleLibrary {
    * @param key Key
    * @return font family CSS string
    */
-  public String getFontFamily(String key);
+  String getFontFamily(String key);
 
   /**
    * Get opacity
@@ -257,19 +257,19 @@ public interface StyleLibrary {
    * @param key Key
    * @return size as double
    */
-  public double getOpacity(String key);
+  double getOpacity(String key);
   
   /**
    * Get the line style library to use.
    * 
    * @return line style library
    */
-  public LineStyleLibrary lines();
+  LineStyleLibrary lines();
   
   /**
    * Get the marker library to use.
    * 
    * @return marker library
    */
-  public MarkerLibrary markers();
+  MarkerLibrary markers();
 }

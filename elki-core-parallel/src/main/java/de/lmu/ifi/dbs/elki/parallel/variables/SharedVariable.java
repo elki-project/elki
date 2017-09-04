@@ -45,7 +45,7 @@ public interface SharedVariable<I extends SharedVariable.Instance<?>> {
    * 
    * @param <T> Payload type
    */
-  public static interface Instance<T> {
+  interface Instance<T> {
     /**
      * Get the current value
      * 

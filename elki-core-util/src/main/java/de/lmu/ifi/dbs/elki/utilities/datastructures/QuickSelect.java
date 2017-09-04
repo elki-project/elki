@@ -195,7 +195,7 @@ public class QuickSelect {
    *
    * @param <T> Data structure type
    */
-  public static interface Adapter<T> {
+  public interface Adapter<T> {
     /**
      * Swap the two elements at positions i and j.
      *

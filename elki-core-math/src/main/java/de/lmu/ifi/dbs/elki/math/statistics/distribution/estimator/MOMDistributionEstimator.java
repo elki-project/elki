@@ -43,7 +43,7 @@ public interface MOMDistributionEstimator<D extends Distribution> extends Distri
   D estimateFromStatisticalMoments(StatisticalMoments moments);
 
   @Override
-  public default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  default <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int size = adapter.size(data);
     StatisticalMoments mv = new StatisticalMoments();
     for (int i = 0; i < size; i++) {

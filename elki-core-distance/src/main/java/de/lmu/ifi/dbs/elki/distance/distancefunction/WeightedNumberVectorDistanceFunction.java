@@ -34,5 +34,5 @@ public interface WeightedNumberVectorDistanceFunction<V> extends NumberVectorDis
   /**
    * Parameter to set the weights of the weighted distance function.
    */
-  public static final OptionID WEIGHTS_ID = new OptionID("distance.weights", "Weights to use for the distance function.");
+  OptionID WEIGHTS_ID = new OptionID("distance.weights", "Weights to use for the distance function.");
 }

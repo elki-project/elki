@@ -52,7 +52,7 @@ public class XTreeSettings extends RTreeSettings {
   /**
    * Overlap computation method.
    */
-  public static enum Overlap {
+  public enum Overlap {
     /**
      * The maximum overlap is calculated as the ratio of total data objects in
      * the overlapping region.

@@ -269,7 +269,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      *
      * @apiviz.exclude
      */
-    protected static enum State { //
+    protected enum State { //
       PREPARATION, // Preparation phase
       EXPLORE, // Exploration phase (rotate etc.)
       MENU, // Menu open

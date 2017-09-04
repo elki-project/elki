@@ -42,12 +42,12 @@ public interface IndexFactory<V, I extends Index> {
    * 
    * @param relation the relation to index
    */
-  public I instantiate(Relation<V> relation);
+  I instantiate(Relation<V> relation);
 
   /**
    * Get the input type restriction used for negotiating the data query.
    * 
    * @return Type restriction
    */
-  public TypeInformation getInputTypeRestriction();
+  TypeInformation getInputTypeRestriction();
 }

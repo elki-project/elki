@@ -65,7 +65,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    *
    * @apiviz.exclude
    */
-  public static enum Mode {
+  public enum Mode {
     /** Cross track distance */
     XTD,
     /** Along track distance */

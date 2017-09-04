@@ -127,6 +127,6 @@ public class ThumbnailThread extends Thread {
     /**
      * Callback when to (re-)compute the thumbnail.
      */
-    public void doThumbnail();
+    void doThumbnail();
   }
 }

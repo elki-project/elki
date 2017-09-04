@@ -34,5 +34,5 @@ public interface TextWriteable {
    * @param out Output writer
    * @param label Label
    */
-  public void writeToText(TextWriterStream out, String label);
+  void writeToText(TextWriterStream out, String label);
 }

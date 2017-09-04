@@ -37,7 +37,7 @@ public interface ObjHistogram<T> extends Histogram {
    * @return Iterator
    */
   @Override
-  public Iter<T> iter();
+  Iter<T> iter();
 
   /**
    * Aggregate new data into the histogram.
@@ -49,19 +49,19 @@ public interface ObjHistogram<T> extends Histogram {
    * @param coord Coordinate
    * @param data Data
    */
-  public void putData(double coord, T data);
+  void putData(double coord, T data);
 
   /**
    * Histogram iterator.
    * 
    * @author Erich Schubert
    */
-  public static interface Iter<T> extends Histogram.Iter {
+  interface Iter<T> extends Histogram.Iter {
     /**
      * Get the value of the bin.
      * 
      * @return Bin value
      */
-    public T getValue();
+    T getValue();
   }
 }

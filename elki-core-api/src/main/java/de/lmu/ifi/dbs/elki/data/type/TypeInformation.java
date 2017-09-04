@@ -33,7 +33,7 @@ public interface TypeInformation {
    * @param type Other type
    * @return true when the other type is accepted as subtype.
    */
-  public boolean isAssignableFromType(TypeInformation type);
+  boolean isAssignableFromType(TypeInformation type);
 
   /**
    * Test whether this type is assignable from a given object instance.
@@ -41,5 +41,5 @@ public interface TypeInformation {
    * @param other Other object
    * @return true when the other type is an acceptable instance.
    */
-  public boolean isAssignableFrom(Object other);
+  boolean isAssignableFrom(Object other);
 }

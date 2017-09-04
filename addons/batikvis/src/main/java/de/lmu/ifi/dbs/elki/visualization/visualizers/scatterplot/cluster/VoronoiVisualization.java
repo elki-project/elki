@@ -90,7 +90,7 @@ public class VoronoiVisualization implements VisFactory {
    *
    * @apiviz.exclude
    */
-  public static enum Mode {
+  public enum Mode {
     /**
      * Draw Voronoi cells.
      */

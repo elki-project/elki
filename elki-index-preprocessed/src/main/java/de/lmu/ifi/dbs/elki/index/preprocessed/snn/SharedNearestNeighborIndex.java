@@ -39,14 +39,14 @@ public interface SharedNearestNeighborIndex<O> extends Index {
    * @param id Object ID
    * @return Neighbor DBIDs
    */
-  public ArrayDBIDs getNearestNeighborSet(DBIDRef id);
+  ArrayDBIDs getNearestNeighborSet(DBIDRef id);
 
   /**
    * Get the number of neighbors
    * 
    * @return NN size
    */
-  public int getNumberOfNeighbors();
+  int getNumberOfNeighbors();
 
   /**
    * Factory interface
@@ -59,7 +59,7 @@ public interface SharedNearestNeighborIndex<O> extends Index {
    * @param <O> The input object type
    * @param <I> Index type produced
    */
-  public static interface Factory<O, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
+  interface Factory<O, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
     /**
      * Instantiate the index for a given database.
      * 
@@ -68,13 +68,13 @@ public interface SharedNearestNeighborIndex<O> extends Index {
      * @return Index
      */
     @Override
-    public I instantiate(Relation<O> database);
+    I instantiate(Relation<O> database);
 
     /**
      * Get the number of neighbors
      * 
      * @return NN size
      */
-    public int getNumberOfNeighbors();
+    int getNumberOfNeighbors();
   }
 }

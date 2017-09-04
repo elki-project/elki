@@ -36,7 +36,7 @@ public interface FeatureVector<D> {
   /**
    * Input type: Any feature vector type.
    */
-  public static final VectorTypeInformation<FeatureVector<?>> TYPE = VectorTypeInformation.typeRequest(FeatureVector.class);
+  VectorTypeInformation<FeatureVector<?>> TYPE = VectorTypeInformation.typeRequest(FeatureVector.class);
 
   /**
    * The dimensionality of the vector space where of this FeatureVector of V is

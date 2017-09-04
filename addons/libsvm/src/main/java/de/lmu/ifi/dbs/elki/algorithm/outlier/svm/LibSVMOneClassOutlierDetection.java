@@ -92,7 +92,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
    * 
    * @apiviz.exclude
    */
-  public static enum SVMKernel { //
+  public enum SVMKernel { //
     LINEAR, // Linear
     QUADRATIC, // Quadratic
     CUBIC, // Cubic

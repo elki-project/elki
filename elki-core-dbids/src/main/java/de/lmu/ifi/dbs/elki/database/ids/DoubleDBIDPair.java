@@ -35,5 +35,5 @@ public interface DoubleDBIDPair extends DBIDRef, Comparable<DoubleDBIDPair> {
    * 
    * @return Double
    */
-  public double doubleValue();
+  double doubleValue();
 }

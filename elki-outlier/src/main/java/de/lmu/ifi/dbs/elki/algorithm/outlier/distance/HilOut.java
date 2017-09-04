@@ -150,7 +150,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * 
    * @apiviz.exclude
    */
-  public static enum ScoreType {
+  public enum ScoreType {
     All, TopN
   }
 

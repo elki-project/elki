@@ -40,7 +40,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectDataToRenderSpace(double[] data);
+  double[] fastProjectDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -48,7 +48,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectDataToRenderSpace(NumberVector data);
+  double[] fastProjectDataToRenderSpace(NumberVector data);
 
   /**
    * Project a data vector from data space to scaled space.
@@ -56,7 +56,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  public double[] fastProjectDataToScaledSpace(double[] data);
+  double[] fastProjectDataToScaledSpace(double[] data);
 
   /**
    * Project a data vector from data space to scaled space.
@@ -64,7 +64,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  public double[] fastProjectDataToScaledSpace(NumberVector data);
+  double[] fastProjectDataToScaledSpace(NumberVector data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -72,7 +72,7 @@ public interface Projection2D extends Projection {
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double[] fastProjectScaledToRenderSpace(double[] v);
+  double[] fastProjectScaledToRenderSpace(double[] v);
 
   /**
    * Project a data vector from rendering space to data space.
@@ -81,7 +81,7 @@ public interface Projection2D extends Projection {
    * @param y Y coordinate
    * @return vector in data space
    */
-  public double[] fastProjectRenderToDataSpace(double x, double y);
+  double[] fastProjectRenderToDataSpace(double x, double y);
 
   /**
    * Project a data vector from rendering space to data space.
@@ -100,7 +100,7 @@ public interface Projection2D extends Projection {
    * @param y Y coordinate
    * @return vector in scaled space
    */
-  public double[] fastProjectRenderToScaledSpace(double x, double y);
+  double[] fastProjectRenderToScaledSpace(double x, double y);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -108,7 +108,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeDataToRenderSpace(double[] data);
+  double[] fastProjectRelativeDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -116,7 +116,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeDataToRenderSpace(NumberVector data);
+  double[] fastProjectRelativeDataToRenderSpace(NumberVector data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -124,7 +124,7 @@ public interface Projection2D extends Projection {
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeScaledToRenderSpace(double[] v);
+  double[] fastProjectRelativeScaledToRenderSpace(double[] v);
 
   // FIXME: add missing relative projection functions
 
@@ -133,12 +133,12 @@ public interface Projection2D extends Projection {
    *
    * @return Canvas size obtained from projecting scale endpoints
    */
-  public CanvasSize estimateViewport();
+  CanvasSize estimateViewport();
 
   /**
    * Get a bit set of dimensions that are visible.
    *
    * @return Bit set, first dimension is bit 0.
    */
-  public long[] getVisibleDimensions2D();
+  long[] getVisibleDimensions2D();
 }

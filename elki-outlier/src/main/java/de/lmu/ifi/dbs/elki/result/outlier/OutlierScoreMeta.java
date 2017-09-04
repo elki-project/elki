@@ -38,21 +38,21 @@ public interface OutlierScoreMeta extends Result {
    * 
    * @return minimum or {@link Double#NaN}
    */
-  public double getActualMinimum();
+  double getActualMinimum();
 
   /**
    * Get the actual maximum of the value range.
    * 
    * @return maximum or {@link Double#NaN}
    */
-  public double getActualMaximum();
+  double getActualMaximum();
 
   /**
    * Get the theoretical minimum of the value range.
    * 
    * @return theoretical minimum or {@link Double#NaN}
    */
-  public double getTheoreticalMinimum();
+  double getTheoreticalMinimum();
 
   /**
    * Get the theoretical maximum of the value range.
@@ -61,7 +61,7 @@ public interface OutlierScoreMeta extends Result {
    * 
    * @return theoretical maximum or {@link Double#NaN}
    */
-  public double getTheoreticalMaximum();
+  double getTheoreticalMaximum();
 
   /**
    * Get the theoretical baseline of the value range.
@@ -70,7 +70,7 @@ public interface OutlierScoreMeta extends Result {
    * 
    * @return theoretical baseline or {@link Double#NaN}
    */
-  public double getTheoreticalBaseline();
+  double getTheoreticalBaseline();
 
   /**
    * Return a normalized value of the outlier score.
@@ -78,5 +78,5 @@ public interface OutlierScoreMeta extends Result {
    * @param value outlier score
    * @return Normalized value (in 0.0-1.0)
    */
-  public double normalizeScore(double value);
+  double normalizeScore(double value);
 }

@@ -36,12 +36,12 @@ public interface DimensionSelectingSubspaceDistanceFunction<O> extends DistanceF
    * 
    * @return a bit set representing the selected dimensions
    */
-  public long[] getSelectedDimensions();
+  long[] getSelectedDimensions();
 
   /**
    * Sets the selected dimensions according to the set bits in the given BitSet.
    * 
    * @param dimensions a bit set designating the new selected dimensions
    */
-  public void setSelectedDimensions(long[] dimensions);
+  void setSelectedDimensions(long[] dimensions);
 }

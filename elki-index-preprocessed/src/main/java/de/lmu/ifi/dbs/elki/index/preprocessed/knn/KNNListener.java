@@ -38,7 +38,7 @@ public interface KNNListener extends EventListener {
    * 
    * @param e the change event
    */
-  public void kNNsChanged(KNNChangeEvent e);
+  void kNNsChanged(KNNChangeEvent e);
 
   /**
    * Existing objects have been removed and as a result existing kNNs have been
@@ -48,5 +48,5 @@ public interface KNNListener extends EventListener {
    * @param removals the ids of the removed kNNs
    * @param updates the ids of kNNs which have been changed due to the removals
    */
-  // public void kNNsRemoved(Object source, DBIDs removals, DBIDs updates);
+  // void kNNsRemoved(Object source, DBIDs removals, DBIDs updates);
 }

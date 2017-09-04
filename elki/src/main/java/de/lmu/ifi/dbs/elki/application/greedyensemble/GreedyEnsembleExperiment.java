@@ -145,7 +145,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    *
    * @apiviz.exclude
    */
-  public static enum Distance {
+  public enum Distance {
     PEARSON, //
     SQEUCLIDEAN, //
     EUCLIDEAN, //

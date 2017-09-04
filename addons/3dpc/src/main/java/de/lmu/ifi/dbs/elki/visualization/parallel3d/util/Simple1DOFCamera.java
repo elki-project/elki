@@ -345,10 +345,10 @@ public class Simple1DOFCamera {
    * 
    * @author Erich Schubert
    */
-  public static interface CameraListener {
+  static interface CameraListener {
     /**
      * Camera changed.
      */
-    public void cameraChanged();
+    void cameraChanged();
   }
 }

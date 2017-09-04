@@ -42,7 +42,7 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
    * @param objid Object ID
    * @return Matrix
    */
-  public PCAFilteredResult getLocalProjection(DBIDRef objid);
+  PCAFilteredResult getLocalProjection(DBIDRef objid);
 
   /**
    * Factory interface
@@ -55,7 +55,7 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
    * @param <NV> Vector type
    * @param <I> Index type produced
    */
-  public static interface Factory<NV extends NumberVector, I extends FilteredLocalPCAIndex<NV>> extends IndexFactory<NV, I> {
+  interface Factory<NV extends NumberVector, I extends FilteredLocalPCAIndex<NV>> extends IndexFactory<NV, I> {
     /**
      * Instantiate the index for a given database.
      *
@@ -64,6 +64,6 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
      * @return Index
      */
     @Override
-    public I instantiate(Relation<NV> relation);
+    I instantiate(Relation<NV> relation);
   }
 }

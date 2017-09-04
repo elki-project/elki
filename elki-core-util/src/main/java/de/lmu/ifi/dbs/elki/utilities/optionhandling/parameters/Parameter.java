@@ -49,21 +49,21 @@ public interface Parameter<T> {
    * @param defaultValue default value of this parameter
    * @return the parameter itself, for chaining
    */
-  public abstract Parameter<T> setDefaultValue(T defaultValue);
+  Parameter<T> setDefaultValue(T defaultValue);
 
   /**
    * Checks if this parameter has a default value.
    * 
    * @return true, if this parameter has a default value, false otherwise
    */
-  public abstract boolean hasDefaultValue();
+  boolean hasDefaultValue();
 
   /**
    * Sets the default value of this parameter as the actual value of this
    * parameter.
    */
   // TODO: can we do this more elegantly?
-  public abstract void useDefaultValue();
+  void useDefaultValue();
 
   /**
    * Handle default values for a parameter.
@@ -73,7 +73,7 @@ public interface Parameter<T> {
    *         required parameter!
    * @throws UnspecifiedParameterException If the parameter requires a value
    */
-  public abstract boolean tryDefaultValue() throws UnspecifiedParameterException;
+  boolean tryDefaultValue() throws UnspecifiedParameterException;
 
   /**
    * Specifies if this parameter is an optional parameter.
@@ -81,14 +81,14 @@ public interface Parameter<T> {
    * @param opt true if this parameter is optional, false otherwise
    * @return the parameter itself, for chaining
    */
-  public abstract Parameter<T> setOptional(boolean opt);
+  Parameter<T> setOptional(boolean opt);
 
   /**
    * Checks if this parameter is an optional parameter.
    * 
    * @return true if this parameter is optional, false otherwise
    */
-  public abstract boolean isOptional();
+  boolean isOptional();
 
   /**
    * Checks if the default value of this parameter was taken as the actual
@@ -97,14 +97,14 @@ public interface Parameter<T> {
    * @return true, if the default value was taken as actual parameter value,
    *         false otherwise
    */
-  public abstract boolean tookDefaultValue();
+  boolean tookDefaultValue();
 
   /**
    * Returns true if the value of the option is defined, false otherwise.
    * 
    * @return true if the value of the option is defined, false otherwise.
    */
-  public abstract boolean isDefined();
+  boolean isDefined();
 
   /**
    * Returns the default value of the parameter.
@@ -115,21 +115,21 @@ public interface Parameter<T> {
    *         has no default value.
    */
   // TODO: change this to return a string value?
-  public abstract T getDefaultValue();
+  T getDefaultValue();
 
   /**
    * Whether this class has a list of default values.
    * 
    * @return whether the class has a description of valid values.
    */
-  public abstract boolean hasValuesDescription();
+  boolean hasValuesDescription();
 
   /**
    * Return a string explaining valid values.
    * 
    * @return String explaining valid values (e.g. a class list)
    */
-  public abstract String getValuesDescription();
+  String getValuesDescription();
 
   /**
    * Returns the extended description of the option which includes the option's
@@ -137,35 +137,35 @@ public interface Parameter<T> {
    * 
    * @return the option's description.
    */
-  public abstract String getFullDescription();
+  String getFullDescription();
 
   /**
    * Return the OptionID of this option.
    * 
    * @return Option ID
    */
-  public abstract OptionID getOptionID();
+  OptionID getOptionID();
 
   /**
    * Returns the name of the option.
    * 
    * @return the option's name.
    */
-  public abstract String getName();
+  String getName();
 
   /**
    * Returns the short description of the option.
    * 
    * @return the option's short description.
    */
-  public abstract String getShortDescription();
+  String getShortDescription();
 
   /**
    * Sets the short description of the option.
    * 
    * @param description the short description to be set
    */
-  public abstract void setShortDescription(String description);
+  void setShortDescription(String description);
 
   /**
    * Sets the value of the option.
@@ -174,7 +174,7 @@ public interface Parameter<T> {
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
    */
-  public abstract void setValue(Object obj) throws ParameterException;
+  void setValue(Object obj) throws ParameterException;
 
   /**
    * Returns the value of the option.
@@ -186,14 +186,14 @@ public interface Parameter<T> {
    * 
    * @return the option's value.
    */
-  public abstract T getValue();
+  T getValue();
 
   /**
    * Get the last given value. May return {@code null}
    * 
    * @return Given value
    */
-  public abstract Object getGivenValue();
+  Object getGivenValue();
 
   /**
    * Checks if the given argument is valid for this option.
@@ -203,7 +203,7 @@ public interface Parameter<T> {
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
    */
-  public abstract boolean isValid(Object obj) throws ParameterException;
+  boolean isValid(Object obj) throws ParameterException;
 
   /**
    * Returns a string representation of the parameter's type (e.g. an
@@ -212,21 +212,21 @@ public interface Parameter<T> {
    * 
    * @return a string representation of the parameter's type
    */
-  public abstract String getSyntax();
+  String getSyntax();
 
   /**
    * Get the value as string. May return {@code null}
    * 
    * @return Value as string
    */
-  public abstract String getValueAsString();
+  String getValueAsString();
 
   /**
    * Get the default value as string.
    * 
    * @return default value
    */
-  public abstract String getDefaultValueAsString();
+  String getDefaultValueAsString();
 
   /**
    * Add an additional constraint.
@@ -234,5 +234,5 @@ public interface Parameter<T> {
    * @param constraint Constraint to add.
    * @return the parameter itself, for chaining
    */
-  public abstract Parameter<T> addConstraint(ParameterConstraint<? super T> constraint);
+  Parameter<T> addConstraint(ParameterConstraint<? super T> constraint);
 }

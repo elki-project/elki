@@ -46,5 +46,5 @@ public interface KMeansInitialization<V extends NumberVector> {
    * @param <T> Input vector type
    * @return List of chosen means for k-means
    */
-  public abstract <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction);
+  <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction);
 }
