@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -252,7 +251,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    */
   public C instantiateClass(Parameterization config) {
     if(getValue() == null /* && !optionalParameter */) {
-      config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
+      config.reportError(new UnspecifiedParameterException(this));
       return null;
     }
     try {

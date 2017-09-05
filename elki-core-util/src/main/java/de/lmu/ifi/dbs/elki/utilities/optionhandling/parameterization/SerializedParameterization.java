@@ -25,15 +25,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Manage a parameterization serialized as String array, e.g. from command line.
  *
- * When building parameter lists, use {@link ListParameterization} where possible.
+ * When building parameter lists, use {@link ListParameterization} where
+ * possible.
  *
  * @author Erich Schubert
  * @since 0.3
@@ -67,7 +69,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization(String[] args) {
     this();
-    for (String arg : args) {
+    for(String arg : args) {
       parameters.add(arg);
     }
   }
@@ -136,7 +138,7 @@ public class SerializedParameterization extends AbstractParameterization {
               piter.remove();
             }
             else if(!next.startsWith(OPTION_PREFIX)) {
-              throw new NoParameterValueException("Flag " + opt.getName() + " requires no parameter-value! " + "(read parameter-value: " + next + ")");
+              throw new WrongParameterValueException(opt, "is a boolean flag, but was followed by: " + next);
             }
             // We do not consume the next if it's not for us ...
           }
@@ -147,7 +149,7 @@ public class SerializedParameterization extends AbstractParameterization {
         else {
           // Ensure there is a potential value for this parameter
           if(!piter.hasNext()) {
-            throw new NoParameterValueException("Parameter " + opt.getName() + " requires a parameter value!");
+            throw new UnspecifiedParameterException(opt);
           }
           opt.setValue(piter.next());
           // Consume parameter

@@ -20,19 +20,73 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+
 /**
  * Abstract super class for all exceptions thrown during parameterization.
  * 
  * @author Elke Achtert
  * @since 0.2
  */
-@SuppressWarnings("serial")
-public abstract class ParameterException extends Exception {
-  protected ParameterException(String message) {
+public class ParameterException extends Exception {
+  /**
+   * Serialization version
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Constructor.
+   *
+   * @param p Parameter
+   * @param message Error message
+   */
+  public ParameterException(Parameter<?> p, String message) {
+    super(prefixParameterToMessage(p, message));
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param p Parameter
+   * @param message Error message
+   * @param cause root cause
+   */
+  public ParameterException(Parameter<?> p, String message, Throwable cause) {
+    super(prefixParameterToMessage(p, message), cause);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param message Error message
+   */
+  public ParameterException(String message) {
     super(message);
   }
 
-  protected ParameterException(String message, Throwable cause) {
+  /**
+   * Constructor.
+   *
+   * @param message Error message
+   * @param cause root cause
+   */
+  public ParameterException(String message, Throwable cause) {
     super(message, cause);
+  }
+
+  /**
+   * Prefix parameter information to error message.
+   *
+   * @param p Parameter
+   * @param message Error message
+   * @return Combined error message
+   */
+  public static String prefixParameterToMessage(Parameter<?> p, String message) {
+    StringBuilder buf = new StringBuilder(100 + message.length());
+    buf.append(p instanceof Flag ? "Flag " : "Parameter ") //
+        .append(p.getOptionID().getName()) //
+        .append(' ').append(message);
+    return buf.toString();
   }
 }

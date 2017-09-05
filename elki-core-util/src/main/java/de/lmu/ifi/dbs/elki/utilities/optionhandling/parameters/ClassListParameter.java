@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -209,7 +209,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     config = config.descend(this);
     List<C> instances = new ArrayList<>();
     if(getValue() == null) {
-      config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
+      config.reportError(new UnspecifiedParameterException(this));
       return instances; // empty list.
     }
 

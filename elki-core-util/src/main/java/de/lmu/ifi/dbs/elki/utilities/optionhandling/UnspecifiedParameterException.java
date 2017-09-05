@@ -45,7 +45,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
    * @param parameter Missing parameter
    */
   public UnspecifiedParameterException(Parameter<?> parameter) {
-    super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription());
+    super(parameter, "requires a value.\nExpected: " + parameter.getFullDescription());
     this.parameter = parameter.getName();
   }
 
