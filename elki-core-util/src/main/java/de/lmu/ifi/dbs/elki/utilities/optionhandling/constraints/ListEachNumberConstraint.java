@@ -26,23 +26,23 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
- * Applies constraints to all elements of a list.
+ * Applies numeric constraints to all elements of a list.
  * 
  * @author Erich Schubert
  * @since 0.5.5
  * 
- * @apiviz.composedOf ParameterConstraint oneway 1 n
+ * @apiviz.composedOf AbstractNumberConstraint oneway 1 n
  */
-public class ListEachConstraint implements ParameterConstraint<int[]> {
+public class ListEachNumberConstraint<T> implements ParameterConstraint<T> {
   /**
    * Constraints
    */
-  private List<ParameterConstraint<? super Integer>> constraints;
+  private List<AbstractNumberConstraint> constraints;
 
   /**
    * Constructor.
    */
-  public ListEachConstraint() {
+  public ListEachNumberConstraint() {
     super();
     this.constraints = new ArrayList<>();
   }
@@ -52,7 +52,7 @@ public class ListEachConstraint implements ParameterConstraint<int[]> {
    * 
    * @param constraint Constraint to apply to all elements
    */
-  public ListEachConstraint(ParameterConstraint<? super Integer> constraint) {
+  public ListEachNumberConstraint(AbstractNumberConstraint constraint) {
     super();
     this.constraints = new ArrayList<>(1);
     this.constraints.add(constraint);
@@ -63,24 +63,38 @@ public class ListEachConstraint implements ParameterConstraint<int[]> {
    * 
    * @param constraint Constraint
    */
-  public void addConstraint(ParameterConstraint<? super Integer> constraint) {
+  public void addConstraint(AbstractNumberConstraint constraint) {
     this.constraints.add(constraint);
   }
 
   @Override
-  public void test(int[] t) throws ParameterException {
-    for (int e : t) {
-      for (ParameterConstraint<? super Integer> c : constraints) {
-        c.test(e);
+  public void test(T t) throws ParameterException {
+    if(t instanceof int[]) {
+      for(int e : ((int[]) t)) {
+        Number n = e; // Auto-boxing. :-(
+        for(AbstractNumberConstraint c : constraints) {
+          c.test(n);
+        }
       }
+    }
+    else if(t instanceof double[]) {
+      for(double e : ((double[]) t)) {
+        Number n = e; // Auto-boxing. :-(
+        for(AbstractNumberConstraint c : constraints) {
+          c.test(n);
+        }
+      }
+    }
+    else {
+      throw new IllegalArgumentException("ListEachConstraint currently can only be used with int[] and double[]. Please contribute patches.");
     }
   }
 
   @Override
   public String getDescription(String parameterName) {
     final String all = "all elements of " + parameterName;
-    StringBuilder b = new StringBuilder();
-    for (ParameterConstraint<? super Integer> c : constraints) {
+    StringBuilder b = new StringBuilder(1000);
+    for(AbstractNumberConstraint c : constraints) {
       b.append(c.getDescription(all));
     }
     return b.toString();

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
  * @author Steffi Wanka
  * @since 0.2
  */
-public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
+public class GreaterEqualConstraint extends AbstractNumberConstraint {
   /**
    * Creates a Greater-Equal parameter constraint.
    *

@@ -25,14 +25,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  *
  * @author Elke Achtert
  * @since 0.2
- * 
- * @apiviz.uses 
- *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter
- * 
- * @param <P> the type of the parameter to be tested by this constraint (e.g.,
- *        Number, List<Number>)
  */
-public abstract class AbstractNumberConstraint<P> implements ParameterConstraint<P> {
+public abstract class AbstractNumberConstraint implements ParameterConstraint<Number> {
   /**
    * The constraint value.
    */

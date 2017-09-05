@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -543,17 +542,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         }
 
         // parameter epsilon
-        // todo: constraint auf positive werte
         final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true) //
-            .setDefaultValue(new double[] { DEFAULT_EPSILON });
+            .setDefaultValue(new double[] { DEFAULT_EPSILON }) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE_LIST);
         if(config.grab(epsilonP)) {
           epsilon = epsilonP.getValue().clone();
-
-          for(int d = 0; d < epsilon.length; d++) {
-            if(epsilon[d] < 0) {
-              config.reportError(new WrongParameterValueException(epsilonP, epsilonP.getValueAsString()));
-            }
-          }
         }
 
         // parameter strategy

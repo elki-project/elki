@@ -33,65 +33,85 @@ public final class CommonConstraints {
   /**
    * Integer constraint: >= -1
    */
-  public static final ParameterConstraint<? super Integer> GREATER_EQUAL_MINUSONE_INT = new GreaterEqualConstraint(-1);
+  public static final AbstractNumberConstraint GREATER_EQUAL_MINUSONE_INT = new GreaterEqualConstraint(-1);
 
   /**
    * Not negative.
    */
-  public static final ParameterConstraint<? super Integer> GREATER_EQUAL_ZERO_INT = new GreaterEqualConstraint(0);
+  public static final AbstractNumberConstraint GREATER_EQUAL_ZERO_INT = new GreaterEqualConstraint(0);
 
   /**
    * Larger than zero.
    */
-  public static final ParameterConstraint<? super Integer> GREATER_EQUAL_ONE_INT = new GreaterEqualConstraint(1);
+  public static final AbstractNumberConstraint GREATER_EQUAL_ONE_INT = new GreaterEqualConstraint(1);
 
   /**
    * Larger than one.
    */
-  public static final ParameterConstraint<? super Integer> GREATER_THAN_ONE_INT = new GreaterConstraint(1);
+  public static final AbstractNumberConstraint GREATER_THAN_ONE_INT = new GreaterConstraint(1);
 
   /**
    * Not negative.
    */
-  public static final ParameterConstraint<? super Double> GREATER_EQUAL_ZERO_DOUBLE = new GreaterEqualConstraint(0.);
+  public static final AbstractNumberConstraint GREATER_EQUAL_ZERO_DOUBLE = new GreaterEqualConstraint(0.);
 
   /**
    * Larger than zero.
    */
-  public static final ParameterConstraint<? super Double> GREATER_THAN_ZERO_DOUBLE = new GreaterConstraint(0.);
+  public static final AbstractNumberConstraint GREATER_THAN_ZERO_DOUBLE = new GreaterConstraint(0.);
 
   /**
    * Constraint: less than .5
    */
-  public static final ParameterConstraint<? super Double> LESS_THAN_HALF_DOUBLE = new LessConstraint(.5);
+  public static final AbstractNumberConstraint LESS_THAN_HALF_DOUBLE = new LessConstraint(.5);
 
   /**
    * At least 1.
    */
-  public static final ParameterConstraint<? super Double> GREATER_EQUAL_ONE_DOUBLE = new GreaterEqualConstraint(1.);
+  public static final AbstractNumberConstraint GREATER_EQUAL_ONE_DOUBLE = new GreaterEqualConstraint(1.);
 
   /**
    * Larger than one.
    */
-  public static final ParameterConstraint<? super Double> GREATER_THAN_ONE_DOUBLE = new GreaterConstraint(1.);
+  public static final AbstractNumberConstraint GREATER_THAN_ONE_DOUBLE = new GreaterConstraint(1.);
 
   /**
    * Less than one.
    */
-  public static final ParameterConstraint<? super Double> LESS_THAN_ONE_DOUBLE = new LessConstraint(1.);
+  public static final AbstractNumberConstraint LESS_THAN_ONE_DOUBLE = new LessConstraint(1.);
 
   /**
    * Less or equal than one.
    */
-  public static final ParameterConstraint<? super Double> LESS_EQUAL_ONE_DOUBLE = new LessEqualConstraint(1.);
+  public static final AbstractNumberConstraint LESS_EQUAL_ONE_DOUBLE = new LessEqualConstraint(1.);
 
   /**
    * Constraint for the whole list.
    */
-  public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachConstraint(GREATER_EQUAL_ZERO_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ZERO_INT);
 
   /**
    * List constraint: >= 1
    */
-  public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachConstraint(GREATER_EQUAL_ONE_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ONE_INT);
+
+  /**
+   * List constraint: > 1
+   */
+  public static final ParameterConstraint<int[]> GREATER_THAN_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_THAN_ONE_INT);
+
+  /**
+   * Constraint for the whole list.
+   */
+  public static final ParameterConstraint<double[]> GREATER_EQUAL_ZERO_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ZERO_DOUBLE);
+
+  /**
+   * List constraint: >= 1
+   */
+  public static final ParameterConstraint<double[]> GREATER_EQUAL_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ONE_DOUBLE);
+
+  /**
+   * List constraint: > 1
+   */
+  public static final ParameterConstraint<double[]> GREATER_THAN_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_THAN_ONE_DOUBLE);
 }
