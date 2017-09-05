@@ -25,7 +25,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -101,23 +100,6 @@ public interface Parameterization {
    * @return {@code true} if at least one parameter was not consumed
    */
   boolean hasUnusedParameters();
-
-  /**
-   * Check a parameter constraint.
-   * 
-   * @param constraint Parameter constraint
-   * @return test result
-   */
-  default boolean checkConstraint(GlobalParameterConstraint constraint) {
-    try {
-      constraint.test();
-      return true;
-    }
-    catch(ParameterException e) {
-      reportError(e);
-      return false;
-    }
-  }
 
   /**
    * Descend parameterization tree into sub-option.

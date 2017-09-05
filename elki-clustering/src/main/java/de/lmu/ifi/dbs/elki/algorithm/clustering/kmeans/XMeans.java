@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -356,8 +356,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       if(config.grab(kMaxP)) {
         k_max = kMaxP.intValue();
       }
-      // We allow k_min = k_max.
-      config.checkConstraint(new LessEqualGlobalConstraint<>(kMinP, kMaxP));
+      // Non-formalized parameter constraint: k_min <= k_max
+      if(k_min > k_max) {
+        config.reportError(new WrongParameterValueException("Parameter " + kMinP.getName() + " must be at most " + kMaxP.getName()));
+      }
+
       getParameterInitialization(config);
       getParameterMaxIter(config);
       getParameterDistanceFunction(config);
@@ -369,12 +372,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
       ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, KMeansLloyd.class);
       if(config.grab(innerKMeansP)) {
-        ListParameterization initialKMeansVariantParameters = new ListParameterization();
-        initialKMeansVariantParameters.addParameter(KMeans.K_ID, k_min);
-        initialKMeansVariantParameters.addParameter(KMeans.INIT_ID, new PredefinedInitialMeans((double[][]) null));
-        initialKMeansVariantParameters.addParameter(KMeans.MAXITER_ID, maxiter);
-        initialKMeansVariantParameters.addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction);
-        ChainedParameterization combinedConfig = new ChainedParameterization(initialKMeansVariantParameters, config);
+        ChainedParameterization combinedConfig = new ChainedParameterization(new ListParameterization() //
+            .addParameter(KMeans.K_ID, k_min) //
+            .addParameter(KMeans.INIT_ID, new PredefinedInitialMeans((double[][]) null)) //
+            .addParameter(KMeans.MAXITER_ID, maxiter) //
+            .addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }

@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -236,17 +235,20 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
+          .setOptional(true);
       if(config.grab(minimaP)) {
         minima = minimaP.getValue().clone();
       }
-      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID) //
+          .setOptional(!minimaP.isDefined());
       if(config.grab(maximaP)) {
         maxima = maximaP.getValue().clone();
       }
-
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));
-      config.checkConstraint(new EqualSizeGlobalConstraint(minimaP, maximaP));
+      // Non-formalized parameter constraint:
+      if(minima != null && maxima != null && minima.length != maxima.length) {
+        config.reportError(new WrongParameterValueException("Parameters " + minimaP.getName() + " and " + maximaP.getName() + " must have the same number of values."));
+      }
     }
 
     @Override

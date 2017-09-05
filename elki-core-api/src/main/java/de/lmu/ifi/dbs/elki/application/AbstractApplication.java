@@ -204,8 +204,6 @@ public abstract class AbstractApplication {
     // Collect options
     OptionUtil.formatForConsole(usage.append(NEWLINE).append("Parameters:").append(NEWLINE), //
         FormatUtil.getConsoleWidth(), "   ", options);
-
-    // FIXME: re-add output of global constraints!
     return usage.toString();
   }
 

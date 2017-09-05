@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -144,7 +144,6 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       }
     }
     LOG.ensureCompleted(prog);
-
     return new Clustering<>("Canopy clustering", "canopy-clustering", clusters);
   }
 
@@ -217,8 +216,10 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       if(config.grab(t2P)) {
         t2 = t2P.doubleValue();
       }
-      // Check that t1 >= t2:
-      config.checkConstraint(new LessEqualGlobalConstraint<>(t2P, t1P));
+      // Non-formalized parameter constraint: t1 >= t2
+      if(t1 < t2) {
+        config.reportError(new WrongParameterValueException("Parameter " + t1P.getName() + " should be at least " + t2P.getName()));
+      }
     }
 
     @Override

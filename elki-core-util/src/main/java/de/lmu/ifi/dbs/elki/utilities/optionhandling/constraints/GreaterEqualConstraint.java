@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
   /**
    * Creates a Greater-Equal parameter constraint.
-   * <p/>
+   *
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -47,7 +47,7 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
 
   /**
    * Creates a Greater-Equal parameter constraint.
-   * <p/>
+   *
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -59,7 +59,7 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
 
   /**
    * Creates a Greater-Equal parameter constraint.
-   * <p/>
+   *
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -72,7 +72,6 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
   /**
    * Checks if the number value given by the number parameter is greater equal
    * than the constraint value. If not, a parameter exception is thrown.
-   * 
    */
   @Override
   public void test(Number t) throws ParameterException {
@@ -85,5 +84,4 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint<Number> {
   public String getDescription(String parameterName) {
     return parameterName + " >= " + constraintValue;
   }
-
 }

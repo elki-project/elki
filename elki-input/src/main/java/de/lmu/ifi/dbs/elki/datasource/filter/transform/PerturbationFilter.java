@@ -33,9 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -57,7 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * Reference:
  * <p>
- * A. Zimek, R. J. G. B. Campello, J. Sander:</br> Data Perturbation for Outlier
+ * A. Zimek, R. J. G. B. Campello, J. Sander:</br>
+ * Data Perturbation for Outlier
  * Detection Ensembles.<\br> In: Proc. 26th International Conference on
  * Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark,
  * 2014.
@@ -68,10 +68,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 @Title("Data Perturbation for Outlier Detection Ensembles")
 @Description("A filter to perturb a datasset on read by an additive noise component, implemented for use in an outlier ensemble (this reference).")
-@Reference(authors = "A. Zimek, R. J. G. B. Campello, J. Sander",//
-title = "Data Perturbation for Outlier Detection Ensembles", //
-booktitle = "Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014", //
-url = "http://dx.doi.org/10.1145/2618243.2618257")
+@Reference(authors = "A. Zimek, R. J. G. B. Campello, J. Sander", //
+    title = "Data Perturbation for Outlier Detection Ensembles", //
+    booktitle = "Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014", //
+    url = "http://dx.doi.org/10.1145/2618243.2618257")
 public class PerturbationFilter<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> {
   /**
    * Class logger
@@ -401,30 +401,31 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
       if(config.grab(noisedistributionP)) {
         noisedistribution = noisedistributionP.getValue();
       }
-      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01);
-      percentageP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      percentageP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID);
-      seedP.setOptional(true);
+      LongParameter seedP = new LongParameter(SEED_ID) //
+          .setOptional(true);
       if(config.grab(seedP)) {
         seed = seedP.getValue();
       }
-      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID);
-      minimaP.setOptional(true);
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
+          .setOptional(true);
       if(config.grab(minimaP)) {
         minima = minimaP.getValue().clone();
       }
-      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID);
-      maximaP.setOptional(true);
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID) //
+          .setOptional(!minimaP.isDefined());
       if(config.grab(maximaP)) {
         maxima = maximaP.getValue().clone();
       }
-
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));
-      config.checkConstraint(new EqualSizeGlobalConstraint(minimaP, maximaP));
+      // Non-formalized parameter constraint:
+      if(minima != null && maxima != null && minima.length != maxima.length) {
+        config.reportError(new WrongParameterValueException("Parameters " + minimaP.getName() + " and " + maximaP.getName() + " must have the same number of values."));
+      }
     }
 
     @Override

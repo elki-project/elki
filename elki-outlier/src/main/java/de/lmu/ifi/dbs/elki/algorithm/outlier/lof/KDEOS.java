@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -414,7 +414,10 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
       if(config.grab(kmaxP)) {
         kmax = kmaxP.intValue();
       }
-      config.checkConstraint(new LessEqualGlobalConstraint<>(kminP, kmaxP));
+      // Non-formalized parameter constraint: k_min <= k_max
+      if(kmin > kmax) {
+        config.reportError(new WrongParameterValueException("Parameter " + kminP.getName() + " must be at most " + kmaxP.getName()));
+      }
 
       DoubleParameter scaleP = new DoubleParameter(KERNEL_SCALE_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

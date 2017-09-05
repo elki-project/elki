@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -30,12 +28,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Scaling that can map arbitrary values to a value in the range of [0:1].
@@ -127,7 +122,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     this.max = max;
     this.usemean = usemean;
     this.nozeros = nozeros;
-    if (min != null && max != null) {
+    if(min != null && max != null) {
       this.factor = (max - min);
     }
   }
@@ -135,7 +130,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if (value <= min) {
+    if(value <= min) {
       return 0;
     }
     return Math.min(1, ((value - min) / factor));
@@ -143,52 +138,53 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    if (usemean) {
+    if(usemean) {
       MeanVariance mv = new MeanVariance();
       DoubleMinMax mm = (max == null) ? new DoubleMinMax() : null;
       boolean skippedzeros = false;
       DoubleRelation scores = or.getScores();
-      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.doubleValue(id);
-        if (nozeros && val == 0.0) {
+        if(nozeros && val == 0.0) {
           skippedzeros = true;
           continue;
         }
-        if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
-        if (max == null) {
+        if(max == null) {
           mm.put(val);
         }
       }
-      if (skippedzeros && mm.getMin() == mm.getMax()) {
+      if(skippedzeros && mm.getMin() == mm.getMax()) {
         mm.put(0.0);
         mv.put(0.0);
       }
       min = mv.getMean();
-      if (max == null) {
+      if(max == null) {
         max = mm.getMax();
       }
-    } else {
-      if (min == null || max == null) {
+    }
+    else {
+      if(min == null || max == null) {
         boolean skippedzeros = false;
         DoubleMinMax mm = new DoubleMinMax();
         DoubleRelation scores = or.getScores();
-        for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+        for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
           double val = scores.doubleValue(id);
-          if (nozeros && val == 0.0) {
+          if(nozeros && val == 0.0) {
             skippedzeros = true;
             continue;
           }
           mm.put(val);
         }
-        if (skippedzeros && mm.getMin() == mm.getMax()) {
+        if(skippedzeros && mm.getMin() == mm.getMax()) {
           mm.put(0.0);
         }
-        if (min == null) {
+        if(min == null) {
           min = mm.getMin();
         }
-        if (max == null) {
+        if(max == null) {
           max = mm.getMax();
         }
       }
@@ -198,52 +194,53 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if (usemean) {
+    if(usemean) {
       MeanVariance mv = new MeanVariance();
       DoubleMinMax mm = (max == null) ? new DoubleMinMax() : null;
       boolean skippedzeros = false;
       final int size = adapter.size(array);
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
-        if (nozeros && val == 0.0) {
+        if(nozeros && val == 0.0) {
           skippedzeros = true;
           continue;
         }
-        if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
-        if (max == null) {
+        if(max == null) {
           mm.put(val);
         }
       }
-      if (skippedzeros && mm.getMin() == mm.getMax()) {
+      if(skippedzeros && mm.getMin() == mm.getMax()) {
         mm.put(0.0);
         mv.put(0.0);
       }
       min = mv.getMean();
-      if (max == null) {
+      if(max == null) {
         max = mm.getMax();
       }
-    } else {
-      if (min == null || max == null) {
+    }
+    else {
+      if(min == null || max == null) {
         boolean skippedzeros = false;
         DoubleMinMax mm = new DoubleMinMax();
         final int size = adapter.size(array);
-        for (int i = 0; i < size; i++) {
+        for(int i = 0; i < size; i++) {
           double val = adapter.getDouble(array, i);
-          if (nozeros && val == 0.0) {
+          if(nozeros && val == 0.0) {
             skippedzeros = true;
             continue;
           }
           mm.put(val);
         }
-        if (skippedzeros && mm.getMin() == mm.getMax()) {
+        if(skippedzeros && mm.getMin() == mm.getMax()) {
           mm.put(0.0);
         }
-        if (min == null) {
+        if(min == null) {
           min = mm.getMin();
         }
-        if (max == null) {
+        if(max == null) {
           max = mm.getMax();
         }
       }
@@ -292,34 +289,27 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minP = new DoubleParameter(MIN_ID);
-      minP.setOptional(true);
-      if (config.grab(minP)) {
+      DoubleParameter minP = new DoubleParameter(MIN_ID).setOptional(true);
+      if(config.grab(minP)) {
         min = minP.getValue();
       }
 
-      DoubleParameter maxP = new DoubleParameter(MAX_ID);
-      maxP.setOptional(true);
-      if (config.grab(maxP)) {
+      DoubleParameter maxP = new DoubleParameter(MAX_ID).setOptional(true);
+      if(config.grab(maxP)) {
         max = maxP.getValue();
       }
 
-      Flag meanF = new Flag(MEAN_ID);
-      if (config.grab(meanF)) {
-        usemean = meanF.getValue();
+      if(!minP.isDefined() && !maxP.isDefined()) {
+        Flag meanF = new Flag(MEAN_ID);
+        if(config.grab(meanF)) {
+          usemean = meanF.getValue();
+        }
       }
 
       Flag nozerosF = new Flag(NOZEROS_ID);
-      if (config.grab(nozerosF)) {
+      if(config.grab(nozerosF)) {
         nozeros = nozerosF.getValue();
       }
-
-      // Use-Mean and Minimum value must not be set at the same time!
-      ArrayList<Parameter<?>> minmean = new ArrayList<>();
-      minmean.add(minP);
-      minmean.add(meanF);
-      GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
-      config.checkConstraint(gpc);
     }
 
     @Override

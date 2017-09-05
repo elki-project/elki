@@ -35,8 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -267,7 +265,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
         mean = meanP.getValue().clone();
       }
       DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID) //
-          .setOptional(true);
+          .setOptional(!meanP.isDefined());
       if(config.grab(stddevP)) {
         stddev = stddevP.getValue().clone();
 
@@ -277,8 +275,10 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
           }
         }
       }
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(meanP, stddevP));
-      config.checkConstraint(new EqualSizeGlobalConstraint(meanP, stddevP));
+      // Non-formalized parameter constraint:
+      if(mean != null && stddev != null && mean.length != stddev.length) {
+        config.reportError(new WrongParameterValueException("Parameters " + meanP.getName() + " and " + stddevP.getName() + " must have the same number of values."));
+      }
     }
 
     @Override

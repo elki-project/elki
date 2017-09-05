@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilte
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -163,17 +163,18 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minP = new DoubleParameter(MIN_ID, 0.) //
-      .setOptional(true);
+      DoubleParameter minP = new DoubleParameter(MIN_ID, 0.);
       if(config.grab(minP)) {
         min = minP.doubleValue();
       }
-      DoubleParameter maxP = new DoubleParameter(MAX_ID, 1.) //
-      .setOptional(true);
+      DoubleParameter maxP = new DoubleParameter(MAX_ID, 1.);
       if(config.grab(maxP)) {
         max = maxP.doubleValue();
       }
-      config.checkConstraint(new LessGlobalConstraint<>(minP, maxP));
+      // Non-formalized parameter constraint: min < max
+      if(min >= max) {
+        config.reportError(new WrongParameterValueException("Parameter " + minP.getName() + " must be less than " + maxP.getName()));
+      }
     }
 
     @Override

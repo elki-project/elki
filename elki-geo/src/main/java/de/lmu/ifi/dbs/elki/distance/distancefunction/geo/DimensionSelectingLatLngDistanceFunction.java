@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NoDuplicateValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -180,17 +180,20 @@ public class DimensionSelectingLatLngDistanceFunction implements SpatialPrimitiv
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimlatP = new IntParameter(LATDIM_ID);
-      dimlatP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter dimlatP = new IntParameter(LATDIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimlatP)) {
         dimlat = dimlatP.getValue();
       }
-      final IntParameter dimlngP = new IntParameter(LNGDIM_ID);
-      dimlngP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter dimlngP = new IntParameter(LNGDIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimlngP)) {
         dimlng = dimlngP.getValue();
       }
-      config.checkConstraint(new NoDuplicateValueGlobalConstraint(dimlatP, dimlngP));
+      // Non-formalized parameter constraint:
+      if(dimlat == dimlng) {
+        config.reportError(new WrongParameterValueException("Parameters " + dimlatP.getName() + " and " + dimlngP.getName() + " should be different columns."));
+      }
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
       if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);

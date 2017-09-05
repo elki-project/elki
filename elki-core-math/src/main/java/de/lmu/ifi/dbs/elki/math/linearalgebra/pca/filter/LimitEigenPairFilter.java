@@ -20,18 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -126,28 +119,18 @@ public class LimitEigenPairFilter implements EigenPairFilter {
         absolute = absoluteF.isTrue();
       }
 
-      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.doubleValue();
-        // TODO: make this a global constraint?
-        if(absolute && deltaP.tookDefaultValue()) {
-          config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + absoluteF.getName() + " is set, " + "but no value for " + deltaP.getName() + " is specified."));
-        }
-      }
-
+      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       // Conditional Constraint:
       // delta must be >= 0 and <= 1 if it's a relative value
-      // Since relative or absolute is dependent on the absolute flag this is a
-      // global constraint!
-      List<ParameterConstraint<? super Double>> cons = new ArrayList<>();
-      // TODO: Keep the constraint here - applies to non-conditional case as
-      // well, and is set above.
-      cons.add(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      cons.add(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-
-      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<>(deltaP, cons, absoluteF, false);
-      config.checkConstraint(gpc);
+      // also, the default value only makes sense as relative delta.
+      if(!absolute) {
+        deltaP.setDefaultValue(DEFAULT_DELTA)//
+            .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      }
+      if(config.grab(deltaP)) {
+        delta = deltaP.doubleValue();
+      }
     }
 
     @Override

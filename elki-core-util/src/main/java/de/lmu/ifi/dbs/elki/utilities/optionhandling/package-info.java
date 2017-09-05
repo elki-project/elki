@@ -127,30 +127,6 @@
  * }</pre></blockquote>
  * </li>
  * 
- * <li><b>Global Constraints:</b> additional global constraints can be added using
- * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#checkConstraint checkConstraint}
- * <p />
- * 
- * Example code:
- * <blockquote><pre>{@code  // Global constraints
- * config.grab(NORMALIZATION_PARAM);
- * config.grab(NORMALIZATION_UNDO_FLAG);
- * GlobalParameterConstraint gpc =
- *   new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(
- *     NORMALIZATION_PARAM, null,
- *     NORMALIZATION_UNDO_FLAG, true);
- * if (config.checkConstraint(gpc)) {
- *   // Code that depends on the constraints being satisfied.
- * }
- * }</pre></blockquote>
- * (This example is from {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask}.)
- * <p />
- * 
- * TODO: Much of the constraint functionality can be solved much easier by direct Java code and
- * {@code reportError}. Unless the constraints can be used by a GUI for input assistance, we should
- * consider replacing them with direct code.
- * </li>
- * 
  * <li><b>Error reporting</b>:
  * <blockquote><pre>{@code  // Proper dealing with errors
  * try {

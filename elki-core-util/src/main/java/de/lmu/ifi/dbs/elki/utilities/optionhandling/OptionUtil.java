@@ -133,7 +133,7 @@ public final class OptionUtil {
    * @param data Data to write.
    * @param indent Indentation
    */
-  public static void println(StringBuilder buf, int width, String data, String indent) {
+  private static void println(StringBuilder buf, int width, String data, String indent) {
     for(String line : FormatUtil.splitAtLastBlank(data, width - indent.length())) {
       buf.append(indent).append(line);
       if(!line.endsWith(FormatUtil.NEWLINE)) {
@@ -186,7 +186,6 @@ public final class OptionUtil {
       if(!options.isEmpty()) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }
-      // TODO: report global constraints?
       return buf;
     }
     catch(Exception e) {

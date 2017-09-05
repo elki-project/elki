@@ -49,9 +49,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -80,9 +79,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 // TODO: allow using more than one k
 @Reference(authors = "B. Hopkins and J. G. Skellam", //
-title = "A new method for determining the type of distribution of plant individuals", //
-booktitle = "Annals of Botany, 18(2), 213-227", //
-url = "http://aob.oxfordjournals.org/content/18/2/213.short")
+    title = "A new method for determining the type of distribution of plant individuals", //
+    booktitle = "Annals of Botany, 18(2), 213-227", //
+    url = "http://aob.oxfordjournals.org/content/18/2/213.short")
 public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, Result> {
   /**
    * The logger for this class.
@@ -371,13 +370,13 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
       }
 
       IntParameter repP = new IntParameter(REP_ID, 1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(repP)) {
         rep = repP.getValue();
       }
 
       IntParameter kP = new IntParameter(K_ID, 1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
@@ -392,18 +391,19 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
       }
 
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID)//
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(minimaP)) {
         minima = minimaP.getValue().clone();
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID)//
-      .setOptional(true);
+          .setOptional(!minimaP.isDefined());
       if(config.grab(maximaP)) {
         maxima = maximaP.getValue().clone();
       }
-
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));
-      config.checkConstraint(new EqualSizeGlobalConstraint(minimaP, maximaP));
+      // Non-formalized parameter constraint:
+      if(minima != null && maxima != null && minima.length != maxima.length) {
+        config.reportError(new WrongParameterValueException("Parameters " + minimaP.getName() + " and " + maximaP.getName() + " must have the same number of values."));
+      }
     }
 
     @Override
