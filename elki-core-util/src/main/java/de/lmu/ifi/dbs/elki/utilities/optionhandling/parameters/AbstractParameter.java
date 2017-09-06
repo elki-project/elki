@@ -155,13 +155,12 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
       useDefaultValue();
       return true;
     }
-    else if(isOptional()) {
+    if(isOptional()) {
       // Optional is fine, but not successful
       return false;
     }
-    else {
-      throw new UnspecifiedParameterException(this);
-    }
+    // A missing value is an error.
+    throw new UnspecifiedParameterException(this);
   }
 
   @SuppressWarnings("unchecked")

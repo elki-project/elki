@@ -145,7 +145,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
           cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
         }
         catch(IOException e) {
-          config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e));
+          config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e.getMessage(), e));
         }
       }
     }

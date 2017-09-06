@@ -147,7 +147,7 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
           cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, false);
         }
         catch(IOException e) {
-          config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e));
+          config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e.getMessage(), e));
         }
       }
     }

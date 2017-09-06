@@ -39,32 +39,11 @@ public class WrongParameterValueException extends ParameterException {
    * 
    * @param parameter the parameter that has a wrong value
    * @param read the value of the parameter read by the option handler
-   */
-  public WrongParameterValueException(Parameter<?> parameter, String read) {
-    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription());
-  }
-
-  /**
-   * Thrown by a Parameterizable object in case of wrong parameter format.
-   * 
-   * @param parameter the parameter that has a wrong value
-   * @param read the value of the parameter read by the option handler
-   * @param cause the cause
-   */
-  public WrongParameterValueException(Parameter<?> parameter, String read, Throwable cause) {
-    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + formatCause(cause), cause);
-  }
-
-  /**
-   * Thrown by a Parameterizable object in case of wrong parameter format.
-   * 
-   * @param parameter the parameter that has a wrong value
-   * @param read the value of the parameter read by the option handler
    * @param reason detailed error description
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason, Throwable cause) {
-    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason + "\n" + formatCause(cause), cause);
+    super(parameter, reason + formatRead(read) + "\nExpected: " + parameter.getFullDescription() + formatCause(cause), cause);
   }
 
   /**
@@ -75,7 +54,17 @@ public class WrongParameterValueException extends ParameterException {
    * @param reason detailed error description
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason) {
-    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason);
+    this(parameter, read, reason, null);
+  }
+
+  /**
+   * Format the value read for the parameter.
+   *
+   * @param read Read value
+   * @return String
+   */
+  private static String formatRead(String read) {
+    return read == null ? "" : ("\nRead: " + read);
   }
 
   /**
@@ -85,16 +74,6 @@ public class WrongParameterValueException extends ParameterException {
    */
   public WrongParameterValueException(String message) {
     super(message);
-  }
-
-  /**
-   * Thrown by a Parameterizable object in case of wrong parameter format.
-   * 
-   * @param message detail message
-   * @param e cause
-   */
-  public WrongParameterValueException(String message, Throwable e) {
-    super(message, e);
   }
 
   /**
@@ -108,9 +87,6 @@ public class WrongParameterValueException extends ParameterException {
       return "";
     }
     String message = cause.getMessage();
-    if(message != null) {
-      return message;
-    }
-    return cause.toString();
+    return "\n" + (message != null ? message : cause.toString());
   }
 }

@@ -133,25 +133,26 @@ public abstract class AbstractApplication {
     try {
       ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class, true);
       params.grab(descriptionP);
-      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
-      params.grab(debugP);
       if(descriptionP.isDefined()) {
         params.clearErrors();
         printDescription(descriptionP.getValue());
-        return;
+        System.exit(1);
+      }
+      // Parse debug parameter
+      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
+      params.grab(debugP);
+      if(debugP.isDefined()) {
+        Parameterizer.parseDebugParameter(debugP);
       }
       // Fail silently on errors.
       if(params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
-        return;
-      }
-      if(debugP.isDefined()) {
-        Parameterizer.parseDebugParameter(debugP);
+        System.exit(1);
       }
     }
     catch(Exception e) {
       printErrorMessage(e);
-      return;
+      System.exit(1);
     }
     try {
       TrackParameters config = new TrackParameters(params);
@@ -166,22 +167,21 @@ public abstract class AbstractApplication {
       if((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
         LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose(usage(config.getAllParameters()));
+        System.exit(1);
       }
-      else {
+      if(params.getErrors().size() > 0) {
+        LoggingConfiguration.setVerbose(Level.VERBOSE);
+        LOG.verbose("ERROR: The following configuration errors prevented execution:");
+        for(ParameterException e : params.getErrors()) {
+          LOG.verbose(e.getMessage());
+          LOG.verbose("\n");
+        }
         params.logUnusedParameters();
-        if(params.getErrors().size() > 0) {
-          LoggingConfiguration.setVerbose(Level.VERBOSE);
-          LOG.verbose("The following configuration errors prevented execution:\n");
-          for(ParameterException e : params.getErrors()) {
-            LOG.verbose(e.getMessage());
-          }
-          LOG.verbose("\nStopping execution because of configuration errors.");
-          System.exit(1);
-        }
-        else {
-          task.run();
-        }
+        LOG.verbose("Stopping execution because of configuration errors above.");
+        System.exit(1);
       }
+      params.logUnusedParameters();
+      task.run();
     }
     catch(Exception e) {
       printErrorMessage(e);
@@ -270,10 +270,8 @@ public abstract class AbstractApplication {
 
     /**
      * Option ID to specify the database type
-     * 
-     * Key:
      * <p>
-     * {@code -db}
+     * Key: {@code -db}
      * </p>
      */
     public static final OptionID DATABASE_ID = new OptionID("db", "Database class.");

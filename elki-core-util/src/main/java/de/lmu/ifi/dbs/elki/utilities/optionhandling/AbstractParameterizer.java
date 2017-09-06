@@ -102,7 +102,7 @@ public abstract class AbstractParameterizer implements Parameterizer {
    */
   public final Object make(Parameterization config) {
     if(state != STATE_FRESH) {
-      throw new AbortException("Parameterizers may only be set up once!");
+      throw new AbortException("Parameterizers may only be used once!");
     }
     state = STATE_INIT;
 

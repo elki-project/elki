@@ -84,9 +84,9 @@ public class ParameterException extends Exception {
    */
   public static String prefixParameterToMessage(Parameter<?> p, String message) {
     StringBuilder buf = new StringBuilder(100 + message.length());
-    buf.append(p instanceof Flag ? "Flag " : "Parameter ") //
+    buf.append(p instanceof Flag ? "Flag '" : "Parameter '") //
         .append(p.getOptionID().getName()) //
-        .append(' ').append(message);
+        .append("' ").append(message);
     return buf.toString();
   }
 }

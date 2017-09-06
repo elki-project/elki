@@ -135,7 +135,9 @@ public interface Parameterization {
       return ClassGenericsUtil.tryInstantiate(c, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
+      String msg = e.getMessage();
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName() //
+          + " " + (msg != null ? msg : e.getClass().getName()), e));
       return null;
     }
   }

@@ -220,7 +220,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
         instances.add(ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config));
       }
       catch(Exception e) {
-        config.reportError(new WrongParameterValueException(this, cls.getName(), e));
+        config.reportError(new WrongParameterValueException(this, cls.getName(), e.getMessage(), e));
       }
     }
     return instances;

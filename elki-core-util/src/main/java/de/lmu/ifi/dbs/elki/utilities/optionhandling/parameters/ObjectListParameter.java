@@ -135,7 +135,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
             instances.set(i, instance);
           }
           catch(Exception e) {
-            config.reportError(new WrongParameterValueException(this, cls.getName(), e));
+            config.reportError(new WrongParameterValueException(this, cls.getName(), e.getMessage(), e));
           }
         }
       }

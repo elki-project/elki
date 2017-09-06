@@ -80,7 +80,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
     Iterator<File> veciter = val.iterator();
     while(veciter.hasNext()) {
       buf.append(veciter.next());
-      if (veciter.hasNext()) {
+      if(veciter.hasNext()) {
         buf.append(LIST_SEP);
       }
     }
@@ -94,7 +94,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
     Iterator<File> veciter = val.iterator();
     while(veciter.hasNext()) {
       buf.append(veciter.next());
-      if (veciter.hasNext()) {
+      if(veciter.hasNext()) {
         buf.append(LIST_SEP);
       }
     }
@@ -109,7 +109,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
       // do extra validation:
       for(Object o : l) {
         if(!(o instanceof File)) {
-          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
+          throw new WrongParameterValueException(this, obj.toString(), "expected a List<File> or a String.");
         }
       }
       // TODO: can we use reflection to get extra checks?
@@ -126,7 +126,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
       }
       return fileValue;
     }
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of file values!");
+    throw new WrongParameterValueException(this, obj.toString(), "expected a String containing file names.");
   }
 
   @Override
@@ -138,12 +138,12 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
       for(File file : obj) {
         try {
           if(!file.exists()) {
-            throw new WrongParameterValueException("Given file " + file.getPath() + " for parameter \"" + getName() + "\" does not exist!\n");
+            throw new WrongParameterValueException(this, getValueAsString(), "File \"" + file.getPath() + "\" does not exist.");
           }
         }
 
         catch(SecurityException e) {
-          throw new WrongParameterValueException("Given file \"" + file.getPath() + "\" cannot be read, access denied!", e);
+          throw new WrongParameterValueException(this, getValueAsString(), "File \"" + file.getPath() + "\" cannot be read, access denied.", e);
         }
       }
     }

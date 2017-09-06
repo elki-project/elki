@@ -138,7 +138,7 @@ public class SerializedParameterization extends AbstractParameterization {
               piter.remove();
             }
             else if(!next.startsWith(OPTION_PREFIX)) {
-              throw new WrongParameterValueException(opt, "is a boolean flag, but was followed by: " + next);
+              throw new WrongParameterValueException(opt, next, "invalid value for a boolean flag.");
             }
             // We do not consume the next if it's not for us ...
           }

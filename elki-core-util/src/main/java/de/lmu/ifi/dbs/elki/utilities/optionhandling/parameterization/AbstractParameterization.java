@@ -26,7 +26,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -96,19 +95,6 @@ public abstract class AbstractParameterization implements Parameterization {
     if(numerror > 0) {
       logAndClearReportedErrors();
       throw new AbortException(numerror + " errors occurred during parameterization.");
-    }
-  }
-
-  /**
-   * Report the internal parameterization errors to another parameterization
-   * 
-   * @param config Other parameterization
-   */
-  public synchronized void reportInternalParameterizationErrors(Parameterization config) {
-    final int numerror = getErrors().size();
-    if(numerror > 0) {
-      config.reportError(new InternalParameterizationErrors(numerror + " internal (re-) parameterization errors prevented execution.", getErrors()));
-      this.clearErrors();
     }
   }
 

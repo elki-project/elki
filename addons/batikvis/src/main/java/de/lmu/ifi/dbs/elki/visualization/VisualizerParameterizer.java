@@ -295,7 +295,7 @@ public class VisualizerParameterizer {
           stylelib = new PropertiesBasedStyleLibrary(filename, filename);
         }
         catch(AbortException e) {
-          config.reportError(new WrongParameterValueException(stylelibP, filename, e));
+          config.reportError(new WrongParameterValueException(stylelibP, filename, e.getMessage(), e));
         }
       }
       PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID) //

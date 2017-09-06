@@ -473,6 +473,7 @@ public class MiniGUI extends AbstractApplication {
         }
       }
     }
+    outputArea.clear();
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
     track.tryInstantiate(LoggingStep.class);
@@ -487,7 +488,6 @@ public class MiniGUI extends AbstractApplication {
 
     List<String> remainingParameters = config.getRemainingParameters();
 
-    outputArea.clear();
     String mainnam = maincls.getCanonicalName();
     if(mainnam.startsWith(APP_PREFIX)) {
       mainnam = mainnam.substring(APP_PREFIX.length());
