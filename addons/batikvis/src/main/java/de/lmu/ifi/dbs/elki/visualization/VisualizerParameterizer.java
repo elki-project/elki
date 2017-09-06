@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -123,7 +122,7 @@ public class VisualizerParameterizer {
    * @param start Starting result
    * @return New context
    */
-  public VisualizerContext newContext(Result start) {
+  public VisualizerContext newContext(Object start) {
     Collection<Relation<?>> rels = ResultUtil.filterResults(start, Relation.class);
     for(Relation<?> rel : rels) {
       if(samplesize == 0) {
@@ -148,7 +147,7 @@ public class VisualizerParameterizer {
    * @param result Result object
    * @return generated title
    */
-  public static String getTitle(Database db, Result result) {
+  public static String getTitle(Database db, Object result) {
     List<TrackedParameter> settings = new ArrayList<>();
     for(SettingsResult sr : SettingsResult.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());

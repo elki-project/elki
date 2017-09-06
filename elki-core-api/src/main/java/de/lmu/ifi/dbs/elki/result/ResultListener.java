@@ -27,8 +27,6 @@ import java.util.EventListener;
  * 
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @has - - - Result
  */
 public interface ResultListener extends EventListener {
   /**
@@ -37,14 +35,14 @@ public interface ResultListener extends EventListener {
    * @param child New child result added
    * @param parent Parent result that was added to
    */
-  void resultAdded(Result child, Result parent);
+  void resultAdded(Object child, Object parent);
   
   /**
    * Notify that the current result has changed substantially.
    * 
    * @param current Result that has changed.
    */
-  void resultChanged(Result current);
+  void resultChanged(Object current);
   
   /**
    * A result was removed.
@@ -52,5 +50,5 @@ public interface ResultListener extends EventListener {
    * @param child result that was removed
    * @param parent Parent result that was removed from
    */
-  void resultRemoved(Result child, Result parent);
+  void resultRemoved(Object child, Object parent);
 }

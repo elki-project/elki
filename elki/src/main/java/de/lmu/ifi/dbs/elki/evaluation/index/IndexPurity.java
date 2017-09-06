@@ -55,7 +55,7 @@ public class IndexPurity implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     Database database = ResultUtil.findDatabase(newResult);
     final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, SpatialIndexTree.class);
     if(indexes == null || indexes.isEmpty()) {

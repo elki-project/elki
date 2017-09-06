@@ -48,7 +48,7 @@ public class IndexStatistics implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     Database db = ResultUtil.findDatabase(newResult);
     Collection<String> header = null;
     final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, IndexTree.class);

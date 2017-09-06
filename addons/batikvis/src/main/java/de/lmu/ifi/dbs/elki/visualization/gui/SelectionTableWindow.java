@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ModifiableRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -344,18 +343,18 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   }
 
   @Override
-  public void resultAdded(Result child, Result parent) {
+  public void resultAdded(Object child, Object parent) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void resultRemoved(Result child, Result parent) {
+  public void resultRemoved(Object child, Object parent) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void resultChanged(Result current) {
-    if(current instanceof SelectionResult || current instanceof Database) {
+  public void resultChanged(Object current) {
+    if (current instanceof SelectionResult || current instanceof Database) {
       updateFromSelection();
       dotTableModel.fireTableStructureChanged();
     }

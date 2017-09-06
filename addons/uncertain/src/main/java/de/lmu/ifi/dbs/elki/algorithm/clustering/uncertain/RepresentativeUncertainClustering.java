@@ -275,7 +275,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       Metadata.of(relation).hierarchy().addChild(samples);
     }
     else {
-      ResultHierarchy.remove(samples);
+      ResultUtil.removeRecursive(samples);
     }
     return c;
   }
@@ -309,8 +309,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     Clustering<?> clusterResult = samplesAlgorithm.run(d);
-    ResultHierarchy.remove(sample);
-    ResultHierarchy.remove(clusterResult);
+    ResultUtil.removeRecursive(sample);
+    ResultUtil.removeRecursive(clusterResult);
     Metadata.of(parent).hierarchy().addChild(sample);
     Metadata.of(sample).hierarchy().addChild(clusterResult);
     return clusterResult;

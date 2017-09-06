@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,12 +62,12 @@ public class AutomaticEvaluation implements Evaluator {
   private static final Logging LOG = Logging.getLogger(AutomaticEvaluation.class);
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     autoEvaluateClusterings(newResult);
     autoEvaluateOutliers(newResult);
   }
 
-  protected void autoEvaluateOutliers(Result newResult) {
+  protected void autoEvaluateOutliers(Object newResult) {
     Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
     if(LOG.isDebugging()) {
       LOG.debug("Number of new outlier results: " + outliers.size());
@@ -121,7 +120,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
   }
 
-  protected void autoEvaluateClusterings(Result newResult) {
+  protected void autoEvaluateClusterings(Object newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     if(LOG.isDebugging()) {
       LOG.warning("Number of new clustering results: " + clusterings.size());

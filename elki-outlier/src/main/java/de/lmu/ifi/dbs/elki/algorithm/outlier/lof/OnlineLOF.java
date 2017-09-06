@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.ResultListenerList;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -291,7 +292,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(3, "Inform listeners.", LOG);
       }
-      lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
+      ResultListenerList.resultChanged(lofResult.getResult());
 
       LOG.setCompleted(stepprog);
     }
@@ -349,7 +350,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(4, "Inform listeners.", LOG);
       }
-      lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
+      ResultListenerList.resultChanged(lofResult.getResult());
 
       LOG.setCompleted(stepprog);
     }

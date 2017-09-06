@@ -48,7 +48,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
   private static final Logging LOG = Logging.getLogger(LogResultStructureResultHandler.class);
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     if(LOG.isVerbose()) {
       StringBuilder buf = new StringBuilder();
       recursiveLogResult(buf, newResult, 0);

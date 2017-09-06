@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -78,7 +77,7 @@ public class OutlierThresholdClustering implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     List<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
     for(OutlierResult or : ors) {
       Metadata.of(or).hierarchy().addChild(split(or));

@@ -91,11 +91,11 @@ public class ResultWriter implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(Result result) {
+  public void processNewResult(Object result) {
     TextWriter writer = new TextWriter();
 
     try (StreamFactory output = openStreamFactory()) {
-      writer.output(ResultUtil.findDatabase(hier), result, output, filter);
+      writer.output(ResultUtil.findDatabase(result), result, output, filter);
     }
     catch(IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);

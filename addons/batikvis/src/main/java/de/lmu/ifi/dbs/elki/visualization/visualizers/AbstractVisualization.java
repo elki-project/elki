@@ -24,7 +24,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -163,12 +162,12 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   public abstract void fullRedraw();
 
   @Override
-  public void resultAdded(Result child, Result parent) {
+  public void resultAdded(Object child, Object parent) {
     // Ignore by default
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     // Default is to redraw when the result we are attached to changed.
     if(task.getResult() == current //
         || (task.has(UpdateFlag.ON_SELECTION) && current instanceof SelectionResult) //
@@ -179,7 +178,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   }
 
   @Override
-  public void resultRemoved(Result child, Result parent) {
+  public void resultRemoved(Object child, Object parent) {
     // Ignore by default.
     // TODO: auto-remove if parent result is removed?
   }

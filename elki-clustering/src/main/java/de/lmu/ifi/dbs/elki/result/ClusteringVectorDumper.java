@@ -105,7 +105,7 @@ public class ClusteringVectorDumper implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     List<Clustering<?>> cs = Clustering.getClusteringResults(newResult);
     if(cs.isEmpty()) {
       return;

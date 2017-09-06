@@ -34,7 +34,6 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
@@ -585,17 +584,17 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   }
 
   @Override
-  public void resultAdded(Result child, Result parent) {
+  public void resultAdded(Object child, Object parent) {
     lazyRefresh();
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     lazyRefresh();
   }
 
   @Override
-  public void resultRemoved(Result child, Result parent) {
+  public void resultRemoved(Object child, Object parent) {
     lazyRefresh();
   }
 

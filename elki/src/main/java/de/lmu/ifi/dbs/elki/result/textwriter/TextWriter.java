@@ -164,7 +164,7 @@ public class TextWriter {
    * @throws IOException on IO error
    */
   @SuppressWarnings("unchecked")
-  public void output(Database db, Result r, StreamFactory streamOpener, Pattern filter) throws IOException {
+  public void output(Database db, Object r, StreamFactory streamOpener, Pattern filter) throws IOException {
     List<Relation<?>> ra = new LinkedList<>();
     List<OrderingResult> ro = new LinkedList<>();
     List<Clustering<?>> rc = new LinkedList<>();

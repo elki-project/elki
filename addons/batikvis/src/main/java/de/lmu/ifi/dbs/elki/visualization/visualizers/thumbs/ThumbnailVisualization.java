@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
@@ -199,7 +198,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     // Default is to redraw when the result we are attached to changed.
     if(task == current || task.getResult() == current) {
       refreshThumbnail();

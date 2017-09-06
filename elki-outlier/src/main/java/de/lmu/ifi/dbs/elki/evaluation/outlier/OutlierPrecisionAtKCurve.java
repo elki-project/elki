@@ -78,7 +78,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result result) {
+  public void processNewResult(Object result) {
     Database db = ResultUtil.findDatabase(result);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));

@@ -20,57 +20,32 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
- * Class to store a hierarchy of result objects.
+ * Class manage listeners for result changes.
  *
  * @author Erich Schubert
- * @since 0.4.0
  */
-// TODO: add listener merging!
-public class ResultHierarchy {
+public final class ResultListenerList {
   /**
    * Logger
    */
-  private static final Logging LOG = Logging.getLogger(ResultHierarchy.class);
+  private static final Logging LOG = Logging.getLogger(ResultListenerList.class);
 
   /**
    * Holds the listener.
    */
-  private ArrayList<ResultListener> listenerList = new ArrayList<>();
+  private static ArrayList<ResultListener> listenerList = new ArrayList<>();
 
   /**
    * Constructor.
    */
-  public ResultHierarchy() {
+  private ResultListenerList() {
     super();
-  }
-
-  public boolean add(Result parent, Result child) {
-    if(!Metadata.of(parent).hierarchy().addChild(child)) {
-      return false;
-    }
-    fireResultAdded(child, parent);
-    return true;
-  }
-
-  public boolean remove(Result parent, Result child) {
-    if(!Metadata.of(parent).hierarchy().removeChild(child)) {
-      return false;
-    }
-    fireResultRemoved(child, parent);
-    return true;
-  }
-
-  public static void remove(Result r) {
-    for(It<Object> it = Metadata.of(r).hierarchy().iterParentsReverse(); it.valid(); it.advance()) {
-      Metadata.of(it.get()).hierarchy().removeChild(r);
-    }
   }
 
   /**
@@ -78,7 +53,7 @@ public class ResultHierarchy {
    *
    * @param listener Result listener.
    */
-  public void addResultListener(ResultListener listener) {
+  public static void addListener(ResultListener listener) {
     listenerList.add(listener);
   }
 
@@ -87,17 +62,8 @@ public class ResultHierarchy {
    *
    * @param listener Result listener.
    */
-  public void removeResultListener(ResultListener listener) {
+  public static void removeListener(ResultListener listener) {
     listenerList.remove(listener);
-  }
-
-  /**
-   * Signal that a result has changed (public API)
-   *
-   * @param res Result that has changed.
-   */
-  public void resultChanged(Result res) {
-    fireResultChanged(res);
   }
 
   /**
@@ -106,7 +72,9 @@ public class ResultHierarchy {
    * @param child New child result added
    * @param parent Parent result that was added to
    */
-  private void fireResultAdded(Result child, Result parent) {
+  public static void resultAdded(Object child, Object parent) {
+    child = deref(child);
+    parent = deref(parent);
     if(LOG.isDebugging()) {
       LOG.debug("Result added: " + child + " <- " + parent);
     }
@@ -120,7 +88,8 @@ public class ResultHierarchy {
    *
    * @param current Result that has changed
    */
-  private void fireResultChanged(Result current) {
+  public static void resultChanged(Object current) {
+    current = deref(current);
     if(LOG.isDebugging()) {
       LOG.debug("Result changed: " + current);
     }
@@ -136,7 +105,9 @@ public class ResultHierarchy {
    * @param child result that has been removed
    * @param parent Parent result that has been removed
    */
-  private void fireResultRemoved(Result child, Result parent) {
+  public static void resultRemoved(Object child, Object parent) {
+    child = deref(child);
+    parent = deref(parent);
     if(LOG.isDebugging()) {
       LOG.debug("Result removed: " + child + " <- " + parent);
     }
@@ -145,7 +116,13 @@ public class ResultHierarchy {
     }
   }
 
-  public It<Object> iterAll() {
-    return EmptyIterator.empty();
+  /**
+   * Automatically expand a reference.
+   * 
+   * @param ret Object
+   * @return Referenced object (may be null!) or ret.
+   */
+  private static Object deref(Object ret) {
+    return (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
   }
 }

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +53,7 @@ public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorit
    */
   protected Clustering<?> findSingleClustering(Result result) {
     List<Clustering<? extends Model>> clusterresults = Clustering.getClusteringResults(result);
-    assertTrue("No unique clustering found in result.", clusterresults.size() == 1);
+    assertEquals("No unique clustering found in result.", 1, clusterresults.size());
     Clustering<? extends Model> clustering = clusterresults.get(0);
     return clustering;
   }

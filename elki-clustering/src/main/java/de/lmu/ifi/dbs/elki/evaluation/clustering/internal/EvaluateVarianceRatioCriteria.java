@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -216,7 +215,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result result) {
+  public void processNewResult(Object result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
