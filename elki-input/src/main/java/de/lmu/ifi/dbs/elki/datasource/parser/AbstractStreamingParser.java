@@ -26,7 +26,6 @@ import java.io.InputStream;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -124,7 +123,7 @@ public abstract class AbstractStreamingParser implements StreamingParser {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      format = ClassGenericsUtil.parameterizeOrAbort(CSVReaderFormat.class, config);
+      format = config.tryInstantiate(CSVReaderFormat.class);
     }
 
     @Override
