@@ -161,7 +161,7 @@ public class Clustering<M extends Model> extends BasicResult {
    * @param r Result
    * @return List of clustering results
    */
-  public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
+  public static List<Clustering<? extends Model>> getClusteringResults(Object r) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .<Clustering<? extends Model>> filter(Clustering.class)//
         .collect(new ArrayList<Clustering<? extends Model>>());

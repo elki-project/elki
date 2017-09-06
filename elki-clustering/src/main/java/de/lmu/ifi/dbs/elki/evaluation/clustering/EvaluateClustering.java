@@ -105,7 +105,7 @@ public class EvaluateClustering implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     // We may just have added this result.
     if(newResult instanceof Clustering && isReferenceResult((Clustering<?>) newResult)) {
       return;

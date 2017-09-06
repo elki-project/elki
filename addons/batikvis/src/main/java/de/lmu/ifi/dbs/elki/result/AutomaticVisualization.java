@@ -93,7 +93,7 @@ public class AutomaticVisualization implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(final Result result) {
+  public void processNewResult(final Object result) {
     if(window == null) {
       if(title == null) {
         title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(result), result);

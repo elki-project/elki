@@ -121,6 +121,16 @@ public class Metadata {
   private static final Object[] EMPTY = new Object[0];
 
   /**
+   * Automatically expand a reference.
+   * 
+   * @param ret Object
+   * @return Referenced object (may be null!) or ret.
+   */
+  private static Object deref(Object ret) {
+    return (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
+  }
+
+  /**
    * Class to represent hierarchy information.
    *
    * @author Erich Schubert
@@ -155,6 +165,7 @@ public class Metadata {
     public boolean addChild(Object c) {
       if(addChildInt(c)) {
         Metadata.of(c).hierarchy().addParentInt(Metadata.this.owner);
+        ResultListenerList.resultAdded(c, Metadata.this.owner);
         return true;
       }
       return false;
@@ -169,6 +180,7 @@ public class Metadata {
     public boolean removeChild(Object c) {
       if(removeChildInt(c)) {
         Metadata.of(c).hierarchy().removeParentInt(Metadata.this.owner);
+        ResultListenerList.resultRemoved(c, Metadata.this.owner);
         return true;
       }
       return false;
@@ -324,7 +336,7 @@ public class Metadata {
      * @return Iterator for descendants
      */
     public It<Object> iterAncestorsSelf() {
-      return (numc == 0) ? EmptyIterator.empty() : new ItrAnc();
+      return (numc == 0) ? EmptyIterator.empty() : new ItrAnc(owner);
     }
 
     /**
@@ -360,7 +372,7 @@ public class Metadata {
      * @return Iterator for descendants
      */
     public It<Object> iterDescendantsSelf() {
-      return (numc == 0) ? EmptyIterator.empty() : new ItrDesc();
+      return (numc == 0) ? EmptyIterator.empty() : new ItrDesc(owner);
     }
 
     /**
@@ -386,13 +398,14 @@ public class Metadata {
         current = null;
         while(pos < nump) {
           Object ret = parents[pos++];
-          current = (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
+          current = deref(ret);
           if(current != null) {
             break;
           }
         }
         return this;
       }
+
     }
 
     /**
@@ -418,7 +431,7 @@ public class Metadata {
         current = null;
         while(pos > 0) {
           Object ret = parents[--pos];
-          current = (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
+          current = deref(ret);
           if(current != null) {
             break;
           }
@@ -450,7 +463,7 @@ public class Metadata {
         current = null;
         while(pos < numc) {
           Object ret = children[pos++];
-          current = (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
+          current = deref(ret);
           if(current != null) {
             break;
           }
@@ -482,7 +495,7 @@ public class Metadata {
         current = null;
         while(pos > 0) {
           Object ret = children[--pos];
-          current = (ret instanceof Reference) ? ((Reference<?>) ret).get() : ret;
+          current = deref(ret);
           if(current != null) {
             break;
           }
@@ -604,7 +617,7 @@ public class Metadata {
        * @param extra Additional element (cannot be {@code null}).
        */
       ItrAnc(Object extra) {
-        parentiter = new ItrChildren();
+        parentiter = new ItrParents();
         this.extra = extra;
       }
 

@@ -50,7 +50,7 @@ public final class ResultUtil {
    * @param r Result
    * @return List of all annotation results
    */
-  public static List<Relation<?>> getRelations(Result r) {
+  public static List<Relation<?>> getRelations(Object r) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .<Relation<?>> filter(Relation.class).collect(new ArrayList<>());
   }
@@ -61,7 +61,7 @@ public final class ResultUtil {
    * @param r Result
    * @return List of ordering results
    */
-  public static List<OrderingResult> getOrderingResults(Result r) {
+  public static List<OrderingResult> getOrderingResults(Object r) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .filter(OrderingResult.class).collect(new ArrayList<>());
   }
@@ -97,7 +97,7 @@ public final class ResultUtil {
    * @param <C> Class type
    * @return filtered results list
    */
-  public static <C extends Result> ArrayList<C> filterResults(Result r, Class<? super C> restrictionClass) {
+  public static <C> ArrayList<C> filterResults(Object r, Class<? super C> restrictionClass) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .<C> filter(restrictionClass).collect(new ArrayList<C>());
   }
@@ -118,7 +118,7 @@ public final class ResultUtil {
    * @param result Result hierarchy.
    * @return Database
    */
-  public static Database findDatabase(Result result) {
+  public static Database findDatabase(Object result) {
     It<Database> it = Metadata.of(result).hierarchy().iterAncestors().filter(Database.class);
     return it.valid() ? it.get() : null;
   }

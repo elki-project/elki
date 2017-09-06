@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.result.ResultListenerList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -91,8 +92,7 @@ public class EvaluationStep implements WorkflowStep {
      */
     public Evaluation(List<? extends Evaluator> evaluators) {
       this.evaluators = evaluators;
-
-      hier.addResultListener(this);
+      ResultListenerList.addListener(this);
     }
 
     /**
@@ -100,7 +100,7 @@ public class EvaluationStep implements WorkflowStep {
      *
      * @param r Result
      */
-    public void update(Result r) {
+    public void update(Object r) {
       for(Evaluator evaluator : evaluators) {
         Thread.currentThread().setName(evaluator.toString());
         evaluator.processNewResult(r);
@@ -108,18 +108,18 @@ public class EvaluationStep implements WorkflowStep {
     }
 
     @Override
-    public void resultAdded(Result child, Result parent) {
+    public void resultAdded(Object child, Object parent) {
       // Re-run evaluators on result
       update(child);
     }
 
     @Override
-    public void resultChanged(Result current) {
+    public void resultChanged(Object current) {
       // Ignore for now. TODO: re-evaluate?
     }
 
     @Override
-    public void resultRemoved(Result child, Result parent) {
+    public void resultRemoved(Object child, Object parent) {
       // TODO: Implement
     }
   }

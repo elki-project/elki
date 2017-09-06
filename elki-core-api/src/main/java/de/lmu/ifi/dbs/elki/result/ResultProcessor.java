@@ -21,12 +21,10 @@
 package de.lmu.ifi.dbs.elki.result;
 
 /**
- * Interface for any class that can handle results
+ * Interface for any class that can handle results.
  * 
  * @author Erich Schubert
  * @since 0.2
- * 
- * @navassoc - processes - Result
  */
 public interface ResultProcessor {
   /**
@@ -34,5 +32,5 @@ public interface ResultProcessor {
    * 
    * @param newResult Newly added result subtree.
    */
-  void processNewResult( Result newResult);
+  void processNewResult(Object newResult);
 }

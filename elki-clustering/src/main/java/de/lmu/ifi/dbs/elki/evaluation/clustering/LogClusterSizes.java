@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
@@ -95,7 +94,7 @@ public class LogClusterSizes implements Evaluator {
   }
 
   @Override
-  public void processNewResult(Result result) {
+  public void processNewResult(Object result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs == null || crs.isEmpty()) {
       return;

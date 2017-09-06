@@ -64,7 +64,7 @@ public class SettingsResult extends BasicResult {
    * @param r Result
    * @return List of settings results
    */
-  public static List<SettingsResult> getSettingsResults(Result r) {
+  public static List<SettingsResult> getSettingsResults(Object r) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .filter(SettingsResult.class).collect(new ArrayList<>());
   }

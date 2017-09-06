@@ -97,7 +97,7 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Starting point of the result tree, may be {@code null}.
    */
-  private Result baseResult;
+  private Object baseResult;
 
   /**
    * Constructor. We currently require a Database and a Result.
@@ -106,7 +106,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param stylelib Style library
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(Result start, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
+  public VisualizerContext(Object start, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
     super();
     this.baseResult = start;
     this.factories = factories;
@@ -140,17 +140,17 @@ public class VisualizerContext implements DataStoreListener, Result {
     // Don't expose these methods to avoid inappropriate use.
     addResultListener(new ResultListener() {
       @Override
-      public void resultAdded(Result child, Result parent) {
+      public void resultAdded(Object child, Object parent) {
         notifyFactories(child);
       }
 
       @Override
-      public void resultChanged(Result current) {
+      public void resultChanged(Object current) {
         // FIXME: need to do anything?
       }
 
       @Override
-      public void resultRemoved(Result child, Result parent) {
+      public void resultRemoved(Object child, Object parent) {
         // FIXME: implement
       }
     });
@@ -260,7 +260,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   public void setSelection(DBIDSelection sel) {
     selection.setSelection(sel);
-    getHierarchy().resultChanged(selection);
+    ResultListenerList.resultChanged(selection);
   }
 
   /**
@@ -305,7 +305,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
-    getHierarchy().addResultListener(listener);
+    ResultListenerList.addListener(listener);
   }
 
   /**
@@ -314,7 +314,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
-    getHierarchy().removeResultListener(listener);
+    ResultListenerList.removeListener(listener);
   }
 
   /**
@@ -350,7 +350,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    *
    * @return Starting point in the result tree, may be {@code null}.
    */
-  public Result getBaseResult() {
+  public Object getBaseResult() {
     return baseResult;
   }
 

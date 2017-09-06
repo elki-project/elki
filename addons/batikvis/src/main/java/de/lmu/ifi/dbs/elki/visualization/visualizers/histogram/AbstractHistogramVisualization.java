@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -60,7 +59,7 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     super.resultChanged(current);
     if(proj != null && current == proj) {
       svgp.requestRedraw(this.task, this);

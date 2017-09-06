@@ -148,7 +148,7 @@ public class KMLOutputHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
     ArrayList<Clustering<?>> crs = ResultUtil.filterResults(newResult, Clustering.class);
     if(ors.size() + crs.size() > 1) {

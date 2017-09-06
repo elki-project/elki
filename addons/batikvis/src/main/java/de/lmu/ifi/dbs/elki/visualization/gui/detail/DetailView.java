@@ -30,7 +30,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
@@ -299,17 +298,17 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   }
 
   @Override
-  public void resultAdded(Result child, Result parent) {
+  public void resultAdded(Object child, Object parent) {
     lazyRefresh();
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     lazyRefresh();
   }
 
   @Override
-  public void resultRemoved(Result child, Result parent) {
+  public void resultRemoved(Object child, Object parent) {
     lazyRefresh();
   }
 

@@ -210,7 +210,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       menubar.removeAll();
       menubar.add(filemenu);
       Hierarchy<Object> vistree = context.getVisHierarchy();
-      Result start = context.getBaseResult();
+      Object start = context.getBaseResult();
       ArrayList<JMenuItem> items = new ArrayList<>();
       for(It<Object> iter = Metadata.of(start).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
         recursiveBuildMenu(items, iter.get(), vistree, proj);
@@ -650,17 +650,17 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
   }
 
   @Override
-  public void resultAdded(Result child, Result parent) {
+  public void resultAdded(Object child, Object parent) {
     updateVisualizerMenus();
   }
 
   @Override
-  public void resultChanged(Result current) {
+  public void resultChanged(Object current) {
     updateVisualizerMenus();
   }
 
   @Override
-  public void resultRemoved(Result child, Result parent) {
+  public void resultRemoved(Object child, Object parent) {
     updateVisualizerMenus();
   }
 

@@ -36,7 +36,7 @@ public class DiscardResultHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(Result newResult) {
+  public void processNewResult(Object newResult) {
     // always ignore the new result.
   }
 }

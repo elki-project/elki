@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Metadata.Hierarchy;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Wrap a typical Outlier result, keeping direct references to the main result
@@ -112,7 +111,7 @@ public class OutlierResult extends BasicResult {
    * @param r Result
    * @return List of outlier results
    */
-  public static List<OutlierResult> getOutlierResults(Result r) {
+  public static List<OutlierResult> getOutlierResults(Object r) {
     return Metadata.of(r).hierarchy().iterDescendantsSelf()//
         .filter(OutlierResult.class).collect(new ArrayList<>());
   }

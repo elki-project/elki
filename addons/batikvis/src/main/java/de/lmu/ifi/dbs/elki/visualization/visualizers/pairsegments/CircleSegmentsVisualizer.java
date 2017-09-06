@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -258,7 +257,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
     }
 
     @Override
-    public void resultChanged(Result current) {
+    public void resultChanged(Object current) {
       super.resultChanged(current);
       if(current == context.getStylingPolicy()) {
         // When switching to a different policy, unhighlight segments.
