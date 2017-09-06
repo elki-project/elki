@@ -117,10 +117,7 @@ public class SerializedParameterization extends AbstractParameterization {
         // throw new NoParameterValueException(cur + " is no parameter!");
       }
 
-      // get the option without the option prefix -
-      String noPrefixOption = cur.substring(OPTION_PREFIX.length());
-
-      if(opt.getName().equals(noPrefixOption)) {
+      if(opt.getName().regionMatches(0, cur, 1, Math.max(opt.getName().length(), cur.length() - 1))) {
         // Consume.
         piter.remove();
         // check if the option is a parameter or a flag

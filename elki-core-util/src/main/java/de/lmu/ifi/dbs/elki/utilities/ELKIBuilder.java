@@ -92,6 +92,29 @@ public final class ELKIBuilder<T> {
   }
 
   /**
+   * Add an option to the builder.
+   *
+   * @param opt Option ID (usually found in the Parameterizer class)
+   * @param value Value
+   * @return The same builder
+   */
+  public ELKIBuilder<T> with(String opt, Object value) {
+    p.addParameter(opt, value);
+    return this;
+  }
+
+  /**
+   * Add a flag to the builder.
+   *
+   * @param opt Option ID (usually found in the Parameterizer class)
+   * @return The same builder
+   */
+  public ELKIBuilder<T> with(String opt) {
+    p.addFlag(opt);
+    return this;
+  }
+
+  /**
    * Instantiate, consuming the parameter list.
    *
    * This will throw an {@link AbortException} if the parameters are incomplete,

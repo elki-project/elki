@@ -20,11 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -60,7 +56,15 @@ public class ListParameterization extends AbstractParameterization {
     this();
     this.parameters = new LinkedList<>();
     for(ParameterPair pair : dbParameters) {
-      addParameter(pair.option, pair.value);
+      if(pair.option instanceof OptionID) {
+        addParameter((OptionID) pair.option, pair.value);
+      }
+      else if(pair.option instanceof String) {
+        addParameter((String) pair.option, pair.value);
+      }
+      else {
+        throw new IllegalStateException("The option field must only store OptionID or Strings.");
+      }
     }
   }
 
@@ -68,9 +72,20 @@ public class ListParameterization extends AbstractParameterization {
    * Add a flag to the parameter list
    *
    * @param optionid Option ID
-   * @return this, for chanining
+   * @return this, for chaining
    */
   public ListParameterization addFlag(OptionID optionid) {
+    parameters.add(new ParameterPair(optionid, Flag.SET));
+    return this;
+  }
+
+  /**
+   * Add a flag to the parameter list
+   *
+   * @param optionid Option ID
+   * @return this, for chaining
+   */
+  public ListParameterization addFlag(String optionid) {
     parameters.add(new ParameterPair(optionid, Flag.SET));
     return this;
   }
@@ -80,9 +95,33 @@ public class ListParameterization extends AbstractParameterization {
    *
    * @param optionid Option ID
    * @param value Value
-   * @return this, for chanining
+   * @return this, for chaining
    */
   public ListParameterization addParameter(OptionID optionid, Object value) {
+    parameters.add(new ParameterPair(optionid, value));
+    return this;
+  }
+
+  /**
+   * Add a parameter to the parameter list
+   *
+   * @param pair Parameter pair
+   * @return this, for chaining
+   */
+  protected ListParameterization addParameter(ParameterPair pair) {
+    parameters.add(pair);
+    return this;
+  }
+
+  /**
+   * Add a parameter to the parameter list
+   *
+   * @param optionid Option ID
+   * @param value Value
+   * @return this, for chaining
+   */
+  public ListParameterization addParameter(String optionid, Object value) {
+    optionid = optionid.startsWith(SerializedParameterization.OPTION_PREFIX) ? optionid.substring(SerializedParameterization.OPTION_PREFIX.length()) : optionid;
     parameters.add(new ParameterPair(optionid, value));
     return this;
   }
@@ -92,7 +131,7 @@ public class ListParameterization extends AbstractParameterization {
     Iterator<ParameterPair> iter = parameters.iterator();
     while(iter.hasNext()) {
       ParameterPair pair = iter.next();
-      if(pair.option == opt.getOptionID()) {
+      if(pair.option == opt.getOptionID() || (pair.option instanceof String && opt.getOptionID().getName().equals(pair.option))) {
         iter.remove();
         opt.setValue(pair.value);
         return true;
@@ -116,10 +155,15 @@ public class ListParameterization extends AbstractParameterization {
   }
 
   @Override
+  public ListParameterization descend(Object option) {
+    return this;
+  }
+  
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     for(ParameterPair pair : parameters) {
-      buf.append('-').append(pair.option.toString()).append(' ')//
+      buf.append(SerializedParameterization.OPTION_PREFIX).append(pair.option.toString()).append(' ')//
           .append(pair.value.toString()).append(' ');
     }
     return buf.toString();
@@ -133,7 +177,7 @@ public class ListParameterization extends AbstractParameterization {
   public ArrayList<String> serialize() {
     ArrayList<String> params = new ArrayList<>();
     for(ParameterPair pair : parameters) {
-      params.add("-" + pair.option.toString());
+      params.add(SerializedParameterization.OPTION_PREFIX + pair.option.toString());
       if(pair.value instanceof String) {
         params.add((String) pair.value);
       }
@@ -154,11 +198,11 @@ public class ListParameterization extends AbstractParameterization {
    *
    * @apiviz.exclude
    */
-  static final class ParameterPair {
+  protected static final class ParameterPair {
     /**
      * Option key.
      */
-    public OptionID option;
+    public Object option;
 
     /**
      * Option value.
@@ -171,14 +215,14 @@ public class ListParameterization extends AbstractParameterization {
      * @param key Option key
      * @param value Option value
      */
-    public ParameterPair(OptionID key, Object value) {
+    public ParameterPair(Object key, Object value) {
       this.option = key;
       this.value = value;
     }
 
     @Override
     public String toString() {
-      return "-" + option.getName() + " " + value;
+      return SerializedParameterization.OPTION_PREFIX + option.toString() + " " + value;
     }
   }
 }

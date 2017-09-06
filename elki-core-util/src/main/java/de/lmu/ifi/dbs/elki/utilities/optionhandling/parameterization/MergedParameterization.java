@@ -86,7 +86,7 @@ public class MergedParameterization implements Parameterization {
   public void rewind() {
     synchronized(used) {
       for(ParameterPair pair : used) {
-        current.addParameter(pair.option, pair.value);
+        current.addParameter(pair);
       }
       used.clear();
     }
@@ -113,9 +113,7 @@ public class MergedParameterization implements Parameterization {
 
   @Override
   public Parameterization descend(Object option) {
-    // We should descend into current, too - but the API doesn't give us a
-    // ListParameterization then!
-    return new MergedParameterization(inner.descend(option), current, used);
+    return new MergedParameterization(inner.descend(option), current.descend(option), used);
   }
 
   @Override
