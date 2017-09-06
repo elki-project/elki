@@ -13,4 +13,5 @@ if [ -z "$core" ]; then
   exit 1
 fi
 cp=$( echo "$core:$mods:$addons:$deps" | paste -s -d: )
+export COLUMNS=$(tput cols)
 exec $java $JVM_OPTS -cp "$cp" de.lmu.ifi.dbs.elki.application.ELKILauncher "$@"

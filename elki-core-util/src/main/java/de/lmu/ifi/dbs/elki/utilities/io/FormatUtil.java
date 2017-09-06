@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.io;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -176,7 +177,7 @@ public final class FormatUtil {
    */
   public static String format(double[] d) {
     return d == null ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, ", ").toString();
+        formatTo(new StringBuilder(), d, ", ").toString();
   }
 
   /**
@@ -188,7 +189,7 @@ public final class FormatUtil {
    */
   public static String format(double[] d, String sep) {
     return d == null ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, sep).toString();
+        formatTo(new StringBuilder(), d, sep).toString();
   }
 
   /**
@@ -212,7 +213,7 @@ public final class FormatUtil {
    */
   public static String format(double[] d, String sep, NumberFormat nf) {
     return d == null ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, sep, nf).toString();
+        formatTo(new StringBuilder(), d, sep, nf).toString();
   }
 
   /**
@@ -488,7 +489,7 @@ public final class FormatUtil {
    */
   public static String format(float[] d, String sep, NumberFormat nf) {
     return (d == null) ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, sep, nf).toString();
+        formatTo(new StringBuilder(), d, sep, nf).toString();
   }
 
   /**
@@ -500,7 +501,7 @@ public final class FormatUtil {
    */
   public static String format(float[] d, String sep) {
     return (d == null) ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, sep).toString();
+        formatTo(new StringBuilder(), d, sep).toString();
   }
 
   /**
@@ -511,7 +512,7 @@ public final class FormatUtil {
    */
   public static String format(float[] f) {
     return (f == null) ? "null" : (f.length == 0) ? "" : //
-    formatTo(new StringBuilder(), f, ", ").toString();
+        formatTo(new StringBuilder(), f, ", ").toString();
   }
 
   /**
@@ -523,7 +524,7 @@ public final class FormatUtil {
    */
   public static String format(int[] a, String sep) {
     return (a == null) ? "null" : (a.length == 0) ? "" : //
-    formatTo(new StringBuilder(), a, sep).toString();
+        formatTo(new StringBuilder(), a, sep).toString();
   }
 
   /**
@@ -534,7 +535,7 @@ public final class FormatUtil {
    */
   public static String format(int[] a) {
     return (a == null) ? "null" : (a.length == 0) ? "" : //
-    formatTo(new StringBuilder(), a, ", ").toString();
+        formatTo(new StringBuilder(), a, ", ").toString();
   }
 
   /**
@@ -545,7 +546,7 @@ public final class FormatUtil {
    */
   public static String format(long[] a) {
     return (a == null) ? "null" : (a.length == 0) ? "" : //
-    formatTo(new StringBuilder(), a, ", ").toString();
+        formatTo(new StringBuilder(), a, ", ").toString();
   }
 
   /**
@@ -556,7 +557,7 @@ public final class FormatUtil {
    */
   public static String format(byte[] a) {
     return (a == null) ? "null" : (a.length == 0) ? "" : //
-    formatTo(new StringBuilder(), a, ", ").toString();
+        formatTo(new StringBuilder(), a, ", ").toString();
   }
 
   /**
@@ -568,7 +569,7 @@ public final class FormatUtil {
    */
   public static String format(boolean[] b, final String sep) {
     return (b == null) ? "null" : (b.length == 0) ? "" : //
-    formatTo(new StringBuilder(), b, ", ").toString();
+        formatTo(new StringBuilder(), b, ", ").toString();
   }
 
   /**
@@ -616,7 +617,7 @@ public final class FormatUtil {
    */
   public static String format(double[][] d) {
     return d == null ? "null" : (d.length == 0) ? "[]" : //
-    formatTo(new StringBuilder().append("[\n"), d, " [", "]\n", ", ", NF2).append(']').toString();
+        formatTo(new StringBuilder().append("[\n"), d, " [", "]\n", ", ", NF2).append(']').toString();
   }
 
   /**
@@ -632,7 +633,7 @@ public final class FormatUtil {
    */
   public static String format(double[][] d, String pre, String pos, String csep, NumberFormat nf) {
     return d == null ? "null" : (d.length == 0) ? "" : //
-    formatTo(new StringBuilder(), d, pre, pos, csep, nf).toString();
+        formatTo(new StringBuilder(), d, pre, pos, csep, nf).toString();
   }
 
   /**
@@ -893,19 +894,47 @@ public final class FormatUtil {
   }
 
   /**
+   * Terminal width cache.
+   */
+  private static int width = -1;
+
+  /**
    * Get the width of the terminal window (on Unix xterms), with a default of 78
    * characters.
    *
    * @return Terminal width
    */
   public static int getConsoleWidth() {
+    if(width > 0) {
+      return width;
+    }
     final int default_termwidth = 78;
     try {
-      return ParseUtil.parseIntBase10(System.getenv("COLUMNS")) - 1;
+      // Note: this will often be a NPE!
+      int columns = ParseUtil.parseIntBase10(System.getenv("COLUMNS"));
+      return width = (columns > 50 ? columns - 1 : default_termwidth);
     }
-    catch(SecurityException|NumberFormatException e) {
-      return default_termwidth;
+    catch(SecurityException | NumberFormatException | NullPointerException e) {
+      // OK. Probably not exported.
     }
+    try {
+      Process p = Runtime.getRuntime().exec(new String[] { "sh", "-c", "tput cols 2> /dev/tty" });
+      byte[] buf = new byte[16];
+      p.getOutputStream().close(); // We do not intend to write.
+      int l = p.getInputStream().read(buf);
+      if(l >= 2 && l < buf.length) {
+        int columns = ParseUtil.parseIntBase10(new String(buf, 0, buf[l - 1] == '\n' ? l - 1 : l));
+        return width = (columns > 50 ? columns - 1 : default_termwidth);
+      }
+      p.destroy();
+    }
+    catch(IOException | SecurityException | NumberFormatException
+        | NullPointerException e) {
+      // Ok. Probably not a unix system.
+    }
+    // We could use the jLine library, but that would introduce another
+    // dependency. :-(
+    return width = default_termwidth;
   }
 
   /**
@@ -1018,15 +1047,15 @@ public final class FormatUtil {
     }
     // This is almost a binary search.
     return (x <= Integer.MAX_VALUE) ? stringSize((int) x) : //
-    (x < 10000000000000L) ? // 10-13 vs. 14-19
-    /**/(x < 100000000000L) ? // 10-11 vs. 12-13
-    /*   */((x < 10000000000L) ? 10 : 11) : //
-    /*   */((x < 1000000000000L) ? 12 : 13) : //
-    /**/(x < 1000000000000000L) ? // 14-15 vs. 16-19
-    /*  */((x < 100000000000000L) ? 14 : 15) : // 14-15
-    /*  */(x < 100000000000000000L) ? // 16-17 vs. 18-19
-    /*    */((x < 10000000000000000L) ? 16 : 17) : // 16-17
-    /*    */((x < 1000000000000000000L) ? 18 : 19) // 18-19
+        (x < 10000000000000L) ? // 10-13 vs. 14-19
+        /**/(x < 100000000000L) ? // 10-11 vs. 12-13
+        /*   */((x < 10000000000L) ? 10 : 11) : //
+        /*   */((x < 1000000000000L) ? 12 : 13) : //
+        /**/(x < 1000000000000000L) ? // 14-15 vs. 16-19
+        /*  */((x < 100000000000000L) ? 14 : 15) : // 14-15
+        /*  */(x < 100000000000000000L) ? // 16-17 vs. 18-19
+        /*    */((x < 10000000000000000L) ? 16 : 17) : // 16-17
+        /*    */((x < 1000000000000000000L) ? 18 : 19) // 18-19
     ;
   }
 }
