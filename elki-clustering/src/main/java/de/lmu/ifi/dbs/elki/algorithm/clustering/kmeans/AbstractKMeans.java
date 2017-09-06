@@ -433,7 +433,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(!(distanceFunction instanceof SquaredEuclideanDistanceFunction) && !(distanceFunction instanceof EuclideanDistanceFunction)) {
+        if(distanceFunction != null //
+            && !(distanceFunction instanceof SquaredEuclideanDistanceFunction) //
+            && !(distanceFunction instanceof EuclideanDistanceFunction)) {
           getLogger().warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
