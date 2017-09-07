@@ -910,11 +910,13 @@ public final class FormatUtil {
     }
     final int default_termwidth = 78;
     try {
-      // Note: this will often be a NPE!
-      int columns = ParseUtil.parseIntBase10(System.getenv("COLUMNS"));
-      return width = (columns > 50 ? columns - 1 : default_termwidth);
+      final String env = System.getenv("COLUMNS");
+      if(env != null) {
+        int columns = ParseUtil.parseIntBase10(env);
+        return width = (columns > 50 ? columns - 1 : default_termwidth);
+      }
     }
-    catch(SecurityException | NumberFormatException | NullPointerException e) {
+    catch(SecurityException | NumberFormatException e) {
       // OK. Probably not exported.
     }
     try {
@@ -928,8 +930,7 @@ public final class FormatUtil {
       }
       p.destroy();
     }
-    catch(IOException | SecurityException | NumberFormatException
-        | NullPointerException e) {
+    catch(IOException | SecurityException | NumberFormatException e) {
       // Ok. Probably not a unix system.
     }
     // We could use the jLine library, but that would introduce another
