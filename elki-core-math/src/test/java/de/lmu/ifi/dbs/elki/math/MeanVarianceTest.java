@@ -104,7 +104,7 @@ public class MeanVarianceTest {
     // Values will not be exactly zero, because 1000.0001 is not exactly
     // representable as float.
     // (But that is not what is causing the problem above).
-    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 1e-25);
+    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 2e-14);
     assertEquals("Mean is bad", 1000.0001, mv.getMean(), 1e-12);
   }
 

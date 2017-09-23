@@ -60,6 +60,7 @@ public class MeanTest {
     assertEquals("Mean wrong.", 0, m.getMean(), 0.);
     assertEquals("No toString", -1, m.toString().indexOf('@'));
     assertEquals("Static helper", 2, Mean.of(1, 2, 3), 0.);
+    assertEquals("Static helper", 2, Mean.highPrecision(1, 2, 3), 0.);
   }
 
   @Test

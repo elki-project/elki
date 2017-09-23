@@ -39,27 +39,52 @@ import net.jafama.FastMath;
  * Trivial code, but replicated a lot. The class is final so it should come at
  * low cost.
  * 
- * Related Literature:
- * 
+ * The current approach is based on:
+ * <p>
+ * E. A. Youngs and E. M. Cramer<br />
+ * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br />
+ * Technometrics 13(3), 1971
+ * </p>
+ *
+ * We have originally experimented with:
  * <p>
  * B. P. Welford<br />
  * Note on a method for calculating corrected sums of squares and products<br />
- * in: Technometrics 4(3)
+ * in: Technometrics 4(3), 1962
  * </p>
  * 
  * <p>
- * D.H.D. West<br />
+ * D. H. D. West<br />
  * Updating Mean and Variance Estimates: An Improved Method<br />
- * In: Communications of the ACM, Volume 22 Issue 9
+ * In: Communications of the ACM 22(9)
  * </p>
  * 
  * @author Erich Schubert
  * @since 0.2
  */
-@Reference(authors = "B. P. Welford", //
-    title = "Note on a method for calculating corrected sums of squares and products", //
-    booktitle = "Technometrics 4(3)")
+@Reference(authors = "E. A. Youngs  and  E. M. Cramer", //
+    title = "Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms", //
+    booktitle = "Technometrics 13(3)", //
+    url = "https://doi.org/10.1080/00401706.1971.10488826")
 public class MeanVariance extends Mean {
+  /**
+   * Additional reference.
+   */
+  @Reference(authors = "B. P. Welford", //
+      title = "Note on a method for calculating corrected sums of squares and products", //
+      booktitle = "Technometrics 4(3)", //
+      url = "https://doi.org/10.2307/1266577")
+  public static Void SECOND_REFERENCE = null;
+
+  /**
+   * Additional reference.
+   */
+  @Reference(authors = "D.H.D. West", //
+      title = "Updating Mean and Variance Estimates: An Improved Method", //
+      booktitle = "Communications of the ACM 22(9)", //
+      url = "https://doi.org/10.1145/359146.359153")
+  public static Void THIRD_REFERENCE = null;
+
   /**
    * n times Variance
    */
@@ -78,7 +103,7 @@ public class MeanVariance extends Mean {
    * @param other other instance to copy data from.
    */
   public MeanVariance(MeanVariance other) {
-    this.m1 = other.m1;
+    this.sum = other.sum;
     this.m2 = other.m2;
     this.n = other.n;
   }
@@ -90,34 +115,41 @@ public class MeanVariance extends Mean {
    */
   @Override
   public void put(double val) {
+    if(n <= 0) {
+      n = 1;
+      sum = val;
+      m2 = 0;
+      return;
+    }
+    final double tmp = n * val - sum;
+    final double oldn = n; // tmp copy
     n += 1.0;
-    final double delta = val - m1;
-    m1 += delta / n;
-    // The next line needs the *new* mean!
-    m2 += delta * (val - m1);
+    sum += val;
+    m2 += tmp * tmp / (n * oldn);
   }
 
   /**
    * Add data with a given weight.
    * 
-   * See also: D.H.D. West<br />
-   * Updating Mean and Variance Estimates: An Improved Method
-   * 
    * @param val data
    * @param weight weight
    */
   @Override
-  @Reference(authors = "D.H.D. West", //
-      title = "Updating Mean and Variance Estimates: An Improved Method", //
-      booktitle = "Communications of the ACM, Volume 22 Issue 9")
   public void put(double val, double weight) {
-    final double nwsum = weight + n;
-    final double delta = val - m1;
-    final double rval = delta * weight / nwsum;
-    m1 += rval;
-    // Use old and new weight sum here:
-    m2 += n * delta * rval;
-    n = nwsum;
+    if(weight == 0.) {
+      return;
+    }
+    if(n <= 0) {
+      n = weight;
+      sum = val * weight;
+      return;
+    }
+    val *= weight;
+    final double tmp = n * val - sum * weight;
+    final double oldn = n; // tmp copy
+    n += weight;
+    sum += val;
+    m2 += tmp * tmp / (weight * n * oldn);
   }
 
   /**
@@ -127,20 +159,16 @@ public class MeanVariance extends Mean {
    */
   @Override
   public void put(Mean other) {
-    if(other instanceof MeanVariance) {
-      final double nwsum = other.n + this.n;
-      final double delta = other.m1 - this.m1;
-      final double rval = delta * other.n / nwsum;
-
-      // this.mean += rval;
-      // This supposedly is more numerically stable:
-      this.m1 = (this.n * this.m1 + other.n * other.m1) / nwsum;
-      this.m2 += ((MeanVariance) other).m2 + delta * this.n * rval;
-      this.n = nwsum;
-    }
-    else {
+    if(!(other instanceof MeanVariance)) {
       throw new IllegalArgumentException("I cannot combine Mean and MeanVariance to a MeanVariance.");
     }
+    final MeanVariance mvo = (MeanVariance) other;
+    final double on = mvo.n, osum = mvo.sum;
+    final double tmp = n * osum - sum * on;
+    final double oldn = n; // tmp copy
+    n += on;
+    sum += osum;
+    m2 += mvo.m2 + tmp * tmp / (on * n * oldn);
   }
 
   /**
@@ -159,26 +187,31 @@ public class MeanVariance extends Mean {
       return this;
     }
     // First pass:
-    double sum = 0.;
+    double s1 = 0.;
     for(int i = 0; i < l; i++) {
-      sum += vals[i];
+      s1 += vals[i];
     }
-    double om1 = sum / vals.length;
+    final double om1 = s1 / l;
     // Second pass:
-    double om2 = 0.;
+    double om2 = 0., err = 0.;
     for(int i = 0; i < l; i++) {
       final double v = vals[i] - om1;
       om2 += v * v;
+      err += v;
     }
-    final double nwsum = vals.length + this.n;
-    final double delta = om1 - this.m1;
-    final double rval = delta * vals.length / nwsum;
-
-    // this.mean += rval;
-    // This supposedly is more numerically stable:
-    this.m1 = (this.n * this.m1 + sum) / nwsum;
-    this.m2 += om2 + delta * this.n * rval;
-    this.n = nwsum;
+    s1 += err;
+    om2 += err / l;
+    if(n <= 0) {
+      n = l;
+      sum = s1;
+      m2 = om2;
+      return this;
+    }
+    final double tmp = n * s1 - sum * l;
+    final double oldn = n; // tmp copy
+    n += l;
+    sum += s1 + err;
+    m2 += om2 + tmp * tmp / (l * n * oldn);
     return this;
   }
 
@@ -190,26 +223,6 @@ public class MeanVariance extends Mean {
       put(vals[i], weights[i]);
     }
     return this;
-  }
-
-  /**
-   * Get the number of points the average is based on.
-   * 
-   * @return number of data points
-   */
-  @Override
-  public double getCount() {
-    return n;
-  }
-
-  /**
-   * Return mean
-   * 
-   * @return mean
-   */
-  @Override
-  public double getMean() {
-    return m1;
   }
 
   /**
@@ -271,7 +284,7 @@ public class MeanVariance extends Mean {
 
   @Override
   public String toString() {
-    return "MeanVariance(mean=" + getMean() + ",var=" + ((n > 1.) ? getSampleVariance() : "n/a") + ")";
+    return "MeanVariance(mean=" + getMean() + ",var=" + getNaiveVariance() + ",weight=" + n + ")";
   }
 
   @Override

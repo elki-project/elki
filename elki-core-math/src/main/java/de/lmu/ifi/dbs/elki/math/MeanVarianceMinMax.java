@@ -80,8 +80,9 @@ public class MeanVarianceMinMax extends MeanVariance {
       throw new IllegalArgumentException("Cannot aggregate into a minmax statistic: " + other.getClass());
     }
     super.put(other);
-    min = Math.min(min, ((MeanVarianceMinMax) other).min);
-    max = Math.max(max, ((MeanVarianceMinMax) other).max);
+    MeanVarianceMinMax om = (MeanVarianceMinMax) other;
+    min = om.min < min ? om.min : min;
+    max = om.max > max ? om.max : max;
   }
 
   /**
@@ -100,37 +101,42 @@ public class MeanVarianceMinMax extends MeanVariance {
       return this;
     }
     // First pass:
-    double sum = 0.;
+    double s1 = 0.;
     for(int i = 0; i < l; i++) {
       final double v = vals[i];
-      sum += v;
+      s1 += v;
       min = v < min ? v : min;
       max = v > max ? v : max;
     }
-    double om1 = sum / vals.length;
+    final double om1 = s1 / l;
     // Second pass:
-    double om2 = 0.;
+    double om2 = 0., err = 0.;
     for(int i = 0; i < l; i++) {
       final double v = vals[i] - om1;
       om2 += v * v;
+      err += v;
     }
-    final double nwsum = vals.length + this.n;
-    final double delta = om1 - this.m1;
-    final double rval = delta * vals.length / nwsum;
-
-    // this.mean += rval;
-    // This supposedly is more numerically stable:
-    this.m1 = (this.n * this.m1 + sum) / nwsum;
-    this.m2 += om2 + delta * this.n * rval;
-    this.n = nwsum;
+    s1 += err;
+    om2 += err / l;
+    if(n <= 0) {
+      n = l;
+      sum = s1;
+      m2 = om2;
+      return this;
+    }
+    final double tmp = n * s1 - sum * l;
+    final double oldn = n; // tmp copy
+    n += l;
+    sum += s1 + err;
+    m2 += om2 + tmp * tmp / (l * n * oldn);
     return this;
   }
 
   @Override
-  public MeanVarianceMinMax put(double[] vals, double[] weights) {
+  public MeanVariance put(double[] vals, double[] weights) {
     assert (vals.length == weights.length);
     for(int i = 0, end = vals.length; i < end; i++) {
-      // TODO: use two-pass update as above.
+      // TODO: use a two-pass update as in the other put
       put(vals[i], weights[i]);
     }
     return this;
@@ -188,7 +194,7 @@ public class MeanVarianceMinMax extends MeanVariance {
 
   @Override
   public String toString() {
-    return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getSampleVariance() + ",min=" + getMin() + ",max=" + getMax() + ")";
+    return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getNaiveVariance() + ",min=" + getMin() + ",max=" + getMax() + ",weight=" + n + ")";
   }
 
   @Override

@@ -46,7 +46,7 @@ public class EMGOlivierNorbergEstimatorTest extends AbstractDistributionEstimato
       data[i] = gen.nextRandom();
     }
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mean", dist.getMean(), 1, -0.026544709107593434);
+    assertStat("mean", dist.getMean(), 1, -0.0265447091074848);
     assertStat("stddev", dist.getStddev(), 2, 0.17902812796064094);
     assertStat("lambda", dist.getLambda(), .1, -0.0010032987771384089);
 

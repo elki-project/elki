@@ -43,6 +43,13 @@ import net.jafama.FastMath;
  * Sandia Report SAND2008-6212, Sandia National Laboratories
  * </p>
  * 
+ * But our approach also uses parts of
+ * <p>
+ * E. A. Youngs and E. M. Cramer<br />
+ * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br />
+ * Technometrics 13(3), 1971
+ * </p>
+ * 
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -75,7 +82,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @param other other instance to copy data from.
    */
   public StatisticalMoments(StatisticalMoments other) {
-    this.m1 = other.m1;
+    this.sum = other.sum;
     this.m2 = other.m2;
     this.n = other.n;
     this.m3 = other.m3;
@@ -89,17 +96,23 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   @Override
   public void put(double val) {
+    if(this.n == 0) {
+      n = 1.;
+      min = max = sum = val;
+      m2 = m3 = m4 = 0;
+      return;
+    }
     final double nn = this.n + 1.0;
-    final double delta = val - m1;
-    final double delta_nn = delta / nn;
+    final double deltan = val * n - sum;
+    final double delta_nn = deltan / (n * nn);
     final double delta_nn2 = delta_nn * delta_nn;
-    final double inc = delta * delta_nn * this.n;
+    final double inc = deltan * delta_nn;
 
     // Update values:
-    m4 += inc * delta_nn2 * (nn * nn - 3. * nn + 3.) + 6. * delta_nn2 * m2 - 4. * delta_nn * m3;
+    m4 += inc * delta_nn2 * (nn * (nn - 3.) + 3.) + 6. * delta_nn2 * m2 - 4. * delta_nn * m3;
     m3 += inc * delta_nn * (nn - 2) - 3. * delta_nn * m2;
     m2 += inc;
-    m1 += delta_nn;
+    sum += val;
     n = nn;
 
     min = Math.min(min, val);
@@ -117,21 +130,30 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     if(weight <= 0) {
       return;
     }
+    if(this.n == 0) {
+      n = weight;
+      min = max = val;
+      sum = val * weight;
+      m2 = m3 = m4 = 0;
+      return;
+    }
     final double nn = weight + this.n;
-    final double delta = val - this.m1;
+    final double deltan = val * this.n - this.sum;
+    final double inc = deltan * weight;
 
     // Some factors used below:
-    final double delta_nn = delta / nn;
+    final double delta_nn = deltan / (this.n * nn);
+    final double delta_nnw = delta_nn * weight;
     final double delta_nn2 = delta_nn * delta_nn;
     final double delta_nn3 = delta_nn2 * delta_nn;
-    final double na2 = this.n * this.n;
     final double nb2 = weight * weight;
-    final double ntn = this.n * weight;
 
-    this.m4 += delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * nb2 * this.m2 * delta_nn2 - 4. * weight * this.m3 * delta_nn;
-    this.m3 += delta * delta_nn2 * ntn * (this.n - weight) - 3. * weight * this.m2 * delta_nn;
-    this.m2 += delta * delta_nn * this.n * weight;
-    this.m1 += weight * delta_nn;
+    final double tmp1 = this.n - weight;
+    final double tmp2 = this.n * tmp1 + nb2;
+    this.m4 += inc * delta_nn3 * tmp2 + 6. * nb2 * this.m2 * delta_nn2 - 4. * this.m3 * delta_nnw;
+    this.m3 += inc * delta_nn2 * tmp1 - 3. * this.m2 * delta_nnw;
+    this.m2 += inc * delta_nn;
+    this.sum += weight * val;
     this.n = nn;
 
     min = val < min ? val : min;
@@ -148,9 +170,20 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     if(!(other instanceof StatisticalMoments)) {
       throw new IllegalArgumentException("I cannot combine Mean or MeanVariance into to a StatisticalMoments class.");
     }
+    if(other.n == 0.) {
+      return;
+    }
     StatisticalMoments othe = (StatisticalMoments) other;
+    if(this.n == 0.) {
+      this.n = othe.n;
+      this.sum = othe.sum;
+      this.m2 = othe.m2;
+      this.m3 = othe.m3;
+      this.m4 = othe.m4;
+      return;
+    }
     final double nn = othe.n + this.n;
-    final double delta = othe.m1 - this.m1;
+    final double delta = othe.sum / othe.n - this.sum / this.n;
 
     // Some factors used below:
     final double delta_nn = delta / nn;
@@ -163,7 +196,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     this.m4 += othe.m4 + delta * delta_nn3 * ntn * (na2 - ntn + nb2) + 6. * (na2 * othe.m2 + nb2 * this.m2) * delta_nn2 + 4. * (this.n * othe.m3 - othe.n * this.m3) * delta_nn;
     this.m3 += othe.m3 + delta * delta_nn2 * ntn * (this.n - othe.n) + 3. * (this.n * othe.m2 - othe.n * this.m2) * delta_nn;
     this.m2 += othe.m2 + delta * delta_nn * this.n * othe.n;
-    this.m1 += othe.n * delta_nn;
+    this.sum += othe.sum;
     this.n = nn;
 
     min = Math.min(min, othe.min);

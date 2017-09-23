@@ -28,34 +28,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * This class can repeatedly be fed with data using the put() methods, the
  * resulting values for mean can be queried at any time using getMean().
  *
- * Trivial code, but replicated a lot. The class is final so it should come at
- * low cost.
- *
- * Related Literature:
- *
+ * The high-precision function is based on:
  * <p>
- * B. P. Welford<br />
- * Note on a method for calculating corrected sums of squares and products<br />
- * in: Technometrics 4(3)
- * </p>
- *
- * <p>
- * D.H.D. West<br />
- * Updating Mean and Variance Estimates: An Improved Method<br />
- * In: Communications of the ACM, Volume 22 Issue 9
+ * P. M. Neely<br />
+ * Comparison of Several Algorithms for Computation of Means, Standard
+ * Deviations and Correlation Coefficients<br />
+ * Communications of the ACM 9(7), 1966
  * </p>
  *
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "B. P. Welford", //
-    title = "Note on a method for calculating corrected sums of squares and products", //
-    booktitle = "Technometrics 4(3)")
 public class Mean {
   /**
-   * Mean of values - first moment.
+   * Sum of all values.
    */
-  protected double m1;
+  protected double sum;
 
   /**
    * Weight sum (number of samples).
@@ -66,7 +54,7 @@ public class Mean {
    * Empty constructor
    */
   public Mean() {
-    m1 = 0.;
+    sum = 0.;
     n = 0;
   }
 
@@ -76,7 +64,7 @@ public class Mean {
    * @param other other instance to copy data from.
    */
   public Mean(Mean other) {
-    this.m1 = other.m1;
+    this.sum = other.sum;
     this.n = other.n;
   }
 
@@ -87,19 +75,11 @@ public class Mean {
    */
   public void put(double val) {
     n += 1.;
-    if(m1 == Double.POSITIVE_INFINITY || m1 == Double.NEGATIVE_INFINITY) {
-      m1 += val;
-      return;
-    }
-    final double delta = val - m1;
-    m1 += delta / n;
+    sum += val;
   }
 
   /**
    * Add data with a given weight.
-   *
-   * See also: D.H.D. West<br />
-   * Updating Mean and Variance Estimates: An Improved Method
    *
    * @param val data
    * @param weight weight
@@ -108,16 +88,8 @@ public class Mean {
     if(weight == 0.) {
       return;
     }
-    if(m1 == Double.POSITIVE_INFINITY || m1 == Double.NEGATIVE_INFINITY) {
-      m1 += val;
-      n += weight;
-      return;
-    }
-    final double nwsum = weight + n;
-    final double delta = val - m1;
-    final double rval = delta * weight / nwsum;
-    m1 += rval;
-    n = nwsum;
+    sum += val * weight;
+    n += weight;
   }
 
   /**
@@ -129,12 +101,8 @@ public class Mean {
     if(other.n == 0) {
       return;
     }
-    final double nwsum = other.n + this.n;
-
-    // this.mean += rval;
-    // This supposedly is more numerically stable:
-    this.m1 = (this.n * this.m1 + other.n * other.m1) / nwsum;
-    this.n = nwsum;
+    this.sum += other.sum;
+    this.n = other.n + this.n;
   }
 
   /**
@@ -179,7 +147,7 @@ public class Mean {
    * @return mean
    */
   public double getMean() {
-    return m1;
+    return sum / n;
   }
 
   /**
@@ -198,14 +166,14 @@ public class Mean {
 
   @Override
   public String toString() {
-    return "Mean(" + getMean() + ")";
+    return "Mean(" + getMean() + ",weight=" + getCount() + ")";
   }
 
   /**
    * Reset the value.
    */
   public void reset() {
-    m1 = 0;
+    sum = 0;
     n = 0;
   }
 
@@ -216,11 +184,35 @@ public class Mean {
    * @return Mean
    */
   public static double of(double... data) {
-    // FIXME: what is numerically good & fast? Kahan summation?
     double sum = 0.;
     for(double v : data) {
       sum += v;
     }
     return sum / data.length;
+  }
+
+  /**
+   * Static helper function, with extra precision
+   *
+   * @param data Data to compute the mean for.
+   * @return Mean
+   */
+  @Reference(authors = "P. M. Neely", //
+      title = "Comparison of Several Algorithms for Computation of Means, Standard Deviations and Correlation Coefficients", //
+      booktitle = "Communications of the ACM 9(7), 1966", //
+      url = "https://doi.org/10.1145/365719.365958")
+  public static double highPrecision(double... data) {
+    double sum = 0.;
+    for(double v : data) {
+      sum += v;
+    }
+    sum /= data.length;
+    // Perform a second pass to increase precision
+    // In ideal math, this would sum to 0.
+    double err = 0;
+    for(double v : data) {
+      err += v - sum;
+    }
+    return sum + err / data.length;
   }
 }

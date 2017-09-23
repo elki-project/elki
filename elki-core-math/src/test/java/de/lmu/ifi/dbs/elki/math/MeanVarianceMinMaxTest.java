@@ -80,14 +80,18 @@ public class MeanVarianceMinMaxTest {
         mean += data[j];
       }
       mean /= WINDOWSIZE;
-      double var = 0.0;
+      double var = 0.0, errs = 0.0;
       for(int j = i + 1 - WINDOWSIZE; j <= i; j++) {
         double v = data[j] - mean;
+        errs += v;
         var += v * v;
       }
-      var /= (WINDOWSIZE - 1);
+      errs /= WINDOWSIZE;
+      mean += errs;
+      var /= WINDOWSIZE;
+      var += errs * errs;
       assertEquals("Variance does not agree at i=" + i, mc.getSampleVariance(), mv.getSampleVariance(), 1e-14);
-      assertEquals("Variance does not agree at i=" + i, var, mv.getSampleVariance(), 1e-14);
+      assertEquals("Variance does not agree at i=" + i, var, mv.getNaiveVariance(), 1e-14);
       // We can only test mc here:
       assertEquals("Min does not agree at i=" + i, min, mc.getMin(), 0);
       assertEquals("Max does not agree at i=" + i, max, mc.getMax(), 0);
@@ -107,10 +111,10 @@ public class MeanVarianceMinMaxTest {
     assertTrue(badvar < 0); // Variance should always be non-negative!
     MeanVarianceMinMax mv = new MeanVarianceMinMax();
     mv.put(evildata);
-    // Values will not be exactly zero, because 1000.0001 is not exactly
+    // Values will not be exactly zero, because 1000.0001 is no)t exactly
     // representable as float.
     // (But that is not what is causing the problem above).
-    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 1e-25);
+    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 2e-14);
     assertEquals("Mean is bad", 1000.0001, mv.getMean(), 1e-12);
   }
 
@@ -133,7 +137,8 @@ public class MeanVarianceMinMaxTest {
 
   @Test
   public void combine() {
-    MeanVarianceMinMax m1 = new MeanVarianceMinMax(), m2 = new MeanVarianceMinMax();
+    MeanVarianceMinMax m1 = new MeanVarianceMinMax(),
+        m2 = new MeanVarianceMinMax();
     m1.put(new double[] { 1, 2, 3 });
     m2.put(new double[] { 4, 5, 6, 7 });
     MeanVarianceMinMax m3 = new MeanVarianceMinMax(m1);
@@ -154,7 +159,7 @@ public class MeanVarianceMinMaxTest {
     m2.put(new double[] { 1, 2, 3 }, new double[] { 4, 2, 1 });
     assertEquals("Fourth mean", 3.0, m2.getMean(), 0);
     assertEquals("Fourth stddev", 4.8, m2.getSampleVariance(), 0);
-    m2.put(new double[] { 0, 100, 9 }, new double[] { .01, 0, 99});
+    m2.put(new double[] { 0, 100, 9 }, new double[] { .01, 0, 99 });
     assertEquals("First min", 0, m2.getMin(), 0.);
     assertEquals("First max", 9, m2.getMax(), 0.);
   }
