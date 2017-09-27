@@ -1217,11 +1217,10 @@ public final class VMath {
    * @return m1 = s1 * m1, overwriting m1
    */
   public static double[][] timesEquals(final double[][] m1, final double s1) {
-    final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
+    final int rowdim = m1.length;
     for(int i = 0; i < rowdim; i++) {
       final double[] row = m1[i];
-      // assert row.length == coldim : ERR_MATRIX_RAGGED;
-      for(int j = 0; j < coldim; j++) {
+      for(int j = 0; j < row.length; j++) {
         row[j] *= s1;
       }
     }
