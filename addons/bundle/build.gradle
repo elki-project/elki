@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.johnrengelman.shadow" version "1.2.4"
+  id "com.github.johnrengelman.shadow" version "2.0.1"
 }
 
 description = 'ELKI - Single-jar Bundle'
@@ -40,9 +40,9 @@ jar {
       include("license/*")
       eachFile { FileCopyDetails fcp ->
         fcp.path = "license/"  + fcp.name.replaceAll(".txt\$", "")
-	fcp.path += "-" + dep.name.replaceAll("batik-.*", "batik")
-	fcp.path = fcp.path.replaceAll("\\.(dom.*|sax)-xml-apis", "-\$1")
-	fcp.path = fcp.path.replaceAll("\\.(sac\\.html)-xml-apis", ".\$1")
+        fcp.path += "-" + dep.name.replaceAll("batik-.*", "batik")
+        fcp.path = fcp.path.replaceAll("\\.(dom.*|sax)-xml-apis", "-\$1")
+        fcp.path = fcp.path.replaceAll("\\.(sac\\.html)-xml-apis", ".\$1")
       }
     }
     // zipTree(dep.file).findAll {
@@ -97,4 +97,17 @@ shadowJar {
   exclude "svm*class" // libsvm main classes
   exclude "Applet*class" // libsvm applet
   exclude "META-INF/maven/tw.edu.ntu.csie/*/*" // libsvm maven metadata
+  // reduce size of fastutil, for much smaller jar (and thus, fasterstartup)
+  exclude "it/unimi/dsi/fastutil/**/*Big*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*AVLTree*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*ArrayMap*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*Big*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Boolean*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Byte*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Char*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Short*" // fastutil
+  exclude "it/unimi/dsi/fastutil/bytes/" // fastutil
+  exclude "it/unimi/dsi/fastutil/chars/" // fastutil
+  exclude "it/unimi/dsi/fastutil/booleans/" // fastutil
+  exclude "it/unimi/dsi/fastutil/shorts/" // fastutil
 }
