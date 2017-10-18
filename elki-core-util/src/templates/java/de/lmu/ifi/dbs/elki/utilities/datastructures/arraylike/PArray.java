@@ -23,12 +23,14 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 import java.util.Arrays;
 
 /**
- * Array of int values.
+ * Array of ${type} values (primitive, avoiding the boxing overhead of ArrayList<${boxedtype}>).
+ *
+ * This class is generated from a code template.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
+public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classname}> {
   /**
    * Maximum array size permitted by Java.
    * 
@@ -49,7 +51,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
   /**
    * (Reused) store for numerical attributes.
    */
-  public int[] data;
+  public ${type}[] data;
 
   /**
    * Number of numerical attributes.
@@ -59,7 +61,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
   /**
    * Constructor.
    */
-  public IntegerArray() {
+  public ${classname}() {
     this(11);
   }
 
@@ -68,14 +70,14 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    *
    * @param initialsize Initial size.
    */
-  public IntegerArray(int initialsize) {
+  public ${classname}(int initialsize) {
     if(initialsize < 0) {
       initialsize = 11;
     }
     else if(initialsize > MAX_ARRAY_SIZE) {
       initialsize = MAX_ARRAY_SIZE;
     }
-    this.data = new int[initialsize];
+    this.data = new ${type}[initialsize];
     this.size = 0;
   }
 
@@ -87,7 +89,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    *
    * @param existing Existing array
    */
-  public IntegerArray(IntegerArray existing) {
+  public ${classname}(${classname} existing) {
     this.data = Arrays.copyOf(existing.data, existing.size);
     this.size = existing.size;
   }
@@ -104,7 +106,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    *
    * @param attribute Attribute value.
    */
-  public void add(int attribute) {
+  public void add(${type} attribute) {
     if(data.length == size) {
       grow();
     }
@@ -130,7 +132,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    * @param pos Position
    * @return Value
    */
-  public int get(int pos) {
+  public ${type} get(int pos) {
     if(pos < 0 || pos >= size) {
       throw new ArrayIndexOutOfBoundsException(pos);
     }
@@ -143,7 +145,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    * @param pos Position
    * @param value Value
    */
-  public void set(int pos, int value) {
+  public void set(int pos, ${type} value) {
     if(pos < 0 || pos > size) {
       throw new ArrayIndexOutOfBoundsException(pos);
     }
@@ -175,14 +177,14 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    * @param pos Insert position
    * @param val Value to insert
    */
-  public void insert(int pos, int val) {
+  public void insert(int pos, ${type} val) {
     if(size == data.length) {
       if(data.length == MAX_ARRAY_SIZE) {
         throw new OutOfMemoryError("Array size has reached the Java maximum.");
       }
       final int newsize = (size >= LAST_GROW_SIZE) ? MAX_ARRAY_SIZE : (size + (size >> 1) + 1);
-      final int[] oldd = data;
-      data = new int[newsize];
+      final ${type}[] oldd = data;
+      data = new ${type}[newsize];
       System.arraycopy(oldd, 0, data, 0, pos);
       System.arraycopy(oldd, pos, data, pos + 1, size - pos);
     }
@@ -209,45 +211,44 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
     Arrays.sort(data, 0, size);
   }
 
-  // NumberArrayAdapter:
-
+  // Implement NumberArrayAdapter:
   @Override
-  public int size(IntegerArray array) {
+  public int size(${classname} array) {
     return array.size;
   }
 
   @Override
-  public Integer get(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public ${boxedtype} get(${classname} array, int off) throws IndexOutOfBoundsException {
     return array.data[off];
   }
 
   @Override
-  public double getDouble(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public double getDouble(${classname} array, int off) throws IndexOutOfBoundsException {
     return (double) array.data[off];
   }
 
   @Override
-  public float getFloat(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(${classname} array, int off) throws IndexOutOfBoundsException {
     return (float) array.data[off];
   }
 
   @Override
-  public int getInteger(IntegerArray array, int off) throws IndexOutOfBoundsException {
-    return array.data[off];
+  public int getInteger(${classname} array, int off) throws IndexOutOfBoundsException {
+    return (int) array.data[off];
   }
 
   @Override
-  public short getShort(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public short getShort(${classname} array, int off) throws IndexOutOfBoundsException {
     return (short) array.data[off];
   }
 
   @Override
-  public long getLong(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public long getLong(${classname} array, int off) throws IndexOutOfBoundsException {
     return (long) array.data[off];
   }
 
   @Override
-  public byte getByte(IntegerArray array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(${classname} array, int off) throws IndexOutOfBoundsException {
     return (byte) array.data[off];
   }
 
@@ -256,7 +257,7 @@ public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
    *
    * @return Copy of the contents.
    */
-  public int[] toArray() {
+  public ${type}[] toArray() {
     return Arrays.copyOf(data, size);
   }
 }

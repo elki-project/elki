@@ -21,66 +21,66 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 
 /**
- * Use a double array as, well, double array in the ArrayAdapter API.
- * 
+ * Use a {@code ${type}[]} in the ArrayAdapter API.
+ *
+ * This class is generated from a code template.
+ *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @apiviz.exclude
  */
-public class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
+public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${type}[]> {
   /**
    * Static instance.
    */
-  public static DoubleArrayAdapter STATIC = new DoubleArrayAdapter();
+  public static final ${classname} STATIC = new ${classname}();
 
   /**
-   * Constructor.
-   * 
-   * Use the static instance from {@link ArrayLikeUtil}!
+   * Private constructor - use the static instance in {@link #STATIC}!
    */
-  protected DoubleArrayAdapter() {
+  protected ${classname}() {
     super();
   }
 
   @Override
-  public int size(double[] array) {
+  public int size(${type}[] array) {
     return array.length;
   }
 
   @Override
   @Deprecated
-  public Double get(double[] array, int off) throws IndexOutOfBoundsException {
-    return Double.valueOf(array[off]);
+  public ${boxedtype} get(${type}[] array, int off) throws IndexOutOfBoundsException {
+    return ${boxedtype}.valueOf(array[off]);
   }
 
   @Override
-  public double getDouble(double[] array, int off) throws IndexOutOfBoundsException {
-    return array[off];
+  public double getDouble(${type}[] array, int off) throws IndexOutOfBoundsException {
+    return (double) array[off];
   }
 
   @Override
-  public float getFloat(double[] array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(${type}[] array, int off) throws IndexOutOfBoundsException {
     return (float) array[off];
   }
 
   @Override
-  public int getInteger(double[] array, int off) throws IndexOutOfBoundsException {
+  public int getInteger(${type}[] array, int off) throws IndexOutOfBoundsException {
     return (int) array[off];
   }
 
   @Override
-  public short getShort(double[] array, int off) throws IndexOutOfBoundsException {
+  public short getShort(${type}[] array, int off) throws IndexOutOfBoundsException {
     return (short) array[off];
   }
 
   @Override
-  public long getLong(double[] array, int off) throws IndexOutOfBoundsException {
+  public long getLong(${type}[] array, int off) throws IndexOutOfBoundsException {
     return (long) array[off];
   }
 
   @Override
-  public byte getByte(double[] array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(${type}[] array, int off) throws IndexOutOfBoundsException {
     return (byte) array[off];
   }
 }

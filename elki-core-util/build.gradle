@@ -1,4 +1,38 @@
 description = 'ELKI - Core Utilities'
+
+def templateDir = new File(projectDir, "src/templates/java")
+def generatedSrcDir = new File(buildDir, "src/generated/java")
+ 
+sourceSets.main.java.srcDirs += generatedSrcDir
+
+// Simple code generator 
+def generate(File inp, File out, Map vals) {
+	if (!out.exists() || out.lastModified() >= inp.lastModified()) {
+	    def eng = new groovy.text.GStringTemplateEngine();
+	    out.text = eng.createTemplate(inp).make(vals);
+	    out.setLastModified(inp.lastModified());
+	}
+	return;
+}
+
+task generateCode(description: "Generate code from templates") {
+    def pkg = "de/lmu/ifi/dbs/elki/utilities/datastructures/arraylike/";
+    def out = new File(generatedSrcDir, pkg);
+    out.mkdirs()
+
+    // This will run every time (but we check timestamps)
+    // Because otherwise, it would not run in eclipse buildship at all.
+    def tpl = new File(templateDir, pkg + "PArray.java")
+    generate(tpl, new File(out, "IntegerArray.java"), [type: "int", boxedtype: "Integer", classname: "IntegerArray"])
+    generate(tpl, new File(out, "DoubleArray.java"), [type: "double", boxedtype: "Double", classname: "DoubleArray"])
+
+    tpl = new File(templateDir, pkg + "PArrayAdapter.java")
+    generate(tpl, new File(out, "FloatArrayAdapter.java"), [type: "float", boxedtype: "Float", classname: "FloatArrayAdapter"])
+    generate(tpl, new File(out, "DoubleArrayAdapter.java"), [type: "double", boxedtype: "Double", classname: "DoubleArrayAdapter"])
+}
+
+tasks.compileJava.dependsOn generateCode
+
 dependencies {
   compile project(':elki-logging')
   compile group: 'net.jafama', name: 'jafama', version:'[2.1.0,3)'

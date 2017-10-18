@@ -60,12 +60,12 @@ public final class ArrayLikeUtil {
   /**
    * Use a double array in the array API.
    */
-  public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = new DoubleArrayAdapter();
+  public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = DoubleArrayAdapter.STATIC;
 
   /**
    * Use a float array in the array API.
    */
-  public static final NumberArrayAdapter<Float, float[]> FLOATARRAYADAPTER = new FloatArrayAdapter();
+  public static final NumberArrayAdapter<Float, float[]> FLOATARRAYADAPTER = FloatArrayAdapter.STATIC;
 
   /**
    * Fake constructor. Do not instantiate!
