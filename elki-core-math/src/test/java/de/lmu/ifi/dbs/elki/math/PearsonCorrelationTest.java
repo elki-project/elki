@@ -79,10 +79,10 @@ public class PearsonCorrelationTest {
     assertEquals("Count", size * WEIGHT1, wpc1.getCount(), 0.);
     assertEquals("Count", size * WEIGHT2, wpc2.getCount(), 1e-13 * size * WEIGHT2);
     assertEquals("Batch and incremental should be the same", pear, pc0.getCorrelation(), 0.);
-    assertEquals("Batch and incremental should be the same", wpear1, wpc1.getCorrelation(), 0.);
-    assertEquals("Batch and incremental should be the same", wpear2, wpc2.getCorrelation(), 0.);
     assertEquals("Pearson and weighted pearson should be the same with constant weights.", pc0.getCorrelation(), wpc1.getCorrelation(), 1E-15);
     assertEquals("Weighted pearsons should be the same with constant weights.", wpc1.getCorrelation(), wpc2.getCorrelation(), 1E-15);
+    assertEquals("Batch and incremental should be the same", wpear1, wpc1.getCorrelation(), 0.);
+    assertEquals("Batch and incremental should be the same", wpear2, wpc2.getCorrelation(), 0.);
 
     // Reset, and rerun.
     pc0.reset();
@@ -128,6 +128,7 @@ public class PearsonCorrelationTest {
   public void testLengthDifference7() {
     PearsonCorrelation.weightedCoefficient(new NV(new double[1]), new NV(new double[1]), new double[2]);
   }
+
   @Test(expected = IllegalArgumentException.class)
   public void testLengthDifference8() {
     PearsonCorrelation.weightedCoefficient(new NV(new double[1]), new NV(new double[2]), new double[1]);

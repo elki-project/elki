@@ -43,7 +43,7 @@ public class PearsonCorrelation {
   /**
    * Current mean for X and Y.
    */
-  private double meanX, meanY;
+  private double sumX, sumY;
 
   /**
    * Weight sum.
@@ -57,8 +57,8 @@ public class PearsonCorrelation {
     sumXX = 0.;
     sumYY = 0.;
     sumXY = 0.;
-    meanX = 0.;
-    meanY = 0.;
+    sumX = 0.;
+    sumY = 0.;
     sumWe = 0.;
   }
 
@@ -70,28 +70,30 @@ public class PearsonCorrelation {
    * @param w Weight
    */
   public void put(double x, double y, double w) {
+    if(w == 0.) {
+      return;
+    }
     if(sumWe <= 0.) {
-      meanX = x;
-      meanY = y;
+      sumX = x * w;
+      sumY = y * w;
       sumWe = w;
       return;
     }
+    // Delta to previous mean
+    final double deltaX = x * sumWe - sumX;
+    final double deltaY = y * sumWe - sumY;
+    final double oldWe = sumWe;
     // Incremental update
     sumWe += w;
-    // Delta to previous mean
-    final double deltaX = x - meanX;
-    final double deltaY = y - meanY;
-    // Update means
-    meanX += deltaX * w / sumWe;
-    meanY += deltaY * w / sumWe;
-    // Delta to new mean
-    final double neltaX = x - meanX;
-    final double neltaY = y - meanY;
+    final double f = w / (sumWe * oldWe);
     // Update
-    sumXX += w * deltaX * neltaX;
-    sumYY += w * deltaY * neltaY;
+    sumXX += f * deltaX * deltaX;
+    sumYY += f * deltaY * deltaY;
     // should equal weight * deltaY * neltaX!
-    sumXY += w * deltaX * neltaY;
+    sumXY += f * deltaX * deltaY;
+    // Update means
+    sumX += x * w;
+    sumY += y * w;
   }
 
   /**
@@ -101,7 +103,27 @@ public class PearsonCorrelation {
    * @param y Value in Y
    */
   public void put(double x, double y) {
-    put(x, y, 1.);
+    if(sumWe <= 0.) {
+      sumX = x;
+      sumY = y;
+      sumWe = 1;
+      return;
+    }
+    // Delta to previous mean
+    final double deltaX = x * sumWe - sumX;
+    final double deltaY = y * sumWe - sumY;
+    final double oldWe = sumWe;
+    // Incremental update
+    sumWe += 1;
+    final double f = 1. / (sumWe * oldWe);
+    // Update
+    sumXX += f * deltaX * deltaX;
+    sumYY += f * deltaY * deltaY;
+    // should equal weight * deltaY * neltaX!
+    sumXY += f * deltaX * deltaY;
+    // Update means
+    sumX += x;
+    sumY += y;
   }
 
   /**
@@ -131,7 +153,7 @@ public class PearsonCorrelation {
    * @return mean
    */
   public double getMeanX() {
-    return meanX;
+    return sumX / sumWe;
   }
 
   /**
@@ -140,7 +162,7 @@ public class PearsonCorrelation {
    * @return mean
    */
   public double getMeanY() {
-    return meanY;
+    return sumY / sumWe;
   }
 
   /**
@@ -248,12 +270,7 @@ public class PearsonCorrelation {
    * Reset the value.
    */
   public void reset() {
-    sumXX = 0.;
-    sumXY = 0.;
-    sumYY = 0.;
-    meanX = 0.;
-    meanY = 0.;
-    sumWe = 0.;
+    sumXX = sumXY = sumYY = sumX = sumY = sumWe = 0.;
   }
 
   /**
@@ -276,26 +293,25 @@ public class PearsonCorrelation {
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0.;
-    double meanX = x[0], meanY = y[0];
+    double sumX = x[0], sumY = y[0];
     int i = 1;
     while(i < xdim) {
       final double xv = x[i], yv = y[i];
       // Delta to previous mean
-      final double deltaX = xv - meanX;
-      final double deltaY = yv - meanY;
+      final double deltaX = xv * i - sumX;
+      final double deltaY = yv * i - sumY;
       // Increment count first
+      final double oldi = i; // Convert to double!
       ++i;
-      // Update means
-      meanX += deltaX / i;
-      meanY += deltaY / i;
-      // Delta to new mean
-      final double neltaX = xv - meanX;
-      final double neltaY = yv - meanY;
+      final double f = 1. / (i * oldi);
       // Update
-      sumXX += deltaX * neltaX;
-      sumYY += deltaY * neltaY;
+      sumXX += f * deltaX * deltaX;
+      sumYY += f * deltaY * deltaY;
       // should equal deltaY * neltaX!
-      sumXY += deltaX * neltaY;
+      sumXY += f * deltaX * deltaY;
+      // Update sums
+      sumX += xv;
+      sumY += yv;
     }
     // One or both series were constant:
     if(!(sumXX > 0. && sumYY > 0.)) {
@@ -324,26 +340,25 @@ public class PearsonCorrelation {
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0.;
-    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    double sumX = x.doubleValue(0), sumY = y.doubleValue(0);
     int i = 1;
     while(i < xdim) {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i);
       // Delta to previous mean
-      final double deltaX = xv - meanX;
-      final double deltaY = yv - meanY;
+      final double deltaX = xv * i - sumX;
+      final double deltaY = yv * i - sumY;
       // Increment count first
+      final double oldi = i; // Convert to double!
       ++i;
-      // Update means
-      meanX += deltaX / i;
-      meanY += deltaY / i;
-      // Delta to new mean
-      final double neltaX = xv - meanX;
-      final double neltaY = yv - meanY;
+      final double f = 1. / (i * oldi);
       // Update
-      sumXX += deltaX * neltaX;
-      sumYY += deltaY * neltaY;
+      sumXX += f * deltaX * deltaX;
+      sumYY += f * deltaY * deltaY;
       // should equal deltaY * neltaX!
-      sumXY += deltaX * neltaY;
+      sumXY += f * deltaX * deltaY;
+      // Update sums
+      sumX += xv;
+      sumY += yv;
     }
     // One or both series were constant:
     if(!(sumXX > 0. && sumYY > 0.)) {
@@ -376,25 +391,24 @@ public class PearsonCorrelation {
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
-    double meanX = x[0], meanY = y[0];
+    double sumX = x[0] * sumWe, sumY = y[0] * sumWe;
     for(int i = 1; i < xdim; ++i) {
       final double xv = x[i], yv = y[i], w = weights[i];
       // Delta to previous mean
-      final double deltaX = xv - meanX;
-      final double deltaY = yv - meanY;
-      // Increment weight first
+      final double deltaX = xv * sumWe - sumX;
+      final double deltaY = yv * sumWe - sumY;
+      // Increment count first
+      final double oldWe = sumWe; // Convert to double!
       sumWe += w;
-      // Update means
-      meanX += deltaX * w / sumWe;
-      meanY += deltaY * w / sumWe;
-      // Delta to new mean
-      final double neltaX = xv - meanX;
-      final double neltaY = yv - meanY;
+      final double f = w / (sumWe * oldWe);
       // Update
-      sumXX += w * deltaX * neltaX;
-      sumYY += w * deltaY * neltaY;
-      // should equal weight * deltaY * neltaX!
-      sumXY += w * deltaX * neltaY;
+      sumXX += f * deltaX * deltaX;
+      sumYY += f * deltaY * deltaY;
+      // should equal deltaY * neltaX!
+      sumXY += f * deltaX * deltaY;
+      // Update sums
+      sumX += xv * w;
+      sumY += yv * w;
     }
     // One or both series were constant:
     if(!(sumXX > 0. && sumYY > 0.)) {
@@ -427,25 +441,24 @@ public class PearsonCorrelation {
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
-    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    double sumX = x.doubleValue(0) * sumWe, sumY = y.doubleValue(0) * sumWe;
     for(int i = 1; i < xdim; ++i) {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i), w = weights[i];
       // Delta to previous mean
-      final double deltaX = xv - meanX;
-      final double deltaY = yv - meanY;
-      // Increment weight first
+      final double deltaX = xv * sumWe - sumX;
+      final double deltaY = yv * sumWe - sumY;
+      // Increment count first
+      final double oldWe = sumWe; // Convert to double!
       sumWe += w;
-      // Update means
-      meanX += deltaX * w / sumWe;
-      meanY += deltaY * w / sumWe;
-      // Delta to new mean
-      final double neltaX = xv - meanX;
-      final double neltaY = yv - meanY;
+      final double f = w / (sumWe * oldWe);
       // Update
-      sumXX += w * deltaX * neltaX;
-      sumYY += w * deltaY * neltaY;
-      // should equal weight * deltaY * neltaX!
-      sumXY += w * deltaX * neltaY;
+      sumXX += f * deltaX * deltaX;
+      sumYY += f * deltaY * deltaY;
+      // should equal deltaY * neltaX!
+      sumXY += f * deltaX * deltaY;
+      // Update sums
+      sumX += xv * w;
+      sumY += yv * w;
     }
     // One or both series were constant:
     if(!(sumXX > 0. && sumYY > 0.)) {
@@ -478,26 +491,25 @@ public class PearsonCorrelation {
     // Inlined computation of Pearson correlation, to avoid allocating objects!
     // This is a numerically stabilized version, avoiding sum-of-squares.
     double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights.doubleValue(0);
-    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    double sumX = x.doubleValue(0) * sumWe, sumY = y.doubleValue(0) * sumWe;
     for(int i = 1; i < xdim; ++i) {
-      final double xv = x.doubleValue(i), yv = y.doubleValue(i),
-          w = weights.doubleValue(i);
+      final double xv = x.doubleValue(i), yv = y.doubleValue(i);
+      final double w = weights.doubleValue(i);
       // Delta to previous mean
-      final double deltaX = xv - meanX;
-      final double deltaY = yv - meanY;
-      // Increment weight first
+      final double deltaX = xv * sumWe - sumX;
+      final double deltaY = yv * sumWe - sumY;
+      // Increment count first
+      final double oldWe = sumWe; // Convert to double!
       sumWe += w;
-      // Update means
-      meanX += deltaX * w / sumWe;
-      meanY += deltaY * w / sumWe;
-      // Delta to new mean
-      final double neltaX = xv - meanX;
-      final double neltaY = yv - meanY;
+      final double f = w / (sumWe * oldWe);
       // Update
-      sumXX += w * deltaX * neltaX;
-      sumYY += w * deltaY * neltaY;
-      // should equal weight * deltaY * neltaX!
-      sumXY += w * deltaX * neltaY;
+      sumXX += f * deltaX * deltaX;
+      sumYY += f * deltaY * deltaY;
+      // should equal deltaY * neltaX!
+      sumXY += f * deltaX * deltaY;
+      // Update sums
+      sumX += xv * w;
+      sumY += yv * w;
     }
     // One or both series were constant:
     if(!(sumXX > 0. && sumYY > 0.)) {
