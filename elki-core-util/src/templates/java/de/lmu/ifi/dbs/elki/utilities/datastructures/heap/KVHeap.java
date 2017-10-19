@@ -23,57 +23,73 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
- * Basic in-memory heap interface, for int keys and V values.
- * 
+ * Basic in-memory heap interface, for ${key.type != "K" ? key.type : "Object"} keys and ${val.type != "V" ? val.type : "Object"} values.
+ *
+ * This class is generated from a template.
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @apiviz.has UnsortedIter
- * @param <V> Value type
- */
-public interface IntegerObjectHeap<V> {
+${key.gend || val.gend ? " *\n" : ""}${key.gend ? " * @param "+key.genu+" Key type\n" : ""}${val.gend ? " * @param "+val.genu+" Value type\n" : ""} */
+public interface ${classname}${key.gend}${val.gend} {
   /**
    * Add a key-value pair to the heap
-   * 
+   *
    * @param key Key
    * @param val Value
    */
-  void add(int key, V val);
+  void add(${key.type} key, ${val.type} val);
 
   /**
    * Add a key-value pair to the heap if it improves the top.
-   * 
+   *
    * @param key Key
    * @param val Value
    * @param k Desired maximum size
    */
-  void add(int key, V val, int k);
+  void add(${key.type} key, ${val.type} val, int k);
 
   /**
-   * Combined operation that removes the top element, and inserts a new element
-   * instead.
-   * 
+   * Combined operation that removes the top element, and inserts a new element instead.
+   *
    * @param key Key of new element
    * @param val Value of new element
    */
-  void replaceTopElement(int key, V val);
+  void replaceTopElement(${key.type} key, ${val.type} val);
 
   /**
-   * Get the current top key
-   * 
+   * Get the current top key.
+   *
    * @return Top key
    */
-  int peekKey();
+  ${key.type} peekKey();
 
   /**
-   * Get the current top value
-   * 
+   * Get the current top value.
+   *
    * @return Value
    */
-  V peekValue();
+  ${val.type} peekValue();
 
   /**
-   * Remove the first element
+   * Contains operation for a key (slow: with a linear scan).
+   *
+   * @param q Key
+   * @return {@code true} if the key is contained in the heap.
+   */
+  boolean containsKey(${key.type} q);
+
+  /**
+   * Contains operation for a value (slow: with a linear scan).
+   *
+   * @param q Value
+   * @return {@code true} if the value is contained in the heap.
+   */
+  boolean containsValue(${val.type} q);
+  
+  /**
+   * Remove the first element.
    */
   void poll();
 
@@ -83,45 +99,44 @@ public interface IntegerObjectHeap<V> {
   void clear();
 
   /**
-   * Query the size
-   * 
+   * Query the size.
+   *
    * @return Size
    */
   int size();
 
   /**
    * Is the heap empty?
-   * 
+   *
    * @return {@code true} when the size is 0.
    */
   boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
-   * 
+   *
    * @return Iterator
    */
-  UnsortedIter<V> unsortedIter();
+  UnsortedIter${key.genu}${val.genu} unsortedIter();
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
    * @author Erich Schubert
-   * @param <V> Value type
-   */
-  interface UnsortedIter<V> extends Iter {
+${key.gend || val.gend ? "   *\n" : ""}${key.gend ? "   * @param "+key.genu+" Key type\n" : ""}${val.gend ? "   * @param "+val.genu+" Value type\n" : ""}   */
+  interface UnsortedIter${key.gend}${val.gend} extends Iter {
     /**
-     * Get the current key
-     * 
+     * Get the current key.
+     *
      * @return Current key
      */
-    int getKey();
+    ${key.type} getKey();
 
     /**
-     * Get the current value
-     * 
+     * Get the current value.
+     *
      * @return Current value
      */
-    V getValue();
+    ${val.type} getValue();
   }
 }

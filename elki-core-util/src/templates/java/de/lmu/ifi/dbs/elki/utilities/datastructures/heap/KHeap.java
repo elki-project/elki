@@ -23,103 +23,98 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
- * Basic in-memory heap interface, for double keys and long values.
- * 
+ * Basic in-memory heap for ${type != "K" ? type : "Object"} values.
+ *
  * @author Erich Schubert
- * @since 0.6.0
- * 
+ * @since 0.5.5
+ *
  * @apiviz.has UnsortedIter
- */
-public interface DoubleLongHeap {
+${genu ? " *\n * @param "+genu+" Key type\n" : ""} */
+public interface ${classname}${gend} {
   /**
    * Add a key-value pair to the heap
-   * 
+   *
    * @param key Key
-   * @param val Value
    */
-  void add(double key, long val);
+  void add(${type} key);
 
   /**
-   * Add a key-value pair to the heap if it improves the top.
-   * 
+   * Add a key-value pair to the heap, except if the new element is larger than
+   * the top, and we are at design size (overflow)
+   *
    * @param key Key
-   * @param val Value
-   * @param k Desired maximum size
+   * @param max Maximum size of heap
    */
-  void add(double key, long val, int k);
+  void add(${type} key, int max);
 
   /**
    * Combined operation that removes the top element, and inserts a new element
    * instead.
-   * 
-   * @param key Key of new element
-   * @param val Value of new element
+   *
+   * @param e New element to insert
+   * @return Previous top element of the heap
    */
-  void replaceTopElement(double key, long val);
+  ${type} replaceTopElement(${type} e);
 
   /**
    * Get the current top key
-   * 
+   *
    * @return Top key
    */
-  double peekKey();
-
-  /**
-   * Get the current top value
-   * 
-   * @return Value
-   */
-  long peekValue();
+  ${type} peek();
 
   /**
    * Remove the first element
+   *
+   * @return Top element
    */
-  void poll();
+  ${type} poll();
 
   /**
-   * Clear the heap contents.
+   * Delete all elements from the heap.
    */
   void clear();
 
   /**
    * Query the size
-   * 
+   *
    * @return Size
    */
   int size();
-  
+
   /**
    * Is the heap empty?
-   * 
+   *
    * @return {@code true} when the size is 0.
    */
   boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
-   * 
+   *
    * @return Iterator
    */
-  UnsortedIter unsortedIter();
+  UnsortedIter${genu} unsortedIter();
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
+   * <pre>
+   * {@code
+   * for (${classname}.UnsortedIter${genu} iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   *   doSomething(iter.get());
+   * }
+   * }
+   * </pre>
+   *
    * @author Erich Schubert
-   */
-  interface UnsortedIter extends Iter {
+${genu ? " *\n   * @param "+genu+" Key type\n" : ""}   */
+  interface UnsortedIter${gend} extends Iter {
     /**
-     * Get the current key
-     * 
-     * @return Current key
+     * Get the iterators current object.
+     *
+     * @return Current object
      */
-    double getKey();
-
-    /**
-     * Get the current value
-     * 
-     * @return Current value
-     */
-    long getValue();
+    ${type} get();
   }
 }

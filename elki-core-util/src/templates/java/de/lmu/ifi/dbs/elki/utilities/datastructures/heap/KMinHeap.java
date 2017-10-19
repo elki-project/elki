@@ -26,16 +26,15 @@ import java.util.Arrays;
  * Binary heap for primitive types.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  *
  * @apiviz.has UnsortedIter
- * @param <K> Key type
- */
-public class ComparatorMinHeap<K> implements ObjectHeap<K> {
+${genu ? " *\n * @param "+genu+" Key type\n" : ""} */
+public class ${classname}${gend} implements ${boxed.equals("Comparable") ? "Object" : boxed}Heap${genu} {
   /**
    * Base heap.
    */
-  protected Object[] twoheap;
+  protected ${raw}[] twoheap;
 
   /**
    * Current size of heap.
@@ -46,46 +45,29 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
    * Initial size of the 2-ary heap.
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
-
-
-  /**
-   * Comparator
-   */
-  protected java.util.Comparator<Object> comparator;
-
+${extra ? "\n  " + extra.fields +"\n" : ""}
   /**
    * Constructor, with default size.
-   * @param comparator Comparator
-   */
-  @SuppressWarnings("unchecked")
-  public ComparatorMinHeap(java.util.Comparator<? super K> comparator) {
-    super();
-    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
-    Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
-
-    this.twoheap = twoheap;
+   ${extra ? "*\n   * " + extra.param + "\n   " : ""}*/
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${classname}(${extra ? extra.constructor : ""}) {
+    super();${extra ? "\n    " + extra.init : ""}
+    this.twoheap = new ${raw.replaceAll("<.*>", "")}[TWO_HEAP_INITIAL_SIZE];
   }
 
   /**
    * Constructor, with given minimum size.
    *
    * @param minsize Minimum size
-   * @param comparator Comparator
-   */
-  @SuppressWarnings("unchecked")
-  public ComparatorMinHeap(int minsize, java.util.Comparator<? super K> comparator) {
-    super();
-    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
-    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
-    Object[] twoheap = new Object[size];
-
-    this.twoheap = twoheap;
+   ${extra ? "* " + extra.param + "\n   " : ""}*/
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${classname}(int minsize${extra ? ", " + extra.constructor : ""}) {
+    super();${extra ? "\n    " + extra.init : ""}
+    this.twoheap = new ${raw.replaceAll("<.*>", "")}[HeapUtil.nextPow2Int(minsize + 1) - 1];
   }
 
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, null);
+    Arrays.fill(twoheap, ${zero});
   }
 
   @Override
@@ -95,14 +77,13 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
 
   @Override
   public boolean isEmpty() {
-    return (size == 0);
+    return size == 0;
   }
 
   @Override
-  public void add(K o) {
-    final Object co = o;
-    // System.err.println("Add: " + o);
-    if (size >= twoheap.length) {
+  ${raw != type && raw != "Object" ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public void add(${type} o) {
+    final ${raw} co = ${raw != type && raw != "Object" ? "(" + raw + ") " : ""}o;
+    if(size >= twoheap.length) {
       // Grow by one layer.
       twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
     }
@@ -113,20 +94,20 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
   }
 
   @Override
-  public void add(K key, int max) {
-    if (size < max) {
+  public void add(${type} key, int max) {
+    if(size < max) {
       add(key);
-    } else if (comparator.compare(twoheap[0], key) < 0) {
+    }
+    else if(${getProperty("cmp")("<", "twoheap[0]", "key")}) {
       replaceTopElement(key);
     }
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K replaceTopElement(K reinsert) {
-    final Object ret = twoheap[0];
-    heapifyDown( reinsert);
-    return (K)ret;
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} replaceTopElement(${type} reinsert) {
+    final ${raw} ret = twoheap[0];
+    heapifyDown(${raw != type && raw != "Object" ? "(" + raw + ") " : ""}reinsert);
+    return ${raw != type ? "(" + type + ") " : ""}ret;
   }
 
   /**
@@ -135,11 +116,11 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp(int twopos, Object cur) {
-    while (twopos > 0) {
+  private void heapifyUp(int twopos, ${raw} cur) {
+    while(twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      Object par = twoheap[parent];
-      if (comparator.compare(cur, par) >= 0) {
+      ${raw} par = twoheap[parent];
+      if(${getProperty("cmp")(">=", "cur", "par")}) {
         break;
       }
       twoheap[twopos] = par;
@@ -149,19 +130,19 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K poll() {
-    final Object ret = twoheap[0];
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} poll() {
+    final ${raw} ret = twoheap[0];
     --size;
     // Replacement object:
-    if (size > 0) {
-      final Object reinsert = twoheap[size];
-      twoheap[size] = null;
+    if(size > 0) {
+      final ${raw} reinsert = twoheap[size];
+      twoheap[size] = ${zero};
       heapifyDown(reinsert);
-    } else {
-      twoheap[0] = null;
     }
-    return (K)ret;
+    else {
+      twoheap[0] = ${zero};
+    }
+    return ${raw != type ? "(" + type + ") " : ""}ret;
   }
 
   /**
@@ -169,18 +150,18 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
    *
    * @param cur Object to insert.
    */
-  private void heapifyDown(Object cur) {
+  private void heapifyDown(${raw} cur) {
     final int stop = size >>> 1;
     int twopos = 0;
-    while (twopos < stop) {
+    while(twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      Object best = twoheap[bestchild];
+      ${raw} best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && comparator.compare(best, twoheap[right]) > 0) {
+      if(right < size && ${getProperty("cmp")(">", "best", "twoheap[right]")}) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (comparator.compare(cur, best) <= 0) {
+      if(${getProperty("cmp")(">=", "best", "cur")}) {
         break;
       }
       twoheap[twopos] = best;
@@ -190,16 +171,15 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K peek() {
-    return (K)twoheap[0];
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} peek() {
+    return ${raw != type ? "(" + type + ") " : ""}twoheap[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(ComparatorMinHeap.class.getSimpleName()).append(" [");
-    for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
+    buf.append(${classname}.class.getSimpleName()).append(" [");
+    for(UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.get()).append(',');
     }
     buf.append(']');
@@ -218,7 +198,7 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
    *
    * <pre>
    * {@code
-   * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (${boxed.equals("Comparable") ? "Object" : boxed}Heap.UnsortedIter${genu} iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
@@ -226,7 +206,7 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
    *
    * @author Erich Schubert
    */
-  private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+  private class UnsortedIter implements ${boxed.equals("Comparable") ? "Object" : boxed}Heap.UnsortedIter${genu} {
     /**
      * Iterator position.
      */
@@ -238,16 +218,14 @@ public class ComparatorMinHeap<K> implements ObjectHeap<K> {
     }
 
     @Override
-    public de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter advance() {
+    public UnsortedIter advance() {
       pos++;
       return this;
     }
 
-    @SuppressWarnings("unchecked")
-
     @Override
-    public K get() {
-      return (K)twoheap[pos];
+    ${raw != type ? "@SuppressWarnings(\"unchecked\")\n    " : ""}public ${type} get() {
+      return ${raw != type ? "(" + type + ") " : ""}twoheap[pos];
     }
   }
 }

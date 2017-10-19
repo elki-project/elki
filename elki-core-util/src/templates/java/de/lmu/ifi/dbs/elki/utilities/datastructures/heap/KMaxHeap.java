@@ -24,18 +24,17 @@ import java.util.Arrays;
 
 /**
  * Binary heap for primitive types.
- * 
+ *
  * @author Erich Schubert
- * @since 0.4.0
- * 
+ * @since 0.5.5
+ *
  * @apiviz.has UnsortedIter
- * @param <K> Key type
- */
-public class ComparableMaxHeap<K extends Comparable<? super K>> implements ObjectHeap<K> {
+${genu ? " *\n * @param "+genu+" Key type\n" : ""} */
+public class ${classname}${gend} implements ${boxed.equals("Comparable") ? "Object" : boxed}Heap${genu} {
   /**
    * Base heap.
    */
-  protected Comparable<Object>[] twoheap;
+  protected ${raw}[] twoheap;
 
   /**
    * Current size of heap.
@@ -46,36 +45,29 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * Initial size of the 2-ary heap.
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
-
+${extra ? "\n  " + extra.fields +"\n" : ""}
   /**
    * Constructor, with default size.
-   */
-  @SuppressWarnings("unchecked")
-  public ComparableMaxHeap() {
-    super();
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
-
-    this.twoheap = twoheap;
+   ${extra ? "*\n   * " + extra.param + "\n   " : ""}*/
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${classname}(${extra ? extra.constructor : ""}) {
+    super();${extra ? "\n    " + extra.init : ""}
+    this.twoheap = new ${raw.replaceAll("<.*>", "")}[TWO_HEAP_INITIAL_SIZE];
   }
 
   /**
    * Constructor, with given minimum size.
-   * 
+   *
    * @param minsize Minimum size
-   */
-  @SuppressWarnings("unchecked")
-  public ComparableMaxHeap(int minsize) {
-    super();
-    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
-      
-    this.twoheap = twoheap;
+   ${extra ? "* " + extra.param + "\n   " : ""}*/
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${classname}(int minsize${extra ? ", " + extra.constructor : ""}) {
+    super();${extra ? "\n    " + extra.init : ""}
+    this.twoheap = new ${raw.replaceAll("<.*>", "")}[HeapUtil.nextPow2Int(minsize + 1) - 1];
   }
 
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, null);
+    Arrays.fill(twoheap, ${zero});
   }
 
   @Override
@@ -85,15 +77,13 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
 
   @Override
   public boolean isEmpty() {
-    return (size == 0);
+    return size == 0;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void add(K o) {
-    final Comparable<Object> co = (Comparable<Object>)o;
-    // System.err.println("Add: " + o);
-    if (size >= twoheap.length) {
+  ${raw != type && raw != "Object" ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public void add(${type} o) {
+    final ${raw} co = ${raw != type && raw != "Object" ? "(" + raw + ") " : ""}o;
+    if(size >= twoheap.length) {
       // Grow by one layer.
       twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
     }
@@ -104,33 +94,33 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   }
 
   @Override
-  public void add(K key, int max) {
-    if (size < max) {
+  public void add(${type} key, int max) {
+    if(size < max) {
       add(key);
-    } else if (twoheap[0].compareTo(key) > 0) {
+    }
+    else if(${getProperty("cmp")(">", "twoheap[0]", "key")}) {
       replaceTopElement(key);
     }
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K replaceTopElement(K reinsert) {
-    final Comparable<Object> ret = twoheap[0];
-    heapifyDown((Comparable<Object>) reinsert);
-    return (K)ret;
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} replaceTopElement(${type} reinsert) {
+    final ${raw} ret = twoheap[0];
+    heapifyDown(${raw != type && raw != "Object" ? "(" + raw + ") " : ""}reinsert);
+    return ${raw != type ? "(" + type + ") " : ""}ret;
   }
 
   /**
    * Heapify-Up method for 2-ary heap.
-   * 
+   *
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp(int twopos, Comparable<Object> cur) {
-    while (twopos > 0) {
+  private void heapifyUp(int twopos, ${raw} cur) {
+    while(twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      Comparable<Object> par = twoheap[parent];
-      if (cur.compareTo(par) <= 0) {
+      ${raw} par = twoheap[parent];
+      if(${getProperty("cmp")("<=", "cur", "par")}) {
         break;
       }
       twoheap[twopos] = par;
@@ -140,38 +130,38 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K poll() {
-    final Comparable<Object> ret = twoheap[0];
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} poll() {
+    final ${raw} ret = twoheap[0];
     --size;
     // Replacement object:
-    if (size > 0) {
-      final Comparable<Object> reinsert = twoheap[size];
-      twoheap[size] = null;
+    if(size > 0) {
+      final ${raw} reinsert = twoheap[size];
+      twoheap[size] = ${zero};
       heapifyDown(reinsert);
-    } else {
-      twoheap[0] = null;
     }
-    return (K)ret;
+    else {
+      twoheap[0] = ${zero};
+    }
+    return ${raw != type ? "(" + type + ") " : ""}ret;
   }
 
   /**
    * Invoke heapify-down for the root object.
-   * 
+   *
    * @param cur Object to insert.
    */
-  private void heapifyDown(Comparable<Object> cur) {
+  private void heapifyDown(${raw} cur) {
     final int stop = size >>> 1;
     int twopos = 0;
-    while (twopos < stop) {
+    while(twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      Comparable<Object> best = twoheap[bestchild];
+      ${raw} best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best.compareTo(twoheap[right]) < 0) {
+      if(right < size && ${getProperty("cmp")("<", "best", "twoheap[right]")}) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur.compareTo(best) >= 0) {
+      if(${getProperty("cmp")("<=", "best", "cur")}) {
         break;
       }
       twoheap[twopos] = best;
@@ -181,16 +171,15 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K peek() {
-    return (K)twoheap[0];
+  ${raw != type ? "@SuppressWarnings(\"unchecked\")\n  " : ""}public ${type} peek() {
+    return ${raw != type ? "(" + type + ") " : ""}twoheap[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(ComparableMaxHeap.class.getSimpleName()).append(" [");
-    for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
+    buf.append(${classname}.class.getSimpleName()).append(" [");
+    for(UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.get()).append(',');
     }
     buf.append(']');
@@ -204,20 +193,20 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
    * Use this class as follows:
-   * 
+   *
    * <pre>
    * {@code
-   * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (${boxed.equals("Comparable") ? "Object" : boxed}Heap.UnsortedIter${genu} iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
    * </pre>
-   * 
+   *
    * @author Erich Schubert
    */
-  private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+  private class UnsortedIter implements ${boxed.equals("Comparable") ? "Object" : boxed}Heap.UnsortedIter${genu} {
     /**
      * Iterator position.
      */
@@ -229,16 +218,14 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
     }
 
     @Override
-    public de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter advance() {
+    public UnsortedIter advance() {
       pos++;
       return this;
     }
 
-    @SuppressWarnings("unchecked")
-
     @Override
-    public K get() {
-      return (K)twoheap[pos];
+    ${raw != type ? "@SuppressWarnings(\"unchecked\")\n    " : ""}public ${type} get() {
+      return ${raw != type ? "(" + type + ") " : ""}twoheap[pos];
     }
   }
 }

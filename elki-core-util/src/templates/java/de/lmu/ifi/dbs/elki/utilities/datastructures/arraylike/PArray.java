@@ -33,7 +33,7 @@ import java.util.Arrays;
 public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classname}> {
   /**
    * Maximum array size permitted by Java.
-   * 
+   *
    * This is JVM dependent, but 2^31 - 5 is the usual OpenJDK8 value.
    */
   private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5;
@@ -115,7 +115,7 @@ public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classnam
 
   /**
    * Grow the current array.
-   * 
+   *
    * @throws OutOfMemoryError
    */
   private void grow() throws OutOfMemoryError {
@@ -202,6 +202,15 @@ public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classnam
    */
   public int size() {
     return size;
+  }
+
+  /**
+   * Test if the array is empty.
+   *
+   * @return {@code true} if empty.
+   */
+  public boolean isEmpty() {
+    return size == 0;
   }
 
   /**

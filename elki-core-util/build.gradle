@@ -7,30 +7,125 @@ sourceSets.main.java.srcDirs += generatedSrcDir
 
 // Simple code generator 
 def generate(File inp, File out, Map vals) {
-	if (!out.exists() || out.lastModified() >= inp.lastModified()) {
-	    def eng = new groovy.text.GStringTemplateEngine();
+	if (out.exists() && out.lastModified() == inp.lastModified()) return;
+	def eng = new groovy.text.GStringTemplateEngine();
+	try {
 	    out.text = eng.createTemplate(inp).make(vals);
-	    out.setLastModified(inp.lastModified());
+	} catch(RuntimeException e) {
+	    throw new RuntimeException("${e.getMessage()} when generating $out", e);
 	}
-	return;
+	out.setLastModified(inp.lastModified());
 }
 
 task generateCode(description: "Generate code from templates") {
     def pkg = "de/lmu/ifi/dbs/elki/utilities/datastructures/arraylike/";
     def out = new File(generatedSrcDir, pkg);
+    def inp = new File(templateDir, pkg);
     out.mkdirs()
 
     // This will run every time (but we check timestamps)
     // Because otherwise, it would not run in eclipse buildship at all.
-    def tpl = new File(templateDir, pkg + "PArray.java")
-    generate(tpl, new File(out, "IntegerArray.java"), [type: "int", boxedtype: "Integer", classname: "IntegerArray"])
-    generate(tpl, new File(out, "DoubleArray.java"), [type: "double", boxedtype: "Double", classname: "DoubleArray"])
 
-    tpl = new File(templateDir, pkg + "PArrayAdapter.java")
-    generate(tpl, new File(out, "FloatArrayAdapter.java"), [type: "float", boxedtype: "Float", classname: "FloatArrayAdapter"])
-    generate(tpl, new File(out, "DoubleArrayAdapter.java"), [type: "double", boxedtype: "Double", classname: "DoubleArrayAdapter"])
+    //// Primitive arrays
+    def tpl = new File(inp, "PArray.java")
+    generate(tpl, new File(out, "IntegerArray.java"),
+      [type: "int", boxedtype: "Integer", classname: "IntegerArray"])
+    generate(tpl, new File(out, "DoubleArray.java"),
+      [type: "double", boxedtype: "Double", classname: "DoubleArray"])
+
+    //// Primitive array adapters
+    tpl = new File(inp, "PArrayAdapter.java")
+    generate(tpl, new File(out, "FloatArrayAdapter.java"),
+      [type: "float", boxedtype: "Float", classname: "FloatArrayAdapter"])
+    generate(tpl, new File(out, "DoubleArrayAdapter.java"),
+      [type: "double", boxedtype: "Double", classname: "DoubleArrayAdapter"])
+    inputs.files fileTree(inp)      
+    outputs.files fileTree(out)
+
+    pkg = "de/lmu/ifi/dbs/elki/utilities/datastructures/heap/";
+    out = new File(generatedSrcDir, pkg);
+    inp = new File(templateDir, pkg);
+    out.mkdirs()
+
+    // It would be straightforward to generate additional types,
+    // but we would rather keep the jar smaller.
+    Map tdbl = [type:"double", boxed:"Double", raw:"double", zero: "0.", gend: "", genu:"", cmp: {c,x,y -> "$x $c $y"}]
+    Map tint = [type:"int", boxed:"Integer", raw:"int", zero: "0", gend: "", genu:"", cmp: {c,x,y -> "$x $c $y"}]
+    Map tlng = [type:"long", boxed:"Long", raw:"long", zero: "0", gend: "", genu:"", cmp: {c,x,y -> "$x $c $y"}]
+    Map kobj = [type:"K", boxed:"Object", raw:"Object", zero: "null", gend: "<K>", genu:"<K>", cmp: {c,x,y -> "comparator.compare($x, $y) $c 0"}]
+    Map kcom = [type:"K", boxed:"Comparable", raw:"Comparable<Object>", zero: "null", gend: "<K extends Comparable<? super K>>", genu:"<K>", cmp: {c,x,y -> "${x}.compareTo($y) $c 0"}]
+    Map vobj = [type:"V", boxed:"Object", raw:"Object", zero: "null", gend: "<V>", genu:"<V>"]
+    Map ecmp = [fields:"/**\n   * Comparator\n   */\n  protected java.util.Comparator<Object> comparator;",
+                param:"@param comparator Comparator",
+                constructor:"java.util.Comparator<? super K> comparator",
+                init:"this.comparator = (java.util.Comparator<Object>) comparator;"]
+
+    //// Key-only Heap interfaces
+    tpl = new File(inp, "KHeap.java")
+    generate(tpl, new File(out, "DoubleHeap.java"),
+      [classname: "DoubleHeap"] + tdbl)
+    generate(tpl, new File(out, "IntegerHeap.java"),
+      [classname: "IntegerHeap"] + tint)
+    generate(tpl, new File(out, "ObjectHeap.java"),
+      [classname: "ObjectHeap"] + kobj)
+    //// Key-only min heaps
+    tpl = new File(inp, "KMinHeap.java")
+    generate(tpl, new File(out, "DoubleMinHeap.java"),
+      [classname: "DoubleMinHeap", extra: null] + tdbl)
+    generate(tpl, new File(out, "IntegerMinHeap.java"),
+      [classname: "IntegerMinHeap", extra: null] + tint)
+    generate(tpl, new File(out, "ComparableMinHeap.java"),
+      [classname: "ComparableMinHeap", extra: null] + kcom)
+    generate(tpl, new File(out, "ComparatorMinHeap.java"),
+      [classname: "ComparatorMinHeap", extra: ecmp] + kobj)
+    //// Key-only max heaps
+    tpl = new File(inp, "KMaxHeap.java")
+    generate(tpl, new File(out, "DoubleMaxHeap.java"),
+      [classname: "DoubleMaxHeap", extra: null] + tdbl)
+    generate(tpl, new File(out, "IntegerMaxHeap.java"),
+      [classname: "IntegerMaxHeap", extra: null] + tint)
+    generate(tpl, new File(out, "ComparableMaxHeap.java"),
+      [classname: "ComparableMaxHeap", extra: null] + kcom)
+    generate(tpl, new File(out, "ComparatorMaxHeap.java"),
+      [classname: "ComparatorMaxHeap", extra: ecmp] + kobj)
+    
+    //// Important: The use of non-primitive keys in KV heaps is currently outdated
+    //// Because it usually makes more sense to use a ObjectHeap instead.
+
+    //// Key-Value heap interfaces
+    tpl = new File(inp, "KVHeap.java")
+    generate(tpl, new File(out, "DoubleIntegerHeap.java"),
+      [classname: "DoubleIntegerHeap", key: tdbl, val: tint])
+    generate(tpl, new File(out, "DoubleLongHeap.java"),
+      [classname: "DoubleLongHeap", key: tdbl, val: tlng])
+    generate(tpl, new File(out, "DoubleObjectHeap.java"),
+      [classname: "DoubleObjectHeap", key: tdbl, val: vobj])
+    generate(tpl, new File(out, "IntegerObjectHeap.java"),
+      [classname: "IntegerObjectHeap", key: tint, val: vobj])
+    //// Key-Value min heaps
+    tpl = new File(inp, "KVMinHeap.java")
+    generate(tpl, new File(out, "DoubleIntegerMinHeap.java"),
+      [classname: "DoubleIntegerMinHeap", key: tdbl, val: tint])
+    generate(tpl, new File(out, "DoubleLongMinHeap.java"),
+      [classname: "DoubleLongMinHeap", key: tdbl, val: tlng])
+    generate(tpl, new File(out, "DoubleObjectMinHeap.java"),
+      [classname: "DoubleObjectMinHeap", key: tdbl, val: vobj])
+    generate(tpl, new File(out, "IntegerObjectMinHeap.java"),
+      [classname: "IntegerObjectMinHeap", key: tint, val: vobj])
+    //// Key-Value max heaps
+    tpl = new File(inp, "KVMaxHeap.java")
+    generate(tpl, new File(out, "DoubleIntegerMaxHeap.java"),
+      [classname: "DoubleIntegerMaxHeap", key: tdbl, val: tint])
+    generate(tpl, new File(out, "DoubleLongMaxHeap.java"),
+      [classname: "DoubleLongMaxHeap", key: tdbl, val: tlng])
+    generate(tpl, new File(out, "DoubleObjectMaxHeap.java"),
+      [classname: "DoubleObjectMaxHeap", key: tdbl, val: vobj])
+    generate(tpl, new File(out, "IntegerObjectMaxHeap.java"),
+      [classname: "IntegerObjectMaxHeap", key: tint, val: vobj])
+
+    inputs.files fileTree(inp)      
+    outputs.files fileTree(out)
 }
-
 tasks.compileJava.dependsOn generateCode
 
 dependencies {

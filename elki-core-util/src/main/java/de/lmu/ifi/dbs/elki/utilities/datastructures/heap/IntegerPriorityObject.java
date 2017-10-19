@@ -25,10 +25,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap
  * UpdatableHeap}, since hashcode and equality use the stored objects only, not
  * the priority.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @param <O> Stored object type.
  */
 public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObject<?>> {
@@ -46,7 +46,7 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
 
   /**
    * Constructor.
-   * 
+   *
    * @param priority Priority
    * @param object Payload
    */
@@ -58,7 +58,7 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
 
   /**
    * Get the priority.
-   * 
+   *
    * @return Priority
    */
   public int getPriority() {
@@ -67,7 +67,7 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
 
   /**
    * Get the stored object payload
-   * 
+   *
    * @return object data
    */
   public O getObject() {
@@ -76,7 +76,7 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
 
   @Override
   public int hashCode() {
-    return ((object == null) ? 0 : object.hashCode());
+    return object == null ? 0 : object.hashCode();
   }
 
   @Override
@@ -84,19 +84,11 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof IntegerPriorityObject)) {
+    if(obj == null || !(obj instanceof IntegerPriorityObject)) {
       return false;
     }
     IntegerPriorityObject<?> other = (IntegerPriorityObject<?>) obj;
-    if(object == null) {
-      return (other.object == null);
-    }
-    else {
-      return object.equals(other.object);
-    }
+    return object == null ? other.object == null : object.equals(other.object);
   }
 
   @Override
@@ -106,8 +98,9 @@ public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObjec
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append(priority).append(':').append(object.toString());
+    String s = object.toString();
+    StringBuilder buf = new StringBuilder(s.length() + 12);
+    buf.append(priority).append(':').append(s);
     return buf.toString();
   }
 }
