@@ -41,7 +41,7 @@ public class ABODTest extends AbstractOutlierAlgorithmTest {
   public void testABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    ABOD<DoubleVector> abod = new ELKIBuilder<>(ABOD.class).build();
+    ABOD<DoubleVector> abod = new ELKIBuilder<ABOD<DoubleVector>>(ABOD.class).build();
 
     // run ABOD on database
     OutlierResult result = abod.run(db);

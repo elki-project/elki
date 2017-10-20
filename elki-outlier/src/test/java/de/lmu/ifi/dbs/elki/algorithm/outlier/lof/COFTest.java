@@ -39,7 +39,7 @@ public class COFTest extends AbstractOutlierAlgorithmTest {
   public void testCOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    COF<DoubleVector> cof = new ELKIBuilder<>(COF.class) //
+    COF<DoubleVector> cof = new ELKIBuilder<COF<DoubleVector>>(COF.class) //
         .with(COF.Parameterizer.K_ID, 10).build();
 
     // run COF on database

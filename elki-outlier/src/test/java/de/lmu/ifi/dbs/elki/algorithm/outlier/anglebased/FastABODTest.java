@@ -40,7 +40,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // setup Algorithm
-    FastABOD<DoubleVector> abod = new ELKIBuilder<>(FastABOD.class) //
+    FastABOD<DoubleVector> abod = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5).build();
 
     // run ABOD on database

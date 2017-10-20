@@ -39,7 +39,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    DBOutlierDetection<DoubleVector> dbOutlierDetection = new ELKIBuilder<>(DBOutlierDetection.class) //
+    DBOutlierDetection<DoubleVector> dbOutlierDetection = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
         .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
         .with(DBOutlierDetection.Parameterizer.P_ID, 0.98) //
         .build();

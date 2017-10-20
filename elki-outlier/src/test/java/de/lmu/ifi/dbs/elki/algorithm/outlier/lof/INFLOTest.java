@@ -39,7 +39,7 @@ public class INFLOTest extends AbstractOutlierAlgorithmTest {
   public void testINFLO() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    INFLO<DoubleVector> inflo = new ELKIBuilder<>(INFLO.class) //
+    INFLO<DoubleVector> inflo = new ELKIBuilder<INFLO<DoubleVector>>(INFLO.class) //
         .with(INFLO.Parameterizer.K_ID, 30).build();
 
     // run INFLO on database

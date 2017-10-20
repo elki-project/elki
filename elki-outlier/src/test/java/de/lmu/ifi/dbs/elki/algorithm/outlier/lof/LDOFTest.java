@@ -39,7 +39,7 @@ public class LDOFTest extends AbstractOutlierAlgorithmTest {
   public void testLDOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    LDOF<DoubleVector> ldof = new ELKIBuilder<>(LDOF.class) //
+    LDOF<DoubleVector> ldof = new ELKIBuilder<LDOF<DoubleVector>>(LDOF.class) //
         .with(LDOF.Parameterizer.K_ID, 24).build();
 
     // run LDOF on database

@@ -40,7 +40,7 @@ public class ParallelLOFTest extends AbstractOutlierAlgorithmTest {
   public void testParallelLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    ParallelLOF<DoubleVector> lof = new ELKIBuilder<>(ParallelLOF.class) //
+    ParallelLOF<DoubleVector> lof = new ELKIBuilder<ParallelLOF<DoubleVector>>(ParallelLOF.class) //
         .with(LOF.Parameterizer.K_ID, 10).build();
 
     // run ParallelLOF on database

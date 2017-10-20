@@ -43,7 +43,7 @@ public class AttributeWiseMeanNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    AttributeWiseMeanNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMeanNormalization.class).build();
+    AttributeWiseMeanNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseMeanNormalization<DoubleVector>>(AttributeWiseMeanNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

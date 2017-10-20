@@ -40,7 +40,7 @@ public class SODTest extends AbstractOutlierAlgorithmTest {
   public void testSOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    SOD<DoubleVector> sod = new ELKIBuilder<>(SOD.class) //
+    SOD<DoubleVector> sod = new ELKIBuilder<SOD<DoubleVector>>(SOD.class) //
         .with(SOD.Parameterizer.KNN_ID, 25) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19) //
         .build();

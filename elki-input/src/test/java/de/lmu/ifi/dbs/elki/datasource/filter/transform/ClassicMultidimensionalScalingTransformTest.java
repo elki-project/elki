@@ -46,7 +46,7 @@ public class ClassicMultidimensionalScalingTransformTest extends AbstractDataSou
   public void parameters() {
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
-    ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<>(ClassicMultidimensionalScalingTransform.class) //
+    ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector>>(ClassicMultidimensionalScalingTransform.class) //
         .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
         .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //
         .build();

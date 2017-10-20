@@ -38,7 +38,7 @@ public class SOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    SOS<DoubleVector> sos = new ELKIBuilder<>(SOS.class) //
+    SOS<DoubleVector> sos = new ELKIBuilder<SOS<DoubleVector>>(SOS.class) //
         .with(SOS.Parameterizer.PERPLEXITY_ID, 50).build();
 
     // run SOS on database

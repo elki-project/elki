@@ -40,7 +40,7 @@ public class KDEOSTest extends AbstractOutlierAlgorithmTest {
   public void testKDEOS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    KDEOS<DoubleVector> kdeos = new ELKIBuilder<>(KDEOS.class) //
+    KDEOS<DoubleVector> kdeos = new ELKIBuilder<KDEOS<DoubleVector>>(KDEOS.class) //
         .with(KDEOS.Parameterizer.KERNEL_ID, EpanechnikovKernelDensityFunction.class) //
         .with(KDEOS.Parameterizer.KMIN_ID, 5) //
         .with(KDEOS.Parameterizer.KMAX_ID, 20) //

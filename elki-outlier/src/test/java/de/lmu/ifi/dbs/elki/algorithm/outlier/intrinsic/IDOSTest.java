@@ -38,7 +38,7 @@ public class IDOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    IDOS<DoubleVector> idos = new ELKIBuilder<>(IDOS.class) //
+    IDOS<DoubleVector> idos = new ELKIBuilder<IDOS<DoubleVector>>(IDOS.class) //
         .with(IDOS.Parameterizer.KC_ID, 100) //
         .with(IDOS.Parameterizer.KR_ID, 20) //
         .build();

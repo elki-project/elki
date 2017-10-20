@@ -39,7 +39,7 @@ public class FlexibleLOFTest extends AbstractOutlierAlgorithmTest {
   public void testFlexibleLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    FlexibleLOF<DoubleVector> flof = new ELKIBuilder<>(FlexibleLOF.class) //
+    FlexibleLOF<DoubleVector> flof = new ELKIBuilder<FlexibleLOF<DoubleVector>>(FlexibleLOF.class) //
         .with(FlexibleLOF.Parameterizer.KREF_ID, 10).build();
 
     // run LOF on database

@@ -42,7 +42,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   public void testHiCSKS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    HiCS<DoubleVector> fb = new ELKIBuilder<>(HiCS.class) //
+    HiCS<DoubleVector> fb = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(HiCS.Parameterizer.LIMIT_ID, 10) //
         .with(HiCS.Parameterizer.SEED_ID, 0) //
@@ -60,7 +60,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   public void testHiCSWelch() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    HiCS<DoubleVector> fb = new ELKIBuilder<>(HiCS.class) //
+    HiCS<DoubleVector> fb = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(HiCS.Parameterizer.LIMIT_ID, 10) //
         .with(HiCS.Parameterizer.SEED_ID, 0) //

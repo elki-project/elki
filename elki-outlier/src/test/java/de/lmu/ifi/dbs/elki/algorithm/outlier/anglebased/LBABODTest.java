@@ -41,7 +41,7 @@ public class LBABODTest extends AbstractOutlierAlgorithmTest {
   public void testLBABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    LBABOD<DoubleVector> abod = new ELKIBuilder<>(LBABOD.class) //
+    LBABOD<DoubleVector> abod = new ELKIBuilder<LBABOD<DoubleVector>>(LBABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 150) //
         .with(LBABOD.Parameterizer.L_ID, 10) //
         .build();

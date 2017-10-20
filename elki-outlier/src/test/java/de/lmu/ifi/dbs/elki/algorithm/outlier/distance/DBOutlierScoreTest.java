@@ -39,7 +39,7 @@ public class DBOutlierScoreTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierScore() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    DBOutlierScore<DoubleVector> dbOutlierScore = new ELKIBuilder<>(DBOutlierScore.class) //
+    DBOutlierScore<DoubleVector> dbOutlierScore = new ELKIBuilder<DBOutlierScore<DoubleVector>>(DBOutlierScore.class) //
         .with(DBOutlierScore.Parameterizer.D_ID, 0.175).build();
 
     // run DBOutlierScore on database

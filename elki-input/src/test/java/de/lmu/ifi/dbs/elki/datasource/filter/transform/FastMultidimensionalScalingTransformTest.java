@@ -46,7 +46,7 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
   public void parameters() {
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
-    FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<>(FastMultidimensionalScalingTransform.class) //
+    FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<FastMultidimensionalScalingTransform<DoubleVector, DoubleVector>>(FastMultidimensionalScalingTransform.class) //
         .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
         .with(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, 0L) //
         .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //

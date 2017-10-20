@@ -39,7 +39,7 @@ public class LocalIsolationCoefficientTest extends AbstractOutlierAlgorithmTest 
   public void testLocalIsolationCoefficient() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    LocalIsolationCoefficient<DoubleVector> licOutlier = new ELKIBuilder<>(LocalIsolationCoefficient.class) //
+    LocalIsolationCoefficient<DoubleVector> licOutlier = new ELKIBuilder<LocalIsolationCoefficient<DoubleVector>>(LocalIsolationCoefficient.class) //
         .with(LocalIsolationCoefficient.Parameterizer.K_ID, 4).build();
 
     // run KNNWeightOutlier on database

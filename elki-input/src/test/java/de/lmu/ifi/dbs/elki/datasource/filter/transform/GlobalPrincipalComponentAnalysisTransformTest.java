@@ -44,7 +44,7 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "transformation-test-1.csv";
-    GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = new ELKIBuilder<>(GlobalPrincipalComponentAnalysisTransform.class).build();
+    GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = new ELKIBuilder<GlobalPrincipalComponentAnalysisTransform<DoubleVector>>(GlobalPrincipalComponentAnalysisTransform.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

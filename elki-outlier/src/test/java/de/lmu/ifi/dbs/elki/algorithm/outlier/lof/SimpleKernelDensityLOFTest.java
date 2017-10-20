@@ -40,7 +40,7 @@ public class SimpleKernelDensityLOFTest extends AbstractOutlierAlgorithmTest {
   public void testLDF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    SimpleKernelDensityLOF<DoubleVector> klof = new ELKIBuilder<>(SimpleKernelDensityLOF.class) //
+    SimpleKernelDensityLOF<DoubleVector> klof = new ELKIBuilder<SimpleKernelDensityLOF<DoubleVector>>(SimpleKernelDensityLOF.class) //
         .with(LOF.Parameterizer.K_ID, 20) //
         .with(SimpleKernelDensityLOF.Parameterizer.KERNEL_ID, BiweightKernelDensityFunction.class) //
         .build();

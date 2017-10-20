@@ -40,7 +40,7 @@ public class ParallelKNNOutlierTest extends AbstractOutlierAlgorithmTest {
   public void testKNNOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    ParallelKNNOutlier<DoubleVector> knnOutlier = new ELKIBuilder<>(ParallelKNNOutlier.class) //
+    ParallelKNNOutlier<DoubleVector> knnOutlier = new ELKIBuilder<ParallelKNNOutlier<DoubleVector>>(ParallelKNNOutlier.class) //
         .with(KNNOutlier.Parameterizer.K_ID, 1).build();
 
     // run KNNOutlier on database

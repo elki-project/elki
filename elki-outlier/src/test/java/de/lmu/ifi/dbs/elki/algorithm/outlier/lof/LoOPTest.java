@@ -39,7 +39,7 @@ public class LoOPTest extends AbstractOutlierAlgorithmTest {
   public void testLoOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    LoOP<DoubleVector> loop = new ELKIBuilder<>(LoOP.class) //
+    LoOP<DoubleVector> loop = new ELKIBuilder<LoOP<DoubleVector>>(LoOP.class) //
         .with(LoOP.Parameterizer.KCOMP_ID, 14).build();
 
     // run LoOP on database

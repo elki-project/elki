@@ -38,7 +38,7 @@ public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithm
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    IntrinsicDimensionalityOutlier<DoubleVector> ido = new ELKIBuilder<>(IntrinsicDimensionalityOutlier.class) //
+    IntrinsicDimensionalityOutlier<DoubleVector> ido = new ELKIBuilder<IntrinsicDimensionalityOutlier<DoubleVector>>(IntrinsicDimensionalityOutlier.class) //
         .with(IntrinsicDimensionalityOutlier.Parameterizer.K_ID, 100).build();
 
     // run KNNOutlier on database

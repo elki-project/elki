@@ -39,7 +39,7 @@ public class LDFTest extends AbstractOutlierAlgorithmTest {
   public void testLDF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    LDF<DoubleVector> ldf = new ELKIBuilder<>(LDF.class) //
+    LDF<DoubleVector> ldf = new ELKIBuilder<LDF<DoubleVector>>(LDF.class) //
         .with(LDF.Parameterizer.K_ID, 10) //
         .with(LDF.Parameterizer.H_ID, 1) //
         .build();

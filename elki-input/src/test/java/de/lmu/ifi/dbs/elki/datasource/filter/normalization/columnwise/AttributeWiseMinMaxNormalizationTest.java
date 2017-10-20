@@ -45,7 +45,7 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMinMaxNormalization.class).build();
+    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseMinMaxNormalization<DoubleVector>>(AttributeWiseMinMaxNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
@@ -72,7 +72,7 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   @Test
   public void testNaNParameters() {
     String filename = UNITTEST + "nan-test-1.csv";
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMinMaxNormalization.class).build();
+    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseMinMaxNormalization<DoubleVector>>(AttributeWiseMinMaxNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));

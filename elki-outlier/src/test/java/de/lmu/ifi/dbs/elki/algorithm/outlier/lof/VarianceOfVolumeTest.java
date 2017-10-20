@@ -39,7 +39,7 @@ public class VarianceOfVolumeTest extends AbstractOutlierAlgorithmTest {
   public void testVOV() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    VarianceOfVolume<DoubleVector> lof = new ELKIBuilder<>(VarianceOfVolume.class) //
+    VarianceOfVolume<DoubleVector> lof = new ELKIBuilder<VarianceOfVolume<DoubleVector>>(VarianceOfVolume.class) //
         .with(VarianceOfVolume.Parameterizer.K_ID, 10) //
         .build();
 

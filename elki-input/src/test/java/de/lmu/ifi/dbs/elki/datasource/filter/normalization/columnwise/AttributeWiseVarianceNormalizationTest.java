@@ -45,7 +45,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseVarianceNormalization.class).build();
+    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseVarianceNormalization<DoubleVector>>(AttributeWiseVarianceNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
@@ -73,7 +73,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   @Test
   public void testNaNParameters() {
     String filename = UNITTEST + "nan-test-1.csv";
-    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseVarianceNormalization.class).build();
+    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseVarianceNormalization<DoubleVector>>(AttributeWiseVarianceNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));

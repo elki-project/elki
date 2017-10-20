@@ -38,7 +38,7 @@ public class KNNSOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    KNNSOS<DoubleVector> sos = new ELKIBuilder<>(KNNSOS.class) //
+    KNNSOS<DoubleVector> sos = new ELKIBuilder<KNNSOS<DoubleVector>>(KNNSOS.class) //
         .with(KNNSOS.Parameterizer.KNN_ID, 150).build();
 
     // run SOS on database

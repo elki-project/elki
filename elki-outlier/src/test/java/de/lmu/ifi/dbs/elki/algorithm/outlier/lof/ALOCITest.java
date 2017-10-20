@@ -39,7 +39,7 @@ public class ALOCITest extends AbstractOutlierAlgorithmTest {
   public void testALOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    ALOCI<DoubleVector> aloci = new ELKIBuilder<>(ALOCI.class) //
+    ALOCI<DoubleVector> aloci = new ELKIBuilder<ALOCI<DoubleVector>>(ALOCI.class) //
         .with(ALOCI.Parameterizer.SEED_ID, 2) //
         .with(ALOCI.Parameterizer.GRIDS_ID, 3) //
         .build();

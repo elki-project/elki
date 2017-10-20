@@ -46,7 +46,7 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
-    AttributeWiseCDFNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseCDFNormalization.class) //
+    AttributeWiseCDFNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseCDFNormalization<DoubleVector>>(AttributeWiseCDFNormalization.class) //
         // Avoid cross-testing too many estimators.
         .with(AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID, //
             Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC)) //

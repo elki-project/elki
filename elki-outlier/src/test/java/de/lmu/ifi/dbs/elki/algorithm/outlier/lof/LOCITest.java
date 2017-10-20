@@ -39,7 +39,7 @@ public class LOCITest extends AbstractOutlierAlgorithmTest {
   public void testLOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    LOCI<DoubleVector> loci = new ELKIBuilder<>(LOCI.class) //
+    LOCI<DoubleVector> loci = new ELKIBuilder<LOCI<DoubleVector>>(LOCI.class) //
         .with(LOCI.Parameterizer.RMAX_ID, 0.5).build();
 
     // run LOCI on database

@@ -48,7 +48,7 @@ public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
   public void parameters() {
     final double p = .88;
     String filename = UNITTEST + "normally-distributed-data-1.csv";
-    AttributeWiseBetaNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseBetaNormalization.class) //
+    AttributeWiseBetaNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseBetaNormalization<DoubleVector>>(AttributeWiseBetaNormalization.class) //
         .with(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p) //
         // Avoid cross-testing too many estimators.
         .with(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, //
