@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression tests the parallel SimplifiedLOF algorithm.
@@ -41,13 +40,8 @@ public class ParallelSimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
   public void testParallelSimplifiedLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-
-    // setup Algorithm
-    ParallelSimplifiedLOF<DoubleVector> lof = ClassGenericsUtil.parameterizeOrAbort(ParallelSimplifiedLOF.class, params);
-    testParameterizationOk(params);
+    ParallelSimplifiedLOF<DoubleVector> lof = new ELKIBuilder<>(ParallelSimplifiedLOF.class) //
+        .with(LOF.Parameterizer.K_ID, 10).build();
 
     // run LOF on database
     OutlierResult result = lof.run(db);

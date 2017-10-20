@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the ISOS outlier detection algorithm.
@@ -39,13 +38,8 @@ public class ISOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ISOS.Parameterizer.KNN_ID, 100);
-
-    // setup Algorithm
-    ISOS<DoubleVector> isos = ClassGenericsUtil.parameterizeOrAbort(ISOS.class, params);
-    testParameterizationOk(params);
+    ISOS<DoubleVector> isos = new ELKIBuilder<>(ISOS.class) //
+        .with(ISOS.Parameterizer.KNN_ID, 100).build();
 
     // run KNNOutlier on database
     OutlierResult result = isos.run(db);

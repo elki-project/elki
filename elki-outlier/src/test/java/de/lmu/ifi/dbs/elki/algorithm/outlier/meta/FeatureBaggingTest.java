@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the Feature Bagging algorithm.
@@ -40,15 +39,11 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   public void testFeatureBaggingSum() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-    params.addParameter(FeatureBagging.Parameterizer.NUM_ID, 10);
-    params.addParameter(FeatureBagging.Parameterizer.SEED_ID, 1);
-
-    // setup Algorithm
-    FeatureBagging fb = ClassGenericsUtil.parameterizeOrAbort(FeatureBagging.class, params);
-    testParameterizationOk(params);
+    FeatureBagging fb = new ELKIBuilder<>(FeatureBagging.class) //
+        .with(LOF.Parameterizer.K_ID, 10) //
+        .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
+        .with(FeatureBagging.Parameterizer.SEED_ID, 1) //
+        .build();
 
     // run AggarwalYuEvolutionary on database
     OutlierResult result = fb.run(db);
@@ -61,16 +56,12 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   public void testFeatureBaggingBreadth() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-    params.addParameter(FeatureBagging.Parameterizer.NUM_ID, 10);
-    params.addParameter(FeatureBagging.Parameterizer.SEED_ID, 5);
-    params.addFlag(FeatureBagging.Parameterizer.BREADTH_ID);
-
-    // setup Algorithm
-    FeatureBagging fb = ClassGenericsUtil.parameterizeOrAbort(FeatureBagging.class, params);
-    testParameterizationOk(params);
+    FeatureBagging fb = new ELKIBuilder<>(FeatureBagging.class) //
+        .with(LOF.Parameterizer.K_ID, 10) //
+        .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
+        .with(FeatureBagging.Parameterizer.SEED_ID, 5) //
+        .with(FeatureBagging.Parameterizer.BREADTH_ID) //
+        .build();
 
     // run AggarwalYuEvolutionary on database
     OutlierResult result = fb.run(db);

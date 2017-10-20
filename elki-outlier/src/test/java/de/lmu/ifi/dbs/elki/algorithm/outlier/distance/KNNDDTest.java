@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the KNNDD algorithm.
@@ -39,13 +38,8 @@ public class KNNDDTest extends AbstractOutlierAlgorithmTest {
   public void testKNNOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KNNDD.Parameterizer.K_ID, 100);
-
-    // setup Algorithm
-    KNNDD<DoubleVector> knnOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNDD.class, params);
-    testParameterizationOk(params);
+    KNNDD<DoubleVector> knnOutlier = new ELKIBuilder<>(KNNDD.class) //
+        .with(KNNDD.Parameterizer.K_ID, 100).build();
 
     // run KNNDD on database
     OutlierResult result = knnOutlier.run(db);

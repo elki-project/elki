@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the LoOP algorithm.
@@ -40,13 +39,8 @@ public class LoOPTest extends AbstractOutlierAlgorithmTest {
   public void testLoOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LoOP.Parameterizer.KCOMP_ID, 14);
-
-    // setup Algorithm
-    LoOP<DoubleVector> loop = ClassGenericsUtil.parameterizeOrAbort(LoOP.class, params);
-    testParameterizationOk(params);
+    LoOP<DoubleVector> loop = new ELKIBuilder<>(LoOP.class) //
+        .with(LoOP.Parameterizer.KCOMP_ID, 14).build();
 
     // run LoOP on database
     OutlierResult result = loop.run(db);

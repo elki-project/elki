@@ -32,8 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the CDF normalization filter.
@@ -47,10 +46,11 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
-    final ListParameterization config = new ListParameterization();
-    // Avoid cross-testing too many estimators.
-    config.addParameter(AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC));
-    AttributeWiseCDFNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseCDFNormalization.class, config);
+    AttributeWiseCDFNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseCDFNormalization.class) //
+        // Avoid cross-testing too many estimators.
+        .with(AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID, //
+            Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC)) //
+        .build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

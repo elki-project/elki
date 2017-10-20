@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.WelchTTest;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the HiCS algorithm.
@@ -43,16 +42,12 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   public void testHiCSKS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-    params.addParameter(HiCS.Parameterizer.LIMIT_ID, 10);
-    params.addParameter(HiCS.Parameterizer.SEED_ID, 0);
-    params.addParameter(HiCS.Parameterizer.TEST_ID, KolmogorovSmirnovTest.STATIC);
-
-    // setup Algorithm
-    HiCS<DoubleVector> fb = ClassGenericsUtil.parameterizeOrAbort(HiCS.class, params);
-    testParameterizationOk(params);
+    HiCS<DoubleVector> fb = new ELKIBuilder<>(HiCS.class) //
+        .with(LOF.Parameterizer.K_ID, 10) //
+        .with(HiCS.Parameterizer.LIMIT_ID, 10) //
+        .with(HiCS.Parameterizer.SEED_ID, 0) //
+        .with(HiCS.Parameterizer.TEST_ID, KolmogorovSmirnovTest.STATIC) //
+        .build();
 
     // run HiCS on database
     OutlierResult result = fb.run(db);
@@ -65,16 +60,12 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   public void testHiCSWelch() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-    params.addParameter(HiCS.Parameterizer.LIMIT_ID, 10);
-    params.addParameter(HiCS.Parameterizer.SEED_ID, 0);
-    params.addParameter(HiCS.Parameterizer.TEST_ID, WelchTTest.STATIC);
-
-    // setup Algorithm
-    HiCS<DoubleVector> fb = ClassGenericsUtil.parameterizeOrAbort(HiCS.class, params);
-    testParameterizationOk(params);
+    HiCS<DoubleVector> fb = new ELKIBuilder<>(HiCS.class) //
+        .with(LOF.Parameterizer.K_ID, 10) //
+        .with(HiCS.Parameterizer.LIMIT_ID, 10) //
+        .with(HiCS.Parameterizer.SEED_ID, 0) //
+        .with(HiCS.Parameterizer.TEST_ID, WelchTTest.STATIC) //
+        .build();
 
     // run HiCS on database
     OutlierResult result = fb.run(db);

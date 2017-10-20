@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the MAD normalization filter.
@@ -44,8 +43,7 @@ public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseMADNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMADNormalization.class, new ListParameterization());
+    AttributeWiseMADNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMADNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the Beta normalization filter.
@@ -49,12 +48,12 @@ public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
   public void parameters() {
     final double p = .88;
     String filename = UNITTEST + "normally-distributed-data-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p);
-    // Avoid cross-testing too many estimators.
-    config.addParameter(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC));
-    AttributeWiseBetaNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseBetaNormalization.class, config);
+    AttributeWiseBetaNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseBetaNormalization.class) //
+        .with(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p) //
+        // Avoid cross-testing too many estimators.
+        .with(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, //
+            Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC)) //
+        .build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the AggarwalYuNaive algorithm.
@@ -40,14 +39,10 @@ public class AggarwalYuNaiveTest extends AbstractOutlierAlgorithmTest {
   public void testAggarwalYuNaive() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(AggarwalYuNaive.Parameterizer.K_ID, 2);
-    params.addParameter(AggarwalYuNaive.Parameterizer.PHI_ID, 8);
-
-    // setup Algorithm
-    AggarwalYuNaive<DoubleVector> aggarwalYuNaive = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuNaive.class, params);
-    testParameterizationOk(params);
+    AggarwalYuNaive<DoubleVector> aggarwalYuNaive = new ELKIBuilder<>(AggarwalYuNaive.class) //
+        .with(AggarwalYuNaive.Parameterizer.K_ID, 2) //
+        .with(AggarwalYuNaive.Parameterizer.PHI_ID, 8) //
+        .build();
 
     // run AggarwalYuNaive on database
     OutlierResult result = aggarwalYuNaive.run(db);

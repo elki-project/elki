@@ -27,8 +27,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the random sampling filter.
@@ -42,11 +41,10 @@ public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
   @Test
   public void parameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .5);
-    config.addParameter(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0);
-    RandomSamplingStreamFilter filter = ClassGenericsUtil.parameterizeOrAbort(RandomSamplingStreamFilter.class, config);
+    RandomSamplingStreamFilter filter = new ELKIBuilder<>(RandomSamplingStreamFilter.class) //
+        .with(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .5) //
+        .with(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0) //
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

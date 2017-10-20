@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the DBOutlierDetection algorithm.
@@ -40,14 +39,10 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBOutlierDetection.Parameterizer.D_ID, 0.175);
-    params.addParameter(DBOutlierDetection.Parameterizer.P_ID, 0.98);
-
-    // setup Algorithm
-    DBOutlierDetection<DoubleVector> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);
-    testParameterizationOk(params);
+    DBOutlierDetection<DoubleVector> dbOutlierDetection = new ELKIBuilder<>(DBOutlierDetection.class) //
+        .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
+        .with(DBOutlierDetection.Parameterizer.P_ID, 0.98) //
+        .build();
 
     // run DBOutlierDetection on database
     OutlierResult result = dbOutlierDetection.run(db);

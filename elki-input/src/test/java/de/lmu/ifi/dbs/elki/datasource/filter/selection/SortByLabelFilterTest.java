@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the label sorting filter.
@@ -43,8 +42,7 @@ public class SortByLabelFilterTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "label-selection-test-1.csv";
-    // Allow loading test data from resources.
-    SortByLabelFilter filter = ClassGenericsUtil.parameterizeOrAbort(SortByLabelFilter.class, new ListParameterization());
+    SortByLabelFilter filter = new ELKIBuilder<>(SortByLabelFilter.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Expect vectors to come first, labels second.
     getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);

@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the fast MDS transformation filter.
@@ -47,12 +46,11 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
   public void parameters() {
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim);
-    config.addParameter(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class);
-    FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(FastMultidimensionalScalingTransform.class, config);
+    FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<>(FastMultidimensionalScalingTransform.class) //
+        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
+        .with(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, 0L) //
+        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

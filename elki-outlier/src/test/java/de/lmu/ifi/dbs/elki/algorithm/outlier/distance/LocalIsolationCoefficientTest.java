@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the LocalIsolationCoefficient algorithm.
@@ -40,13 +39,8 @@ public class LocalIsolationCoefficientTest extends AbstractOutlierAlgorithmTest 
   public void testLocalIsolationCoefficient() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LocalIsolationCoefficient.Parameterizer.K_ID, 4);
-
-    // setup Algorithm
-    LocalIsolationCoefficient<DoubleVector> licOutlier = ClassGenericsUtil.parameterizeOrAbort(LocalIsolationCoefficient.class, params);
-    testParameterizationOk(params);
+    LocalIsolationCoefficient<DoubleVector> licOutlier = new ELKIBuilder<>(LocalIsolationCoefficient.class) //
+        .with(LocalIsolationCoefficient.Parameterizer.K_ID, 4).build();
 
     // run KNNWeightOutlier on database
     OutlierResult result = licOutlier.run(db);

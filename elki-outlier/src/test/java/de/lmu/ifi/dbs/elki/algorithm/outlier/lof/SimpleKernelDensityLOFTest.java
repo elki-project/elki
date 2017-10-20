@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.BiweightKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the SimpleKernelDensityLOF algorithm.
@@ -41,14 +40,10 @@ public class SimpleKernelDensityLOFTest extends AbstractOutlierAlgorithmTest {
   public void testLDF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 20);
-    params.addParameter(SimpleKernelDensityLOF.Parameterizer.KERNEL_ID, BiweightKernelDensityFunction.class);
-
-    // setup Algorithm
-    SimpleKernelDensityLOF<DoubleVector> klof = ClassGenericsUtil.parameterizeOrAbort(SimpleKernelDensityLOF.class, params);
-    testParameterizationOk(params);
+    SimpleKernelDensityLOF<DoubleVector> klof = new ELKIBuilder<>(SimpleKernelDensityLOF.class) //
+        .with(LOF.Parameterizer.K_ID, 20) //
+        .with(SimpleKernelDensityLOF.Parameterizer.KERNEL_ID, BiweightKernelDensityFunction.class) //
+        .build();
 
     // run LDF on database
     OutlierResult result = klof.run(db);

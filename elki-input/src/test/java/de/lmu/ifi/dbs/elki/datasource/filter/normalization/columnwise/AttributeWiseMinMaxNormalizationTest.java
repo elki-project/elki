@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the min-max normalization filter.
@@ -46,8 +45,7 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMinMaxNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
@@ -74,8 +72,7 @@ public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest
   @Test
   public void testNaNParameters() {
     String filename = UNITTEST + "nan-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseMinMaxNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMinMaxNormalization.class, new ListParameterization());
+    AttributeWiseMinMaxNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseMinMaxNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));

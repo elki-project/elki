@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the LOF algorithm.
@@ -40,13 +39,9 @@ public class SimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
   public void testSimplifiedLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.Parameterizer.K_ID, 10);
-
-    // setup Algorithm
-    SimplifiedLOF<DoubleVector> lof = ClassGenericsUtil.parameterizeOrAbort(SimplifiedLOF.class, params);
-    testParameterizationOk(params);
+    SimplifiedLOF<DoubleVector> lof = new ELKIBuilder<>(SimplifiedLOF.class) //
+        .with(LOF.Parameterizer.K_ID, 10) //
+        .build();
 
     // run LOF on database
     OutlierResult result = lof.run(db);

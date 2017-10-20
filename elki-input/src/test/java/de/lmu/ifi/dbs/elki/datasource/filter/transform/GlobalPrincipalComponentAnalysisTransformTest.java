@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the PCA transformation filter.
@@ -45,8 +44,7 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "transformation-test-1.csv";
-    // Allow loading test data from resources.
-    GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(GlobalPrincipalComponentAnalysisTransform.class, new ListParameterization());
+    GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = new ELKIBuilder<>(GlobalPrincipalComponentAnalysisTransform.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

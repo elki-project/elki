@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the classic MDS transformation filter.
@@ -47,11 +46,10 @@ public class ClassicMultidimensionalScalingTransformTest extends AbstractDataSou
   public void parameters() {
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim);
-    config.addParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class);
-    ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(ClassicMultidimensionalScalingTransform.class, config);
+    ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<>(ClassicMultidimensionalScalingTransform.class) //
+        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
+        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

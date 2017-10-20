@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the ALOCI algorithm.
@@ -40,14 +39,10 @@ public class ALOCITest extends AbstractOutlierAlgorithmTest {
   public void testALOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ALOCI.Parameterizer.SEED_ID, 2);
-    params.addParameter(ALOCI.Parameterizer.GRIDS_ID, 3);
-
-    // setup Algorithm
-    ALOCI<DoubleVector> aloci = ClassGenericsUtil.parameterizeOrAbort(ALOCI.class, params);
-    testParameterizationOk(params);
+    ALOCI<DoubleVector> aloci = new ELKIBuilder<>(ALOCI.class) //
+        .with(ALOCI.Parameterizer.SEED_ID, 2) //
+        .with(ALOCI.Parameterizer.GRIDS_ID, 3) //
+        .build();
 
     // run LOCI on database
     OutlierResult result = aloci.run(db);

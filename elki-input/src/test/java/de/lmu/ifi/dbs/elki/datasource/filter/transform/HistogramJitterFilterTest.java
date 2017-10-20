@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the histogram jitter filter.
@@ -43,14 +42,13 @@ public class HistogramJitterFilterTest extends AbstractDataSourceTest {
   @Test
   public void parameters() {
     String filename = UNITTEST + "transformation-test-1.csv";
-    // Allow loading test data from resources.
     // Use the value of s as the seed value and j as the jitter amount.
     final double s = 0.;
     final double j = .01;
-    ListParameterization config = new ListParameterization();
-    config.addParameter(HistogramJitterFilter.Parameterizer.SEED_ID, s);
-    config.addParameter(HistogramJitterFilter.Parameterizer.JITTER_ID, j);
-    HistogramJitterFilter<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(HistogramJitterFilter.class, config);
+    HistogramJitterFilter<DoubleVector> filter = new ELKIBuilder<>(HistogramJitterFilter.class) //
+        .with(HistogramJitterFilter.Parameterizer.SEED_ID, s) //
+        .with(HistogramJitterFilter.Parameterizer.JITTER_ID, j) //
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

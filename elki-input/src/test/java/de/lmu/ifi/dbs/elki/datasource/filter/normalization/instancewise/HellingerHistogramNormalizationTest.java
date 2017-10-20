@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the hellinger histogram normalization filter.
@@ -43,8 +42,7 @@ public class HellingerHistogramNormalizationTest extends AbstractDataSourceTest 
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    HellingerHistogramNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(HellingerHistogramNormalization.class, new ListParameterization());
+    HellingerHistogramNormalization<DoubleVector> filter = new ELKIBuilder<>(HellingerHistogramNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

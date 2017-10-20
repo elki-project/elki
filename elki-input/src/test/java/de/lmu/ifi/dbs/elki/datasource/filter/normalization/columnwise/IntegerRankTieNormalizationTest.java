@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test the integer rank tie normalization filter.
@@ -45,8 +44,7 @@ public class IntegerRankTieNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    IntegerRankTieNormalization filter = ClassGenericsUtil.parameterizeOrAbort(IntegerRankTieNormalization.class, new ListParameterization());
+    IntegerRankTieNormalization filter = new ELKIBuilder<>(IntegerRankTieNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the IDOS outlier detection algorithm.
@@ -39,14 +38,10 @@ public class IDOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(IDOS.Parameterizer.KC_ID, 100);
-    params.addParameter(IDOS.Parameterizer.KR_ID, 20);
-
-    // setup Algorithm
-    IDOS<DoubleVector> idos = ClassGenericsUtil.parameterizeOrAbort(IDOS.class, params);
-    testParameterizationOk(params);
+    IDOS<DoubleVector> idos = new ELKIBuilder<>(IDOS.class) //
+        .with(IDOS.Parameterizer.KC_ID, 100) //
+        .with(IDOS.Parameterizer.KR_ID, 20) //
+        .build();
 
     // run KNNOutlier on database
     OutlierResult result = idos.run(db);

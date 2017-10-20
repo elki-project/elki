@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the LOCI algorithm.
@@ -40,13 +39,8 @@ public class LOCITest extends AbstractOutlierAlgorithmTest {
   public void testLOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOCI.Parameterizer.RMAX_ID, 0.5);
-
-    // setup Algorithm
-    LOCI<DoubleVector> loci = ClassGenericsUtil.parameterizeOrAbort(LOCI.class, params);
-    testParameterizationOk(params);
+    LOCI<DoubleVector> loci = new ELKIBuilder<>(LOCI.class) //
+        .with(LOCI.Parameterizer.RMAX_ID, 0.5).build();
 
     // run LOCI on database
     OutlierResult result = loci.run(db);

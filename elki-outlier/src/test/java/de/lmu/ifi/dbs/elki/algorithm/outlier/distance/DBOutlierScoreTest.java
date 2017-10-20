@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the DBOutlierScore algorithm.
@@ -40,13 +39,8 @@ public class DBOutlierScoreTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierScore() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBOutlierScore.Parameterizer.D_ID, 0.175);
-
-    // setup Algorithm
-    DBOutlierScore<DoubleVector> dbOutlierScore = ClassGenericsUtil.parameterizeOrAbort(DBOutlierScore.class, params);
-    testParameterizationOk(params);
+    DBOutlierScore<DoubleVector> dbOutlierScore = new ELKIBuilder<>(DBOutlierScore.class) //
+        .with(DBOutlierScore.Parameterizer.D_ID, 0.175).build();
 
     // run DBOutlierScore on database
     OutlierResult result = dbOutlierScore.run(db);

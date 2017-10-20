@@ -30,7 +30,9 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
 import net.jafama.FastMath;
 
 /**
@@ -45,9 +47,8 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    InstanceMinMaxNormalization<DoubleVector> minMaxFilter = ClassGenericsUtil.parameterizeOrAbort(InstanceMinMaxNormalization.class, new ListParameterization());
-    Log1PlusNormalization<DoubleVector> log1plusFilter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, new ListParameterization());
+    InstanceMinMaxNormalization<DoubleVector> minMaxFilter = new ELKIBuilder<>(InstanceMinMaxNormalization.class).build();
+    Log1PlusNormalization<DoubleVector> log1plusFilter = new ELKIBuilder<>(Log1PlusNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, minMaxFilter, log1plusFilter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

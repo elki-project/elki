@@ -25,8 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.referencepoints.*;
 
 /**
@@ -41,14 +40,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(GridBasedReferencePoints.Parameterizer.GRID_ID, 3);
-
-    // setup Algorithm
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
-    testParameterizationOk(params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
+        .with(GridBasedReferencePoints.Parameterizer.GRID_ID, 3)//
+        .build();
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
@@ -61,14 +56,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionStar() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, StarBasedReferencePoints.class);
-
-    // setup Algorithm
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
-    testParameterizationOk(params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, StarBasedReferencePoints.class) //
+        .build();
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
@@ -81,14 +72,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionAxis() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, AxisBasedReferencePoints.class);
-
-    // setup Algorithm
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
-    testParameterizationOk(params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, AxisBasedReferencePoints.class) //
+        .build();
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
@@ -101,16 +88,12 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionGenerated() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomGeneratedReferencePoints.class);
-    params.addParameter(RandomGeneratedReferencePoints.Parameterizer.N_ID, 15);
-    params.addParameter(RandomGeneratedReferencePoints.Parameterizer.RANDOM_ID, 0);
-
-    // setup Algorithm
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
-    testParameterizationOk(params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomGeneratedReferencePoints.class)//
+        .with(RandomGeneratedReferencePoints.Parameterizer.N_ID, 15)//
+        .with(RandomGeneratedReferencePoints.Parameterizer.RANDOM_ID, 0)//
+        .build();
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
@@ -123,16 +106,12 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionSample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomSampleReferencePoints.class);
-    params.addParameter(RandomSampleReferencePoints.Parameterizer.N_ID, 15);
-    params.addParameter(RandomSampleReferencePoints.Parameterizer.RANDOM_ID, 0);
-
-    // setup Algorithm
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
-    testParameterizationOk(params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomSampleReferencePoints.class) //
+        .with(RandomSampleReferencePoints.Parameterizer.N_ID, 15)//
+        .with(RandomSampleReferencePoints.Parameterizer.RANDOM_ID, 0)//
+        .build();
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);

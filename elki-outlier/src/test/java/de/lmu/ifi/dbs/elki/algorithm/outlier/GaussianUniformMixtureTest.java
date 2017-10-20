@@ -25,8 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the GaussianUniformMixture algorithm.
@@ -39,12 +38,7 @@ public class GaussianUniformMixtureTest extends AbstractOutlierAlgorithmTest {
   public void testGaussianUniformMixture() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-
-    // setup Algorithm
-    GaussianUniformMixture<DoubleVector> gaussianUniformMixture = ClassGenericsUtil.parameterizeOrAbort(GaussianUniformMixture.class, params);
-    testParameterizationOk(params);
+    GaussianUniformMixture<DoubleVector> gaussianUniformMixture = new ELKIBuilder<>(GaussianUniformMixture.class).build();
 
     // run GaussianUniformMixture on database
     OutlierResult result = gaussianUniformMixture.run(db);

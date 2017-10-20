@@ -25,8 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the DWOF algorithm.
@@ -39,15 +38,10 @@ public class DWOFTest extends AbstractOutlierAlgorithmTest {
   public void testDWOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DWOF.Parameterizer.K_ID, 20);
+    DWOF<DoubleVector> dwof = new ELKIBuilder<>(DWOF.class)//
+        .with(DWOF.Parameterizer.K_ID, 20).build();
 
-    // setup Algorithm
-    DWOF<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(DWOF.class, params);
-    testParameterizationOk(params);
-
-    OutlierResult result = cop.run(db);
+    OutlierResult result = dwof.run(db);
 
     testAUC(db, "Noise", result, 0.8098666);
     testSingleScore(result, 416, 6.95226128);

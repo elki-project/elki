@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the ODIN algorithm.
@@ -40,13 +39,8 @@ public class ODINTest extends AbstractOutlierAlgorithmTest {
   public void testODIN() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ODIN.Parameterizer.K_ID, 10);
-
-    // setup Algorithm
-    ODIN<DoubleVector> odin = ClassGenericsUtil.parameterizeOrAbort(ODIN.class, params);
-    testParameterizationOk(params);
+    ODIN<DoubleVector> odin = new ELKIBuilder<>(ODIN.class) //
+        .with(ODIN.Parameterizer.K_ID, 10).build();
 
     // run KNNOutlier on database
     OutlierResult result = odin.run(db);

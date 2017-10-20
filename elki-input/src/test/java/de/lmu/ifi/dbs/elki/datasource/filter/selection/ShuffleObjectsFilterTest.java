@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the shuffle objects filter.
@@ -44,8 +43,7 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "sorted-data-1.csv";
-    // Allow loading test data from resources.
-    ShuffleObjectsFilter filter = ClassGenericsUtil.parameterizeOrAbort(ShuffleObjectsFilter.class, new ListParameterization());
+    ShuffleObjectsFilter filter = new ELKIBuilder<>(ShuffleObjectsFilter.class).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

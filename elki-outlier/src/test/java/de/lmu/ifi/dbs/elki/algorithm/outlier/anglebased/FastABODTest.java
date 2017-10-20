@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the ABOD algorithm.
@@ -40,13 +39,9 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
   public void testFastABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(FastABOD.Parameterizer.K_ID, 5);
-
     // setup Algorithm
-    FastABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(FastABOD.class, params);
-    testParameterizationOk(params);
+    FastABOD<DoubleVector> abod = new ELKIBuilder<>(FastABOD.class) //
+        .with(FastABOD.Parameterizer.K_ID, 5).build();
 
     // run ABOD on database
     OutlierResult result = abod.run(db);

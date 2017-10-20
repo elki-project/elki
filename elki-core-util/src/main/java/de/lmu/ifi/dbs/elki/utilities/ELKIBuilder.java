@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -39,9 +40,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public final class ELKIBuilder<T> {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(ELKIBuilder.class);
+
+  /**
    * Class to build.
    */
-  private Class<T> clazz;
+  private Class<? super T> clazz;
 
   /**
    * Parameter list.
@@ -64,7 +70,7 @@ public final class ELKIBuilder<T> {
    *
    * @param clazz Class
    */
-  public ELKIBuilder(Class<T> clazz) {
+  public ELKIBuilder(Class<? super T> clazz) {
     this.clazz = clazz;
   }
 
@@ -133,6 +139,9 @@ public final class ELKIBuilder<T> {
       throw new AbortException("build() may be called only once.");
     }
     final T obj = ClassGenericsUtil.parameterizeOrAbort(clazz, p);
+    if(p.hasUnusedParameters()) {
+      LOG.warning("Unused parameters: " + p.getRemainingParameters());
+    }
     p = null; // Prevent build() from being called again.
     return (C) obj;
   }

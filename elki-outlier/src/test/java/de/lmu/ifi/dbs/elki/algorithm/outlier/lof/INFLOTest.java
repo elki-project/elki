@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the INFLO algorithm.
@@ -40,13 +39,8 @@ public class INFLOTest extends AbstractOutlierAlgorithmTest {
   public void testINFLO() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(INFLO.Parameterizer.K_ID, 30);
-
-    // setup Algorithm
-    INFLO<DoubleVector> inflo = ClassGenericsUtil.parameterizeOrAbort(INFLO.class, params);
-    testParameterizationOk(params);
+    INFLO<DoubleVector> inflo = new ELKIBuilder<>(INFLO.class) //
+        .with(INFLO.Parameterizer.K_ID, 30).build();
 
     // run INFLO on database
     OutlierResult result = inflo.run(db);

@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.cleaning.VectorDimensionalityFilter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the vector dimensionality cleaning filter.
@@ -45,15 +44,14 @@ public class VectorDimensionalityFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     final int dim_keep = 10;
     String filename = UNITTEST + "dimensionality-test-2.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(VectorDimensionalityFilter.Parameterizer.DIM_P, dim_keep);
-    VectorDimensionalityFilter<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(VectorDimensionalityFilter.class, config);
+    VectorDimensionalityFilter<DoubleVector> filter = new ELKIBuilder<>(VectorDimensionalityFilter.class) //
+        .with(VectorDimensionalityFilter.Parameterizer.DIM_P, dim_keep).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
-    
-    // Verify that the filter has removed the vectors of the wrong dimensionality.
+
+    // Verify that the filter has removed the vectors of the wrong
+    // dimensionality.
     boolean foundTooSmall = false;
     for(int row = 0; row < unfilteredBundle.dataLength(); row++) {
       Object obj = unfilteredBundle.data(row, 0);
@@ -65,7 +63,7 @@ public class VectorDimensionalityFilterTest extends AbstractDataSourceTest {
       }
     }
     assertTrue("Expected a vector with filterable dimensionality", foundTooSmall);
-    
+
     assertTrue("Expected smaller data length", filteredBundle.dataLength() < unfilteredBundle.dataLength());
   }
 }

@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the split number vector filter filter.
@@ -47,10 +46,8 @@ public class SplitNumberVectorFilterTest extends AbstractDataSourceTest {
     String s = "0,1,2,3,4";
     int s_int = 5;
     String filename = UNITTEST + "dimensionality-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SplitNumberVectorFilter.Parameterizer.SELECTED_ATTRIBUTES_ID, s);
-    SplitNumberVectorFilter<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(SplitNumberVectorFilter.class, config);
+    SplitNumberVectorFilter<DoubleVector> filter = new ELKIBuilder<>(SplitNumberVectorFilter.class) //
+        .with(SplitNumberVectorFilter.Parameterizer.SELECTED_ATTRIBUTES_ID, s).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

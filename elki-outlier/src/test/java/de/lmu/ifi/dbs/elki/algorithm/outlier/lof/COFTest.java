@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the COF algorithm.
@@ -40,13 +39,8 @@ public class COFTest extends AbstractOutlierAlgorithmTest {
   public void testCOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(COF.Parameterizer.K_ID, 10);
-
-    // setup Algorithm
-    COF<DoubleVector> cof = ClassGenericsUtil.parameterizeOrAbort(COF.class, params);
-    testParameterizationOk(params);
+    COF<DoubleVector> cof = new ELKIBuilder<>(COF.class) //
+        .with(COF.Parameterizer.K_ID, 10).build();
 
     // run COF on database
     OutlierResult result = cof.run(db);

@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the LDF algorithm.
@@ -40,14 +39,10 @@ public class LDFTest extends AbstractOutlierAlgorithmTest {
   public void testLDF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LDF.Parameterizer.K_ID, 10);
-    params.addParameter(LDF.Parameterizer.H_ID, 1);
-
-    // setup Algorithm
-    LDF<DoubleVector> ldf = ClassGenericsUtil.parameterizeOrAbort(LDF.class, params);
-    testParameterizationOk(params);
+    LDF<DoubleVector> ldf = new ELKIBuilder<>(LDF.class) //
+        .with(LDF.Parameterizer.K_ID, 10) //
+        .with(LDF.Parameterizer.H_ID, 1) //
+        .build();
 
     // run LDF on database
     OutlierResult result = ldf.run(db);

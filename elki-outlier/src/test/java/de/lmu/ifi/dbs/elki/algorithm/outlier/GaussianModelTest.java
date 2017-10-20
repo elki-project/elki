@@ -25,8 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the GaussianModel algorithm.
@@ -39,12 +38,7 @@ public class GaussianModelTest extends AbstractOutlierAlgorithmTest {
   public void testGaussianModel() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-
-    // setup Algorithm
-    GaussianModel<DoubleVector> gaussianModel = ClassGenericsUtil.parameterizeOrAbort(GaussianModel.class, params);
-    testParameterizationOk(params);
+    GaussianModel<DoubleVector> gaussianModel = new ELKIBuilder<>(GaussianModel.class).build();
 
     // run GaussianModel on database
     OutlierResult result = gaussianModel.run(db);

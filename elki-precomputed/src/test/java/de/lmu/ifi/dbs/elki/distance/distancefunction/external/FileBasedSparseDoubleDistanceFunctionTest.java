@@ -35,9 +35,8 @@ import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.datasource.DBIDRangeDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for external distances.
@@ -50,15 +49,12 @@ public class FileBasedSparseDoubleDistanceFunctionTest extends AbstractClusterAl
 
   @Test
   public void testExternalDistance() throws IOException {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DBIDRangeDatabaseConnection.class);
-    params.addParameter(DBIDRangeDatabaseConnection.Parameterizer.COUNT_ID, 4);
-
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
+    Database db = new ELKIBuilder<>(StaticArrayDatabase.class) //
+        .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DBIDRangeDatabaseConnection.class) //
+        .with(DBIDRangeDatabaseConnection.Parameterizer.COUNT_ID, 4) //
+        .build();
     db.initialize();
 
-    ListParameterization distparams = new ListParameterization();
-    distparams.addParameter(FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
     FileBasedSparseDoubleDistanceFunction df = new FileBasedSparseDoubleDistanceFunction(//
         new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null, Double.POSITIVE_INFINITY);
     // We need to read from a resource, instead of a file.

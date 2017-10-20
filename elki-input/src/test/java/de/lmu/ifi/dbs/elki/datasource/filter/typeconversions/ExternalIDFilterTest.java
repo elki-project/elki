@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the external ID filter.
@@ -46,10 +45,8 @@ public class ExternalIDFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     final int c = 2;
     String filename = UNITTEST + "external-id-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(ExternalIDFilter.Parameterizer.EXTERNALID_INDEX_ID, c);
-    ExternalIDFilter filter = ClassGenericsUtil.parameterizeOrAbort(ExternalIDFilter.class, config);
+    ExternalIDFilter filter = new ELKIBuilder<>(ExternalIDFilter.class) //
+        .with(ExternalIDFilter.Parameterizer.EXTERNALID_INDEX_ID, c).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
 
     // Ensure that the filter has correctly formed the bundle.

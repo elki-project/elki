@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the AggarwalYuEvolutionary algorithm.
@@ -40,16 +39,12 @@ public class AggarwalYuEvolutionaryTest extends AbstractOutlierAlgorithmTest {
   public void testAggarwalYuEvolutionary() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(AggarwalYuEvolutionary.Parameterizer.K_ID, 2);
-    params.addParameter(AggarwalYuEvolutionary.Parameterizer.PHI_ID, 8);
-    params.addParameter(AggarwalYuEvolutionary.Parameterizer.M_ID, 20);
-    params.addParameter(AggarwalYuEvolutionary.Parameterizer.SEED_ID, 0);
-
-    // setup Algorithm
-    AggarwalYuEvolutionary<DoubleVector> aggarwalYuEvolutionary = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuEvolutionary.class, params);
-    testParameterizationOk(params);
+    AggarwalYuEvolutionary<DoubleVector> aggarwalYuEvolutionary = new ELKIBuilder<AggarwalYuEvolutionary<DoubleVector>>(AggarwalYuEvolutionary.class) //
+        .with(AggarwalYuEvolutionary.Parameterizer.K_ID, 2) //
+        .with(AggarwalYuEvolutionary.Parameterizer.PHI_ID, 8) //
+        .with(AggarwalYuEvolutionary.Parameterizer.M_ID, 20) //
+        .with(AggarwalYuEvolutionary.Parameterizer.SEED_ID, 0) //
+        .build();
 
     // run AggarwalYuEvolutionary on database
     OutlierResult result = aggarwalYuEvolutionary.run(db);

@@ -32,8 +32,7 @@ import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Abstract test for outlier algorithms.
@@ -52,9 +51,8 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
    * @param expected Expected AUC value
    */
   protected void testAUC(Database db, String positive, OutlierResult result, double expected) {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive);
-    OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
+    OutlierROCCurve rocCurve = new ELKIBuilder<>(OutlierROCCurve.class)//
+        .with(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive).build();
 
     // Ensure the result has been added to the hierarchy:
     ResultHierarchy hier = db.getHierarchy();

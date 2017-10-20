@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilde
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the COP algorithm.
@@ -44,13 +43,8 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(COP.Parameterizer.K_ID, 30);
-
-    // setup Algorithm
-    COP<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(COP.class, params);
-    testParameterizationOk(params);
+    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+        .with(COP.Parameterizer.K_ID, 30).build();
 
     OutlierResult result = cop.run(db);
 
@@ -62,16 +56,12 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOPRobust() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(COP.Parameterizer.K_ID, 30);
-    params.addParameter(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class);
-    params.addParameter(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-
-    // setup Algorithm
-    COP<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(COP.class, params);
-    testParameterizationOk(params);
+    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+        .with(COP.Parameterizer.K_ID, 30)//
+        .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
+        .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .build();
 
     OutlierResult result = cop.run(db);
 
@@ -83,18 +73,14 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOPRANSAC() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(COP.Parameterizer.K_ID, 30);
-    params.addParameter(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class);
-    params.addParameter(AutotuningPCA.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
-    params.addParameter(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class);
-    params.addParameter(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25);
-    params.addParameter(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0);
-
-    // setup Algorithm
-    COP<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(COP.class, params);
-    testParameterizationOk(params);
+    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+        .with(COP.Parameterizer.K_ID, 30)//
+        .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
+        .with(AutotuningPCA.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
+        .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class)//
+        .with(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25) //
+        .with(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0) //
+        .build();
 
     OutlierResult result = cop.run(db);
 

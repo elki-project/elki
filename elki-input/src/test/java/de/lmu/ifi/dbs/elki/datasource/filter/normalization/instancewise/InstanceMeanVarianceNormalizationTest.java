@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the mean-variance normalization filter.
@@ -44,8 +43,7 @@ public class InstanceMeanVarianceNormalizationTest extends AbstractDataSourceTes
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    InstanceMeanVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(InstanceMeanVarianceNormalization.class, new ListParameterization());
+    InstanceMeanVarianceNormalization<DoubleVector> filter = new ELKIBuilder<>(InstanceMeanVarianceNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

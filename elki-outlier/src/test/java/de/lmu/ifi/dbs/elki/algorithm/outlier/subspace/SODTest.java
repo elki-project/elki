@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the SOD algorithm.
@@ -41,14 +40,10 @@ public class SODTest extends AbstractOutlierAlgorithmTest {
   public void testSOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SOD.Parameterizer.KNN_ID, 25);
-    params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19);
-
-    // setup Algorithm
-    SOD<DoubleVector> sod = ClassGenericsUtil.parameterizeOrAbort(SOD.class, params);
-    testParameterizationOk(params);
+    SOD<DoubleVector> sod = new ELKIBuilder<>(SOD.class) //
+        .with(SOD.Parameterizer.KNN_ID, 25) //
+        .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19) //
+        .build();
 
     // run SOD on database
     OutlierResult result = sod.run(db);

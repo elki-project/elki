@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the SOS Outlier algorithm.
@@ -39,13 +38,8 @@ public class SOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SOS.Parameterizer.PERPLEXITY_ID, 50);
-
-    // setup Algorithm
-    SOS<DoubleVector> sos = ClassGenericsUtil.parameterizeOrAbort(SOS.class, params);
-    testParameterizationOk(params);
+    SOS<DoubleVector> sos = new ELKIBuilder<>(SOS.class) //
+        .with(SOS.Parameterizer.PERPLEXITY_ID, 50).build();
 
     // run SOS on database
     OutlierResult result = sos.run(db);

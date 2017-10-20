@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the Intrinsic Dimensionality outlier detection algorithm.
@@ -39,13 +38,8 @@ public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithm
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(IntrinsicDimensionalityOutlier.Parameterizer.K_ID, 100);
-
-    // setup Algorithm
-    IntrinsicDimensionalityOutlier<DoubleVector> ido = ClassGenericsUtil.parameterizeOrAbort(IntrinsicDimensionalityOutlier.class, params);
-    testParameterizationOk(params);
+    IntrinsicDimensionalityOutlier<DoubleVector> ido = new ELKIBuilder<>(IntrinsicDimensionalityOutlier.class) //
+        .with(IntrinsicDimensionalityOutlier.Parameterizer.K_ID, 100).build();
 
     // run KNNOutlier on database
     OutlierResult result = ido.run(db);

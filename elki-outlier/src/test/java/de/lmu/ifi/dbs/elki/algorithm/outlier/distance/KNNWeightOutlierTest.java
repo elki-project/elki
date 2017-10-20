@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the KNNWeightOutlier algorithm.
@@ -40,13 +39,8 @@ public class KNNWeightOutlierTest extends AbstractOutlierAlgorithmTest {
   public void testKNNWeightOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KNNWeightOutlier.Parameterizer.K_ID, 4);
-
-    // setup Algorithm
-    KNNWeightOutlier<DoubleVector> knnWeightOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNWeightOutlier.class, params);
-    testParameterizationOk(params);
+    KNNWeightOutlier<DoubleVector> knnWeightOutlier = new ELKIBuilder<>(KNNWeightOutlier.class) //
+        .with(KNNWeightOutlier.Parameterizer.K_ID, 4).build();
 
     // run KNNWeightOutlier on database
     OutlierResult result = knnWeightOutlier.run(db);

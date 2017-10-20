@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the variance-max normalization filter.
@@ -46,8 +45,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
+    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseVarianceNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 
@@ -75,8 +73,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   @Test
   public void testNaNParameters() {
     String filename = UNITTEST + "nan-test-1.csv";
-    // Allow loading test data from resources.
-    AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
+    AttributeWiseVarianceNormalization<DoubleVector> filter = new ELKIBuilder<>(AttributeWiseVarianceNormalization.class).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));

@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.cleaning;
 
-
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -37,8 +36,7 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.cleaning.ReplaceNaNWithRandomFilter;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the random NaN-replacement cleaning filter.
@@ -52,10 +50,9 @@ public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
   @Test
   public void parameters() {
     String filename = UNITTEST + "nan-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(ReplaceNaNWithRandomFilter.Parameterizer.REPLACEMENT_DISTRIBUTION, new NormalDistribution(0, 1, new Random(0L)));
-    ReplaceNaNWithRandomFilter filter = ClassGenericsUtil.parameterizeOrAbort(ReplaceNaNWithRandomFilter.class, config);
+    ReplaceNaNWithRandomFilter filter = new ELKIBuilder<>(ReplaceNaNWithRandomFilter.class) //
+        .with(ReplaceNaNWithRandomFilter.Parameterizer.REPLACEMENT_DISTRIBUTION, //
+            new NormalDistribution(0, 1, new Random(0L))).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
@@ -66,9 +63,9 @@ public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
     int dimFiltered = ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality();
     int dimUnfiltered = ((FieldTypeInformation) unfilteredBundle.meta(0)).getDimensionality();
     assertEquals("Dimensionality expected equal", dimFiltered, dimUnfiltered);
-    
+
     // Note the indices of the NaN(s) in the data.
-    List<IntegerVector> NaNs= new ArrayList<IntegerVector>();    
+    List<IntegerVector> NaNs = new ArrayList<IntegerVector>();
     for(int row = 0; row < unfilteredBundle.dataLength(); row++) {
       Object obj = unfilteredBundle.data(row, 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
@@ -76,13 +73,13 @@ public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
       for(int col = 0; col < dimUnfiltered; col++) {
         final double v = d.doubleValue(col);
         if(Double.isNaN(v)) {
-          NaNs.add(new IntegerVector(new int[]{row, col}));
+          NaNs.add(new IntegerVector(new int[] { row, col }));
         }
       }
     }
     // Verify that at least a single NaN exists in the unfiltered bundle.
     assertTrue("NaN expected in unfiltered data", NaNs.size() > 0);
-    
+
     for(IntegerVector iv : NaNs) {
       Object obj = filteredBundle.data(iv.intValue(0), 0);
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());

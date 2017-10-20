@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the label selection filter.
@@ -45,10 +44,9 @@ public class ByLabelFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     String s = "yes";
     String filename = UNITTEST + "label-selection-test-1.csv";
-    // Allow loading test data from resources.
-    ListParameterization config = new ListParameterization();
-    config.addParameter(ByLabelFilter.Parameterizer.LABELFILTER_PATTERN_ID, s);
-    ByLabelFilter filter = ClassGenericsUtil.parameterizeOrAbort(ByLabelFilter.class, config);
+    ByLabelFilter filter = new ELKIBuilder<>(ByLabelFilter.class) //
+        .with(ByLabelFilter.Parameterizer.LABELFILTER_PATTERN_ID, s) //
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

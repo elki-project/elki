@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -47,8 +46,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the OnlineLOF algorithm. Compares the result of the static LOF
@@ -140,7 +138,6 @@ public class OnlineLOFTest {
 
     // delete objects
     db.delete(deletions);
-
     return result;
   }
 
@@ -148,16 +145,9 @@ public class OnlineLOFTest {
    * Returns the database.
    */
   private static UpdatableDatabase getDatabase() {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-
-    UpdatableDatabase db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
-    params.failOnErrors();
-    if(params.hasUnusedParameters()) {
-      fail("Unused parameters: " + params.getRemainingParameters());
-    }
-
-    // get database
+    UpdatableDatabase db = new ELKIBuilder<>(HashmapDatabase.class) //
+        .with(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset) //
+        .build();
     db.initialize();
     return db;
   }

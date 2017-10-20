@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the KDEOS algorithm.
@@ -41,17 +40,13 @@ public class KDEOSTest extends AbstractOutlierAlgorithmTest {
   public void testKDEOS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KDEOS.Parameterizer.KERNEL_ID, EpanechnikovKernelDensityFunction.class);
-    params.addParameter(KDEOS.Parameterizer.KMIN_ID, 5);
-    params.addParameter(KDEOS.Parameterizer.KMAX_ID, 20);
-    params.addParameter(KDEOS.Parameterizer.KERNEL_SCALE_ID, 1.);
-    params.addParameter(KDEOS.Parameterizer.IDIM_ID, -1);
-
-    // setup Algorithm
-    KDEOS<DoubleVector> kdeos = ClassGenericsUtil.parameterizeOrAbort(KDEOS.class, params);
-    testParameterizationOk(params);
+    KDEOS<DoubleVector> kdeos = new ELKIBuilder<>(KDEOS.class) //
+        .with(KDEOS.Parameterizer.KERNEL_ID, EpanechnikovKernelDensityFunction.class) //
+        .with(KDEOS.Parameterizer.KMIN_ID, 5) //
+        .with(KDEOS.Parameterizer.KMAX_ID, 20) //
+        .with(KDEOS.Parameterizer.KERNEL_SCALE_ID, 1.) //
+        .with(KDEOS.Parameterizer.IDIM_ID, -1) //
+        .build();
 
     // run LOF on database
     OutlierResult result = kdeos.run(db);
