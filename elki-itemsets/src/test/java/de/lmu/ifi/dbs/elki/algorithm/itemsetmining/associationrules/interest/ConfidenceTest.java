@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.AssociationRuleGeneration;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AssociationRuleResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the Confidence metric.
@@ -42,11 +41,11 @@ public class ConfidenceTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(FPGrowth.Parameterizer.MINSUPP_ID, 3);
-      params.addParameter(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 1.);
-      params.addParameter(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Confidence.class);
-      AssociationRuleGeneration ap = ClassGenericsUtil.parameterizeOrAbort(AssociationRuleGeneration.class, params);
+      AssociationRuleGeneration ap = new ELKIBuilder<>(AssociationRuleGeneration.class) //
+      .with(FPGrowth.Parameterizer.MINSUPP_ID, 3) //
+      .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 1.) //
+      .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Confidence.class) //
+          .build();
       AssociationRuleResult res = ap.run(db);
       assertEquals("Size not as expected.", 6, res.getRules().size());
     }

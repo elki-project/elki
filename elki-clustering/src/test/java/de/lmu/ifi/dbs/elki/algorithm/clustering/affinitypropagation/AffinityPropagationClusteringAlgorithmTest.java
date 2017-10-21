@@ -28,9 +28,8 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test Affinity Propagation
@@ -49,10 +48,8 @@ public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterA
   public void testAffinityPropagationClusteringAlgorithmResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = ClassGenericsUtil.parameterizeOrAbort(AffinityPropagationClusteringAlgorithm.class, params);
-    testParameterizationOk(params);
+    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = new ELKIBuilder<AffinityPropagationClusteringAlgorithm<DoubleVector>>(AffinityPropagationClusteringAlgorithm.class) //
+        .build();
 
     // run AffinityPropagationClusteringAlgorithm on database
     Clustering<MedoidModel> result = apc.run(db);
@@ -71,10 +68,8 @@ public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterA
   public void testAffinityPropagationClusteringAlgorithmOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = ClassGenericsUtil.parameterizeOrAbort(AffinityPropagationClusteringAlgorithm.class, params);
-    testParameterizationOk(params);
+    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = new ELKIBuilder<AffinityPropagationClusteringAlgorithm<DoubleVector>>(AffinityPropagationClusteringAlgorithm.class) //
+        .build();
 
     // run AffinityPropagationClusteringAlgorithm on database
     Clustering<MedoidModel> result = apc.run(db);
@@ -92,12 +87,10 @@ public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterA
   public void testAffinityPropagationSimilarity() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(AffinityPropagationClusteringAlgorithm.Parameterizer.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class);
-    params.addParameter(SimilarityBasedInitializationWithMedian.Parameterizer.SIMILARITY_ID, PolynomialKernelFunction.class);
-    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = ClassGenericsUtil.parameterizeOrAbort(AffinityPropagationClusteringAlgorithm.class, params);
-    testParameterizationOk(params);
+    AffinityPropagationClusteringAlgorithm<DoubleVector> apc = new ELKIBuilder<AffinityPropagationClusteringAlgorithm<DoubleVector>>(AffinityPropagationClusteringAlgorithm.class) //
+        .with(AffinityPropagationClusteringAlgorithm.Parameterizer.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class) //
+        .with(SimilarityBasedInitializationWithMedian.Parameterizer.SIMILARITY_ID, PolynomialKernelFunction.class) //
+        .build();
 
     // run AffinityPropagationClusteringAlgorithm on database
     Clustering<MedoidModel> result = apc.run(db);

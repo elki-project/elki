@@ -39,8 +39,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.datasource.parser.SimpleTransactionParser;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for APRIORI.
@@ -58,7 +57,6 @@ public abstract class AbstractFrequentItemsetAlgorithmTest extends AbstractSimpl
   public static <T> Database loadTransactions(String filename, int expectedSize) {
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
-      ListParameterization params = new ListParameterization();
       // Instantiate filters manually. TODO: redesign
       List<ObjectFilter> filterlist = new ArrayList<>();
       filterlist.add(new FixedDBIDsFilter(1));
@@ -67,10 +65,8 @@ public abstract class AbstractFrequentItemsetAlgorithmTest extends AbstractSimpl
       InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, filterlist, parser);
 
       // We want to allow the use of indexes via "params"
-      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
-      Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
-
-      testParameterizationOk(params);
+      Database db = new ELKIBuilder<>(StaticArrayDatabase.class) //
+          .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc).build();
 
       db.initialize();
       Relation<?> rel = db.getRelation(TypeUtil.ANY);

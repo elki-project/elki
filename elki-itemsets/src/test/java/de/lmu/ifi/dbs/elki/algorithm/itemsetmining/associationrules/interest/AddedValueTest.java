@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.AssociationRuleGeneration;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AssociationRuleResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the Added Value metric.
@@ -41,14 +40,11 @@ public class AddedValueTest extends AbstractFrequentItemsetAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
-    {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(FPGrowth.Parameterizer.MINSUPP_ID, 1);
-      params.addParameter(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.6);
-      params.addParameter(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, AddedValue.class);
-      AssociationRuleGeneration ap = ClassGenericsUtil.parameterizeOrAbort(AssociationRuleGeneration.class, params);
-      AssociationRuleResult res = ap.run(db);
-      assertEquals("Size not as expected.", 27, res.getRules().size());
-    }
+    AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
+        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.6) //
+        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, AddedValue.class) //
+        .build().run(db);
+    assertEquals("Size not as expected.", 27, res.getRules().size());
   }
 }

@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the Silhouette outlier detection algorithm.
@@ -42,15 +41,11 @@ public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest
   public void testSilhouetteOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SilhouetteOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class);
-    params.addParameter(KMeans.K_ID, 10);
-    params.addParameter(KMeans.SEED_ID, 7);
-
-    // setup Algorithm
-    SilhouetteOutlierDetection<DoubleVector> silout = ClassGenericsUtil.parameterizeOrAbort(SilhouetteOutlierDetection.class, params);
-    testParameterizationOk(params);
+    SilhouetteOutlierDetection<DoubleVector> silout = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
+        .with(SilhouetteOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class) //
+        .with(KMeans.K_ID, 10) //
+        .with(KMeans.SEED_ID, 7) //
+        .build();
 
     OutlierResult result = silout.run(db);
 

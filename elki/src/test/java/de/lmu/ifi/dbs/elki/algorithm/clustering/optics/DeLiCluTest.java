@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -62,13 +62,11 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     indexparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000);
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams);
 
-    // Setup actual algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DeLiClu.Parameterizer.MINPTS_ID, 18);
-    params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class);
-    OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
-    testParameterizationOk(params);
+    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+        .with(DeLiClu.Parameterizer.MINPTS_ID, 18) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
+        .with(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class) //
+        .build();
 
     // run DeLiClu on database
     Clustering<?> clustering = opticsxi.run(db);

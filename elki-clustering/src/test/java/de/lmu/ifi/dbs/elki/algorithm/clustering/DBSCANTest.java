@@ -22,14 +22,12 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full DBSCAN run, and compares the result with a clustering derived
@@ -53,12 +51,10 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    DBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
-    testParameterizationOk(params);
+    DBSCAN<DoubleVector> dbscan = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);
@@ -77,12 +73,10 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
-    DBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
-    testParameterizationOk(params);
+    DBSCAN<DoubleVector> dbscan = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);

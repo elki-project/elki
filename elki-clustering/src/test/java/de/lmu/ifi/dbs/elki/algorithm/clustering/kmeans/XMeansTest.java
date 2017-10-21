@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.BayesianInformati
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for X-Means.
@@ -42,17 +41,14 @@ public class XMeansTest extends AbstractClusterAlgorithmTest {
   public void testXMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(XMeans.Parameterizer.K_MIN_ID, 2);
-    params.addParameter(KMeans.K_ID, 20);
-    params.addParameter(XMeans.Parameterizer.INNER_KMEANS_ID, KMeansLloyd.class);
-    params.addParameter(XMeans.Parameterizer.INFORMATION_CRITERION_ID, BayesianInformationCriterion.class);
-    params.addParameter(KMeans.SEED_ID, 0); // Initializer seed
-    params.addParameter(XMeans.Parameterizer.SEED_ID, 0); // X-means seed
-
-    XMeans<DoubleVector, ?> xmeans = ClassGenericsUtil.parameterizeOrAbort(XMeans.class, params);
-    testParameterizationOk(params);
+    XMeans<DoubleVector, ?> xmeans = new ELKIBuilder<>(XMeans.class) //
+        .with(XMeans.Parameterizer.K_MIN_ID, 2) //
+        .with(KMeans.K_ID, 20) //
+        .with(XMeans.Parameterizer.INNER_KMEANS_ID, KMeansLloyd.class) //
+        .with(XMeans.Parameterizer.INFORMATION_CRITERION_ID, BayesianInformationCriterion.class) //
+        .with(KMeans.SEED_ID, 0) // // Initializer seed
+        .with(XMeans.Parameterizer.SEED_ID, 0) // // X-means seed
+    .build();
 
     // run XMeans on database
     Clustering<?> result = xmeans.run(db);

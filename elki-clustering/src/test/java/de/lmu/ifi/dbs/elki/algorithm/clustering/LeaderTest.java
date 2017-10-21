@@ -22,12 +22,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for the Leader algorithm.
@@ -43,11 +41,9 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
   public void testLeaderResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(Leader.Parameterizer.THRESHOLD_ID, 0.2);
-    Leader<DoubleVector> leader = ClassGenericsUtil.parameterizeOrAbort(Leader.class, params);
-    testParameterizationOk(params);
+    Leader<DoubleVector> leader = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
+        .with(Leader.Parameterizer.THRESHOLD_ID, 0.2) //
+        .build();
 
     // run Leader on database
     Clustering<?> result = leader.run(db);
@@ -64,11 +60,9 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
   public void testLeaderOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(Leader.Parameterizer.THRESHOLD_ID, 25);
-    Leader<DoubleVector> leader = ClassGenericsUtil.parameterizeOrAbort(Leader.class, params);
-    testParameterizationOk(params);
+    Leader<DoubleVector> leader = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
+        .with(Leader.Parameterizer.THRESHOLD_ID, 25) //
+        .build();
 
     // run Leader on database
     Clustering<?> result = leader.run(db);

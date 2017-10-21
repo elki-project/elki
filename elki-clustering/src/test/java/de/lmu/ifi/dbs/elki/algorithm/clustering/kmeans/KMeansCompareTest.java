@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for Compare k-means.
@@ -44,12 +43,10 @@ public class KMeansCompareTest extends AbstractClusterAlgorithmTest {
   public void testKMeansCompare() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansCompare.class, params);
-    testParameterizationOk(params);
+    KMeansCompare<DoubleVector> kmeans = new ELKIBuilder<>(KMeansCompare.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);

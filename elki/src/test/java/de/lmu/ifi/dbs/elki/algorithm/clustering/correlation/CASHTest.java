@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Perform a full CASH run, and compare the result with a clustering derived
@@ -49,16 +48,12 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
     // Input
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
-    // CASH parameters
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CASH.Parameterizer.JITTER_ID, 0.7);
-    params.addParameter(CASH.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(CASH.Parameterizer.MAXLEVEL_ID, 25);
-    params.addFlag(CASH.Parameterizer.ADJUST_ID);
-
-    // setup algorithm
-    CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
-    testParameterizationOk(params);
+    CASH<DoubleVector> cash = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
+        .with(CASH.Parameterizer.JITTER_ID, 0.7) //
+        .with(CASH.Parameterizer.MINPTS_ID, 50) //
+        .with(CASH.Parameterizer.MAXLEVEL_ID, 25) //
+        .with(CASH.Parameterizer.ADJUST_ID) //
+        .build();
 
     // run CASH on database
     Clustering<Model> result = cash.run(db);
@@ -75,15 +70,11 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
     // CASH input
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600);
 
-    // CASH parameters
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CASH.Parameterizer.JITTER_ID, 0.7);
-    params.addParameter(CASH.Parameterizer.MINPTS_ID, 160);
-    params.addParameter(CASH.Parameterizer.MAXLEVEL_ID, 40);
-
-    // setup algorithm
-    CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
-    testParameterizationOk(params);
+    CASH<DoubleVector> cash = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
+        .with(CASH.Parameterizer.JITTER_ID, 0.7) //
+        .with(CASH.Parameterizer.MINPTS_ID, 160) //
+        .with(CASH.Parameterizer.MAXLEVEL_ID, 40) //
+        .build();
 
     // run CASH on database
     Clustering<Model> result = cash.run(db);

@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.AbstractOPTICS;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the OPTICS-OF algorithm.
@@ -40,13 +39,8 @@ public class OPTICSOFTest extends AbstractOutlierAlgorithmTest {
   public void testOPTICSOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractOPTICS.Parameterizer.MINPTS_ID, 22);
-
-    // setup Algorithm
-    OPTICSOF<DoubleVector> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);
-    testParameterizationOk(params);
+    OPTICSOF<DoubleVector> opticsof = new ELKIBuilder<OPTICSOF<DoubleVector>>(OPTICSOF.class) //
+        .with(AbstractOPTICS.Parameterizer.MINPTS_ID, 22).build();
 
     // run OPTICSOF on database
     OutlierResult result = opticsof.run(db);

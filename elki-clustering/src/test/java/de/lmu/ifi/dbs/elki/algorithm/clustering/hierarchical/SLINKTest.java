@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendr
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Performs a full SLINK run, and compares the result with a clustering derived
@@ -52,12 +51,10 @@ public class SLINKTest extends AbstractClusterAlgorithmTest {
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, SLINK.class);
-    CutDendrogramByNumberOfClusters slink = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters slink = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .build();
 
     // run SLINK on database
     Result result = slink.run(db);

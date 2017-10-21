@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -58,17 +58,13 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
     Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
 
-    ListParameterization params = new ListParameterization();
-    // PreDeCon
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 60);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 40);
-    params.addParameter(PreDeCon.Settings.Parameterizer.DELTA_ID, 400);
-    params.addParameter(PreDeCon.Settings.Parameterizer.KAPPA_ID, 20.);
-    params.addParameter(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 4);
-
-    // setup algorithm
-    PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
-    testParameterizationOk(params);
+    PreDeCon<DoubleVector> predecon = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 60) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 40) //
+        .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 400) //
+        .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 20.) //
+        .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 4) //
+        .build();
 
     // run PredeCon on database
     Clustering<Model> result = predecon.run(db);
@@ -88,16 +84,13 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   public void testPreDeConSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    // PreDeCon
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.3);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 10);
-    params.addParameter(PreDeCon.Settings.Parameterizer.DELTA_ID, 0.012);
-    params.addParameter(PreDeCon.Settings.Parameterizer.KAPPA_ID, 10.);
-    params.addParameter(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 2);
-    PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
-    testParameterizationOk(params);
+    PreDeCon<DoubleVector> predecon = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.3) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 10) //
+        .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 0.012) //
+        .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 10.) //
+        .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 2) //
+        .build();
 
     // run PredeCon on database
     Clustering<Model> result = predecon.run(db);

@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for simplified hierarchy extraction.
@@ -41,12 +40,10 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, SLINK.class);
-    SimplifiedHierarchyExtraction slink = ClassGenericsUtil.parameterizeOrAbort(SimplifiedHierarchyExtraction.class, params);
-    testParameterizationOk(params);
+    SimplifiedHierarchyExtraction slink = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+        .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .build();
 
     // run SLINK on database
     Result result = slink.run(db);

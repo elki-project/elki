@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the KMeans outlier detection algorithm.
@@ -42,15 +41,11 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testKMeansOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeansOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class);
-    params.addParameter(KMeans.K_ID, 10);
-    params.addParameter(KMeans.SEED_ID, 0);
-
-    // setup Algorithm
-    KMeansOutlierDetection<DoubleVector> silout = ClassGenericsUtil.parameterizeOrAbort(KMeansOutlierDetection.class, params);
-    testParameterizationOk(params);
+    KMeansOutlierDetection<DoubleVector> silout = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+        .with(KMeansOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class) //
+        .with(KMeans.K_ID, 10) //
+        .with(KMeans.SEED_ID, 0) //
+        .build();
 
     OutlierResult result = silout.run(db);
 

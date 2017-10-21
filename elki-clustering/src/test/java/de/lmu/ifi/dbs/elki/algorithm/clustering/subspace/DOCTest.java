@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test DOC on a simple test data set.
@@ -45,14 +44,11 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
   public void testDOCSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DOC.Parameterizer.RANDOM_ID, 0);
-    params.addParameter(DOC.Parameterizer.ALPHA_ID, 0.4);
-    params.addParameter(DOC.Parameterizer.BETA_ID, 0.85);
-
-    // setup algorithm
-    DOC<DoubleVector> doc = ClassGenericsUtil.parameterizeOrAbort(DOC.class, params);
-    testParameterizationOk(params);
+    DOC<DoubleVector> doc = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+        .with(DOC.Parameterizer.RANDOM_ID, 0) //
+        .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
+        .with(DOC.Parameterizer.BETA_ID, 0.85) //
+        .build();
 
     // run DOC on database
     Clustering<?> result = doc.run(db);
@@ -68,16 +64,13 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
   public void testDOCOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DOC.Parameterizer.RANDOM_ID, 2);
-    params.addParameter(DOC.Parameterizer.ALPHA_ID, 0.4);
-    params.addParameter(DOC.Parameterizer.BETA_ID, 0.95);
-    params.addFlag(DOC.Parameterizer.HEURISTICS_ID);
-    params.addParameter(DOC.Parameterizer.D_ZERO_ID, 1);
-
-    DOC<DoubleVector> doc = ClassGenericsUtil.parameterizeOrAbort(DOC.class, params);
-    testParameterizationOk(params);
+    DOC<DoubleVector> doc = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+        .with(DOC.Parameterizer.RANDOM_ID, 2) //
+        .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
+        .with(DOC.Parameterizer.BETA_ID, 0.95) //
+        .with(DOC.Parameterizer.HEURISTICS_ID) //
+        .with(DOC.Parameterizer.D_ZERO_ID, 1) //
+        .build();
 
     // run DOC on database
     Clustering<?> result = doc.run(db);

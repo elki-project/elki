@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics.RandomProjectedNeighborsAndDensities;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Simple regression test for FastOPTICS.
@@ -40,14 +39,12 @@ public class FastOPTICSTest extends AbstractClusterAlgorithmTest {
   public void testFastOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICSList.Parameterizer.MINPTS_ID, 18);
-    params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, FastOPTICS.class);
-    params.addParameter(RandomProjectedNeighborsAndDensities.Parameterizer.RANDOM_ID, 0);
-    OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
-    testParameterizationOk(params);
+    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+        .with(OPTICSList.Parameterizer.MINPTS_ID, 18) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
+        .with(OPTICSXi.Parameterizer.XIALG_ID, FastOPTICS.class) //
+        .with(RandomProjectedNeighborsAndDensities.Parameterizer.RANDOM_ID, 0) //
+        .build();
 
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);

@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Performs a full KMeans run, and compares the result with a clustering derived
@@ -48,12 +47,10 @@ public class KMeansLloydTest extends AbstractClusterAlgorithmTest {
   public void testKMeansLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
-    testParameterizationOk(params);
+    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<>(KMeansLloyd.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);

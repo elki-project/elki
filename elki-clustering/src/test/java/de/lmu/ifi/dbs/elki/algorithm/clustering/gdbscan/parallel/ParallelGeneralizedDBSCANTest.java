@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Performs a full DBSCAN run, and compares the result with a clustering derived
@@ -48,12 +47,10 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   public void testParallelDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    ParallelGeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(ParallelGeneralizedDBSCAN.class, params);
-    testParameterizationOk(params);
+    ParallelGeneralizedDBSCAN dbscan = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);
@@ -70,12 +67,10 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
-    ParallelGeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(ParallelGeneralizedDBSCAN.class, params);
-    testParameterizationOk(params);
+    ParallelGeneralizedDBSCAN dbscan = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);

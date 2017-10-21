@@ -26,9 +26,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full PROCLUS run, and compares the result with a clustering
@@ -52,15 +51,12 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
   public void testPROCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(PROCLUS.Parameterizer.L_ID, 1);
-    params.addParameter(PROCLUS.Parameterizer.K_ID, 4);
-    // NOTE: PROCLUS quality heavily depends on random...
-    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 12);
-
-    // setup algorithm
-    PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
-    testParameterizationOk(params);
+    PROCLUS<DoubleVector> proclus = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+        .with(PROCLUS.Parameterizer.L_ID, 1) //
+        .with(PROCLUS.Parameterizer.K_ID, 4) //
+        // NOTE: PROCLUS quality heavily depends on random...
+        .with(PROCLUS.Parameterizer.SEED_ID, 12) //
+        .build();
 
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
@@ -79,14 +75,12 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
   public void testPROCLUSSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(PROCLUS.Parameterizer.L_ID, 2);
-    params.addParameter(PROCLUS.Parameterizer.K_ID, 3);
-    // NOTE: PROCLUS quality heavily depends on random...
-    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 3);
-    PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
-    testParameterizationOk(params);
+    PROCLUS<DoubleVector> proclus = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+        .with(PROCLUS.Parameterizer.L_ID, 2) //
+        .with(PROCLUS.Parameterizer.K_ID, 3) //
+        // NOTE: PROCLUS quality heavily depends on random...
+        .with(PROCLUS.Parameterizer.SEED_ID, 3) //
+        .build();
 
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);

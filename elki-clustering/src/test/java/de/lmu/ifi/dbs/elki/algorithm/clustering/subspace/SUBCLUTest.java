@@ -27,9 +27,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full SUBCLU run, and compares the result with a clustering derived
@@ -53,13 +52,10 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SUBCLU.EPSILON_ID, 0.001);
-    params.addParameter(SUBCLU.MINPTS_ID, 100);
-
-    // setup algorithm
-    SUBCLU<DoubleVector> subclu = ClassGenericsUtil.parameterizeOrAbort(SUBCLU.class, params);
-    testParameterizationOk(params);
+    SUBCLU<DoubleVector> subclu = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+        .with(SUBCLU.EPSILON_ID, 0.001) //
+        .with(SUBCLU.MINPTS_ID, 100) //
+        .build();
 
     // run SUBCLU on database
     Clustering<SubspaceModel> result = subclu.run(db);
@@ -79,12 +75,10 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SUBCLU.EPSILON_ID, 0.04);
-    params.addParameter(SUBCLU.MINPTS_ID, 70);
-    SUBCLU<DoubleVector> subclu = ClassGenericsUtil.parameterizeOrAbort(SUBCLU.class, params);
-    testParameterizationOk(params);
+    SUBCLU<DoubleVector> subclu = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+        .with(SUBCLU.EPSILON_ID, 0.04) //
+        .with(SUBCLU.MINPTS_ID, 70) //
+        .build();
 
     // run SUBCLU on database
     Clustering<SubspaceModel> result = subclu.run(db);

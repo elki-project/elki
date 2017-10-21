@@ -25,9 +25,8 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full OPTICS run, and compares the result with a clustering derived
@@ -50,13 +49,11 @@ public class OPTICSListTest extends AbstractClusterAlgorithmTest {
   public void testOPTICSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICSList.Parameterizer.MINPTS_ID, 18);
-    params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, OPTICSList.class);
-    OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
-    testParameterizationOk(params);
+    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+        .with(OPTICSList.Parameterizer.MINPTS_ID, 18) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
+        .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSList.class) //
+        .build();
 
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);

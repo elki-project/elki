@@ -22,15 +22,13 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full SNNClustering run, and compares the result with a clustering
@@ -53,13 +51,11 @@ public class SNNClusteringTest extends AbstractClusterAlgorithmTest {
   public void testSNNClusteringResults() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SNNClustering.Parameterizer.EPSILON_ID, 77);
-    params.addParameter(SNNClustering.Parameterizer.MINPTS_ID, 28);
-    params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100);
-    SNNClustering<DoubleVector> snn = ClassGenericsUtil.parameterizeOrAbort(SNNClustering.class, params);
-    testParameterizationOk(params);
+    SNNClustering<DoubleVector> snn = new ELKIBuilder<SNNClustering<DoubleVector>>(SNNClustering.class) //
+        .with(SNNClustering.Parameterizer.EPSILON_ID, 77) //
+        .with(SNNClustering.Parameterizer.MINPTS_ID, 28) //
+        .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100) //
+        .build();
 
     // run SNN on database
     Clustering<Model> result = snn.run(db);

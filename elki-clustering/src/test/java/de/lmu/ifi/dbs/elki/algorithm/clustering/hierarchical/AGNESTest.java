@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.*;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Perform agglomerative hierarchical clustering, using the naive algorithm.
@@ -49,13 +48,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testSingleLink() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, SingleLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -72,13 +69,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testWard() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WardLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, WardLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -95,13 +90,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testGroupAverage() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -118,13 +111,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testWeightedAverage() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WeightedAverageLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, WeightedAverageLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -141,13 +132,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testCompleteLink() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -164,13 +153,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testCentroid() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CentroidLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, CentroidLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -187,13 +174,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testMedian() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MedianLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, MedianLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -210,13 +195,11 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testMinimumVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MinimumVarianceLinkage.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, MinimumVarianceLinkage.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -233,14 +216,12 @@ public class AGNESTest extends AbstractClusterAlgorithmTest {
   public void testBetaVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AGNES.class);
-    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkage.class);
-    params.addParameter(FlexibleBetaLinkage.Parameterizer.BETA_ID, -.33);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, AGNES.class) //
+        .with(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkage.class) //
+        .with(FlexibleBetaLinkage.Parameterizer.BETA_ID, -.33) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);

@@ -27,9 +27,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full ORCLUS run, and compares the result with a clustering derived
@@ -52,14 +51,11 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   public void testORCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ORCLUS.Parameterizer.K_ID, 3);
-    params.addParameter(ORCLUS.Parameterizer.L_ID, 1);
-    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 1);
-
-    // setup algorithm
-    ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
-    testParameterizationOk(params);
+    ORCLUS<DoubleVector> orclus = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+        .with(ORCLUS.Parameterizer.K_ID, 3) //
+        .with(ORCLUS.Parameterizer.L_ID, 1) //
+        .with(ORCLUS.Parameterizer.SEED_ID, 1) //
+        .build();
 
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
@@ -78,14 +74,11 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ORCLUS.Parameterizer.K_ID, 3);
-    params.addParameter(ORCLUS.Parameterizer.L_ID, 4);
-    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 0);
-
-    ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
-    testParameterizationOk(params);
+    ORCLUS<DoubleVector> orclus = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+        .with(ORCLUS.Parameterizer.K_ID, 3) //
+        .with(ORCLUS.Parameterizer.L_ID, 4) //
+        .with(ORCLUS.Parameterizer.SEED_ID, 0) //
+        .build();
 
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);

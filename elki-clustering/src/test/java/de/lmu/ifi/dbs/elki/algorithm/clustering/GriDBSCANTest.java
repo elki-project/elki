@@ -22,14 +22,12 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test GriDBSCAN.
@@ -48,13 +46,11 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testGriDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    params.addParameter(GriDBSCAN.Parameterizer.GRID_ID, 0.08);
-    GriDBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(GriDBSCAN.class, params);
-    testParameterizationOk(params);
+    GriDBSCAN<DoubleVector> dbscan = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(GriDBSCAN.Parameterizer.GRID_ID, 0.08) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);
@@ -73,13 +69,11 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testGriDBSCANWide() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    params.addParameter(GriDBSCAN.Parameterizer.GRID_ID, 0.4);
-    GriDBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(GriDBSCAN.class, params);
-    testParameterizationOk(params);
+    GriDBSCAN<DoubleVector> dbscan = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(GriDBSCAN.Parameterizer.GRID_ID, 0.4) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);
@@ -98,13 +92,11 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
-    params.addParameter(GriDBSCAN.Parameterizer.GRID_ID, 25.);
-    GriDBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(GriDBSCAN.class, params);
-    testParameterizationOk(params);
+    GriDBSCAN<DoubleVector> dbscan = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
+        .with(GriDBSCAN.Parameterizer.GRID_ID, 25.) //
+        .build();
 
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);

@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the CBLOF outlier detection algorithm.
@@ -41,16 +40,12 @@ public class CBLOFTest extends AbstractOutlierAlgorithmTest {
   public void testCBLOFDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CBLOF.Parameterizer.ALPHPA_ID, 0.8);
-    params.addParameter(CBLOF.Parameterizer.BETA_ID, 3);
-    params.addParameter(CBLOF.Parameterizer.CLUSTERING_ID, KMeansSort.class);
-    params.addParameter(KMeans.K_ID, 1);
-
-    // setup Algorithm
-    CBLOF<DoubleVector> cblof = ClassGenericsUtil.parameterizeOrAbort(CBLOF.class, params);
-    testParameterizationOk(params);
+    CBLOF<DoubleVector> cblof = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
+        .with(CBLOF.Parameterizer.ALPHPA_ID, 0.8) //
+        .with(CBLOF.Parameterizer.BETA_ID, 3) //
+        .with(CBLOF.Parameterizer.CLUSTERING_ID, KMeansSort.class) //
+        .with(KMeans.K_ID, 1) //
+        .build();
 
     OutlierResult result = cblof.run(db);
 

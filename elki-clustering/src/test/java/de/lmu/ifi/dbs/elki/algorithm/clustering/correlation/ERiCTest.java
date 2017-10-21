@@ -34,9 +34,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full ERiC run, and compare the result with a clustering derived
@@ -58,21 +57,18 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
   public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
-    // ERiC
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 30);
-    // ERiC Distance function in DBSCAN:
-    params.addParameter(ERiC.Parameterizer.DELTA_ID, 0.20);
-    params.addParameter(ERiC.Parameterizer.TAU_ID, 0.04);
-    params.addParameter(ERiC.Parameterizer.K_ID, 50);
-    // PCA
-    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
-    params.addParameter(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60);
-
-    ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
-    testParameterizationOk(params);
+    ERiC<DoubleVector> eric = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 30) //
+        // ERiC Distance function in DBSCAN:
+        .with(ERiC.Parameterizer.DELTA_ID, 0.20) //
+        .with(ERiC.Parameterizer.TAU_ID, 0.04) //
+        .with(ERiC.Parameterizer.K_ID, 50) //
+        // PCA
+        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class) //
+        .with(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60) //
+        .build();
 
     // run ERiC on database
     Clustering<CorrelationModel> result = eric.run(db);
@@ -90,22 +86,19 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
   public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    // ERiC
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 15);
-    // ERiC Distance function in DBSCAN:
-    params.addParameter(ERiC.Parameterizer.DELTA_ID, 1.0);
-    params.addParameter(ERiC.Parameterizer.TAU_ID, 1.0);
-    params.addParameter(ERiC.Parameterizer.K_ID, 45);
-    // PCA
-    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
-    params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6);
-
-    ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
-    testParameterizationOk(params);
+    ERiC<DoubleVector> eric = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+        // ERiC
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 15) //
+        // ERiC Distance function in DBSCAN:
+        .with(ERiC.Parameterizer.DELTA_ID, 1.0) //
+        .with(ERiC.Parameterizer.TAU_ID, 1.0) //
+        .with(ERiC.Parameterizer.K_ID, 45) //
+        // PCA
+        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
+        .with(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6) //
+        .build();
 
     // run ERiC on database
     Clustering<CorrelationModel> result = eric.run(db);

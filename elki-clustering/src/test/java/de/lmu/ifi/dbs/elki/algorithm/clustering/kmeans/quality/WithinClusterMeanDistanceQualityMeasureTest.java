@@ -25,19 +25,17 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test cluster quality measure computations.
@@ -54,17 +52,13 @@ public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractCluster
     Database db = makeSimpleDatabase(UNITTEST + "quality-measure-test.csv", 7);
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 2);
-    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
-    testParameterizationOk(params);
+    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<>(KMeansLloyd.class) //
+        .with(KMeans.K_ID, 2) //
+        .with(KMeans.INIT_ID, FirstKInitialMeans.class) //
+        .build();
 
     // run KMeans on database
-    @SuppressWarnings("unchecked")
-    Clustering<MeanModel> result = (Clustering<MeanModel>) kmeans.run(db);
+    Clustering<KMeansModel> result = kmeans.run(db);
     final NumberVectorDistanceFunction<? super DoubleVector> dist = kmeans.getDistanceFunction();
 
     // Test Cluster Average Overall Distance

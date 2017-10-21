@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test the k-means-- algorithm
@@ -40,13 +39,11 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMinusMinusRateZero() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
-    testParameterizationOk(params);
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
@@ -58,13 +55,11 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMinusMinus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
-    testParameterizationOk(params);
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
@@ -72,19 +67,16 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 
-
   @Test
   public void testKMeansMinusMinusOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1);
-    params.addFlag(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
-    testParameterizationOk(params);
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
+        .with(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);

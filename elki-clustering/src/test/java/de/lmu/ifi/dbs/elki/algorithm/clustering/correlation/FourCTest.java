@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full 4C run, and compare the result with a clustering derived from
@@ -53,15 +52,12 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
   public void testFourCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
-    // Setup 4C
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.30);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5);
-    params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 1);
-
-    FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
-    testParameterizationOk(params);
+    FourC<DoubleVector> fourc = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.30) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
+        .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
+        .with(FourC.Settings.Parameterizer.LAMBDA_ID, 1) //
+        .build();
 
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
@@ -79,16 +75,12 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
   public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    // 4C
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 3);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5);
-    params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 3);
-
-    FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
-    testParameterizationOk(params);
+    FourC<DoubleVector> fourc = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 3) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
+        .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
+        .with(FourC.Settings.Parameterizer.LAMBDA_ID, 3) //
+        .build();
 
     // run 4C on database
     Clustering<Model> result = fourc.run(db);

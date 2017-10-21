@@ -23,15 +23,13 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a single assignment with different k-means initializations.
@@ -50,13 +48,11 @@ public class RandomlyChosenInitialMeansTest extends AbstractClusterAlgorithmTest
   public void testRandomlyChosenInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 7);
-    params.addParameter(KMeans.INIT_ID, RandomlyChosenInitialMeans.class);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
-    testParameterizationOk(params);
+    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<>(SingleAssignmentKMeans.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.INIT_ID, RandomlyChosenInitialMeans.class) //
+        .build();
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);

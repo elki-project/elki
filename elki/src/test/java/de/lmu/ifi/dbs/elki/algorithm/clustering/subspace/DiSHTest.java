@@ -28,9 +28,8 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full DiSH run, and compares the result with a clustering derived
@@ -53,13 +52,10 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
   public void testDiSHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DiSH.Parameterizer.EPSILON_ID, 0.005);
-    params.addParameter(DiSH.Parameterizer.MU_ID, 50);
-
-    // setup algorithm
-    DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
-    testParameterizationOk(params);
+    DiSH<DoubleVector> dish = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+        .with(DiSH.Parameterizer.EPSILON_ID, 0.005) //
+        .with(DiSH.Parameterizer.MU_ID, 50) //
+        .build();
 
     // run DiSH on database
     Clustering<SubspaceModel> result = dish.run(db);
@@ -77,13 +73,11 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
   public void testDiSHSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DiSH.Parameterizer.EPSILON_ID, 0.1);
-    params.addParameter(DiSH.Parameterizer.MU_ID, 40);
-    params.addParameter(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI);
-    DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
-    testParameterizationOk(params);
+    DiSH<DoubleVector> dish = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+        .with(DiSH.Parameterizer.EPSILON_ID, 0.1) //
+        .with(DiSH.Parameterizer.MU_ID, 40) //
+        .with(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI) //
+        .build();
 
     // run DiSH on database
     Clustering<SubspaceModel> result = dish.run(db);

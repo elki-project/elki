@@ -26,9 +26,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test the LMCLUS algorithm.
@@ -46,13 +45,11 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   public void testLMCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LMCLUS.Parameterizer.MINSIZE_ID, 100);
-    params.addParameter(LMCLUS.Parameterizer.THRESHOLD_ID, 10);
-    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 6);
-
-    LMCLUS lmclus = ClassGenericsUtil.parameterizeOrAbort(LMCLUS.class, params);
-    testParameterizationOk(params);
+    LMCLUS lmclus = new ELKIBuilder<>(LMCLUS.class) //
+        .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
+        .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
+        .with(LMCLUS.Parameterizer.RANDOM_ID, 6) //
+        .build();
 
     Clustering<Model> result = lmclus.run(db);
     testFMeasure(db, result, 0.487716464);
@@ -68,13 +65,11 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   public void testLMCLUSOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LMCLUS.Parameterizer.MINSIZE_ID, 100);
-    params.addParameter(LMCLUS.Parameterizer.THRESHOLD_ID, 10);
-    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 0);
-
-    LMCLUS lmclus = ClassGenericsUtil.parameterizeOrAbort(LMCLUS.class, params);
-    testParameterizationOk(params);
+    LMCLUS lmclus = new ELKIBuilder<>(LMCLUS.class) //
+        .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
+        .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
+        .with(LMCLUS.Parameterizer.RANDOM_ID, 0) //
+        .build();
 
     Clustering<Model> result = lmclus.run(db);
     testClusterSizes(result, new int[] { 200, 201, 249 });

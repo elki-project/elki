@@ -26,8 +26,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for APRIORI.
@@ -39,49 +38,41 @@ public class APRIORITest extends AbstractFrequentItemsetAlgorithmTest {
   public void testMissing() {
     Database db = loadTransactions(UNITTEST + "itemsets/missing1.txt", 4);
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 1);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 1).build().run(db);
       assertEquals("Size not as expected.", 14, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
       }
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 0.5);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 0.5).build().run(db);
       assertEquals("Size not as expected.", 10, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
       }
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 3);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 3).build().run(db);
       assertEquals("Size not as expected.", 4, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
       }
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 4);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
+      APRIORI ap = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 4).build();
       FrequentItemsetsResult res = ap.run(db);
       assertEquals("Size not as expected.", 0, res.getItemsets().size());
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 1);
-      params.addParameter(APRIORI.Parameterizer.MINLENGTH_ID, 2);
-      params.addParameter(APRIORI.Parameterizer.MAXLENGTH_ID, 3);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 1) //
+          .with(APRIORI.Parameterizer.MINLENGTH_ID, 2) //
+          .with(APRIORI.Parameterizer.MAXLENGTH_ID, 3) //
+          .build().run(db);
       assertEquals("Size not as expected.", 10, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
@@ -93,31 +84,23 @@ public class APRIORITest extends AbstractFrequentItemsetAlgorithmTest {
   public void testIncreasing() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing.txt", 4);
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 1);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 1).build().run(db);
       assertEquals("Size not as expected.", 15, res.getItemsets().size());
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, .5);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, .5).build().run(db);
       assertEquals("Size not as expected.", 7, res.getItemsets().size());
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 3);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 3).build().run(db);
       assertEquals("Size not as expected.", 3, res.getItemsets().size());
     }
     {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 4);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
+      FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+          .with(APRIORI.Parameterizer.MINSUPP_ID, 4).build().run(db);
       assertEquals("Size not as expected.", 1, res.getItemsets().size());
     }
   }
@@ -125,12 +108,8 @@ public class APRIORITest extends AbstractFrequentItemsetAlgorithmTest {
   @Test
   public void testLarge() {
     Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
-    {
-      ListParameterization params = new ListParameterization();
-      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 200);
-      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
-      FrequentItemsetsResult res = ap.run(db);
-      assertEquals("Size not as expected.", 184, res.getItemsets().size());
-    }
+    FrequentItemsetsResult res = new ELKIBuilder<>(APRIORI.class) //
+        .with(APRIORI.Parameterizer.MINSUPP_ID, 200).build().run(db);
+    assertEquals("Size not as expected.", 184, res.getItemsets().size());
   }
 }

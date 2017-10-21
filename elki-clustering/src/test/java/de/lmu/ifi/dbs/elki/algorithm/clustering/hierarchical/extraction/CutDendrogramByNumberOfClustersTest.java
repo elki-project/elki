@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for cutting dendrograms at a given height.
@@ -41,12 +40,10 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, SLINK.class);
-    CutDendrogramByNumberOfClusters slink = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters slink = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .build();
 
     // run SLINK on database
     Result result = slink.run(db);

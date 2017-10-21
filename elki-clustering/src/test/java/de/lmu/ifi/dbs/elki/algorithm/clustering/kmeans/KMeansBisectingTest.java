@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the KMeansBisecting
@@ -46,16 +45,13 @@ public class KMeansBisectingTest extends AbstractClusterAlgorithmTest {
   public void testKMeansBisectingClusterSize() {
     Database db = makeSimpleDatabase(UNITTEST + "bisecting-test.csv", 300);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 3);
-    params.addParameter(KMeans.SEED_ID, 0);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
-
-    KMeansBisecting<DoubleVector, MeanModel> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
-    testParameterizationOk(params);
+    KMeansBisecting<DoubleVector, MeanModel> kmeans = new ELKIBuilder<>(KMeansBisecting.class) //
+        .with(KMeans.K_ID, 3) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5) //
+        .with(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class) //
+        .with(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class) //
+        .build();
 
     // run KMedians on database
     Clustering<MeanModel> result = kmeans.run(db);
@@ -70,16 +66,13 @@ public class KMeansBisectingTest extends AbstractClusterAlgorithmTest {
   public void testKMeansBisectingFMeasure() {
     Database db = makeSimpleDatabase(UNITTEST + "bisecting-test.csv", 300);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 2);
-    params.addParameter(KMeans.SEED_ID, 0);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
-    params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
-
-    KMeansBisecting<DoubleVector, MeanModel> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
-    testParameterizationOk(params);
+    KMeansBisecting<DoubleVector, MeanModel> kmeans = new ELKIBuilder<>(KMeansBisecting.class) //
+        .with(KMeans.K_ID, 2) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5) //
+        .with(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class) //
+        .with(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class) //
+        .build();
 
     // run KMedians on database
     Clustering<MeanModel> result = kmeans.run(db);

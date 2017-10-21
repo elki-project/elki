@@ -27,9 +27,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full CLIQUE run, and compares the result with a clustering derived
@@ -53,13 +52,10 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   public void testCLIQUEResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.Parameterizer.TAU_ID, "0.1");
-    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 20);
-
-    // setup algorithm
-    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
-    testParameterizationOk(params);
+    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+        .with(CLIQUE.Parameterizer.TAU_ID, "0.1") //
+        .with(CLIQUE.Parameterizer.XSI_ID, 20) //
+        .build();
 
     // run CLIQUE on database
     Clustering<SubspaceModel> result = clique.run(db);
@@ -79,12 +75,10 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   public void testCLIQUESubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.Parameterizer.TAU_ID, 0.2);
-    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 6);
-    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
-    testParameterizationOk(params);
+    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+        .with(CLIQUE.Parameterizer.TAU_ID, 0.2) //
+        .with(CLIQUE.Parameterizer.XSI_ID, 6) //
+        .build();
 
     // run CLIQUE on database
     Clustering<SubspaceModel> result = clique.run(db);
@@ -103,13 +97,11 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   public void testCLIQUESubspaceOverlappingPrune() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.Parameterizer.TAU_ID, 0.2);
-    params.addParameter(CLIQUE.Parameterizer.XSI_ID, 6);
-    params.addFlag(CLIQUE.Parameterizer.PRUNE_ID);
-    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
-    testParameterizationOk(params);
+    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+        .with(CLIQUE.Parameterizer.TAU_ID, 0.2) //
+        .with(CLIQUE.Parameterizer.XSI_ID, 6) //
+        .with(CLIQUE.Parameterizer.PRUNE_ID) //
+        .build();
 
     // run CLIQUE on database
     Clustering<SubspaceModel> result = clique.run(db);

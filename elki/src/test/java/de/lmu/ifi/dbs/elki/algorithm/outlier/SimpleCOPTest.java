@@ -25,8 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the SimpleCOP algorithm.
@@ -41,13 +40,8 @@ public class SimpleCOPTest extends AbstractOutlierAlgorithmTest {
   public void testSimpleCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SimpleCOP.Parameterizer.K_ID, 55);
-
-    // setup Algorithm
-    SimpleCOP<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(SimpleCOP.class, params);
-    testParameterizationOk(params);
+    SimpleCOP<DoubleVector> cop = new ELKIBuilder<SimpleCOP<DoubleVector>>(SimpleCOP.class) //
+        .with(SimpleCOP.Parameterizer.K_ID, 55).build();
 
     OutlierResult result = cop.run(db);
 

@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for LSDBC.
@@ -41,12 +40,10 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
   public void testLSDBCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LSDBC.Parameterizer.ALPHA_ID, 0.4);
-    params.addParameter(LSDBC.Parameterizer.K_ID, 20);
-    LSDBC<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(LSDBC.class, params);
-    testParameterizationOk(params);
+    LSDBC<DoubleVector> dbscan = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
+        .with(LSDBC.Parameterizer.ALPHA_ID, 0.4) //
+        .with(LSDBC.Parameterizer.K_ID, 20) //
+        .build();
 
     // run LSDBC on database
     Clustering<Model> result = dbscan.run(db);
@@ -59,12 +56,10 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
   public void testLSDBCOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LSDBC.Parameterizer.ALPHA_ID, 0.2);
-    params.addParameter(LSDBC.Parameterizer.K_ID, 120);
-    LSDBC<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(LSDBC.class, params);
-    testParameterizationOk(params);
+    LSDBC<DoubleVector> dbscan = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
+        .with(LSDBC.Parameterizer.ALPHA_ID, 0.2) //
+        .with(LSDBC.Parameterizer.K_ID, 120) //
+        .build();
 
     // run LSDBC on database
     Clustering<Model> result = dbscan.run(db);

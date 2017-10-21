@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Performs a full EM run, and compares the result with a clustering derived
@@ -49,11 +48,10 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 1);
-    params.addParameter(EM.Parameterizer.K_ID, 6);
-    EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
-    testParameterizationOk(params);
+    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+        .with(KMeans.SEED_ID, 1) //
+        .with(EM.Parameterizer.K_ID, 6) //
+        .build();
 
     // run EM on database
     Clustering<?> result = em.run(db);
@@ -68,13 +66,11 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   public void testEMResultsDiagonal() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 0);
-    params.addParameter(EM.Parameterizer.K_ID, 5);
-    params.addParameter(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class);
-    EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
-    testParameterizationOk(params);
+    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .build();
 
     // run EM on database
     Clustering<?> result = em.run(db);
@@ -89,13 +85,11 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   public void testEMResultsSpherical() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 1);
-    params.addParameter(EM.Parameterizer.K_ID, 4);
-    params.addParameter(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class);
-    EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
-    testParameterizationOk(params);
+    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+        .with(KMeans.SEED_ID, 1) //
+        .with(EM.Parameterizer.K_ID, 4) //
+        .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
+        .build();
 
     // run EM on database
     Clustering<?> result = em.run(db);

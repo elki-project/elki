@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test P3C on a simple test data set.
@@ -49,11 +48,7 @@ public class P3CTest extends AbstractClusterAlgorithmTest {
   public void testP3CSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
-    ListParameterization params = new ListParameterization();
-
-    // setup algorithm
-    P3C<DoubleVector> p3c = ClassGenericsUtil.parameterizeOrAbort(P3C.class, params);
-    testParameterizationOk(params);
+    P3C<DoubleVector> p3c = new ELKIBuilder<P3C<DoubleVector>>(P3C.class).build();
 
     // run P3C on database
     Clustering<?> result = p3c.run(db);
@@ -69,11 +64,8 @@ public class P3CTest extends AbstractClusterAlgorithmTest {
   public void testP3COverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(P3C.Parameterizer.ALPHA_THRESHOLD_ID, 0.01);
-    P3C<DoubleVector> p3c = ClassGenericsUtil.parameterizeOrAbort(P3C.class, params);
-    testParameterizationOk(params);
+    P3C<DoubleVector> p3c = new ELKIBuilder<P3C<DoubleVector>>(P3C.class) //
+        .with(P3C.Parameterizer.ALPHA_THRESHOLD_ID, 0.01).build();
 
     // run P3C on database
     Clustering<?> result = p3c.run(db);

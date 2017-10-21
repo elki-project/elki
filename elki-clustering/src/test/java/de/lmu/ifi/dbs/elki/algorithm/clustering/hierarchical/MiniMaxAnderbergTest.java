@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendr
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Perform agglomerative hierarchical clustering, using the naive algorithm.
@@ -48,12 +47,10 @@ public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
   public void testMiniMax() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);
@@ -70,12 +67,10 @@ public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
   public void testMiniMax2() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);

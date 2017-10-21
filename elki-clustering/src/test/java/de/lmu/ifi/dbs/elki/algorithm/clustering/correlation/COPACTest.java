@@ -33,9 +33,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilde
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full COPAC run, and compare the result with a clustering derived
@@ -59,13 +58,11 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     // these parameters are not picked too smartly - room for improvement.
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.02);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(COPAC.Parameterizer.K_ID, 15);
-
-    COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
-    testParameterizationOk(params);
+    COPAC<DoubleVector> copac = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.02) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
+        .with(COPAC.Parameterizer.K_ID, 15) //
+        .build();
 
     // run COPAC on database
     Clustering<DimensionModel> result = copac.run(db);
@@ -84,19 +81,16 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
   public void testCOPACOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.5);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    params.addParameter(COPAC.Parameterizer.K_ID, 45);
-    // PCA
-    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
-    params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.8);
-
-    COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
-    testParameterizationOk(params);
+    COPAC<DoubleVector> copac = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
+        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.5) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(COPAC.Parameterizer.K_ID, 45) //
+        // PCA
+        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
+        .with(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.8) //
+        .build();
 
     Clustering<DimensionModel> result = copac.run(db);
     testFMeasure(db, result, 0.86505092);

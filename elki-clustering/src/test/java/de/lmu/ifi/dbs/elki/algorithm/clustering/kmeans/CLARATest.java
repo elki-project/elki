@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Performs a full KMeans run, and compares the result with a clustering derived
@@ -49,15 +48,14 @@ public class CLARATest extends AbstractClusterAlgorithmTest {
   public void testCLARA() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    // These parameters are chosen suboptimal, for better regression testing.
-    params.addParameter(CLARA.Parameterizer.RANDOM_ID, 1);
-    params.addParameter(CLARA.Parameterizer.NUMSAMPLES_ID, 2);
-    params.addParameter(CLARA.Parameterizer.SAMPLESIZE_ID, 50);
-    CLARA<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(CLARA.class, params);
-    testParameterizationOk(params);
+    CLARA<DoubleVector> kmedians = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
+        .with(KMeans.K_ID, 5) //
+        // These parameters are chosen suboptimal,
+        // for better regression testing.
+        .with(CLARA.Parameterizer.RANDOM_ID, 1) //
+        .with(CLARA.Parameterizer.NUMSAMPLES_ID, 2) //
+        .with(CLARA.Parameterizer.SAMPLESIZE_ID, 50) //
+        .build();
 
     // run KMedians on database
     Clustering<MedoidModel> result = kmedians.run(db);

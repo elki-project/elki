@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Test k-Medoids using the EM approach.
@@ -47,12 +46,10 @@ public class KMedoidsEMTest extends AbstractClusterAlgorithmTest {
   public void testKMedoidsEM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.INIT_ID, PAMInitialMeans.class);
-    KMedoidsEM<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsEM.class, params);
-    testParameterizationOk(params);
+    KMedoidsEM<DoubleVector> kmedians = new ELKIBuilder<KMedoidsEM<DoubleVector>>(KMedoidsEM.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.INIT_ID, PAMInitialMeans.class) //
+        .build();
 
     // run KMedians on database
     Clustering<MedoidModel> result = kmedians.run(db);

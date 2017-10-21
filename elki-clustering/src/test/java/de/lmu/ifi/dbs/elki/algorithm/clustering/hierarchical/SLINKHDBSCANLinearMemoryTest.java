@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendr
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Perform HDBSCAN unit test
@@ -48,13 +47,11 @@ public class SLINKHDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
   public void testHDBSCAN() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class);
-    params.addParameter(SLINKHDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20);
-    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
-    testParameterizationOk(params);
+    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
+        .with(SLINKHDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .build();
 
     // run clustering algorithm on database
     Result result = c.run(db);

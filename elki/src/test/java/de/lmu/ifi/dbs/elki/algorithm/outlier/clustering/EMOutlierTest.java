@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the EM outlier detection algorithm.
@@ -42,14 +41,10 @@ public class EMOutlierTest extends AbstractOutlierAlgorithmTest {
   public void testEMOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
-    // Parameterization
-    ListParameterization params = new ListParameterization();
-    params.addParameter(EM.Parameterizer.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
-
-    // setup Algorithm
-    EMOutlier<DoubleVector> silout = ClassGenericsUtil.parameterizeOrAbort(EMOutlier.class, params);
-    testParameterizationOk(params);
+    EMOutlier<DoubleVector> silout = new ELKIBuilder<EMOutlier<DoubleVector>>(EMOutlier.class) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .with(KMeans.SEED_ID, 2) //
+        .build();
 
     OutlierResult result = silout.run(db);
 
