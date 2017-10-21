@@ -303,12 +303,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       return ids;
     }
 
-    @Override
+    // @Override
     public String getLongName() {
       return "Similarity Matrix";
     }
 
-    @Override
+    // @Override
     public String getShortName() {
       return "sim-matrix";
     }

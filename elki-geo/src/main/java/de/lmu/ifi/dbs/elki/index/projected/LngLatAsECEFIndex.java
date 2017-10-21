@@ -89,12 +89,12 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
 
   @Override
   public String getLongName() {
-    return "projected " + inner.getLongName();
+    return "ECEF " + inner.getLongName();
   }
 
   @Override
   public String getShortName() {
-    return "proj-" + inner.getShortName();
+    return "ecef-" + inner.getShortName();
   }
 
   @SuppressWarnings("unchecked")

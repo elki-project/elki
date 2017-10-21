@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
  * An XYCurve is an ordered collection of 2d {@link Curve}s, meant for chart
  * generation.
@@ -35,7 +33,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  *
  * @composed - - - Curve
  */
-public class XYPlot implements Result, Iterable<XYPlot.Curve> {
+public class XYPlot implements Iterable<XYPlot.Curve> {
   /**
    * Simplification threshold
    */
@@ -369,12 +367,12 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
     return curves.iterator();
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return labelx + "-" + labely + "-Curve";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return (labelx + "-" + labely + "-curve").toLowerCase();
   }

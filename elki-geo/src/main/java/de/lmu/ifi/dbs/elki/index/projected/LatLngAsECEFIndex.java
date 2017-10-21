@@ -39,11 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RKNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.index.*;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -93,12 +89,12 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
 
   @Override
   public String getLongName() {
-    return "projected " + inner.getLongName();
+    return "ECEF " + inner.getLongName();
   }
 
   @Override
   public String getShortName() {
-    return "proj-" + inner.getShortName();
+    return "ecef-" + inner.getShortName();
   }
 
   @SuppressWarnings("unchecked")

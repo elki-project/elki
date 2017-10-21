@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * 
  * @composed - - - DBIDSelection
  */
-public class SelectionResult implements Result {
+public class SelectionResult {
   /**
    * The actual selection
    */
@@ -61,12 +61,12 @@ public class SelectionResult implements Result {
     this.selection = selection;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "Selection";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "selection";
   }

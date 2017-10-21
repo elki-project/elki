@@ -140,7 +140,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
    *
    * @return Evaluation result
    */
-  public static EvaluationResult findOrCreate(Result parent, String name, String shortname) {
+  public static EvaluationResult findOrCreate(Object parent, String name, String shortname) {
     ArrayList<EvaluationResult> ers = ResultUtil.filterResults(parent, EvaluationResult.class);
     EvaluationResult ev = null;
     for(EvaluationResult e : ers) {

@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <O> Input type
  * @param <R> Result type
  */
-public abstract class AbstractClassifier<O, R extends Result> extends AbstractAlgorithm<R> implements Classifier<O> {
+public abstract class AbstractClassifier<O, R> extends AbstractAlgorithm<R> implements Classifier<O> {
   @Override
   @Deprecated
   public R run(Database database) {

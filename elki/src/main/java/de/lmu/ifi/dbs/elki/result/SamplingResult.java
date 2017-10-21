@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * 
  * @composed - - - DBIDs
  */
-public class SamplingResult implements Result {
+public class SamplingResult {
   /**
    * The actual selection
    */
@@ -64,12 +64,12 @@ public class SamplingResult implements Result {
     this.sample = sample;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "Sample";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "sample";
   }

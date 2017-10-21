@@ -94,12 +94,12 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
     return knnQuery.getKNNForDBID(id, k);
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "kNN-based local filtered PCA";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "kNNFilteredPCA";
   }

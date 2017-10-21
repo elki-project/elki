@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
@@ -144,7 +143,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @return Style result
    */
-  public StylingPolicy getStylePolicy(Result r, StyleLibrary stylelib) {
+  public StylingPolicy getStylePolicy(Object r, StyleLibrary stylelib) {
     Database db = ResultUtil.findDatabase(r);
     AutomaticEvaluation.ensureClusteringResult(db);
     List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);

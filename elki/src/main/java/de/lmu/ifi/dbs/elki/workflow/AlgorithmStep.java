@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,7 +62,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * The algorithm output
    */
-  private Result stepresult;
+  private Object stepresult;
 
   /**
    * Constructor.
@@ -81,7 +80,7 @@ public class AlgorithmStep implements WorkflowStep {
    * @param database Database
    * @return Algorithm result
    */
-  public Result runAlgorithms(Database database) {
+  public Object runAlgorithms(Database database) {
     if(LOG.isStatistics()) {
       boolean first = true;
       for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
@@ -96,7 +95,7 @@ public class AlgorithmStep implements WorkflowStep {
     for(Algorithm algorithm : algorithms) {
       Thread.currentThread().setName(algorithm.toString());
       Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName() + ".runtime").begin() : null;
-      Result res = algorithm.run(database);
+      Object res = algorithm.run(database);
       if(duration != null) {
         LOG.statistics(duration.end());
       }
@@ -123,7 +122,7 @@ public class AlgorithmStep implements WorkflowStep {
    *
    * @return Result.
    */
-  public Result getResult() {
+  public Object getResult() {
     return stepresult;
   }
 

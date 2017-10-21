@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleLongHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDistanceBasedAlgorithm<O, R> {
+public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorithm<O, R> {
   /**
    * MinPts parameter.
    */

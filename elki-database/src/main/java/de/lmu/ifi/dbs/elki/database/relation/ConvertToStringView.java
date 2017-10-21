@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * Representation adapter that uses toString() to produce a string
@@ -82,12 +83,12 @@ public class ConvertToStringView extends AbstractRelation<String> {
 
   @Override
   public String getLongName() {
-    return "toString(" + existing.getLongName() + ")";
+    return "toString(" + Metadata.of(existing).getLongName() + ")";
   }
 
   @Override
   public String getShortName() {
-    return "tostring-" + existing.getShortName();
+    return "tostring-" + Metadata.of(existing).getShortName();
   }
 
   @Override

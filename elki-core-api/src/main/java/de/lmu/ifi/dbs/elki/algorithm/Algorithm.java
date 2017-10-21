@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Specifies the requirements for any algorithm that is to be executable by the
@@ -51,7 +50,7 @@ public interface Algorithm {
    * @param database the database to run the algorithm on
    * @return the Result computed by this algorithm
    */
-  Result run(Database database);
+  Object run(Database database);
 
   /**
    * Get the input type restriction used for negotiating the data query.

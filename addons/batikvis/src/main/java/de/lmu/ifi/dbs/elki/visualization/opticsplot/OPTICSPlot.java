@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @composed - - - LinearScale
  * @navhas - renders - ClusterOrder
  */
-public class OPTICSPlot implements Result {
+public class OPTICSPlot {
   /**
    * Logger
    */
@@ -256,12 +255,12 @@ public class OPTICSPlot implements Result {
     return ThumbnailRegistryEntry.INTERNAL_PREFIX + plotnum;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "OPTICS Plot";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "optics plot";
   }

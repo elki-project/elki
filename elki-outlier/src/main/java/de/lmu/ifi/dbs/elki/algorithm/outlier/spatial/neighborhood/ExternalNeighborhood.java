@@ -74,16 +74,6 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   }
 
   @Override
-  public String getLongName() {
-    return "External Neighborhood";
-  }
-
-  @Override
-  public String getShortName() {
-    return "external-neighborhood";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

@@ -30,7 +30,7 @@ package de.lmu.ifi.dbs.elki.result;
  * @opt nodefillcolor LemonChiffon
  */
 // TODO: getter, setter for result names? Merge with AbstractHierarchicalResult?
-public class BasicResult implements Result {
+public class BasicResult {
   /**
    * Result name, for presentation
    */
@@ -53,12 +53,12 @@ public class BasicResult implements Result {
     this.shortname = shortname;
   }
 
-  @Override
+  //@Override
   public final String getLongName() {
     return name;
   }
 
-  @Override
+  //@Override
   public final String getShortName() {
     return shortname;
   }

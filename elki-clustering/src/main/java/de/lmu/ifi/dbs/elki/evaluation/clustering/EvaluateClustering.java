@@ -36,7 +36,9 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DistanceResultAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -139,7 +141,7 @@ public class EvaluateClustering implements Evaluator {
     }
     if(refc == null) {
       LOG.debug("Generating a new reference clustering.");
-      Result refres = referencealg.run(db);
+      Object refres = referencealg.run(db);
       List<Clustering<?>> refcrs = Clustering.getClusteringResults(refres);
       if(refcrs.isEmpty()) {
         LOG.warning("Reference algorithm did not return a clustering result!");

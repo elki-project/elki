@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -83,7 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "Annals of Botany, 18(2), 213-227", //
     url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
     bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
-public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, Result> {
+public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, Void> {
   /**
    * The logger for this class.
    */
@@ -146,7 +145,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    * @param database Database context
    * @param relation Relation to analyze
    */
-  public Result run(Database database, Relation<NumberVector> relation) {
+  public Void run(Database database, Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final DistanceQuery<NumberVector> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<NumberVector> knnQuery = database.getKNNQuery(distanceQuery, k + 1);

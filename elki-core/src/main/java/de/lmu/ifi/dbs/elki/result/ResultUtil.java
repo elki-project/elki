@@ -72,7 +72,7 @@ public final class ResultUtil {
    * @param r Result
    * @return List of collection results
    */
-  public static List<CollectionResult<?>> getCollectionResults(Result r) {
+  public static List<CollectionResult<?>> getCollectionResults(Object r) {
     return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<CollectionResult<?>> filter(CollectionResult.class).collect(new ArrayList<>());
   }
@@ -83,7 +83,7 @@ public final class ResultUtil {
    * @param r Result
    * @return List of iterable results
    */
-  public static List<IterableResult<?>> getIterableResults(Result r) {
+  public static List<IterableResult<?>> getIterableResults(Object r) {
     return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<IterableResult<?>> filter(IterableResult.class).collect(new ArrayList<>());
   }
@@ -108,7 +108,7 @@ public final class ResultUtil {
    * @param parent Parent
    * @param child Child
    */
-  public static void addChildResult(Result parent, Result child) {
+  public static void addChildResult(Object parent, Object child) {
     Metadata.hierarchyOf(parent).addChild(child);
   }
 

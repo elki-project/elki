@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.evaluation.classification;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
  * Provides the prediction performance measures for a classifier based on the
  * confusion matrix.
@@ -33,7 +31,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  *
  * @composed - - - ConfusionMatrix
  */
-public class ConfusionMatrixEvaluationResult implements Result {
+public class ConfusionMatrixEvaluationResult {
   /**
    * Holds the confusion matrix.
    */
@@ -57,12 +55,12 @@ public class ConfusionMatrixEvaluationResult implements Result {
     this.evaluationName = evaluationName;
   }
 
-  @Override
+  //@Override
   public String getLongName() {
     return "confusionmatrixresult";
   }
 
-  @Override
+  //@Override
   public String getShortName() {
     return "confusionmatrixresult";
   }

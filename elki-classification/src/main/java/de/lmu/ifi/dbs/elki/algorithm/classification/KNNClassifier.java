@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -64,7 +63,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
 @Priority(Priority.IMPORTANT)
-public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements DistanceBasedAlgorithm<O>, Classifier<O> {
+public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements DistanceBasedAlgorithm<O>, Classifier<O> {
   /**
    * The logger for this class.
    */
@@ -154,7 +153,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
 
   @Override
   @Deprecated
-  public Result run(Database database) throws IllegalStateException {
+  public Void run(Database database) throws IllegalStateException {
     throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
   }
 

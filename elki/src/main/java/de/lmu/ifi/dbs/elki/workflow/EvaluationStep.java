@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultListenerList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -53,7 +52,7 @@ public class EvaluationStep implements WorkflowStep {
   /**
    * Result.
    */
-  private Result stepresult;
+  private Object stepresult;
 
   /**
    * Constructor.
@@ -163,7 +162,7 @@ public class EvaluationStep implements WorkflowStep {
    *
    * @return Result
    */
-  public Result getResult() {
+  public Object getResult() {
     return stepresult;
   }
 }

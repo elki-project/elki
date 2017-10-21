@@ -372,12 +372,12 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     return LOG;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "DiSH Preference Vectors";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "dish-pref";
   }

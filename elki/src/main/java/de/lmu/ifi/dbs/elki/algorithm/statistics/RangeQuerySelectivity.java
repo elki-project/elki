@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.7.0
  * @param <V> Vector type
  */
-public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Result> {
+public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Void> {
   /**
    * The logger for this class.
    */
@@ -90,7 +89,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     this.random = random;
   }
 
-  public Result run(Database database, Relation<V> relation) {
+  public Void run(Database database, Relation<V> relation) {
     DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     RangeQuery<V> rangeQuery = database.getRangeQuery(distQuery, radius);
 

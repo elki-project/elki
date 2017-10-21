@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.lang.ref.Reference;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -123,6 +124,34 @@ public class Metadata {
    */
   public Hierarchy hierarchy() {
     return hierarchy;
+  }
+
+  public String getLongName() {
+    try {
+      Method m = owner.getClass().getMethod("getLongName");
+      if(m.getReturnType() == String.class) {
+        return (String) m.invoke(owner);
+      }
+    }
+    catch(SecurityException | IllegalArgumentException
+        | ReflectiveOperationException e) {
+      // pass.
+    }
+    return owner.getClass().getSimpleName();
+  }
+
+  public String getShortName() {
+    try {
+      Method m = owner.getClass().getMethod("getShortName");
+      if(m.getReturnType() == String.class) {
+        return (String) m.invoke(owner);
+      }
+    }
+    catch(SecurityException | IllegalArgumentException
+        | ReflectiveOperationException e) {
+      // pass.
+    }
+    return owner.getClass().getSimpleName();
   }
 
   /**

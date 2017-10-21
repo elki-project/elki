@@ -28,11 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -44,17 +40,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
@@ -69,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * @assoc - - - KNNQuery
  */
-public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgorithm<O, Void> {
   /**
    * The logger for this class.
    */
@@ -133,7 +123,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    * @param relation Relation
    * @return Null result
    */
-  public Result run(Database database, Relation<O> relation) {
+  public Void run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
     DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     // Approximate query:

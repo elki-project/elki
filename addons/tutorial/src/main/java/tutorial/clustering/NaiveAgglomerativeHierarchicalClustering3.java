@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -75,7 +74,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
-public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> {
   /**
    * Class logger
    */
@@ -175,7 +174,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public Result run(Database db, Relation<O> relation) {
+  public Clustering<Model> run(Database db, Relation<O> relation) {
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();

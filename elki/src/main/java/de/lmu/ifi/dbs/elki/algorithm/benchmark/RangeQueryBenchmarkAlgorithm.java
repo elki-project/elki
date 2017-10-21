@@ -26,11 +26,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -41,7 +37,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
@@ -94,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @assoc - - - RangeQuery
  */
-public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Void> {
   /**
    * The logger for this class.
    */
@@ -138,7 +133,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
    * @param radrel Radius relation
    * @return Null result
    */
-  public Result run(Database database, Relation<O> relation, Relation<NumberVector> radrel) {
+  public Void run(Database database, Relation<O> relation, Relation<NumberVector> radrel) {
     if(queries != null) {
       throw new AbortException("This 'run' method will not use the given query set!");
     }
@@ -176,7 +171,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
    * @param relation Relation
    * @return Null result
    */
-  public Result run(Database database, Relation<O> relation) {
+  public Void run(Database database, Relation<O> relation) {
     if(queries == null) {
       throw new AbortException("A query set is required for this 'run' method.");
     }

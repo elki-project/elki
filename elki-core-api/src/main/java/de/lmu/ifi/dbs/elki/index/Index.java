@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
  * Interface defining the minimum requirements for all index classes.
  * 
@@ -31,7 +29,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @since 0.1
  * 
  */
-public interface Index extends Result {
+public interface Index {
   /**
    * Initialize the index. For static indexes, this is the moment the index is
    * bulk loaded.
@@ -46,4 +44,22 @@ public interface Index extends Result {
    * statistics.
    */
   void logStatistics();
+  
+  /**
+   * Get a long (human-readbale) name of the index.
+   *
+   * @return Name
+   */
+  // @Override // Used to be in Result
+  String getLongName();
+
+  /**
+   * Get a short (suitable for filenames) name of the index.
+   * 
+   * FIXME: remove.
+   *
+   * @return Name
+   */
+  // @Override // Used to be in Result
+  String getShortName();
 }

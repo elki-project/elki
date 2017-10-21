@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * An object representation from a database.
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  *
  * @param <O> Object type
  */
-public interface Relation<O> extends DatabaseQuery, Result {
+public interface Relation<O> extends DatabaseQuery {
   /**
    * Get the representation of an object.
    *
@@ -95,6 +94,22 @@ public interface Relation<O> extends DatabaseQuery, Result {
    * @return Size
    */
   int size();
+
+  /**
+   * Get a long (human readable) name for the relation.
+   *
+   * @return Relation name
+   */
+  // @Override // Used to be in "Result"
+  String getLongName();
+
+  /**
+   * Get a short (suitable for filenames) name for the relation.
+   *
+   * @return Relation name
+   */
+  // @Override // Used to be in "Result"
+  String getShortName();
 
   /**
    * Execute a function for each ID.

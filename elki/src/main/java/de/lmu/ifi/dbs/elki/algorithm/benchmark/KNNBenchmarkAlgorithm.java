@@ -24,11 +24,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -38,7 +34,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -62,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @assoc - - - KNNQuery
  */
-public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, Void> {
   /**
    * The logger for this class.
    */
@@ -112,7 +107,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @param relation Relation
    * @return Null result
    */
-  public Result run(Database database, Relation<O> relation) {
+  public Void run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
     DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k);

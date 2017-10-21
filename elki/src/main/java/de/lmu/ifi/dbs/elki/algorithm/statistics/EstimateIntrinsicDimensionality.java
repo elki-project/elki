@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <O> Data type
  */
-public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlgorithm<O, Void> {
   /**
    * Class logger.
    */
@@ -90,7 +89,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     this.samples = samples;
   }
 
-  public Result run(Database database, Relation<O> relation) {
+  public Void run(Database database, Relation<O> relation) {
     DBIDs allids = relation.getDBIDs();
     // Number of samples to draw.
     int ssize = (int) ((samples > 1.) ? samples : Math.ceil(samples * allids.size()));

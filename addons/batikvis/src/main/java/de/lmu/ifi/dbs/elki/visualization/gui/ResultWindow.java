@@ -55,7 +55,6 @@ import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -226,14 +225,17 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, Hierarchy<Object> vistree, Projection proj) {
       // Make a submenu for this element
       final String nam;
-      if(r instanceof Result) {
-        nam = ((Result) r).getLongName();
-      }
-      else if(r instanceof VisualizationItem) {
+      if(r instanceof VisualizationItem) {
         nam = ((VisualizationItem) r).getMenuName();
       }
       else {
-        return;
+        Metadata m = Metadata.get(r);
+        if(m != null) {
+          nam = m.getLongName();
+        }
+        else {
+          return;
+        }
       }
       ArrayList<JMenuItem> subitems = new ArrayList<>();
       // Add menus for any child results

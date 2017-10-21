@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @author Erich Schubert
  * @since 0.2
  */
-public interface OrderingResult extends Result {
+public interface OrderingResult {
   /**
    * Get the full set of DBIDs this ordering is defined for.
    * 

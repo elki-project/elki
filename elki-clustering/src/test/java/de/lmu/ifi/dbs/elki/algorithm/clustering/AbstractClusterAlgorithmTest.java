@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
@@ -51,7 +50,7 @@ public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorit
    * @param result Base result
    * @return Clustering
    */
-  protected Clustering<?> findSingleClustering(Result result) {
+  protected Clustering<?> findSingleClustering(Object result) {
     List<Clustering<? extends Model>> clusterresults = Clustering.getClusteringResults(result);
     assertEquals("No unique clustering found in result.", 1, clusterresults.size());
     Clustering<? extends Model> clustering = clusterresults.get(0);

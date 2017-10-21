@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * A virtual partitioning of the database. For the accepted DBIDs, access is
@@ -92,7 +93,7 @@ public class ProxyView<O> extends AbstractRelation<O> {
 
   @Override
   public String getLongName() {
-    return "Partition of " + inner.getLongName();
+    return "Partition of " + Metadata.of(inner).getLongName();
   }
 
   @Override

@@ -20,11 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -45,11 +41,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -60,7 +52,10 @@ import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -70,13 +65,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -185,7 +177,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
     // To collect samples
-    Result samples = new BasicResult("Samples", "samples");
+    BasicResult samples = new BasicResult("Samples", "samples");
 
     // Step 1: Cluster sampled possible worlds:
     Random rand = random.getSingleThreadedRandom();
@@ -221,7 +213,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Metadata.hierarchyOf(d).removeChild(c); // Detach from database
 
     // Evaluation
-    Result reps = new BasicResult("Representants", "representative");
+    BasicResult reps = new BasicResult("Representants", "representative");
     Metadata.hierarchyOf(relation).addChild(reps);
 
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
@@ -304,7 +296,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    *
    * @return Clustering result
    */
-  protected Clustering<?> runClusteringAlgorithm(Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected Clustering<?> runClusteringAlgorithm(Object parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);

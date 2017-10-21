@@ -64,16 +64,6 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
   }
 
   @Override
-  public String getLongName() {
-    return "K Nearest Neighbors Neighborhood";
-  }
-
-  @Override
-  public String getShortName() {
-    return "knn-neighborhood";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

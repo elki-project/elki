@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -123,7 +122,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
    * @param title Title of relation
    * @return Clustering result
    */
-  protected C runClusteringAlgorithm(Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected C runClusteringAlgorithm(Object parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);

@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 
 /**
@@ -152,7 +151,6 @@ public class DatabaseEventManager {
    * @param l the listener to add
    * @see #removeListener(ResultListener)
    * @see ResultListener
-   * @see Result
    */
   public void addListener(ResultListener l) {
     resultListenerList.add(l);
@@ -165,8 +163,6 @@ public class DatabaseEventManager {
    * @param l the listener to remove
    * @see #addListener(ResultListener)
    * @see ResultListener
-   * @see Result
-   *
    */
   public void removeListener(ResultListener l) {
     resultListenerList.remove(l);
@@ -309,7 +305,7 @@ public class DatabaseEventManager {
    * @param r New child result added
    * @param parent Parent result that was added to
    */
-  public void fireResultAdded(Result r, Result parent) {
+  public void fireResultAdded(Object r, Object parent) {
     for(int i = resultListenerList.size(); --i >= 0;) {
       resultListenerList.get(i).resultAdded(r, parent);
     }
@@ -322,7 +318,7 @@ public class DatabaseEventManager {
    * @param r result that has been removed
    * @param parent Parent result that has been removed
    */
-  public void fireResultRemoved(Result r, Result parent) {
+  public void fireResultRemoved(Object r, Object parent) {
     for(int i = resultListenerList.size(); --i >= 0;) {
       resultListenerList.get(i).resultRemoved(r, parent);
     }
