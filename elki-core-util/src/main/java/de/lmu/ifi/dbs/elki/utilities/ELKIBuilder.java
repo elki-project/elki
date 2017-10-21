@@ -28,11 +28,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Builder utility class.
  *
- * This class only delegates to {@link ListParameterization} and
- * {@link ClassGenericsUtil}, but may be easier to use for beginners.
+ * This class delegates to {@link ListParameterization} and
+ * {@link ClassGenericsUtil}, but may be easier to use in many cases.
  * 
- * TODO: use SerializedParameterization instead, and allow passing option names
- * as strings, so people do not have to find the OptionIDs?
+ * You will often need to specify the type T, because of <i>nested</i>
+ * generics. This is because of the way generics are implemented in Java, and
+ * we cannot easily resolve this; you have to give the type explicitly.
+ *
+ * Example:
+ * {@code
+ * RStarTreeFactory<DoubleVector> indexfactory =
+ *   new ELKIBuilder<RStarTreeFactory<DoubleVector>>(RStarTreeFactory.class)
+ *       .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512)
+ *       .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
+ *       .build();
+ * }
+ * with {@code new ELKIBuilder<RStarTreeFactory<DoubleVector>>} this code is
+ * fine, whereas {@code new ELKIBuilder<>} will cause an unchecked cast warning,
+ * because you are, in fact, casting a {@code RStarTreeFactory} (without
+ * generics) into a {@code RStarTreeFactory<DoubleVector>} here.
  *
  * @author Erich Schubert
  *
@@ -57,7 +71,9 @@ public final class ELKIBuilder<T> {
   /**
    * Constructor.
    *
-   * You will often need to specify the type T, because of nested generics.
+   * You will often need to specify the type T, because of <i>nested</i>
+   * generics. This is because of the way generics are implemented in Java, and
+   * we cannot easily resolve this; you have to give the type explicitly.
    *
    * Example:
    * {@code
@@ -67,6 +83,10 @@ public final class ELKIBuilder<T> {
    *       .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
    *       .build();
    * }
+   * with {@code new ELKIBuilder<RStarTreeFactory<DoubleVector>>} this code is
+   * fine, whereas {@code new ELKIBuilder<>} will cause an unchecked cast
+   * warning, because you are, in fact, casting a {@code RStarTreeFactory}
+   * (without generics) into a {@code RStarTreeFactory<DoubleVector>} here.
    *
    * @param clazz Class
    */
@@ -124,7 +144,7 @@ public final class ELKIBuilder<T> {
    * Instantiate, consuming the parameter list.
    *
    * This will throw an {@link AbortException} if the parameters are incomplete,
-   * or {@code build ()} is called twice.
+   * or {@code build()} is called twice.
    * 
    * We lose some type safety here, for convenience. The type {@code <C>} is
    * meant to be {@code <T>} with generics added only, which is necessary
