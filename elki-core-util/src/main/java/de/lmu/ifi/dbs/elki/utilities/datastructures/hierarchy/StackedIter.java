@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.EmptyIterator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
@@ -64,7 +65,7 @@ public class StackedIter<B, A extends B> implements It<B> {
       it1.advance();
     }
     else {
-      this.it2 = null;
+      this.it2 = EmptyIterator.empty();
     }
   }
 
