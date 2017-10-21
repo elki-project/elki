@@ -212,7 +212,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       Hierarchy<Object> vistree = context.getVisHierarchy();
       Object start = context.getBaseResult();
       ArrayList<JMenuItem> items = new ArrayList<>();
-      for(It<Object> iter = Metadata.of(start).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+      for(It<Object> iter = Metadata.hierarchyOf(start).iterChildren(); iter.valid(); iter.advance()) {
         recursiveBuildMenu(items, iter.get(), vistree, proj);
       }
       // Add all items.
@@ -237,7 +237,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
       ArrayList<JMenuItem> subitems = new ArrayList<>();
       // Add menus for any child results
-      for(It<Object> iter = Metadata.of(r).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+      for(It<Object> iter = Metadata.hierarchyOf(r).iterChildren(); iter.valid(); iter.advance()) {
         recursiveBuildMenu(subitems, iter.get(), vistree, proj);
       }
       // Add visualizers:

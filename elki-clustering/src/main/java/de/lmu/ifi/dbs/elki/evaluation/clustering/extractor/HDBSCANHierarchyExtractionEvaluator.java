@@ -67,7 +67,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
       Clustering<DendrogramModel> result = inner.run(pointerresult);
-      Metadata.of(pointerresult).hierarchy().addChild(result);
+      Metadata.hierarchyOf(pointerresult).addChild(result);
     }
   }
 

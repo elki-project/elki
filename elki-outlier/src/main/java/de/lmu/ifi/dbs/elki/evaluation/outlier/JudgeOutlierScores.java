@@ -154,7 +154,7 @@ public class JudgeOutlierScores implements Evaluator {
     ids.removeDBIDs(outlierIds);
 
     for (OutlierResult or : ors) {
-      Metadata.of(or).hierarchy().addChild(computeScore(ids, outlierIds, or));
+      Metadata.hierarchyOf(or).addChild(computeScore(ids, outlierIds, or));
     }
   }
 

@@ -128,7 +128,7 @@ public class BubbleVisualization implements VisFactory {
       boolean vis = true;
       // Quick and dirty hack: hide if parent result is also an outlier
       // result since that probably is already visible and we're redundant.
-      if(Metadata.of(o).hierarchy().iterParents().filter(OutlierResult.class).valid()) {
+      if(Metadata.hierarchyOf(o).iterParents().filter(OutlierResult.class).valid()) {
         vis = false;
       }
       final VisualizationTask task = new VisualizationTask(this, NAME, o, rel) //

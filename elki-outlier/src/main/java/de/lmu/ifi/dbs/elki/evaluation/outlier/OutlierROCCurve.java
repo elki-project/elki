@@ -120,7 +120,7 @@ public class OutlierROCCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       ROCResult rocres = computeROCResult(positiveids, o);
-      Metadata.of(o).hierarchy().addChild(rocres);
+      Metadata.hierarchyOf(o).addChild(rocres);
       EvaluationResult ev = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {
@@ -139,7 +139,7 @@ public class OutlierROCCurve implements Evaluator {
         throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
       }
       ROCResult rocres = computeROCResult(positiveids, sorted);
-      Metadata.of(or).hierarchy().addChild(rocres);
+      Metadata.hierarchyOf(or).addChild(rocres);
       EvaluationResult ev = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {

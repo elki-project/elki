@@ -174,7 +174,7 @@ public class EvaluateClustering implements Evaluator {
 
     ScoreResult sr = new ScoreResult(contmat);
     sr.addHeader(c.getLongName());
-    Metadata.of(c).hierarchy().addChild(sr);
+    Metadata.hierarchyOf(c).addChild(sr);
   }
 
   /**

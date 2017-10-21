@@ -56,7 +56,7 @@ public class ParallelPlotFactory implements ProjectorFactory {
         return;
       }
       // Do not enable nested relations by default:
-      for(It<Relation<?>> it2 = Metadata.of(rel).hierarchy().iterAncestors().filter(Relation.class); it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = Metadata.hierarchyOf(rel).iterAncestors().filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         if(dimensionality(it2.get()) == dim) {
           // TODO: add Actions instead?

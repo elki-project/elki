@@ -151,7 +151,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
     }
     if(ev == null) {
       ev = new EvaluationResult(name, shortname);
-      Metadata.of(parent).hierarchy().addChild(ev);
+      Metadata.hierarchyOf(parent).addChild(ev);
     }
     return ev;
   }

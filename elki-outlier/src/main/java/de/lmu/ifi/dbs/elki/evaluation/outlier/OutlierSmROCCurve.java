@@ -184,7 +184,7 @@ public class OutlierSmROCCurve implements Evaluator {
 
     List<OutlierResult> oresults = OutlierResult.getOutlierResults(result);
     for(OutlierResult o : oresults) {
-      Metadata.of(o).hierarchy().addChild(computeSmROCResult(positiveids, o));
+      Metadata.hierarchyOf(o).addChild(computeSmROCResult(positiveids, o));
     }
   }
 

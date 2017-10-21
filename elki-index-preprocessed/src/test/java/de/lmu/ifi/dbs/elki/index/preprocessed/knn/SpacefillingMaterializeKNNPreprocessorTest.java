@@ -85,7 +85,7 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    Metadata.of(rel).hierarchy().addChild(preproc);
+    Metadata.hierarchyOf(rel).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 

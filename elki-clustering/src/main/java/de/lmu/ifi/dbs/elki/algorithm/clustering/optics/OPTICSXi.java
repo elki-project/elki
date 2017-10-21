@@ -365,9 +365,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         clustering.addToplevelCluster(cluster);
       }
     }
-    Metadata.of(clustering).hierarchy().addChild(clusterOrderResult);
+    Metadata.hierarchyOf(clustering).addChild(clusterOrderResult);
     if(salist != null) {
-      Metadata.of(clusterOrderResult).hierarchy().addChild(new SteepAreaResult(salist));
+      Metadata.hierarchyOf(clusterOrderResult).addChild(new SteepAreaResult(salist));
     }
     return clustering;
   }

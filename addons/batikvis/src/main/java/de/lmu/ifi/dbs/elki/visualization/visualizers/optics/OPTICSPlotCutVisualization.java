@@ -258,7 +258,7 @@ public class OPTICSPlotCutVisualization implements VisFactory {
         // FIXME: replace an existing optics cut result!
         final ClusterOrder order = optics.getResult();
         Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, epsilon);
-        Metadata.of(order).hierarchy().addChild(cl);
+        Metadata.hierarchyOf(order).addChild(cl);
       }
       svgp.requestRedraw(this.task, this);
       return true;

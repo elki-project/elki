@@ -216,13 +216,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, rids, distance);
     mat.initialize();
     ProxyDatabase d = new ProxyDatabase(rids, crel);
-    Metadata.of(crel).hierarchy().addChild(mat);
+    Metadata.hierarchyOf(crel).addChild(mat);
     Clustering<?> c = metaAlgorithm.run(d);
-    Metadata.of(d).hierarchy().removeChild(c); // Detach from database
+    Metadata.hierarchyOf(d).removeChild(c); // Detach from database
 
     // Evaluation
     Result reps = new BasicResult("Representants", "representative");
-    Metadata.of(relation).hierarchy().addChild(reps);
+    Metadata.hierarchyOf(relation).addChild(reps);
 
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
     List<? extends Cluster<?>> cl = c.getAllClusters();
@@ -258,7 +258,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       final double cprob = computeConfidence(clus.size(), crel.size());
 
       // Build an evaluation result
-      Metadata.of(bestc).hierarchy().addChild(new RepresentativenessEvaluation(gtau, besttau, cprob));
+      Metadata.hierarchyOf(bestc).addChild(new RepresentativenessEvaluation(gtau, besttau, cprob));
 
       evaluated.add(new DoubleObjPair<Clustering<?>>(cprob, bestc));
     }
@@ -266,13 +266,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Collections.sort(evaluated, Collections.reverseOrder());
     for(DoubleObjPair<Clustering<?>> pair : evaluated) {
       // Attach parent relation (= sample) to the representative samples.
-      for(It<Relation<?>> it = Metadata.of(pair.second).hierarchy().iterParents().filter(Relation.class); it.valid(); it.advance()) {
-        Metadata.of(reps).hierarchy().addChild(it.get());
+      for(It<Relation<?>> it = Metadata.hierarchyOf(pair.second).iterParents().filter(Relation.class); it.valid(); it.advance()) {
+        Metadata.hierarchyOf(reps).addChild(it.get());
       }
     }
     // Add the random samples below the representative results only:
     if(keep) {
-      Metadata.of(relation).hierarchy().addChild(samples);
+      Metadata.hierarchyOf(relation).addChild(samples);
     }
     else {
       ResultUtil.removeRecursive(samples);
@@ -311,8 +311,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Clustering<?> clusterResult = samplesAlgorithm.run(d);
     ResultUtil.removeRecursive(sample);
     ResultUtil.removeRecursive(clusterResult);
-    Metadata.of(parent).hierarchy().addChild(sample);
-    Metadata.of(sample).hierarchy().addChild(clusterResult);
+    Metadata.hierarchyOf(parent).addChild(sample);
+    Metadata.hierarchyOf(sample).addChild(clusterResult);
     return clusterResult;
   }
 

@@ -140,7 +140,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     DoubleRelation scoreResult = new MaterializedDoubleRelation("MO", "Median-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
-    Metadata.of(or).hierarchy().addChild(npred);
+    Metadata.hierarchyOf(or).addChild(npred);
     return or;
   }
 

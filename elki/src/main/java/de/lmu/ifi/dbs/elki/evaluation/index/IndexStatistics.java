@@ -61,7 +61,7 @@ public class IndexStatistics implements Evaluator {
     }
     Collection<Pair<String, String>> col = new ArrayList<>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
-    Metadata.of(db).hierarchy().addChild(analysis);
+    Metadata.hierarchyOf(db).addChild(analysis);
   }
 
   /**

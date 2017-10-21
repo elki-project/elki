@@ -264,7 +264,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
     }
     if(isSoft()) {
-      Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
     }
     else {
       probClusterIGivenX.destroy();

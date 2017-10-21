@@ -83,6 +83,16 @@ public class Metadata {
   }
 
   /**
+   * Get <b>or create</b> the Hierarchy of an object.
+   *
+   * @param o Object
+   * @return Hierarchy
+   */
+  public static Hierarchy hierarchyOf(Object o) {
+    return Metadata.of(o).hierarchy();
+  }
+
+  /**
    * The global metadata map.
    */
   private static final Map<Object, Metadata> global = new WeakHashMap<>();

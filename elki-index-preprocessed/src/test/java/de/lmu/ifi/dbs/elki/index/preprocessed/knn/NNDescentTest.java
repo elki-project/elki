@@ -77,7 +77,7 @@ public class NNDescentTest {
         .build().instantiate(rel);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
-    Metadata.of(rel).hierarchy().addChild(preproc);
+    Metadata.hierarchyOf(rel).addChild(preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries

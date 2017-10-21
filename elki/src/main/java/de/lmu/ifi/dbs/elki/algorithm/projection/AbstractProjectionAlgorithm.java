@@ -71,7 +71,7 @@ public abstract class AbstractProjectionAlgorithm<R extends Result> extends Abst
       return;
     }
     boolean first = true;
-    for(It<Index> it = Metadata.of(relation).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(relation).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       if(first) {
         Logging.getLogger(getClass()).statistics("Index statistics when removing initial data relation.");
         first = false;

@@ -182,7 +182,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new MaterializedDoubleRelation("Subspace Outlier Degree", "sod-outlier", sod_scores, relation.getDBIDs()));
     if(sod_models != null) {
-      Metadata.of(sodResult).hierarchy().addChild(new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs()));
+      Metadata.hierarchyOf(sodResult).addChild(new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs()));
     }
     return sodResult;
   }

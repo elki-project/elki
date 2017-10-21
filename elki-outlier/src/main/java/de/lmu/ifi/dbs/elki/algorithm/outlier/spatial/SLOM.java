@@ -191,7 +191,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     DoubleRelation scoreResult = new MaterializedDoubleRelation("SLOM", "slom-outlier", sloms, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
-    Metadata.of(or).hierarchy().addChild(npred);
+    Metadata.hierarchyOf(or).addChild(npred);
     return or;
   }
 

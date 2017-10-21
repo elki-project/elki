@@ -198,7 +198,7 @@ public class ComputeOutlierHistogram implements Evaluator {
     }
 
     for(OutlierResult or : ors) {
-      Metadata.of(or).hierarchy().addChild(evaluateOutlierResult(db, or));
+      Metadata.hierarchyOf(or).addChild(evaluateOutlierResult(db, or));
     }
   }
 

@@ -135,7 +135,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNRefer = preproc.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
       rkNNRefer = preproc.getRKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      Metadata.of(relation).hierarchy().addChild(preproc);
+      Metadata.hierarchyOf(relation).addChild(preproc);
     }
     else {
       if(stepprog != null) {
@@ -157,7 +157,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNReach = preproc.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
       rkNNReach = preproc.getRKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      Metadata.of(relation).hierarchy().addChild(preproc);
+      Metadata.hierarchyOf(relation).addChild(preproc);
     }
 
     Pair<KNNQuery<O>, KNNQuery<O>> kNNPair = new Pair<>(kNNRefer, kNNReach);

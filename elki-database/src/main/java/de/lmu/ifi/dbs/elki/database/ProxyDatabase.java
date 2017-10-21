@@ -55,7 +55,7 @@ public class ProxyDatabase extends AbstractDatabase {
     super();
     this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
-    Metadata.of(this).hierarchy().addChild(idrep);
+    Metadata.hierarchyOf(this).addChild(idrep);
   }
 
   /**
@@ -68,11 +68,11 @@ public class ProxyDatabase extends AbstractDatabase {
     super();
     this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
-    Metadata.of(this).hierarchy().addChild(idrep);
+    Metadata.hierarchyOf(this).addChild(idrep);
     for (Relation<?> orel : relations) {
       Relation<?> relation = new ProxyView<>(ids, orel);
       this.relations.add(relation);
-      Metadata.of(this).hierarchy().addChild(relation);
+      Metadata.hierarchyOf(this).addChild(relation);
     }
   }
 

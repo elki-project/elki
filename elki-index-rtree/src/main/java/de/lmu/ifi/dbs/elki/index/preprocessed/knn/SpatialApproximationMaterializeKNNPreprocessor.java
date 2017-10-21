@@ -143,7 +143,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   protected SpatialIndexTree<N, E> getSpatialIndex(Relation<O> relation) {
     SpatialIndexTree<N, E> ret = null;
-    for(It<SpatialIndexTree<N, E>> iter = Metadata.of(relation).hierarchy().iterDescendants().filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
+    for(It<SpatialIndexTree<N, E>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one spatial index found - this is not supported!");
       }

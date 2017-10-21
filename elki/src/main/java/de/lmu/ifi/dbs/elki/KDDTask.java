@@ -103,7 +103,7 @@ public class KDDTask {
     algorithmStep.runAlgorithms(db);
 
     // TODO: this could be nicer
-    Metadata.of(db).hierarchy().addChild(new SettingsResult(settings));
+    Metadata.hierarchyOf(db).addChild(new SettingsResult(settings));
 
     // Evaluation
     evaluationStep.runEvaluators(db);

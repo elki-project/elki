@@ -192,7 +192,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
       boolean noise = entry.getIntKey() < 0;
       result.addToplevelCluster(new Cluster<>(entry.getValue(), noise, ClusterModel.CLUSTER));
     }
-    Metadata.of(r).hierarchy().addChild(result);
+    Metadata.hierarchyOf(r).addChild(result);
   }
 
   @Override

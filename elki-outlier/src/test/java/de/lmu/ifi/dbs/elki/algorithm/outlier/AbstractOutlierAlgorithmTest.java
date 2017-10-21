@@ -57,7 +57,7 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
         .with(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive).build();
 
     // Ensure the result has been added to the hierarchy:
-    Metadata.of(db).hierarchy().addChild(result);
+    Metadata.hierarchyOf(db).addChild(result);
 
     // Compute ROC and AUC:
     rocCurve.processNewResult(result);

@@ -64,7 +64,7 @@ public class HistogramFactory implements ProjectorFactory {
         return;
       }
       // Do not enable nested relations by default:
-      for(It<Relation<?>> it2 = Metadata.of(rel).hierarchy().iterAncestors().filter(Relation.class); it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = Metadata.hierarchyOf(rel).iterAncestors().filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = it2.get();
         if(TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel2.getDataTypeInformation())) {

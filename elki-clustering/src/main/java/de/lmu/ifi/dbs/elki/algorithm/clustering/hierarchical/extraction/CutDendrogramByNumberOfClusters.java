@@ -68,7 +68,7 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
   @Override
   public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
-    Metadata.of(result).hierarchy().addChild(pointerresult);
+    Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
   }
 

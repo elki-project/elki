@@ -88,7 +88,7 @@ public class GeoIndexing {
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // For all indexes, dump their statistics.
-    for(It<Index> it = Metadata.of(db).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(db).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
 
@@ -125,7 +125,7 @@ public class GeoIndexing {
 
     // But also that we only read a small part of the data, and only computed
     // the distances to a few points in the data set.
-    for(It<Index> it = Metadata.of(db).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(db).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
   }

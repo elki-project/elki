@@ -126,7 +126,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    */
   public Clustering<Model> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<Model> result = new Instance(pointerresult).run();
-    Metadata.of(result).hierarchy().addChild(pointerresult);
+    Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
   }
 

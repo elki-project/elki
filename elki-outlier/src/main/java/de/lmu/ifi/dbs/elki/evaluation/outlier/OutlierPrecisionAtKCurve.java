@@ -93,7 +93,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
-      Metadata.of(o).hierarchy().addChild(computePrecisionResult(o.getScores().size(), positiveids, sorted));
+      Metadata.hierarchyOf(o).addChild(computePrecisionResult(o.getScores().size(), positiveids, sorted));
       // Process them only once.
       orderings.remove(o.getOrdering());
     }
@@ -102,7 +102,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      Metadata.of(or).hierarchy().addChild(computePrecisionResult(or.getDBIDs().size(), positiveids, sorted));
+      Metadata.hierarchyOf(or).addChild(computePrecisionResult(or.getDBIDs().size(), positiveids, sorted));
     }
   }
 

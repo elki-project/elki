@@ -22,9 +22,7 @@ package de.lmu.ifi.dbs.elki.evaluation.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
@@ -37,7 +35,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * Compute the purity of index pages as a naive measure for performance
@@ -70,29 +73,22 @@ public class IndexPurity implements Evaluator {
         Node<?> n = index.getNode(leaf.getPageID());
 
         final int total = n.getNumEntries();
-        HashMap<String, Integer> map = new HashMap<>(total);
+        Object2IntOpenHashMap<String> map = new Object2IntOpenHashMap<>(total);
         for(int i = 0; i < total; i++) {
           DBID id = ((SpatialPointLeafEntry) n.getEntry(i)).getDBID();
           String label = lblrel.get(id);
-          Integer val = map.get(label);
-          if(val == null) {
-            val = 1;
-          }
-          else {
-            val += 1;
-          }
-          map.put(label, val);
+          map.addTo(label, 1);
         }
         double gini = 0.0;
-        for(Entry<String, Integer> ent : map.entrySet()) {
-          double rel = ent.getValue() / (double) total;
+        for(IntIterator it = map.values().iterator(); it.hasNext();) {
+          double rel = it.nextInt() / (double) total;
           gini += rel * rel;
         }
         mv.put(gini);
       }
       Collection<double[]> col = new ArrayList<>();
       col.add(new double[] { mv.getMean(), mv.getSampleStddev() });
-      Metadata.of(index).hierarchy().addChild(new CollectionResult<>("Gini coefficient of index", "index-gini", col));
+      Metadata.hierarchyOf(index).addChild(new CollectionResult<>("Gini coefficient of index", "index-gini", col));
     }
   }
 }

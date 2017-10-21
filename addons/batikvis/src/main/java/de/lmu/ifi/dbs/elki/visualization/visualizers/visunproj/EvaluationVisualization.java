@@ -154,7 +154,7 @@ public class EvaluationVisualization implements VisFactory {
         for(It<EvaluationResult> it = VisualizationTree.findNewResults(context, cpol.getClustering()).filter(c); it.valid(); it.advance()) {
           // This could be attached to a child clustering, in which case we
           // may end up displaying the wrong evaluation.
-          if(Metadata.of(it.get()).hierarchy().iterAncestors().find(cpol.getClustering())) {
+          if(Metadata.hierarchyOf(it.get()).iterAncestors().find(cpol.getClustering())) {
             sr = it.get();
             break;
           }

@@ -244,7 +244,7 @@ public class EvaluateDBCV<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(cl, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Density Based Clustering Validation", dbcv, 0., Double.POSITIVE_INFINITY, 0., true);
-    Metadata.of(cl).hierarchy().addChild(ev);
+    Metadata.hierarchyOf(cl).addChild(ev);
     // FIXME: notify of changes, if reused!
     return dbcv;
   }

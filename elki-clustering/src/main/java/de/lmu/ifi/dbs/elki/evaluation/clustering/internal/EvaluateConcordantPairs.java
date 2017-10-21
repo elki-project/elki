@@ -208,7 +208,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     MeasurementGroup g = ev.findOrCreateGroup("Concordance-based Evaluation");
     g.addMeasure("Gamma", gamma, -1., 1., 0., false);
     g.addMeasure("Tau", tau, -1., +1., 0., false);
-    Metadata.of(c).hierarchy().addChild(ev);
+    Metadata.hierarchyOf(c).addChild(ev);
     // FIXME: notify of changes, if reused!
     return gamma;
   }

@@ -192,7 +192,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, lim);
       preproc.initialize();
-      Metadata.of(relation).hierarchy().addChild(preproc);
+      Metadata.hierarchyOf(relation).addChild(preproc);
     }
 
     // Test that we now get a proper index query

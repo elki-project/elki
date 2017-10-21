@@ -79,8 +79,8 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
     reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
     predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
 
-    Metadata.of(this).hierarchy().addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
-    Metadata.of(this).hierarchy().addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
+    Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
   }
 
   /**
@@ -96,9 +96,9 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
     this.reachability = reachability;
     this.predecessor = predecessor;
 
-    Metadata.of(this).hierarchy().addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
+    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
     if(predecessor != null) {
-      Metadata.of(this).hierarchy().addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+      Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
     }
   }
 

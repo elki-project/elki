@@ -95,7 +95,7 @@ public class OPTICSClusterVisualization implements VisFactory {
         }
       });
       // Also check parents, the current default behavior of OPTICSXi.
-      Metadata.of(p.getResult()).hierarchy().iterAncestors().filter(Clustering.class).forEach(clus -> {
+      Metadata.hierarchyOf(p.getResult()).iterAncestors().filter(Clustering.class).forEach(clus -> {
         if(clus.getToplevelClusters().size() == 0) {
           return;
         }

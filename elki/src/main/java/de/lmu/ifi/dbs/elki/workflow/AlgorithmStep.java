@@ -84,7 +84,7 @@ public class AlgorithmStep implements WorkflowStep {
   public Result runAlgorithms(Database database) {
     if(LOG.isStatistics()) {
       boolean first = true;
-      for(It<Index> it = Metadata.of(database).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+      for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
         if(first) {
           LOG.statistics("Index statistics before running algorithms:");
           first = false;
@@ -102,7 +102,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(LOG.isStatistics()) {
         boolean first = true;
-        for(It<Index> it = Metadata.of(database).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+        for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
           if(first) {
             LOG.statistics("Index statistics after running algorithm " + algorithm.toString() + ":");
             first = false;
@@ -112,7 +112,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(res != null) {
         // Make sure the result is attached, but usually this is a noop:
-        Metadata.of(database).hierarchy().addChild(res);
+        Metadata.hierarchyOf(database).addChild(res);
       }
     }
     return stepresult;
