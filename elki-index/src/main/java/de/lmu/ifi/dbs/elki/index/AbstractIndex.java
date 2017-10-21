@@ -46,10 +46,4 @@ public abstract class AbstractIndex<O> implements Index {
     super();
     this.relation = relation;
   }
-
-  @Override
-  abstract public String getLongName();
-
-  @Override
-  abstract public String getShortName();
 }

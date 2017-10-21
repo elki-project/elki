@@ -112,12 +112,12 @@ public class ProbabilisticOutlierScore implements OutlierScoreMeta {
     return value;
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getLongName() {
     return "Outlier Score Metadata";
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getShortName() {
     return "outlier-score-meta";
   }

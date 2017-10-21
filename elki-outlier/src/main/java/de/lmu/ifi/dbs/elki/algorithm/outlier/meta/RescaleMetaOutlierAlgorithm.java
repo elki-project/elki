@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -89,7 +88,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
   @Override
   public OutlierResult run(Database database) {
-    Result innerresult = algorithm.run(database);
+    Object innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(innerresult);
     final DoubleRelation scores = or.getScores();
@@ -120,7 +119,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * 
    * @return Iterator to work with
    */
-  private OutlierResult getOutlierResult(Result result) {
+  private OutlierResult getOutlierResult(Object result) {
     It<OutlierResult> it = Metadata.hierarchyOf(result).iterDescendantsSelf().filter(OutlierResult.class);
     if(it.valid()) {
       return it.get();

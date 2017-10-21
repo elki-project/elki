@@ -26,12 +26,7 @@ import de.lmu.ifi.dbs.elki.data.type.AlternativeTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -40,7 +35,6 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -52,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -360,7 +355,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    *
    * @author Erich Schubert
    */
-  public static class RetrievalPerformanceResult implements Result, TextWriteable {
+  public static class RetrievalPerformanceResult implements TextWriteable {
     /**
      * Sample size
      */
@@ -411,12 +406,12 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
       return map;
     }
 
-    @Override
+    //@Override
     public String getLongName() {
       return "Distance function retrieval evaluation.";
     }
 
-    @Override
+    //@Override
     public String getShortName() {
       return "distance-retrieval-evaluation";
     }

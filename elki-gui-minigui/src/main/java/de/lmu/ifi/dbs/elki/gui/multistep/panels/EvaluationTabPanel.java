@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
@@ -95,7 +94,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
-    Result res = algs.getAlgorithmStep().getResult();
+    Object res = algs.getAlgorithmStep().getResult();
     evals.runEvaluators(database);
     basedOnResult = new WeakReference<Object>(res);
   }

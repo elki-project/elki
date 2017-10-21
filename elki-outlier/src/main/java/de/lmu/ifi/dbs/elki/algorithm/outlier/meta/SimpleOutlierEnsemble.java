@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -101,7 +100,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, LOG) : null;
       for (Algorithm alg : algorithms) {
-        Result res = alg.run(database);
+        Object res = alg.run(database);
         List<OutlierResult> ors = OutlierResult.getOutlierResults(res);
         for (OutlierResult or : ors) {
           results.add(or);

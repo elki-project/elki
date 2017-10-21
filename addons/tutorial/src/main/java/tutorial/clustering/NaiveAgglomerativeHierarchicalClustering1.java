@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -61,7 +60,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
  * 
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> {
   /**
    * Class logger
    */
@@ -90,7 +89,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public Result run(Database db, Relation<O> relation) {
+  public Clustering<Model> run(Database db, Relation<O> relation) {
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();

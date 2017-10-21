@@ -65,12 +65,12 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
     return LOG;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "knn-join materialized neighbors";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "knn-join";
   }

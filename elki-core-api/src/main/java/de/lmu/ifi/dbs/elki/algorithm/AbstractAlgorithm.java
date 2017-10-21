@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  *
  * @param <R> the result type
  */
-public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
+public abstract class AbstractAlgorithm<R> implements Algorithm {
   /**
    * Constructor.
    */

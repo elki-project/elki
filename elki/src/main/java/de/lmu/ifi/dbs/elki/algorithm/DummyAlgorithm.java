@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -53,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Dummy Algorithm")
 @Description("The algorithm executes an Euclidean 10NN query on all data points, and can be used in unit testing")
 @Priority(Priority.SUPPLEMENTARY)
-public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Result> {
+public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Void> {
   /**
    * The logger for this class.
    */
@@ -73,7 +72,7 @@ public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Re
    * @param relation Relation
    * @return Null result
    */
-  public Result run(Database database, Relation<O> relation) {
+  public Void run(Database database, Relation<O> relation) {
     // Get a distance and knn query for the Euclidean distance
     // Hardcoded, only use this if you only allow the eucliden distance
     DistanceQuery<O> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);

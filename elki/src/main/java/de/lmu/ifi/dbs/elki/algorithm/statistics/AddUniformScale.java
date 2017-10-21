@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -54,7 +53,7 @@ public class AddUniformScale implements Algorithm {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Result run(Database database) {
+  public Void run(Database database) {
     for(Relation<?> rel : database.getRelations()) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         ScalesResult res = run((Relation<? extends NumberVector>) rel);

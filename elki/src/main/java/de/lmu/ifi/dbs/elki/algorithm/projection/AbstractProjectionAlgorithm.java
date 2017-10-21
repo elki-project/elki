@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  *
  * @param <R> Result type.
  */
-public abstract class AbstractProjectionAlgorithm<R extends Result> extends AbstractAlgorithm<R> {
+public abstract class AbstractProjectionAlgorithm<R> extends AbstractAlgorithm<R> {
   /**
    * Keep the original data relation.
    */

@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.math.geometry;
 
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  * 
  * @has - - - Itr
  */
-public class XYCurve implements Result {
+public class XYCurve {
   /**
    * Simplification threshold
    */
@@ -149,7 +148,7 @@ public class XYCurve implements Result {
   public void addAndSimplify(double x, double y) {
     // simplify curve when possible:
     final int len = data.size();
-    if (len >= 4) {
+    if(len >= 4) {
       // Look at the previous 2 points
       final double l1x = data.get(len - 4);
       final double l1y = data.get(len - 3);
@@ -161,16 +160,16 @@ public class XYCurve implements Result {
       final double cdx = x - l2x;
       final double cdy = y - l2y;
       // X simplification
-      if ((ldx == 0) && (cdx == 0)) {
+      if((ldx == 0) && (cdx == 0)) {
         data.remove(len - 2, 2);
       }
       // horizontal simplification
-      else if ((ldy == 0) && (cdy == 0)) {
+      else if((ldy == 0) && (cdy == 0)) {
         data.remove(len - 2, 2);
       }
       // diagonal simplification
-      else if (ldy > 0 && cdy > 0) {
-        if (Math.abs((ldx / ldy) - (cdx / cdy)) < THRESHOLD) {
+      else if(ldy > 0 && cdy > 0) {
+        if(Math.abs((ldx / ldy) - (cdx / cdy)) < THRESHOLD) {
           data.remove(len - 2, 2);
         }
       }
@@ -259,7 +258,7 @@ public class XYCurve implements Result {
    * @param sy Scaling factor for Y axis
    */
   public void rescale(double sx, double sy) {
-    for (int i = 0; i < data.size(); i += 2) {
+    for(int i = 0; i < data.size(); i += 2) {
       data.set(i, sx * data.get(i));
       data.set(i + 1, sy * data.get(i + 1));
     }
@@ -306,19 +305,19 @@ public class XYCurve implements Result {
     StringBuilder buf = new StringBuilder();
     buf.append("XYCurve[");
     buf.append(labelx).append(',').append(labely).append(':');
-    for (int pos = 0; pos < data.size(); pos += 2) {
+    for(int pos = 0; pos < data.size(); pos += 2) {
       buf.append(' ').append(data.get(pos)).append(',').append(data.get(pos + 1));
     }
     buf.append(']');
     return buf.toString();
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return labelx + "-" + labely + "-Curve";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return (labelx + "-" + labely + "-curve").toLowerCase();
   }
@@ -334,20 +333,20 @@ public class XYCurve implements Result {
   public static double areaUnderCurve(XYCurve curve) {
     DoubleArray data = curve.data;
     double prevx = data.get(0), prevy = data.get(1);
-    if (prevx > curve.minx) {
+    if(prevx > curve.minx) {
       throw new UnsupportedOperationException("Curves must be monotone on X for areaUnderCurve to be valid.");
     }
     double area = 0.0;
-    for (int pos = 2; pos < data.size(); pos += 2) {
+    for(int pos = 2; pos < data.size(); pos += 2) {
       final double curx = data.get(pos), cury = data.get(pos + 1);
-      if (prevx > curx) {
+      if(prevx > curx) {
         throw new UnsupportedOperationException("Curves must be monotone on X for areaUnderCurve to be valid.");
       }
       area += (curx - prevx) * (prevy + cury) * .5; // .5 = mean Y
       prevx = curx;
       prevy = cury;
     }
-    if (prevx < curve.maxx) {
+    if(prevx < curve.maxx) {
       throw new UnsupportedOperationException("Curves must be complete on X for areaUnderCurve to be valid.");
     }
     return area;

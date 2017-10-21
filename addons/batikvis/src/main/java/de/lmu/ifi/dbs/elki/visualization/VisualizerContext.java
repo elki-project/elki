@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @composed - - - DataStoreListener
  * @composed - - - VisualizationProcessor
  */
-public class VisualizerContext implements DataStoreListener, Result {
+public class VisualizerContext implements DataStoreListener {
   /**
    * Logger.
    */
@@ -336,12 +336,12 @@ public class VisualizerContext implements DataStoreListener, Result {
     vistree.removeVisualizationListener(listener);
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "Visualizer context";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "vis-context";
   }

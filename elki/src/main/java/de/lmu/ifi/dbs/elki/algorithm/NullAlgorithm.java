@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")
-public class NullAlgorithm extends AbstractAlgorithm<Result> {
+public class NullAlgorithm extends AbstractAlgorithm<Void> {
   /**
    * The logger for this class.
    */
@@ -51,7 +50,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Result> {
   }
 
   @Override
-  public Result run(Database database) {
+  public Void run(Database database) {
     return null;
   }
   

@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -66,12 +65,11 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testHDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Result result = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
         .build().run(db);
-    Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.96941);
     testClusterSizes(clustering, new int[] { 7, 14, 54, 103, 152 });
   }
@@ -79,12 +77,11 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testHDBSCANDegenerate() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Result result = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 1) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
         .build().run(db);
-    Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
     assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
   }
@@ -92,11 +89,10 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testMiniMaxNNResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Result result = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 1) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxNNChain.class) //
         .build().run(db);
-    Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
     assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
   }

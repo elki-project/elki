@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorithmTest {
-  // TODO: add more data sets.
-
   /**
    * Run agglomerative hierarchical clustering with fixed parameters and compare
    * the result to a golden standard.

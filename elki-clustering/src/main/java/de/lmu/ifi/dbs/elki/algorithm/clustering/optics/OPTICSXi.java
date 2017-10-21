@@ -668,12 +668,12 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       this.areas = areas;
     }
 
-    @Override
+    // @Override
     public String getLongName() {
       return "Xi-Steep areas";
     }
 
-    @Override
+    // @Override
     public String getShortName() {
       return "xi-steep-areas";
     }

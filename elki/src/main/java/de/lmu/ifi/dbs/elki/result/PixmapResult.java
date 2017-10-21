@@ -29,7 +29,7 @@ import java.io.File;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public interface PixmapResult extends Result {
+public interface PixmapResult {
   /**
    * Get the image pixmap
    * 

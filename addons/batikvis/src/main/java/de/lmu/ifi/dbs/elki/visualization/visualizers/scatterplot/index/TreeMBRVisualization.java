@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -96,7 +95,7 @@ public class TreeMBRVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ScatterPlotProjector.class, (tree, p) -> {
-      final VisualizationTask task = new VisualizationTask(this, NAME, (Result) tree, p.getRelation()) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, tree, p.getRelation()) //
           .level(VisualizationTask.LEVEL_BACKGROUND + 1).visibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);

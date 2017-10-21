@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.visualization;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
@@ -384,8 +384,9 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
-    if(result != null && result instanceof Result) {
-      buf.append("Result: ").append(((Result) result).getLongName()).append(' ');
+    Metadata m = result != null ? Metadata.get(result) : null;
+    if(m != null) {
+      buf.append("Result: ").append(m.getLongName()).append(' ');
     }
     buf.append(super.toString());
     return buf.toString();

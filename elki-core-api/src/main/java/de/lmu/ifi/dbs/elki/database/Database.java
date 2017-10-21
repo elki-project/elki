@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -55,7 +54,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @navhas - contains - Relation
  * @navhas - invokes - DataStoreListener
  */
-public interface Database extends Result {
+public interface Database {
   /**
    * Initialize the database, for example by loading the input data. (Since this
    * should NOT be done on construction time!)

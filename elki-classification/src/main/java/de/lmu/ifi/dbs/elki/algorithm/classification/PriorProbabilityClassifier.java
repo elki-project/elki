@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -45,7 +45,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
-public class PriorProbabilityClassifier extends AbstractClassifier<Object, Result> {
+public class PriorProbabilityClassifier extends AbstractClassifier<Object, Void> {
   /**
    * The logger for this class.
    */

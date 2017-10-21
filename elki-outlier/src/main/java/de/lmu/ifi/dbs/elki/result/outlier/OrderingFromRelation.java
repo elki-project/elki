@@ -81,12 +81,12 @@ public class OrderingFromRelation implements OrderingResult {
     return sorted;
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getLongName() {
     return scores.getLongName() + " Order";
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getShortName() {
     return scores.getShortName() + "_order";
   }

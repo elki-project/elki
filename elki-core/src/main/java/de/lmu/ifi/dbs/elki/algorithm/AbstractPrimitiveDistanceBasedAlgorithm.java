@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of objects handled by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R extends Result> extends AbstractAlgorithm<R> {
+public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
    * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.

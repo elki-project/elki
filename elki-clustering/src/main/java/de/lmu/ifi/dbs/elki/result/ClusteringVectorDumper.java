@@ -149,7 +149,7 @@ public class ClusteringVectorDumper implements ResultHandler {
         ids = (DBIDRange) pids;
         break;
       }
-      LOG.warning("Parent result " + iter.get().getLongName() + " has DBID type " + pids.getClass());
+      LOG.warning("Parent result " + Metadata.of(iter.get()).getLongName() + " has DBID type " + pids.getClass());
     }
     // Fallback: try to locate a database.
     if(ids == null) {
@@ -159,7 +159,7 @@ public class ClusteringVectorDumper implements ResultHandler {
           ids = (DBIDRange) pids;
           break;
         }
-        LOG.warning("Parent result " + iter.get().getLongName() + " has DBID type " + pids.getClass());
+        LOG.warning("Parent result " + Metadata.of(iter.get()).getLongName() + " has DBID type " + pids.getClass());
       }
     }
     if(ids == null) {

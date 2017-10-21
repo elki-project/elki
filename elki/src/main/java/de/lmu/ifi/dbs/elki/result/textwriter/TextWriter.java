@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
@@ -170,13 +169,13 @@ public class TextWriter {
     List<Clustering<?>> rc = new LinkedList<>();
     List<IterableResult<?>> ri = new LinkedList<>();
     List<SettingsResult> rs = new LinkedList<>();
-    List<Result> otherres = new LinkedList<>();
+    List<Object> otherres = new LinkedList<>();
 
     // Split result objects in different known types:
     {
-      Metadata.hierarchyOf(r).iterDescendantsSelf().filter(Result.class).forEach(res -> {
+      Metadata.hierarchyOf(r).iterDescendantsSelf().forEach(res -> {
         if(filter != null) {
-          final String nam = res.getShortName();
+          final String nam = Metadata.of(res).getShortName();
           if(nam == null || !filter.matcher(nam).find()) {
             return;
           }
@@ -219,7 +218,7 @@ public class TextWriter {
     for(OrderingResult ror : ro) {
       writeOrderingResult(db, streamOpener, ror, ra);
     }
-    for(Result otherr : otherres) {
+    for(Object otherr : otherres) {
       writeOtherResult(streamOpener, otherr);
     }
   }
@@ -251,7 +250,7 @@ public class TextWriter {
         if(dbrels.contains(a)) {
           continue;
         }
-        String label = a.getShortName();
+        String label = Metadata.of(a).getShortName();
         Object value = a.get(objID);
         if(value == null) {
           continue;
@@ -301,7 +300,7 @@ public class TextWriter {
   }
 
   private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws IOException {
-    PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
+    PrintStream outStream = streamOpener.openStream(getFilename(ri, Metadata.of(ri).getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     // hack to print collectionResult header information
@@ -328,7 +327,7 @@ public class TextWriter {
   }
 
   private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException {
-    PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
+    PrintStream outStream = streamOpener.openStream(getFilename(or, Metadata.of(or).getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     for(DBIDIter i = or.order(or.getDBIDs()).iter(); i.valid(); i.advance()) {
@@ -390,9 +389,9 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
-  private void writeOtherResult(StreamFactory streamOpener, Result r) throws IOException {
+  private void writeOtherResult(StreamFactory streamOpener, Object r) throws IOException {
     if(writers.getHandler(r) != null) {
-      PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
+      PrintStream outStream = streamOpener.openStream(getFilename(r, Metadata.of(r).getShortName()));
       TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
       TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
       if(owriter == null) {

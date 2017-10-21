@@ -165,12 +165,12 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
     this.actualMaximum = actualMaximum;
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getLongName() {
     return "Outlier Score Metadata";
   }
 
-  @Override
+  // @Override // used to be in Result
   public String getShortName() {
     return "outlier-score-meta";
   }

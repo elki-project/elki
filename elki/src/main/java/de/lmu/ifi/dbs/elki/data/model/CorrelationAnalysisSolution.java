@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesExc
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+
 import net.jafama.FastMath;
 
 /**
@@ -49,7 +49,7 @@ import net.jafama.FastMath;
  * 
  * @param <V> the type of NumberVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends NumberVector> implements TextWriteable, Result, Model {
+public class CorrelationAnalysisSolution<V extends NumberVector> implements TextWriteable, Model {
   /**
    * Empty constant vector returned when no subspace was used.
    */
@@ -291,12 +291,12 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     }
   }
 
-  @Override
+  //@Override
   public String getLongName() {
     return "Correlation Analysis Solution";
   }
 
-  @Override
+  //@Override
   public String getShortName() {
     return "correlationanalysissolution";
   }

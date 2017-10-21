@@ -160,12 +160,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     return LOG;
   }
 
-  @Override
+  // @Override
   public String getLongName() {
     return "HiSC Preference Vectors";
   }
 
-  @Override
+  // @Override
   public String getShortName() {
     return "hisc-pref";
   }

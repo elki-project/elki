@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.result.outlier;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
  * Generic meta information about the value range of an outlier score.
  * 
@@ -32,7 +30,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @author Erich Schubert
  * @since 0.3
  */
-public interface OutlierScoreMeta extends Result {
+public interface OutlierScoreMeta {
   /**
    * Get the actual minimum of the value range.
    * 

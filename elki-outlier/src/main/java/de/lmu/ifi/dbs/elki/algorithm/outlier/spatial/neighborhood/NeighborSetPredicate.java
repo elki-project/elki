@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Predicate to obtain the neighbors of a reference object as set.
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public interface NeighborSetPredicate extends Result {
+public interface NeighborSetPredicate {
   /**
    * Get the neighbors of a reference object for DBSCAN.
    * 

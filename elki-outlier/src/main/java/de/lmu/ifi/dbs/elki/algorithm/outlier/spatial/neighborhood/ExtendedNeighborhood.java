@@ -68,16 +68,6 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
     return LOG;
   }
 
-  @Override
-  public String getLongName() {
-    return "Extended Neighborhood";
-  }
-
-  @Override
-  public String getShortName() {
-    return "extended-neighborhood";
-  }
-
   /**
    * Factory class.
    * 
