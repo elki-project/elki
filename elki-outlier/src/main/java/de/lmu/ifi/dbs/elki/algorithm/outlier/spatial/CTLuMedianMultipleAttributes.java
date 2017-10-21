@@ -154,7 +154,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Median multiple attributes outlier", "median-outlier", scores, attributes.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
-    Metadata.of(or).hierarchy().addChild(npred);
+    Metadata.hierarchyOf(or).addChild(npred);
     return or;
   }
 

@@ -64,7 +64,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     MaterializeKNNPreprocessor<NumberVector> preproc = new MaterializeKNNPreprocessor<>(rel, EuclideanDistanceFunction.STATIC, 179);
-    Metadata.of(rel).hierarchy().addChild(preproc);
+    Metadata.hierarchyOf(rel).addChild(preproc);
     preproc.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
         .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
@@ -88,7 +88,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         return null; // Disable kNN queries, to force range queries to be tested.
       }
     };
-    Metadata.of(rel).hierarchy().addChild(idx);
+    Metadata.hierarchyOf(rel).addChild(idx);
     idx.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
         .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //

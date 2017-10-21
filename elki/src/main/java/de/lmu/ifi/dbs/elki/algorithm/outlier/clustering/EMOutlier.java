@@ -98,7 +98,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     emClustering.setSoft(true);
     Clustering<?> emresult = emClustering.run(database, relation);
     Relation<double[]> soft = null;
-    for(It<Relation<double[]>> iter = Metadata.of(emresult).hierarchy().iterChildren().filter(Relation.class); iter.valid(); iter.advance()) {
+    for(It<Relation<double[]>> iter = Metadata.hierarchyOf(emresult).iterChildren().filter(Relation.class); iter.valid(); iter.advance()) {
       if(iter.get().getDataTypeInformation() == EM.SOFT_TYPE) {
         soft = iter.get();
       }
@@ -123,7 +123,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);
     // TODO: add a keep-EM flag?
-    Metadata.of(result).hierarchy().addChild(emresult);
+    Metadata.hierarchyOf(result).addChild(emresult);
     return result;
   }
 

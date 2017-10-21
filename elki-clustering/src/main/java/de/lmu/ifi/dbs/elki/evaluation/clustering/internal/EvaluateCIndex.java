@@ -195,7 +195,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
-    Metadata.of(c).hierarchy().addChild(ev);
+    Metadata.hierarchyOf(c).addChild(ev);
     // FIXME: notify of changes, if reused!
     return cIndex;
   }

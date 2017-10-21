@@ -72,7 +72,7 @@ public class OutlierResult extends BasicResult {
     this.meta = meta;
     this.scores = scores;
     this.ordering = new OrderingFromRelation(scores, meta instanceof InvertedOutlierScoreMeta);
-    Hierarchy hier = Metadata.of(this).hierarchy();
+    Hierarchy hier = Metadata.hierarchyOf(this);
     hier.addChild(scores);
     hier.addChild(ordering);
     hier.addChild(meta);
@@ -112,7 +112,7 @@ public class OutlierResult extends BasicResult {
    * @return List of outlier results
    */
   public static List<OutlierResult> getOutlierResults(Object r) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .filter(OutlierResult.class).collect(new ArrayList<>());
   }
 

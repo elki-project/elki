@@ -67,7 +67,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
   @Override
   public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
-    Metadata.of(result).hierarchy().addChild(pointerresult);
+    Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
   }
 

@@ -100,7 +100,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @return Iterator of results.
    */
   public static It<Object> findVis(VisualizerContext context) {
-    return new StackedIter<>(Metadata.of(context.getBaseResult()).hierarchy().iterDescendantsSelf(), context.getVisHierarchy());
+    return new StackedIter<>(Metadata.hierarchyOf(context.getBaseResult()).iterDescendantsSelf(), context.getVisHierarchy());
   }
 
   /**
@@ -114,7 +114,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static It<Object> findVis(VisualizerContext context, Object start) {
     if(start instanceof Result) { // In first hierarchy.
-      It<Object> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf();
+      It<Object> it1 = Metadata.hierarchyOf(start).iterDescendantsSelf();
       return new StackedIter<>(it1, context.getVisHierarchy());
     }
     return context.getVisHierarchy().iterDescendantsSelf(start);
@@ -128,7 +128,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @return Iterator of results.
    */
   public static It<Object> findNewResults(VisualizerContext context, Object start) {
-    return (start instanceof Result) ? Metadata.of(start).hierarchy().iterDescendantsSelf() : EmptyIterator.empty();
+    return (start instanceof Result) ? Metadata.hierarchyOf(start).iterDescendantsSelf() : EmptyIterator.empty();
   }
 
   /**
@@ -146,11 +146,11 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static <A extends Result, B extends VisualizationItem> void findNewSiblings(VisualizerContext context, Object start, Class<? super A> type1, Class<? super B> type2, BiConsumer<A, B> handler) {
     // Search start in first hierarchy:
-    final Metadata.Hierarchy hier = Metadata.of(context.getBaseResult()).hierarchy();
+    final Metadata.Hierarchy hier = Metadata.hierarchyOf(context.getBaseResult());
     final Hierarchy<Object> vistree = context.getVisHierarchy();
     if(start instanceof Result) {
       // New result:
-      for(It<A> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
+      for(It<A> it1 = Metadata.hierarchyOf(start).iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
         final A result = it1.get();
         // Existing visualization:
         for(It<B> it2 = vistree.iterDescendantsSelf(context.getBaseResult()).filter(type2); it2.valid(); it2.advance()) {
@@ -185,10 +185,10 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     final Hierarchy<Object> hier = context.getVisHierarchy();
     // Search start in first hierarchy:
     if(start instanceof Result) {
-      for(It<A> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
+      for(It<A> it1 = Metadata.hierarchyOf(start).iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
         final A result = it1.get();
         // Find descendant results in result hierarchy:
-        for(It<Object> it3 = Metadata.of(result).hierarchy().iterDescendantsSelf(); it3.valid(); it3.advance()) {
+        for(It<Object> it3 = Metadata.hierarchyOf(result).iterDescendantsSelf(); it3.valid(); it3.advance()) {
           // Find descendant in visualization hierarchy:
           for(It<B> it2 = hier.iterDescendantsSelf(it3.get()).filter(type2); it2.valid(); it2.advance()) {
             handler.accept(result, it2.get());
@@ -203,7 +203,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
         // Find ancestor result in visualization hierarchy:
         for(It<Result> it3 = hier.iterAncestorsSelf(vis).filter(Result.class); it3.valid(); it3.advance()) {
           // Find ancestor in result hierarchy:
-          for(It<A> it1 = Metadata.of(it3.get()).hierarchy().iterAncestorsSelf().filter(type1); it1.valid(); it1.advance()) {
+          for(It<A> it1 = Metadata.hierarchyOf(it3.get()).iterAncestorsSelf().filter(type1); it1.valid(); it1.advance()) {
             handler.accept(it1.get(), vis);
           }
         }

@@ -128,7 +128,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    */
   public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).run();
-    Metadata.of(result).hierarchy().addChild(pointerresult);
+    Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
   }
 

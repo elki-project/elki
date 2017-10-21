@@ -174,7 +174,7 @@ public class TextWriter {
 
     // Split result objects in different known types:
     {
-      Metadata.of(r).hierarchy().iterDescendantsSelf().filter(Result.class).forEach(res -> {
+      Metadata.hierarchyOf(r).iterDescendantsSelf().filter(Result.class).forEach(res -> {
         if(filter != null) {
           final String nam = res.getShortName();
           if(nam == null || !filter.matcher(nam).find()) {

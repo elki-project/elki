@@ -98,7 +98,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     this.ids = DBIDUtil.newHashSet();
     this.idrep = new DBIDView(this.ids);
     this.relations.add(idrep);
-    Metadata.of(this).hierarchy().addChild(idrep);
+    Metadata.hierarchyOf(this).addChild(idrep);
 
     // Add indexes.
     if(indexFactories != null) {
@@ -203,7 +203,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
     Relation<?> relation = new MaterializedRelation<>(ometa, ids);
     relations.add(relation);
-    Metadata.of(this).hierarchy().addChild(relation);
+    Metadata.hierarchyOf(this).addChild(relation);
     // Try to add indexes where appropriate
     for(IndexFactory<?> factory : indexFactories) {
       if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
@@ -213,7 +213,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
         final Relation<Object> orep = (Relation<Object>) relation;
         Index index = ofact.instantiate(orep);
         index.initialize();
-        Metadata.of(relation).hierarchy().addChild(index);
+        Metadata.hierarchyOf(relation).addChild(index);
       }
     }
     return relation;

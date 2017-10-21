@@ -154,7 +154,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
     ((WritableDataStore<O>) content).put(id, val);
-    for(It<Index> it = Metadata.of(this).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(this).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
         throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
       }
@@ -173,7 +173,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
     if(!(content instanceof WritableDataStore)) {
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
-    for(It<Index> it = Metadata.of(this).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(this).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
         throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
       }

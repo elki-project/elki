@@ -146,7 +146,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
-    Metadata.of(c).hierarchy().addChild(ev);
+    Metadata.hierarchyOf(c).addChild(ev);
     // FIXME: notify of changes, if reused!
     return ssq;
   }

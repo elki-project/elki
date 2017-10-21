@@ -153,7 +153,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<? extends O> relation) throws IllegalStateException {
     MetricalIndexTree<O, N, E> ret = null;
-    for(It<MetricalIndexTree<O, N, E>> iter = Metadata.of(relation).hierarchy().iterDescendants().filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
+    for(It<MetricalIndexTree<O, N, E>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one metrical index found - this is not supported!");
       }

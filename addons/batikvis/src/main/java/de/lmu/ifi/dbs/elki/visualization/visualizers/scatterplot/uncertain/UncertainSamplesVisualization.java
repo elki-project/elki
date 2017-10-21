@@ -91,7 +91,7 @@ public class UncertainSamplesVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      Metadata.of(p.getRelation()).hierarchy().iterAncestorsSelf().filter(Relation.class).forEach(r2 -> {
+      Metadata.hierarchyOf(p.getRelation()).iterAncestorsSelf().filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
           context.addVis(p, new VisualizationTask(this, NAME, p, r2) //
               .level(VisualizationTask.LEVEL_DATA).visibility(false) //

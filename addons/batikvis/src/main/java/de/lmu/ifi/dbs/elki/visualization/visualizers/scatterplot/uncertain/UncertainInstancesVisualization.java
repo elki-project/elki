@@ -139,7 +139,7 @@ public class UncertainInstancesVisualization implements VisFactory {
       // database.
       Relation<? extends NumberVector> srel = null;
       boolean isChild = false;
-      for(It<Relation<?>> it = Metadata.of(c).hierarchy().iterAncestors().filter(Relation.class); it.valid(); it.advance()) {
+      for(It<Relation<?>> it = Metadata.hierarchyOf(c).iterAncestors().filter(Relation.class); it.valid(); it.advance()) {
         Relation<?> r = it.get();
         if(r == this.rel) {
           isChild = true;

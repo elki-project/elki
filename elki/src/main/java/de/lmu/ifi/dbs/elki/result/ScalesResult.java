@@ -98,13 +98,13 @@ public class ScalesResult extends BasicResult {
    * @return associated scales result
    */
   public static ScalesResult getScalesResult(final Relation<? extends SpatialComparable> rel) {
-    It<ScalesResult> it = Metadata.of(rel).hierarchy().iterDescendantsSelf()//
+    It<ScalesResult> it = Metadata.hierarchyOf(rel).iterDescendantsSelf()//
         .filter(ScalesResult.class);
     if(it.valid()) {
       return it.get();
     }
     ScalesResult newsca = new ScalesResult(rel);
-    Metadata.of(rel).hierarchy().addChild(newsca);
+    Metadata.hierarchyOf(rel).addChild(newsca);
     return newsca;
   }
 }

@@ -92,7 +92,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
       PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), o.getScores());
-      Metadata.of(o).hierarchy().addChild(curve);
+      Metadata.hierarchyOf(o).addChild(curve);
       EvaluationResult ev = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
       // Process them only once.
@@ -104,7 +104,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
       PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), null);
-      Metadata.of(or).hierarchy().addChild(curve);
+      Metadata.hierarchyOf(or).addChild(curve);
       EvaluationResult ev = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
     }

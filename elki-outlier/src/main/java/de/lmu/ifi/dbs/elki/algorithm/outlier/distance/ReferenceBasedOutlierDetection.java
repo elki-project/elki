@@ -161,7 +161,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // adds reference points to the result. header information for the
     // visualizer to find the reference points in the result
-    Metadata.of(result).hierarchy().addChild(new ReferencePointsResult<>("Reference points", "reference-points", refPoints));
+    Metadata.hierarchyOf(result).addChild(new ReferencePointsResult<>("Reference points", "reference-points", refPoints));
     return result;
   }
 

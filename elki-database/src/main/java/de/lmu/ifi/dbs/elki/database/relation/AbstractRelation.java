@@ -59,7 +59,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
-    for(It<DistanceIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(DistanceIndex.class); it.valid(); it.advance()) {
+    for(It<DistanceIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(DistanceIndex.class); it.valid(); it.advance()) {
       DistanceQuery<O> q = it.get().getDistanceQuery(distanceFunction, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for distance query: " + it.get());
@@ -81,7 +81,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
-    for(It<SimilarityIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(SimilarityIndex.class); it.valid(); it.advance()) {
+    for(It<SimilarityIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(SimilarityIndex.class); it.valid(); it.advance()) {
       SimilarityQuery<O> q = it.get().getSimilarityQuery(similarityFunction, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for similarity query: " + it.get());
@@ -103,7 +103,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(It<KNNIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
+    for(It<KNNIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
       KNNQuery<O> q = it.get().getKNNQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for kNN query: " + it.get());
@@ -139,7 +139,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(It<RangeIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
+    for(It<RangeIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
       RangeQuery<O> q = it.get().getRangeQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
@@ -175,7 +175,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(simQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(It<SimilarityRangeIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
+    for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
       RangeQuery<O> q = it.get().getSimilarityRangeQuery(simQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
@@ -211,7 +211,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(It<RKNNIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
+    for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
       RKNNQuery<O> q = it.get().getRKNNQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());

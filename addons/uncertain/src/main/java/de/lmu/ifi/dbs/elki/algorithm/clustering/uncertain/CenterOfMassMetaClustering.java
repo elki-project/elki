@@ -130,8 +130,8 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
     C clusterResult = inner.run(d);
     ResultUtil.removeRecursive(sample);
     ResultUtil.removeRecursive(clusterResult);
-    Metadata.of(parent).hierarchy().addChild(sample);
-    Metadata.of(sample).hierarchy().addChild(clusterResult);
+    Metadata.hierarchyOf(parent).addChild(sample);
+    Metadata.hierarchyOf(sample).addChild(clusterResult);
     return clusterResult;
   }
 

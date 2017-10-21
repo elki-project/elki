@@ -81,7 +81,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
       buf.append(((Result) result).getLongName()).append(" (").append(((Result) result).getShortName()).append(')');
     }
     buf.append('\n');
-    for(It<Object> iter = Metadata.of(result).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+    for(It<Object> iter = Metadata.hierarchyOf(result).iterChildren(); iter.valid(); iter.advance()) {
       recursiveLogResult(buf, iter.get(), depth + 1);
     }
   }

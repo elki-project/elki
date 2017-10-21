@@ -81,13 +81,13 @@ public class SamplingResult implements Result {
    * @return Sampling result.
    */
   public static SamplingResult getSamplingResult(final Relation<?> rel) {
-    It<SamplingResult> it = Metadata.of(rel).hierarchy().iterDescendantsSelf()//
+    It<SamplingResult> it = Metadata.hierarchyOf(rel).iterDescendantsSelf()//
         .filter(SamplingResult.class);
     if(it.valid()) {
       return it.get();
     }
     SamplingResult newsam = new SamplingResult(rel);
-    Metadata.of(rel).hierarchy().addChild(newsam);
+    Metadata.hierarchyOf(rel).addChild(newsam);
     return newsam;
   }
 }

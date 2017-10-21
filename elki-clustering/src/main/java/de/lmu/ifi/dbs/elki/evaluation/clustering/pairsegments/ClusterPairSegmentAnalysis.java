@@ -73,6 +73,6 @@ public class ClusterPairSegmentAnalysis implements Evaluator {
     }
 
     // create segments
-    Metadata.of(result).hierarchy().addChild(new Segments(clusterings));
+    Metadata.hierarchyOf(result).addChild(new Segments(clusterings));
   }
 }

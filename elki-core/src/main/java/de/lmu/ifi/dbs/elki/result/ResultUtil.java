@@ -51,7 +51,7 @@ public final class ResultUtil {
    * @return List of all annotation results
    */
   public static List<Relation<?>> getRelations(Object r) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<Relation<?>> filter(Relation.class).collect(new ArrayList<>());
   }
 
@@ -62,7 +62,7 @@ public final class ResultUtil {
    * @return List of ordering results
    */
   public static List<OrderingResult> getOrderingResults(Object r) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .filter(OrderingResult.class).collect(new ArrayList<>());
   }
 
@@ -73,7 +73,7 @@ public final class ResultUtil {
    * @return List of collection results
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<CollectionResult<?>> filter(CollectionResult.class).collect(new ArrayList<>());
   }
 
@@ -84,7 +84,7 @@ public final class ResultUtil {
    * @return List of iterable results
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<IterableResult<?>> filter(IterableResult.class).collect(new ArrayList<>());
   }
 
@@ -98,7 +98,7 @@ public final class ResultUtil {
    * @return filtered results list
    */
   public static <C> ArrayList<C> filterResults(Object r, Class<? super C> restrictionClass) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .<C> filter(restrictionClass).collect(new ArrayList<C>());
   }
 
@@ -109,7 +109,7 @@ public final class ResultUtil {
    * @param child Child
    */
   public static void addChildResult(Result parent, Result child) {
-    Metadata.of(parent).hierarchy().addChild(child);
+    Metadata.hierarchyOf(parent).addChild(child);
   }
 
   /**
@@ -119,7 +119,7 @@ public final class ResultUtil {
    * @return Database
    */
   public static Database findDatabase(Object result) {
-    It<Database> it = Metadata.of(result).hierarchy().iterAncestorsSelf().filter(Database.class);
+    It<Database> it = Metadata.hierarchyOf(result).iterAncestorsSelf().filter(Database.class);
     return it.valid() ? it.get() : null;
   }
 
@@ -129,9 +129,9 @@ public final class ResultUtil {
    * @param child Result to remove
    */
   public static void removeRecursive(Object child) {
-    final Hierarchy h = Metadata.of(child).hierarchy();
+    final Hierarchy h = Metadata.hierarchyOf(child);
     for(It<Object> iter = h.iterParents(); iter.valid(); iter.advance()) {
-      Metadata.of(iter.get()).hierarchy().removeChild(child);
+      Metadata.hierarchyOf(iter.get()).removeChild(child);
     }
     for(It<Object> iter = h.iterChildren(); iter.valid(); iter.advance()) {
       removeRecursive(iter.get());

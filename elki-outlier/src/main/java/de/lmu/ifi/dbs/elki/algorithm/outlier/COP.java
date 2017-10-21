@@ -267,8 +267,8 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     if(models) {
-      Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-      Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
     }
     return result;
   }

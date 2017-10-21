@@ -78,13 +78,13 @@ public class SelectionResult implements Result {
    * @return selection result
    */
   public static SelectionResult ensureSelectionResult(final Database db) {
-    It<SelectionResult> it = Metadata.of(db).hierarchy().iterDescendantsSelf()//
+    It<SelectionResult> it = Metadata.hierarchyOf(db).iterDescendantsSelf()//
         .filter(SelectionResult.class);
     if(it.valid()) {
       return it.get();
     }
     SelectionResult sel = new SelectionResult();
-    Metadata.of(db).hierarchy().addChild(sel);
+    Metadata.hierarchyOf(db).addChild(sel);
     return sel;
   }
 }

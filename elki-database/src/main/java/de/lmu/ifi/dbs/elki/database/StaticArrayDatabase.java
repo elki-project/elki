@@ -141,7 +141,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
     // DBIDView at all)
     this.idrep = new DBIDView(this.ids);
     relations.add(this.idrep);
-    Metadata.of(this).hierarchy().addChild(idrep);
+    Metadata.hierarchyOf(this).addChild(idrep);
 
     DBIDArrayIter it = this.ids.iter();
 
@@ -156,7 +156,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
       }
       Relation<?> relation = new MaterializedRelation<>(ometa, ids, null, store);
       relations.add(relation);
-      Metadata.of(this).hierarchy().addChild(relation);
+      Metadata.hierarchyOf(this).addChild(relation);
 
       // Try to add indexes where appropriate
       for(IndexFactory<?> factory : indexFactories) {
@@ -171,7 +171,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
           if(duration != null) {
             LOG.statistics(duration.end());
           }
-          Metadata.of(relation).hierarchy().addChild(index);
+          Metadata.hierarchyOf(relation).addChild(index);
         }
       }
     }

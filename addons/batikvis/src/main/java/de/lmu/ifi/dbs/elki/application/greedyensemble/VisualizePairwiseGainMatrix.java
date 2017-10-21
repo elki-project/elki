@@ -239,7 +239,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       }
     }
     SimilarityMatrix smat = new ComputeSimilarityMatrixImage.SimilarityMatrix(img, relation, ids);
-    Metadata.of(database).hierarchy().addChild(smat);
+    Metadata.hierarchyOf(database).addChild(smat);
 
     VisualizerContext context = vispar.newContext(smat);
 

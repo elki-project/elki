@@ -202,7 +202,7 @@ public class EvaluatePBMIndex implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
-    Metadata.of(c).hierarchy().addChild(ev);
+    Metadata.hierarchyOf(c).addChild(ev);
     // FIXME: notify of changes, if reused!
     return pbm;
   }

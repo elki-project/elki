@@ -63,7 +63,7 @@ public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
   public void processNewResult(Object newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      Metadata.of(pointerresult).hierarchy().addChild(inner.run(pointerresult));
+      Metadata.hierarchyOf(pointerresult).addChild(inner.run(pointerresult));
     }
   }
 

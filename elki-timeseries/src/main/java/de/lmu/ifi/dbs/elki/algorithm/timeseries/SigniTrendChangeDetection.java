@@ -180,7 +180,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0.);
       DoubleRelation scores = new MaterializedDoubleRelation("Signi-Trend scores", "signitrend-scores", vals, relation.getDBIDs());
-      Metadata.of(changepoints).hierarchy().addChild(new OutlierResult(meta, scores));
+      Metadata.hierarchyOf(changepoints).addChild(new OutlierResult(meta, scores));
       return changepoints;
     }
 

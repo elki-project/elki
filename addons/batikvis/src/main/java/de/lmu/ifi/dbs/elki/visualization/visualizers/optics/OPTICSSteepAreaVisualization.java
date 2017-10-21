@@ -69,7 +69,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
       ClusterOrder co = p.getResult();
-      It<OPTICSXi.SteepAreaResult> r = Metadata.of(co).hierarchy().iterChildren().filter(OPTICSXi.SteepAreaResult.class);
+      It<OPTICSXi.SteepAreaResult> r = Metadata.hierarchyOf(co).iterChildren().filter(OPTICSXi.SteepAreaResult.class);
       if(r.valid()) {
         final VisualizationTask task = new VisualizationTask(this, NAME, p.getResult(), null) //
             .level(VisualizationTask.LEVEL_DATA + 1);
@@ -126,7 +126,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
     public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(context, task, plot, width, height, proj);
       ClusterOrder co = this.optics.getResult();
-      this.areas = Metadata.of(co).hierarchy().iterChildren().filter(OPTICSXi.SteepAreaResult.class).get();
+      this.areas = Metadata.hierarchyOf(co).iterChildren().filter(OPTICSXi.SteepAreaResult.class).get();
     }
 
     @Override
