@@ -119,7 +119,7 @@ public final class ResultUtil {
    * @return Database
    */
   public static Database findDatabase(Object result) {
-    It<Database> it = Metadata.of(result).hierarchy().iterAncestors().filter(Database.class);
+    It<Database> it = Metadata.of(result).hierarchy().iterAncestorsSelf().filter(Database.class);
     return it.valid() ? it.get() : null;
   }
 

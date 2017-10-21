@@ -110,6 +110,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     super();
     this.baseResult = start;
     this.factories = factories;
+    this.stylelibrary = stylelib;
 
     // Ensure that various common results needed by visualizers are
     // automatically created
