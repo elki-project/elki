@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
@@ -146,7 +147,8 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", size, LOG) : null;
 
-    ClusterOrder clusterOrder = new ClusterOrder(ids, "DeLiClu Clustering", "deliclu-clustering");
+    ClusterOrder clusterOrder = new ClusterOrder(ids);
+    Metadata.of(clusterOrder).setLongName("DeLiClu Cluster Order");
     heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue

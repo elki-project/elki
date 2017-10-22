@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
 import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -288,7 +289,8 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
       clusterids.destroy();
 
       // Wrap into final format
-      Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("Generalized DBSCAN Clustering");
       for(int i = 0; i < clusters.length; i++) {
         if(clusters[i] != null) {
           result.addToplevelCluster(new Cluster<Model>(clusters[i], ClusterModel.CLUSTER));

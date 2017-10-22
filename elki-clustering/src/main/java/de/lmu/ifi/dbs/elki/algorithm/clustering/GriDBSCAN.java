@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
@@ -140,7 +141,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     // Degenerate result:
     if(ids.size() < minpts) {
-      Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("DBSCAN Clustering");
       result.addToplevelCluster(new Cluster<Model>(ids, true, ClusterModel.CLUSTER));
       return result;
     }
@@ -368,7 +370,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       LOG.ensureCompleted(pprog);
       clusterids.destroy();
 
-      Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("DBSCAN Clustering");
       for(int i = NOISE + 1; i < clusters.length; i++) {
         if(clusters[i] != null) {
           result.addToplevelCluster(new Cluster<Model>(clusters[i], ClusterModel.CLUSTER));

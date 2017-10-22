@@ -106,7 +106,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    DoubleRelation scoresult = new MaterializedDoubleRelation("Scaled Outlier", "scaled-outlier", scaledscores, scores.getDBIDs());
+    DoubleRelation scoresult = new MaterializedDoubleRelation("Scaled Outlier", scores.getDBIDs(), scaledscores);
     OutlierResult result = new OutlierResult(meta, scoresult);
     Metadata.hierarchyOf(result).addChild(innerresult);
     return result;

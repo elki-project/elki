@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -134,7 +135,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     HashMap<String, DBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
 
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
-    Clustering<Model> result = new Clustering<>("By Label Clustering", "bylabel-clustering");
+    Clustering<Model> result = new ReferenceClustering<>();
+    Metadata.of(result).setLongName("By Label Clustering");
     for(Entry<String, DBIDs> entry : labelMap.entrySet()) {
       DBIDs ids = entry.getValue();
       if(ids.size() <= 1) {

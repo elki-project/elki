@@ -25,6 +25,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ReferenceClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -153,7 +154,7 @@ public class EvaluateClustering implements Evaluator {
       refc = refcrs.get(0);
     }
     else {
-      LOG.debug("Using existing clustering: " + refc.getLongName() + " " + refc.getShortName());
+      LOG.debug("Using existing clustering: " + Metadata.of(refc).getLongName());
     }
     for(Clustering<?> c : crs) {
       if(c == refc) {
@@ -175,7 +176,7 @@ public class EvaluateClustering implements Evaluator {
     contmat.process(refc, c);
 
     ScoreResult sr = new ScoreResult(contmat);
-    sr.addHeader(c.getLongName());
+    sr.addHeader(Metadata.of(c).getLongName());
     Metadata.hierarchyOf(c).addChild(sr);
   }
 
@@ -186,11 +187,7 @@ public class EvaluateClustering implements Evaluator {
    * @return {@code true} if it is considered to be a reference result.
    */
   private boolean isReferenceResult(Clustering<?> t) {
-    // FIXME: don't hard-code strings
-    return "bylabel-clustering".equals(t.getShortName()) //
-        || "bymodel-clustering".equals(t.getShortName()) //
-        || "allinone-clustering".equals(t.getShortName()) //
-        || "allinnoise-clustering".equals(t.getShortName());
+    return t instanceof ReferenceClustering;
   }
 
   /**
@@ -212,7 +209,8 @@ public class EvaluateClustering implements Evaluator {
      * @param contmat score result
      */
     public ScoreResult(ClusterContingencyTable contmat) {
-      super("Cluster-Evalation", "cluster-evaluation");
+      super();
+      Metadata.of(this).setLongName("Cluster Evalation");
       this.contmat = contmat;
 
       PairCounting paircount = contmat.getPaircount();

@@ -26,11 +26,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -65,56 +61,26 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
   private String name;
 
   /**
-   * The relation name (short version)
-   */
-  private String shortname = "relation";
-
-  /**
    * Constructor.
    *
+   * @param name Name
    * @param ids IDs
    */
-  public MaterializedDoubleRelation(DBIDs ids) {
-    this(ids, null);
+  public MaterializedDoubleRelation(String name, DBIDs ids) {
+    this(name, ids, DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB));
   }
 
   /**
    * Constructor.
    *
-   * @param ids IDs
    * @param name Name
-   */
-  public MaterializedDoubleRelation(DBIDs ids, String name) {
-    this(ids, name, DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB));
-  }
-
-  /**
-   * Constructor.
-   *
    * @param ids IDs
-   * @param name Name
    * @param content Content
    */
-  public MaterializedDoubleRelation(DBIDs ids, String name, DoubleDataStore content) {
+  public MaterializedDoubleRelation(String name, DBIDs ids, DoubleDataStore content) {
     super();
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
-    this.content = content;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param name Name
-   * @param shortname Short name of the result
-   * @param content Content
-   * @param ids IDs
-   */
-  public MaterializedDoubleRelation(String name, String shortname, DoubleDataStore content, DBIDs ids) {
-    super();
-    this.ids = DBIDUtil.makeUnmodifiable(ids);
-    this.name = name;
-    this.shortname = shortname;
     this.content = content;
   }
 
@@ -176,11 +142,6 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
   @Override
   public String getLongName() {
     return (name != null) ? name : "Double";
-  }
-
-  @Override
-  public String getShortName() {
-    return shortname;
   }
 
   @Override

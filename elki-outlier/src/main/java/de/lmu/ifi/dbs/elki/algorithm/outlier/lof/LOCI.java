@@ -208,10 +208,10 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       LOG.incrementProcessed(progressLOCI);
     }
     LOG.ensureCompleted(progressLOCI);
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("LOCI normalized MDEF", "loci-mdef-outlier", mdef_norm, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("LOCI normalized MDEF", relation.getDBIDs(), mdef_norm);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    Metadata.hierarchyOf(result).addChild(new MaterializedDoubleRelation("LOCI MDEF Radius", "loci-critical-radius", mdef_radius, relation.getDBIDs()));
+    Metadata.hierarchyOf(result).addChild(new MaterializedDoubleRelation("LOCI MDEF Radius", relation.getDBIDs(), mdef_radius));
     return result;
   }
 

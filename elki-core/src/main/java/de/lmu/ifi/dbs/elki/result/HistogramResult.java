@@ -32,23 +32,19 @@ public class HistogramResult extends CollectionResult<double[]> {
   /**
    * Constructor
    *
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    * @param col Collection
    */
-  public HistogramResult(String name, String shortname, Collection<double[]> col) {
-    super(name, shortname, col);
+  public HistogramResult(Collection<double[]> col) {
+    super(col);
   }
 
   /**
    * Constructor
    *
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    * @param col Collection
    * @param header Header information
    */
-  public HistogramResult(String name, String shortname, Collection<double[]> col, Collection<String> header) {
-    super(name, shortname, col, header);
+  public HistogramResult(Collection<double[]> col, Collection<String> header) {
+    super(col, header);
   }
 }

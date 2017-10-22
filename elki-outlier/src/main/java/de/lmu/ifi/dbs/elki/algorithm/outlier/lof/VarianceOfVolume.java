@@ -142,7 +142,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     LOG.setCompleted(stepprog);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Variance of Volume", "vov-outlier", vovs, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Variance of Volume", ids, vovs);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(vovminmax.getMin(), vovminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

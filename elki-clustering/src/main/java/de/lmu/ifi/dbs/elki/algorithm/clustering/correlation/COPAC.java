@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -114,7 +115,8 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
     CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
     Clustering<Model> dclusters = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
     // Re-wrap the detected clusters for COPAC:
-    Clustering<DimensionModel> result = new Clustering<>("COPAC clustering", "copac-clustering");
+    Clustering<DimensionModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("COPAC Clustering");
     // Generalized DBSCAN clusterings will be flat.
     for(It<Cluster<Model>> iter = dclusters.iterToplevelClusters(); iter.valid(); iter.advance()) {
       Cluster<Model> clus = iter.get();

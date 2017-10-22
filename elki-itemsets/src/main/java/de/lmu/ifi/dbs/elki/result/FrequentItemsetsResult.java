@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @has - - - Itemset
  */
-public class FrequentItemsetsResult extends BasicResult implements TextWriteable {
+public class FrequentItemsetsResult implements TextWriteable {
   /**
    * The supports of all frequent itemsets.
    */
@@ -55,14 +55,12 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
   /**
    * Constructor.
    *
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    * @param itemsets Frequent itemsets (sorted, by size then lexicographically)
    * @param meta Metadata
    * @param total Total number of transactions
    */
-  public FrequentItemsetsResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta, int total) {
-    super(name, shortname);
+  public FrequentItemsetsResult(List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta, int total) {
+    super();
     this.itemsets = itemsets;
     this.meta = meta;
     this.total = total;

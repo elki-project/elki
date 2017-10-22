@@ -226,7 +226,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     LOG.setCompleted(stepprog);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", "loop-outlier", plofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", relation.getDBIDs(), plofs);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore(mm.getMin(), mm.getMax(), 0.);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -154,7 +154,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
       for(it.seek(0); it.valid(); it.advance()) {
         store.put(it, bundle.data(it.getOffset(), i));
       }
-      Relation<?> relation = new MaterializedRelation<>(ometa, ids, null, store);
+      Relation<?> relation = new MaterializedRelation<>(null, ometa, ids, store);
       relations.add(relation);
       Metadata.hierarchyOf(this).addChild(relation);
 

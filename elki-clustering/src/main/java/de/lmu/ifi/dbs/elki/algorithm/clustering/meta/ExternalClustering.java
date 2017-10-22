@@ -35,11 +35,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -54,12 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
+
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
@@ -184,9 +176,8 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
         cids.get(assignment.getInt(i)).add(it.seek(i));
       }
     }
-    String nam = FormatUtil.format(name, " ");
-    String snam = nam.toLowerCase().replace(' ', '-');
-    Clustering<ClusterModel> result = new Clustering<>(nam, snam);
+    Clustering<ClusterModel> result = new Clustering<>();
+    Metadata.of(result).setLongName(FormatUtil.format(name, " "));
     for(ObjectIterator<Int2ObjectMap.Entry<ArrayModifiableDBIDs>> it = cids.int2ObjectEntrySet().fastIterator(); it.hasNext();) {
       Int2ObjectMap.Entry<ArrayModifiableDBIDs> entry = it.next();
       boolean noise = entry.getIntKey() < 0;

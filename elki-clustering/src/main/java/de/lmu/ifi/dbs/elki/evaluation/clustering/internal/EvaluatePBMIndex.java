@@ -199,7 +199,7 @@ public class EvaluatePBMIndex implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".pbm", pbm));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
     Metadata.hierarchyOf(c).addChild(ev);

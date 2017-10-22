@@ -121,7 +121,7 @@ public class OutlierROCCurve implements Evaluator {
     for(OutlierResult o : oresults) {
       ROCResult rocres = computeROCResult(positiveids, o);
       Metadata.hierarchyOf(o).addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING);
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {
         g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
@@ -140,7 +140,7 @@ public class OutlierROCCurve implements Evaluator {
       }
       ROCResult rocres = computeROCResult(positiveids, sorted);
       Metadata.hierarchyOf(or).addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING);
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {
         g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);

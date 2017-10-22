@@ -170,7 +170,8 @@ public class JudgeOutlierScores implements Evaluator {
      * @param col score result
      */
     public ScoreResult(Collection<double[]> col) {
-      super("Outlier Score", "outlier-score", col);
+      super(col);
+      Metadata.of(this).setLongName("Outlier Score");
     }
   }
 

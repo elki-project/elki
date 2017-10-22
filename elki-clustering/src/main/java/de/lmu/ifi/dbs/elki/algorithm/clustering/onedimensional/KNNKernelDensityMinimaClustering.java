@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -211,7 +212,8 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     }
 
     LOG.beginStep(sprog, 2, "Local minima detection.");
-    Clustering<ClusterModel> clustering = new Clustering<>("onedimensional-kde-clustering", "One-Dimensional clustering using kernel density estimation.");
+    Clustering<ClusterModel> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("One-Dimensional KDE Clustering");
     {
       double[] scratch = new double[2 * minwindow + 1];
       int begin = 0;

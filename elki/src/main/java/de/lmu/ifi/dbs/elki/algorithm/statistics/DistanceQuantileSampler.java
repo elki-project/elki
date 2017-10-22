@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -151,7 +152,9 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
     LOG.ensureCompleted(prog);
     Collection<String> header = Arrays.asList(new String[] { "Distance" });
     Collection<double[]> data = Arrays.asList(new double[][] { new double[] { heap.peek() } });
-    return new CollectionResult<double[]>("Distances sample", "distance-sample", data, header);
+    CollectionResult<double[]> result = new CollectionResult<>(data, header);
+    Metadata.of(result).setLongName("Distances Sample");
+    return result;
   }
 
   @Override

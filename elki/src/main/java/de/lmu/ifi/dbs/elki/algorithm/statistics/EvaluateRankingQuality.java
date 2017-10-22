@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -162,7 +163,9 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     for(ObjHistogram<MeanVariance>.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       res.add(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
     }
-    return new HistogramResult("Ranking Quality Histogram", "ranking-histogram", res);
+    HistogramResult result = new HistogramResult(res);
+    Metadata.of(result).setLongName("Ranking Quality Histogram");
+    return result;
   }
 
   @Override

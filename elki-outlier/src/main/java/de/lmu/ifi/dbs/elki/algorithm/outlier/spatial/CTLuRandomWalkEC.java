@@ -219,7 +219,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
       scores.putDouble(id, score);
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("randomwalkec", "RandomWalkEC", scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("randomwalkec", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -166,7 +167,8 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     // build hierarchy
     LOG.beginStep(stepprog, 3, "Building hierarchy");
-    Clustering<CorrelationModel> clustering = new Clustering<>("ERiC clustering", "eric-clustering");
+    Clustering<CorrelationModel> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("ERiC Clustering");
     buildHierarchy(clustering, clusterMap, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 3: Build hierarchy");

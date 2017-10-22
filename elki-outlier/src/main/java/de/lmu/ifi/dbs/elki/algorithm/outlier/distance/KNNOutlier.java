@@ -142,7 +142,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", knno_score, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", relation.getDBIDs(), knno_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, scoreres);
   }

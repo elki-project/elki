@@ -124,7 +124,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
    */
   protected C runClusteringAlgorithm(Object parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
+    Relation<DoubleVector> sample = new MaterializedRelation<>(title, t, ids, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     C clusterResult = inner.run(d);
     ResultUtil.removeRecursive(sample);

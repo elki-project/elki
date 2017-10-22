@@ -143,7 +143,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
       LOG.ensureCompleted(cprog);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    DoubleRelation scores = new MaterializedDoubleRelation("Simple Outlier Ensemble", "ensemble-outlier", sumscore, ids);
+    DoubleRelation scores = new MaterializedDoubleRelation("Simple Outlier Ensemble", ids, sumscore);
     return new OutlierResult(meta, scores);
   }
 

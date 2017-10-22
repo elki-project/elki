@@ -88,7 +88,9 @@ public class IndexPurity implements Evaluator {
       }
       Collection<double[]> col = new ArrayList<>();
       col.add(new double[] { mv.getMean(), mv.getSampleStddev() });
-      Metadata.hierarchyOf(index).addChild(new CollectionResult<>("Gini coefficient of index", "index-gini", col));
+      CollectionResult<double[]> result = new CollectionResult<>(col);
+      Metadata.of(result).setLongName("Gini coefficient of index");
+      Metadata.hierarchyOf(index).addChild(result);
     }
   }
 }

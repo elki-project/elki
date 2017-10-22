@@ -87,7 +87,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
     DoubleDataStore dbodscore = computeOutlierScores(database, relation, d);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Density-Based Outlier Detection", "db-outlier", dbodscore, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Density-Based Outlier Detection", relation.getDBIDs(), dbodscore);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

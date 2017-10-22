@@ -218,7 +218,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       minmax.put(sum);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    DoubleRelation scoreres = new MaterializedDoubleRelation("HiCS", "HiCS-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("HiCS", relation.getDBIDs(), scores);
 
     return new OutlierResult(meta, scoreres);
   }

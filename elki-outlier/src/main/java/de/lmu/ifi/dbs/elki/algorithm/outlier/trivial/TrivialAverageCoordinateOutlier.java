@@ -87,7 +87,7 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
       scores.putDouble(iditer, score);
       minmax.put(score);
     }
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Trivial mean score", "mean-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Trivial mean score", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     return new OutlierResult(meta, scoreres);
   }

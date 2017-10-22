@@ -135,7 +135,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     ParallelExecutor.run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
-    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", store, ids);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", ids, store);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }

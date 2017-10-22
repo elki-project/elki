@@ -225,7 +225,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
         mm.put(score);
       }
     }
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("One-Class SVM Decision", "svm-outlier", scores, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("One-Class SVM Decision", ids, scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
   }

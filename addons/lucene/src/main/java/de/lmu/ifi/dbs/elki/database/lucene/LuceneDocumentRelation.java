@@ -109,11 +109,6 @@ public class LuceneDocumentRelation extends AbstractRelation<Document> {
   }
 
   @Override
-  public String getShortName() {
-    return "lucene-document";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

@@ -196,7 +196,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     OutlierScoreMeta meta = inverted //
         ? new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax()) //
         : new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    DoubleRelation scoresult = new MaterializedDoubleRelation("External Outlier", "external-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoresult = new MaterializedDoubleRelation("External Outlier", relation.getDBIDs(), scores);
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling

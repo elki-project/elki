@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ReferenceClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
@@ -126,17 +127,7 @@ public class AutomaticEvaluation implements Evaluator {
       LOG.warning("Number of new clustering results: " + clusterings.size());
     }
     for(Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
-      Clustering<?> test = c.next();
-      if("allinone-clustering".equals(test.getShortName())) {
-        c.remove();
-      }
-      else if("allinnoise-clustering".equals(test.getShortName())) {
-        c.remove();
-      }
-      else if("bylabel-clustering".equals(test.getShortName())) {
-        c.remove();
-      }
-      else if("bymodel-clustering".equals(test.getShortName())) {
+      if(c.next() instanceof ReferenceClustering) {
         c.remove();
       }
     }

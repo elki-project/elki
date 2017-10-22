@@ -104,14 +104,6 @@ public interface Relation<O> extends DatabaseQuery {
   String getLongName();
 
   /**
-   * Get a short (suitable for filenames) name for the relation.
-   *
-   * @return Relation name
-   */
-  // @Override // Used to be in "Result"
-  String getShortName();
-
-  /**
    * Execute a function for each ID.
    *
    * @param action Action to execute

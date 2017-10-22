@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @param <T> Data type in hash map
  */
-public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult implements OrderingResult {
+public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingResult {
   /**
    * HashMap with object values
    */
@@ -59,16 +59,14 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
 
   /**
    * Constructor with comparator
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
+   *
    * @param ids DBIDs included
    * @param map data hash map
    * @param comparator comparator to use, may be null
    * @param descending ascending (false) or descending (true) order.
    */
-  public OrderingFromDataStore(String name, String shortname, DBIDs ids, DataStore<? extends T> map, Comparator<T> comparator, boolean descending) {
-    super(name, shortname);
+  public OrderingFromDataStore(DBIDs ids, DataStore<? extends T> map, Comparator<T> comparator, boolean descending) {
+    super();
     this.map = map;
     this.ids = ids;
     this.comparator = comparator;
@@ -77,15 +75,13 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
 
   /**
    * Constructor without comparator
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
+   *
    * @param ids DBIDs included
    * @param map data hash map
    * @param descending ascending (false) or descending (true) order.
    */
-  public OrderingFromDataStore(String name, String shortname, DBIDs ids, DataStore<? extends T> map, boolean descending) {
-    super(name, shortname);
+  public OrderingFromDataStore(DBIDs ids, DataStore<? extends T> map, boolean descending) {
+    super();
     this.map = map;
     this.ids = ids;
     this.comparator = null;
@@ -94,14 +90,12 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
 
   /**
    * Minimal Constructor
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
+   *
    * @param ids DBIDs included
    * @param map data hash map
    */
-  public OrderingFromDataStore(String name, String shortname, DBIDs ids, DataStore<? extends T> map) {
-    super(name, shortname);
+  public OrderingFromDataStore(DBIDs ids, DataStore<? extends T> map) {
+    super();
     this.map = map;
     this.ids = ids;
     this.comparator = null;

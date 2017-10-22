@@ -198,18 +198,15 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    * @param meta meta data
    * @return new representation
    */
+  @SuppressWarnings("unchecked")
   private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
-    @SuppressWarnings("unchecked")
-    SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> relation = new MaterializedRelation<>(ometa, ids);
+    Relation<?> relation = new MaterializedRelation<>(null, meta, ids);
     relations.add(relation);
     Metadata.hierarchyOf(this).addChild(relation);
     // Try to add indexes where appropriate
     for(IndexFactory<?> factory : indexFactories) {
       if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
-        @SuppressWarnings("unchecked")
         final IndexFactory<Object> ofact = (IndexFactory<Object>) factory;
-        @SuppressWarnings("unchecked")
         final Relation<Object> orep = (Relation<Object>) relation;
         Index index = ofact.instantiate(orep);
         index.initialize();

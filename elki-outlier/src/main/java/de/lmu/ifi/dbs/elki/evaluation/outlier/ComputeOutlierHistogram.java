@@ -184,7 +184,9 @@ public class ComputeOutlierHistogram implements Evaluator {
       double[] data = iter.getValue();
       collHist.add(new double[] { iter.getCenter(), data[0], data[1] });
     }
-    return new HistogramResult("Outlier Score Histogram", "outlier-histogram", collHist);
+    HistogramResult result = new HistogramResult(collHist);
+    Metadata.of(result).setLongName("Outlier Score Histogram");
+    return result;
   }
 
   @Override

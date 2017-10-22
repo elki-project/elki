@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -225,7 +226,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       prep.put(iter, new ParameterizationFunction(vrel.get(iter)));
     }
-    return new MaterializedRelation<>(type, ids, null, prep);
+    return new MaterializedRelation<>(null, type, ids, prep);
   }
 
   /**
@@ -237,7 +238,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @return a mapping of subspace dimensionalities to clusters
    */
   private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) {
-    Clustering<Model> res = new Clustering<>("CASH clustering", "cash-clustering");
+    Clustering<Model> res = new Clustering<>();
+    Metadata.of(res).setLongName("CASH Clustering");
     final int dim = dimensionality(relation);
 
     // init heap
@@ -437,7 +439,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     if(LOG.isDebugging()) {
       LOG.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
     }
-    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
+    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(null, type, ids, prep);
     proxy.addRelation(prel);
     return prel;
   }
@@ -674,7 +676,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       LOG.debugFine("db fuer derivator : " + ids.size());
     }
 
-    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(type, ids, null, prep);
+    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(null, type, ids, prep);
     proxy.addRelation(prel);
     return proxy;
   }
@@ -720,7 +722,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(type, ids);
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(null, type, ids);
     proxy.addRelation(prep);
 
     // Project

@@ -43,14 +43,12 @@ public class CorrelationClusterOrder extends ClusterOrder {
    * Constructor.
    *
    * @param ids Cluster order
-   * @param name Result name
-   * @param shortname Short result name
    * @param reachability Reachability
    * @param predecessor Predecessor (may be {@code null})
    * @param corrdim Correlation dimensionality
    */
-  public CorrelationClusterOrder(String name, String shortname, ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, WritableDBIDDataStore predecessor, WritableIntegerDataStore corrdim) {
-    super(name, shortname, ids, reachability, predecessor);
+  public CorrelationClusterOrder(ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, WritableDBIDDataStore predecessor, WritableIntegerDataStore corrdim) {
+    super(ids, reachability, predecessor);
     this.correlationValue = corrdim;
   }
 

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -159,8 +160,9 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     protected CorrelationClusterOrder buildResult() {
-      return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
-          clusterOrder, reachability, predecessor, correlationValue);
+      CorrelationClusterOrder result = new CorrelationClusterOrder(clusterOrder, reachability, predecessor, correlationValue);
+      Metadata.of(result).setLongName("HiCO Cluster Order");
+      return result;
     }
 
     @Override

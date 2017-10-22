@@ -123,7 +123,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     }
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans outlier scores", "kmeans-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans outlier scores", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
   }

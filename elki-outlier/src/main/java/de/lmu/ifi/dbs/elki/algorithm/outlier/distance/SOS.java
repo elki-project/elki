@@ -145,7 +145,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     for(DBIDIter it2 = relation.iterDBIDs(); it2.valid(); it2.advance()) {
       minmax.put(scores.doubleValue(it2));
     }
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Stoachastic Outlier Selection", "sos-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Stoachastic Outlier Selection", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);
   }

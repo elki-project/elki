@@ -141,7 +141,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     }
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Spatial Outlier Factor", "sof-outlier", lofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Spatial Outlier Factor", relation.getDBIDs(), lofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);

@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -185,7 +186,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     }
 
     // build the hierarchy
-    Clustering<SubspaceModel> clustering = new Clustering<>("DiSH clustering", "dish-clustering");
+    Clustering<SubspaceModel> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("DiSH clustering");
     buildHierarchy(database, clustering, clusters, dimensionality);
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
@@ -701,8 +703,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     @Override
     protected DiSHClusterOrder buildResult() {
-      return new DiSHClusterOrder("DiSH Cluster Order", "dish-cluster-order", //
-          clusterOrder, reachability, predecessor, correlationValue, commonPreferenceVectors);
+      DiSHClusterOrder result = new DiSHClusterOrder(clusterOrder, reachability, predecessor, correlationValue, commonPreferenceVectors);
+      Metadata.of(result).setLongName("DiSH Cluster Order");
+      return result;
     }
 
     @Override
@@ -825,19 +828,16 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     /**
      * Constructor.
      *
-     * @param name
-     * @param shortname
-     * @param ids
-     * @param reachability
-     * @param predecessor
-     * @param corrdim
-     * @param commonPreferenceVectors
+     * @param ids Cluster order
+     * @param reachability Reachability
+     * @param predecessor Predecessors
+     * @param corrdim Correlation dimensionality
+     * @param commonPreferenceVectors Subspace preference
      */
-    public DiSHClusterOrder(String name, String shortname, //
-        ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, //
+    public DiSHClusterOrder(ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, //
         WritableDBIDDataStore predecessor, WritableIntegerDataStore corrdim, //
         WritableDataStore<long[]> commonPreferenceVectors) {
-      super(name, shortname, ids, reachability, predecessor, corrdim);
+      super(ids, reachability, predecessor, corrdim);
       this.commonPreferenceVectors = commonPreferenceVectors;
     }
 

@@ -137,7 +137,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     for(DBIDArrayIter it = neighbors.iterDBIDs(); it.valid(); it.advance()) {
       proj.put(it, DoubleVector.wrap(solution[it.getOffset()]));
     }
-    return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
+    return new MaterializedRelation<>("Barnes-Hut t-SNE", otype, ids, proj);
   }
 
   /**

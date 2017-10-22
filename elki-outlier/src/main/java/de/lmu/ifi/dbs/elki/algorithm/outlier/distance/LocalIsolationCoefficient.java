@@ -133,7 +133,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
     }
     LOG.ensureCompleted(prog);
 
-    DoubleRelation res = new MaterializedDoubleRelation("Local Isolation Coefficient", "lic-outlier", lic_score, relation.getDBIDs());
+    DoubleRelation res = new MaterializedDoubleRelation("Local Isolation Coefficient", relation.getDBIDs(), lic_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, res);
   }

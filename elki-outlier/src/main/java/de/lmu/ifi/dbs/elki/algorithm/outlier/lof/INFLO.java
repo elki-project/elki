@@ -162,7 +162,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     LOG.statistics(new LongStatistic(INFLO.class.getName() + ".pruned", pruned.size()));
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Influence Outlier Score", "inflo-outlier", inflos, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Influence Outlier Score", relation.getDBIDs(), inflos);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0., Double.POSITIVE_INFINITY, 1.);
     return new OutlierResult(scoreMeta, scoreResult);
   }

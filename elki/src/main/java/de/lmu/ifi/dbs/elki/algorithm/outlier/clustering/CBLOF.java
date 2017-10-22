@@ -175,7 +175,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
     LOG.setCompleted(stepprog);
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Cluster-Based Local Outlier Factor", "cblof-outlier", cblofs, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Cluster-Based Local Outlier Factor", ids, cblofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(cblofMinMax.getMin(), cblofMinMax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

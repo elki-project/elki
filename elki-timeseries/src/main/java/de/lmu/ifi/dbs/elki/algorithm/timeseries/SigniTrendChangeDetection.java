@@ -170,7 +170,8 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
       ewmv = new double[dim];
       weight = 0.;
 
-      ChangePoints changepoints = new ChangePoints("Signi-Trend Changepoints", "signitrend-changepoints");
+      ChangePoints changepoints = new ChangePoints();
+      Metadata.of(changepoints).setLongName("Signi-Trend Changepoints");
       WritableDoubleDataStore vals = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED | DataStoreFactory.HINT_STATIC);
       DoubleMinMax mm = new DoubleMinMax();
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -179,7 +180,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
         mm.put(absmax);
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0.);
-      DoubleRelation scores = new MaterializedDoubleRelation("Signi-Trend scores", "signitrend-scores", vals, relation.getDBIDs());
+      DoubleRelation scores = new MaterializedDoubleRelation("Signi-Trend Scores", relation.getDBIDs(), vals);
       Metadata.hierarchyOf(changepoints).addChild(new OutlierResult(meta, scores));
       return changepoints;
     }

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -130,7 +131,9 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     LOG.statistics(etime.end());
 
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
-    return new FrequentItemsetsResult("Eclat", "eclat", solution, meta, relation.size());
+    FrequentItemsetsResult result = new FrequentItemsetsResult(solution, meta, relation.size());
+    Metadata.of(result).setLongName("Eclat");
+    return result;
   }
 
   // TODO: implement diffsets.

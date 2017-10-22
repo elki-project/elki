@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @has - - - AssociationRule
  */
-public class AssociationRuleResult extends BasicResult implements TextWriteable {
+public class AssociationRuleResult implements TextWriteable {
   /**
    * Association rules together with the interestingness measure.
    */
@@ -50,11 +50,11 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
   /**
    * Constructor.
    *
-   * @param name
-   * @param shortname
+   * @param rules Association rules
+   * @param meta Column metadata
    */
-  public AssociationRuleResult(String name, String shortname, List<AssociationRule> rules, VectorFieldTypeInformation<BitVector> meta) {
-    super(name, shortname);
+  public AssociationRuleResult(List<AssociationRule> rules, VectorFieldTypeInformation<BitVector> meta) {
+    super();
     this.rules = rules;
     this.meta = meta;
   }

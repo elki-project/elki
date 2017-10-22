@@ -266,7 +266,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       LOG.ensureCompleted(progress);
 
       // Build final dendrogram:
-      final Clustering<DendrogramModel> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
+      final Clustering<DendrogramModel> dendrogram = new Clustering<>();
+      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       Cluster<DendrogramModel> nclus = null;
       if(noise.size() > 0) {
         nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));

@@ -130,7 +130,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic dimensionality", "id-score", id_score, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic dimensionality", relation.getDBIDs(), id_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }

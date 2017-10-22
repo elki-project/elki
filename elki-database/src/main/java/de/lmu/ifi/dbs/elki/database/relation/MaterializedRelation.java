@@ -78,28 +78,22 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
   private String name;
 
   /**
-   * The relation name (short version)
-   */
-  private String shortname = "relation";
-
-  /**
    * Constructor.
    *
    * @param type Type information
    * @param ids IDs
    */
   public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids) {
-    this(type, ids, null);
+    this(null, type, ids);
   }
 
   /**
    * Constructor.
-   *
+   * @param name Name
    * @param type Type information
    * @param ids IDs
-   * @param name Name
    */
-  public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids, String name) {
+  public MaterializedRelation(String name, SimpleTypeInformation<O> type, DBIDs ids) {
     // We can't call this() since we'll have generics issues then.
     super();
     this.type = type;
@@ -110,35 +104,16 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
 
   /**
    * Constructor.
-   *
+   * @param name Name
    * @param type Type information
    * @param ids IDs
-   * @param name Name
    * @param content Content
    */
-  public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
+  public MaterializedRelation(String name, SimpleTypeInformation<O> type, DBIDs ids, DataStore<O> content) {
     super();
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
-    this.content = content;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param name Name
-   * @param shortname Short name of the result
-   * @param type Type information
-   * @param content Content
-   * @param ids IDs
-   */
-  public MaterializedRelation(String name, String shortname, SimpleTypeInformation<O> type, DataStore<O> content, DBIDs ids) {
-    super();
-    this.type = type;
-    this.ids = DBIDUtil.makeUnmodifiable(ids);
-    this.name = name;
-    this.shortname = shortname;
     this.content = content;
   }
 
@@ -205,11 +180,6 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
   @Override
   public String getLongName() {
     return (name != null) ? name : type.toString();
-  }
-
-  @Override
-  public String getShortName() {
-    return shortname;
   }
 
   @Override

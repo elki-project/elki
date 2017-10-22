@@ -26,7 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.IterableIt;
  *
  * @param <M> Model type
  */
-public class Clustering<M extends Model> extends BasicResult {
+public class Clustering<M extends Model> {
   /**
    * Type information, for relation matching.
    */
@@ -71,12 +71,10 @@ public class Clustering<M extends Model> extends BasicResult {
   /**
    * Constructor with a list of top level clusters
    *
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    * @param toplevelclusters Top level clusters
    */
-  public Clustering(String name, String shortname, List<Cluster<M>> toplevelclusters) {
-    super(name, shortname);
+  public Clustering(List<Cluster<M>> toplevelclusters) {
+    super();
     this.toplevelclusters = toplevelclusters;
     this.hierarchy = new HashMapHierarchy<>();
     for(Cluster<M> clus : toplevelclusters) {
@@ -86,12 +84,9 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Constructor for an empty clustering
-   *
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    */
-  public Clustering(String name, String shortname) {
-    this(name, shortname, new ArrayList<Cluster<M>>());
+  public Clustering() {
+    this(new ArrayList<Cluster<M>>());
   }
 
   /**

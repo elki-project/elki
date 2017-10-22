@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -171,7 +172,8 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
     LOG.ensureCompleted(prog);
 
     // Build the clustering result
-    final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
+    final Clustering<Model> dendrogram = new Clustering<>();
+    Metadata.of(dendrogram).setLongName("Hierarchical-Clustering");
     for(int x = 0; x < size; x++) {
       if(height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);

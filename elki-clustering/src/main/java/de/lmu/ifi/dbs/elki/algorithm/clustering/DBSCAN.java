@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -139,7 +140,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
   public Clustering<Model> run(Relation<O> relation) {
     final int size = relation.size();
     if(size < minpts) {
-      Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("DBSCAN Clustering");
       result.addToplevelCluster(new Cluster<Model>(relation.getDBIDs(), true, ClusterModel.CLUSTER));
       return result;
     }
@@ -158,7 +160,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
       LOG.warning("There are very many neighbors found. Epsilon may be too large.");
     }
 
-    Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+    Clustering<Model> result = new Clustering<>();
+    Metadata.of(result).setLongName("DBSCAN Clustering");
     for(ModifiableDBIDs res : resultList) {
       result.addToplevelCluster(new Cluster<Model>(res, ClusterModel.CLUSTER));
     }

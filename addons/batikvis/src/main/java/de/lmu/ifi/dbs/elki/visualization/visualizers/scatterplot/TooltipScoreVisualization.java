@@ -100,7 +100,7 @@ public class TooltipScoreVisualization implements VisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      addTooltips(o.getLongName() + NAME_GEN, o.getScores(), context, p, rel);
+      addTooltips(Metadata.of(o).getLongName() + NAME_GEN, o.getScores(), context, p, rel);
     });
     VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, (r, p) -> {
       if(Metadata.hierarchyOf(r).iterParents().filter(OutlierResult.class).valid()) {

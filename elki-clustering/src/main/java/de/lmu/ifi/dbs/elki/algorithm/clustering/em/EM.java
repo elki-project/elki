@@ -258,13 +258,14 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       hardClusters.get(argmax(probClusterIGivenX.get(iditer))).add(iditer);
     }
-    Clustering<M> result = new Clustering<>("EM Clustering", "em-clustering");
+    Clustering<M> result = new Clustering<>();
+    Metadata.of(result).setLongName("EM Clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
       result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
     }
     if(isSoft()) {
-      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("EM Cluster Probabilities", SOFT_TYPE, relation.getDBIDs(), probClusterIGivenX));
     }
     else {
       probClusterIGivenX.destroy();

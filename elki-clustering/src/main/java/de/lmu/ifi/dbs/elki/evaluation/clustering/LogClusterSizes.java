@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
@@ -63,7 +64,7 @@ public class LogClusterSizes implements Evaluator {
     }
     final List<Cluster<C>> clusters = c.getAllClusters();
     final int numc = clusters.size();
-    LOG.statistics(new StringStatistic(PREFIX + "name", c.getLongName()));
+    LOG.statistics(new StringStatistic(PREFIX + "name", Metadata.of(c).getLongName()));
     LOG.statistics(new LongStatistic(PREFIX + "clusters", numc));
     Hierarchy<Cluster<C>> h = c.getClusterHierarchy();
     int cnum = 0;

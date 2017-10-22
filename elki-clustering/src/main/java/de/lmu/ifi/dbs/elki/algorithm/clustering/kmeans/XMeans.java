@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -205,7 +206,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       prog.setTotal(k);
       prog.setProcessed(k, LOG);
     }
-    return new Clustering<>("X-Means Result", "X-Means", clusters);
+    Clustering<M> result = new Clustering<>(clusters);
+    Metadata.of(result).setLongName("X-Means Clustering");
+    return result;
   }
 
   /**
@@ -225,7 +228,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       // Split is not possbile
       return parentClusterList;
     }
-    Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
+    Clustering<M> parentClustering = new Clustering<>(parentClusterList);
 
     ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
 

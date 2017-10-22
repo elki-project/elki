@@ -136,7 +136,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     // Wrap the result and add metadata.
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., inc * (ids.size() - 1), 1);
-    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", "odin", scores, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", ids, scores);
     return new OutlierResult(meta, rel);
   }
 

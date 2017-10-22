@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -134,7 +135,8 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     for(DoubleHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       res.add(new double[] { iter.getCenter(), iter.getValue() });
     }
-    HistogramResult result = new HistogramResult("Ranking Quality Histogram", "ranking-histogram", res);
+    HistogramResult result = new HistogramResult(res);
+    Metadata.of(result).setLongName("Ranking Quality Histogram");
     result.addHeader("Mean: " + mv.getMean() + " Variance: " + mv.getSampleVariance());
     return result;
   }

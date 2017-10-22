@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -582,7 +583,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @return Clustering result
      */
     protected Clustering<KMeansModel> buildResult() {
-      Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+      Clustering<KMeansModel> result = new Clustering<>();
+      Metadata.of(result).setLongName("k-Means Clustering");
       for(int i = 0; i < clusters.size(); i++) {
         DBIDs ids = clusters.get(i);
         if(ids.isEmpty()) {
@@ -602,7 +604,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @return Clustering result
      */
     protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
-      Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+      Clustering<KMeansModel> result = new Clustering<>();
+      Metadata.of(result).setLongName("k-Means Clustering");
+      if (relation.size() <= 0) {
+        return result;
+      }
       if(!varstat) {
         for(int i = 0; i < clusters.size(); i++) {
           DBIDs ids = clusters.get(i);

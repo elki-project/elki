@@ -152,14 +152,14 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
       LOG.ensureCompleted(progressLocalPCA);
     }
     // combine results.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Original Correlation Outlier Probabilities", "origcop-outlier", cop_score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Original Correlation Outlier Probabilities", ids, cop_score);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
-    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.DOUBLE_ARRAY, cop_datav, ids));
-    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
+    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP.COP_DIM, TypeUtil.INTEGER, ids, cop_dim));
+    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, ids, cop_err_v));
+    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Data vectors", TypeUtil.DOUBLE_ARRAY, ids, cop_datav));
+    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Correlation analysis", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), ids, cop_sol));
     return result;
   }
 

@@ -106,12 +106,13 @@ public class OutlierThresholdClustering implements Evaluator {
       }
       idlists.get(i).add(iter);
     }
-    Clustering<Model> c = new Clustering<>("Outlier threshold clustering", "threshold-clustering");
+    Clustering<Model> result = new Clustering<>();
+    Metadata.of(result).setLongName("Outlier threshold clustering");
     for(int i = 0; i <= threshold.length; i++) {
       String name = (i == 0) ? "Inlier" : "Outlier_" + threshold[i - 1];
-      c.addToplevelCluster(new Cluster<>(name, idlists.get(i), (i > 0)));
+      result.addToplevelCluster(new Cluster<>(name, idlists.get(i), (i > 0)));
     }
-    return c;
+    return result;
   }
 
   /**

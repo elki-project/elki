@@ -122,7 +122,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     LOG.setCompleted(stepprog);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Connectivity-Based Outlier Factor", "cof-outlier", cofs, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Connectivity-Based Outlier Factor", ids, cofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(cofminmax.getMin(), cofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

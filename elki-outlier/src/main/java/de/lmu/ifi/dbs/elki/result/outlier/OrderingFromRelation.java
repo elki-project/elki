@@ -85,9 +85,4 @@ public class OrderingFromRelation implements OrderingResult {
   public String getLongName() {
     return scores.getLongName() + " Order";
   }
-
-  // @Override // used to be in Result
-  public String getShortName() {
-    return scores.getShortName() + "_order";
-  }
 }

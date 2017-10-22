@@ -20,21 +20,13 @@
  */
 package de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -72,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     booktitle = "Proc. 28th International Conference on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.128", //
     bibkey = "DBLP:conf/icde/AchtertGKSZ12")
-public class Segments extends BasicResult implements Iterable<Segment> {
+public class Segments implements Iterable<Segment> {
   /**
    * Class logger
    */
@@ -119,7 +111,8 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    * @param clusterings List of clusterings in comparison
    */
   public Segments(List<Clustering<?>> clusterings) {
-    super("cluster pair segments", "pair-segments");
+    super();
+    Metadata.of(this).setLongName("Cluster Pair Segments");
     this.clusterings = clusterings;
     this.clusteringsCount = clusterings.size();
     segments = new TreeMap<>(); // TODO: replace with array list
@@ -259,7 +252,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    * @return long name of clustering
    */
   public String getClusteringDescription(int clusteringID) {
-    return clusterings.get(clusteringID).getLongName();
+    return Metadata.of(clusterings.get(clusteringID)).getLongName();
   }
 
   /**

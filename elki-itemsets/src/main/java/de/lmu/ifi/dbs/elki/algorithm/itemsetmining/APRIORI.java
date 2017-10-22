@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -184,7 +185,9 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
         }
       }
     }
-    return new FrequentItemsetsResult("APRIORI", "apriori", solution, meta, size);
+    FrequentItemsetsResult result = new FrequentItemsetsResult(solution, meta, size);
+    Metadata.of(result).setLongName("APRIORI");
+    return result;
   }
 
   /**

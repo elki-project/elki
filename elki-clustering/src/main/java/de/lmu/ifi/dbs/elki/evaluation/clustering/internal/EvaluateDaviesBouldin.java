@@ -170,7 +170,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".db-index", daviesBouldinMean));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Davies Bouldin Index", daviesBouldinMean, 0., Double.POSITIVE_INFINITY, 0., true);
     Metadata.hierarchyOf(c).addChild(ev);

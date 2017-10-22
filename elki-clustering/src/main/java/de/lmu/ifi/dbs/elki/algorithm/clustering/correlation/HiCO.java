@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -216,8 +217,9 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     protected CorrelationClusterOrder buildResult() {
-      return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
-          clusterOrder, reachability, predecessor, correlationValue);
+      CorrelationClusterOrder result = new CorrelationClusterOrder(clusterOrder, reachability, predecessor, correlationValue);
+      Metadata.of(result).setLongName("HiCO Cluster Order");
+      return result;
     }
 
     @Override

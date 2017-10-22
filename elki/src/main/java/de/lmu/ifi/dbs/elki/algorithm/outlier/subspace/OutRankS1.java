@@ -135,7 +135,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       }
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("OutRank-S1", "OUTRANK_S1", score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("OutRank-S1", ids, score);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
     OutlierResult res = new OutlierResult(meta, scoreResult);
     Metadata.hierarchyOf(res).addChild(clustering);

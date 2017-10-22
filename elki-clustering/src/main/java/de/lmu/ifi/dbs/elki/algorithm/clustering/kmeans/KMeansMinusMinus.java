@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -192,7 +193,8 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       }
 
       // Wrap result
-      Clustering<KMeansModel> result = new Clustering<>("k-Means-- Clustering", "kmeans-minus-minus-clustering");
+      Clustering<KMeansModel> result = new Clustering<>();
+      Metadata.of(result).setLongName("k-Means-- Clustering");
       for(int i = 0; i < k; i++) {
         DBIDs ids = clusters.get(i);
         if(ids.isEmpty()) {

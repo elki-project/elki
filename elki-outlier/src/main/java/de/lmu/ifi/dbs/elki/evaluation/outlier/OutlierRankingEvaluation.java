@@ -185,7 +185,7 @@ public class OutlierRankingEvaluation implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      EvaluationResult res = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult res = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING);
       evaluateOutlierResult(res, o.getScores().size(), positiveids, o);
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -196,7 +196,7 @@ public class OutlierRankingEvaluation implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      EvaluationResult res = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult res = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING);
       evaluateOrderingResult(res, or.getDBIDs().size(), positiveids, sorted);
       nonefound = false;
     }

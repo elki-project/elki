@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -253,7 +254,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       }
       clusterids.destroy();
 
-      Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("Generalized DBSCAN Clustering");
       for(int cid = NOISE; cid < clusterlists.length; cid++) {
         boolean isNoise = (cid == NOISE);
         Model m = coremodel ? new CoreObjectsModel(corelists[cid]) : ClusterModel.CLUSTER;

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -520,7 +521,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     BiclusterCandidate cand = new BiclusterCandidate(getRowDim(), getColDim());
 
-    Clustering<BiclusterWithInversionsModel> result = new Clustering<>("Cheng-and-Church", "Cheng and Church Biclustering");
+    Clustering<BiclusterWithInversionsModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("Cheng-and-Church");
     ModifiableDBIDs noise = DBIDUtil.newHashSet(relation.getDBIDs());
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting Cluster", n, LOG) : null;

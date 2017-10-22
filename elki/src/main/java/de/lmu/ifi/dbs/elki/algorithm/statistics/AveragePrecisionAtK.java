@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -148,7 +149,9 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
       final double std = mv.getCount() > 1. ? mv.getSampleStddev() : 0.;
       res.add(new double[] { i + 1, mv.getMean(), std, mv.getMin(), mv.getMax(), mv.getCount() });
     }
-    return new CollectionResult<>("Average Precision", "average-precision", res);
+    CollectionResult<double[]> result = new CollectionResult<>(res);
+    Metadata.of(result).setLongName("Average Precision");
+    return result;
   }
 
   /**

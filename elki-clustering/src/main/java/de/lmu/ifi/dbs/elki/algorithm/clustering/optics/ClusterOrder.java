@@ -25,18 +25,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
@@ -48,7 +39,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @opt nodefillcolor LemonChiffon
  */
-public class ClusterOrder extends BasicResult implements OrderingResult {
+public class ClusterOrder implements OrderingResult {
   /**
    * Cluster order.
    */
@@ -70,35 +61,31 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
    * Constructor
    * 
    * @param ids Object IDs included
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    */
-  public ClusterOrder(DBIDs ids, String name, String shortname) {
-    super(name, shortname);
+  public ClusterOrder(DBIDs ids) {
+    super();
     this.ids = DBIDUtil.newArray(ids.size());
     reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
     predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
 
-    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
-    Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", ids, reachability));
+    Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", TypeUtil.DBID, ids, predecessor));
   }
 
   /**
    * Constructor
    * 
    * @param ids Object IDs included
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
    */
-  public ClusterOrder(String name, String shortname, ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, WritableDBIDDataStore predecessor) {
-    super(name, shortname);
+  public ClusterOrder(ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, WritableDBIDDataStore predecessor) {
+    super();
     this.ids = ids;
     this.reachability = reachability;
     this.predecessor = predecessor;
 
-    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
+    Metadata.hierarchyOf(this).addChild(new MaterializedDoubleRelation("Reachability distance", ids, reachability));
     if(predecessor != null) {
-      Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+      Metadata.hierarchyOf(this).addChild(new MaterializedRelation<DBID>("OPTICS predecessor", TypeUtil.DBID, ids, predecessor));
     }
   }
 

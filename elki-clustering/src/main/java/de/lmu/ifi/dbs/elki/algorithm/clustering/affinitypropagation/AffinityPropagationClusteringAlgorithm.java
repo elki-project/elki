@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -235,7 +236,8 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
       }
     }
 
-    Clustering<MedoidModel> clustering = new Clustering<>("Affinity Propagation Clustering", "ap-clustering");
+    Clustering<MedoidModel> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("Affinity Propagation Clustering");
     ModifiableDBIDs noise = DBIDUtil.newArray();
     for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
       Int2ObjectOpenHashMap.Entry<ModifiableDBIDs> entry = iter.next();

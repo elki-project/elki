@@ -71,11 +71,6 @@ public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
   }
 
   @Override
-  public String getShortName() {
-    return "projection";
-  }
-
-  @Override
   public OUT get(DBIDRef id) {
     return projection.project(inner.get(id));
   }

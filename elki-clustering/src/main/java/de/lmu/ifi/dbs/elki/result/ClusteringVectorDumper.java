@@ -187,7 +187,7 @@ public class ClusteringVectorDumper implements ResultHandler {
       }
     }
     else {
-      writer.append(' ').append(c.getLongName());
+      writer.append(' ').append(Metadata.of(c).getLongName());
     }
     writer.append('\n');
   }

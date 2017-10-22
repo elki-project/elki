@@ -134,7 +134,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
       scores.putDouble(iditer, score);
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("mean multiple attributes spatial outlier", "mean-multipleattributes-outlier", scores, attributes.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("mean multiple attributes spatial outlier", attributes.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);

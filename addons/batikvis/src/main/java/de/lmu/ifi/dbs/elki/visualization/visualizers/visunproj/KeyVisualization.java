@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -208,7 +209,7 @@ public class KeyVisualization implements VisFactory {
 
       // Add a label for the clustering.
       {
-        Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
+        Element label = svgp.svgText(0.1, 0.7, Metadata.of(clustering).getLongName());
         SVGUtil.setCSSClass(label, KEY_CAPTION);
         layer.appendChild(label);
       }

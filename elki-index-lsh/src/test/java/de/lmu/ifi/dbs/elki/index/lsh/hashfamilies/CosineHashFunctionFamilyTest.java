@@ -66,6 +66,6 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
   }
 
   private Relation<NumberVector> mockRelation(final int dimension) {
-    return new MaterializedRelation<>(VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
+    return new MaterializedRelation<>(null, VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
   }
 }

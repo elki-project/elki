@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
@@ -65,7 +66,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testHDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<DendrogramModel> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
@@ -77,7 +78,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testHDBSCANDegenerate() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<DendrogramModel> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 1) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
@@ -89,7 +90,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
   @Test
   public void testMiniMaxNNResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+    Clustering<DendrogramModel> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 1) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxNNChain.class) //
         .build().run(db);

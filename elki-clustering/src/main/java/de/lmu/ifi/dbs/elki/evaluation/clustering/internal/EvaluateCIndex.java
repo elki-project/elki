@@ -192,7 +192,7 @@ public class EvaluateCIndex<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
     Metadata.hierarchyOf(c).addChild(ev);

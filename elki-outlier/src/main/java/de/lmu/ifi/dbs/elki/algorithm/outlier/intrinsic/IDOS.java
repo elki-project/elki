@@ -138,7 +138,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     if(stepprog != null) {
       stepprog.setCompleted(LOG);
     }
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Intrinsic Dimensionality Outlier Score", "idos", ldms, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Intrinsic Dimensionality Outlier Score", ids, ldms);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(idosminmax.getMin(), idosminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
