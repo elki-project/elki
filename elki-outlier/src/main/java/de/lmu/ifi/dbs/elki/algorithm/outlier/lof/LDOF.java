@@ -165,7 +165,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     LOG.ensureCompleted(progressLDOFs);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("LDOF Outlier Score", "ldof-outlier", ldofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("LDOF Outlier Score", relation.getDBIDs(), ldofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }

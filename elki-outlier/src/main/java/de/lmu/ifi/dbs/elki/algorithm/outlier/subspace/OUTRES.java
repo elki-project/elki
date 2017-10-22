@@ -135,7 +135,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
     LOG.ensureCompleted(progress);
 
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., 1., 1.);
-    return new OutlierResult(meta, new MaterializedDoubleRelation("OUTRES", "outres-score", ranks, ids));
+    return new OutlierResult(meta, new MaterializedDoubleRelation("OUTRES", ids, ranks));
   }
 
   /**

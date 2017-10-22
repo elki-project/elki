@@ -206,7 +206,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
       proj.put(it, DoubleVector.wrap(sol[it.getOffset()]));
     }
 
-    return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
+    return new MaterializedRelation<>("t-SNE", otype, ids, proj);
   }
 
   /**

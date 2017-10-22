@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -147,7 +148,8 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       candidates = DBIDUtil.newArray();
       predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
       reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
-      clusterOrder = new ClusterOrder(ids, "OPTICS Clusterorder", "optics-clusterorder");
+      clusterOrder = new ClusterOrder(ids);
+      Metadata.of(clusterOrder).setLongName("OPTICS Clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
       DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
       rangeQuery = db.getRangeQuery(dq, epsilon);

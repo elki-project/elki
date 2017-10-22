@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimi
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -167,7 +168,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     LOG.ensureCompleted(objprog);
     LOG.setCompleted(clusprog);
 
-    Clustering<Model> result = new Clustering<>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
+    Clustering<Model> result = new Clustering<>();
+    Metadata.of(result).setLongName("Shared-Nearest-Neighbor Clustering");
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       result.addToplevelCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
     }

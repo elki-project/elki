@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  *
  * @composed - - - LinearScale
  */
-public class ScalesResult extends BasicResult {
+public class ScalesResult {
   /**
    * The scales in use.
    */
@@ -55,7 +55,7 @@ public class ScalesResult extends BasicResult {
    * @param scales Relation scales to use
    */
   public ScalesResult(LinearScale[] scales) {
-    super("scales", "scales");
+    super();
     this.scales = scales;
   }
 

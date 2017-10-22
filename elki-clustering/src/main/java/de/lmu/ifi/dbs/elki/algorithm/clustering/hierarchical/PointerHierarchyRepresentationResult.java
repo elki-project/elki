@@ -21,9 +21,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import java.util.Comparator;
+
 import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.*;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * The pointer representation of a hierarchical clustering. Each object is
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class PointerHierarchyRepresentationResult extends BasicResult {
+public class PointerHierarchyRepresentationResult {
   /**
    * The DBIDs in this result.
    */
@@ -95,7 +96,8 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
    * @param mergeOrder Order in which to execute merges
    */
   public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder) {
-    super("Pointer Representation", "pointer-representation");
+    super();
+    Metadata.of(this).setLongName("Pointer Representation");
     this.ids = ids;
     this.parent = parent;
     this.parentDistance = parentDistance;

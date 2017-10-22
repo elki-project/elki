@@ -245,7 +245,8 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
       if(noise.isEmpty()) {
         toplevel.remove(0);
       }
-      Clustering<Model> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering", toplevel);
+      Clustering<Model> dendrogram = new Clustering<>(toplevel);
+      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       return dendrogram;
     }
 

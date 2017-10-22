@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -146,7 +147,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("PAM Clustering", "pam-clustering");
+    Clustering<MedoidModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("PAM Clustering");
     for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
       result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
     }

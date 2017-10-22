@@ -152,7 +152,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
       minmax = mmm.getMinMax();
     }
 
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Simplified Local Outlier Factor", ids, lofs);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(meta, scoreres);
   }

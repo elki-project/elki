@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -130,9 +131,6 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
    * @return Clustering result
    */
   public Clustering<?> run(final Database database, final Relation<DiscreteUncertainObject> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("Uk-Means Clustering", "ukmeans-clustering");
-    }
     // Choose initial means randomly
     DBIDs sampleids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<double[]> means = new ArrayList<>(k);
@@ -168,7 +166,8 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
     }
 
     // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("Uk-Means Clustering", "ukmeans-clustering");
+    Clustering<KMeansModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("Uk-Means Clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
       if(ids.isEmpty()) {

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedPara
  * @author Erich Schubert
  * @since 0.3
  */
-public class SettingsResult extends BasicResult {
+public class SettingsResult {
   /**
    * Settings storage.
    */
@@ -45,7 +45,8 @@ public class SettingsResult extends BasicResult {
    * @param settings Settings to store
    */
   public SettingsResult(Collection<TrackedParameter> settings) {
-    super("Settings", "settings");
+    super();
+    Metadata.of(this).setLongName("Settings");
     this.settings = settings;
   }
 

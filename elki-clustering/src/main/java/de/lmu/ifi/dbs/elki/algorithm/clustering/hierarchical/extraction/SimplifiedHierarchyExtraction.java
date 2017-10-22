@@ -182,7 +182,8 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
       ArrayModifiableDBIDs noise = DBIDUtil.newArray();
       ArrayList<Cluster<DendrogramModel>> toplevel = new ArrayList<>();
 
-      final Clustering<DendrogramModel> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
+      final Clustering<DendrogramModel> dendrogram = new Clustering<>();
+      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
 
       DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
       // Perform one join at a time, in increasing order

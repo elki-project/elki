@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -127,7 +128,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
-    Clustering<MeanModel> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
+    Clustering<MeanModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("k-Means Samesize Clustering");
     for(int i = 0; i < clusters.size(); i++) {
       result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(means[i])));
     }

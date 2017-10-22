@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -210,7 +211,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     // build result
     int numClusters = 1;
-    Clustering<SubspaceModel> result = new Clustering<>("ProClus clustering", "proclus-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("ProClus Clustering");
     for(PROCLUSCluster c : finalClusters) {
       Cluster<SubspaceModel> cluster = new Cluster<>(c.objectIDs);
       cluster.setModel(new SubspaceModel(new Subspace(c.getDimensions()), c.centroid));

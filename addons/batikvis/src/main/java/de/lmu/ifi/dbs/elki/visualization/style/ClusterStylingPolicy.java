@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -159,6 +160,6 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public String getMenuName() {
-    return clustering.getLongName();
+    return Metadata.of(clustering).getLongName();
   }
 }

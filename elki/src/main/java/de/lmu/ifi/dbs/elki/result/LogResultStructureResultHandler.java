@@ -79,7 +79,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
     buf.append(result.getClass().getSimpleName()).append(": ");
     Metadata m = Metadata.get(result);
     if(m != null) {
-      buf.append(m.getLongName()).append(" (").append(m.getShortName()).append(')');
+      buf.append(m.getLongName());
     }
     buf.append('\n');
     for(It<Object> iter = Metadata.hierarchyOf(result).iterChildren(); iter.valid(); iter.advance()) {

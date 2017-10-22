@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -147,7 +148,8 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     int minClusterSize = (int) (alpha * S.size());
 
     // List of all clusters we found.
-    Clustering<SubspaceModel> result = new Clustering<>("DOC Clusters", "DOC");
+    Clustering<SubspaceModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("DOC Clusters");
 
     // Inform the user about the number of actual clusters found so far.
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;

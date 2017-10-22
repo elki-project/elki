@@ -196,7 +196,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", stdssil));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Simp. Silhouette +-" + FormatUtil.NF2.format(stdssil), meanssil, -1., 1., 0., false);
     Metadata.hierarchyOf(c).addChild(ev);

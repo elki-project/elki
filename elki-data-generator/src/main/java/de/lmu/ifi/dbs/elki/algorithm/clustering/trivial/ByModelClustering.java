@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -107,7 +108,8 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       modelids.add(iditer);
     }
 
-    Clustering<Model> result = new Clustering<>("By Model Clustering", "bymodel-clustering");
+    Clustering<Model> result = new ReferenceClustering<>();
+    Metadata.of(result).setLongName("By Model Clustering");
     for(Entry<Model, ModifiableDBIDs> entry : modelMap.entrySet()) {
       final Model model = entry.getKey();
       final ModifiableDBIDs ids = entry.getValue();

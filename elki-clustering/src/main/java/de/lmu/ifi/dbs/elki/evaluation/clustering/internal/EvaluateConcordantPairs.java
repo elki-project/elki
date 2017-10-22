@@ -204,7 +204,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".tau", tau));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Concordance-based Evaluation");
     g.addMeasure("Gamma", gamma, -1., 1., 0., false);
     g.addMeasure("Tau", tau, -1., +1., 0., false);

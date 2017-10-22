@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -166,7 +167,8 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     // 2. Identification of clusters
     step.beginStep(2, "Identification of clusters", LOG);
     // build result
-    Clustering<SubspaceModel> result = new Clustering<>("CLIQUE clustering", "clique-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("CLIQUE clustering");
     for(int dim = 0; dim < dimensionToDenseSubspaces.size(); dim++) {
       List<CLIQUESubspace> subspaces = dimensionToDenseSubspaces.get(dim);
       List<Pair<Subspace, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);

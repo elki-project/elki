@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 /**
  * Trivial class that will try to cluster by label, and fall back to an
@@ -65,7 +66,8 @@ public class ByLabelOrAllInOneClustering extends ByLabelClustering {
       // Ignore.
     }
     final DBIDs ids = database.getRelation(TypeUtil.ANY).getDBIDs();
-    Clustering<Model> result = new Clustering<>("All-in-one trivial Clustering", "allinone-clustering");
+    Clustering<Model> result = new ReferenceClustering<>();
+    Metadata.of(result).setLongName("All-in-one Trivial Clustering");
     Cluster<Model> c = new Cluster<Model>(ids, ClusterModel.CLUSTER);
     result.addToplevelCluster(c);
     return result;

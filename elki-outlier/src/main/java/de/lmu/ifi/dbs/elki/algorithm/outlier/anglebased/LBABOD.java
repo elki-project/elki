@@ -236,7 +236,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
       LOG.statistics(new LongStatistic("lb-abod.refinements", refinements));
     }
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-based Outlier Detection", "abod-outlier", abodvalues, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-based Outlier Detection", ids, abodvalues);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }

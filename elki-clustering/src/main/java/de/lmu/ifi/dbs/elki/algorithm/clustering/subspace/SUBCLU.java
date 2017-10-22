@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -239,7 +240,8 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     int numClusters = 0;
     ModifiableDBIDs noise = DBIDUtil.newHashSet(relation.getDBIDs());
     TreeMap<Subspace, ModifiableDBIDs> filtered = new TreeMap<>(Subspace.DIMENSION_COMPARATOR);
-    Clustering<SubspaceModel> result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("SUBCLU clustering");
     for(Subspace subspace : clusterMap.descendingKeySet()) {
       if(subspace.dimensionality() < mindim) {
         continue;

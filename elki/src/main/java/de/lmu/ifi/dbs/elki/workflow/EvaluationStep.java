@@ -26,7 +26,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultListenerList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -66,7 +66,8 @@ public class EvaluationStep implements WorkflowStep {
 
   public void runEvaluators(Database db) {
     // Currently only serves indication purposes.
-    stepresult = new BasicResult("Evaluation Step", "evaluation-step");
+    stepresult = new Object();
+    Metadata.of(stepresult).setLongName("Evaluation Step");
     // Run evaluation helpers
     if(evaluators != null) {
       new Evaluation(evaluators).update(db);

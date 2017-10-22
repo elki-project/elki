@@ -107,6 +107,11 @@ public class Metadata {
    * Hierarchy information.
    */
   private Hierarchy hierarchy = new Hierarchy();
+  
+  /**
+   * Human-readable name of the entry.
+   */
+  private String name;
 
   /**
    * Constructor, use via static methods only!
@@ -126,23 +131,16 @@ public class Metadata {
     return hierarchy;
   }
 
-  public String getLongName() {
-    try {
-      Method m = owner.getClass().getMethod("getLongName");
-      if(m.getReturnType() == String.class) {
-        return (String) m.invoke(owner);
-      }
-    }
-    catch(SecurityException | IllegalArgumentException
-        | ReflectiveOperationException e) {
-      // pass.
-    }
-    return owner.getClass().getSimpleName();
+  public void setLongName(String name) {
+    this.name = name;
   }
 
-  public String getShortName() {
+  public String getLongName() {
+    if (name != null) {
+      return name;
+    }
     try {
-      Method m = owner.getClass().getMethod("getShortName");
+      Method m = owner.getClass().getMethod("getLongName");
       if(m.getReturnType() == String.class) {
         return (String) m.invoke(owner);
       }

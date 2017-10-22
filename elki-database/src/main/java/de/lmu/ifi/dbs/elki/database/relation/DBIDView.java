@@ -97,11 +97,6 @@ public class DBIDView extends AbstractRelation<DBID> {
   }
 
   @Override
-  public String getShortName() {
-    return "DBID";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -257,7 +258,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
       final double ocaf = ((double) value[1]) / bnum / histogram.getBinsize();
       binstat.add(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
     }
-    HistogramResult result = new HistogramResult("Distance Histogram", "distance-histogram", binstat);
+    HistogramResult result = new HistogramResult(binstat);
+    Metadata.of(result).setLongName("Distance Histogram");
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());

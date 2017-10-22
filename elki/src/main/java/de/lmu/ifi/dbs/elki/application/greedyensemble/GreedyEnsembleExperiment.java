@@ -522,7 +522,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       }
       contents.put(iter, factory.newNumberVector(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER));
     }
-    return new MaterializedRelation<>(relation.getDataTypeInformation(), ids, "rescaled", contents);
+    return new MaterializedRelation<>("rescaled", relation.getDataTypeInformation(), ids, contents);
   }
 
   private static void applyScaling(double[] raw, ScalingFunction scaling) {

@@ -170,7 +170,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
       ofminmax.put(of);
     }
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("OPTICS Outlier Scores", "optics-outlier", ofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("OPTICS Outlier Scores", relation.getDBIDs(), ofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

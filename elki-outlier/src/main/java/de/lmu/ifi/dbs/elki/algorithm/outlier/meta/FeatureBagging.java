@@ -209,7 +209,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       LOG.ensureCompleted(cprog);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Feature bagging", "fb-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Feature bagging", relation.getDBIDs(), scores);
     return new OutlierResult(meta, scoreres);
   }
 

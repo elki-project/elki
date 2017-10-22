@@ -114,7 +114,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
     // Wrap the result in the standard containers
     // Actual min-max, theoretical min-max!
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
-    DoubleRelation rel = new MaterializedDoubleRelation(relation.getDBIDs(), "stddev-outlier", scores);
+    DoubleRelation rel = new MaterializedDoubleRelation("stddev-outlier", relation.getDBIDs(), scores);
     return new OutlierResult(meta, rel);
   }
 

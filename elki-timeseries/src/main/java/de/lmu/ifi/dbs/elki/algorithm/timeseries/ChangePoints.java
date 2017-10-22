@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @has - - - ChangePoint
  */
-public class ChangePoints extends BasicResult implements TextWriteable {
+public class ChangePoints implements TextWriteable {
   /**
    * Change points.
    */
@@ -47,12 +46,9 @@ public class ChangePoints extends BasicResult implements TextWriteable {
 
   /**
    * Result constructor.
-   *
-   * @param name Full name
-   * @param shortname Short name (for filenames)
    */
-  public ChangePoints(String name, String shortname) {
-    super(name, shortname);
+  public ChangePoints() {
+    super();
   }
 
   @Override

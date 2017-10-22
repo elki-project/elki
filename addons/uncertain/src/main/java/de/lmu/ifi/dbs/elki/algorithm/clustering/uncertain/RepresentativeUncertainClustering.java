@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -176,8 +175,9 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
-    // To collect samples
-    BasicResult samples = new BasicResult("Samples", "samples");
+    // "Result" to group our samples
+    Object samples = new Object();
+    Metadata.of(samples).setLongName("Samples"); // For UI
 
     // Step 1: Cluster sampled possible worlds:
     Random rand = random.getSingleThreadedRandom();
@@ -204,7 +204,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     assert (rids.size() == clusterings.size());
 
     // Build a relation, and a distance matrix.
-    Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(Clustering.TYPE, rids, "Clusterings", datastore);
+    Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>("Clusterings", Clustering.TYPE, rids, datastore);
     PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, rids, distance);
     mat.initialize();
     ProxyDatabase d = new ProxyDatabase(rids, crel);
@@ -212,8 +212,9 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Clustering<?> c = metaAlgorithm.run(d);
     Metadata.hierarchyOf(d).removeChild(c); // Detach from database
 
-    // Evaluation
-    BasicResult reps = new BasicResult("Representants", "representative");
+    // "Result" to group or representative results
+    Object reps = new Object();
+    Metadata.of(reps).setLongName("Representants");
     Metadata.hierarchyOf(relation).addChild(reps);
 
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
@@ -298,7 +299,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    */
   protected Clustering<?> runClusteringAlgorithm(Object parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
+    Relation<DoubleVector> sample = new MaterializedRelation<>(title, t, ids, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     Clustering<?> clusterResult = samplesAlgorithm.run(d);
     ResultUtil.removeRecursive(sample);
@@ -332,7 +333,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
      * @param cprob Confidence probability
      */
     public RepresentativenessEvaluation(double gtau, double besttau, double cprob) {
-      super("Possible-Worlds Evaluation", "representativeness");
+      super();
+      Metadata.of(this).setLongName("Possible-Worlds Evaluation");
       MeasurementGroup g = newGroup("Representativeness");
       g.addMeasure("Confidence", cprob, 0, 1, false);
       g.addMeasure("Global Tau", gtau, 0, 1, true);

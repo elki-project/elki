@@ -128,7 +128,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     }
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-Based Outlier Degree", "abod-outlier", abodvalues, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-Based Outlier Degree", relation.getDBIDs(), abodvalues);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }

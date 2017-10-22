@@ -214,7 +214,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", stdsil));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
     Metadata.hierarchyOf(c).addChild(ev);

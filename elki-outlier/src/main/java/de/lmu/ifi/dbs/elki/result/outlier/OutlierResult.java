@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Metadata.Hierarchy;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * @navcomposed - - - DoubleRelation
  * @composed - - - OrderingFromRelation
  */
-public class OutlierResult extends BasicResult {
+public class OutlierResult {
   /**
    * Outlier score meta information
    */
@@ -68,10 +67,11 @@ public class OutlierResult extends BasicResult {
    * @param scores Scores result.
    */
   public OutlierResult(OutlierScoreMeta meta, DoubleRelation scores) {
-    super(scores.getLongName(), scores.getShortName());
+    super();
     this.meta = meta;
     this.scores = scores;
     this.ordering = new OrderingFromRelation(scores, meta instanceof InvertedOutlierScoreMeta);
+    Metadata.of(this).setLongName(scores.getLongName());
     Hierarchy hier = Metadata.hierarchyOf(this);
     hier.addChild(scores);
     hier.addChild(ordering);

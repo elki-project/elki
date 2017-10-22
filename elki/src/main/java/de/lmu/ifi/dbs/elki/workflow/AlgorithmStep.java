@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -91,7 +90,8 @@ public class AlgorithmStep implements WorkflowStep {
         it.get().logStatistics();
       }
     }
-    stepresult = new BasicResult("Algorithm Step", "algorithm-step");
+    stepresult = new Object();
+    Metadata.of(stepresult).setLongName("Algorithm Step");
     for(Algorithm algorithm : algorithms) {
       Thread.currentThread().setName(algorithm.toString());
       Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName() + ".runtime").begin() : null;

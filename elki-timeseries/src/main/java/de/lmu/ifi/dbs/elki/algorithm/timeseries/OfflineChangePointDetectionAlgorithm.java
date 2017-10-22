@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -202,7 +203,8 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
       column = new double[size];
       sums = new double[size];
       bstrap = new double[size];
-      result = new ChangePoints("CUSUM Changepoints", "cusum-changepoints");
+      result = new ChangePoints();
+      Metadata.of(result).setLongName("CUSUM Changepoints");
 
       for(columnnr = 0; columnnr < dim; columnnr++) {
         // Materialize one column of the data.

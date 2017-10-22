@@ -168,7 +168,8 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     double mib = 0.0;
     List<SteepArea> salist = keepsteep ? new ArrayList<SteepArea>() : null;
     List<SteepDownArea> sdaset = new ArrayList<>();
-    final Clustering<OPTICSModel> clustering = new Clustering<>("OPTICS Xi-Clusters", "optics");
+    final Clustering<OPTICSModel> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("OPTICS Xi-Clusters");
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 

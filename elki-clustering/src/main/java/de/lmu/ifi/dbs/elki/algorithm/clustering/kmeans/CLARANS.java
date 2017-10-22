@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -132,7 +133,9 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
 
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
-      return new Clustering<>("CLARANS Clustering", "clarans-clustering");
+      Clustering<MedoidModel> empty = new Clustering<>();
+      Metadata.of(empty).setLongName("CLARANS Clustering");
+      return empty;
     }
     if(k * 2 >= relation.size()) {
       // Random sampling of non-medoids will be slow for huge k
@@ -221,10 +224,11 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, best.assignment, k);
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("CLARANS Clustering", "clarans-clustering");
+    Clustering<MedoidModel> result = new Clustering<>();
     for(DBIDArrayIter it = best.medoids.iter(); it.valid(); it.advance()) {
       result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
     }
+    Metadata.of(result).setLongName("CLARANS Clustering");
     return result;
   }
 

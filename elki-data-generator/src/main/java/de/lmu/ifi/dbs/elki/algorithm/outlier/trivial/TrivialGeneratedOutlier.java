@@ -177,7 +177,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       }
       scores.putDouble(iditer, score);
     }
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Model outlier scores", "model-outlier", scores, models.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Model outlier scores", models.getDBIDs(), scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0., 1.);
     return new OutlierResult(meta, scoreres);
   }

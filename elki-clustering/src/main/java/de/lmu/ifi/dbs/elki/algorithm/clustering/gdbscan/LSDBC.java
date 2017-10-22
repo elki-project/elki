@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -201,7 +202,8 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     }
     clusterids.destroy();
 
-    Clustering<Model> result = new Clustering<>("LSDBC", "lsdbc-clustering");
+    Clustering<Model> result = new Clustering<>();
+    Metadata.of(result).setLongName("LSDBC Clustering");
     for(int cid = NOISE; cid < clusterlists.size(); cid++) {
       boolean isNoise = (cid == NOISE);
       Cluster<Model> c;

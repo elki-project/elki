@@ -168,7 +168,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       minmax.put(dwofs.doubleValue(iter));
     }
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    DoubleRelation rel = new MaterializedDoubleRelation("Dynamic-Window Outlier Factors", "dwof-outlier", dwofs, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("Dynamic-Window Outlier Factors", ids, dwofs);
     return new OutlierResult(meta, rel);
   }
 

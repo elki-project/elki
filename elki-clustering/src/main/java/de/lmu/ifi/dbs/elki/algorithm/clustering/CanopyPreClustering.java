@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -143,7 +144,9 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       }
     }
     LOG.ensureCompleted(prog);
-    return new Clustering<>("Canopy clustering", "canopy-clustering", clusters);
+    Clustering<PrototypeModel<O>> clustering = new Clustering<>(clusters);
+    Metadata.of(clustering).setLongName("Canopy clustering");
+    return clustering;
   }
 
   @Override

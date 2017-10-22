@@ -34,7 +34,12 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @composed - - - EvaluationResult.MeasurementGroup
  */
-public class EvaluationResult extends BasicResult implements TextWriteable, Iterable<EvaluationResult.MeasurementGroup> {
+public class EvaluationResult implements TextWriteable, Iterable<EvaluationResult.MeasurementGroup> {
+  /**
+   * Result name for aggregating ranking evaluations.
+   */
+  public static final String RANKING = "Evaluation of Ranking";
+
   /**
    * Measurements.
    */
@@ -47,12 +52,9 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Constructor.
-   *
-   * @param name Evaluation name
-   * @param shortname Short name
    */
-  public EvaluationResult(String name, String shortname) {
-    super(name, shortname);
+  public EvaluationResult() {
+    super();
   }
 
   /**
@@ -133,25 +135,27 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Find or create an evaluation result.
-   * 
+   *
    * @param parent Parent result
    * @param name Long name
-   * @param shortname Short name
    *
    * @return Evaluation result
    */
-  public static EvaluationResult findOrCreate(Object parent, String name, String shortname) {
+  public static EvaluationResult findOrCreate(Object parent, String name) {
     ArrayList<EvaluationResult> ers = ResultUtil.filterResults(parent, EvaluationResult.class);
     EvaluationResult ev = null;
     for(EvaluationResult e : ers) {
-      if(shortname.equals(e.getShortName())) {
+      Metadata m = Metadata.get(e);
+      if(m != null && name.equals(m.getLongName())) {
         ev = e;
         break;
       }
     }
     if(ev == null) {
-      ev = new EvaluationResult(name, shortname);
-      Metadata.hierarchyOf(parent).addChild(ev);
+      ev = new EvaluationResult();
+      Metadata m = Metadata.of(ev);
+      m.setLongName(name);
+      m.hierarchy().addChild(ev);
     }
     return ev;
   }

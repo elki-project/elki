@@ -26,7 +26,9 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -52,7 +54,7 @@ public class IndexStatistics implements Evaluator {
     Database db = ResultUtil.findDatabase(newResult);
     Collection<String> header = null;
     final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, IndexTree.class);
-    if (indexes == null || indexes.isEmpty()) {
+    if(indexes == null || indexes.isEmpty()) {
       return;
     }
     for(IndexTree<?, ?> index : indexes) {
@@ -77,7 +79,8 @@ public class IndexStatistics implements Evaluator {
      * @param header header
      */
     public IndexMetaResult(Collection<Pair<String, String>> col, Collection<String> header) {
-      super("Index Statistics", "index-meta", col, header);
+      super(col, header);
+      Metadata.of(this).setLongName("Index Statistics");
     }
   }
 }

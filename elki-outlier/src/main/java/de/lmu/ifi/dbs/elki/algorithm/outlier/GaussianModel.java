@@ -129,7 +129,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Model Outlier Score", "gaussian-model-outlier", oscores, relation.getDBIDs());
+    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Model Outlier Score", relation.getDBIDs(), oscores);
     return new OutlierResult(meta, res);
   }
 

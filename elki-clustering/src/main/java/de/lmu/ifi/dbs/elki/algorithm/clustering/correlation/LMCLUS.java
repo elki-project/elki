@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram.Iter;
@@ -167,7 +168,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    * @return Clustering result
    */
   public Clustering<Model> run(Database database, Relation<NumberVector> relation) {
-    Clustering<Model> ret = new Clustering<>("LMCLUS Clustering", "lmclus-clustering");
+    Clustering<Model> ret = new Clustering<>();
+    Metadata.of(ret).setLongName("LMCLUS Clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());

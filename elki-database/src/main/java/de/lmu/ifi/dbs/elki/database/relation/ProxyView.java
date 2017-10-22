@@ -96,11 +96,6 @@ public class ProxyView<O> extends AbstractRelation<O> {
     return "Partition of " + Metadata.of(inner).getLongName();
   }
 
-  @Override
-  public String getShortName() {
-    return "partition";
-  }
-
   /**
    * Set the DBIDs to use.
    *

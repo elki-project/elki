@@ -189,7 +189,7 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
       proj.put(it, DoubleVector.wrap(sol[it.getOffset()]));
     }
 
-    return new MaterializedRelation<>("SNE", "SNE", otype, proj, ids);
+    return new MaterializedRelation<>("SNE", otype, ids, proj);
   }
 
   /**

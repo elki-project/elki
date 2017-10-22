@@ -156,7 +156,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       }
       minmax.put(val);
     }
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuEvolutionary", "aggarwal-yu-outlier", outlierScore, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuEvolutionary", relation.getDBIDs(), outlierScore);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -112,7 +113,7 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
       }
       ids.add(iter);
     }
-    Clustering<MeanModel> result = new Clustering<>("BIRCH-leaves", "BIRCH leaves");
+    Clustering<MeanModel> result = new Clustering<>();
     for(Map.Entry<ClusteringFeature, ModifiableDBIDs> ent : idmap.entrySet()) {
       ClusteringFeature leaf = ent.getKey();
       double[] center = new double[dim];
@@ -121,6 +122,7 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
       }
       result.addToplevelCluster(new Cluster<>(ent.getValue(), new MeanModel(center)));
     }
+    Metadata.of(result).setLongName("BIRCH Clustering");
     return result;
   }
 

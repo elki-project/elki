@@ -181,7 +181,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     LOG.setCompleted(stepprog);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Kernel Density Local Outlier Factor", "kernel-density-slof-outlier", lofs, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Kernel Density Local Outlier Factor", ids, lofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 

@@ -35,7 +35,7 @@ import java.util.Iterator;
  *
  * @param <O> data type
  */
-public class CollectionResult<O> extends BasicResult implements IterableResult<O> {
+public class CollectionResult<O> implements IterableResult<O> {
   /**
    * The collection represented.
    */
@@ -48,32 +48,28 @@ public class CollectionResult<O> extends BasicResult implements IterableResult<O
   
   /**
    * Constructor
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
+   *
    * @param col Collection represented
    * @param header Auxiliary information for result headers
    */
-  public CollectionResult(String name, String shortname, Collection<O> col, Collection<String> header) {
-    super(name, shortname);
+  public CollectionResult(Collection<O> col, Collection<String> header) {
+    super();
     this.col = col;
     this.header = header;
   }
   
   /**
    * Constructor
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
+   *
    * @param col Collection represented
    */
-  public CollectionResult(String name, String shortname, Collection<O> col) {
-    this(name, shortname, col, new ArrayList<String>());
+  public CollectionResult(Collection<O> col) {
+    this(col, new ArrayList<String>());
   }
   
   /**
    * Add header information
-   * 
+   *
    * @param s Header information string
    */
   public void addHeader(String s) {
@@ -82,7 +78,7 @@ public class CollectionResult<O> extends BasicResult implements IterableResult<O
   
   /**
    * Get header information
-   * 
+   *
    * @return header information of the result
    */
   public Collection<String> getHeader() {
@@ -99,7 +95,7 @@ public class CollectionResult<O> extends BasicResult implements IterableResult<O
   
   /**
    * Get the collection size.
-   * 
+   *
    * @return Collection size
    */
   public int size() {

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -108,7 +109,8 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     }
 
     protected Clustering<MeanModel> buildMediansResult() {
-      Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
+      Clustering<MeanModel> result = new Clustering<>();
+      Metadata.of(result).setLongName("k-Medians Clustering");
       for(int i = 0; i < clusters.size(); i++) {
         result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(means[i])));
       }

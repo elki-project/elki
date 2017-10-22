@@ -186,7 +186,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
       }
     }
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", "silhouette-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
     return new OutlierResult(scoreMeta, scoreResult);
   }

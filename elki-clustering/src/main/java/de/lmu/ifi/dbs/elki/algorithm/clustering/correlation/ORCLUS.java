@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -169,11 +170,12 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     LOG.setCompleted(cprogress);
 
     // get the result
-    Clustering<Model> r = new Clustering<>("ORCLUS clustering", "orclus-clustering");
+    Clustering<Model> result = new Clustering<>();
+    Metadata.of(result).setLongName("ORCLUS Clustering");
     for(ORCLUSCluster c : clusters) {
-      r.addToplevelCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
+      result.addToplevelCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
     }
-    return r;
+    return result;
   }
 
   /**

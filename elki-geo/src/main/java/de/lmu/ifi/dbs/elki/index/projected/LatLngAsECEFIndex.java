@@ -212,7 +212,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
         for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           content.put(iter, proj.project(relation.get(iter)));
         }
-        view = new MaterializedRelation<>("ECEF Projection", "ecef-projection", proj.getOutputDataTypeInformation(), content, ids);
+        view = new MaterializedRelation<>("ECEF Projection", proj.getOutputDataTypeInformation(), ids, content);
       }
       else {
         view = new ProjectedView<>(relation, proj);

@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * Parallel implementation of k-Means clustering.
@@ -98,7 +99,8 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     // Wrap result
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("k-Means Clustering");
     for(int i = 0; i < clusters.length; i++) {
       DBIDs cids = clusters[i];
       if(cids.size() == 0) {

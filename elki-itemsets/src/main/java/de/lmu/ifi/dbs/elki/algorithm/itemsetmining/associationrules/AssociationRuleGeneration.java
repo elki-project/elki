@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AssociationRuleResult;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -184,7 +185,9 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
       // Shortcut.
       if(itemsets.isEmpty()) {
         LOG.warning("No frequent itemsets found.");
-        return new AssociationRuleResult("association rules", "arules", Collections.emptyList(), frequentResult.getMeta());
+        AssociationRuleResult result = new AssociationRuleResult(Collections.emptyList(), frequentResult.getMeta());
+        Metadata.of(result).setLongName("Association Rules");
+        return result;
       }
 
       // Ensure it is an array list for efficiency:
@@ -230,7 +233,9 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
 
         processSubsets(itemset, len, len - 1);
       }
-      return new AssociationRuleResult("association rules", "arules", rules, meta);
+      AssociationRuleResult result = new AssociationRuleResult(rules, meta);
+      Metadata.of(result).setLongName("Association Rules");
+      return result;
     }
 
     private void processSubsets(Itemset itemset, final int len, int cur) {

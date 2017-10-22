@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -245,7 +246,8 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      */
     private Clustering<DendrogramModel> buildFlat(DBIDArrayIter it, final int split, FiniteProgress progress) {
       final Logging log = getLogger();
-      Clustering<DendrogramModel> dendrogram = new Clustering<>("Flattened Hierarchical Clustering", "flattened-hierarchical-clustering");
+      Clustering<DendrogramModel> dendrogram = new Clustering<>();
+      Metadata.of(dendrogram).setLongName("Flattened Hierarchical Clustering");
       // Convert initial clusters to cluster objects
       {
         int i = 0;
@@ -278,9 +280,8 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     private Clustering<DendrogramModel> buildHierarchical(DBIDArrayIter it, int split, FiniteProgress progress) {
       final int expcnum = ids.size() - split;
       final Logging log = getLogger();
-      final Clustering<DendrogramModel> dendrogram;
-      // Build a hierarchy out of these clusters.
-      dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
+      final Clustering<DendrogramModel> dendrogram = new Clustering<>();
+      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       Cluster<DendrogramModel> root = null;
       ArrayList<Cluster<DendrogramModel>> clusters = new ArrayList<>(expcnum);
       // Convert initial clusters to cluster objects

@@ -221,12 +221,12 @@ public class KMLOutputHandler implements ResultHandler {
     {
       // TODO: can we automatically generate more helpful data here?
       xmlw.writeStartElement("name");
-      xmlw.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
+      xmlw.writeCharacters("ELKI KML output for " + Metadata.of(outlierResult).getLongName());
       xmlw.writeEndElement(); // name
       writeNewlineOnDebug(xmlw);
       // TODO: e.g. list the settings in the description?
       xmlw.writeStartElement("description");
-      xmlw.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
+      xmlw.writeCharacters("ELKI KML output for " + Metadata.of(outlierResult).getLongName());
       xmlw.writeEndElement(); // description
       writeNewlineOnDebug(xmlw);
     }
@@ -369,12 +369,12 @@ public class KMLOutputHandler implements ResultHandler {
     {
       // TODO: can we automatically generate more helpful data here?
       xmlw.writeStartElement("name");
-      xmlw.writeCharacters("ELKI KML output for " + clustering.getLongName());
+      xmlw.writeCharacters("ELKI KML output for " + Metadata.of(clustering).getLongName());
       xmlw.writeEndElement(); // name
       writeNewlineOnDebug(xmlw);
       // TODO: e.g. list the settings in the description?
       xmlw.writeStartElement("description");
-      xmlw.writeCharacters("ELKI KML output for " + clustering.getLongName());
+      xmlw.writeCharacters("ELKI KML output for " + Metadata.of(clustering).getLongName());
       xmlw.writeEndElement(); // description
       writeNewlineOnDebug(xmlw);
     }

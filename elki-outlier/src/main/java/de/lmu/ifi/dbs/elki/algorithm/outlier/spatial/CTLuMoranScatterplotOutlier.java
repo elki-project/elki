@@ -143,7 +143,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       scores.putDouble(iditer, score);
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("MoranOutlier", "Moran Scatterplot Outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("MoranOutlier", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);

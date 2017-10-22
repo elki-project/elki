@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -104,7 +105,8 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
   public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, DBIDs> labelmap = new HashMap<>();
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
-    Clustering<Model> clustering = new Clustering<>("By Label Hierarchical Clustering", "bylabel-clustering");
+    Clustering<Model> clustering = new ReferenceClustering<>();
+    Metadata.of(clustering).setLongName("By Label Hierarchical Clustering");
 
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final Object val = relation.get(iditer);

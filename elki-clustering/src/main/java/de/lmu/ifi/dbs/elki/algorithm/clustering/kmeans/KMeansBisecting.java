@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -138,10 +139,8 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
     LOG.ensureCompleted(prog);
 
     // add all current clusters to the result
-    Clustering<M> result = new Clustering<>("Bisecting k-Means Result", "Bisecting-k-means");
-    for(Cluster<M> cluster : currentClusterList) {
-      result.addToplevelCluster(cluster);
-    }
+    Clustering<M> result = new Clustering<>(currentClusterList);
+    Metadata.of(result).setLongName("Bisecting k-Means Result");
     return result;
   }
 

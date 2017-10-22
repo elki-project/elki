@@ -156,12 +156,14 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
       rbod_score.putDouble(iditer, score);
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Reference-points Outlier Scores", "reference-outlier", rbod_score, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Reference-points Outlier Scores", relation.getDBIDs(), rbod_score);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., 1., 0.);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // adds reference points to the result. header information for the
     // visualizer to find the reference points in the result
-    Metadata.hierarchyOf(result).addChild(new ReferencePointsResult<>("Reference points", "reference-points", refPoints));
+    ReferencePointsResult<? extends NumberVector> refresult = new ReferencePointsResult<>(refPoints);
+    Metadata.of(refresult).setLongName("Reference points");
+    Metadata.hierarchyOf(result).addChild(refresult);
     return result;
   }
 

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -133,9 +134,6 @@ public class CLARA<V> extends KMedoidsPAM<V> {
 
   @Override
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("CLARA Clustering", "clara-clustering");
-    }
     DBIDs ids = relation.getDBIDs();
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
@@ -185,7 +183,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("CLARA Clustering", "clara-clustering");
+    Clustering<MedoidModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("CLARA Clustering");
     for(DBIDArrayIter it = bestmedoids.iter(); it.valid(); it.advance()) {
       MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
       result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));

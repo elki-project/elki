@@ -173,8 +173,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
-
-    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", oscores, relation.getDBIDs());
+    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Mixture Outlier Score", relation.getDBIDs(), oscores);
     return new OutlierResult(meta, res);
   }
 

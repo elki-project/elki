@@ -168,7 +168,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
       }
       minmax.put(val);
     }
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuNaive", "aggarwal-yu-outlier", sparsity, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuNaive", relation.getDBIDs(), sparsity);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

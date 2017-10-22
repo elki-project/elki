@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -92,7 +93,8 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
     RangeQuery<O> rq = relation.getRangeQuery(getDistanceFunction(), threshold);
 
     ModifiableDBIDs seen = DBIDUtil.newHashSet(relation.size());
-    Clustering<PrototypeModel<O>> clustering = new Clustering<>("Prototype clustering", "prototype-clustering");
+    Clustering<PrototypeModel<O>> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("Leader Clustering");
 
     int queries = 0;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Leader clustering", relation.size(), LOG) : null;

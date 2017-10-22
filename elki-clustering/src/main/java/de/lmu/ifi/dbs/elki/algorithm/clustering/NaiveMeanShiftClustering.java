@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -204,7 +205,9 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     if(noise.size() > 0) {
       cs.add(new Cluster<MeanModel>(noise, true));
     }
-    return new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
+    Clustering<MeanModel> c = new Clustering<>(cs);
+    Metadata.of(c).setLongName("Mean-shift Clustering");
+    return c;
   }
 
   @Override

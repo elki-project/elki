@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -217,7 +218,8 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clusterin
     }
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
+    Clustering<MedoidModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("k-Medoids Clustering");
     for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
       result.addToplevelCluster(new Cluster<>(clusters.get(it.getOffset()), new MedoidModel(DBIDUtil.deref(it))));
     }

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * Compute a partitioning from an OPTICS plot by doing a horizontal cut.
@@ -57,7 +58,8 @@ public final class OPTICSCut {
    */
   public static <E extends ClusterOrder> Clustering<Model> makeOPTICSCut(E co, double epsilon) {
     // Clustering model we are building
-    Clustering<Model> clustering = new Clustering<>("OPTICS Cut Clustering", "optics-cut");
+    Clustering<Model> clustering = new Clustering<>();
+    Metadata.of(clustering).setLongName("OPTICS Cut at "+epsilon);
     // Collects noise elements
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
 

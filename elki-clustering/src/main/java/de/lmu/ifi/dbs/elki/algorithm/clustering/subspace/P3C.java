@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -224,7 +225,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     if(clusterCores.isEmpty()) {
       LOG.setCompleted(stepProgress);
-      Clustering<SubspaceModel> c = new Clustering<>("P3C", "P3C");
+      Clustering<SubspaceModel> c = new Clustering<>();
+      Metadata.of(c).setLongName("P3C Clustering");
       c.addToplevelCluster(new Cluster<SubspaceModel>(relation.getDBIDs(), true));
       return c;
     }
@@ -304,7 +306,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     // Generate final output.
-    Clustering<SubspaceModel> result = new Clustering<>("P3C", "P3C");
+    Clustering<SubspaceModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("P3C Clustering");
     for(int cluster = 0; cluster < clusterCandidates.size(); ++cluster) {
       ClusterCandidate candidate = clusterCandidates.get(cluster);
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.ids);

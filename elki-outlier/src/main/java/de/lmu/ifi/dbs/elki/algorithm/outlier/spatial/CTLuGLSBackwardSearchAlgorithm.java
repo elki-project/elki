@@ -153,7 +153,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
       }
     }
 
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("GLSSODBackward", "GLSSODbackward-outlier", scores, relationx.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("GLSSODBackward", relationx.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

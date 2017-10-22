@@ -87,11 +87,6 @@ public class ConvertToStringView extends AbstractRelation<String> {
   }
 
   @Override
-  public String getShortName() {
-    return "tostring-" + Metadata.of(existing).getShortName();
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

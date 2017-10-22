@@ -459,7 +459,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           content.put(iter, proj.project(relation.get(iter)));
         }
-        view = new MaterializedRelation<>("Projected Index", "projected-index", proj.getOutputDataTypeInformation(), content, ids);
+        view = new MaterializedRelation<>("Projected Index", proj.getOutputDataTypeInformation(), ids, content);
       }
       else {
         view = new ProjectedView<>(relation, proj);

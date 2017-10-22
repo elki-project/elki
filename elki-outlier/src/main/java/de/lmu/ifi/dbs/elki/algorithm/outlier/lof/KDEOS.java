@@ -181,7 +181,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     DoubleMinMax minmax = new DoubleMinMax();
     computeOutlierScores(knnq, ids, densities, kofs, minmax);
 
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Kernel Density Estimation Outlier Scores", "kdeos-outlier", kofs, ids);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Kernel Density Estimation Outlier Scores", ids, kofs);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax());
     return new OutlierResult(meta, scoreres);
   }

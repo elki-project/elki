@@ -83,17 +83,17 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   /**
    * Result name for the COP outlier scores.
    */
-  public static final String COP_SCORES = "cop-outlier";
+  public static final String COP_SCORES = "Correlation Outlier Probabilities";
 
   /**
    * Result name for the dimensionality.
    */
-  public static final String COP_DIM = "cop-dim";
+  public static final String COP_DIM = "Local Correlation Dimensionality";
 
   /**
    * Result name for the error vectors.
    */
-  public static final String COP_ERRORVEC = "cop-errorvec";
+  public static final String COP_ERRORVEC = "Error vectors";
 
   /**
    * A clone of
@@ -263,12 +263,12 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     LOG.ensureCompleted(prog);
 
     // combine results.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Correlation Outlier Probabilities", COP_SCORES, cop_score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation(COP_SCORES, ids, cop_score);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     if(models) {
-      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP_DIM, TypeUtil.INTEGER, ids, cop_dim));
+      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, ids, cop_err_v));
     }
     return result;
   }

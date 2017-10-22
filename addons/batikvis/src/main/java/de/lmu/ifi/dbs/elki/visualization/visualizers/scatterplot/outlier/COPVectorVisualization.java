@@ -96,7 +96,7 @@ public class COPVectorVisualization implements VisFactory {
         return;
       }
       VisualizationTree.findNewResults(context, o).filter(Relation.class).forEach(rel -> {
-        if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
+        if(!rel.getLongName().equals(COP.COP_ERRORVEC)) {
           return;
         }
         final VisualizationTask task = new VisualizationTask(this, NAME, rel, rel2) //

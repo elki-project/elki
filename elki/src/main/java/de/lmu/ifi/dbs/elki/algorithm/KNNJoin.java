@@ -111,7 +111,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     DBIDs ids = relation.getDBIDs();
     WritableDataStore<KNNList> knnLists = run(relation, ids);
     // Wrap as relation:
-    return new MaterializedRelation<>("k nearest neighbors", "kNNs", TypeUtil.KNNLIST, knnLists, ids);
+    return new MaterializedRelation<>("k Nearest Neighbors", TypeUtil.KNNLIST, ids, knnLists);
   }
 
   /**

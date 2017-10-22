@@ -164,7 +164,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     }
     LOG.ensureCompleted(prog);
     DoubleMinMax minmax = transformScores(scores, relation.getDBIDs(), logPerp, phi);
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic Stoachastic Outlier Selection", "isos-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic Stoachastic Outlier Selection", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);
   }

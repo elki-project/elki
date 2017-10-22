@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusteringVectorDumper;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -179,7 +180,8 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
         }
         // Build clustering to store in the relation.
         Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(csize.size());
-        curclu = new Clustering<>(name, name);
+        curclu = new Clustering<>();
+        Metadata.of(curclu).setLongName(name);
         for(ObjectIterator<Int2IntMap.Entry> iter = csize.int2IntEntrySet().fastIterator(); iter.hasNext();) {
           Int2IntMap.Entry entry = iter.next();
           if(entry.getIntValue() > 0) {
