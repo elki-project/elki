@@ -39,7 +39,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMinusMinusRateZero() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.) //
@@ -55,7 +55,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMinusMinus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
@@ -71,7 +71,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMinusMinusOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMinusMinus.class) //
+    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //

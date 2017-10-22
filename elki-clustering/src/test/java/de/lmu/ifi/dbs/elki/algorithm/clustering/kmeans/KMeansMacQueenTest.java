@@ -47,7 +47,7 @@ public class KMeansMacQueenTest extends AbstractClusterAlgorithmTest {
   public void testKMeansMacQueen() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansMacQueen<DoubleVector> kmeans = new ELKIBuilder<>(KMeansMacQueen.class) //
+    KMeansMacQueen<DoubleVector> kmeans = new ELKIBuilder<KMeansMacQueen<DoubleVector>>(KMeansMacQueen.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
     .build();

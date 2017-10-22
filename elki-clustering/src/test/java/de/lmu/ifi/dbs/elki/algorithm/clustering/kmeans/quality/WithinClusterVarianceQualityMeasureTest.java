@@ -53,7 +53,7 @@ public class WithinClusterVarianceQualityMeasureTest extends AbstractClusterAlgo
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // Setup algorithm
-    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<>(KMeansLloyd.class) //
+    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<KMeansLloyd<DoubleVector>>(KMeansLloyd.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstKInitialMeans.class) //
         .build();

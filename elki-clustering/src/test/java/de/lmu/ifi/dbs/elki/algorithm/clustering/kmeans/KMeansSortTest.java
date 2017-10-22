@@ -43,7 +43,7 @@ public class KMeansSortTest extends AbstractClusterAlgorithmTest {
   public void testKMeansSort() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansSort<DoubleVector> kmeans = new ELKIBuilder<>(KMeansSort.class) //
+    KMeansSort<DoubleVector> kmeans = new ELKIBuilder<KMeansSort<DoubleVector>>(KMeansSort.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build();

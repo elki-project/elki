@@ -41,7 +41,7 @@ public class XMeansTest extends AbstractClusterAlgorithmTest {
   public void testXMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
-    XMeans<DoubleVector, ?> xmeans = new ELKIBuilder<>(XMeans.class) //
+    XMeans<DoubleVector, ?> xmeans = new ELKIBuilder<XMeans<DoubleVector, ?>>(XMeans.class) //
         .with(XMeans.Parameterizer.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
         .with(XMeans.Parameterizer.INNER_KMEANS_ID, KMeansLloyd.class) //

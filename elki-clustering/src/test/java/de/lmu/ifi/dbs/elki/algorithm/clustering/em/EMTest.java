@@ -48,7 +48,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm
-    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Parameterizer.K_ID, 6) //
         .build();
@@ -66,7 +66,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   public void testEMResultsDiagonal() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Parameterizer.K_ID, 5) //
         .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
@@ -85,7 +85,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   public void testEMResultsSpherical() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
-    EM<DoubleVector, ?> em = new ELKIBuilder<>(EM.class) //
+    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Parameterizer.K_ID, 4) //
         .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //

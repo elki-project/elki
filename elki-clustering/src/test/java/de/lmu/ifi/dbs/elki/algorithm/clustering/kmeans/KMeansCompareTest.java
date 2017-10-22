@@ -43,7 +43,7 @@ public class KMeansCompareTest extends AbstractClusterAlgorithmTest {
   public void testKMeansCompare() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansCompare<DoubleVector> kmeans = new ELKIBuilder<>(KMeansCompare.class) //
+    KMeansCompare<DoubleVector> kmeans = new ELKIBuilder<KMeansCompare<DoubleVector>>(KMeansCompare.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build();

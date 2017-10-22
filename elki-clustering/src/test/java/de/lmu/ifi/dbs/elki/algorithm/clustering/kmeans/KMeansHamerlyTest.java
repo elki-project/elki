@@ -43,7 +43,7 @@ public class KMeansHamerlyTest extends AbstractClusterAlgorithmTest {
   public void testKMeansHamerly() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansHamerly<DoubleVector> kmeans = new ELKIBuilder<>(KMeansHamerly.class) //
+    KMeansHamerly<DoubleVector> kmeans = new ELKIBuilder<KMeansHamerly<DoubleVector>>(KMeansHamerly.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build();

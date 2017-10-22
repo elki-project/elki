@@ -52,7 +52,7 @@ public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractCluster
     Database db = makeSimpleDatabase(UNITTEST + "quality-measure-test.csv", 7);
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
-    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<>(KMeansLloyd.class) //
+    KMeansLloyd<DoubleVector> kmeans = new ELKIBuilder<KMeansLloyd<DoubleVector>>(KMeansLloyd.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstKInitialMeans.class) //
         .build();
