@@ -719,7 +719,11 @@ public final class FormatUtil {
     if(d.size() == 1) {
       return d.iterator().next();
     }
-    StringBuilder buffer = new StringBuilder();
+    int len = sep.length() * (d.size() - 1);
+    for(String s : d) {
+      len += s.length();
+    }
+    StringBuilder buffer = new StringBuilder(len);
     Iterator<String> it = d.iterator();
     buffer.append(it.next());
     while(it.hasNext()) {
@@ -737,14 +741,22 @@ public final class FormatUtil {
    * @return a String representing the string array d
    */
   public static String format(String[] d, String sep) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < d.length; i++) {
-      if(i > 0) {
-        buffer.append(sep).append(d[i]);
-      }
-      else {
-        buffer.append(d[i]);
-      }
+    if(d == null) {
+      return "null";
+    }
+    if(d.length == 0) {
+      return "";
+    }
+    if(d.length == 1) {
+      return d[0];
+    }
+    int len = sep.length() * (d.length - 1);
+    for(String s : d) {
+      len += s.length();
+    }
+    StringBuilder buffer = new StringBuilder(len).append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buffer.append(sep).append(d[i]);
     }
     return buffer.toString();
   }
