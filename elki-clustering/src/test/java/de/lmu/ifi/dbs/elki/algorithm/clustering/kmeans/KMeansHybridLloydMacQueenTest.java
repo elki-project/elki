@@ -47,7 +47,7 @@ public class KMeansHybridLloydMacQueenTest extends AbstractClusterAlgorithmTest 
   public void testKMeansHybridLloydMacQueen() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMeansHybridLloydMacQueen<DoubleVector> kmeans = new ELKIBuilder<>(KMeansHybridLloydMacQueen.class) //
+    KMeansHybridLloydMacQueen<DoubleVector> kmeans = new ELKIBuilder<KMeansHybridLloydMacQueen<DoubleVector>>(KMeansHybridLloydMacQueen.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build();

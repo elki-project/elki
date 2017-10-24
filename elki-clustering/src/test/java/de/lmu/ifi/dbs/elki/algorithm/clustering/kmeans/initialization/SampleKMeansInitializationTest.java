@@ -49,7 +49,7 @@ public class SampleKMeansInitializationTest extends AbstractClusterAlgorithmTest
   public void testSampleKMeansInitialization() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<>(SingleAssignmentKMeans.class) //
+    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 8) //
         .with(KMeans.INIT_ID, SampleKMeansInitialization.class) //

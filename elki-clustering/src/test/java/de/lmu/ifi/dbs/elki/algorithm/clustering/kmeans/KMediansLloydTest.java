@@ -47,7 +47,7 @@ public class KMediansLloydTest extends AbstractClusterAlgorithmTest {
   public void testKMediansLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    KMediansLloyd<DoubleVector> kmedians = new ELKIBuilder<>(KMediansLloyd.class) //
+    KMediansLloyd<DoubleVector> kmedians = new ELKIBuilder<KMediansLloyd<DoubleVector>>(KMediansLloyd.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build();

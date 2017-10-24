@@ -48,7 +48,7 @@ public class FarthestSumPointsInitialMeansTest extends AbstractClusterAlgorithmT
   public void testFarthestSumPointsInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
-    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<>(SingleAssignmentKMeans.class) //
+    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 3) //
         .with(KMeans.INIT_ID, FarthestSumPointsInitialMeans.class) //
