@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full KMeans run, and compares the result with a clustering derived
@@ -44,20 +43,14 @@ public class ParallelLloydKMeansTest extends AbstractClusterAlgorithmTest {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testParallelKMeansLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    ParallelLloydKMeans<DoubleVector> kmeans = new ELKIBuilder<ParallelLloydKMeans<DoubleVector>>(ParallelLloydKMeans.class) //
+    Clustering<?> result = new ELKIBuilder<ParallelLloydKMeans<DoubleVector>>(ParallelLloydKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

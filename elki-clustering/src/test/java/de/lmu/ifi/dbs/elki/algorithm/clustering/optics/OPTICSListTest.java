@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full OPTICS run, and compares the result with a clustering derived
@@ -42,22 +41,15 @@ public class OPTICSListTest extends AbstractClusterAlgorithmTest {
   /**
    * Run OPTICS with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testOPTICSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-
-    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSList.Parameterizer.MINPTS_ID, 18) //
         .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSList.class) //
-        .build();
-
-    // run OPTICS on database
-    Clustering<?> clustering = opticsxi.run(db);
-
+        .build().run(db);
     // This is 2 objects better than the heap based OPTICS, but this is
     // solely by chance due to different processing order.
     testFMeasure(db, clustering, 0.886757018);

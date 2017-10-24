@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full CLIQUE run, and compares the result with a clustering derived
@@ -45,21 +44,14 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   /**
    * Run CLIQUE with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testCLIQUEResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-
-    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
         .with(CLIQUE.Parameterizer.TAU_ID, "0.1") //
         .with(CLIQUE.Parameterizer.XSI_ID, 20) //
-        .build();
-
-    // run CLIQUE on database
-    Clustering<SubspaceModel> result = clique.run(db);
-
+        .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9882);
     testClusterSizes(result, new int[] { 200, 200, 216, 400 });
@@ -68,20 +60,14 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   /**
    * Run CLIQUE with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testCLIQUESubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
         .with(CLIQUE.Parameterizer.TAU_ID, 0.2) //
         .with(CLIQUE.Parameterizer.XSI_ID, 6) //
-        .build();
-
-    // run CLIQUE on database
-    Clustering<SubspaceModel> result = clique.run(db);
+        .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
@@ -90,21 +76,15 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
   /**
    * Run CLIQUE with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testCLIQUESubspaceOverlappingPrune() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    CLIQUE<DoubleVector> clique = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE<DoubleVector>>(CLIQUE.class) //
         .with(CLIQUE.Parameterizer.TAU_ID, 0.2) //
         .with(CLIQUE.Parameterizer.XSI_ID, 6) //
         .with(CLIQUE.Parameterizer.PRUNE_ID) //
-        .build();
-
-    // run CLIQUE on database
-    Clustering<SubspaceModel> result = clique.run(db);
+        .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });

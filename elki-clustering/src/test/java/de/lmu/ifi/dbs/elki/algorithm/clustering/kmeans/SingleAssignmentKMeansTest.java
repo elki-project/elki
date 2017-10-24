@@ -45,14 +45,10 @@ public class SingleAssignmentKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSingleAssignmentKMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
+    Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     // Unsurprisingly, these results are much worse than normal k-means
     testFMeasure(db, result, 0.702733122);
     testClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });

@@ -40,14 +40,9 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testLeaderResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    Leader<DoubleVector> leader = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
+    Clustering<?> result = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
         .with(Leader.Parameterizer.THRESHOLD_ID, 0.2) //
-        .build();
-
-    // run Leader on database
-    Clustering<?> result = leader.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.910848);
     testClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 13, 52, 105, 141 });
   }
@@ -59,13 +54,9 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testLeaderOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    Leader<DoubleVector> leader = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
+    Clustering<?> result = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
         .with(Leader.Parameterizer.THRESHOLD_ID, 25) //
-        .build();
-
-    // run Leader on database
-    Clustering<?> result = leader.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.61614);
     testClusterSizes(result, new int[] { 4, 139, 147, 348 });
   }

@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Perform a full 4C run, and compare the result with a clustering derived from
@@ -44,46 +43,33 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 public class FourCTest extends AbstractClusterAlgorithmTest {
   /**
-   * Run 4F with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
+   * Run 4C with fixed parameters and compare the result to a golden standard.
    */
   @Test
   public void testFourCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-
-    FourC<DoubleVector> fourc = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+    Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 0.30) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
         .with(FourC.Settings.Parameterizer.LAMBDA_ID, 1) //
-        .build();
-
-    // run 4C on database
-    Clustering<Model> result = fourc.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.7052);
     testClusterSizes(result, new int[] { 218, 382 });
   }
 
   /**
-   * Run ERiC with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
+   * Run 4C with fixed parameters and compare the result to a golden standard.
    */
   @Test
   public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-
-    FourC<DoubleVector> fourc = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+    Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 3) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
         .with(FourC.Settings.Parameterizer.LAMBDA_ID, 3) //
-        .build();
-
-    // run 4C on database
-    Clustering<Model> result = fourc.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.9073744);
     testClusterSizes(result, new int[] { 200, 202, 248 });
   }

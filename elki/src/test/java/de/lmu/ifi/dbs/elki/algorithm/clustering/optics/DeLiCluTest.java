@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -51,8 +50,6 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DeLiClu with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testDeLiCluResults() {
@@ -62,28 +59,23 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     indexparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000);
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams);
 
-    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
         .with(DeLiClu.Parameterizer.MINPTS_ID, 18) //
         .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class) //
-        .build();
-
-    // run DeLiClu on database
-    Clustering<?> clustering = opticsxi.run(db);
-
+        .build().run(db);
     // Test F-Measure
-    ByLabelClustering bylabel = new ByLabelClustering();
-    Clustering<Model> rbl = bylabel.run(db);
+    Clustering<Model> rbl = new ByLabelClustering().run(db);
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
     double score = ct.getPaircount().f1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary.
     if(Math.abs(score - 0.8771174) < 1e-5) {
-      assertEquals("Score does not match.", 0.8771174, score, 1E-5);
+      assertEquals("Score does not match.", 0.8771174, score, 1e-5);
     }
     else {
-      assertEquals("Score does not match.", 0.8819664, score, 1E-5);
+      assertEquals("Score does not match.", 0.8819664, score, 1e-5);
     }
   }
 }

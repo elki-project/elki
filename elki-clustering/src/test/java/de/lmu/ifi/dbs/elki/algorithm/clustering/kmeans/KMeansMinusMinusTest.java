@@ -38,15 +38,11 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansMinusMinusRateZero() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
+    Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -54,15 +50,11 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansMinusMinus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
+    Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -70,16 +62,12 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansMinusMinusOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMeansMinusMinus<DoubleVector> kmeans = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
+    Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
         .with(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.92674);
     testClusterSizes(result, new int[] { 100, 115, 185, 200, 200, 200 });
   }

@@ -47,18 +47,14 @@ public class CLARATest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCLARA() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    CLARA<DoubleVector> kmedians = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
         // These parameters are chosen suboptimal,
         // for better regression testing.
         .with(CLARA.Parameterizer.RANDOM_ID, 1) //
         .with(CLARA.Parameterizer.NUMSAMPLES_ID, 2) //
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 50) //
-        .build();
-
-    // run KMedians on database
-    Clustering<MedoidModel> result = kmedians.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

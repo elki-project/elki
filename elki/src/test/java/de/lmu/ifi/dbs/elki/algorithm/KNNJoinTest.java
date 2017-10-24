@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFacto
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -83,8 +82,7 @@ public class KNNJoinTest {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList knnlist = knnq.getKNNForDBID(iditer, 2);
-        meansize.put(knnlist.size());
+        meansize.put(knnq.getKNNForDBID(iditer, 2).size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
@@ -96,8 +94,7 @@ public class KNNJoinTest {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList knnlist = knnq.getKNNForDBID(iditer, 2);
-        meansize.put(knnlist.size());
+        meansize.put(knnq.getKNNForDBID(iditer, 2).size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Manhattan variance 2NN", var2nnManhattan, meansize.getSampleVariance(), 0.00001);
@@ -106,43 +103,34 @@ public class KNNJoinTest {
 
   /**
    * Test {@link RStarTree} using a file based database connection.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testKNNJoinRtreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
-
     doKNNJoin(spatparams);
   }
 
   /**
    * Test {@link RStarTree} using a file based database connection.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testKNNJoinRtreeMaxi() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 2000);
-
     doKNNJoin(spatparams);
   }
 
   /**
    * Test {@link DeLiCluTree} using a file based database connection.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testKNNJoinDeLiCluTreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, DeLiCluTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
-
     doKNNJoin(spatparams);
   }
 
@@ -150,7 +138,6 @@ public class KNNJoinTest {
    * Actual test routine.
    *
    * @param inputparams
-   * @throws ParameterException
    */
   void doKNNJoin(ListParameterization inputparams) {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
@@ -163,8 +150,7 @@ public class KNNJoinTest {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList knnlist = result.get(id);
-        meansize.put(knnlist.size());
+        meansize.put(result.get(id).size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN set size", mean2nnEuclid, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
@@ -176,8 +162,7 @@ public class KNNJoinTest {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList knnlist = result.get(id);
-        meansize.put(knnlist.size());
+        meansize.put(result.get(id).size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Manhattan variance 2NN", var2nnManhattan, meansize.getSampleVariance(), 0.00001);

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full SUBCLU run, and compares the result with a clustering derived
@@ -45,21 +44,14 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   /**
    * Run SUBCLU with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-
-    SUBCLU<DoubleVector> subclu = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
         .with(SUBCLU.EPSILON_ID, 0.001) //
         .with(SUBCLU.MINPTS_ID, 100) //
-        .build();
-
-    // run SUBCLU on database
-    Clustering<SubspaceModel> result = subclu.run(db);
-
+        .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9090);
     testClusterSizes(result, new int[] { 191, 194, 395 });
@@ -68,20 +60,14 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   /**
    * Run SUBCLU with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    SUBCLU<DoubleVector> subclu = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
         .with(SUBCLU.EPSILON_ID, 0.04) //
         .with(SUBCLU.MINPTS_ID, 70) //
-        .build();
-
-    // run SUBCLU on database
-    Clustering<SubspaceModel> result = subclu.run(db);
+        .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.49279033);
     testClusterSizes(result, new int[] { 99, 247, 303, 323, 437, 459 });

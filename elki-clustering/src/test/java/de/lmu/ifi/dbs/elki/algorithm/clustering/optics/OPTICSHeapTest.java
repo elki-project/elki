@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full OPTICS run, and compares the result with a clustering derived
@@ -42,22 +41,15 @@ public class OPTICSHeapTest extends AbstractClusterAlgorithmTest {
   /**
    * Run OPTICS with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testOPTICSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-
-    OPTICSXi opticsxi = new ELKIBuilder<>(OPTICSXi.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSHeap.Parameterizer.MINPTS_ID, 18) //
         .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSHeap.class) //
-        .build();
-
-    // run OPTICS on database
-    Clustering<?> clustering = opticsxi.run(db);
-
+        .build().run(db);
     testFMeasure(db, clustering, 0.8819664);
     testClusterSizes(clustering, new int[] { 108, 120, 209, 273 });
   }

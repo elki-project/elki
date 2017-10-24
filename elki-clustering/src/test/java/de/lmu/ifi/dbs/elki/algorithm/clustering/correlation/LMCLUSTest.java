@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Test the LMCLUS algorithm.
@@ -37,41 +36,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   /**
-   * Run 4F with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
+   * Run LMCLUS with fixed parameters and compare the result to a golden standard.
    */
   @Test
   public void testLMCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-
-    LMCLUS lmclus = new ELKIBuilder<>(LMCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
         .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
         .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
         .with(LMCLUS.Parameterizer.RANDOM_ID, 6) //
-        .build();
-
-    Clustering<Model> result = lmclus.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.487716464);
     testClusterSizes(result, new int[] { 30, 570 });
   }
 
   /**
-   * Run ERiC with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
+   * Run LMCLUS with fixed parameters and compare the result to a golden standard.
    */
   @Test
   public void testLMCLUSOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-
-    LMCLUS lmclus = new ELKIBuilder<>(LMCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
         .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
         .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
         .with(LMCLUS.Parameterizer.RANDOM_ID, 0) //
-        .build();
-
-    Clustering<Model> result = lmclus.run(db);
+        .build().run(db);
     testClusterSizes(result, new int[] { 200, 201, 249 });
     testFMeasure(db, result, 0.921865);
   }

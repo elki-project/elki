@@ -45,14 +45,10 @@ public class KMedoidsEMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsEM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMedoidsEM<DoubleVector> kmedians = new ELKIBuilder<KMedoidsEM<DoubleVector>>(KMedoidsEM.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsEM<DoubleVector>>(KMedoidsEM.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, PAMInitialMeans.class) //
-        .build();
-
-    // run KMedians on database
-    Clustering<MedoidModel> result = kmedians.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

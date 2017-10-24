@@ -43,16 +43,11 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testDOCSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-
-    DOC<DoubleVector> doc = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+    Clustering<?> result = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
         .with(DOC.Parameterizer.RANDOM_ID, 0) //
         .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
         .with(DOC.Parameterizer.BETA_ID, 0.85) //
-        .build();
-
-    // run DOC on database
-    Clustering<?> result = doc.run(db);
-
+        .build().run(db);
     testClusterSizes(result, new int[] { 200, 400 });
     testFMeasure(db, result, 1.0);
   }
@@ -63,17 +58,13 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testDOCOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    DOC<DoubleVector> doc = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+    Clustering<?> result = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
         .with(DOC.Parameterizer.RANDOM_ID, 2) //
         .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
         .with(DOC.Parameterizer.BETA_ID, 0.95) //
         .with(DOC.Parameterizer.HEURISTICS_ID) //
         .with(DOC.Parameterizer.D_ZERO_ID, 1) //
-        .build();
-
-    // run DOC on database
-    Clustering<?> result = doc.run(db);
+        .build().run(db);
     testFMeasure(db, result, .5573367);
     testClusterSizes(result, new int[] { 3, 5, 8, 8, 9, 10, 19, 42, 70, 73, 291, 312 });
   }

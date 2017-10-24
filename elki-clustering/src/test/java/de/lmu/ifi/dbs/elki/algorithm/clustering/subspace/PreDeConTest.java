@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -47,8 +46,6 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   /**
    * Run PreDeCon with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testPreDeConResults() {
@@ -58,18 +55,15 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
     Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
 
-    PreDeCon<DoubleVector> predecon = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+    Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 60) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 40) //
         .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 400) //
         .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 20.) //
         .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 4) //
-        .build();
+        .build().run(db);
 
-    // run PredeCon on database
-    Clustering<Model> result = predecon.run(db);
-
-    // FIXME: find working parameters...
+    // FIXME: find better working parameters?
     testFMeasure(db, result, 0.724752);
     testClusterSizes(result, new int[] { 43, 93, 108, 611, 638, 1007 });
   }
@@ -77,23 +71,17 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   /**
    * Run PreDeCon with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testPreDeConSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    PreDeCon<DoubleVector> predecon = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+    Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 0.3) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 10) //
         .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 0.012) //
         .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 10.) //
         .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 2) //
-        .build();
-
-    // run PredeCon on database
-    Clustering<Model> result = predecon.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.74982899);
     testClusterSizes(result, new int[] { 356, 494 });
   }

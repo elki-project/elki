@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full ORCLUS run, and compares the result with a clustering derived
@@ -44,22 +43,15 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   /**
    * Run ORCLUS with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testORCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
-
-    ORCLUS<DoubleVector> orclus = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
         .with(ORCLUS.Parameterizer.K_ID, 3) //
         .with(ORCLUS.Parameterizer.L_ID, 1) //
         .with(ORCLUS.Parameterizer.SEED_ID, 1) //
-        .build();
-
-    // run ORCLUS on database
-    Clustering<Model> result = orclus.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.627537295);
     testClusterSizes(result, new int[] { 25, 34, 391 });
   }
@@ -67,21 +59,15 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   /**
    * Run ORCLUS with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
-
-    ORCLUS<DoubleVector> orclus = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
         .with(ORCLUS.Parameterizer.K_ID, 3) //
         .with(ORCLUS.Parameterizer.L_ID, 4) //
         .with(ORCLUS.Parameterizer.SEED_ID, 0) //
-        .build();
-
-    // run ORCLUS on database
-    Clustering<Model> result = orclus.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.848054);
     testClusterSizes(result, new int[] { 189, 200, 212 });
   }

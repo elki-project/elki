@@ -46,15 +46,10 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   @Test
   public void testParallelDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    ParallelGeneralizedDBSCAN dbscan = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
-        .build();
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
@@ -66,14 +61,10 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   @Test
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    ParallelGeneralizedDBSCAN dbscan = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
-        .build();
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });
   }

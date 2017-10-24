@@ -46,15 +46,10 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testEMResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-
-    // Setup algorithm
-    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Parameterizer.K_ID, 6) //
-        .build();
-
-    // run EM on database
-    Clustering<?> result = em.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.967410);
     testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
   }
@@ -65,15 +60,11 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testEMResultsDiagonal() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-
-    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Parameterizer.K_ID, 5) //
         .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
-        .build();
-
-    // run EM on database
-    Clustering<?> result = em.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.9681384);
     testClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
   }
@@ -84,15 +75,11 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testEMResultsSpherical() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-
-    EM<DoubleVector, ?> em = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Parameterizer.K_ID, 4) //
         .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
-        .build();
-
-    // run EM on database
-    Clustering<?> result = em.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.812082);
     testClusterSizes(result, new int[] { 87, 143, 163, 317 });
   }

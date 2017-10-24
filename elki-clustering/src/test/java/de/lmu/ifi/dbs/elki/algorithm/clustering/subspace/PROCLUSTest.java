@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full PROCLUS run, and compares the result with a clustering
@@ -44,23 +43,16 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
   /**
    * Run PROCLUS with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testPROCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-
-    PROCLUS<DoubleVector> proclus = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+    Clustering<?> result = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
         .with(PROCLUS.Parameterizer.L_ID, 1) //
         .with(PROCLUS.Parameterizer.K_ID, 4) //
         // NOTE: PROCLUS quality heavily depends on random...
         .with(PROCLUS.Parameterizer.SEED_ID, 12) //
-        .build();
-
-    // run PROCLUS on database
-    Clustering<?> result = proclus.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.88499877);
     testClusterSizes(result, new int[] { 22, 36, 200, 342 });
   }
@@ -68,22 +60,16 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
   /**
    * Run PROCLUS with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testPROCLUSSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-
-    PROCLUS<DoubleVector> proclus = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+    Clustering<?> result = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
         .with(PROCLUS.Parameterizer.L_ID, 2) //
         .with(PROCLUS.Parameterizer.K_ID, 3) //
         // NOTE: PROCLUS quality heavily depends on random...
         .with(PROCLUS.Parameterizer.SEED_ID, 3) //
-        .build();
-
-    // run PROCLUS on database
-    Clustering<?> result = proclus.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.96985144);
     testClusterSizes(result, new int[] { 150, 288, 412 });
   }

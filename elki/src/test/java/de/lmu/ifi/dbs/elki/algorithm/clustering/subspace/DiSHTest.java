@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full DiSH run, and compares the result with a clustering derived
@@ -45,42 +44,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 public class DiSHTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DiSH with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testDiSHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
-
-    DiSH<DoubleVector> dish = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
         .with(DiSH.Parameterizer.EPSILON_ID, 0.005) //
         .with(DiSH.Parameterizer.MU_ID, 50) //
-        .build();
-
-    // run DiSH on database
-    Clustering<SubspaceModel> result = dish.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, .99516369);
     testClusterSizes(result, new int[] { 50, 199, 201 });
   }
 
   /**
    * Run DiSH with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testDiSHSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
-
-    DiSH<DoubleVector> dish = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
         .with(DiSH.Parameterizer.EPSILON_ID, 0.1) //
         .with(DiSH.Parameterizer.MU_ID, 40) //
         .with(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI) //
-        .build();
-
-    // run DiSH on database
-    Clustering<SubspaceModel> result = dish.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.653797548);
     testClusterSizes(result, new int[] { 61, 84, 148, 188, 289, 330 });
   }

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full SNNClustering run, and compares the result with a clustering
@@ -44,21 +43,15 @@ public class SNNClusteringTest extends AbstractClusterAlgorithmTest {
   /**
    * Run SNNClustering with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testSNNClusteringResults() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
-
-    SNNClustering<DoubleVector> snn = new ELKIBuilder<SNNClustering<DoubleVector>>(SNNClustering.class) //
+    Clustering<Model> result = new ELKIBuilder<SNNClustering<DoubleVector>>(SNNClustering.class) //
         .with(SNNClustering.Parameterizer.EPSILON_ID, 77) //
         .with(SNNClustering.Parameterizer.MINPTS_ID, 28) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100) //
-        .build();
-
-    // run SNN on database
-    Clustering<Model> result = snn.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.832371422);
     testClusterSizes(result, new int[] { 73, 228, 213, 219, 231, 236 });
   }

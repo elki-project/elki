@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilt
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Perform a full ERiC run, and compare the result with a clustering derived
@@ -50,58 +49,45 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 public class ERiCTest extends AbstractClusterAlgorithmTest {
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-
-    ERiC<DoubleVector> eric = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 30) //
         // ERiC Distance function in DBSCAN:
         .with(ERiC.Parameterizer.DELTA_ID, 0.20) //
         .with(ERiC.Parameterizer.TAU_ID, 0.04) //
         .with(ERiC.Parameterizer.K_ID, 50) //
-        // PCA
+        // PCA options:
         .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
         .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class) //
         .with(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60) //
-        .build();
-
-    // run ERiC on database
-    Clustering<CorrelationModel> result = eric.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.728074); // Hierarchical pairs scored: 0.9204825
     testClusterSizes(result, new int[] { 109, 188, 303 });
   }
 
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-
-    ERiC<DoubleVector> eric = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
         // ERiC
         .with(DBSCAN.Parameterizer.MINPTS_ID, 15) //
         // ERiC Distance function in DBSCAN:
         .with(ERiC.Parameterizer.DELTA_ID, 1.0) //
         .with(ERiC.Parameterizer.TAU_ID, 1.0) //
         .with(ERiC.Parameterizer.K_ID, 45) //
-        // PCA
+        // PCA options:
         .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
         .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
         .with(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6) //
-        .build();
-
-    // run ERiC on database
-    Clustering<CorrelationModel> result = eric.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.831136946);
     testClusterSizes(result, new int[] { 29, 189, 207, 225 });
   }

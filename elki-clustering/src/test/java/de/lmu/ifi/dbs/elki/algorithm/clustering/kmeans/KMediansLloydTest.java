@@ -46,14 +46,10 @@ public class KMediansLloydTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMediansLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMediansLloyd<DoubleVector> kmedians = new ELKIBuilder<KMediansLloyd<DoubleVector>>(KMediansLloyd.class) //
+    Clustering<?> result = new ELKIBuilder<KMediansLloyd<DoubleVector>>(KMediansLloyd.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build();
-
-    // run KMedians on database
-    Clustering<?> result = kmedians.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

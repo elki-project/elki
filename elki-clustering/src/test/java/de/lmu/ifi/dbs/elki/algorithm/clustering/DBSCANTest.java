@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a full DBSCAN run, and compares the result with a clustering derived
@@ -44,21 +43,14 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DBSCAN with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    DBSCAN<DoubleVector> dbscan = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
-        .build();
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
@@ -66,20 +58,14 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DBSCAN with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    DBSCAN<DoubleVector> dbscan = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
-        .build();
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });
   }

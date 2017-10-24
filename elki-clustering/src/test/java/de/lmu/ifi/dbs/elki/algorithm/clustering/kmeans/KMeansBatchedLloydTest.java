@@ -42,16 +42,12 @@ public class KMeansBatchedLloydTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansBatchedLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    KMeansBatchedLloyd<DoubleVector> kmeans = new ELKIBuilder<KMeansBatchedLloyd<DoubleVector>>(KMeansBatchedLloyd.class) //
+    Clustering<?> result = new ELKIBuilder<KMeansBatchedLloyd<DoubleVector>>(KMeansBatchedLloyd.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeansBatchedLloyd.Parameterizer.BLOCKS_ID, 10) //
         .with(KMeansBatchedLloyd.Parameterizer.RANDOM_ID, 0) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

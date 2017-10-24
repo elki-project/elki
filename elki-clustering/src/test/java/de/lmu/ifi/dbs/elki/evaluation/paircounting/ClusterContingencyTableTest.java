@@ -30,14 +30,12 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
- * Validate {@link ClusterContingencyTable} with respect to its ability to compare
+ * Validate {@link ClusterContingencyTable} with respect to its ability to
+ * compare
  * data clusterings.
  *
  * @author Erich Schubert
@@ -53,28 +51,14 @@ public class ClusterContingencyTableTest {
   /**
    * Validate {@link ClusterContingencyTable} with respect to its ability to
    * compare data clusterings.
-   *
-   * @throws ParameterException on errors.
    */
   @Test
   public void testCompareDatabases() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    // verify data set size.
-    Relation<?> rel = db.getRelation(TypeUtil.ANY);
-    assertEquals("Data set size not as expected", shoulds, rel.size());
-
-    // run all-in-one
-    TrivialAllInOne allinone = new TrivialAllInOne();
-    Clustering<Model> rai = allinone.run(db);
-
-    // run all-in-noise
-    TrivialAllNoise allinnoise = new TrivialAllNoise();
-    Clustering<Model> ran = allinnoise.run(db);
-
-    // run by-label
-    ByLabelClustering bylabel = new ByLabelClustering();
-    Clustering<?> rbl = bylabel.run(db);
+    Clustering<Model> rai = new TrivialAllInOne().run(db);
+    Clustering<Model> ran = new TrivialAllNoise().run(db);
+    Clustering<?> rbl = new ByLabelClustering().run(db);
 
     assertEquals(1.0, computeFMeasure(rai, rai, false), Double.MIN_VALUE);
     assertEquals(1.0, computeFMeasure(ran, ran, false), Double.MIN_VALUE);

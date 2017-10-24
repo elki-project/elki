@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Performs a single assignment with different k-means initializations.
@@ -41,21 +40,15 @@ public class FarthestPointsInitialMeansTest extends AbstractClusterAlgorithmTest
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testFarthestPointsInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-
-    SingleAssignmentKMeans<DoubleVector> kmeans = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
+    Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 3) //
         .with(KMeans.INIT_ID, FarthestPointsInitialMeans.class) //
-        .build();
-
-    // run KMeans on database
-    Clustering<?> result = kmeans.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.88132453);
     testClusterSizes(result, new int[] { 128, 199, 201, 201, 271 });
   }

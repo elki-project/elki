@@ -39,15 +39,10 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testLSDBCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    LSDBC<DoubleVector> dbscan = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
+    Clustering<Model> result = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
         .with(LSDBC.Parameterizer.ALPHA_ID, 0.4) //
         .with(LSDBC.Parameterizer.K_ID, 20) //
-        .build();
-
-    // run LSDBC on database
-    Clustering<Model> result = dbscan.run(db);
-
+        .build().run(db);
     testFMeasure(db, result, 0.44848979);
     testClusterSizes(result, new int[] { 38, 38, 41, 54, 159 });
   }
@@ -55,14 +50,10 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testLSDBCOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    LSDBC<DoubleVector> dbscan = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
+    Clustering<Model> result = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
         .with(LSDBC.Parameterizer.ALPHA_ID, 0.2) //
         .with(LSDBC.Parameterizer.K_ID, 120) //
-        .build();
-
-    // run LSDBC on database
-    Clustering<Model> result = dbscan.run(db);
+        .build().run(db);
     testFMeasure(db, result, 0.95681073);
     testClusterSizes(result, new int[] { 32, 197, 203, 206 });
   }
