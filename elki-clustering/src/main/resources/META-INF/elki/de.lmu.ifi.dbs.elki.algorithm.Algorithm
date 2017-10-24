@@ -56,6 +56,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS
 de.lmu.ifi.dbs.elki.algorithm.clustering.onedimensional.KNNKernelDensityMinimaClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DOC
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.FastDOC
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.P3C
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon
