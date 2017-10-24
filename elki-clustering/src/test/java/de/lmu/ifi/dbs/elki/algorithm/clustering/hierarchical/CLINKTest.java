@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -47,15 +46,10 @@ public class CLINKTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    CutDendrogramByNumberOfClusters slink = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 2) //
         .with(AbstractAlgorithm.ALGORITHM_ID, CLINK.class) //
-        .build();
-
-    // run SLINK on database
-    Result result = slink.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+        .build().run(db);
     testFMeasure(db, clustering, 0.5147426);
     testClusterSizes(clustering, new int[] { 131, 507 });
   }

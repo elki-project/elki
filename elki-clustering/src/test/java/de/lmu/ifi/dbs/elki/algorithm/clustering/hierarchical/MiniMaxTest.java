@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -46,15 +45,10 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testMiniMax() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMax.class) //
-        .build();
-
-    // run clustering algorithm on database
-    Result result = c.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+        .build().run(db);
     testFMeasure(db, clustering, 0.938662648);
     testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
@@ -66,15 +60,10 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testMiniMax2() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMax.class) //
-        .build();
-
-    // run clustering algorithm on database
-    Result result = c.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+        .build().run(db);
     testFMeasure(db, clustering, 0.914592130);
     testClusterSizes(clustering, new int[] { 59, 112, 159 });
   }

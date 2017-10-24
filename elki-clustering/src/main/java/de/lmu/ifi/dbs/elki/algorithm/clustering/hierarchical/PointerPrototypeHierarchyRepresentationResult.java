@@ -86,9 +86,10 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
     // Find the last merge within the cluster.
     // The object with maximum priority will merge outside of the cluster,
     // So we need the second largest priority.
-    DBIDVar proto = DBIDUtil.newVar(), last = DBIDUtil.newVar();
+    DBIDIter it = members.iter();
+    DBIDVar proto = DBIDUtil.newVar(it), last = DBIDUtil.newVar(it);
     int maxprio = Integer.MIN_VALUE, secprio = Integer.MIN_VALUE;
-    for(DBIDIter it = members.iter(); it.valid(); it.advance()) {
+    for(; it.valid(); it.advance()) {
       int prio = mergeOrder.intValue(it);
       if(prio > maxprio) {
         secprio = maxprio;

@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -39,16 +38,23 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
   @Test
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    CutDendrogramByNumberOfClusters slink = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
-        .build();
-
-    // run SLINK on database
-    Result result = slink.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+        .build().run(db);
     testFMeasure(db, clustering, 0.9474250948);
     testClusterSizes(clustering, new int[] { 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
+  }
+
+  @Test
+  public void testSLINKHierarchical() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.HIERARCHICAL_ID) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .build().run(db);
+    testFMeasure(db, clustering, 0.9474250948);
+    testClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }
 }

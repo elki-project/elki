@@ -342,8 +342,13 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      */
     protected Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members) {
       final String name;
-      if(members == null || (members.size() == 1 && members.contains(lead))) {
+      if(members == null || members.size() == 1 && members.contains(lead)) {
         name = "obj_" + DBIDUtil.toString(lead);
+        if (members == null) {
+          ArrayModifiableDBIDs m = DBIDUtil.newArray(1);
+          m.add(lead);
+          members = m;
+        }
       }
       else if(members.size() == 0) {
         name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;

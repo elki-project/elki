@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -46,16 +45,11 @@ public class SLINKHDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testHDBSCAN() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    CutDendrogramByNumberOfClusters c = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
         .with(SLINKHDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
-        .build();
-
-    // run clustering algorithm on database
-    Result result = c.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+        .build().run(db);
     testFMeasure(db, clustering, 0.686953412);
     testClusterSizes(clustering, new int[] { 1, 200, 437 });
   }

@@ -24,10 +24,10 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -39,16 +39,45 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
   @Test
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
     HDBSCANHierarchyExtraction slink = new ELKIBuilder<>(HDBSCANHierarchyExtraction.class) //
         .with(HDBSCANHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
         .build();
+    testFMeasure(db, slink.run(db), 0.9407684);
+    testClusterSizes(slink.run(db), new int[] { 8, 62, 104, 156 });
+  }
 
-    // run SLINK on database
-    Result result = slink.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
-    testFMeasure(db, clustering, 0.9407684);
-    testClusterSizes(clustering, new int[] { 8, 62, 104, 156 });
+  @Test
+  public void testSLINKDegenerate() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    HDBSCANHierarchyExtraction slink = new ELKIBuilder<>(HDBSCANHierarchyExtraction.class) //
+        .with(HDBSCANHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 1) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .build();
+    testFMeasure(db, slink.run(db), 0.497315);
+    testClusterSizes(slink.run(db), new int[] { 0, 1, 329 });
+  }
+
+  @Test
+  public void testHDBSCANResults() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    HDBSCANHierarchyExtraction slink = new ELKIBuilder<>(HDBSCANHierarchyExtraction.class) //
+        .with(HDBSCANHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .build();
+    testFMeasure(db, slink.run(db), 0.97218);
+    testClusterSizes(slink.run(db), new int[] { 21, 54, 103, 152 });
+  }
+
+  @Test
+  public void testMiniMaxNNResults() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    HDBSCANHierarchyExtraction slink = new ELKIBuilder<>(HDBSCANHierarchyExtraction.class) //
+        .with(HDBSCANHierarchyExtraction.Parameterizer.MINCLUSTERSIZE_ID, 50) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxNNChain.class) //
+        .build();
+    testFMeasure(db, slink.run(db), 0.91459);
+    testClusterSizes(slink.run(db), new int[] { 0, 59, 112, 159 });
   }
 }
