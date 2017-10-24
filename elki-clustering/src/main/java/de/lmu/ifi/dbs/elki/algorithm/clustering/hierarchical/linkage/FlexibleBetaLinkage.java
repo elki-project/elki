@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -50,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "The computer journal 9.4", //
     url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
 @Alias({ "flex", "beta", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod" })
+@Priority(Priority.DEFAULT - 2) // Rather uncommon
 public class FlexibleBetaLinkage implements Linkage {
   /**
    * Alpha parameter, derived from beta.

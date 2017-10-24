@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
@@ -45,7 +46,8 @@ import net.jafama.FastMath;
     title = "Hierarchical grouping to optimize an objective function", //
     booktitle = "Journal of the American statistical association 58.301", //
     url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
-@Alias({ "ward", "ssq", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
+@Alias({ "ward", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
+@Priority(Priority.IMPORTANT + 1)
 public class WardLinkage implements Linkage {
   /**
    * Static instance of class.

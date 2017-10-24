@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -43,9 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.6.0
  */
 @Reference(authors = "A. K. Jain and R. C. Dubes", //
-title = "Algorithms for Clustering Data", //
-booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+    title = "Algorithms for Clustering Data", //
+    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
 @Alias({ "wpgma", "WPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMethod" })
+@Priority(Priority.DEFAULT - 1)
 public class WeightedAverageLinkage implements Linkage {
   /**
    * Static instance of class.

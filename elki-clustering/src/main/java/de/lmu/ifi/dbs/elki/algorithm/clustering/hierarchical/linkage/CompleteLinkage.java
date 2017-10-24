@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.5.0
  */
 @Alias({ "complete", "clink", "complete-link", "farthest-neighbor", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CompleteLinkageMethod" })
+@Priority(Priority.IMPORTANT)
 public class CompleteLinkage implements Linkage {
   /**
    * Static instance of class.

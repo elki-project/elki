@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Sur la liaison et la division des points d'un ensemble fini", //
     booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
 @Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SingleLinkageMethod" })
+@Priority(Priority.IMPORTANT)
 public class SingleLinkage implements Linkage {
   /**
    * Static instance of class.

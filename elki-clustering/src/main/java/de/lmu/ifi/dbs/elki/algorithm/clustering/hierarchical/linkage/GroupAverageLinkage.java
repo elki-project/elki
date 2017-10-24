@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Algorithms for Clustering Data", //
     booktitle = "Algorithms for Clustering Data, Prentice-Hall")
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod" })
+@Priority(Priority.RECOMMENDED + 1)
 public class GroupAverageLinkage implements Linkage {
   /**
    * Static instance of class.
