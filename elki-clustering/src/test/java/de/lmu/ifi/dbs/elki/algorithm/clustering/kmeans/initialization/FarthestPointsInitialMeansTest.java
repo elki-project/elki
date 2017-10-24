@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -51,5 +52,24 @@ public class FarthestPointsInitialMeansTest extends AbstractClusterAlgorithmTest
         .build().run(db);
     testFMeasure(db, result, 0.88132453);
     testClusterSizes(result, new int[] { 128, 199, 201, 201, 271 });
+  }
+
+  /**
+   * Run CLARA with fixed parameters and compare the result to a golden
+   * standard.
+   */
+  @Test
+  public void testFarthestPointsInitialMedoids() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+    Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 3) //
+        .with(KMeans.INIT_ID, FarthestPointsInitialMeans.class) //
+        .with(KMeans.MAXITER_ID, 1) //
+        .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
+        .with(CLARA.Parameterizer.RANDOM_ID, 0) //
+        .build().run(db);
+    testFMeasure(db, result, 0.8832692);
+    testClusterSizes(result, new int[] { 128, 200, 200, 201, 271 });
   }
 }

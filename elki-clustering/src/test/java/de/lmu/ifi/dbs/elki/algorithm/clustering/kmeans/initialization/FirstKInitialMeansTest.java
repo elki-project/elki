@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -50,5 +51,23 @@ public class FirstKInitialMeansTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, result, 0.62025907);
     testClusterSizes(result, new int[] { 23, 38, 226, 258, 455 });
+  }
+
+  /**
+   * Run CLARA with fixed parameters and compare the result to a golden
+   * standard.
+   */
+  @Test
+  public void testFirstKInitialMedoids() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+    Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.INIT_ID, FirstKInitialMeans.class) //
+        .with(KMeans.MAXITER_ID, 1) //
+        .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
+        .with(CLARA.Parameterizer.RANDOM_ID, 0) //
+        .build().run(db);
+    testFMeasure(db, result, 0.7454859);
+    testClusterSizes(result, new int[] { 45, 155, 200, 287, 313 });
   }
 }
