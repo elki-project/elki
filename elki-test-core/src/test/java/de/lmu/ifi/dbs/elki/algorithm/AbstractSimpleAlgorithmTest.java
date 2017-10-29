@@ -20,25 +20,20 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -55,22 +50,6 @@ public abstract class AbstractSimpleAlgorithmTest {
   public final static String UNITTEST = "elki/testdata/unittests/";
 
   /**
-   * Validate that parameterization succeeded: no parameters left, no
-   * parameterization errors.
-   *
-   * @param config Parameterization to test
-   */
-  public static void testParameterizationOk(ListParameterization config) {
-    if(config.hasUnusedParameters()) {
-      fail("Unused parameters: " + config.getRemainingParameters());
-    }
-    if(config.hasErrors()) {
-      config.logAndClearReportedErrors();
-      fail("Parameterization errors.");
-    }
-  }
-
-  /**
    * Generate a simple DoubleVector database from a file.
    *
    * @param filename File to load
@@ -78,7 +57,11 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Database
    */
   public static Database makeSimpleDatabase(String filename, int expectedSize) {
-    return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
+    ListParameterization params = new ListParameterization();
+    // Use a fixed DBID - historically, we used 1 indexed - to reduce random
+    // variation in results due to different hash codes everywhere.
+    params.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    return makeSimpleDatabase(filename, expectedSize, params);
   }
 
   /**
@@ -89,32 +72,26 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param params Extra parameters
    * @return Database
    */
-  public static Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>... filters) {
+  public static Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
+    assertNotNull("Params, if given, must not be null.", params);
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
-      if(params == null) {
-        params = new ListParameterization();
-      }
-      // Instantiate filters manually. TODO: redesign
-      List<ObjectFilter> filterlist = new ArrayList<>();
-      filterlist.add(new FixedDBIDsFilter(1));
-      if(filters != null) {
-        for(Class<?> filtercls : filters) {
-          ObjectFilter filter = ClassGenericsUtil.parameterizeOrAbort(filtercls, params);
-          filterlist.add(filter);
-        }
-      }
-      // Setup parser and data loading
-      NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(DoubleVector.FACTORY);
-      InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, filterlist, parser);
-
-      // We want to allow the use of indexes via "params"
-      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
+      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class);
+      params.addParameter(InputStreamDatabaseConnection.Parameterizer.STREAM_ID, is);
       Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
 
-      testParameterizationOk(params);
+      // Ensure we have no unused parameters:
+      if(params.hasUnusedParameters()) {
+        fail("Unused parameters: " + params.getRemainingParameters());
+      }
+      // And report any parameterization errors:
+      if(params.hasErrors()) {
+        params.logAndClearReportedErrors();
+        fail("Parameterization errors.");
+      }
 
       db.initialize();
+      // Check the relation has the expected size:
       Relation<?> rel = db.getRelation(TypeUtil.ANY);
       if(expectedSize > 0) {
         assertEquals("Database size does not match.", expectedSize, rel.size());

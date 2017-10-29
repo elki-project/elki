@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -112,6 +114,9 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactEuclidean(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    // Use a fixed DBID - historically, we used 1 indexed - to reduce random
+    // variation in results due to different hash codes everywhere.
+    inputparams.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
@@ -162,6 +167,9 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactCosine(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    // Use a fixed DBID - historically, we used 1 indexed - to reduce random
+    // variation in results due to different hash codes everywhere.
+    inputparams.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistanceFunction.STATIC);

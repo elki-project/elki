@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * This unit test verifies that the linear scan produces the reference result.
@@ -37,7 +38,7 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExact() {
-    testExactEuclidean(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    testExactEuclidean(new ListParameterization(), LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 
   /**
@@ -45,6 +46,6 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExactCosine() {
-    testExactCosine(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    testExactCosine(new ListParameterization(), LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 }

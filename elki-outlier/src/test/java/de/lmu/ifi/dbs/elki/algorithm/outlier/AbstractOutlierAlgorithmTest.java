@@ -26,8 +26,9 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -80,7 +81,10 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
   protected void testSingleScore(OutlierResult result, int id, double expected) {
     assertNotNull("No outlier result", result);
     assertNotNull("No score result.", result.getScores());
-    final DBID dbid = DBIDUtil.importInteger(id);
+    DBIDs ids = result.getScores().getDBIDs();
+    assertTrue("IDs must be array-based", ids instanceof ArrayDBIDs);
+    // Translate offset. We used to use 1-indexed
+    DBIDRef dbid = ((ArrayDBIDs) ids).iter().seek(id - 1);
     assertNotNull("No result for ID " + id, result.getScores().doubleValue(dbid));
     double actual = result.getScores().doubleValue(dbid);
     assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);

@@ -33,7 +33,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Database connection expecting input from an input stream such as stdin.
@@ -136,15 +138,36 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+    /**
+     * Input stream to read.
+     * <p>
+     * Key: {@code -dbc.inputstream}
+     * </p>
+     * 
+     * Note that this parameter is not used by the subclass
+     * {@link FileBasedDatabaseConnection}. It is mostly useful with the
+     * Parameterization API from java.
+     */
+    public static final OptionID STREAM_ID = new OptionID("dbc.inputstream", "Input stream to read. Defaults to standard input.");
+
+    /**
+     * Input stream.
+     */
+    protected InputStream instream;
+
     @Override
     protected void makeOptions(Parameterization config) {
+      ObjectParameter<InputStream> inP = new ObjectParameter<>(STREAM_ID, InputStream.class, System.in);
+      if(config.grab(inP)) {
+        instream = inP.instantiateClass(config);
+      }
       configParser(config, Parser.class, NumberVectorLabelParser.class);
       configFilters(config);
     }
 
     @Override
     protected InputStreamDatabaseConnection makeInstance() {
-      return new InputStreamDatabaseConnection(System.in, filters, parser);
+      return new InputStreamDatabaseConnection(instream, filters, parser);
     }
   }
 }

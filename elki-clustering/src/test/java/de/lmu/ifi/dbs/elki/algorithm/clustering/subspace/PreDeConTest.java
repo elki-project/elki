@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -51,9 +52,9 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   public void testPreDeConResults() {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
+    inp.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, ClassLabelFilter.class);
     inp.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 1);
-    Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
-    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
 
     Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
         .with(DBSCAN.Parameterizer.EPSILON_ID, 60) //
@@ -70,7 +71,7 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
 
   /**
    * Run PreDeCon with fixed parameters and compare the result to a golden
-   * standard.
+   * standard.O
    */
   @Test
   public void testPreDeConSubspaceOverlapping() {
