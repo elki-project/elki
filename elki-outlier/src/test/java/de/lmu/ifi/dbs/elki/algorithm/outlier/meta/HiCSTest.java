@@ -41,17 +41,12 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHiCSKS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    HiCS<DoubleVector> fb = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
+    OutlierResult result = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(HiCS.Parameterizer.LIMIT_ID, 10) //
         .with(HiCS.Parameterizer.SEED_ID, 0) //
         .with(HiCS.Parameterizer.TEST_ID, KolmogorovSmirnovTest.STATIC) //
-        .build();
-
-    // run HiCS on database
-    OutlierResult result = fb.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.85340056);
     testSingleScore(result, 1293, 4.935802);
   }
@@ -59,17 +54,12 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHiCSWelch() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    HiCS<DoubleVector> fb = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
+    OutlierResult result = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(HiCS.Parameterizer.LIMIT_ID, 10) //
         .with(HiCS.Parameterizer.SEED_ID, 0) //
         .with(HiCS.Parameterizer.TEST_ID, WelchTTest.STATIC) //
-        .build();
-
-    // run HiCS on database
-    OutlierResult result = fb.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.867159);
     testSingleScore(result, 1293, 4.7877822);
   }

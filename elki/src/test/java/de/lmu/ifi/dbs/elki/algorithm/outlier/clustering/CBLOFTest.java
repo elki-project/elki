@@ -39,16 +39,12 @@ public class CBLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testCBLOFDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    CBLOF<DoubleVector> cblof = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
+    OutlierResult result = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
         .with(CBLOF.Parameterizer.ALPHPA_ID, 0.8) //
         .with(CBLOF.Parameterizer.BETA_ID, 3) //
         .with(CBLOF.Parameterizer.CLUSTERING_ID, KMeansSort.class) //
         .with(KMeans.K_ID, 1) //
-        .build();
-
-    OutlierResult result = cblof.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.8232666666666666);
     testSingleScore(result, 416, 260.80721255987174);
   }

@@ -37,15 +37,10 @@ public class IDOSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    IDOS<DoubleVector> idos = new ELKIBuilder<IDOS<DoubleVector>>(IDOS.class) //
+    OutlierResult result = new ELKIBuilder<IDOS<DoubleVector>>(IDOS.class) //
         .with(IDOS.Parameterizer.KC_ID, 100) //
         .with(IDOS.Parameterizer.KR_ID, 20) //
-        .build();
-
-    // run KNNOutlier on database
-    OutlierResult result = idos.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.9194814);
     testSingleScore(result, 945, 1.130819);
   }

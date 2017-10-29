@@ -40,15 +40,11 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testKMeansOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    KMeansOutlierDetection<DoubleVector> silout = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
         .with(KMeansOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 0) //
-        .build();
-
-    OutlierResult result = silout.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.80386666);
     testSingleScore(result, 416, 0.01551616);
   }

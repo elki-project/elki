@@ -89,22 +89,16 @@ public class OnlineLOFTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testOnlineLOF() {
-    // LoggingConfiguration.setLevelFor("de.lmu.ifi.dbs.elki.algorithm.outlier.lof",
-    // Level.FINEST.toString());
-
     UpdatableDatabase db = getDatabase();
 
     // 1. Run LOF
     FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
-    OutlierResult result1 = lof.run(db);
+    DoubleRelation scores1 = lof.run(db).getScores();
 
     // 2. Run OnlineLOF (with insertions and removals) on database
-    OutlierResult result2 = runOnlineLOF(db);
+    DoubleRelation scores2 = runOnlineLOF(db).getScores();
 
     // 3. Compare results
-    DoubleRelation scores1 = result1.getScores();
-    DoubleRelation scores2 = result2.getScores();
-
     for(DBIDIter id = scores1.getDBIDs().iter(); id.valid(); id.advance()) {
       double lof1 = scores1.doubleValue(id);
       double lof2 = scores2.doubleValue(id);
@@ -151,5 +145,4 @@ public class OnlineLOFTest {
     db.initialize();
     return db;
   }
-
 }

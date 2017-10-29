@@ -42,12 +42,8 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
-        .with(COP.Parameterizer.K_ID, 30).build();
-
-    OutlierResult result = cop.run(db);
-
+    OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+        .with(COP.Parameterizer.K_ID, 30).build().run(db);
     testAUC(db, "Noise", result, 0.89476666);
     testSingleScore(result, 416, 0.26795866);
   }
@@ -55,16 +51,12 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testCOPRobust() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+    OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
         .with(COP.Parameterizer.K_ID, 30)//
         .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
         .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
         .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
-        .build();
-
-    OutlierResult result = cop.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.90166666);
     testSingleScore(result, 416, 0.25705955);
   }
@@ -72,18 +64,14 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testCOPRANSAC() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    COP<DoubleVector> cop = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+    OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
         .with(COP.Parameterizer.K_ID, 30)//
         .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
         .with(AutotuningPCA.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
         .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class)//
         .with(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25) //
         .with(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0) //
-        .build();
-
-    OutlierResult result = cop.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.89526);
     testSingleScore(result, 416, 0.382879);
   }

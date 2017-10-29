@@ -37,12 +37,7 @@ public class GaussianUniformMixtureTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testGaussianUniformMixture() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
-
-    GaussianUniformMixture<DoubleVector> gaussianUniformMixture = new ELKIBuilder<GaussianUniformMixture<DoubleVector>>(GaussianUniformMixture.class).build();
-
-    // run GaussianUniformMixture on database
-    OutlierResult result = gaussianUniformMixture.run(db);
-
+    OutlierResult result = new ELKIBuilder<GaussianUniformMixture<DoubleVector>>(GaussianUniformMixture.class).build().run(db);
     testSingleScore(result, 1025, -20.27211494);
     testAUC(db, "Noise", result, 0.97251282);
   }

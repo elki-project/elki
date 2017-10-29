@@ -31,8 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 /**
  * Tests the LB-ABOD algorithm.
  *
- * Note: we don't implement JUnit4Test, as this test is slow.
- *
  * @author Lucia Cichella
  * @since 0.4.0
  */
@@ -40,15 +38,10 @@ public class LBABODTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testLBABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    LBABOD<DoubleVector> abod = new ELKIBuilder<LBABOD<DoubleVector>>(LBABOD.class) //
+    OutlierResult result = new ELKIBuilder<LBABOD<DoubleVector>>(LBABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 150) //
         .with(LBABOD.Parameterizer.L_ID, 10) //
-        .build();
-
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.92279629629629);
     testSingleScore(result, 945, 2.0897348547799E-5);
   }

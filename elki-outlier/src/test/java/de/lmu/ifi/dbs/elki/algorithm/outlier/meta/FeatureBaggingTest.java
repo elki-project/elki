@@ -38,16 +38,11 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testFeatureBaggingSum() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    FeatureBagging fb = new ELKIBuilder<>(FeatureBagging.class) //
+    OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
         .with(FeatureBagging.Parameterizer.SEED_ID, 1) //
-        .build();
-
-    // run AggarwalYuEvolutionary on database
-    OutlierResult result = fb.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.94758434);
     testSingleScore(result, 1293, 12.816102);
   }
@@ -55,17 +50,12 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testFeatureBaggingBreadth() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    FeatureBagging fb = new ELKIBuilder<>(FeatureBagging.class) //
+    OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
         .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
         .with(FeatureBagging.Parameterizer.SEED_ID, 5) //
         .with(FeatureBagging.Parameterizer.BREADTH_ID) //
-        .build();
-
-    // run AggarwalYuEvolutionary on database
-    OutlierResult result = fb.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.92470588);
     testSingleScore(result, 1293, 1.2047264);
   }

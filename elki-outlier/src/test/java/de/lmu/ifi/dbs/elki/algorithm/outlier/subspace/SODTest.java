@@ -39,15 +39,10 @@ public class SODTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testSOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    SOD<DoubleVector> sod = new ELKIBuilder<SOD<DoubleVector>>(SOD.class) //
+    OutlierResult result = new ELKIBuilder<SOD<DoubleVector>>(SOD.class) //
         .with(SOD.Parameterizer.KNN_ID, 25) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19) //
-        .build();
-
-    // run SOD on database
-    OutlierResult result = sod.run(db);
-
+        .build().run(db);
     testSingleScore(result, 1293, 1.5167500);
     testAUC(db, "Noise", result, 0.949131652);
   }

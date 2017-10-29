@@ -38,14 +38,9 @@ public class VarianceOfVolumeTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testVOV() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    VarianceOfVolume<DoubleVector> lof = new ELKIBuilder<VarianceOfVolume<DoubleVector>>(VarianceOfVolume.class) //
+    OutlierResult result = new ELKIBuilder<VarianceOfVolume<DoubleVector>>(VarianceOfVolume.class) //
         .with(VarianceOfVolume.Parameterizer.K_ID, 10) //
-        .build();
-
-    // run LOF on database
-    OutlierResult result = lof.run(db);
-
+        .build().run(db);
     testSingleScore(result, 1293, 2.0733100852601836e13);
     testAUC(db, "Noise", result, 0.9306946778);
   }

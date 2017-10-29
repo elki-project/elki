@@ -37,13 +37,8 @@ public class ISOSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ISOS<DoubleVector> isos = new ELKIBuilder<ISOS<DoubleVector>>(ISOS.class) //
-        .with(ISOS.Parameterizer.KNN_ID, 100).build();
-
-    // run KNNOutlier on database
-    OutlierResult result = isos.run(db);
-
+    OutlierResult result = new ELKIBuilder<ISOS<DoubleVector>>(ISOS.class) //
+        .with(ISOS.Parameterizer.KNN_ID, 100).build().run(db);
     testAUC(db, "Noise", result, 0.946333);
     testSingleScore(result, 945, 0.05128157);
   }

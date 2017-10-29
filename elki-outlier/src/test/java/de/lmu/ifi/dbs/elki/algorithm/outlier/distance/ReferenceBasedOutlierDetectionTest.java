@@ -29,7 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.referencepoints.*;
 
 /**
- * Tests the ReferenceBasedOutlierDetection algorithm.
+ * Tests the ReferenceBasedOutlierDetection algorithm, with different reference
+ * point strategies.
  *
  * @author Lucia Cichella
  * @author Erich Schubert
@@ -37,17 +38,12 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.*;
  */
 public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testReferenceBasedOutlierDetection() {
+  public void testReferenceBasedOutlierDetectionGridBased() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
         .with(GridBasedReferencePoints.Parameterizer.GRID_ID, 3)//
-        .build();
-
-    // run ReferenceBasedOutlierDetection on database
-    OutlierResult result = referenceBasedOutlierDetection.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.9693703703703);
     testSingleScore(result, 945, 0.933574455);
   }
@@ -55,15 +51,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   @Test
   public void testReferenceBasedOutlierDetectionStar() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, StarBasedReferencePoints.class) //
-        .build();
-
-    // run ReferenceBasedOutlierDetection on database
-    OutlierResult result = referenceBasedOutlierDetection.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.910722222);
     testSingleScore(result, 945, 0.920950222);
   }
@@ -71,15 +62,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   @Test
   public void testReferenceBasedOutlierDetectionAxis() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, AxisBasedReferencePoints.class) //
-        .build();
-
-    // run ReferenceBasedOutlierDetection on database
-    OutlierResult result = referenceBasedOutlierDetection.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.858953703);
     testSingleScore(result, 945, 0.9193032738);
   }
@@ -87,17 +73,12 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   @Test
   public void testReferenceBasedOutlierDetectionGenerated() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomGeneratedReferencePoints.class)//
         .with(RandomGeneratedReferencePoints.Parameterizer.N_ID, 15)//
         .with(RandomGeneratedReferencePoints.Parameterizer.RANDOM_ID, 0)//
-        .build();
-
-    // run ReferenceBasedOutlierDetection on database
-    OutlierResult result = referenceBasedOutlierDetection.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.878203703);
     testSingleScore(result, 945, 0.910430564);
   }
@@ -105,17 +86,12 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   @Test
   public void testReferenceBasedOutlierDetectionSample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
         .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomSampleReferencePoints.class) //
         .with(RandomSampleReferencePoints.Parameterizer.N_ID, 15)//
         .with(RandomSampleReferencePoints.Parameterizer.RANDOM_ID, 0)//
-        .build();
-
-    // run ReferenceBasedOutlierDetection on database
-    OutlierResult result = referenceBasedOutlierDetection.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.829814814);
     testSingleScore(result, 945, 0.846881387);
   }

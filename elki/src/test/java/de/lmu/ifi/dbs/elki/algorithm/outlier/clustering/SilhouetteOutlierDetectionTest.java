@@ -40,15 +40,11 @@ public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest
   @Test
   public void testSilhouetteOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    SilhouetteOutlierDetection<DoubleVector> silout = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
         .with(SilhouetteOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 7) //
-        .build();
-
-    OutlierResult result = silout.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.69553333);
     testSingleScore(result, 416, 0.48453988);
   }

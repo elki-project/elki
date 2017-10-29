@@ -40,14 +40,10 @@ public class EMOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testEMOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-
-    EMOutlier<DoubleVector> silout = new ELKIBuilder<EMOutlier<DoubleVector>>(EMOutlier.class) //
+    OutlierResult result = new ELKIBuilder<EMOutlier<DoubleVector>>(EMOutlier.class) //
         .with(EM.Parameterizer.K_ID, 5) //
         .with(KMeans.SEED_ID, 2) //
-        .build();
-
-    OutlierResult result = silout.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.534466);
     testSingleScore(result, 416, 1.8997442e-5);
   }

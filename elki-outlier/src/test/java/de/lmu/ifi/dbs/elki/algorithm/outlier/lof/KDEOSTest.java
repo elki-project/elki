@@ -39,18 +39,13 @@ public class KDEOSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testKDEOS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    KDEOS<DoubleVector> kdeos = new ELKIBuilder<KDEOS<DoubleVector>>(KDEOS.class) //
+    OutlierResult result = new ELKIBuilder<KDEOS<DoubleVector>>(KDEOS.class) //
         .with(KDEOS.Parameterizer.KERNEL_ID, EpanechnikovKernelDensityFunction.class) //
         .with(KDEOS.Parameterizer.KMIN_ID, 5) //
         .with(KDEOS.Parameterizer.KMAX_ID, 20) //
         .with(KDEOS.Parameterizer.KERNEL_SCALE_ID, 1.) //
         .with(KDEOS.Parameterizer.IDIM_ID, -1) //
-        .build();
-
-    // run LOF on database
-    OutlierResult result = kdeos.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.804918767);
     testSingleScore(result, 1293, 0.88750800246);
   }

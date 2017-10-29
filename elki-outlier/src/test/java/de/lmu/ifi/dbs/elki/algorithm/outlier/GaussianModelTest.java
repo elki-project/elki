@@ -37,12 +37,7 @@ public class GaussianModelTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testGaussianModel() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
-
-    GaussianModel<DoubleVector> gaussianModel = new ELKIBuilder<GaussianModel<DoubleVector>>(GaussianModel.class).build();
-
-    // run GaussianModel on database
-    OutlierResult result = gaussianModel.run(db);
-
+    OutlierResult result = new ELKIBuilder<GaussianModel<DoubleVector>>(GaussianModel.class).build().run(db);
     testSingleScore(result, 1025, 2.8312466458765426);
     testAUC(db, "Noise", result, 0.9937641025641025);
   }

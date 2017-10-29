@@ -40,12 +40,7 @@ public class ABODTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    ABOD<DoubleVector> abod = new ELKIBuilder<ABOD<DoubleVector>>(ABOD.class).build();
-
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
-
+    OutlierResult result = new ELKIBuilder<ABOD<DoubleVector>>(ABOD.class).build().run(db);
     testAUC(db, "Noise", result, 0.9297962962962);
     testSingleScore(result, 945, 2.0897348547799E-5);
   }

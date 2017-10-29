@@ -38,13 +38,8 @@ public class LOCITest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testLOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    LOCI<DoubleVector> loci = new ELKIBuilder<LOCI<DoubleVector>>(LOCI.class) //
-        .with(LOCI.Parameterizer.RMAX_ID, 0.5).build();
-
-    // run LOCI on database
-    OutlierResult result = loci.run(db);
-
+    OutlierResult result = new ELKIBuilder<LOCI<DoubleVector>>(LOCI.class) //
+        .with(LOCI.Parameterizer.RMAX_ID, 0.5).build().run(db);
     testAUC(db, "Noise", result, 0.982444);
     testSingleScore(result, 146, 3.8054382);
   }

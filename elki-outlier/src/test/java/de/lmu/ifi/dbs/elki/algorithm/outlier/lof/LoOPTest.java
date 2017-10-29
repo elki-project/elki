@@ -38,13 +38,8 @@ public class LoOPTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testLoOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    LoOP<DoubleVector> loop = new ELKIBuilder<LoOP<DoubleVector>>(LoOP.class) //
-        .with(LoOP.Parameterizer.KCOMP_ID, 14).build();
-
-    // run LoOP on database
-    OutlierResult result = loop.run(db);
-
+    OutlierResult result = new ELKIBuilder<LoOP<DoubleVector>>(LoOP.class) //
+        .with(LoOP.Parameterizer.KCOMP_ID, 14).build().run(db);
     testAUC(db, "Noise", result, 0.9443796296296296);
     testSingleScore(result, 945, 0.39805457858293325);
   }

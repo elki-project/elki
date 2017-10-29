@@ -39,13 +39,8 @@ public class ParallelLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testParallelLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    ParallelLOF<DoubleVector> lof = new ELKIBuilder<ParallelLOF<DoubleVector>>(ParallelLOF.class) //
-        .with(LOF.Parameterizer.K_ID, 10).build();
-
-    // run ParallelLOF on database
-    OutlierResult result = lof.run(db);
-
+    OutlierResult result = new ELKIBuilder<ParallelLOF<DoubleVector>>(ParallelLOF.class) //
+        .with(LOF.Parameterizer.K_ID, 10).build().run(db);
     testSingleScore(result, 1293, 1.1945314199156365);
     testAUC(db, "Noise", result, 0.8921680672268908);
   }

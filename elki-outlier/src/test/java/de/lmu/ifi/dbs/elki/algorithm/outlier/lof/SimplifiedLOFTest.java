@@ -38,14 +38,9 @@ public class SimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testSimplifiedLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-
-    SimplifiedLOF<DoubleVector> lof = new ELKIBuilder<SimplifiedLOF<DoubleVector>>(SimplifiedLOF.class) //
+    OutlierResult result = new ELKIBuilder<SimplifiedLOF<DoubleVector>>(SimplifiedLOF.class) //
         .with(LOF.Parameterizer.K_ID, 10) //
-        .build();
-
-    // run LOF on database
-    OutlierResult result = lof.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.8892549019);
     testSingleScore(result, 1293, 1.3025894);
   }

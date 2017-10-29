@@ -38,15 +38,10 @@ public class AggarwalYuNaiveTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testAggarwalYuNaive() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    AggarwalYuNaive<DoubleVector> aggarwalYuNaive = new ELKIBuilder<AggarwalYuNaive<DoubleVector>>(AggarwalYuNaive.class) //
+    OutlierResult result = new ELKIBuilder<AggarwalYuNaive<DoubleVector>>(AggarwalYuNaive.class) //
         .with(AggarwalYuNaive.Parameterizer.K_ID, 2) //
         .with(AggarwalYuNaive.Parameterizer.PHI_ID, 8) //
-        .build();
-
-    // run AggarwalYuNaive on database
-    OutlierResult result = aggarwalYuNaive.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.9007777777777);
     testSingleScore(result, 945, -2.862640213982);
   }

@@ -38,15 +38,10 @@ public class HilOutTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHilOut() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    HilOut<DoubleVector> hilout = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
+    OutlierResult result = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
         .with(HilOut.Parameterizer.K_ID, 4) //
         .with(HilOut.Parameterizer.N_ID, 200) //
-        .build();
-
-    // run KNNWeightOutlier on database
-    OutlierResult result = hilout.run(db);
-
+        .build().run(db);
     testAUC(db, "Noise", result, 0.985398148);
     testSingleScore(result, 945, 1.70927657);
   }

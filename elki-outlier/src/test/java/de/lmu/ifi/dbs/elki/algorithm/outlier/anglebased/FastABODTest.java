@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Tests the ABOD algorithm.
+ * Tests the FastABOD algorithm.
  *
  * @author Lucia Cichella
  * @since 0.4.0
@@ -38,14 +38,8 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testFastABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-
-    // setup Algorithm
-    FastABOD<DoubleVector> abod = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
-        .with(FastABOD.Parameterizer.K_ID, 5).build();
-
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
-
+    OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
+        .with(FastABOD.Parameterizer.K_ID, 5).build().run(db);
     testAUC(db, "Noise", result, 0.94626962962);
     testSingleScore(result, 945, 3.28913914467E-4);
   }

@@ -23,8 +23,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -37,29 +36,9 @@ import org.junit.Test;
 public class PolygonTest {
   @Test
   public void testPolygonContainment() {
-    final Polygon p1, p2, p3;
-    {
-      List<double[]> v1 = new ArrayList<>();
-      v1.add(new double[] { 0, 0 });
-      v1.add(new double[] { .9, 0 });
-      v1.add(new double[] { 0, .9 });
-      p1 = new Polygon(v1);
-    }
-    {
-      List<double[]> v2 = new ArrayList<>();
-      v2.add(new double[] { 1, 1 });
-      v2.add(new double[] { 1, .1 });
-      v2.add(new double[] { .1, 1 });
-      p2 = new Polygon(v2);
-    }
-    {
-      List<double[]> v3 = new ArrayList<>();
-      v3.add(new double[] { .1, .1 });
-      v3.add(new double[] { .1, .9 });
-      v3.add(new double[] { .9, .9 });
-      v3.add(new double[] { .9, .1 });
-      p3 = new Polygon(v3);
-    }
+    Polygon p1 = new Polygon(Arrays.asList(new double[][] { { 0, 0 }, { .9, 0 }, { 0, .9 } }));
+    Polygon p2 = new Polygon(Arrays.asList(new double[][] { { 1, 1 }, { 1, .1 }, { .1, 1 } }));
+    Polygon p3 = new Polygon(Arrays.asList(new double[][] { { .1, .1 }, { .1, .9 }, { .9, .9 }, { .9, .1 } }));
     double[] pou = new double[] { -1, -1 };
     double[] p22 = new double[] { .2, .2 };
     assertFalse("P2 not in p1", p1.containsPoint2D(pou));
