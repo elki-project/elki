@@ -1,0 +1,47 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1" test-model="0">
+  <cluster name="C1" size="200">
+    <normal mean="0.25" stddev="0.1" />
+    <normal mean="0.75" stddev="0.1" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C11" size="150">
+    <normal mean="0.20" stddev="0.03" />
+    <normal mean="0.80" stddev="0.03" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C12" size="150">
+    <normal mean="0.30" stddev="0.03" />
+    <normal mean="0.70" stddev="0.03" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C2" size="300">
+    <normal mean="0.45" stddev="0.07" />
+    <normal mean="0.2" stddev="0.07" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C3" size="200">
+    <normal mean="0.75" stddev="0.1" />
+    <normal mean="0.65" stddev="0.1" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C31" size="100">
+    <normal mean="0.65" stddev="0.02" />
+    <normal mean="0.60" stddev="0.02" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C32" size="100">
+    <normal mean="0.85" stddev="0.01" />
+    <normal mean="0.75" stddev="0.01" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C33" size="100">
+    <normal mean="0.80" stddev="0.03" />
+    <normal mean="0.55" stddev="0.03" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Noise" size="50" density-correction="50">
+    <uniform min="0" max="1" />
+    <uniform min="0" max="1" />
+  </cluster>
+</dataset>
