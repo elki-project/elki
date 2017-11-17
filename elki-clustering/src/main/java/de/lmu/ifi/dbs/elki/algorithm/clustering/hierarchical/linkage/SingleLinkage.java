@@ -26,8 +26,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Single-linkage clustering method.
+ * Single-linkage ("minimum") clustering method.
+ *
+ * The distance of two clusters is simply the minimum of all pairwise distances
+ * between the two clusters.
+ *
+ * The distance of two clusters is defined as:
+ * \[d_{\min}(A,B):=\min_{a\in A}\min_{b\in B} d(a,b)\]
  * 
+ * This can be computed recursively using:
+ * \[d_{\min}(A\cup B,C) = \min(d(A,C), d(B,C))\]
+ *
+ * Note that with similarity functions, one would need to use the maximum
+ * instead to get the same effect.
+ *
  * Reference:
  * <p>
  * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S.

@@ -26,26 +26,37 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Weighted average linkage clustering method.
- * 
+ * Weighted average linkage clustering method (WPGMA).
+ *
  * This is somewhat a misnomer, as it actually ignores that the clusters should
  * likely be weighted differently according to their size when computing the
  * average linkage. See {@link GroupAverageLinkage} for the UPGMA method
  * that uses the group size to weight the objects the same way.
+ * Because of this, it is sometimes also called "simple average".
  * 
+ * There does not appear to be a closed form distance for this clustering,
+ * but it is only defined recursively on the previous clusters simply by
+ * \[d_{\text{WPGMA}}(A\cup B,C):=\tfrac{1}{2}d(A,C)+\tfrac{1}{2}d(B,C)\]
+ *
+ * {@link MedianLinkage} (WPGMC) is similar in the sense that it is ignoring
+ * the cluster sizes, and therefore the weight of points decreases with the
+ * depth of the tree. The method is "weighted" in the sense that the new members
+ * get the weight adjusted to match the old cluster members.
+ *
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * R. R. Sokal and C. D. Michener<br/>
+ * A statistical method for evaluating systematic relationship<br/>
+ * University of Kansas science bulletin, 28, 1409-1438. (1958)
  * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-    title = "Algorithms for Clustering Data", //
-    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Reference(authors = "R. R. Sokal and C. D. Michener", //
+    title = "A statistical method for evaluating systematic relationship", //
+    booktitle = "University of Kansas science bulletin 28", //
+    url = "https://archive.org/details/cbarchive_33927_astatisticalmethodforevaluatin1902")
 @Alias({ "wpgma", "WPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMethod" })
 @Priority(Priority.DEFAULT - 1)
 public class WeightedAverageLinkage implements Linkage {

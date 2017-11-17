@@ -25,8 +25,20 @@ import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Complete-linkage clustering method.
+ * Complete-linkage ("maximum") clustering method.
+ *
+ * The distance of two clusters is simply the maximum of all pairwise distances
+ * between the two clusters.
+ *
+ * The distance of two clusters is defined as:
+ * \[d_{\max}(A,B):=\max_{a\in A}\max_{b\in B} d(a,b)\]
  * 
+ * This can be computed recursively using:
+ * \[d_{\max}(A\cup B,C) = \max(d(A,C), d(B,C))\]
+ *
+ * Note that with similarity functions, one would need to use the minimum
+ * instead to get the same effect.
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */

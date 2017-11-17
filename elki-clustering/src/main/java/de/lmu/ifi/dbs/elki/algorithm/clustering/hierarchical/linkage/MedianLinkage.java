@@ -25,12 +25,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Median-linkage clustering method: Weighted pair group method using centroids
- * (WPGMC).
+ * Median-linkage &mdash; weighted pair group method using centroids (WPGMC).
+ * 
+ * Similar to {@link WeightedAverageLinkage} (WPGMA), the weight of points in
+ * this method decreases with the depth of the tree. This yields to difficult to
+ * understand semantics of the result, as it does <em>not yield the distance of
+ * medians</em>. The method is best defined recursively:
+ * \[d_{\text{WPGMC}}(A\cup B,C):=\tfrac{1}{2}d(A,C)+\tfrac{1}{2}d(B,C)
+ * -\tfrac{1}{4}d(A,B)\]
  * 
  * Reference:
  * <p>
- * J.C. Gower<br/>
+ * J. C. Gower<br/>
  * A comparison of some methods of cluster analysis<br/>
  * Biometrics (1967): 623-637.
  * </p>

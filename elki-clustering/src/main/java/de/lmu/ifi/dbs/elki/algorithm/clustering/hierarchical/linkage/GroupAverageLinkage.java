@@ -26,21 +26,46 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Group-average linkage clustering method.
+ * Group-average linkage clustering method (UPGMA).
+ *
+ * This is a good default linkage to use with hierarchical clustering, as it
+ * neither exhibits the single-link chaining effect, nor has the strong tendency
+ * of complete linkage to split large clusters. It is also easy to understand,
+ * and it can be used with arbitrary distances and similarity functions.
+ *
+ * The distances of two clusters is defined as the between-group average
+ * distance of two points $a$ and $b$, one from each cluster. It should be noted
+ * that this is not the average distance within the resulting cluster, because
+ * it does not take within-cluster distances into account.
+ *
+ * The distance of two clusters in this method is:
+ * \[d_{\text{UPGMA}}(A,B)=\tfrac{1}{|A|\cdot|B|}
+ * \sum_{a\in A}\sum_{b\in B} d(a,b)\]
  * 
+ * For Lance-Williams, we can then obtain the following recursive definition:
+ * \[d_{\text{UPGMA}}(A\cup B,C)=\frac{|A|}{|A|+|B|} d(A,C) +
+ * \frac{|B|}{|A|+|B|} d(B,C)\]
+ * 
+ * While the method is also called "Unweighted Pair Group Method with Arithmetic
+ * mean", it uses weights in the Lance-Williams formulation that account for the
+ * cluster size. It is unweighted in the sense that every point keeps the same
+ * weight, whereas in {@link WeightedAverageLinkage} (WPGMA), the weight of
+ * points effectively depends on the depth in the cluster tree.
+ *
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * R. R. Sokal and C. D. Michener<br/>
+ * A statistical method for evaluating systematic relationship<br/>
+ * University of Kansas science bulletin, 28, 1409-1438. (1958)
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-    title = "Algorithms for Clustering Data", //
-    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Reference(authors = "R. R. Sokal and C. D. Michener", //
+    title = "A statistical method for evaluating systematic relationship", //
+    booktitle = "University of Kansas science bulletin 28", //
+    url = "")
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod" })
 @Priority(Priority.RECOMMENDED + 1)
 public class GroupAverageLinkage implements Linkage {

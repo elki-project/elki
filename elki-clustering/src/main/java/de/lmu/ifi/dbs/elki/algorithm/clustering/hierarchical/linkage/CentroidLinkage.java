@@ -25,22 +25,49 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Centroid linkage clustering method, aka UPGMC: Unweighted Pair-Group Method
- * using Centroids.
+ * Centroid linkage &mdash; Unweighted Pair-Group Method using Centroids
+ * (UPGMC).
+ *
+ * This is closely related to {@link GroupAverageLinkage} (UPGMA), but the
+ * resulting distance corresponds to the distance of the cluster centroids when
+ * used with squared Euclidean distance.
+ * 
+ * For Lance-Williams, we can then obtain the following recursive definition:
+ * \[d_{\text{UPGMC}}(A\cup B,C)=\frac{|A|}{|A|+|B|} d(A,C) +
+ * \frac{|B|}{|A|+|B|} d(B,C) - \frac{|A|\cdot|B|}{(|A|+|B|)^2} d(A,B)\]
+ *
+ * With <em>squared</em> Euclidean distance, we then get the cluster distance:
+ * \[d_{\text{UPGMC}}(A,B)=||\tfrac{1}{|A|}\sum_{a\in A} a,
+ * \tfrac{1}{|B|}\sum_{b\in B} b||^2\]
+ * but for other distances, this will not generally be true.
+ *
+ * Because the ELKI implementations use Lance-Williams, this linkage should only
+ * be used with (squared) Euclidean distance.
+ * 
+ * While titled "unweighted", this method does take cluster sizes into account
+ * when merging clusters with Lance-Williams.
+ *
+ * While the idea of this method &mdash; at least for squared Euclidean &mdash;
+ * is compelling (distance of cluster centers), it is not as well behaved as one
+ * may think. It can yield so called "inversions", where a later merge has a
+ * smaller distance than an early merge, because a cluster center <em>can</em>
+ * be closer to a neighboring cluster than any of the individual points. Because
+ * of this, the {@link GroupAverageLinkage} (UPGMA) is usually preferable.
  * 
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * J. C. Gower<br/>
+ * A comparison of some methods of cluster analysis<br/>
+ * Biometrics (1967): 623-637.
  * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-    title = "Algorithms for Clustering Data", //
-    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Reference(authors = "J. C. Gower", //
+    title = "A comparison of some methods of cluster analysis", //
+    booktitle = "Biometrics (1967)", //
+    url = "http://www.jstor.org/stable/10.2307/2528417")
 @Alias({ "centroid", "upgmc", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod" })
 public class CentroidLinkage implements Linkage {
   /**
@@ -79,4 +106,4 @@ public class CentroidLinkage implements Linkage {
       return STATIC;
     }
   }
-} // Sokal and Michener (1958), Gower (1967)
+}

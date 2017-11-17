@@ -28,15 +28,50 @@ import net.jafama.FastMath;
 
 /**
  * Ward's method clustering method.
+ *
+ * This criterion minimizes the <em>increase</em> of squared errors, and should
+ * be used with <em>squared Euclidean</em> distance. Usually, ELKI will try to
+ * automatically square distances when you combine this with Euclidean distance.
+ * For performance reasons, the direct use of squared distances is preferable!
+ *
+ * The distance of two clusters in this method is:
+ * \[ d_{\text{Ward}}(A,B):=\text{SSE}(A\cup B)-\text{SSE}(A)-\text{SSE}(B) \]
+ * where the sum of squared errors is defined as:
+ * \[ \text{SSE}(X):=\sum_{x\in X} (x-\mu_X)^2 \qquad \text{with }
+ * \mu_X=\tfrac{1}{|X|}\sum_{x\in X} X \]
+ * This objective can be rewritten to
+ * \[ d_{\text{Ward}}(A,B):=\frac{|A|\cdot|B|}{|A|+|B|} ||\mu_A-\mu_B||^2
+ * = \frac{1}{1/|A|+1/|B|} ||\mu_A-\mu_B||^2 \]
  * 
- * This criterion minimizes the increase of squared errors, and should be used
- * with <em>squared Euclidean</em> distance.
- * 
+ * For Lance-Williams, we can then obtain the following recursive definition:
+ * \[d_{\text{Ward}}(A\cup B,C)=\frac{|A|+|C|}{|A|+|B|+|C|} d(A,C) +
+ * \frac{|B|+|C|}{|A|+|B|+|C|} d(B,C) - \frac{|C|}{|A|+|B|+|C|} d(A,B)\]
+ *
+ * These transformations rely on properties of the L2-norm, so they cannot be
+ * used with arbitrary metrics, unless they are equivalent to the L2-norm in
+ * some transformed space.
+ *
+ * Because the resulting distances are squared, when used with a non-squared
+ * distance, ELKI implementations will apply the square root before returning
+ * the final result. This is statistically somewhat questionable, but usually
+ * yields more interpretable distances that &mdash; roughly &mdash; correspond
+ * to the increase in standard deviation. With ELKI, you can get both behavior:
+ * Either choose squared Euclidean distance, or regular Euclidean distance.
+ *
+ * This method is also referred to as "minimize increase of sum of squares"
+ * (MISSQ) by Podani.
+ *
  * Reference:
  * <p>
- * Ward Jr, Joe H.<br />
+ * J. H. Ward Jr<br />
  * Hierarchical grouping to optimize an objective function<br />
  * Journal of the American statistical association 58.301 (1963): 236-244.
+ * </p>
+ * The formulation using Lance-Williams equations is due to:
+ * <p>
+ * D. Wishart<br />
+ * 256. Note: An Algorithm for Hierarchical Classifications<br />
+ * Biometrics 25(1)
  * </p>
  * 
  * @author Erich Schubert
@@ -46,13 +81,22 @@ import net.jafama.FastMath;
     title = "Hierarchical grouping to optimize an objective function", //
     booktitle = "Journal of the American statistical association 58.301", //
     url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
-@Alias({ "ward", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
+@Alias({ "ward", "MISSQ", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
 @Priority(Priority.IMPORTANT + 1)
 public class WardLinkage implements Linkage {
   /**
    * Static instance of class.
    */
   public static final WardLinkage STATIC = new WardLinkage();
+
+  /**
+   * Additional reference.
+   */
+  @Reference(authors = "D. Wishart", //
+      title = "256. Note: An Algorithm for Hierarchical Classifications", //
+      booktitle = "BBiometrics 25(1)", //
+      url = "https://doi.org/10.2307/2528688")
+  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * Constructor.

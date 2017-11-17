@@ -36,6 +36,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Beta values larger than 0 cause chaining, and are thus not recommended.
  * Instead, choose a value between -1 and 0.
  * 
+ * The general form of the recursive definition is:
+ * \[d_{\text{Flexible},\beta}(A\cup B, C) := \tfrac{1-\beta}{2} d(A,C)
+ * + \tfrac{1-\beta}{2} d(B,C) + \beta d(A,B) \]
+ * 
  * Reference:
  * <p>
  * G. N. Lance and W. T. Williams<br />

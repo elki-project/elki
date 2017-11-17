@@ -23,14 +23,23 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
- * Minimum variance linkage.
+ * Minimum increase in variance (MIVAR) linkage.
  *
- * This is subtly different from Ward's method ({@link WardLinkage}),
+ * This is subtly different from Ward's method ({@link WardLinkage}, MISSQ),
  * because variance is normalized by the cluster size; and Ward minimizes the
  * increase in sum of squares (without normalization).
+ * 
+ * \[d_{\text{MIVAR}}(A\cup B,C)=
+ * \left(\frac{|A|+|C|}{|A|+|B|+|C|}\right)^2 d(A,C) +
+ * \left(\frac{|B|+|C|}{|A|+|B|+|C|}\right)^2 d(B,C)
+ * - \frac{|C|\cdot(|A|+|B|)}{(|A|+|B|+|C|)^2} d(A,B)\]
+ * or equivalently:
+ * \[d_{\text{MIVAR}}(A\cup B,C)=\frac{(|A|+|C|)^2 d(A,C)
+ * + (|B|+|C|)^2 d(B,C) - |C|\cdot(|A|+|B|) d(A,B)}{(|A|+|B|+|C|)^2}\]
  *
  * Reference:
  * <p>
@@ -87,8 +96,7 @@ public class MinimumVarianceLinkage implements Linkage {
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    final int xj = sizex + sizej;
-    final int yj = sizey + sizej;
+    final int xj = sizex + sizej, yj = sizey + sizej;
     final int n = sizex + sizey + sizej;
     return (xj * (double) xj * dx + yj * (double) yj * dy - (sizej * (double) (sizex + sizey)) * dxy) / (n * (double) n);
   }
