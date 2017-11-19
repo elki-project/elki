@@ -56,13 +56,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * The original PAM algorithm or k-medoids clustering, as proposed by Kaufman
- * and Rousseeuw in "Partitioning Around Medoids".
+ * The original Partitioning Around Medoids (PAM) algorithm or k-medoids
+ * clustering, as proposed by Kaufman and Rousseeuw in "Clustering by means of
+ * Medoids".
  *
  * Reference:
  * <p>
- * Clustering my means of Medoids<br />
- * Kaufman, L. and Rousseeuw, P.J.<br />
+ * Clustering by means of Medoids<br />
+ * L. Kaufman and P. J. Rousseeuw<br />
  * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
  * </p>
  *
@@ -76,9 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Partioning Around Medoids")
 @Reference(title = "Clustering by means of Medoids", //
-authors = "Kaufman, L. and Rousseeuw, P.J.", //
-booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
-public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>>implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+    authors = "L. Kaufman and P. J. Rousseeuw", //
+    booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
+public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -212,8 +213,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
             for(int pi = 0; pi < k; pi++) {
               if(pi == pj) { // The current nearest is lost.
                 cost[pi] += ((dist_h < distsec) ? //
-                dist_h // Case 1b1) j is closer to h
-                : distsec // Case 1b2) j would switch to its second nearest
+                    dist_h // Case 1b1) j is closer to h
+                    : distsec // Case 1b2) j would switch to its second nearest
                 ) - distcur;
               }
               else { // Case 1c) j is closer to h than its current medoid
@@ -281,7 +282,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @return Assignment cost
    */
   protected double assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore nearest, WritableDoubleDataStore second, WritableIntegerDataStore assignment, DistanceQuery<V> distQ) {
-    assert(means.size() == k);
+    assert (means.size() == k);
     DBIDArrayIter miter = means.iter();
     double cost = 0.;
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
@@ -347,7 +348,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(KMeans.K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
@@ -358,7 +359,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       }
 
       IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }

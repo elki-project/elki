@@ -43,13 +43,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * PAM initialization for k-means (and of course, PAM).
+ * PAM initialization for k-means (and of course, for PAM).
  *
  * Reference:
  * <p>
- * Clustering my means of Medoids<br />
- * Kaufman, L. and Rousseeuw, P.J.<br />
- * in: Statistical Data Analysis Based on the L_1–Norm and Related Methods
+ * Clustering by means of Medoids<br />
+ * L. Kaufman and P. J. Rousseeuw<br />
+ * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
  * </p>
  *
  * @author Erich Schubert
@@ -57,9 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @param <O> Object type for KMedoids initialization
  */
-@Reference(title = "Clustering my means of Medoids", //
-authors = "Kaufman, L. and Rousseeuw, P.J.", //
-booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
+@Reference(title = "Clustering by means of Medoids", //
+    authors = "L. Kaufman and P. J. Rousseeuw", //
+    booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans")
 public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
