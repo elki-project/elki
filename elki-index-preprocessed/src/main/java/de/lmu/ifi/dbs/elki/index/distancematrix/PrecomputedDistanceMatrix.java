@@ -102,11 +102,13 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    * Constructor.
    *
    * @param relation Data relation
+   * @param range DBID range
    * @param distanceFunction Distance function
    */
-  public PrecomputedDistanceMatrix(Relation<O> relation, DistanceFunction<? super O> distanceFunction) {
+  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, DistanceFunction<? super O> distanceFunction) {
     super();
     this.relation = relation;
+    this.ids = range;
     this.distanceFunction = distanceFunction;
 
     if(!distanceFunction.isSymmetric()) {
@@ -116,11 +118,6 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
 
   @Override
   public void initialize() {
-    DBIDs rids = relation.getDBIDs();
-    if(!(rids instanceof DBIDRange)) {
-      throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
-    }
-    ids = (DBIDRange) rids;
     size = ids.size();
     if(size > 65536) {
       throw new AbortException("Distance matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
@@ -377,7 +374,11 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
 
     @Override
     public PrecomputedDistanceMatrix<O> instantiate(Relation<O> relation) {
-      return new PrecomputedDistanceMatrix<>(relation, distanceFunction);
+      DBIDs rids = relation.getDBIDs();
+      if(!(rids instanceof DBIDRange)) {
+        throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases; not on modifiable databases) for performance reasons (Patches welcome).");
+      }
+      return new PrecomputedDistanceMatrix<>(relation, (DBIDRange) rids, distanceFunction);
     }
 
     @Override

@@ -217,7 +217,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
 
     // Build a relation, and a distance matrix.
     Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(Clustering.TYPE, rids, "Clusterings", datastore);
-    PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, distance);
+    PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, rids, distance);
     mat.initialize();
     ProxyDatabase d = new ProxyDatabase(rids, crel);
     d.getHierarchy().add(crel, mat);

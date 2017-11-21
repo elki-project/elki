@@ -28,10 +28,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -239,16 +236,19 @@ public final class DatabaseUtil {
    */
   public static <O> DistanceQuery<O> precomputedDistanceQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, Logging log) {
     DistanceQuery<O> dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    if(dq == null && relation.getDBIDs() instanceof DBIDRange) {
-      log.verbose("Adding a distance matrix index to accelerate MiniMax.");
-      PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, distf);
-      idx.initialize();
-      // TODO: attach weakly persistent to the relation?
-      dq = idx.getDistanceQuery(distf);
+    if(dq == null) {
+      DBIDs ids = relation.getDBIDs();
+      if(ids instanceof DBIDRange) {
+        log.verbose("Precomputing a distance matrix for acceleration.");
+        PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, (DBIDRange) ids, distf);
+        idx.initialize();
+        // TODO: attach weakly persistent to the relation?
+        dq = idx.getDistanceQuery(distf);
+      }
     }
     if(dq == null) {
       dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE);
-      log.warning("PAM may be slow, because we do not have a precomputed distance matrix available.");
+      log.warning("We could not automatically use a distance matrix, expect a performance degradation.");
     }
     return dq;
   }

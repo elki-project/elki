@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -97,5 +98,25 @@ public class MatrixParadigm {
     return (x == y) ? 0 : (x < y) //
         ? matrix[MatrixParadigm.triangleSize(y) + x] //
         : matrix[MatrixParadigm.triangleSize(x) + y];
+  }
+
+  /**
+   * Initialize a distance matrix.
+   *
+   * @param dq Distance query
+   * @return this
+   */
+  public MatrixParadigm initializeWithDistances(DistanceQuery<?> dq) {
+    final DBIDArrayIter ix = this.ix, iy = this.iy;
+    final double[] matrix = this.matrix;
+    int pos = 0;
+    for(ix.seek(0); ix.valid(); ix.advance()) {
+      final int x = ix.getOffset();
+      assert (pos == triangleSize(x));
+      for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
+        matrix[pos++] = dq.distance(ix, iy);
+      }
+    }
+    return this;
   }
 }
