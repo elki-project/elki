@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -126,6 +121,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
       DBIDs rids = DBIDUtil.randomSample(ids, sampling, rnd);
+      // FIXME: precompute and use a distance matrix for this sample!
+      
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store
@@ -234,7 +231,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         numsamples = numsamplesP.intValue();
       }
 
-      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID) //
+      // Default sample size suggested by Kaufman and Rousseeuw
+      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 40 + 2 * k) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
