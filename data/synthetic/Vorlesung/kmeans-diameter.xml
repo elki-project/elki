@@ -1,0 +1,13 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1" test-model="0">
+  <cluster name="C1" size="50">
+    <normal mean="0.20" stddev="0.05" />
+    <normal mean="0.20" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="C2" size="200">
+    <normal mean="0.60" stddev="0.15" />
+    <normal mean="0.60" stddev="0.15" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+</dataset>
