@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
@@ -30,6 +29,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+
 import net.jafama.FastMath;
 
 /**
@@ -105,16 +105,15 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    */
   public MultivariateGaussianModel(double weight, double[] mean, double norm, double[][] covariance) {
     this.weight = weight;
-    final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / FastMath.sqrt(norm);
-    this.nmea = new double[dim];
+    this.nmea = new double[mean.length];
     if(covariance == null) {
-      covariance = new double[mean.length][mean.length];
+      this.covariance = new double[mean.length][mean.length];
     }
-    this.covariance = covariance;
-    if(covariance != null) {
+    else {
+      this.covariance = covariance;
       robustInvert();
     }
     this.wsum = 0.;
@@ -129,27 +128,28 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert (vec.getDimensionality() == mean.length);
+    final int dim = mean.length;
+    assert (vec.getDimensionality() == dim);
+    assert (wei >= 0);
     final double nwsum = wsum + wei;
     // Compute new means
-    for(int i = 0; i < mean.length; i++) {
+    for(int i = 0; i < dim; i++) {
       final double delta = vec.doubleValue(i) - mean[i];
       final double rval = delta * wei / nwsum;
       nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
-    for(int i = 0; i < mean.length; i++) {
-      for(int j = i; j < mean.length; j++) {
+    for(int i = 0; i < dim; i++) {
+      double vi = vec.doubleValue(i);
+      double[] cov_i = covariance[i];
+      for(int j = 0; j < i; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
-        double vi = vec.doubleValue(i);
-        double delta = (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
-        covariance[i][j] = covariance[i][j] + delta;
-        // Optimize via symmetry
-        if(i != j) {
-          covariance[j][i] = covariance[j][i] + delta;
-        }
+        cov_i[j] += (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
       }
+      // Element on diagonal
+      cov_i[i] += (vi - nmea[i]) * (vi - mean[i]) * wei;
+      // Other half is NOT updated here, but in finalizeEStep!
     }
     // Use new values.
     wsum = nwsum;
@@ -158,8 +158,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void finalizeEStep() {
-    if(wsum > Double.MIN_NORMAL) {
-      timesEquals(covariance, 1. / wsum);
+    // Restore symmetry, and apply weight:
+    final int dim = covariance.length;
+    final double f = (wsum > Double.MIN_NORMAL) ? 1. / wsum : 1.;
+    for(int i = 0; i < dim; i++) {
+      double[] row_i = covariance[i];
+      for(int j = 0; j < i; j++) {
+        covariance[j][i] = row_i[j] *= f;
+      }
+      // Entry on diagonal:
+      row_i[i] *= f;
     }
     robustInvert();
   }

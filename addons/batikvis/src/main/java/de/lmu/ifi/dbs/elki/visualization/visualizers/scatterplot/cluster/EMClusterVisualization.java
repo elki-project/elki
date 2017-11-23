@@ -131,19 +131,33 @@ public class EMClusterVisualization implements VisFactory {
     public static final String EMBORDER = "EMClusterBorder";
 
     /**
-     * Kappa constant,
+     * Kappa constant.
      */
     private static final double KAPPA = SVGHyperSphere.EUCLIDEAN_KAPPA;
+
+    /**
+     * Minus Kappa constant.
+     */
+    private static final double MKAPPA = -KAPPA;
 
     /**
      * StyleParameter:
      */
     private int times = 3;
 
+    /**
+     * Opacity
+     */
     private int opacStyle = 1;
 
+    /**
+     * Soft or hard border
+     */
     private int softBorder = 1;
 
+    /**
+     * Round or boxed.
+     */
     private int drawStyle = 0;
 
     /**
@@ -213,13 +227,12 @@ public class EMClusterVisualization implements VisFactory {
         // Compute the eigenvectors
         EigenvalueDecomposition evd = new EigenvalueDecomposition(covmat);
         double[] eigenvalues = evd.getRealEigenvalues();
-        double[][] eigenvectors = evd.getV();
+        double[][] eigenvectors = transpose(evd.getV());
 
         // Projected eigenvectors:
         double[][] pc = new double[eigenvalues.length][];
         for(int i = 0; i < eigenvalues.length; i++) {
-          double[] sev = times(eigenvectors[i], FastMath.sqrt(eigenvalues[i]));
-          pc[i] = proj.fastProjectRelativeDataToRenderSpace(sev);
+          pc[i] = proj.fastProjectRelativeDataToRenderSpace(times(eigenvectors[i], FastMath.sqrt(eigenvalues[i])));
         }
         if(drawStyle != 0 || eigenvalues.length == 2) {
           drawSphere2D(sname, cent, pc);
@@ -239,32 +252,33 @@ public class EMClusterVisualization implements VisFactory {
      */
     protected void drawSphere2D(String sname, double[] cent, double[][] pc) {
       CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
+      double[] p1 = new double[2], p2 = new double[2], p3 = new double[2],
+          p4 = new double[2], tmp1 = new double[2], tmp2 = new double[2];
       for(int dim1 = 0; dim1 < pc.length - 1; dim1++) {
         for(int dim2 = dim1 + 1; dim2 < pc.length; dim2++) {
           for(int i = 1; i <= times; i++) {
+            equalsPlusTimes(p1, cent, pc[dim1], i);
+            equalsPlusTimes(p2, cent, pc[dim2], i);
+            equalsPlusTimes(p3, cent, pc[dim1], -i);
+            equalsPlusTimes(p4, cent, pc[dim2], -i);
+
             SVGPath path = new SVGPath();
-
-            double[] p1 = plusTimes(cent, pc[dim1], i);
-            double[] p2 = plusTimes(cent, pc[dim2], i);
-            double[] p3 = minusTimes(cent, pc[dim1], i);
-            double[] p4 = minusTimes(cent, pc[dim2], i);
-
             path.moveTo(p1);
             path.cubicTo(//
-                plusTimes(p1, pc[dim2], KAPPA * i), //
-                plusTimes(p2, pc[dim1], KAPPA * i), //
+                equalsPlusTimes(tmp1, p1, pc[dim2], KAPPA * i), //
+                equalsPlusTimes(tmp2, p2, pc[dim1], KAPPA * i), //
                 p2);
             path.cubicTo(//
-                minusTimes(p2, pc[dim1], KAPPA * i), //
-                plusTimes(p3, pc[dim2], KAPPA * i), //
+                equalsPlusTimes(tmp1, p2, pc[dim1], MKAPPA * i), //
+                equalsPlusTimes(tmp2, p3, pc[dim2], KAPPA * i), //
                 p3);
             path.cubicTo(//
-                minusTimes(p3, pc[dim2], KAPPA * i), //
-                minusTimes(p4, pc[dim1], KAPPA * i), //
+                equalsPlusTimes(tmp1, p3, pc[dim2], MKAPPA * i), //
+                equalsPlusTimes(tmp2, p4, pc[dim1], MKAPPA * i), //
                 p4);
             path.cubicTo(//
-                plusTimes(p4, pc[dim1], KAPPA * i), //
-                minusTimes(p1, pc[dim2], KAPPA * i), //
+                equalsPlusTimes(tmp1, p4, pc[dim1], KAPPA * i), //
+                equalsPlusTimes(tmp2, p1, pc[dim2], MKAPPA * i), //
                 p1);
             path.close();
 
@@ -279,6 +293,21 @@ public class EMClusterVisualization implements VisFactory {
           }
         }
       }
+    }
+
+    /**
+     * Compute out = x + y * a, for 2d.
+     * 
+     * @param out Output buffer
+     * @param x X
+     * @param y Y
+     * @param a Scaling
+     * @return out
+     */
+    private double[] equalsPlusTimes(double[] out, double[] x, double[] y, double a) {
+      out[0] = x[0] + y[0] * a;
+      out[1] = x[1] + y[1] * a;
+      return out;
     }
 
     /**
@@ -364,10 +393,10 @@ public class EMClusterVisualization implements VisFactory {
           hull.add(times(pmq, -1));
           for(int l = k + 1; l < pc.length; l++) {
             double[] r = pc[k];
-            double[] ppqpr = timesEquals(plus(ppq, r), FastMath.sqrt(1 / 3.));
-            double[] pmqpr = timesEquals(plus(pmq, r), FastMath.sqrt(1 / 3.));
-            double[] ppqmr = timesEquals(minus(ppq, r), FastMath.sqrt(1 / 3.));
-            double[] pmqmr = timesEquals(minus(pmq, r), FastMath.sqrt(1 / 3.));
+            double[] ppqpr = timesEquals(plus(ppq, r), MathUtil.SQRTTHIRD);
+            double[] pmqpr = timesEquals(plus(pmq, r), MathUtil.SQRTTHIRD);
+            double[] ppqmr = timesEquals(minus(ppq, r), MathUtil.SQRTTHIRD);
+            double[] pmqmr = timesEquals(minus(pmq, r), MathUtil.SQRTTHIRD);
             hull.add(ppqpr);
             hull.add(times(ppqpr, -1));
             hull.add(pmqpr);

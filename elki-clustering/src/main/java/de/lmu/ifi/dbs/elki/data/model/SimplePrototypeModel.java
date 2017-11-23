@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Cluster model that stores a prototype for each cluster.
@@ -56,11 +57,25 @@ public class SimplePrototypeModel<V> implements PrototypeModel<V>, TextWriteable
       out.commentPrintLn(label);
     }
     out.commentPrintLn("Model class: " + getClass().getName());
-    out.commentPrintLn("Cluster " + getPrototypeType() + ": " + prototype.toString());
+    out.commentPrintLn("Cluster " + getPrototypeType() + ": " + prototypeToString());
+  }
+
+  /**
+   * Format the prototype as string.
+   *
+   * @return Prototype
+   */
+  protected String prototypeToString() {
+    return (prototype instanceof double[]) ? FormatUtil.format((double[]) prototype) : prototype.toString();
   }
 
   @Override
   public String getPrototypeType() {
     return "Prototype";
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[" + prototypeToString() + "]";
   }
 }

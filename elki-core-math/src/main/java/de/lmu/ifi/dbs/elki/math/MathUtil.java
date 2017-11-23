@@ -81,6 +81,11 @@ public final class MathUtil {
   public static final double SQRT2 = Math.sqrt(2.);
 
   /**
+   * Square root of 3.
+   */
+  public static final double SQRT3 = Math.sqrt(3.);
+
+  /**
    * Square root of 5.
    */
   public static final double SQRT5 = Math.sqrt(5.);
@@ -114,6 +119,11 @@ public final class MathUtil {
    * One third.
    */
   public static final double ONE_THIRD = 1. / 3.;
+
+  /**
+   * Square root of one third.
+   */
+  public static final double SQRTTHIRD = FastMath.sqrt(1 / 3.);
 
   /**
    * Logarithm of 2 to the basis e, for logarithm conversion.
@@ -547,7 +557,7 @@ public final class MathUtil {
   public static double exp(double d) {
     return FastMath.exp(d);
   }
-  
+
   /**
    * Delegate to FastMath.powFast
    *
