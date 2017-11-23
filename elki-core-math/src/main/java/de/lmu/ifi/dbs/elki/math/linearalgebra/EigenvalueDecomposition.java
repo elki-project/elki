@@ -26,12 +26,12 @@ import net.jafama.FastMath;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
- * <p>
+ *
  * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal
  * and the eigenvector matrix V is orthogonal. I.e. A =
  * V.times(D.timesTranspose(V)) and V.timesTranspose(V) equals the identity
  * matrix.
- * <p>
+ *
  * If A is not symmetric, then the eigenvalue matrix D is block diagonal with
  * the real eigenvalues in 1-by-1 blocks and any complex eigenvalues, lambda +
  * i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda]. The columns of V represent
@@ -83,11 +83,9 @@ public class EigenvalueDecomposition {
    */
   private double[] ort;
 
-  /*
-   * ------------------------ Private Methods ------------------------
+  /**
+   * Symmetric Householder reduction to tridiagonal form.
    */
-
-  // Symmetric Householder reduction to tridiagonal form.
   private void tred2() {
     // This is derived from the Algol procedures tred2 by
     // Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
@@ -106,8 +104,7 @@ public class EigenvalueDecomposition {
         e[i] = d[i - 1];
         for(int j = 0; j < i; j++) {
           d[j] = V[i - 1][j];
-          V[i][j] = 0.0;
-          V[j][i] = 0.0;
+          V[i][j] = V[j][i] = 0.0;
         }
         d[i] = 0;
         continue;
@@ -191,7 +188,9 @@ public class EigenvalueDecomposition {
     }
   }
 
-  // Symmetric tridiagonal QL algorithm.
+  /**
+   * Symmetric tridiagonal QL algorithm.
+   */
   private void tql2() {
     // This is derived from the Algol procedures tql2, by
     // Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
@@ -282,23 +281,22 @@ public class EigenvalueDecomposition {
     d[l] = c * p;
   }
 
-  // Nonsymmetric reduction to Hessenberg form.
-
   private void sortEigen() {
     for(int i = 0; i < n - 1; i++) {
       // Find minimum:
       int k = i;
       double p = d[i];
       for(int j = i + 1; j < n; j++) {
-        if(d[j] < p) {
+        final double d_j = d[j];
+        if(d_j < p) {
           k = j;
-          p = d[j];
+          p = d_j;
         }
       }
       // Swap
       if(k != i) {
         d[k] = d[i];
-        d[i] = p;
+        d[i] = p; // d[k], from above.
         for(int j = 0; j < n; j++) {
           final double[] Vj = V[j];
           final double swap = Vj[i];
@@ -309,6 +307,9 @@ public class EigenvalueDecomposition {
     }
   }
 
+  /**
+   * Nonsymmetric reduction to Hessenberg form.
+   */
   private void orthes() {
     // FIXME: does this fail on NaN/inf values?
 
@@ -317,11 +318,9 @@ public class EigenvalueDecomposition {
     // Vol.ii-Linear Algebra, and the corresponding
     // Fortran subroutines in EISPACK.
 
-    int low = 0;
-    int high = n - 1;
+    int low = 0, high = n - 1;
 
     for(int m = low + 1; m <= high - 1; m++) {
-
       // Scale column.
       double scale = 0.0;
       for(int i = m; i <= high; i++) {
@@ -371,23 +370,24 @@ public class EigenvalueDecomposition {
 
     // Accumulate transformations (Algol's ortran).
     for(int i = 0; i < n; i++) {
-      for(int j = 0; j < n; j++) {
-        V[i][j] = (i == j ? 1.0 : 0.0);
-      }
+      Arrays.fill(V[i], 0.);
+      V[i][i] = 1.0;
     }
 
     for(int m = high - 1; m >= low + 1; m--) {
-      if(H[m][m - 1] != 0.0) {
+      final double[] H_m = H[m];
+      if(H_m[m - 1] != 0.0) {
         for(int i = m + 1; i <= high; i++) {
           ort[i] = H[i][m - 1];
         }
+        final double ort_m = ort[m];
         for(int j = m; j <= high; j++) {
           double g = 0.0;
           for(int i = m; i <= high; i++) {
             g += ort[i] * V[i][j];
           }
           // Double division avoids possible underflow
-          g = (g / ort[m]) / H[m][m - 1];
+          g = (g / ort_m) / H_m[m - 1];
           for(int i = m; i <= high; i++) {
             V[i][j] += g * ort[i];
           }
@@ -400,16 +400,14 @@ public class EigenvalueDecomposition {
 
   private static void cdiv(double xr, double xi, double yr, double yi, double[] buf, int off) {
     if(Math.abs(yr) > Math.abs(yi)) {
-      final double r = yi / yr;
-      final double d = yr + r * yi;
-      buf[off] = (xr + r * xi) / d;
-      buf[off + 1] = (xi - r * xr) / d;
+      final double r = yi / yr, d = 1. / (yr + r * yi);
+      buf[off] = (xr + r * xi) * d;
+      buf[off + 1] = (xi - r * xr) * d;
     }
     else {
-      final double r = yr / yi;
-      final double d = yi + r * yr;
-      buf[off] = (r * xr + xi) / d;
-      buf[off + 1] = (r * xi - xr) / d;
+      final double r = yr / yi, d = 1. / (yi + r * yr);
+      buf[off] = (r * xr + xi) * d;
+      buf[off + 1] = (r * xi - xr) * d;
     }
   }
 
@@ -891,15 +889,13 @@ public class EigenvalueDecomposition {
   public double[][] getD() {
     double[][] D = new double[n][n];
     for(int i = 0; i < n; i++) {
-      for(int j = 0; j < n; j++) {
-        D[i][j] = 0.0;
-      }
-      D[i][i] = d[i];
+      final double[] D_i = D[i];
+      D_i[i] = d[i];
       if(e[i] > 0) {
-        D[i][i + 1] = e[i];
+        D_i[i + 1] = e[i];
       }
       else if(e[i] < 0) {
-        D[i][i - 1] = e[i];
+        D_i[i - 1] = e[i];
       }
     }
     return D;
