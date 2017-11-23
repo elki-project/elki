@@ -56,9 +56,11 @@ public class DoubleStatistic extends AbstractStatistic {
    * Set the statistics.
    * 
    * @param value New value
+   * @return this
    */
-  public void setDouble(double value) {
+  public DoubleStatistic setDouble(double value) {
     this.value = value;
+    return this;
   }
 
   @Override

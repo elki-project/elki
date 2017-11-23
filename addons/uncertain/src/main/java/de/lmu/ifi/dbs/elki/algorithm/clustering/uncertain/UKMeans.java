@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.sum;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +53,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -79,10 +81,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.7.0
  */
 @Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
-title = "Uncertain data mining: An example in clustering location data", //
-booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006)", //
-url = "http://dx.doi.org/10.1007/11731139_24")
-public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implements ClusteringAlgorithm<Clustering<KMeansModel>> {
+    title = "Uncertain data mining: An example in clustering location data", //
+    booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006)", //
+    url = "http://dx.doi.org/10.1007/11731139_24")
+public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
    * CLass logger.
    */
@@ -170,11 +172,10 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
     Clustering<KMeansModel> result = new Clustering<>("Uk-Means Clustering", "ukmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means.get(i), varsum[i])));
     }
     return result;
   }
@@ -191,7 +192,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    * @return true when the object was reassigned
    */
   protected boolean assignToNearestCluster(Relation<DiscreteUncertainObject> relation, List<double[]> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
-    assert(k == means.size());
+    assert (k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -276,7 +277,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
             mean[j] += vec.doubleValue(j);
           }
         }
-        VMath.timesEquals(mean, 1.0 / list.size());
+        timesEquals(mean, 1.0 / list.size());
       }
       else {
         // Keep degenerated means as-is for now.
@@ -304,15 +305,10 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    * @param varsum Variance sum per cluster
    */
   protected void logVarstat(DoubleStatistic varstat, double[] varsum) {
-    if(varstat == null) {
-      return;
+    if(varstat != null) {
+      double s = sum(varsum);
+      getLogger().statistics(varstat.setDouble(s));
     }
-    double s = 0.;
-    for(double v : varsum) {
-      s += v;
-    }
-    varstat.setDouble(s);
-    getLogger().statistics(varstat);
   }
 
   /**
@@ -342,12 +338,12 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(KMeans.K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
       IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }

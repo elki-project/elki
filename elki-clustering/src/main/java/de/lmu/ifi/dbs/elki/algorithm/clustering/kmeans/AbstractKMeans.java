@@ -20,9 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,13 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.QuickSelectDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -183,16 +175,14 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       DBIDIter iter = list.iter();
       // Initialize with first.
       double[] mean = relation.get(iter).toArray();
-      iter.advance();
       // Update with remaining instances
-      for(; iter.valid(); iter.advance()) {
+      for(iter.advance(); iter.valid(); iter.advance()) {
         NumberVector vec = relation.get(iter);
         for(int j = 0; j < mean.length; j++) {
           mean[j] += vec.doubleValue(j);
         }
       }
-      timesEquals(mean, 1.0 / list.size());
-      newMeans[i] = mean;
+      newMeans[i] = timesEquals(mean, 1.0 / list.size());
     }
     return newMeans;
   }
@@ -218,16 +208,14 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       DBIDIter iter = list.iter();
       // Initialize with first.
       double[] mean = relation.get(iter).toArray();
-      iter.advance();
       // Update with remaining instances
-      for(; iter.valid(); iter.advance()) {
+      for(iter.advance(); iter.valid(); iter.advance()) {
         SparseNumberVector vec = relation.get(iter);
         for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
           mean[vec.iterDim(j)] += vec.iterDoubleValue(j);
         }
       }
-      timesEquals(mean, 1.0 / list.size());
-      newMeans[i] = mean;
+      newMeans[i] = timesEquals(mean, 1.0 / list.size());
     }
     return newMeans;
   }
@@ -276,8 +264,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       return; // Keep old mean
     }
     // Note: numerically stabilized version:
-    double[] delta = minusEquals(vec.toArray(), mean);
-    plusTimesEquals(mean, delta, op / newsize);
+    plusTimesEquals(mean, minusEquals(vec.toArray(), mean), op / newsize);
   }
 
   /**
@@ -371,12 +358,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     if(varstat == null) {
       return Double.NaN;
     }
-    double s = 0.;
-    for(double v : varsum) {
-      s += v;
-    }
-    varstat.setDouble(s);
-    getLogger().statistics(varstat);
+    double s = sum(varsum);
+    getLogger().statistics(varstat.setDouble(s));
     return s;
   }
 

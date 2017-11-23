@@ -632,6 +632,26 @@ public final class VMath {
   }
 
   /**
+   * Find the maximum value.
+   *
+   * @param v Vector
+   * @return Position of maximum
+   */
+  public static int argmax(double[] v) {
+    assert (v.length > 0);
+    int maxIndex = 0;
+    double currentMax = v[0];
+    for(int i = 1; i < v.length; i++) {
+      final double x = v[i];
+      if(x > currentMax) {
+        maxIndex = i;
+        currentMax = x;
+      }
+    }
+    return maxIndex;
+  }
+
+  /**
    * Normalizes v1 to the length of 1.0.
    * 
    * @param v1 vector

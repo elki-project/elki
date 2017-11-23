@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,8 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -56,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -93,6 +98,11 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
   private static final Logging LOG = Logging.getLogger(EM.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = EM.class.getName();
+
+  /**
    * Number of clusters
    */
   private int k;
@@ -117,6 +127,9 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    */
   private boolean soft;
 
+  /**
+   * Minimum loglikelihood to avoid -infinity.
+   */
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
@@ -126,7 +139,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
 
   /**
    * Constructor.
-   * 
+   *
    * @param k k parameter
    * @param delta delta parameter
    * @param mfactory EM cluster model factory
@@ -144,7 +157,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
 
   /**
    * Performs the EM clustering algorithm on the given database.
-   * <p/>
+   *
    * Finally a hard clustering is provided where each clusters gets assigned the
    * points exhibiting the highest probability to belong to this cluster. But
    * still, the database objects hold associated the complete probability-vector
@@ -159,66 +172,47 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
-    if(LOG.isVerbose()) {
-      LOG.verbose("initializing " + k + " models");
-    }
     List<? extends EMClusterModel<M>> models = mfactory.buildInitialModels(database, relation, k, SquaredEuclideanDistanceFunction.STATIC);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    double emNew = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    DoubleStatistic likestat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".loglikelihood") : null;
+    if(LOG.isStatistics()) {
+      LOG.statistics(likestat.setDouble(loglikelihood));
+    }
 
     // iteration unless no change
-    if(LOG.isVerbose()) {
-      LOG.verbose("iterating EM");
-    }
-    if(LOG.isVerbose()) {
-      LOG.verbose("iteration " + 0 + " - expectation value: " + emNew);
-    }
-
-    for(int it = 1; it <= maxiter || maxiter < 0; it++) {
-      final double emOld = emNew;
+    int it = 0;
+    for(++it; it <= maxiter || maxiter < 0; it++) {
+      final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
       // reassign probabilities
-      emNew = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+      loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
-      if(LOG.isVerbose()) {
-        LOG.verbose("iteration " + it + " - expectation value: " + emNew);
+      if(LOG.isStatistics()) {
+        LOG.statistics(likestat.setDouble(loglikelihood));
       }
-      if(Math.abs(emOld - emNew) <= delta || emOld > emNew) {
+      if(Math.abs(oldloglikelihood - loglikelihood) <= delta || oldloglikelihood > loglikelihood) {
         break;
       }
     }
-
-    if(LOG.isVerbose()) {
-      LOG.verbose("assigning clusters");
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", it));
     }
 
     // fill result with clusters and models
     List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      hardClusters.add(DBIDUtil.newHashSet());
+      hardClusters.add(DBIDUtil.newArray());
     }
 
     // provide a hard clustering
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double[] clusterProbabilities = probClusterIGivenX.get(iditer);
-      int maxIndex = 0;
-      double currentMax = 0.0;
-      for(int i = 0; i < k; i++) {
-        if(clusterProbabilities[i] > currentMax) {
-          maxIndex = i;
-          currentMax = clusterProbabilities[i];
-        }
-      }
-      hardClusters.get(maxIndex).add(iditer);
+      hardClusters.get(argmax(probClusterIGivenX.get(iditer))).add(iditer);
     }
     Clustering<M> result = new Clustering<>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
-      // TODO: re-do labeling.
-      // SimpleClassLabel label = new SimpleClassLabel();
-      // label.init(result.canonicalClusterLabel(i));
-      Cluster<M> model = new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster());
-      result.addToplevelCluster(model);
+      result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
     }
     if(isSoft()) {
       result.addChildResult(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
@@ -244,21 +238,18 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       NumberVector instance = relation.get(iditer);
-      int i = 0;
-      for(EMClusterModel<?> m : models) {
+      for(int i = 0; i < clusterProbabilities.length; i++) {
         final double prior = clusterProbabilities[i];
         if(prior > 0.) {
-          m.updateE(instance, prior);
+          models.get(i).updateE(instance, prior);
         }
         wsum[i] += prior;
-        ++i;
       }
     }
     int i = 0;
     for(EMClusterModel<?> m : models) {
       m.finalizeEStep();
-      m.setWeight(wsum[i] / relation.size());
-      i++;
+      m.setWeight(wsum[i++] / relation.size());
     }
   }
 
@@ -281,30 +272,19 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       NumberVector vec = relation.get(iditer);
       double[] probabilities = new double[k];
-      {
-        int i = 0;
-        for(EMClusterModel<?> m : models) {
-          probabilities[i] = m.estimateDensity(vec);
-          ++i;
-        }
-      }
-      double priorProbability = 0.;
       for(int i = 0; i < k; i++) {
-        priorProbability += probabilities[i];
+        probabilities[i] = models.get(i).estimateDensity(vec);
       }
-      double logP = Math.max(FastMath.log(priorProbability), MIN_LOGLIKELIHOOD);
-      emSum += (logP == logP) ? logP : 0.; /* avoid NaN */
+      double priorProbability = sum(probabilities);
+      double logP = FastMath.log(priorProbability);
+      emSum += logP > MIN_LOGLIKELIHOOD ? logP : MIN_LOGLIKELIHOOD;
 
-      double[] clusterProbabilities = new double[k];
       if(priorProbability > 0.) {
-        for(int i = 0; i < k; i++) {
-          // do not divide by zero!
-          clusterProbabilities[i] = probabilities[i] / priorProbability;
-        }
+        // do not divide by zero!
+        timesEquals(probabilities, 1. / priorProbability);
       }
-      probClusterIGivenX.put(iditer, clusterProbabilities);
+      probClusterIGivenX.put(iditer, probabilities);
     }
-
     return emSum / relation.size();
   }
 
@@ -383,8 +363,8 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
