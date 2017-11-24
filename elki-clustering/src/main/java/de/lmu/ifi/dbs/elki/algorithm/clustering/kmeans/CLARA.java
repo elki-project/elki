@@ -122,12 +122,12 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     for(int j = 0; j < numsamples; j++) {
       DBIDs rids = DBIDUtil.randomSample(ids, sampling, rnd);
       // FIXME: precompute and use a distance matrix for this sample!
-      
+
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store
       WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-      runPAMOptimization(distQ, rids, medoids, assignment);
+      new /* PAM */Instance(distQ, rids, assignment).run(medoids, maxiter);
       double score = assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
       if(score < best) {
         best = score;
