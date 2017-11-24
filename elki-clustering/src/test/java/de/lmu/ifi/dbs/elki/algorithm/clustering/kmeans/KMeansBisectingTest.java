@@ -62,7 +62,7 @@ public class KMeansBisectingTest extends AbstractClusterAlgorithmTest {
   public void testKMeansBisectingFMeasure() {
     Database db = makeSimpleDatabase(UNITTEST + "bisecting-test.csv", 300);
 
-    KMeansBisecting<DoubleVector, MeanModel> kmeans = new ELKIBuilder<>(KMeansBisecting.class) //
+    KMeansBisecting<DoubleVector, MeanModel> kmeans = new ELKIBuilder<KMeansBisecting<DoubleVector, MeanModel>>(KMeansBisecting.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.SEED_ID, 0) //
         .with(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5) //
