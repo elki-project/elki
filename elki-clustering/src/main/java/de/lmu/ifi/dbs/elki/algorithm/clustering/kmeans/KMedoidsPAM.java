@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
@@ -47,9 +45,11 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -76,6 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> vector datatype
  */
 @Title("Partioning Around Medoids")
+@Priority(Priority.IMPORTANT)
 @Reference(title = "Clustering by means of Medoids", //
     authors = "L. Kaufman and P. J. Rousseeuw", //
     booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
@@ -131,6 +132,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     if(relation.size() <= 0) {
       return new Clustering<>("PAM Clustering", "pam-clustering");
     }
+    if(k > 0x7FFF) {
+      throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
+    }
     DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
@@ -144,7 +148,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
     // Setup cluster assignment store
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    run(distQ, ids, medoids, assignment);
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
@@ -157,7 +161,24 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
   }
 
   /**
+   * Run the main algorithm. Internal use, for easier subclassing, this
+   * primarily is a wrapper around "new Instance" for subclasses.
+   * 
+   * @param distQ Distance query
+   * @param ids IDs to process
+   * @param medoids Current medoids
+   * @param assignment Cluster assignment output
+   */
+  protected void run(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+  }
+
+  /**
    * Instance for a single dataset.
+   *
+   * Note: we experimented with not caching the distance to nearest and second
+   * nearest, but only the assignments. The matrix lookup was more expensive, so
+   * this is probably worth the 2*n doubles in storage.
    *
    * @author Erich Schubert
    */
@@ -197,9 +218,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     public Instance(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment) {
       this.distQ = distQ;
       this.ids = ids;
+      this.assignment = assignment;
       this.nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
       this.second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-      this.assignment = assignment;
     }
 
     /**
@@ -225,7 +246,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       DBIDVar bestid = DBIDUtil.newVar();
       DBIDArrayIter m = medoids.iter();
       int iteration = 1;
-      double[] cost = new double[k];
       for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
         LOG.incrementProcessed(prog);
         // Try to swap a non-medoid with a medoid member:
@@ -233,21 +253,18 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         int bestcluster = -1;
         // Iterate over all non-medoids:
         for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
-          m.seek(assignment.intValue(h)); // Medoid h is assigned to.
-          if(DBIDUtil.equal(m, h)) {
+          // Compare object to its own medoid.
+          if(DBIDUtil.equal(m.seek(assignment.intValue(h)), h)) {
             continue; // This is a medoid.
           }
-          double hdist = nearest.doubleValue(h); // Current cost of h.
+          final double hdist = nearest.doubleValue(h); // Current cost of h.
           if(metric && hdist <= 0.) {
             continue; // Duplicate of a medoid.
           }
-          // h is a non-medoid currently in cluster of medoid m.
-          // hdist is the cost we get back by removing.
-          computeReassignmentCost(h, hdist, m.getOffset(), cost);
-
-          // Find the best possible swaps for h:
+          // Find the best possible swap for h:
           for(int pi = 0; pi < k; pi++) {
-            final double cpi = cost[pi];
+            // hdist is the cost we get back by making the non-medoid h medoid.
+            final double cpi = computeReassignmentCost(h, pi) - hdist;
             if(cpi < best) {
               best = cpi;
               bestid.set(h);
@@ -285,37 +302,33 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
      * Compute the reassignment cost, for all medoids in one pass.
      *
      * @param h Current object to swap with any medoid.
-     * @param hdist Current distance of h to its medoid.
-     * @param hcur Current cluster assignment of h.
-     * @param cost Cost aggregation array, must have size k
+     * @param mnum Medoid number to be replaced
+     * @return cost
      */
-    protected void computeReassignmentCost(DBIDRef h, double hdist, int hcur, double[] cost) {
-      // Cost gain for moving h away:
-      Arrays.fill(cost, -hdist);
-      cost[hcur] = 0;
+    protected double computeReassignmentCost(DBIDRef h, int mnum) {
+      double cost = 0.;
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
         if(DBIDUtil.equal(h, j)) {
           continue;
         }
-        final int pj = assignment.intValue(j);
-        // distance(j, i) for pi == pj
+        // distance(j, i) to nearest medoid
         final double distcur = nearest.doubleValue(j);
-        // distance(j, o) to second nearest / possible reassignment
-        final double distsec = second.doubleValue(j);
         // distance(j, h) to new medoid
         final double dist_h = distQ.distance(h, j);
-        // Case 1b: j switches to new medoid, or to the second nearest:
-        cost[pj] += (dist_h < distsec ? dist_h : distsec) - distcur;
-        // Case 1c: j is closer to h than its current medoid
-        if(dist_h < distcur) {
-          for(int pi = 0; pi < cost.length; pi++) {
-            if(pi != pj) {
-              cost[pi] += dist_h - distcur;
-            }
-          }
+        // Check if current medoid of j is removed:
+        if(assignment.intValue(j) == mnum) {
+          // distance(j, o) to second nearest / possible reassignment
+          final double distsec = second.doubleValue(j);
+          // Case 1b: j switches to new medoid, or to the second nearest:
+          cost += Math.min(dist_h, distsec) - distcur;
+        }
+        else if(dist_h < distcur) {
+          // Case 1c: j is closer to h than its current medoid
+          cost += dist_h - distcur;
         } // else Case 1a): j is closer to i than h and m, so no change.
       }
+      return cost;
     }
 
     /**
@@ -331,28 +344,29 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY,
             mindist2 = Double.POSITIVE_INFINITY;
-        int minIndex = -1;
+        int minindx = -1;
         for(miter.seek(0); miter.valid(); miter.advance()) {
           final double dist = distQ.distance(iditer, miter);
           if(dist < mindist) {
             mindist2 = mindist;
+            minindx = miter.getOffset();
             mindist = dist;
-            minIndex = miter.getOffset();
           }
           else if(dist < mindist2) {
             mindist2 = dist;
           }
         }
-        if(minIndex < 0) {
+        if(minindx < 0) {
           throw new AbortException("Too many infinite distances. Cannot assign objects.");
         }
-        assignment.put(iditer, minIndex);
+        assignment.put(iditer, minindx);
         nearest.put(iditer, mindist);
         second.put(iditer, mindist2);
         cost += mindist;
       }
       return cost;
     }
+
   }
 
   @Override

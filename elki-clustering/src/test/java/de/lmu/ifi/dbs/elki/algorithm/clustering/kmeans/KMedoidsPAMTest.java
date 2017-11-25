@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Performs a full KMeans run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that KMeans's performance doesn't
+ * Performs a full PAM run, and compares the result with a clustering derived
+ * from the data set labels. This test ensures that PAM's performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  *
