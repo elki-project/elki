@@ -277,7 +277,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-        LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", tc));
       }
       return this;
     }
