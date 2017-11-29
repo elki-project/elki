@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -331,19 +332,20 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
      * Adds the required CSS-Classes
      */
     private void addCSSClasses() {
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the markers
       if(!svgp.getCSSClassManager().contains(CSS_MARKER)) {
         final CSSClass cls = new CSSClass(this, CSS_MARKER);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
-        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(cls);
       }
 
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(rcls);
       }
     }
