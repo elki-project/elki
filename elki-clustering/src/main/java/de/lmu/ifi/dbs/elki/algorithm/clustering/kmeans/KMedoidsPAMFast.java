@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
@@ -30,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * A slightly faster version of PAM (but in the same overall complexity). The
@@ -123,13 +126,15 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         // Iterate over all non-medoids:
         for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
           // Compare object to its own medoid.
-          if(DBIDUtil.equal(m.seek(assignment.intValue(h)), h)) {
+          if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
             continue; // This is a medoid.
           }
           final double hdist = nearest.doubleValue(h); // Current cost of h.
           if(metric && hdist <= 0.) {
             continue; // Duplicate of a medoid.
           }
+          // hdist is the cost we get back by making the non-medoid h medoid.
+          Arrays.fill(cost, -hdist);
           computeReassignmentCost(h, cost);
 
           // Find the best possible swap for h:
@@ -141,33 +146,79 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
               bestcluster = pi;
             }
           }
-          // hdist is the cost we get back by making the non-medoid h medoid.
-          best -= hdist;
         }
         if(best >= 0.) {
           break;
         }
+        // Update values for new medoid.
         medoids.set(bestcluster, bestid);
+        final double hdist = nearest.putDouble(bestid, 0);
+        final int olda = assignment.intValue(bestid);
+        // In the high short, we store the second nearest center!
+        if((olda & 0x7FFF) != bestcluster) {
+          assignment.putInt(bestid, bestcluster | ((olda & 0x7FFF) << 16));
+          second.putDouble(bestid, hdist);
+        }
+        else {
+          assignment.putInt(bestid, bestcluster | (olda & 0x7FFF0000));
+        }
+        assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) & 0x7FFF)) == nearest.doubleValue(bestid));
+        assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) >>> 16)) == second.doubleValue(bestid));
         // Reassign
-        double nc = assignToNearestCluster(medoids);
+        updateAssignment(m, bestid, bestcluster);
+        tc += best;
         if(LOG.isStatistics()) {
-          LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
+          LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", tc));
         }
-        if(nc > tc) {
-          if(nc - tc < 1e-7 * tc) {
-            LOG.warning("PAM failed to converge (numerical instability?)");
-            break;
-          }
-          LOG.warning("PAM failed to converge: costs increased by: " + (nc - tc) + " exepected a decrease by " + best);
-          break;
-        }
-        tc = nc;
       }
+      // TODO: we may have accumulated some error on tc.
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
       }
+      // Cleanup
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        assignment.putInt(it, assignment.intValue(it) & 0x7FFF);
+      }
       return this;
+    }
+
+    /**
+     * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids
+     * of those objects, that are nearest to the k<sup>th</sup> mean.
+     *
+     * @param means Object centroids
+     * @return Assignment cost
+     */
+    protected double assignToNearestCluster(ArrayDBIDs means) {
+      DBIDArrayIter miter = means.iter();
+      double cost = 0.;
+      for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+        double mindist = Double.POSITIVE_INFINITY,
+            mindist2 = Double.POSITIVE_INFINITY;
+        int minindx = -1, minindx2 = -1;
+        for(miter.seek(0); miter.valid(); miter.advance()) {
+          final double dist = distQ.distance(iditer, miter);
+          if(dist < mindist) {
+            minindx2 = minindx;
+            mindist2 = mindist;
+            minindx = miter.getOffset();
+            mindist = dist;
+          }
+          else if(dist < mindist2) {
+            minindx2 = miter.getOffset();
+            mindist2 = dist;
+          }
+        }
+        if(minindx < 0) {
+          throw new AbortException("Too many infinite distances. Cannot assign objects.");
+        }
+        assignment.put(iditer, minindx | (minindx2 << 16));
+        nearest.put(iditer, mindist);
+        second.put(iditer, mindist2);
+        cost += mindist;
+      }
+      return cost;
     }
 
     /**
@@ -189,7 +240,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         // distance(j, h) to new medoid
         final double dist_h = distQ.distance(h, j);
         // Case 1b: j switches to new medoid, or to the second nearest:
-        final int pj = assignment.intValue(j);
+        final int pj = assignment.intValue(j) & 0x7FFF;
         cost[pj] += Math.min(dist_h, distsec) - distcur;
         final double delta = dist_h - distcur;
         if(delta < 0) {
@@ -202,6 +253,85 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           }
         } // else Case 1a): j is closer to i than h and m, so no change.
       }
+    }
+
+    /**
+     * Update an existing cluster assignment.
+     *
+     * @param medoids Medoid iterator
+     * @param h New medoid
+     * @param m Position of replaced medoid
+     */
+    protected void updateAssignment(DBIDArrayIter medoids, DBIDRef h, int m) {
+      assert (DBIDUtil.equal(h, medoids.seek(m)));
+      // Compute costs of reassigning other objects j:
+      for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
+        if(DBIDUtil.equal(h, j)) {
+          continue;
+        }
+        // distance(j, i) for pi == pj
+        final double distcur = nearest.doubleValue(j);
+        // distance(j, o) to second nearest / possible reassignment
+        final double distsec = second.doubleValue(j);
+        // distance(j, h) to new medoid
+        final double dist_h = distQ.distance(h, j);
+        // Case 1b: j switches to new medoid, or to the second nearest:
+        int pj = assignment.intValue(j), po = pj >>> 16;
+        pj &= 0x7FFF; // Low byte is the old nearest cluster.
+        if(pj == m) { // Nearest medoid is gone.
+          pj = -1; // FIXME: sentinel
+          if(dist_h < distsec) { // Replace nearest.
+            nearest.putDouble(j, dist_h);
+            assignment.putInt(j, m | (po << 16));
+          }
+          else { // Second is new nearest.
+            nearest.putDouble(j, distsec);
+            // Find new second nearest.
+            assignment.putInt(j, po | (updateSecondNearest(j, medoids, m, dist_h, po) << 16));
+          }
+        }
+        else { // Nearest medoid not replaced
+          if(dist_h < distcur) {
+            nearest.putDouble(j, dist_h);
+            second.putDouble(j, distcur);
+            assignment.putInt(j, m | (pj << 16));
+          }
+          else if(po == m) { // Second was replaced.
+            po = -1; // FIXME: sentinel
+            assignment.putInt(j, pj | (updateSecondNearest(j, medoids, m, dist_h, pj) << 16));
+          }
+          else if(dist_h < distsec) {
+            second.putDouble(j, dist_h);
+            assignment.putInt(j, pj | (m << 16));
+          }
+        }
+      }
+    }
+
+    /**
+     * Find the second nearest medoid.
+     *
+     * @param j Query point
+     * @param medoids Medoids
+     * @param h Known medoid
+     * @param dist_h Distance to h
+     * @param n Known nearest
+     * @return Index of second nearest medoid, {@link #second} is updated.
+     */
+    private int updateSecondNearest(DBIDRef j, DBIDArrayIter medoids, int h, double dist_h, int n) {
+      double sdist = dist_h;
+      int sbest = h;
+      for(medoids.seek(0); medoids.valid(); medoids.advance()) {
+        if(medoids.getOffset() != h && medoids.getOffset() != n) {
+          double d = distQ.distance(j, medoids);
+          if(d < sdist) {
+            sdist = d;
+            sbest = medoids.getOffset();
+          }
+        }
+      }
+      second.putDouble(j, sdist);
+      return sbest;
     }
   }
 
