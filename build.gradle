@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
 description = "ELKI - Parent Project"
@@ -38,7 +38,7 @@ class PropertiesFileTask extends PropertiesGeneratorTask<PropertiesFile> {
 }
 
 allprojects  {
-  apply plugin: 'java'
+  apply plugin: 'java-library'
   apply plugin: 'eclipse'
   if(project.hasProperty('jacoco')) apply plugin: 'jacoco'
 
@@ -226,7 +226,7 @@ subprojects {
   }
   // To use, add javadoc.dependsOn documentReferences
   // Collect dependencies
-  task collectDependencies(type: Copy) {
+  task collectDependencies(type: Sync) {
     description = "Collect dependencies"
     group = "Build"
     from configurations.runtime
@@ -266,7 +266,7 @@ if(project.hasProperty('jacoco')) {
     reports {
       html.enabled = true
       xml.enabled = true
-      xml.destination = "${buildDir}/reports/jacoco/report.xml"
+      xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
     }
   }
   check.dependsOn codeCoverageReport
