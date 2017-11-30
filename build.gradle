@@ -15,6 +15,7 @@ def getCommitHash() {
 import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
 import org.gradle.plugins.ide.api.PropertiesGeneratorTask;
 import org.gradle.api.internal.PropertiesTransformer;
+import org.gradle.util.ConfigureUtil;
 
 // Class to allow updating arbitrary properties files
 class PropertiesFile extends PropertiesPersistableConfigurationObject {
@@ -271,7 +272,7 @@ if(project.hasProperty('jacoco')) {
   check.dependsOn codeCoverageReport
 }
 
-task dependencyPlot << {
+task dependencyPlot { doLast {
   def includeTest = false
   def includeExternal = false
   def depsExclude = [ rootProject.path, ":elki-bundle" ]
@@ -315,4 +316,4 @@ task dependencyPlot << {
 
     out.println "}"
   }
-}
+} }

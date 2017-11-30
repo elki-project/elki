@@ -10,8 +10,8 @@ install:
 before_script:
   - chmod +x ./gradlew
 script:
-  - ./gradlew check -Pjacoco
-  - ./gradlew :codeCoverageReport -Pjacoco
+  - ./gradlew check -Pjacoco --stacktrace
+  - ./gradlew :codeCoverageReport -Pjacoco --stacktrace
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_cache:

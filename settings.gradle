@@ -1,4 +1,4 @@
-rootProject.name = "ELKI Data Mining Framework"
+rootProject.name = "ELKI"
 
 def module(m, d=null) {
   include ":$m"
