@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -111,6 +112,10 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
           if(nanpattern.reset(s).matches()) {
             attributes.add(Double.NaN);
             continue;
+          }
+          if(!warnedPrecision && (e == ParseUtil.PRECISION_OVERFLOW || e == ParseUtil.EXPONENT_OVERFLOW)) {
+            getLogger().warning("Too many digits in what looked like a double number - treating as string: " + tokenizer.getSubstring());
+            warnedPrecision = true;
           }
           int id = unique.getInt(s);
           if(id == unique.defaultReturnValue()) {

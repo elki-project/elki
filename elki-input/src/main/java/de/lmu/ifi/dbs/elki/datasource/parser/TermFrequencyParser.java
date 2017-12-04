@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -146,6 +147,10 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
         curterm = null;
       }
       catch(NumberFormatException e) {
+        if(!warnedPrecision && (e == ParseUtil.PRECISION_OVERFLOW || e == ParseUtil.EXPONENT_OVERFLOW)) {
+          getLogger().warning("Too many digits in what looked like a double number - treating as string: " + tokenizer.getSubstring());
+          warnedPrecision = true;
+        }
         if(curterm != null) {
           labels.add(curterm);
         }

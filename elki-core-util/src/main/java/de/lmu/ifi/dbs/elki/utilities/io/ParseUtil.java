@@ -38,7 +38,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException EMPTY_STRING = new NumberFormatException("Parser called on an empty string.") {
+  public static final NumberFormatException EMPTY_STRING = new NumberFormatException("Parser called on an empty string.") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -50,7 +50,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException EXPONENT_OVERFLOW = new NumberFormatException("Precision overflow for double exponent.") {
+  public static final NumberFormatException EXPONENT_OVERFLOW = new NumberFormatException("Precision overflow for double exponent.") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -62,7 +62,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException INVALID_EXPONENT = new NumberFormatException("Invalid exponent") {
+  public static final NumberFormatException INVALID_EXPONENT = new NumberFormatException("Invalid exponent") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -74,7 +74,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException TRAILING_CHARACTERS = new NumberFormatException("String sequence was not completely consumed.") {
+  public static final NumberFormatException TRAILING_CHARACTERS = new NumberFormatException("String sequence was not completely consumed.") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -86,7 +86,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow for long values.") {
+  public static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow for long values.") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -98,7 +98,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  private static final NumberFormatException NOT_A_NUMBER = new NumberFormatException("Number must start with a digit or dot.") {
+  public static final NumberFormatException NOT_A_NUMBER = new NumberFormatException("Number must start with a digit or dot.") {
     private static final long serialVersionUID = 1L;
 
     @Override

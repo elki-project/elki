@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -133,6 +134,11 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * Event to report next.
    */
   Event nextevent = null;
+
+  /**
+   * Emit a double-precision limit warning once.
+   */
+  boolean warnedPrecision = false;
 
   /**
    * Constructor.
@@ -277,6 +283,10 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
           continue;
         }
         catch(NumberFormatException e) {
+          if(!warnedPrecision && (e == ParseUtil.PRECISION_OVERFLOW || e == ParseUtil.EXPONENT_OVERFLOW)) {
+            getLogger().warning("Too many digits in what looked like a double number - treating as string: " + tokenizer.getSubstring());
+            warnedPrecision = true;
+          }
           // Ignore attempt, add to labels below.
         }
       }
