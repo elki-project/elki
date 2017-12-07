@@ -1,9 +1,9 @@
 #!/bin/sh
 bd=$( dirname $( dirname $0 ) )
 java=$( test -z "$JAVA" && echo java || echo $JAVA  )
-core=$( ls -d $bd/elki/build/*/main $bd/elki-core*/build/*/main )
-mods=$( ls -d $bd/elki*/build/*/main | egrep -v "/elki-core|/elki/|elki-docutil" )
-addons=$( ls -d $bd/addons/*/build/*/main | egrep -v "addons/bundle" )
+core=$( ls -d $bd/elki/build/*/main $bd/elki/build/classes/*/main $bd/elki-core*/build/*/main $bd/elki-core*/build/classes/*/main )
+mods=$( ls -d $bd/elki*/build/*/main $bd/elki*/build/classes/*/main | egrep -v "/elki-core|/elki/|elki-docutil" )
+addons=$( ls -d $bd/addons/*/build/*/main $bd/addons/*/build/classes/*/main | egrep -v "addons/bundle" )
 # This is really ugly... collect .jars on the class path, but avoid duplicates.
 deps=$( ls -d $bd/*/build/libs/lib/*.jar $bd/addons/*/build/libs/lib/*.jar | egrep -v "elki-docutil" \
 | sed -e 's,.*build/libs/lib/,,' | egrep -v "^elki|^hamcrest|^junit" | sort -u \
