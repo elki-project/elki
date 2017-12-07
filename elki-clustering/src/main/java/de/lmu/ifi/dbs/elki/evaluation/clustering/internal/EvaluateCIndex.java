@@ -73,9 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "L. J. Hubert and J. R. Levin", //
-title = "A general statistical framework for assessing categorical clustering in free recall.", //
-booktitle = "Psychological Bulletin, Vol. 83(6)", //
-url = "http://dx.doi.org/10.1037/0033-2909.83.6.1072")
+    title = "A general statistical framework for assessing categorical clustering in free recall.", //
+    booktitle = "Psychological Bulletin, Vol. 83(6)", //
+    url = "http://dx.doi.org/10.1037/0033-2909.83.6.1072")
 public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Logger for debug output.
@@ -132,56 +132,58 @@ public class EvaluateCIndex<O> implements Evaluator {
           continue; // No within-cluster distances!
         case MERGE_NOISE:
           break; // Treat like a cluster
+        default:
+          LOG.warning("Unknown noise handling option: " + noiseOption);
         }
       }
       w += (cluster.size() * (cluster.size() - 1)) >>> 1;
     }
 
+    // TODO: for small k=2, and balanced clusters, it may be more efficient to
+    // just build a long array with all distances, and select the quantiles.
+    // The heaps used below pay off in memory consumption for k > 2
+
+    // Yes, maxDists is supposed to be a min heap, and the other way.
+    // Because we want to replace the smallest of the current k-largest
+    // distances.
+    DoubleHeap maxDists = new DoubleMinHeap(w);
+    DoubleHeap minDists = new DoubleMaxHeap(w);
     double theta = 0.; // Sum of within-cluster distances
-    double min = 0, max = 0; // Sum of larges and smallest
-    if(w <= (rel.size() * (rel.size() - 1L)) >>> 2) {
-      DoubleHeap maxDists = new DoubleMinHeap(w); // Careful: REALLY minHeap!
-      DoubleHeap minDists = new DoubleMaxHeap(w); // Careful: REALLY maxHeap!
 
-      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing clusters for C-Index", clusters.size(), LOG) : null;
-      for(int i = 0; i < clusters.size(); i++) {
-        Cluster<?> cluster = clusters.get(i);
-        if(cluster.size() <= 1 || cluster.isNoise()) {
-          switch(noiseOption){
-          case IGNORE_NOISE:
-            LOG.incrementProcessed(prog);
-            continue; // Ignore
-          case TREAT_NOISE_AS_SINGLETONS:
-            processSingleton(cluster, rel, dq, maxDists, minDists, w);
-            LOG.incrementProcessed(prog);
-            continue;
-          case MERGE_NOISE:
-            break; // Treat like a cluster, below
-          }
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing clusters for C-Index", clusters.size(), LOG) : null;
+    for(int i = 0; i < clusters.size(); i++) {
+      Cluster<?> cluster = clusters.get(i);
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+          LOG.incrementProcessed(prog);
+          continue; // Ignore
+        case TREAT_NOISE_AS_SINGLETONS:
+          processSingleton(cluster, rel, dq, maxDists, minDists, w);
+          LOG.incrementProcessed(prog);
+          continue;
+        case MERGE_NOISE:
+          break; // Treat like a cluster, below
         }
-        theta += processCluster(cluster, clusters, i, dq, maxDists, minDists, w);
-        LOG.incrementProcessed(prog);
       }
-      LOG.ensureCompleted(prog);
-
-      // Simulate best and worst cases:
-      assert (minDists.size() == w);
-      assert (maxDists.size() == w);
-      for(DoubleHeap.UnsortedIter it = minDists.unsortedIter(); it.valid(); it.advance()) {
-        min += it.get();
-      }
-      for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
-        max += it.get();
-      }
-      assert (max >= min);
+      theta += processCluster(cluster, clusters, i, dq, maxDists, minDists, w);
+      LOG.incrementProcessed(prog);
     }
-    else {
-      // Since we have fewer cross-cluster distances than within-cluster
-      // distances, min=max and cIndex = 0.
-      theta = min = max = 0;
-    }
+    LOG.ensureCompleted(prog);
 
-    double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
+    // Simulate best and worst cases:
+    double min = 0, max = 0; // Sum of largest and smallest
+    assert (minDists.size() == w);
+    assert (maxDists.size() == w);
+    for(DoubleHeap.UnsortedIter it = minDists.unsortedIter(); it.valid(); it.advance()) {
+      min += it.get();
+    }
+    for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
+      max += it.get();
+    }
+    assert (max >= min);
+
+    double cIndex = (max > min) ? (theta - min) / (max - min) : 1.;
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".c-index.noise-handling", noiseOption.toString()));
