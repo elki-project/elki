@@ -27,8 +27,8 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 import net.jafama.FastMath;
 
 /**
@@ -38,11 +38,6 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
-  /**
-   * Class logger.
-   */
-  private static Logging LOG = Logging.getLogger(DiagonalGaussianModel.class);
-
   /**
    * Constant to avoid singular matrixes.
    */
@@ -66,7 +61,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Normalization factor.
    */
-  double norm, normDistrFactor;
+  double logNorm, logNormDet;
 
   /**
    * Weight aggregation sum
@@ -80,7 +75,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public DiagonalGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), null);
+    this(weight, mean, null);
   }
 
   /**
@@ -88,25 +83,14 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * 
    * @param weight Cluster weight
    * @param mean Initial mean
-   * @param norm Normalization factor.
+   * @param variances Initial variances.
    */
-  public DiagonalGaussianModel(double weight, double[] mean, double norm) {
-    this(weight, mean, norm, null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param weight Cluster weight
-   * @param mean Initial mean
-   * @param norm Normalization factor.
-   */
-  public DiagonalGaussianModel(double weight, double[] mean, double norm, double[] variances) {
+  public DiagonalGaussianModel(double weight, double[] mean, double[] variances) {
     this.weight = weight;
     final int dim = mean.length;
     this.mean = mean;
-    this.norm = norm;
-    this.normDistrFactor = 1. / FastMath.sqrt(norm); // assume det=1
+    this.logNorm = MathUtil.LOGTWOPI * mean.length;
+    this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[dim];
     if(variances == null) {
       variances = new double[dim];
@@ -147,21 +131,17 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void finalizeEStep() {
+    double logDet = 0;
     if(wsum > 0.) {
       final double s = 1. / wsum;
-      double det = 1.;
       for(int i = 0; i < variances.length; i++) {
         double v = variances[i];
         v = v > 0 ? v * s : SINGULARITY_CHEAT;
         variances[i] = v;
-        det *= v;
+        logDet += FastMath.log(v);
       }
-      normDistrFactor = 1. / FastMath.sqrt(norm * det);
-    }
-    else {
-      // Degenerate
-      normDistrFactor = 1. / FastMath.sqrt(norm);
-    }
+    } // else degenerate
+    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
   }
 
   /**
@@ -180,14 +160,8 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   }
 
   @Override
-  public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec);
-    double prob = normDistrFactor * FastMath.exp(-.5 * power);
-    if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + (-.5 * power) + " factor: " + normDistrFactor);
-      prob = 0.;
-    }
-    return prob * weight;
+  public double estimateLogDensity(NumberVector vec) {
+    return -.5 * mahalanobisDistance(vec) + logNormDet;
   }
 
   @Override

@@ -47,11 +47,11 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   public void testEMResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 1) //
+        .with(KMeans.SEED_ID, 0) //
         .with(EM.Parameterizer.K_ID, 6) //
         .build().run(db);
-    testFMeasure(db, result, 0.967410);
-    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    testFMeasure(db, result, 0.971834390);
+    testClusterSizes(result, new int[] { 0, 5, 93, 100, 200, 312 });
   }
 
   /**
@@ -80,7 +80,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Parameterizer.K_ID, 4) //
         .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
         .build().run(db);
-    testFMeasure(db, result, 0.812082);
-    testClusterSizes(result, new int[] { 87, 143, 163, 317 });
+    testFMeasure(db, result, 0.811247176);
+    testClusterSizes(result, new int[] { 8, 95, 198, 409 });
   }
 }

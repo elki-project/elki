@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +32,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+
+import net.jafama.FastMath;
 
 /**
  * Factory for EM with multivariate gaussian models using diagonal matrixes.
@@ -61,14 +63,11 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
   public List<DiagonalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.length == k);
-    final int dimensionality = initialMeans[0].length;
-    final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
-    double[] variances = RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs());
-    VMath.times(variances, 1. / k);
+    double[] variances = timesEquals(RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs()), 1. / FastMath.sqrt(k));
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new DiagonalGaussianModel(1. / k, nv, norm, variances.clone()));
+      models.add(new DiagonalGaussianModel(1. / k, nv, variances.clone()));
     }
     return models;
   }

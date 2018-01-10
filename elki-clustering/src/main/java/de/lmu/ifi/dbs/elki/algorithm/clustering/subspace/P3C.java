@@ -577,9 +577,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       }
       probClusterIGivenX.put(iter, weights);
     }
-    final double f = MathUtil.powi(MathUtil.TWOPI, dim); // Scaling coefficient
     for(int i = 0; i < k; i++) {
-      models.add(new MultivariateGaussianModel(clusterWeights[i], new double[dim], f));
+      models.add(new MultivariateGaussianModel(clusterWeights[i], new double[dim]));
     }
   }
 

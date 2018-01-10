@@ -49,12 +49,12 @@ public interface EMClusterModel<M extends MeanModel> {
   void finalizeEStep();
 
   /**
-   * Estimate the likelihood of a vector.
+   * Estimate the log likelihood of a vector.
    * 
    * @param vec Vector
-   * @return Likelihood.
+   * @return log likelihood.
    */
-  double estimateDensity(NumberVector vec);
+  double estimateLogDensity(NumberVector vec);
 
   /**
    * Finalize a cluster model.

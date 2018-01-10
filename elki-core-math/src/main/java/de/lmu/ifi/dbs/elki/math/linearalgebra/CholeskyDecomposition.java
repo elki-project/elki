@@ -186,16 +186,16 @@ public class CholeskyDecomposition {
       throw new ArithmeticException(ERR_MATRIX_NOT_SPD);
     }
     // Work on a copy!
-    return solveLtransposed(solveL(copy(b)));
+    return solveLtransposed(solveLInplace(copy(b)));
   }
 
   /**
-   * Solve L*Y = b
+   * Solve L*X = b, <b>modifying X</b>.
    * 
    * @param X Copy of b.
    * @return X
    */
-  private double[] solveL(double[] X) {
+  public double[] solveLInplace(double[] X) {
     final int n = L.length;
     X[0] /= L[0][0]; // First iteration, simplified.
     for(int k = 1; k < n; k++) {

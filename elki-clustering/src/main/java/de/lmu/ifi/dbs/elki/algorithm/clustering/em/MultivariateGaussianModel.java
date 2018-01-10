@@ -20,15 +20,14 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 import net.jafama.FastMath;
 
@@ -55,9 +54,14 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   double[] mean;
 
   /**
-   * Covariance matrix, and inverse.
+   * Covariance matrix.
    */
-  double[][] covariance, invCovMatr;
+  double[][] covariance;
+
+  /**
+   * Decomposition of covariance matrix.
+   */
+  CholeskyDecomposition chol;
 
   /**
    * Temporary storage, to avoid reallocations.
@@ -67,7 +71,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Normalization factor.
    */
-  double norm, normDistrFactor;
+  double logNorm, logNormDet;
 
   /**
    * Weight aggregation sum
@@ -81,7 +85,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public MultivariateGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), new double[mean.length][mean.length]);
+    this(weight, mean, null);
   }
 
   /**
@@ -89,34 +93,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * 
    * @param weight Cluster weight
    * @param mean Initial mean
-   * @param norm Normalization factor.
+   * @param covariance initial covariance matrix.
    */
-  public MultivariateGaussianModel(double weight, double[] mean, double norm) {
-    this(weight, mean, norm, new double[mean.length][mean.length]);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param weight Cluster weight
-   * @param mean Initial mean
-   * @param norm Normalization factor.
-   * @param covariance Covariance matrix.
-   */
-  public MultivariateGaussianModel(double weight, double[] mean, double norm, double[][] covariance) {
+  public MultivariateGaussianModel(double weight, double[] mean, double[][] covariance) {
     this.weight = weight;
     this.mean = mean;
-    this.norm = norm;
-    this.normDistrFactor = 1. / FastMath.sqrt(norm);
+    this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.nmea = new double[mean.length];
-    if(covariance == null) {
-      this.covariance = new double[mean.length][mean.length];
-    }
-    else {
-      this.covariance = covariance;
-      robustInvert();
-    }
+    this.covariance = covariance != null ? covariance : identity(mean.length, mean.length);
     this.wsum = 0.;
+    updateCholesky();
   }
 
   @Override
@@ -130,7 +116,10 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   public void updateE(NumberVector vec, double wei) {
     final int dim = mean.length;
     assert (vec.getDimensionality() == dim);
-    assert (wei >= 0);
+    assert (wei >= 0 && wei < Double.POSITIVE_INFINITY) : wei;
+    if(wei < Double.MIN_NORMAL) {
+      return;
+    }
     final double nwsum = wsum + wei;
     // Compute new means
     for(int i = 0; i < dim; i++) {
@@ -160,7 +149,8 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   public void finalizeEStep() {
     // Restore symmetry, and apply weight:
     final int dim = covariance.length;
-    final double f = (wsum > Double.MIN_NORMAL) ? 1. / wsum : 1.;
+    final double f = (wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY) ? 1. / wsum : 1.;
+    assert (f > 0) : wsum;
     for(int i = 0; i < dim; i++) {
       double[] row_i = covariance[i];
       for(int j = 0; j < i; j++) {
@@ -169,55 +159,59 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       // Entry on diagonal:
       row_i[i] *= f;
     }
-    robustInvert();
+    updateCholesky();
   }
 
   /**
-   * Robust computation of the inverse covariance matrix.
+   * Update the cholesky decomposition.
    */
-  private void robustInvert() {
+  private void updateCholesky() {
     // TODO: further improve handling of degenerated cases?
-    final int dim = mean.length;
-    LUDecomposition lu = new LUDecomposition(covariance);
-    double det = lu.det();
-    if(!(det > 0.)) {
+    chol = new CholeskyDecomposition(covariance);
+    if(!chol.isSPD()) {
       // Add a small value to the diagonal
-      for(int i = 0; i < dim; i++) {
+      for(int i = 0; i < covariance.length; i++) {
         covariance[i][i] += SINGULARITY_CHEAT;
       }
-      lu = new LUDecomposition(covariance);
-      det = lu.det();
-      if(!(det > 0.)) {
-        LOG.warning("Singularity cheat did not resolve zero determinant.");
-        det = 1.;
+      chol = new CholeskyDecomposition(covariance);
+      if(!chol.isSPD()) {
+        LOG.warning("Singularity cheat did not resolve zero determinant." + FormatUtil.format(covariance));
       }
     }
-    normDistrFactor = 1. / FastMath.sqrt(norm * det);
-    invCovMatr = lu.solve(identity(dim, dim));
-  }
-
-  @Override
-  public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec);
-    double prob = normDistrFactor * FastMath.exp(-.5 * power);
-    if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + -.5 * power + " factor: " + normDistrFactor);
-      prob = 0.;
-    }
-    return prob * weight;
+    logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(chol);
   }
 
   /**
-   * Compute the Mahalanobis distance of a vector.
+   * Get 0.5 * log(det) of a cholesky decomposition.
    * 
-   * Note: used from
-   * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.P3C}!
+   * @param chol Cholesky Decomposition
+   * @return log determinant.
+   */
+  private double getHalfLogDeterminant(CholeskyDecomposition chol) {
+    double[][] l = chol.getL();
+    double logdet = FastMath.log(l[0][0]);
+    for(int i = 1; i < l.length; i++) {
+      logdet += FastMath.log(l[i][i]);
+    }
+    return logdet;
+  }
+
+  /**
+   * Compute the Mahalanobis distance from the centroid for a given vector.
+   *
+   * Note: used by P3C.
    * 
    * @param vec Vector
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    return VMath.mahalanobisDistance(invCovMatr, vec.toArray(), mean);
+    // TODO: this allocates one array.
+    return squareSum(chol.solveLInplace(minusEquals(vec.toArray(), mean)));
+  }
+  
+  @Override
+  public double estimateLogDensity(NumberVector vec) {
+    return -.5 * mahalanobisDistance(vec) + logNormDet;
   }
 
   @Override

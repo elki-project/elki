@@ -25,8 +25,8 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 import net.jafama.FastMath;
 
 /**
@@ -36,11 +36,6 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 public class SphericalGaussianModel implements EMClusterModel<EMModel> {
-  /**
-   * Class logger.
-   */
-  private static Logging LOG = Logging.getLogger(SphericalGaussianModel.class);
-
   /**
    * Mean vector.
    */
@@ -59,7 +54,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Normalization factor.
    */
-  double norm, normDistrFactor;
+  double logNorm, logNormDet;
 
   /**
    * Weight aggregation sum
@@ -73,7 +68,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public SphericalGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), 1.);
+    this(weight, mean, 1.);
   }
 
   /**
@@ -81,24 +76,13 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * 
    * @param weight Cluster weight
    * @param mean Initial mean
-   * @param norm Normalization factor.
+   * @param var Initial variance
    */
-  public SphericalGaussianModel(double weight, double[] mean, double norm) {
-    this(weight, mean, norm, 1.);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param weight Cluster weight
-   * @param mean Initial mean
-   * @param norm Normalization factor.
-   */
-  public SphericalGaussianModel(double weight, double[] mean, double norm, double var) {
+  public SphericalGaussianModel(double weight, double[] mean, double var) {
     this.weight = weight;
     this.mean = mean;
-    this.norm = norm;
-    this.normDistrFactor = 1. / FastMath.sqrt(norm); // assume det=1
+    this.logNorm = MathUtil.LOGTWOPI * mean.length;
+    this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
     this.variance = var;
     this.wsum = 0.;
@@ -134,14 +118,12 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void finalizeEStep() {
+    double logDet = 0.;
     if(wsum > 0.) {
       variance = variance / (wsum * mean.length);
-      normDistrFactor = 1. / FastMath.sqrt(norm * variance);
-    }
-    else {
-      // Degenerate
-      normDistrFactor = 1. / FastMath.sqrt(norm);
-    }
+      logDet = FastMath.log(variance);
+    } // Else degenerate
+    logNormDet = FastMath.log(weight) - .5 * logNorm - logDet;
   }
 
   /**
@@ -175,14 +157,8 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   }
 
   @Override
-  public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec) * .5;
-    double prob = normDistrFactor * FastMath.exp(-power);
-    if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor);
-      prob = 0.;
-    }
-    return prob * weight;
+  public double estimateLogDensity(NumberVector vec) {
+    return -.5 * mahalanobisDistance(vec) + logNormDet;
   }
 
   @Override
