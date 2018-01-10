@@ -345,7 +345,7 @@ public class Simple1DOFCamera {
    * 
    * @author Erich Schubert
    */
-  interface CameraListener {
+  public interface CameraListener {
     /**
      * Camera changed.
      */
