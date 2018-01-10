@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 import net.jafama.FastMath;
 
@@ -42,11 +41,6 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * Class logger.
    */
   private static Logging LOG = Logging.getLogger(MultivariateGaussianModel.class);
-
-  /**
-   * Small value to add to the diagonal to avoid singularities.
-   */
-  private static final double SINGULARITY_CHEAT = 1e-9;
 
   /**
    * Mean vector.
@@ -167,18 +161,15 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    */
   private void updateCholesky() {
     // TODO: further improve handling of degenerated cases?
-    chol = new CholeskyDecomposition(covariance);
-    if(!chol.isSPD()) {
-      // Add a small value to the diagonal
-      for(int i = 0; i < covariance.length; i++) {
-        covariance[i][i] += SINGULARITY_CHEAT;
-      }
-      chol = new CholeskyDecomposition(covariance);
-      if(!chol.isSPD()) {
-        LOG.warning("Singularity cheat did not resolve zero determinant." + FormatUtil.format(covariance));
-      }
+    CholeskyDecomposition chol = new CholeskyDecomposition(covariance);
+    if(chol.isSPD()) {
+      this.chol = chol; // Keep.
     }
-    logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(chol);
+    else {
+      LOG.warning("A cluster has degenerated, likely due to too lack of variance in a subset of the data.\n" + //
+          "The algorithm will likely stop, and fail to produce a good fit.");
+    }
+    logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 
   /**
@@ -208,7 +199,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     // TODO: this allocates one array.
     return squareSum(chol.solveLInplace(minusEquals(vec.toArray(), mean)));
   }
-  
+
   @Override
   public double estimateLogDensity(NumberVector vec) {
     return -.5 * mahalanobisDistance(vec) + logNormDet;

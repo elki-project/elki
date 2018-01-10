@@ -239,17 +239,19 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       NumberVector instance = relation.get(iditer);
       for(int i = 0; i < clusterProbabilities.length; i++) {
-        final double prior = clusterProbabilities[i];
-        if(prior > 0.) {
-          models.get(i).updateE(instance, prior);
+        final double prob = clusterProbabilities[i];
+        if(!(prob > 0.)) {
+          continue;
         }
-        wsum[i] += prior;
+        models.get(i).updateE(instance, prob);
+        wsum[i] += prob;
       }
     }
-    int i = 0;
-    for(EMClusterModel<?> m : models) {
+    for(int i = 0; i < models.size(); i++) {
+      EMClusterModel<?> m = models.get(i);
+      // Set weight before calling finalize, because this uses the new weight already!
+      m.setWeight(wsum[i] / relation.size());
       m.finalizeEStep();
-      m.setWeight(wsum[i++] / relation.size());
     }
   }
 
@@ -277,7 +279,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       }
       double logP = logSumExp(probs);
       emSum += logP > MIN_LOGLIKELIHOOD ? logP : MIN_LOGLIKELIHOOD;
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         probs[i] = FastMath.exp(probs[i] - logP);
       }
       probClusterIGivenX.put(iditer, probs);

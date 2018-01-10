@@ -51,6 +51,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Parameterizer.K_ID, 6) //
         .build().run(db);
     testFMeasure(db, result, 0.971834390);
+    // This test case shows that EM can work very well,
+    // but cause an empty cluster! This is OK.
     testClusterSizes(result, new int[] { 0, 5, 93, 100, 200, 312 });
   }
 
