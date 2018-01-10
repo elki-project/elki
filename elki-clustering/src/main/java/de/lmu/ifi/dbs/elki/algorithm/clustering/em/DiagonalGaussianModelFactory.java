@@ -32,9 +32,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-
-import net.jafama.FastMath;
 
 /**
  * Factory for EM with multivariate gaussian models using diagonal matrixes.
@@ -63,7 +62,8 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
   public List<DiagonalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.length == k);
-    double[] variances = timesEquals(RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs()), 1. / FastMath.sqrt(k));
+    double[] variances = RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs());
+    timesEquals(variances, 1. / MathUtil.powi(k, variances.length));
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
