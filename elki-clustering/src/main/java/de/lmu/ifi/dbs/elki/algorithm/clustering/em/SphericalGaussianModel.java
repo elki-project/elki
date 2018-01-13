@@ -57,9 +57,14 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   double logNorm, logNormDet;
 
   /**
-   * Weight aggregation sum
+   * Weight aggregation sum.
    */
   double weight, wsum;
+
+  /**
+   * Prior variance, for MAP estimation.
+   */
+  double priorvar;
 
   /**
    * Constructor.
@@ -85,6 +90,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
     this.variance = var;
+    this.priorvar = var;
     this.wsum = 0.;
   }
 
@@ -117,11 +123,17 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   }
 
   @Override
-  public void finalizeEStep() {
+  public void finalizeEStep(double weight, double prior) {
+    final int dim = mean.length;
+    this.weight = weight;
     double logDet = 0.;
-    if(wsum > 0.) {
-      variance = variance / (wsum * mean.length);
-      logDet = FastMath.log(variance);
+    if(prior > 0) { // MAP
+      double nu = dim + 2; // Popular default.F
+      variance /= dim;
+      logDet = FastMath.log(variance = (variance + prior * priorvar) / (wsum + prior * (nu + dim + 2)));
+    }
+    else if(wsum > 0.) { // MLE
+      logDet = FastMath.log(variance = variance / (wsum * dim));
     } // Else degenerate
     logNormDet = FastMath.log(weight) - .5 * logNorm - logDet;
   }

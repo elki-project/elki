@@ -30,9 +30,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+
+import net.jafama.FastMath;
 
 /**
  * Factory for EM with multivariate gaussian models using a single variance.
@@ -62,7 +63,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
     double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.length == k);
     double[] variances = RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs());
-    double var = VMath.sum(variances) / MathUtil.powi(k, variances.length); // Initial variance estimate
+    double var = VMath.sum(variances) * FastMath.pow(k, -2. / variances.length); // Initial variance estimate
 
     List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {

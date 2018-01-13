@@ -39,14 +39,17 @@ public interface EMClusterModel<M extends MeanModel> {
    * Update the
    * 
    * @param vec Vector to process
-   * @param weight Weight
+   * @param weight Weight of point ("responsibility" of the cluster)
    */
   void updateE(NumberVector vec, double weight);
 
   /**
    * Finalize the E step.
+   * 
+   * @param Weight of the cluster
+   * @param prior MAP prior (0 for MLE)
    */
-  void finalizeEStep();
+  void finalizeEStep(double weight, double prior);
 
   /**
    * Estimate the log likelihood of a vector.

@@ -40,30 +40,34 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.4.0
  */
 public class EMTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run EM with fixed parameters and compare the result to a golden standard.
-   */
   @Test
-  public void testEMResults() {
+  public void testEMMLEMultivariate() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Parameterizer.K_ID, 6) //
         .build().run(db);
-    testFMeasure(db, result, 0.971834390);
-    // This test case shows that EM can work very well,
-    // but cause an empty cluster! This is OK.
-    testClusterSizes(result, new int[] { 0, 5, 93, 100, 200, 312 });
+    testFMeasure(db, result, 0.967410486);
+    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
   }
 
-  /**
-   * Run EM with fixed parameters and compare the result to a golden standard.
-   */
   @Test
-  public void testEMResultsDiagonal() {
+  public void testEMMAPMultivariate() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .build().run(db);
+    testFMeasure(db, result, 0.958843);
+    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+  }
+
+  @Test
+  public void testEMMLEDiagonal() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 3) //
         .with(EM.Parameterizer.K_ID, 5) //
         .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
         .build().run(db);
@@ -71,11 +75,21 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     testClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
   }
 
-  /**
-   * Run EM with fixed parameters and compare the result to a golden standard.
-   */
   @Test
-  public void testEMResultsSpherical() {
+  public void testEMMAPDiagonal() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 3) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .build().run(db);
+    testFMeasure(db, result, 0.949566);
+    testClusterSizes(result, new int[] { 6, 97, 98, 202, 307 });
+  }
+
+  @Test
+  public void testEMMLESpherical() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
@@ -84,5 +98,18 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, result, 0.811247176);
     testClusterSizes(result, new int[] { 8, 95, 198, 409 });
+  }
+
+  @Test
+  public void testEMMAPSpherical() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 1) //
+        .with(EM.Parameterizer.K_ID, 4) //
+        .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .build().run(db);
+    testFMeasure(db, result, 0.9357286);
+    testClusterSizes(result, new int[] { 103, 104, 208, 295 });
   }
 }

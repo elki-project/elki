@@ -74,6 +74,14 @@ import net.jafama.FastMath;
  * In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
  * </p>
  * 
+ * The MAP estimation is derived from
+ * <p>
+ * C. Fraley and A. E. Raftery<br />
+ * Bayesian Regularization for Normal Mixture Estimation and Model-Based
+ * Clustering<br />
+ * J. Classification 24(2)
+ * </p>
+ * 
  * @author Arthur Zimek
  * @author Erich Schubert
  * @since 0.2
@@ -123,6 +131,15 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
   private int maxiter;
 
   /**
+   * Prior to enable MAP estimation (use 0 for MLE)
+   */
+  @Reference(title = "Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering", //
+      authors = "C. Fraley and A. E. Raftery", //
+      booktitle = "J. Classification 24(2)", //
+      url = "https://doi.org/10.1007/s00357-007-0004-5")
+  private double prior = 0.;
+
+  /**
    * Retain soft assignments.
    */
   private boolean soft;
@@ -143,16 +160,42 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * @param k k parameter
    * @param delta delta parameter
    * @param mfactory EM cluster model factory
+   */
+  public EM(int k, double delta, EMClusterModelFactory<V, M> mfactory) {
+    this(k, delta, mfactory, -1, 0., false);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param k k parameter
+   * @param delta delta parameter
+   * @param mfactory EM cluster model factory
    * @param maxiter Maximum number of iterations
    * @param soft Include soft assignments
    */
   public EM(int k, double delta, EMClusterModelFactory<V, M> mfactory, int maxiter, boolean soft) {
+    this(k, delta, mfactory, maxiter, 0., soft);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param k k parameter
+   * @param delta delta parameter
+   * @param mfactory EM cluster model factory
+   * @param maxiter Maximum number of iterations
+   * @param prior MAP prior
+   * @param soft Include soft assignments
+   */
+  public EM(int k, double delta, EMClusterModelFactory<V, M> mfactory, int maxiter, double prior, boolean soft) {
     super();
     this.k = k;
     this.delta = delta;
     this.mfactory = mfactory;
     this.maxiter = maxiter;
-    this.setSoft(soft);
+    this.prior = prior;
+    this.soft = soft;
   }
 
   /**
@@ -181,17 +224,22 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     }
 
     // iteration unless no change
-    int it = 0;
+    int it = 0, lastimprovement = 0;
+    double bestloglikelihood = loglikelihood; // For detecting instabilities.
     for(++it; it <= maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
-      recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
+      recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
       // reassign probabilities
       loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
       if(LOG.isStatistics()) {
         LOG.statistics(likestat.setDouble(loglikelihood));
       }
-      if(loglikelihood - oldloglikelihood <= delta) {
+      if(loglikelihood - bestloglikelihood > delta) {
+        lastimprovement = it;
+        bestloglikelihood = loglikelihood;
+      }
+      if(Math.abs(loglikelihood - oldloglikelihood) <= delta || lastimprovement < it >> 1) {
         break;
       }
     }
@@ -229,12 +277,14 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * @param relation Vector data
    * @param probClusterIGivenX Object probabilities
    * @param models Cluster models to update
+   * @param prior MAP prior (use 0 for MLE)
    */
-  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<?>> models) {
+  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<?>> models, double prior) {
+    final int k = models.size();
     for(EMClusterModel<?> m : models) {
       m.beginEStep();
     }
-    double[] wsum = new double[models.size()];
+    double[] wsum = new double[k];
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       NumberVector instance = relation.get(iditer);
@@ -249,9 +299,9 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     }
     for(int i = 0; i < models.size(); i++) {
       EMClusterModel<?> m = models.get(i);
-      // Set weight before calling finalize, because this uses the new weight already!
-      m.setWeight(wsum[i] / relation.size());
-      m.finalizeEStep();
+      // MLE / MAP
+      final double weight = prior <= 0. ? wsum[i] / relation.size() : (wsum[i] + prior - 1) / (relation.size() + prior * k - k);
+      m.finalizeEStep(weight, prior);
     }
   }
 
@@ -367,6 +417,12 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
         "Model factory.");
 
     /**
+     * Parameter to specify the MAP prior
+     */
+    public static final OptionID PRIOR_ID = new OptionID("em.map.prior", //
+        "Regularization factor for MAP estimation.");
+
+    /**
      * Number of clusters.
      */
     protected int k;
@@ -385,6 +441,11 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
      * Maximum number of iterations.
      */
     protected int maxiter = -1;
+
+    /**
+     * Prior to enable MAP estimation (use 0 for MLE)
+     */
+    double prior = 0.;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -412,11 +473,18 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
+
+      DoubleParameter priorP = new DoubleParameter(PRIOR_ID) //
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(priorP)) {
+        prior = priorP.doubleValue();
+      }
     }
 
     @Override
     protected EM<V, M> makeInstance() {
-      return new EM<>(k, delta, initializer, maxiter, false);
+      return new EM<>(k, delta, initializer, maxiter, prior, false);
     }
   }
 }

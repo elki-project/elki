@@ -20,8 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.diagonal;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
@@ -69,6 +68,11 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   double weight, wsum;
 
   /**
+   * For the MAP version only, a prior diagonal
+   */
+  double[] priordiag;
+
+  /**
    * Constructor.
    * 
    * @param weight Cluster weight
@@ -93,10 +97,13 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[dim];
     if(variances == null) {
-      variances = new double[dim];
+      this.variances = new double[dim];
       Arrays.fill(variances, 1.);
     }
-    this.variances = variances;
+    else {
+      this.variances = variances;
+      this.priordiag = copy(variances);
+    }
     this.wsum = 0.;
   }
 
@@ -130,15 +137,24 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   }
 
   @Override
-  public void finalizeEStep() {
+  public void finalizeEStep(double weight, double prior) {
+    final int dim = variances.length;
+    this.weight = weight;
+    // FIXME: support prior.
     double logDet = 0;
-    if(wsum > 0.) {
+    if(prior > 0 && priordiag != null) {
+      // MAP
+      double nu = dim + 2; // Popular default.
+      double f2 = 1. / (wsum + prior * (nu + dim + 2));
+      for(int i = 0; i < dim; i++) {
+        logDet += FastMath.log(variances[i] = (variances[i] + prior * priordiag[i]) * f2);
+      }
+    }
+    else if(wsum > 0.) { // MLE
       final double s = 1. / wsum;
-      for(int i = 0; i < variances.length; i++) {
+      for(int i = 0; i < dim; i++) {
         double v = variances[i];
-        v = v > 0 ? v * s : SINGULARITY_CHEAT;
-        variances[i] = v;
-        logDet += FastMath.log(v);
+        logDet += FastMath.log(variances[i] = v > 0 ? v * s : SINGULARITY_CHEAT);
       }
     } // else degenerate
     logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);

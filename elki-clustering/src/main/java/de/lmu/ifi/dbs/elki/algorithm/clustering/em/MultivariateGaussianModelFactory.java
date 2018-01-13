@@ -32,8 +32,9 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+
+import net.jafama.FastMath;
 
 /**
  * Factory for EM with multivariate Gaussian models (with covariance; also known
@@ -65,7 +66,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
     assert (initialMeans.length == k);
     // Compute the global covariance matrix for better starting conditions:
     double[][] covmat = CovarianceMatrix.make(relation).destroyToSampleMatrix();
-    timesEquals(covmat, 1. / MathUtil.powi(k, covmat.length));
+    timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
 
     List<MultivariateGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {

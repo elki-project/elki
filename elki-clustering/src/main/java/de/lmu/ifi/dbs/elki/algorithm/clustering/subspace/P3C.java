@@ -242,13 +242,13 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     computeFuzzyMembership(relation, clusterCores, noise, probClusterIGivenX, models, dim);
 
     // Initial estimate of covariances, to assign noise objects
-    EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
+    EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models, 0.);
     assignUnassigned(relation, probClusterIGivenX, models, noise);
 
     double emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
     for(int it = 1; it <= maxEmIterations || maxEmIterations < 0; it++) {
       final double emOld = emNew;
-      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
+      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models, 0.);
       // reassign probabilities
       emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 

@@ -44,7 +44,7 @@ public class EMOutlierTest extends AbstractOutlierAlgorithmTest {
         .with(EM.Parameterizer.K_ID, 5) //
         .with(KMeans.SEED_ID, 2) //
         .build().run(db);
-    testAUC(db, "Noise", result, 0.534466);
+    testAUC(db, "Noise", result, 0.5654666);
     testSingleScore(result, 416, 1.8997442e-5);
   }
 }
