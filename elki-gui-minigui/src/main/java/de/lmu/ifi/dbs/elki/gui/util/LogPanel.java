@@ -132,30 +132,32 @@ public class LogPanel extends JPanel {
     JProgressBar pbar = pbarmap.get(prog);
     // Add a new progress bar.
     if(pbar == null) {
-      if(prog instanceof FiniteProgress) {
-        pbar = new JProgressBar(0, ((FiniteProgress) prog).getTotal());
-        pbar.setStringPainted(true);
-      }
-      else if(prog instanceof IndefiniteProgress) {
-        pbar = new JProgressBar();
-        pbar.setIndeterminate(true);
-        pbar.setStringPainted(true);
-      }
-      else if(prog instanceof MutableProgress) {
-        pbar = new JProgressBar(0, ((MutableProgress) prog).getTotal());
-        pbar.setStringPainted(true);
-      }
-      else {
-        throw new RuntimeException("Unsupported progress record");
-      }
-      pbarmap.put(prog, pbar);
-      final JProgressBar pbar2 = pbar;
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          addProgressBar(pbar2);
+      synchronized(pbarmap) {
+        if(prog instanceof FiniteProgress) {
+          pbar = new JProgressBar(0, ((FiniteProgress) prog).getTotal());
+          pbar.setStringPainted(true);
         }
-      });
+        else if(prog instanceof IndefiniteProgress) {
+          pbar = new JProgressBar();
+          pbar.setIndeterminate(true);
+          pbar.setStringPainted(true);
+        }
+        else if(prog instanceof MutableProgress) {
+          pbar = new JProgressBar(0, ((MutableProgress) prog).getTotal());
+          pbar.setStringPainted(true);
+        }
+        else {
+          throw new RuntimeException("Unsupported progress record");
+        }
+        pbarmap.put(prog, pbar);
+        final JProgressBar pbar2 = pbar;
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            addProgressBar(pbar2);
+          }
+        });
+      }
     }
     return pbar;
   }
@@ -192,14 +194,16 @@ public class LogPanel extends JPanel {
    * @param pbar Associated progress bar
    */
   private void removeProgressBar(Progress prog, JProgressBar pbar) {
-    pbarmap.remove(prog);
-    final JProgressBar pbar2 = pbar;
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        removeProgressBar(pbar2);
-      }
-    });
+    synchronized(pbarmap) {
+      pbarmap.remove(prog);
+      final JProgressBar pbar2 = pbar;
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          removeProgressBar(pbar2);
+        }
+      });
+    }
   }
 
   /**
@@ -207,9 +211,11 @@ public class LogPanel extends JPanel {
    */
   public void clear() {
     logpane.clear();
-    for(Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
-      super.remove(ent.getValue());
-      pbarmap.remove(ent.getKey());
+    synchronized(pbarmap) {
+      for(Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
+        super.remove(ent.getValue());
+        pbarmap.remove(ent.getKey());
+      }
     }
   }
 

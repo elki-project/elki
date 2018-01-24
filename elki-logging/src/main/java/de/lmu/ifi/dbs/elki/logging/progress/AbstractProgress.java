@@ -96,7 +96,7 @@ public abstract class AbstractProgress implements Progress {
    */
   public void setProcessed(int processed, Logging logger) throws IllegalArgumentException {
     setProcessed(processed);
-    if(testLoggingRate()) {
+    if(testLoggingRate(processed)) {
       logger.progress(this);
     }
   }
@@ -127,7 +127,7 @@ public abstract class AbstractProgress implements Progress {
    */
   @Override
   public String toString() {
-    return appendToBuffer(new StringBuilder()).toString();
+    return appendToBuffer(new StringBuilder(200)).toString();
   }
 
   /**
@@ -136,31 +136,35 @@ public abstract class AbstractProgress implements Progress {
    * @param logger Logger to report to.
    */
   public void incrementProcessed(Logging logger) {
-    this.processed.incrementAndGet();
-    if(testLoggingRate()) {
+    if(testLoggingRate(this.processed.incrementAndGet())) {
       logger.progress(this);
     }
   }
 
   /**
    * Logging rate control.
-   * 
+   *
+   * @param processed Counter
    * @return true when logging is sensible
    */
-  protected boolean testLoggingRate() {
-    final int processed = getProcessed();
+  protected boolean testLoggingRate(int processed) {
     final long now = System.currentTimeMillis();
-    final long age = now - lastLogged;
-    if(!isComplete() && processed > 10 && age < 5E2) {
-      return false;
+    if(processed > 10 && now - lastLogged < 5E2) {
+      return isComplete();
     }
-    if(lastValue > 0) {
-      int increment = processed - lastValue;
-      double newrate = increment / (double) age;
-      ratems = ratems != ratems ? newrate : (.95 * ratems + .05 * newrate);
+    synchronized(this) {
+      final long age = now - lastLogged;
+      if (age < 5E2) { // Probably another thread.
+        return isComplete();
+      }
+      if(lastValue > 0) {
+        int increment = processed - lastValue;
+        double newrate = increment / (double) age;
+        ratems = ratems != ratems ? newrate : (.95 * ratems + .05 * newrate);
+      }
+      lastValue = processed;
+      lastLogged = now;
     }
-    lastValue = processed;
-    lastLogged = now;
     return true;
   }
 }
