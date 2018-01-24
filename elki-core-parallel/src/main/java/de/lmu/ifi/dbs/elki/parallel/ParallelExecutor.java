@@ -75,7 +75,7 @@ public final class ParallelExecutor {
       List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
       for(int i = 0; i < numparts; i++) {
         final int start = i * blocksize;
-        final int end = (start + blocksize < size) ? start + blocksize : size;
+        final int end = Math.min(start + blocksize, size);
         Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, procs);
         parts.add(core.submit(run));
       }
@@ -150,10 +150,7 @@ public final class ParallelExecutor {
       for(int i = 0; i < procs.length; i++) {
         instances[i] = procs[i].instantiate(this);
       }
-
-      DBIDArrayIter iter = ids.iter();
-      iter.seek(start);
-      for(int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
+      for(DBIDArrayIter iter = ids.iter().seek(start); iter.valid() && iter.getOffset() < end; iter.advance()) {
         for(int i = 0; i < instances.length; i++) {
           instances[i].map(iter);
         }

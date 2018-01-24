@@ -226,6 +226,11 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
     private NeighborPredicate<? extends T> npreds;
 
     /**
+     * Progress logger.
+     */
+    private FiniteProgress progress;
+
+    /**
      * Full Constructor
      *
      * @param database Database to process
@@ -253,9 +258,12 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      */
     public Clustering<Model> run() {
       DBIDs ids = npred.getIDs();
+      
+      progress = LOG.isVerbose() ? new FiniteProgress("DBSCAN clustering", ids.size(), LOG) : null;
       // Do the majority of the work in parallel:
       // (This will call "instantiate".)
       ParallelExecutor.run(ids, this);
+      LOG.ensureCompleted(progress);
 
       // Build the final result
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Building final result", ids.size(), LOG) : null;
@@ -310,6 +318,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      */
     protected void processNeighbors(DBIDRef id, T neighbors) {
       if(!corepred.isCorePoint(id, neighbors)) {
+        LOG.incrementProcessed(progress);
         return;
       }
       Core core = null;
@@ -338,6 +347,9 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
         // Label neighbors, execute merges.
         for(DBIDIter it = npred.iterDBIDs(neighbors); it.valid(); it.advance()) {
           Assignment oclus = clusterids.get(it);
+          if(oclus == core) {
+            continue;
+          }
           if(oclus == null) { // Neighbor is still noise:
             clusterids.put(it, border);
           }
@@ -356,6 +368,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
           }
         }
       }
+      LOG.incrementProcessed(progress);
     }
 
     @Override
