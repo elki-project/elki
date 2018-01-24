@@ -127,7 +127,7 @@ public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunctio
 
   @Override
   public boolean isMetric() {
-    // As this is also reffered to as "canberra metric", it is probably a metric
+    // As this is also referred to as "canberra metric", it is probably a metric
     // But *maybe* only for positive numbers only?
     return true;
   }
