@@ -226,7 +226,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     // iteration unless no change
     int it = 0, lastimprovement = 0;
     double bestloglikelihood = loglikelihood; // For detecting instabilities.
-    for(++it; it <= maxiter || maxiter < 0; it++) {
+    for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
       // reassign probabilities
@@ -290,10 +290,9 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       NumberVector instance = relation.get(iditer);
       for(int i = 0; i < clusterProbabilities.length; i++) {
         final double prob = clusterProbabilities[i];
-        if(!(prob > 0.)) {
-          continue;
+        if(prob > 1e-10) {
+          models.get(i).updateE(instance, prob);
         }
-        models.get(i).updateE(instance, prob);
         wsum[i] += prob;
       }
     }
@@ -325,14 +324,15 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       NumberVector vec = relation.get(iditer);
       double[] probs = new double[k];
       for(int i = 0; i < k; i++) {
-        probs[i] = models.get(i).estimateLogDensity(vec);
+        double v = models.get(i).estimateLogDensity(vec);
+        probs[i] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
       }
-      double logP = logSumExp(probs);
-      emSum += logP > MIN_LOGLIKELIHOOD ? logP : MIN_LOGLIKELIHOOD;
+      final double logP = logSumExp(probs);
       for(int i = 0; i < k; i++) {
         probs[i] = FastMath.exp(probs[i] - logP);
       }
       probClusterIGivenX.put(iditer, probs);
+      emSum += logP;
     }
     return emSum / relation.size();
   }
@@ -345,23 +345,19 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    */
   private static double logSumExp(double[] x) {
     double max = x[0];
-    int maxPos = 0;
     for(int i = 1; i < x.length; i++) {
       final double v = x[i];
-      if(v > max) {
-        max = v;
-        maxPos = i;
-      }
+      max = v > max ? v : max;
     }
     final double cutoff = max - 35.350506209; // log_e(2**51)
     double acc = 0.;
     for(int i = 0; i < x.length; i++) {
       final double v = x[i];
-      if(i != maxPos && v > cutoff) {
-        acc += FastMath.exp(v - max);
+      if(v > cutoff) {
+        acc += v < max ? FastMath.exp(v - max) : 1.;
       }
     }
-    return acc != 0 ? (max + FastMath.log1p(acc)) : max;
+    return acc > 1. ? (max + FastMath.log(acc)) : max;
   }
 
   @Override

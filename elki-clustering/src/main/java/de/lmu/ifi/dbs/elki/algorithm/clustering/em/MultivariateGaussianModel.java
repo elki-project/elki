@@ -43,6 +43,11 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   private static Logging LOG = Logging.getLogger(MultivariateGaussianModel.class);
 
   /**
+   * Constant to avoid singular matrixes.
+   */
+  private static final double SINGULARITY_CHEAT = 1E-10;
+
+  /**
    * Mean vector.
    */
   double[] mean;
@@ -126,11 +131,11 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       return;
     }
     final double nwsum = wsum + wei;
+    final double f = wei / nwsum; // Do division only once
     // Compute new means
     for(int i = 0; i < dim; i++) {
       final double delta = vec.doubleValue(i) - mean[i];
-      final double rval = delta * wei / nwsum;
-      nmea[i] = mean[i] + rval;
+      nmea[i] = mean[i] + delta * f;
     }
     // Update covariance matrix
     for(int i = 0; i < dim; i++) {
@@ -193,13 +198,24 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   private void updateCholesky() {
     // TODO: further improve handling of degenerated cases?
     CholeskyDecomposition chol = new CholeskyDecomposition(covariance);
-    if(chol.isSPD()) {
-      this.chol = chol; // Keep.
+    if(!chol.isSPD()) {
+      // Add a small value to the diagonal, to reduce some rounding problems.
+      double s = 0.;
+      for(int i = 0; i < covariance.length; i++) {
+        s += covariance[i][i];
+      }
+      s *= SINGULARITY_CHEAT / covariance.length;
+      for(int i = 0; i < covariance.length; i++) {
+        covariance[i][i] += s;
+      }
+      chol = new CholeskyDecomposition(covariance);
     }
-    else {
-      LOG.warning("A cluster has degenerated, likely due to too lack of variance in a subset of the data.\n" + //
+    if(!chol.isSPD()) {
+      LOG.warning("A cluster has degenerated, likely due to lack of variance in a subset of the data or too extreme magnitude differences.\n" + //
           "The algorithm will likely stop without converging, and fail to produce a good fit.");
+      chol = this.chol != null ? this.chol : chol; // Prefer previous
     }
+    this.chol = chol;
     logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 
