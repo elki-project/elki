@@ -139,15 +139,15 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     }
     // Update covariance matrix
     for(int i = 0; i < dim; i++) {
-      double vi = vec.doubleValue(i);
+      double vi = vec.doubleValue(i), delta_i = vi - nmea[i];
       double[] cov_i = covariance[i];
       for(int j = 0; j < i; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
-        cov_i[j] += (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
+        cov_i[j] += delta_i * (vec.doubleValue(j) - mean[j]) * wei;
       }
       // Element on diagonal
-      cov_i[i] += (vi - nmea[i]) * (vi - mean[i]) * wei;
+      cov_i[i] += delta_i * (vi - mean[i]) * wei;
       // Other half is NOT updated here, but in finalizeEStep!
     }
     // Use new values.
