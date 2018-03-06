@@ -64,6 +64,56 @@ public class EMTest extends AbstractClusterAlgorithmTest {
   }
 
   @Test
+  public void testEMMLETwoPass() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.K_ID, 6) //
+        .with(EM.Parameterizer.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
+        .build().run(db);
+    testFMeasure(db, result, 0.967410486);
+    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+  }
+
+  @Test
+  public void testEMMAPTwoPass() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .with(EM.Parameterizer.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
+        .build().run(db);
+    testFMeasure(db, result, 0.958843);
+    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+  }
+
+  @Test
+  public void testEMMLETextbook() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.K_ID, 6) //
+        .with(EM.Parameterizer.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .build().run(db);
+    testFMeasure(db, result, 0.967410486);
+    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+  }
+
+  @Test
+  public void testEMMAPTextbook() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .with(EM.Parameterizer.K_ID, 5) //
+        .with(EM.Parameterizer.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .build().run(db);
+    testFMeasure(db, result, 0.958843);
+    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+  }
+
+  @Test
   public void testEMMLEDiagonal() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //

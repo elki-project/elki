@@ -36,7 +36,37 @@ public interface EMClusterModel<M extends MeanModel> {
   void beginEStep();
 
   /**
-   * Update the
+   * True, if the model needs two passes in the E step.
+   * 
+   * @return {@code true} when an initial pass is needed.
+   */
+  default boolean needsTwoPass() {
+    return false;
+  }
+
+  /**
+   * First run in the E step.
+   *
+   * By default, this is not used (c.f. {@link #needsTwoPass()}.
+   *
+   * @param vec Vector to process
+   * @param weight Weight of point ("responsibility" of the cluster)
+   */
+  default void firstPassE(NumberVector vec, double weight) {
+    // empty.
+  };
+
+  /**
+   * Finalize the first pass of the E step.
+   *
+   * By default, this is not used (c.f. {@link #needsTwoPass()}.
+   */
+  default void finalizeFirstPassE() {
+    // empty.
+  }
+
+  /**
+   * Process one data point in the E step
    * 
    * @param vec Vector to process
    * @param weight Weight of point ("responsibility" of the cluster)
@@ -64,7 +94,7 @@ public interface EMClusterModel<M extends MeanModel> {
    * 
    * @return Cluster model
    */
-  M finalizeCluster();  
+  M finalizeCluster();
 
   /**
    * Get the cluster weight.

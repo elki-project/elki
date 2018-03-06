@@ -281,8 +281,26 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    */
   public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<?>> models, double prior) {
     final int k = models.size();
+    boolean needsTwoPass = false;
     for(EMClusterModel<?> m : models) {
       m.beginEStep();
+      needsTwoPass |= m.needsTwoPass();
+    }
+    // First pass, only for two-pass models.
+    if (needsTwoPass) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        double[] clusterProbabilities = probClusterIGivenX.get(iditer);
+        NumberVector instance = relation.get(iditer);
+        for(int i = 0; i < clusterProbabilities.length; i++) {
+          final double prob = clusterProbabilities[i];
+          if(prob > 1e-10) {
+            models.get(i).firstPassE(instance, prob);
+          }
+        }
+      }
+      for(EMClusterModel<?> m : models) {
+        m.finalizeFirstPassE();
+      }
     }
     double[] wsum = new double[k];
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
