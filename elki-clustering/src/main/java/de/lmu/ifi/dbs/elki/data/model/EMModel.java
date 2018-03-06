@@ -50,7 +50,7 @@ public class EMModel extends MeanModel {
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    out.commentPrintLn("Covariance Matrix: " + FormatUtil.format(covarianceMatrix, FormatUtil.NF8));
+    out.commentPrintLn("Covariance Matrix: " + FormatUtil.format(covarianceMatrix, FormatUtil.NF16));
   }
 
   /**

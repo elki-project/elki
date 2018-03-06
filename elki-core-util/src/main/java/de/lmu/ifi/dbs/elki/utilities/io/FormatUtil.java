@@ -79,6 +79,11 @@ public final class FormatUtil {
    */
   public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
 
+  /**
+   * Number Formatter (16 digits) for output purposes.
+   */
+  public static final NumberFormat NF16 = NumberFormat.getInstance(Locale.US);
+
   static {
     NF.setMinimumFractionDigits(0);
     NF.setMaximumFractionDigits(8);
@@ -101,6 +106,9 @@ public final class FormatUtil {
     NF8.setMinimumFractionDigits(8);
     NF8.setMaximumFractionDigits(8);
     NF8.setGroupingUsed(false);
+    NF16.setMinimumFractionDigits(0);
+    NF16.setMaximumFractionDigits(16);
+    NF16.setGroupingUsed(false);
   }
 
   /**
