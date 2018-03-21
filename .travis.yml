@@ -6,11 +6,10 @@ jdk:
 before_script:
   - chmod +x ./gradlew
 script:
-  - ./gradlew elki:dependencies
-  - ./gradlew check -Pjacoco --stacktrace
-  - ./gradlew :codeCoverageReport -Pjacoco --stacktrace
+  - ./gradlew --no-daemon check -Pjacoco
+  - ./gradlew --no-daemon :codeCoverageReport -Pjacoco
 install:
-  - ./gradlew assemble -Pjacoco
+  - ./gradlew --no-daemon assemble -Pjacoco
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_cache:
