@@ -184,7 +184,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class PreDeConModel {
     /**
@@ -255,7 +255,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

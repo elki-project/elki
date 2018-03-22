@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  */
 @Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
     title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
@@ -118,7 +118,7 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

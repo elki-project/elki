@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf EvaluationResult.MeasurementGroup
+ * @composed - - - EvaluationResult.MeasurementGroup
  */
 public class EvaluationResult extends BasicResult implements TextWriteable, Iterable<EvaluationResult.MeasurementGroup> {
   /**
@@ -161,7 +161,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf EvaluationResult.Measurement
+   * @composed - - - EvaluationResult.Measurement
    */
   public static class MeasurementGroup implements Iterable<Measurement> {
     /**

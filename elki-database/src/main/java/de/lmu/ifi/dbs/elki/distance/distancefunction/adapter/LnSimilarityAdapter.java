@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has Instance
+ * @has - - - Instance
  * 
  * @param <O> object class to process.
  */
@@ -86,7 +86,7 @@ public class LnSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O, NormalizedSimilarityFunction<? super O>> {
     @Override

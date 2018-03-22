@@ -630,7 +630,7 @@ public class KMLOutputHandler implements ResultHandler {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

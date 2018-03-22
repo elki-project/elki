@@ -40,7 +40,7 @@ public class ParameterizationFunction {
   /**
    * Available types for the global extremum.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum ExtremumType {
   /**

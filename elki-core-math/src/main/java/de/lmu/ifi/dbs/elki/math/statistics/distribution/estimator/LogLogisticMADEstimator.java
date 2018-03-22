@@ -39,7 +39,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has LogLogisticDistribution
+ * @has - - - LogLogisticDistribution
  */
 @Reference(authors = "D. J. Olive", //
     title = "Applied Robust Statistics", booktitle = "", //
@@ -78,7 +78,7 @@ public class LogLogisticMADEstimator implements LogMADDistributionEstimator<LogL
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

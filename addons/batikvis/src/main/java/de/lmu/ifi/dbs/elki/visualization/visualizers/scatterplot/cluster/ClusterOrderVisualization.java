@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 // TODO: draw sample only?
 public class ClusterOrderVisualization implements VisFactory {
@@ -92,7 +92,7 @@ public class ClusterOrderVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has ClusterOrder oneway - - visualizes
+   * @navhas - visualizes - ClusterOrder
    */
   // TODO: listen for CLUSTER ORDER changes.
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {

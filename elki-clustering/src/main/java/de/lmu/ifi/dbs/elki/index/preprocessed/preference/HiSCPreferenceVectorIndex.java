@@ -180,8 +180,8 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses HiSCPreferenceVectorIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - HiSCPreferenceVectorIndex
    *
    * @param <V> Vector type
    */
@@ -229,7 +229,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**

@@ -106,7 +106,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

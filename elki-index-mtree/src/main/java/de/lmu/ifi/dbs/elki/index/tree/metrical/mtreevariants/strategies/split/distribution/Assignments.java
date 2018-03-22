@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @author Elke Achtert
  * @since 0.2
  * 
- * @apiviz.composedOf DistanceEntry
+ * @composed - - - DistanceEntry
  * 
  * @param <E> the type of MetricalEntry used in the M-Tree
  */

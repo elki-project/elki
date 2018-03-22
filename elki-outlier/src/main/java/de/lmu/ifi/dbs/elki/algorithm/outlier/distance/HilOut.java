@@ -82,8 +82,9 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf HilbertFeatures
- * @apiviz.uses HilFeature
+ * @composed - - - HilbertFeatures
+ * @assoc - - - HilFeature
+ *
  * @param <O> Object type
  */
 @Title("Fast Outlier Detection in High Dimensional Spaces")
@@ -145,7 +146,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * 
    * @author Jonathan von Brünken
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum ScoreType {
     All, TopN
@@ -425,7 +426,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * 
    * @author Jonathan von Brünken
    * 
-   * @apiviz.composedOf HilFeature
+   * @composed - - - HilFeature
    */
   class HilbertFeatures {
     // public int distcomp = 1;
@@ -892,7 +893,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * 
    * @author Jonathan von Brünken
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Vector type
    */

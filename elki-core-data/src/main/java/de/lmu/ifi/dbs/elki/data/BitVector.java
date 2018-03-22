@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.composedOf Bit
+ * @composed - - - Bit
  */
 public class BitVector implements SparseNumberVector {
   /**
@@ -328,7 +328,7 @@ public class BitVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has BitVector
+   * @has - - - BitVector
    */
   public static class Factory implements SparseNumberVector.Factory<BitVector> {
     @Override
@@ -383,7 +383,7 @@ public class BitVector implements SparseNumberVector {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -400,7 +400,7 @@ public class BitVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses BitVector - - «serializes»
+   * @assoc - serializes - BitVector
    */
   public static class ShortSerializer implements ByteBufferSerializer<BitVector> {
     @Override

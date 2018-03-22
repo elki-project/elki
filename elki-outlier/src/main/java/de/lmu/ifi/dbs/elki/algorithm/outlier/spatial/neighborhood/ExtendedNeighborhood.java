@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -83,8 +83,8 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.has ExtendedNeighborhood oneway - - «produces»
+   * @stereotype factory
+   * @navhas - produces - ExtendedNeighborhood
    */
   public static class Factory<O> extends AbstractPrecomputedNeighborhood.Factory<O> {
     /**
@@ -167,7 +167,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

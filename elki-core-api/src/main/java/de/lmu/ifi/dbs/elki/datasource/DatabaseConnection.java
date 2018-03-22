@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.landmark
- * @apiviz.has MultipleObjectsBundle
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - MultipleObjectsBundle
  */
 public interface DatabaseConnection {
   /**

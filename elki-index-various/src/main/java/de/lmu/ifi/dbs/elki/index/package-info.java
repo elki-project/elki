@@ -1,8 +1,8 @@
 /**
  * Index structure implementations
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*\.*\.Factory
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory
+ * @opt hide de.lmu.ifi.dbs.elki.index.*\.*\.Factory
+ * @opt hide de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory
  */
 /*
  * This file is part of ELKI:

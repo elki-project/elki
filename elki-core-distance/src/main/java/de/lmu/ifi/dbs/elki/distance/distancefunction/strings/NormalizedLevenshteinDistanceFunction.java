@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses String
+ * @assoc - - - String
  */
 @Description("Levenshtein distance, normalized by average string length.")
 @Reference(authors = "V. I. Levenshtein", //
@@ -91,7 +91,7 @@ public class NormalizedLevenshteinDistanceFunction implements PrimitiveDistanceF
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

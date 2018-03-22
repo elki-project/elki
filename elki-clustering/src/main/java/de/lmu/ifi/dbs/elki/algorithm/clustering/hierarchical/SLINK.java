@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has SingleLinkageMethod
+ * @has - - - SingleLinkageMethod
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -283,7 +283,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     @Override

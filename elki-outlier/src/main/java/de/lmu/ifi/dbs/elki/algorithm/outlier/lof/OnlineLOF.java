@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @since 0.4.0
  *
- * @apiviz.has FlexibleLOF.LOFResult oneway - - updates
+ * @navhas - updates - FlexibleLOF.LOFResult
  */
 // TODO: related to publication?
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF")
@@ -169,7 +169,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    *
    * @author Elke Achtert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class LOFKNNListener implements KNNListener {
     /**
@@ -410,7 +410,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends FlexibleLOF.Parameterizer<O> {
     @Override

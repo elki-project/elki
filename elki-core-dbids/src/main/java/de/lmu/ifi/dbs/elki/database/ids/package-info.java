@@ -56,17 +56,17 @@
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#makeUnmodifiable DBIDUtil.makeUnmodifiable} to wrap DBIDs unmodifiable</li>
  * </ul>
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDIterator
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*Database
- * @apiviz.exclude de.lmu.ifi.dbs.elki.data.Cluster
- * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.query.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.(algorithm|evaluation|parallel|distance|index|result|persistent|utilities).*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.relation.*
- * @apiviz.exclude java.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
+ * @opt hide de.lmu.ifi.dbs.elki.database.ids.integer.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.ids.generic.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDIterator
+ * @opt hide de.lmu.ifi.dbs.elki.database.*Database
+ * @opt hide de.lmu.ifi.dbs.elki.data.Cluster
+ * @opt hide de.lmu.ifi.dbs.elki.datasource.filter.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.query.*
+ * @opt hide de.lmu.ifi.dbs.elki.(algorithm|evaluation|parallel|distance|index|result|persistent|utilities).*
+ * @opt hide de.lmu.ifi.dbs.elki.database.relation.*
+ * @opt hide java.*
  */
 /*
  * This file is part of ELKI:

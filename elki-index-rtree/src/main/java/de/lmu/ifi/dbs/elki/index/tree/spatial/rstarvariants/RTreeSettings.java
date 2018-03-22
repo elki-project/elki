@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Top
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.composedOf BulkSplit
- * @apiviz.composedOf SplitStrategy
- * @apiviz.composedOf InsertionStrategy
- * @apiviz.composedOf OverflowTreatment
+ * @composed - - - BulkSplit
+ * @composed - - - SplitStrategy
+ * @composed - - - InsertionStrategy
+ * @composed - - - OverflowTreatment
  */
 public class RTreeSettings {
   /**

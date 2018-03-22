@@ -1,17 +1,17 @@
 /**
  * Basic classes for different data types, database object types and label types
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.(algorithm|evaluation).*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.result.textwriter.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.(parser|filter).*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.math.linearalgebra.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.data.model.ModelUtil
- * @apiviz.exclude java.io.*
- * @apiviz.exclude java.util.*
- * @apiviz.exclude java.lang.*
- * @apiviz.exclude .*\.Factory$
- * @apiviz.exclude ByteBufferSerializer$
+ * @opt hide de.lmu.ifi.dbs.elki.(algorithm|evaluation).*
+ * @opt hide de.lmu.ifi.dbs.elki.result.textwriter.*
+ * @opt hide de.lmu.ifi.dbs.elki.visualization.*
+ * @opt hide de.lmu.ifi.dbs.elki.datasource.(parser|filter).*
+ * @opt hide de.lmu.ifi.dbs.elki.math.linearalgebra.*
+ * @opt hide de.lmu.ifi.dbs.elki.data.model.ModelUtil
+ * @opt hide java.io.*
+ * @opt hide java.util.*
+ * @opt hide java.lang.*
+ * @opt hide .*\.Factory$
+ * @opt hide ByteBufferSerializer$
  */
 /*
  * This file is part of ELKI:

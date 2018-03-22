@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.uses Clustering
- * @apiviz.uses Segments
+ * @assoc - - - Clustering
+ * @assoc - - - Segments
  */
 @Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Evaluation of Clusterings - Metrics and Visual Support", //

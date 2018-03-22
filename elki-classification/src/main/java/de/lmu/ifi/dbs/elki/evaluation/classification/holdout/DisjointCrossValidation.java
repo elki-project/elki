@@ -107,7 +107,7 @@ public class DisjointCrossValidation extends RandomizedHoldout {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends RandomizedHoldout.Parameterizer {
     /**

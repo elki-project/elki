@@ -18,8 +18,8 @@
  * final WritableDoubleDataStore scores = DataStoreFactory.FACTORY.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
  * }
  * 
- * @apiviz.exclude datastore.memory
- * @apiviz.exclude index.preprocessed
+ * @opt hide datastore.memory
+ * @opt hide index.preprocessed
  */
 /*
  * This file is part of ELKI:

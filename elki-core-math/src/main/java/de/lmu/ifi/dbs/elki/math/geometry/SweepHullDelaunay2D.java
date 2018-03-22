@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has Polygon
+ * @has - - - Polygon
  */
 @Reference(authors = "D. Sinclair", //
     title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", //
@@ -716,7 +716,7 @@ public class SweepHullDelaunay2D {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Orientation {
     ORIENT_AB_BA, ORIENT_AB_CB, ORIENT_AB_AC, ORIENT_BC_BA, ORIENT_BC_CB, ORIENT_BC_AC, ORIENT_CA_BA, ORIENT_CA_CB, ORIENT_CA_AC
@@ -727,7 +727,7 @@ public class SweepHullDelaunay2D {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Triangle {
     /**

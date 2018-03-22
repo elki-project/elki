@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.composedOf AchlioptasRandomProjectionFamily
+ * @composed - - - AchlioptasRandomProjectionFamily
  * 
  * @param <O> Object type
  */
@@ -79,7 +79,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Outer object type.
    */

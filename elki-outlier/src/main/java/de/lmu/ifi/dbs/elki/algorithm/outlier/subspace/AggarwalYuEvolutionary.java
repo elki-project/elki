@@ -70,8 +70,8 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has EvolutionarySearch oneway - - runs
- * @apiviz.has Individuum oneway - - obtains
+ * @navhas - runs - EvolutionarySearch
+ * @navhas - obtains - Individuum
  *
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
@@ -171,7 +171,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    *
    * @author Erich Schubert
    *
-   * @apiviz.has Individuum oneway - - evolves
+   * @navhas - evolves - Individuum
    */
   private class EvolutionarySearch {
     /**
@@ -670,7 +670,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
     /**

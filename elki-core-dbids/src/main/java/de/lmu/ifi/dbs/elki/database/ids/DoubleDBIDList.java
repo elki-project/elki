@@ -48,10 +48,10 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.composedOf DoubleDBIDPair
- * @apiviz.has DoubleDBIDListIter
+ * @composed - - - DoubleDBIDPair
+ * @has - - - DoubleDBIDListIter
  */
 public interface DoubleDBIDList extends DBIDs {
   @Override

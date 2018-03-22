@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.landmark
- * @apiviz.has EigenPair
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - SortedEigenPairs
  */
 public class PCAResult {
   /**

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 @Alias("de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection")
 @Priority(Priority.IMPORTANT)
@@ -102,7 +102,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends InputStreamDatabaseConnection.Parameterizer {
     /**

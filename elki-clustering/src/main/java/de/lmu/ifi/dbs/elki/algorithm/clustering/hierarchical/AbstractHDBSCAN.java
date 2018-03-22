@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,8 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf HDBSCANAdapter
- * @apiviz.composedOf HeapMSTCollector
+ * @composed - - - HDBSCANAdapter
+ * @composed - - - HeapMSTCollector
  *
  * @param <O> Input object type
  * @param <R> Output result type
@@ -284,7 +284,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

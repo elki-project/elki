@@ -50,7 +50,7 @@ import net.jafama.FastMath;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 @Priority(Priority.RECOMMENDED)
 @Alias({ "lp", "minkowski", "p", "de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction" })
@@ -252,7 +252,7 @@ public class LPNormDistanceFunction implements SpatialPrimitiveDistanceFunction<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

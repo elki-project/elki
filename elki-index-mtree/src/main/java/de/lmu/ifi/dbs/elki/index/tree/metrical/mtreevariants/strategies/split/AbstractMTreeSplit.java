@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.composedOf Assignments
+ * @has - - - Assignments
  *
  * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
@@ -82,7 +82,7 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree

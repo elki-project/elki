@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @apiviz.landmark
- * @apiviz.has SimilarityQuery
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - SimilarityQuery
  *
  * @param <O> Database object type
  */

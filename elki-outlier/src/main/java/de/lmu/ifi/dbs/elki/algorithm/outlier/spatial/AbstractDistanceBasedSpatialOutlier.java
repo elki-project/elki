@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -70,7 +70,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Object type for neighborhood
    * @param <O> Non-spatial object type

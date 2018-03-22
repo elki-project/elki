@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.uses TextWriteable
+ * @assoc - - - TextWriteable
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
   /**

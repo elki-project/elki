@@ -133,7 +133,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,13 +59,13 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.composedOf AlgorithmTabPanel
- * @apiviz.composedOf EvaluationTabPanel
- * @apiviz.composedOf InputTabPanel
- * @apiviz.composedOf LoggingTabPanel
- * @apiviz.composedOf OutputTabPanel
- * @apiviz.composedOf SavedSettingsTabPanel
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - AlgorithmTabPanel
+ * @composed - - - EvaluationTabPanel
+ * @composed - - - InputTabPanel
+ * @composed - - - LoggingTabPanel
+ * @composed - - - OutputTabPanel
+ * @composed - - - SavedSettingsTabPanel
  */
 @Alias({ "multi", "multigui", "multistepgui" })
 public class MultiStepGUI extends AbstractApplication {

@@ -88,7 +88,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
     /**

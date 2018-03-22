@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,10 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.composedOf PageFile
- * @apiviz.has Node oneway - - contains
- * @apiviz.has TreeIndexHeader oneway
- * @apiviz.excludeSubtypes
+ * @composed - - - PageFile
+ * @navhas - contains - Node
+ * @navhas - - - TreeIndexHeader
  *
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index

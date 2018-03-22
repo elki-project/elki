@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has ExponentiallyModifiedGaussianDistribution - - estimates
+ * @navassoc - estimates - ExponentiallyModifiedGaussianDistribution
  */
 @Reference(authors = "J. Olivier, M. M. Norberg", //
     title = "Positively skewed data: Revisiting the Box-Cox power transformation", //
@@ -86,7 +86,7 @@ public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<Expo
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

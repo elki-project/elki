@@ -52,7 +52,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KMeansModel
+ * @has - - - KMeansModel
+ *
  * @param <V> vector datatype
  */
 @Reference(authors = "G. Hamerly", //
@@ -97,7 +98,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -299,7 +300,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

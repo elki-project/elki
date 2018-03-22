@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses SVGPath
- * @apiviz.uses Projection2D
+ * @assoc - - - SVGPath
+ * @assoc - - - Projection2D
  */
 public final class SVGHyperCube {
   /**

@@ -231,7 +231,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

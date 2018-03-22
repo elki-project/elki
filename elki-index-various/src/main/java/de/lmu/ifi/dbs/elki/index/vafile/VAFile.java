@@ -65,12 +65,12 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  * 
- * @apiviz.composedOf VectorApproximation
- * @apiviz.has VAFileRangeQuery
- * @apiviz.has VAFileKNNQuery
- * @apiviz.uses VALPNormDistance
+ * @composed - - - VectorApproximation
+ * @has - - - VAFileRangeQuery
+ * @has - - - VAFileKNNQuery
+ * @assoc - - - VALPNormDistance
  * 
  * @param <V> Vector type
  */
@@ -406,8 +406,8 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.has VAFile
+   * @stereotype factory
+   * @has - - - VAFile
    * 
    * @param <V> Vector type
    */
@@ -458,7 +458,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

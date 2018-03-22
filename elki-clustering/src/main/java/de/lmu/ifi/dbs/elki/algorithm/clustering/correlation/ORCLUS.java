@@ -70,7 +70,8 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.has PCARunner
+ * @has - - - PCARunner
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
@@ -404,7 +405,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   /**
    * Encapsulates the attributes of a cluster.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private final class ORCLUSCluster {
     // TODO: reuse/derive from existing cluster classes?
@@ -449,7 +450,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   /**
    * Encapsulates the projected energy for a cluster.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private final class ProjectedEnergy implements Comparable<ProjectedEnergy> {
     int i, j;
@@ -483,7 +484,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
     /**

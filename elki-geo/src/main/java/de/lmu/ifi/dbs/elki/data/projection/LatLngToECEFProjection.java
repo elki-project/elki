@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.composedOf EarthModel
- * @apiviz.uses NumberVector
+ * @composed - - - EarthModel
+ * @assoc - - - NumberVector
  * 
  * @param <V> Vector type
  */
@@ -88,7 +88,7 @@ public class LatLngToECEFProjection<V extends NumberVector> implements Projectio
   /**
    * Parameterization class.
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @author Erich Schubert
    */

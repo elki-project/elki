@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedP
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.composedOf SavedSettingsTabPanel.SettingsComboboxModel
+ * @composed - - - SavedSettingsTabPanel.SettingsComboboxModel
  */
 public class SavedSettingsTabPanel extends JPanel {
   /**
@@ -177,7 +177,7 @@ public class SavedSettingsTabPanel extends JPanel {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
+   * @composed - - - de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
   class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses ExternalID
+ * @assoc - - - ExternalID
  */
 public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection {
   /**
@@ -200,7 +200,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

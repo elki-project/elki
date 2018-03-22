@@ -64,8 +64,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.Cluster
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 // TODO: make parameterizable: rounded.
 public class ClusterOutlineVisualization implements VisFactory {
@@ -259,7 +259,7 @@ public class ClusterOutlineVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

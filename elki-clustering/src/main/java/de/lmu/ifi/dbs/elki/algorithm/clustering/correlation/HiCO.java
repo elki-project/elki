@@ -72,7 +72,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.composedOf HiCO.Instance
+ * @composed - - - HiCO.Instance
+ *
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Mining Hierarchies of Correlation Clusters")
@@ -139,7 +140,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses FilteredLocalPCAIndex
+   * @assoc - - - FilteredLocalPCAIndex
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
     /**
@@ -386,7 +387,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

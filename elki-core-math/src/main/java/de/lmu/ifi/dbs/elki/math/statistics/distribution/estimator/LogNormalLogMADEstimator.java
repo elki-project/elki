@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has LogNormalDistribution - - estimates
+ * @navassoc - estimates - LogNormalDistribution
  */
 @Reference(authors = "F. R. Hampel", //
     title = "The Influence Curve and Its Role in Robust Estimation", //
@@ -83,7 +83,7 @@ public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<Log
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

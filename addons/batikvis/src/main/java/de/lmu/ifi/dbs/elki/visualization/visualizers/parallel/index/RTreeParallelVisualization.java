@@ -57,8 +57,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVi
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class RTreeParallelVisualization implements VisFactory {
   /**
@@ -106,7 +106,7 @@ public class RTreeParallelVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has AbstractRStarTree oneway - - visualizes
+   * @navhas - visualizes - AbstractRStarTree
    *
    * @param <N> Tree node type
    * @param <E> Tree entry type
@@ -220,7 +220,7 @@ public class RTreeParallelVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     protected boolean fill = true;

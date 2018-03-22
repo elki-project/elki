@@ -226,7 +226,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

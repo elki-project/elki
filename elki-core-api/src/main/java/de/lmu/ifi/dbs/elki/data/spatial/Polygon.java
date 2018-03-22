@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.composedOf double[]
+ * @composed - - - double[]
  */
 public class Polygon implements SpatialComparable {
   /**

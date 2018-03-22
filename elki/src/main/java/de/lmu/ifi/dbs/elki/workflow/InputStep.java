@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has Database
+ * @has - - - Database
  */
 public class InputStep implements WorkflowStep {
   /**
@@ -67,7 +67,7 @@ public class InputStep implements WorkflowStep {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

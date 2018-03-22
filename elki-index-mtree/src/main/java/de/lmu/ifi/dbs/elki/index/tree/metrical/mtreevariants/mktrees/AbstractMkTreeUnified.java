@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert
  * @since 0.2
  * 
- * @apiviz.has MkTreeHeader oneway
- * @apiviz.composedOf MkTreeSettings
+ * @navassoc - - - MkTreeHeader
+ * @composed - - - MkTreeSettings
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index

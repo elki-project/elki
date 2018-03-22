@@ -315,7 +315,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
    *
    * @author Alexander Koos
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

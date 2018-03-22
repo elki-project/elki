@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  *
  * @author Erich Schubert
  *
- * @apiviz.uses ClusteringFeature
- * @apiviz.uses NumberVector
+ * @assoc - - - ClusteringFeature
+ * @assoc - - - NumberVector
  */
 public interface BIRCHDistance {
   /**

@@ -80,7 +80,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf ALOCIQuadTree
+ * @composed - - - ALOCIQuadTree
  *
  * @param <O> Object type
  */
@@ -305,7 +305,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    * @author Jonathan von Brünken
    * @author Erich Schubert
    *
-   * @apiviz.composedOf Node
+   * @composed - - - Node
    */
   static class ALOCIQuadTree {
     /**
@@ -650,7 +650,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

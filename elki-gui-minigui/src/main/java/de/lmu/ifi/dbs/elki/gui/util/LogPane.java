@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,9 +48,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * @author Erich Schubert
  * @since 0.3
  * 
- * @apiviz.uses LoggingConfiguration
- * @apiviz.uses de.lmu.ifi.dbs.elki.logging.ELKILogRecord
- * @apiviz.uses ProgressLogRecord
+ * @assoc - - - LoggingConfiguration
+ * @assoc - - - de.lmu.ifi.dbs.elki.logging.ELKILogRecord
+ * @assoc - - - ProgressLogRecord
  */
 public class LogPane extends JTextPane {
   /**
@@ -228,7 +228,7 @@ public class LogPane extends JTextPane {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private class LogPaneHandler extends Handler {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,9 +37,8 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.excludeSubtypes
- * @apiviz.has AbstractRangeQuery
- * @apiviz.has AbstractKNNQuery
+ * @has - - - AbstractRangeQuery
+ * @has - - - AbstractKNNQuery
  * 
  * @param <O> Object type
  */
@@ -101,7 +100,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.excludeSubtypes
    */
   public abstract class AbstractRangeQuery extends AbstractDistanceRangeQuery<O> {
     /**
@@ -140,7 +138,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.excludeSubtypes
    */
   public abstract class AbstractKNNQuery extends AbstractDistanceKNNQuery<O> {
     /**

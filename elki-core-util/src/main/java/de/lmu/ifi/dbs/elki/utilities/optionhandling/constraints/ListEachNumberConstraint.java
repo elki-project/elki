@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,11 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Applies numeric constraints to all elements of a list.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
- * @apiviz.composedOf AbstractNumberConstraint oneway 1 n
+ *
+ * @composed - - * AbstractNumberConstraint
  */
 public class ListEachNumberConstraint<T> implements ParameterConstraint<T> {
   /**
@@ -49,7 +49,7 @@ public class ListEachNumberConstraint<T> implements ParameterConstraint<T> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param constraint Constraint to apply to all elements
    */
   public ListEachNumberConstraint(AbstractNumberConstraint constraint) {
@@ -60,7 +60,7 @@ public class ListEachNumberConstraint<T> implements ParameterConstraint<T> {
 
   /**
    * Add a constraint to this operator.
-   * 
+   *
    * @param constraint Constraint
    */
   public void addConstraint(AbstractNumberConstraint constraint) {

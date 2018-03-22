@@ -37,8 +37,8 @@
  * </ul>
  * This file format is e.g. also suitable to gnuplot.
  *
- * @apiviz.exclude java.io.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
+ * @opt hide java.io.*
+ * @opt hide de.lmu.ifi.dbs.elki.utilities.*
  */
 /*
  * This file is part of ELKI:

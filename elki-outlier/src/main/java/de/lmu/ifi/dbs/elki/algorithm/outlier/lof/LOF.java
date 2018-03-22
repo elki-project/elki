@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @since 0.2
  * 
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
  * 
  * @param <O> the type of data objects handled by this algorithm
  */
@@ -254,7 +254,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

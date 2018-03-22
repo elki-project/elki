@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  * 
  * @param <V> Vector type
  */
@@ -153,7 +153,7 @@ public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFi
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

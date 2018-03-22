@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf ChiSquaredDistribution
+ * @composed - - - ChiSquaredDistribution
  */
 public class ChiDistribution extends AbstractDistribution {
   /**
@@ -161,7 +161,7 @@ public class ChiDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /**

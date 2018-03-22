@@ -320,7 +320,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @author Omar Yousry
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

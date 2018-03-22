@@ -68,7 +68,7 @@ public class GRS80SpheroidEarthModel extends AbstractEarthModel {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

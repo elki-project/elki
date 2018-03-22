@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -162,7 +162,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,10 +29,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  * 
- * @apiviz.uses SpatialComparable oneway - - «compares»
- * @apiviz.has ModifiableHyperBoundingBox oneway - - «creates»
+ * @navassoc - compares - SpatialComparable
+ * @navhas - creates - ModifiableHyperBoundingBox
  */
 // IMPORTANT NOTE: when editing this class, bear in mind that the dimension
 // numbers start at 1 or 0 depending on the context!

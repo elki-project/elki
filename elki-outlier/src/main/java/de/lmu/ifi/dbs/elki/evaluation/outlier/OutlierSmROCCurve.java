@@ -63,8 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.uses OutlierResult
- * @apiviz.has SmROCResult oneway - - «create»
+ * @assoc - - - OutlierResult
+ * @navhas - create - SmROCResult
  */
 @Reference(authors = "W. Klement, P. A. Flach, N. Japkowicz, S. Matwin", //
     title = "Smooth Receiver Operating Characteristics (smROC) Curves", //
@@ -238,7 +238,7 @@ public class OutlierSmROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class ClusterStarVisualization implements VisFactory {
   /**
@@ -95,8 +95,8 @@ public class ClusterStarVisualization implements VisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has MeanModel oneway - - visualizes
-   * @apiviz.has MedoidModel oneway - - visualizes
+   * @navhas - visualizes - MeanModel
+   * @navhas - visualizes - MedoidModel
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**

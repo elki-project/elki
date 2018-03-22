@@ -28,9 +28,9 @@ import java.util.function.Consumer;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.composedOf DBID
- * @apiviz.has DBIDIter
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - DBID
+ * @has - - - DBIDIter
  */
 public interface DBIDs {
   /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class OPTICSSteepAreaVisualization implements VisFactory {
   /**
@@ -94,7 +94,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses SteepAreaResult
+   * @assoc - - - SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**

@@ -105,7 +105,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public class DoubleVector implements NumberVector {
   /**
@@ -143,7 +143,7 @@ public class DoubleVector implements NumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has DoubleVector
+   * @has - - - DoubleVector
    */
   public static class Factory implements NumberVector.Factory<DoubleVector> {
     @Override
@@ -189,7 +189,7 @@ public class DoubleVector implements NumberVector {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -205,7 +205,7 @@ public class DoubleVector implements NumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses DoubleVector - - «serializes»
+   * @assoc - serializes - DoubleVector
    */
   public static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
@@ -243,7 +243,7 @@ public class DoubleVector implements NumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses DoubleVector - - «serializes»
+   * @assoc - serializes - DoubleVector
    */
   public static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
@@ -280,7 +280,7 @@ public class DoubleVector implements NumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses DoubleVector - - «serializes»
+   * @assoc - serializes - DoubleVector
    */
   public static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override

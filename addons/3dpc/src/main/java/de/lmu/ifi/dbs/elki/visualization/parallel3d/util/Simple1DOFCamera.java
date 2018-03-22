@@ -39,7 +39,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses CameraListener
+ * @assoc - - - CameraListener
  */
 public class Simple1DOFCamera {
   /**

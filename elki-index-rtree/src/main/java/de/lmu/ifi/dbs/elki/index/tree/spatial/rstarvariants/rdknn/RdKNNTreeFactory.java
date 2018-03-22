@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses RdKNNTree oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - RdKNNTree
  *
  * @param <O> Object type
  */
@@ -87,7 +87,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings> {
     @Override

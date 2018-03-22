@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.landmark
- * @apiviz.has DistanceQuery
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - DistanceQuery
  */
 public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> implements LinearScanQuery {
   /**

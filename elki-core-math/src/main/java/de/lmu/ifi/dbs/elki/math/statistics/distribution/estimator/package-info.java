@@ -3,13 +3,13 @@
  * 
  * @author Erich Schubert
  * 
- * @apiviz.exclude de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.*
+ * @opt hide de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.*
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

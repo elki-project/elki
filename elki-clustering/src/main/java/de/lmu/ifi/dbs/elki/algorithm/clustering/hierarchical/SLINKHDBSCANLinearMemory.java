@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has PointerDensityHierarchyRepresentationResult
+ * @has - - - PointerDensityHierarchyRepresentationResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
@@ -243,7 +243,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

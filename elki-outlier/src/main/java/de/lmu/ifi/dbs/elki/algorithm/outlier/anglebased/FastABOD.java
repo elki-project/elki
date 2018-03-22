@@ -278,7 +278,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends ABOD.Parameterizer<V> {
     /**

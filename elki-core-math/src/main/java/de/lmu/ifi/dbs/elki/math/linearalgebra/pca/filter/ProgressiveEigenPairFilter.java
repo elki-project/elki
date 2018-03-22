@@ -145,7 +145,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

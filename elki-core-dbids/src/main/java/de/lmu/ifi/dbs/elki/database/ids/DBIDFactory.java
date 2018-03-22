@@ -31,15 +31,15 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses DBID oneway - - «create»
- * @apiviz.uses DBIDs oneway - - «create»
- * @apiviz.uses DBIDPair oneway - - «create»
- * @apiviz.uses DBIDRange oneway - - «create»
- * @apiviz.uses ArrayModifiableDBIDs oneway - - «create»
- * @apiviz.uses HashSetModifiableDBIDs oneway - - «create»
- * @apiviz.uses HashSetModifiableDBIDs oneway - - «create»
- * @apiviz.has ByteBufferSerializer oneway - - provides
+ * @stereotype factory
+ * @navassoc - create - DBID
+ * @navassoc - create - DBIDs
+ * @navassoc - create - DBIDPair
+ * @navassoc - create - DBIDRange
+ * @navassoc - create - ArrayModifiableDBIDs
+ * @navassoc - create - HashSetModifiableDBIDs
+ * @navassoc - create - HashSetModifiableDBIDs
+ * @navhas - provides - ByteBufferSerializer
  */
 public interface DBIDFactory {
   /**

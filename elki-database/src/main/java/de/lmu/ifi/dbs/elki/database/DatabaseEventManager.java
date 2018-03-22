@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
  *
  * @author Elke Achtert
  * @since 0.4.0
- * @apiviz.has ResultListener
+ * @has - - - ResultListener
  */
 public class DatabaseEventManager {
   /**
@@ -64,7 +64,7 @@ public class DatabaseEventManager {
   /**
    * Types for aggregation.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Type {
     INSERT, REMOVE, UPDATE

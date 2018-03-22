@@ -65,7 +65,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  */
 @Reference(authors = "M. K. Pakhira, S. Bandyopadhyay, U. Maulik", //
     title = "Validity index for crisp and fuzzy clusters", //
@@ -226,7 +226,7 @@ public class EvaluatePBMIndex implements Evaluator {
    * @author Stephan Baier
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

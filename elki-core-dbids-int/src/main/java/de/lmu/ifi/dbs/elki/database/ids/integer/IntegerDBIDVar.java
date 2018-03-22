@@ -148,7 +148,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Itr implements IntegerDBIDArrayIter, IntegerDBIDRef {
     /**

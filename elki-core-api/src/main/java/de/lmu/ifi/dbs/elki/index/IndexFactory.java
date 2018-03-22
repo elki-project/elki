@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory,interface
- * @apiviz.has Index oneway - - «create»
- * @apiviz.excludeSubtypes
+ * @stereotype factory,interface
+ * @navhas - create - Index
  *
  * @param <V> Input object type
  */

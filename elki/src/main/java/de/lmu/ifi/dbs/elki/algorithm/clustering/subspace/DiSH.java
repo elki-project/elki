@@ -92,9 +92,9 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.uses DiSHPreferenceVectorIndex
- * @apiviz.has SubspaceModel
- * @apiviz.has DiSHClusterOrder
+ * @assoc - - - DiSHPreferenceVectorIndex
+ * @has - - - SubspaceModel
+ * @has - - - DiSHClusterOrder
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -622,7 +622,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, DiSHClusterOrder> {
     /**
@@ -798,7 +798,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     private final class Sorter implements Comparator<DBIDRef> {
       @Override
@@ -861,7 +861,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

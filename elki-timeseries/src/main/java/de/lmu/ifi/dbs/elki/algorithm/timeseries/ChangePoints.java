@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Sebastian Rühl
  * @author Erich Schubert
  *
- * @apiviz.composedOf ChangePoint
+ * @has - - - ChangePoint
  */
 public class ChangePoints extends BasicResult implements TextWriteable {
   /**

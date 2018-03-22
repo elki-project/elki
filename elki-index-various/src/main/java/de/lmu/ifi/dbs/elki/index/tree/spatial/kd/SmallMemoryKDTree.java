@@ -70,8 +70,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KDTreeKNNQuery
- * @apiviz.has KDTreeRangeQuery
+ * @has - - - KDTreeKNNQuery
+ * @has - - - KDTreeRangeQuery
+ *
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", //
@@ -461,8 +462,8 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.has SmallMemoryKDTree
+   * @stereotype factory
+   * @has - - - SmallMemoryKDTree
    *
    * @param <O> Vector type
    */
@@ -505,7 +506,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
       /**

@@ -316,7 +316,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      *
      * @param <V> Vector type
      */

@@ -43,7 +43,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has LogNormalDistribution
+ * @has - - - LogNormalDistribution
  */
 @Reference(authors = "D. Bílková", //
     title = "Lognormal distribution and using L-moment method for estimating its parameters", //
@@ -101,7 +101,7 @@ public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<Lo
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

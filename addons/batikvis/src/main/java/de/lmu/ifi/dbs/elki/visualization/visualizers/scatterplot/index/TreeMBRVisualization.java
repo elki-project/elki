@@ -59,8 +59,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class TreeMBRVisualization implements VisFactory {
   /**
@@ -108,8 +108,8 @@ public class TreeMBRVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has AbstractRStarTree oneway - - visualizes
-   * @apiviz.uses SVGHyperCube
+   * @navhas - visualizes - AbstractRStarTree
+   * @assoc - - - SVGHyperCube
    *
    * @param <N> Tree node type
    * @param <E> Tree entry type
@@ -216,7 +216,7 @@ public class TreeMBRVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

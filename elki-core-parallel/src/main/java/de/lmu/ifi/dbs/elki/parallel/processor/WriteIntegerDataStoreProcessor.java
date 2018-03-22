@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedInteger;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has Instance
- * @apiviz.uses SharedInteger
- * @apiviz.uses WritableIntegerDataStore
+ * @has - - - Instance
+ * @assoc - - - SharedInteger
+ * @assoc - - - WritableIntegerDataStore
  */
 public class WriteIntegerDataStoreProcessor implements Processor {
   /**

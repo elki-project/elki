@@ -72,8 +72,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Ahmed Hettab
  * @since 0.3
  *
- * @apiviz.has KNNQuery
- * @apiviz.has RangeQuery
+ * @has - - - KNNQuery
+ * @has - - - RangeQuery
  *
  * @param <O> DatabaseObject
  */
@@ -190,7 +190,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

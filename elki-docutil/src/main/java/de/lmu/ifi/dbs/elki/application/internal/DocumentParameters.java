@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.uses Parameter
+ * @assoc - - - Parameter
  */
 public class DocumentParameters {
   private static final Logging LOG = Logging.getLogger(DocumentParameters.class);
@@ -367,7 +367,7 @@ public class DocumentParameters {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    * @param <T> State
    */
   private interface Format<T> {
@@ -403,7 +403,7 @@ public class DocumentParameters {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class HTMLFormat implements Format<Element> {
     Class<?> base = getBaseClass();

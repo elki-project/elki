@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * 
  * @param <T> data type
  *
- * @apiviz.has Instance
- * @apiviz.uses SharedObject
- * @apiviz.uses WritableDataStore
+ * @has - - - Instance
+ * @assoc - - - SharedObject
+ * @assoc - - - WritableDataStore
  */
 public class WriteDataStoreProcessor<T> implements Processor {
   /**

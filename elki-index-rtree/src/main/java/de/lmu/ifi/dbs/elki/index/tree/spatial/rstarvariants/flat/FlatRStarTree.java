@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert
  * @since 0.7.0
  *
- * @apiviz.has FlatRStarTreeNode oneway - - contains
+ * @navhas - contains - FlatRStarTreeNode
  */
 public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry, RTreeSettings> {
   /**

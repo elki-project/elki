@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has UniformDistribution - - estimates
+ * @navassoc - estimates - UniformDistribution
  */
 public class UniformMinMaxEstimator implements DistributionEstimator<UniformDistribution> {
   /**
@@ -96,7 +96,7 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

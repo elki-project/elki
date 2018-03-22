@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Erich Schubert
  *
- * @apiviz.has MedoidModel
- * @apiviz.composedOf KMedoidsInitialization
+ * @has - - - MedoidModel
+ * @composed - - - KMedoidsInitialization
  *
  * @param <V> vector datatype
  */
@@ -94,7 +94,7 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends KMedoidsPAM.Instance {
     /**
@@ -236,7 +236,7 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
     @Override

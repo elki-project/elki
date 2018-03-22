@@ -54,7 +54,7 @@ import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.composedOf DistanceCacheWriter
+ * @composed - - - DistanceCacheWriter
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction")
 public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
@@ -193,7 +193,7 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

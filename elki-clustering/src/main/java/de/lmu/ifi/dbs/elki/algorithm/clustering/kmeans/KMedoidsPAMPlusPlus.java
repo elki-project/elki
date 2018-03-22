@@ -66,8 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  *
  * @author Erich Schubert
  *
- * @apiviz.has MedoidModel
- * @apiviz.composedOf KMedoidsInitialization
+ * @has - - - MedoidModel
+ * @has - - - KMedoidsInitialization
  *
  * @param <V> vector datatype
  */
@@ -314,7 +314,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends KMedoidsPAMPlus.Parameterizer<V> {
     /**

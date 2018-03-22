@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class PolygonVisualization implements VisFactory {
   /**
@@ -96,7 +96,7 @@ public class PolygonVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has PolygonsObject - - visualizes
+   * @has - visualizes - PolygonsObject
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

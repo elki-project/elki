@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 @Alias({ "WGS-84", "WGS84" })
 public class WGS84SpheroidEarthModel extends AbstractEarthModel {
@@ -73,7 +73,7 @@ public class WGS84SpheroidEarthModel extends AbstractEarthModel {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

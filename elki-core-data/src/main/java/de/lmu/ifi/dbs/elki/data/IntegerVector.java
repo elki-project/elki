@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -148,7 +148,7 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has IntegerVector
+   * @has - - - IntegerVector
    */
   public static class Factory implements NumberVector.Factory<IntegerVector> {
     @Override
@@ -186,7 +186,7 @@ public class IntegerVector implements NumberVector {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -202,7 +202,7 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses IntegerVector - - «serializes»
+   * @assoc - serializes - IntegerVector
    */
   public static class SmallSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
@@ -240,7 +240,7 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses IntegerVector - - «serializes»
+   * @assoc - serializes - IntegerVector
    */
   public static class ShortSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
@@ -276,7 +276,7 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses IntegerVector - - «serializes»
+   * @assoc - serializes - IntegerVector
    */
   public static class VariableSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override

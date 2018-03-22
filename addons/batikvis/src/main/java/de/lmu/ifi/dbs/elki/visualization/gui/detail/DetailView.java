@@ -55,10 +55,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has Visualization
- * @apiviz.has PlotItem
- * @apiviz.uses VisualizerContext
- * @apiviz.uses VisualizationTask
+ * @has - - - Visualization
+ * @has - - - PlotItem
+ * @assoc - - - VisualizerContext
+ * @assoc - - - VisualizationTask
  */
 public class DetailView extends VisualizationPlot implements ResultListener, VisualizationListener {
   /**

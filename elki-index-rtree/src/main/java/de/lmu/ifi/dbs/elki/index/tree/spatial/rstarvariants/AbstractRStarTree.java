@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,10 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.has AbstractRStarTreeNode oneway - - contains
- * @apiviz.composedOf AbstractRTreeSettings
- * @apiviz.composedOf Statistics
+ * @opt nodefillcolor LemonChiffon
+ * @navhas - contains - AbstractRStarTreeNode
+ * @composed - - - AbstractRTreeSettings
+ * @composed - - - Statistics
  *
  * @param <N> Node type
  * @param <E> Entry type
@@ -821,7 +821,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf Counter
+   * @composed - - - Counter
    */
   public class Statistics {
     /**

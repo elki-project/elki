@@ -1,7 +1,7 @@
 /**
  * Object bundles - exchange container for multi-represented objects
  *
- * @apiviz.exclude java.util.*
+ * @opt hide java.util.*
  */
 /*
  * This file is part of ELKI:

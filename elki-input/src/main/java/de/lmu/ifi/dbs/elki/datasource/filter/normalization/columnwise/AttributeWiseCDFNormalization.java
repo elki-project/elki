@@ -61,8 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @since 0.6.0
  * @param <V> vector type
  *
- * @apiviz.uses NumberVector
- * @apiviz.uses DistributionEstimator
+ * @assoc - - - NumberVector
+ * @assoc - - - DistributionEstimator
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization" })
@@ -237,7 +237,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
     /**
@@ -271,7 +271,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

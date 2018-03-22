@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has TreeNode
+ * @has - - - TreeNode
  */
 public final class ClassTree {
   /**
@@ -148,7 +148,7 @@ public final class ClassTree {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class PackageNode extends DefaultMutableTreeNode {
     /**
@@ -187,7 +187,7 @@ public final class ClassTree {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class ClassNode extends DefaultMutableTreeNode {
     /**

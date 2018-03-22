@@ -55,8 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * @since 0.1
  * 
- * @apiviz.composedOf DatabaseEventManager
- * @apiviz.has IndexFactory
+ * @composed - - - DatabaseEventManager
+ * @has - - - IndexFactory
  */
 public abstract class AbstractDatabase extends AbstractHierarchicalResult implements Database {
   /**
@@ -203,7 +203,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

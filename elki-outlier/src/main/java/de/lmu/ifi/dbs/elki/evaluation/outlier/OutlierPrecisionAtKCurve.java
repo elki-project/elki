@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has PrecisionAtKCurve
+ * @has - - - PrecisionAtKCurve
  */
 public class OutlierPrecisionAtKCurve implements Evaluator {
   /**
@@ -158,7 +158,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -299,7 +299,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    *
    * @author Lisa Reichert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
     /**

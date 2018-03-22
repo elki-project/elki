@@ -109,7 +109,7 @@ public class NDCGEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

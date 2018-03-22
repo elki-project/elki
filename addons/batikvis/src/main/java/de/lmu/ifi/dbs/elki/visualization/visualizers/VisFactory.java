@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @author Remigius Wojdanowski
  * @since 0.3
  *
- * @apiviz.landmark
- * @apiviz.stereotype factory
- * @apiviz.uses Visualization - - «create»
- * @apiviz.uses VisualizationTask - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @stereotype factory
+ * @assoc - create - Visualization
+ * @assoc - create - VisualizationTask
  */
 public interface VisFactory extends VisualizationProcessor {
   /**

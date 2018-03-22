@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.uses Entry
+ * @assoc - - - Entry
  * 
  * @param <E> the type of Entry used in the index
  */

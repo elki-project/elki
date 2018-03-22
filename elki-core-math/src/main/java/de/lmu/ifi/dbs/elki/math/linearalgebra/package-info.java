@@ -32,13 +32,13 @@
  * <a href="http://www.nist.gov/">NIST</a>
  * and can be found at
  * <a href="http://math.nist.gov/javanumerics/jama/">math.nist.gov</a>.
- * 
+ * <p>
  * Here, for the adaption some classes and methods convenient for data mining
  * applications within ELKI were added.
  * Furthermore some erroneous comments were corrected and the coding-style was
  * subtly changed to a more Java-typical style.
- * 
- * @apiviz.exclude ^java\.(io|lang)\..*
+ *
+ * @opt hide ^java\.(io|lang)\..*
  */
 /*
  * This file is part of ELKI:

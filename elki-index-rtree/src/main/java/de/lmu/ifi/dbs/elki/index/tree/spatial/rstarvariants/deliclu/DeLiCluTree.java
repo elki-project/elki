@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.ints.IntSets;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.has DeLiCluNode oneway - - contains
+ * @navhas - contains - DeLiCluNode
  */
 public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, RTreeSettings> {
   /**

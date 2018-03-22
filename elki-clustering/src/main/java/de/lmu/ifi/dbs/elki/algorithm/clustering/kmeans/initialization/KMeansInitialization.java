@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public interface KMeansInitialization {
   /**

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has ExponentialDistribution
+ * @has - - - ExponentialDistribution
  */
 @Reference(authors = "D. J. Olive", //
     title = "Applied Robust Statistics", booktitle = "", //
@@ -80,7 +80,7 @@ public class ExponentialMADEstimator implements MADDistributionEstimator<Exponen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

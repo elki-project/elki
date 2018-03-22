@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * 
  * @param <O> Object type
  *
- * @apiviz.has Instance
- * @apiviz.uses KNNQuery
- * @apiviz.uses SharedObject
- * @apiviz.has KNNList
+ * @has - - - Instance
+ * @assoc - - - KNNQuery
+ * @assoc - - - SharedObject
+ * @has - - - KNNList
  */
 public class KNNProcessor<O> implements Processor {
   /**

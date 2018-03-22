@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.composedOf SingularValueDecomposition
+ * @composed - - - SingularValueDecomposition
  *
  * @param <I> Input data type
  * @param <O> Output vector type
@@ -225,7 +225,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <I> Input vector type
    * @param <O> Output vector type

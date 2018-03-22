@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Lisa Reichert
  * @since 0.3
  *
- * @apiviz.has EM
+ * @has - - - EM
  *
  * @param <V> Vector type
  */
@@ -138,7 +138,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

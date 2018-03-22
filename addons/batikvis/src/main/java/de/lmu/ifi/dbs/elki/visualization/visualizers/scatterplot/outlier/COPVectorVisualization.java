@@ -60,9 +60,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
- * @apiviz.has OutlierResult oneway - - visualizes
+ * @stereotype factory
+ * @navassoc - create - Instance
+ * @navhas - visualizes - OutlierResult
  */
 @Title("COP: Correlation Outlier Probability")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //

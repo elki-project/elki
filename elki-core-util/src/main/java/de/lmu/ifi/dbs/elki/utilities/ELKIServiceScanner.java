@@ -179,7 +179,7 @@ public class ELKIServiceScanner {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   static class DirClassIterator implements Iterator<String> {
     private static final String CLASS_EXT = ".class";

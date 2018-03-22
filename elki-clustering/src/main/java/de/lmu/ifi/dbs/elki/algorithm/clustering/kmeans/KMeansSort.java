@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.7.1
  *
- * @apiviz.has KMeansModel
+ * @has - - - KMeansModel
  *
  * @param <V> vector datatype
  */
@@ -91,7 +91,7 @@ public class KMeansSort<V extends NumberVector> extends KMeansCompare<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends KMeansCompare.Instance {
     /**
@@ -163,7 +163,7 @@ public class KMeansSort<V extends NumberVector> extends KMeansCompare<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

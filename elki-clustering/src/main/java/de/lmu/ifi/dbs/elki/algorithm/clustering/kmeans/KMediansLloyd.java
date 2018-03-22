@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has MeanModel
+ * @has - - - MeanModel
  *
  * @param <V> vector datatype
  */
@@ -88,7 +88,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -165,7 +165,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

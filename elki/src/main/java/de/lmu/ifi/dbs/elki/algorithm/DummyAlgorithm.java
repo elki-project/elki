@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @since 0.2
  * @param <O> Vector type
  * 
- * @apiviz.uses KNNQuery
+ * @assoc - - - KNNQuery
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes an Euclidean 10NN query on all data points, and can be used in unit testing")

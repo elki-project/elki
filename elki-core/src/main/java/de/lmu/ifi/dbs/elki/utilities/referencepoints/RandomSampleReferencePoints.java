@@ -87,7 +87,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

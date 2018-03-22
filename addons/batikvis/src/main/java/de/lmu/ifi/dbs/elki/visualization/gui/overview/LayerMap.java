@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has PlotItem
- * @apiviz.has VisualizationTask
+ * @has - - - PlotItem
+ * @has - - - VisualizationTask
  */
 public class LayerMap {
   /**

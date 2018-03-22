@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -180,7 +180,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Itr implements IntegerDBIDArrayIter {
     /**
@@ -246,7 +246,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Slice implements IntegerArrayDBIDs {
     /**
@@ -313,7 +313,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     private class SliceItr implements IntegerDBIDArrayIter {
       /**

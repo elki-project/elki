@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf RandomProjectedNeighborsAndDensities
+ * @composed - - - RandomProjectedNeighborsAndDensities
  */
 @Reference(authors = "J. Schneider, M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
@@ -227,7 +227,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

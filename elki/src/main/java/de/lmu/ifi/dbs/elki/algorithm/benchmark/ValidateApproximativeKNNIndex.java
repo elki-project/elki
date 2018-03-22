@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * @param <O> Object type
  * 
- * @apiviz.uses KNNQuery
+ * @assoc - - - KNNQuery
  */
 public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
@@ -291,7 +291,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
   /**
    * Parameterization class
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @author Erich Schubert
    * 

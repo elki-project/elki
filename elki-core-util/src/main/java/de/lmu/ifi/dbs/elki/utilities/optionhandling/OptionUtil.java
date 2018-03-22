@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.uses Parameter
+ * @assoc - - - Parameter
  */
 public final class OptionUtil {
   /**

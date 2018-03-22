@@ -88,7 +88,7 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

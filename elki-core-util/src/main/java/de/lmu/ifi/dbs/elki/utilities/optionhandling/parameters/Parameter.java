@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Erich Schubert
  * @since 0.1
  * 
- * @apiviz.composedOf OptionID
- * @apiviz.uses ParameterConstraint
+ * @composed - - - OptionID
+ * @assoc - - - ParameterConstraint
  * 
  * @param <T> the type of a possible value (i.e., the type of the option)
  */

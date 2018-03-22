@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.uses GaussianRandomProjectionFamily
+ * @assoc - - - GaussianRandomProjectionFamily
  */
 @Reference(authors = "M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni", //
     title = "Locality-sensitive hashing scheme based on p-stable distributions", //
@@ -67,7 +67,7 @@ public class EuclideanHashFunctionFamily extends AbstractProjectedHashFunctionFa
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractProjectedHashFunctionFamily.Parameterizer {
     @Override

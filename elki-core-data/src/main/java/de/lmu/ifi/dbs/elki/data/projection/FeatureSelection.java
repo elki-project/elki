@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.uses FeatureVector
+ * @assoc - - - FeatureVector
  * 
  * @param <V> Vector type
  * @param <F> Feature type
@@ -134,7 +134,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends FeatureVector<F>, F> extends AbstractParameterizer {
     /**

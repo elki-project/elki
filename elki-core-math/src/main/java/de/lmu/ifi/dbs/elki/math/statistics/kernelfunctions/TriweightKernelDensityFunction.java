@@ -93,7 +93,7 @@ public final class TriweightKernelDensityFunction implements KernelDensityFuncti
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

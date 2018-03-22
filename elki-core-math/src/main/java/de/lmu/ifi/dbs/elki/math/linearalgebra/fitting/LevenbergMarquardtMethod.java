@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has FittingFunction
- * @apiviz.uses FittingFunctionResult oneway - - «create»
+ * @has - - - FittingFunction
+ * @navassoc - create - FittingFunctionResult
  */
 public class LevenbergMarquardtMethod {
   /**

@@ -277,7 +277,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @author Patrick Kostjens
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.uses SharedNearestNeighborSimilarityFunction
+ * @assoc - - - SharedNearestNeighborSimilarityFunction
  *
  * @param <O> the type of Object the algorithm is applied on
  */
@@ -289,7 +289,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> object type
    */

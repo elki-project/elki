@@ -124,7 +124,7 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     @Override

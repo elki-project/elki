@@ -167,7 +167,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    *
    * @author Arthur Zimek
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class KNNDistanceOrderResult extends XYCurve {
     /**
@@ -206,7 +206,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

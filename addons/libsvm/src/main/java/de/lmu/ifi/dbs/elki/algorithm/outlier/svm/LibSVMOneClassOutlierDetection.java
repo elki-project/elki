@@ -91,7 +91,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
   /**
    * Kernel functions. Expose as enum for convenience.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum SVMKernel { //
     LINEAR, // Linear
@@ -259,7 +259,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <V> Vector type
    */

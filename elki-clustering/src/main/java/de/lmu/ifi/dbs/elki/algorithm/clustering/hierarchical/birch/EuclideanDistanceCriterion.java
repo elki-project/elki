@@ -66,7 +66,7 @@ public class EuclideanDistanceCriterion implements BIRCHAbsorptionCriterion {
   /**
    * Parameterization class
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @author Erich Schubert
    */

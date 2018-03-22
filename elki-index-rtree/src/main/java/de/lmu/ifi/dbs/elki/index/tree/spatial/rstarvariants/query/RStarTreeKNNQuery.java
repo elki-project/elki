@@ -50,9 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveDistanceFunction
- * @apiviz.uses DoubleDistanceSearchCandidate
+ * @assoc - - - AbstractRStarTree
+ * @assoc - - - SpatialPrimitiveDistanceFunction
+ * @assoc - - - DoubleDistanceSearchCandidate
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //
@@ -231,10 +231,10 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
 
   /**
    * Optimized double distance entry implementation.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   *
+   * @hidden
    */
   static class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
     /**

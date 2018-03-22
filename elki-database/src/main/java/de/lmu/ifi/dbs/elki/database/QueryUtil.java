@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,15 +47,15 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.uses Database
- * @apiviz.uses Relation
- * @apiviz.has DistanceQuery
- * @apiviz.has SimilarityQuery
- * @apiviz.has KNNQuery
- * @apiviz.has RangeQuery
- * @apiviz.has RKNNQuery
+ * @assoc - - - Database
+ * @assoc - - - Relation
+ * @has - - - DistanceQuery
+ * @has - - - SimilarityQuery
+ * @has - - - KNNQuery
+ * @has - - - RangeQuery
+ * @has - - - RKNNQuery
  */
 public final class QueryUtil {
   /**

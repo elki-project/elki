@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has SimilarityMatrix oneway - - «create»
+ * @navhas - create - SimilarityMatrix
  * 
  * @param <O> Object class
  */
@@ -323,7 +323,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

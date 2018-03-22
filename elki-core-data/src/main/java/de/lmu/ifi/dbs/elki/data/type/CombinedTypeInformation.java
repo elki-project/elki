@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.composedOf TypeInformation
+ * @composed - - - TypeInformation
  */
 public class CombinedTypeInformation implements TypeInformation {
   /**

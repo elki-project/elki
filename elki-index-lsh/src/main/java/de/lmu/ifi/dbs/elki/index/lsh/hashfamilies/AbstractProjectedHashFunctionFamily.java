@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses RandomProjectionFamily
- * @apiviz.has MultipleProjectionsLocalitySensitiveHashFunction
+ * @assoc - - - RandomProjectionFamily
+ * @has - - - MultipleProjectionsLocalitySensitiveHashFunction
  */
 public abstract class AbstractProjectedHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
@@ -108,7 +108,7 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

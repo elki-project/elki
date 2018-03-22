@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,11 +36,11 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.uses CSSClass
- * @apiviz.uses CSSClassManager
- * @apiviz.uses LinearScale
- * @apiviz.uses StyleLibrary
- * @apiviz.uses Element oneway - - «create»
+ * @assoc - - - CSSClass
+ * @assoc - - - CSSClassManager
+ * @assoc - - - LinearScale
+ * @assoc - - - StyleLibrary
+ * @navassoc - create - Element
  */
 public final class SVGSimpleLinearAxis {
   /**
@@ -54,7 +54,7 @@ public final class SVGSimpleLinearAxis {
    * Flag for axis label position. First char: right-hand or left-hand side of
    * line. Second char: text alignment
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Alignment {
     LL, RL, LC, RC, LR, RR
@@ -63,7 +63,7 @@ public final class SVGSimpleLinearAxis {
   /**
    * Labeling style: left-handed, right-handed, no ticks, labels at ends
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum LabelStyle {
     LEFTHAND, RIGHTHAND, NOLABELS, NOTHING, ENDLABEL

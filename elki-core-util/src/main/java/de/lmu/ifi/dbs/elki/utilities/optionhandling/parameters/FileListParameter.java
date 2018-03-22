@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
    * Available types of the files: {@link #INPUT_FILES} denotes input files,
    * {@link #OUTPUT_FILES} denotes output files.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum FilesType {
     /**

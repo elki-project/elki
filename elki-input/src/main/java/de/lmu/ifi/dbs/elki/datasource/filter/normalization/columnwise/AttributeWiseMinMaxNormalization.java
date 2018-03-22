@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @since 0.4.0
  * @param <V> vector type
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization", //
     "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
@@ -209,7 +209,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

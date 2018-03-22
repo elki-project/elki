@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.excludeSubtypes
+ * @opt nodefillcolor LemonChiffon
+ * @opt operations
  *
  * @param <R> the result type
  */
@@ -128,7 +128,7 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
 
   /**
    * Get the input type restriction used for negotiating the data query.
-   * 
+   *
    * @return Type restriction
    */
   @Override
@@ -136,7 +136,7 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
 
   /**
    * Get the (STATIC) logger for this class.
-   * 
+   *
    * @return the static logger
    */
   protected abstract Logging getLogger();

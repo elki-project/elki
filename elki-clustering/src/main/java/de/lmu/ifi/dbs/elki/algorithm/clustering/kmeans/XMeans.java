@@ -290,7 +290,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @author Tibor Goldschwendt
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    * @param <M> Model type of inner algorithm

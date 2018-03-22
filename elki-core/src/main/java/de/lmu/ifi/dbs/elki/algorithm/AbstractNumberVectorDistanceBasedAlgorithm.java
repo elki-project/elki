@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has NumberVectorDistanceFunction
- * @apiviz.excludeSubtypes
+ * @has - - - NumberVectorDistanceFunction
  *
  * @param <O> Object type
  * @param <R> the type of result to retrieve from this Algorithm
@@ -72,7 +71,7 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R extends Re
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

@@ -65,7 +65,7 @@ import net.jafama.FastMath;
  * @author Florian Nuecke
  * @since 0.6.0
  * 
- * @apiviz.has SubspaceModel
+ * @has - - - SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
@@ -361,7 +361,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * 
    * @author Florian Nuecke
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

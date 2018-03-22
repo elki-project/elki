@@ -263,7 +263,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     protected enum State { //
       PREPARATION, // Preparation phase
@@ -644,7 +644,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -50,9 +50,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Peer Kröger
  * @since 0.1
  *
- * @apiviz.has PreDeCon.Settings
- * @apiviz.composedOf PreDeConNeighborPredicate
- * @apiviz.composedOf PreDeConCorePredicate
+ * @has - - - PreDeCon.Settings
+ * @composed - - - PreDeConNeighborPredicate
+ * @composed - - - PreDeConCorePredicate
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
@@ -88,7 +89,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Settings {
     /**
@@ -121,7 +122,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
@@ -238,7 +239,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

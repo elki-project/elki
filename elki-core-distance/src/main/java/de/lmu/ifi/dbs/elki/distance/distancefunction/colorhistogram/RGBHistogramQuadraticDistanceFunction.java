@@ -92,7 +92,7 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadrat
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

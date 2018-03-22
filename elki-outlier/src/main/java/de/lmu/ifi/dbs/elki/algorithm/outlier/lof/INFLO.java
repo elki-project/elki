@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -282,7 +282,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

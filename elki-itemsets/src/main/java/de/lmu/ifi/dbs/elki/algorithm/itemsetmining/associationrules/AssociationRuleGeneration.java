@@ -132,7 +132,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public class Instance {
     /**
@@ -291,7 +291,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class PartialItemset extends Itemset {
     /**
@@ -347,7 +347,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class ItemsetSearcher {
     /**
@@ -468,7 +468,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    *
    * @author Frederic Sautter
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -125,7 +125,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     @Override

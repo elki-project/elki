@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,16 +46,16 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.composedOf ByteSerializer
- * @apiviz.composedOf ShortSerializer
- * @apiviz.composedOf IntegerSerializer
- * @apiviz.composedOf LongSerializer
- * @apiviz.composedOf FloatSerializer
- * @apiviz.composedOf DoubleSerializer
- * @apiviz.composedOf StringSerializer
- * @apiviz.composedOf VarintSerializer
+ * @composed - - - ByteSerializer
+ * @composed - - - ShortSerializer
+ * @composed - - - IntegerSerializer
+ * @composed - - - LongSerializer
+ * @composed - - - FloatSerializer
+ * @composed - - - DoubleSerializer
+ * @composed - - - StringSerializer
+ * @composed - - - VarintSerializer
  */
 public final class ByteArrayUtil {
   /**

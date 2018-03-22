@@ -55,8 +55,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance - - «create»
+ * @stereotype factory
+ * @assoc - create - Instance
  */
 public class SelectionToolDotVisualization implements VisFactory {
   /**
@@ -67,7 +67,7 @@ public class SelectionToolDotVisualization implements VisFactory {
   /**
    * Input modes
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Mode {
     REPLACE, ADD, INVERT
@@ -106,7 +106,7 @@ public class SelectionToolDotVisualization implements VisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has DBIDSelection oneway - - updates
+   * @navhas - updates - DBIDSelection
    */
   public class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
     /**

@@ -57,8 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.landmark
- * @apiviz.has ScoreResult oneway - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @navhas - create - ScoreResult
  */
 public class JudgeOutlierScores implements Evaluator {
   /**
@@ -184,7 +184,7 @@ public class JudgeOutlierScores implements Evaluator {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

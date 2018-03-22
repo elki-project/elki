@@ -51,7 +51,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KMeansModel
+ * @has - - - KMeansModel
  *
  * @param <V> vector datatype
  */
@@ -91,7 +91,7 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends KMeansSimplifiedElkan.Instance {
     /**
@@ -177,7 +177,7 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansSimplifiedElkan.Parameterizer<V> {
     @Override

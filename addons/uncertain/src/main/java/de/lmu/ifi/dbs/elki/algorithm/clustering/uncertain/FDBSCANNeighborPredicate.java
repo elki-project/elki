@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf Instance
+ * @composed - - - Instance
  */
 @Reference(authors = "Hans-Peter Kriegel, Martin Pfeifle", //
     title = "Density-based clustering of uncertain data", //
@@ -138,7 +138,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    * @author Alexander Koos
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Instance implements NeighborPredicate.Instance<DBIDs> {
     /**
@@ -295,7 +295,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    * @author Alexander Koos
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

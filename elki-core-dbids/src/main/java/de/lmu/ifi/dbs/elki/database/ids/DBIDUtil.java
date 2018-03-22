@@ -33,11 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.has DBIDs
- * @apiviz.has DBIDRef
- * @apiviz.composedOf DBIDFactory
+ * @has - - - DBIDs
+ * @has - - - DBIDRef
+ * @composed - - - DBIDFactory
  */
 public final class DBIDUtil {
   /**

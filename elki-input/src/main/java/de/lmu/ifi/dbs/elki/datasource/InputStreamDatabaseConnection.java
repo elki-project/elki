@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.uses Parser oneway - - runs
+ * @navassoc - runs - Parser
  */
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")
@@ -159,7 +159,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

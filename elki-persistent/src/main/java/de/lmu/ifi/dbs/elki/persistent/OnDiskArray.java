@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.composedOf RandomAccessFile
+ * @composed - - - RandomAccessFile
  */
 // TODO: ensure file doesn't become to big - check for overflows in recordsize *
 // numrecs + headersize

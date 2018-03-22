@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ import net.jafama.FastMath;
  * @author Simon Paradies
  * @since 0.1
  * 
- * @apiviz.uses PrimitiveSimilarityFunction
+ * @assoc - - - PrimitiveSimilarityFunction
  */
 public class KernelMatrix {
   /**
@@ -66,7 +66,7 @@ public class KernelMatrix {
    * TODO: move to shared code.
    * 
    * @author Erich Schubert
-   * @apiviz.exclude
+   * @hidden
    */
   private interface DBIDMap {
     /**
@@ -89,7 +89,7 @@ public class KernelMatrix {
    * Map a DBID to an integer offset, DBIDRange version.
    * 
    * @author Erich Schubert
-   * @apiviz.exclude
+   * @hidden
    */
   private class RangeMap implements DBIDMap {
     DBIDRange range;
@@ -114,7 +114,7 @@ public class KernelMatrix {
    * Map a DBID to an integer offset, Version to support arbitrary DBIDs.
    * 
    * @author Erich Schubert
-   * @apiviz.exclude
+   * @hidden
    */
   private class SortedArrayMap implements DBIDMap {
     ArrayModifiableDBIDs ids;

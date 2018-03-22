@@ -299,7 +299,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    *
    * @param <O> Object type
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends PerplexityAffinityMatrixBuilder.Parameterizer<O> {
     @Override

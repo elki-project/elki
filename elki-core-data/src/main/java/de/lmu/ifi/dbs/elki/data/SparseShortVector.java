@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -289,7 +289,7 @@ public class SparseShortVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has SparseShortVector
+   * @has - - - SparseShortVector
    */
   public static class Factory implements SparseNumberVector.Factory<SparseShortVector> {
     @Override
@@ -334,7 +334,7 @@ public class SparseShortVector implements SparseNumberVector {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -349,7 +349,7 @@ public class SparseShortVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses SparseShortVector - - «serializes»
+   * @assoc - serializes - SparseShortVector
    */
   public static class VariableSerializer implements ByteBufferSerializer<SparseShortVector> {
     @Override

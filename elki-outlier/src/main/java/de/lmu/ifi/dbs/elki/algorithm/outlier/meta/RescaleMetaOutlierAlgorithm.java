@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.composedOf OutlierAlgorithm
+ * @composed - - - OutlierAlgorithm
  */
 public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -146,7 +146,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

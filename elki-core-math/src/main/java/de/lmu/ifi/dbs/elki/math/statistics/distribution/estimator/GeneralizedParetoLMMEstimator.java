@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has GeneralizedParetoDistribution
+ * @has - - - GeneralizedParetoDistribution
  */
 @Reference(authors = "J. R. M. Hosking, J. R. Wallis, E. F. Wood", //
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
@@ -90,7 +90,7 @@ public class GeneralizedParetoLMMEstimator implements LMMDistributionEstimator<G
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

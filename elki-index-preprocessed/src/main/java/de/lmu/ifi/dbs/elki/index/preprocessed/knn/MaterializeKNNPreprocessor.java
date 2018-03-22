@@ -57,9 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.has DistanceFunction
- * @apiviz.has KNNQuery
- * @apiviz.has KNNListener
+ * @has - - - DistanceFunction
+ * @has - - - KNNQuery
+ * @has - - - KNNListener
  *
  * @param <O> the type of database objects the preprocessor can be applied to
  */
@@ -383,9 +383,9 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    *
    * @author Erich Schubert
    *
-   * @apiviz.landmark
-   * @apiviz.stereotype factory
-   * @apiviz.uses MaterializeKNNPreprocessor oneway - - «create»
+   * @opt nodefillcolor LemonChiffon
+   * @stereotype factory
+   * @navassoc - create - MaterializeKNNPreprocessor
    *
    * @param <O> The object type
    */
@@ -411,7 +411,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override

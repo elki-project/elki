@@ -54,8 +54,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class OPTICSPlotSelectionVisualization implements VisFactory {
   /**
@@ -71,7 +71,7 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
   /**
    * Input modes
    *
-   * @apiviz.exclude
+   * @hidden
    */
   // TODO: Refactor all Mode copies into a shared class?
   private enum Mode {
@@ -110,7 +110,7 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
    * @author Heidi Kolb
    * @author Erich Schubert
    *
-   * @apiviz.uses DBIDSelection oneway - 1 visualizes
+   * @has - visualizes 1 DBIDSelection
    */
   public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**

@@ -194,7 +194,7 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
    * 
    * @author Marie Kiermeier
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

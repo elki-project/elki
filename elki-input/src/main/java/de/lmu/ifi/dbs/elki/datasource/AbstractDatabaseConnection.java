@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.uses ObjectFilter
+ * @assoc - - - ObjectFilter
  */
 public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   /**
@@ -128,7 +128,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

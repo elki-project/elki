@@ -84,7 +84,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.1
  * 
- * @apiviz.composedOf EMClusterModelFactory
+ * @composed - - - EMClusterModelFactory
  * 
  * @param <V> vector type to analyze
  * @param <M> model type to produce
@@ -406,7 +406,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
     /**

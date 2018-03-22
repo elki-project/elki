@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has LaplaceDistribution
+ * @has - - - LaplaceDistribution
  */
 @Reference(title = "The Double Exponential Distribution: Using Calculus to Find a Maximum Likelihood Estimator", //
     authors = "R. M. Norton", booktitle = "The American Statistician 38 (2)", //
@@ -89,7 +89,7 @@ public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistrib
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.uses Element oneway - - «create»
+ * @navassoc - create - Element
  */
 public class SVGPath {
   /**

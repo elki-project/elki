@@ -229,7 +229,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Assignment {
     /**
@@ -432,7 +432,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

@@ -57,8 +57,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class ClusterParallelMeanVisualization implements VisFactory {
   /**

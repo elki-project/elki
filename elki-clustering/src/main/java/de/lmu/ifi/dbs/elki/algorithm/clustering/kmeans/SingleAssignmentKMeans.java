@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KMeansModel
+ * @has - - - KMeansModel
  *
  * @param <V> vector datatype
  */
@@ -69,7 +69,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -104,7 +104,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

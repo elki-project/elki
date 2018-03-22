@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.landmark
- * @apiviz.uses KNNQuery
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - KNNQuery
  * 
  * @param <NV> Vector type
  */
@@ -119,9 +119,9 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.landmark
-   * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
+   * @stereotype factory
+   * @opt nodefillcolor LemonChiffon
+   * @navassoc - create - KNNQueryFilteredPCAIndex
    */
   public static class Factory<V extends NumberVector> extends AbstractFilteredPCAIndex.Factory<V> {
     /**
@@ -154,7 +154,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
       /**

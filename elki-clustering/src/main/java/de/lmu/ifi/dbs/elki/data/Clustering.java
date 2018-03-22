@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,20 +39,20 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.IterableIt;
 /**
  * Result class for clusterings. Can be used for both hierarchical and
  * non-hierarchical clusterings.
- * 
+ *
  * The class does not enforce or rely on clusterings to be a tree or DAG,
  * instead they can be an arbitrary forest of directed graphs that COULD contain
  * cycles.
- * 
+ *
  * This class is NOT iterable for a simple reason: there is more than one method
  * to do so. You need to specify whether you want to use getToplevelClusters()
  * or getAllClusters().
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
- * @apiviz.composedOf Cluster oneway - n
- * 
+ *
+ * @composed - - * Cluster
+ *
  * @param <M> Model type
  */
 public class Clustering<M extends Model> extends BasicResult {
@@ -73,7 +73,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Constructor with a list of top level clusters
-   * 
+   *
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    * @param toplevelclusters Top level clusters
@@ -89,7 +89,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Constructor for an empty clustering
-   * 
+   *
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    */
@@ -99,7 +99,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Add a cluster to the clustering.
-   * 
+   *
    * @param clus new cluster
    */
   public void addToplevelCluster(Cluster<M> clus) {
@@ -109,7 +109,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Add a cluster to the clustering.
-   * 
+   *
    * @param parent Parent cluster
    * @param child Child cluster.
    */
@@ -119,7 +119,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Return top level clusters
-   * 
+   *
    * @return top level clusters
    */
   public List<Cluster<M>> getToplevelClusters() {
@@ -128,7 +128,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Get the cluster hierarchy.
-   * 
+   *
    * @return Cluster hierarchy.
    */
   public Hierarchy<Cluster<M>> getClusterHierarchy() {
@@ -137,7 +137,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Collect all clusters (recursively) into a List.
-   * 
+   *
    * @return List of all clusters.
    */
   public List<Cluster<M>> getAllClusters() {
@@ -151,7 +151,7 @@ public class Clustering<M extends Model> extends BasicResult {
 
   /**
    * Iterate over the top level clusters.
-   * 
+   *
    * @return Iterator
    */
   public It<Cluster<M>> iterToplevelClusters() {

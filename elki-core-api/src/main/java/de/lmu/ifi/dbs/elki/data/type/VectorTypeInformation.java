@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has FeatureVector
+ * @has - - - FeatureVector
  * 
  * @param <V> Vector type
  */

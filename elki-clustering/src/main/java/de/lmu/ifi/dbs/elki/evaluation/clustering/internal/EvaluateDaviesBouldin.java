@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Stephan Baier
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  */
 @Reference(authors = "D. L. Davies, D. W. Bouldin", //
     title = "A Cluster Separation Measure", //
@@ -216,7 +216,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
    *
    * @author Stephan Baier
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

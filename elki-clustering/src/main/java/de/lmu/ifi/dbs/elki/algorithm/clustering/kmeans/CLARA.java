@@ -246,7 +246,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
     /**

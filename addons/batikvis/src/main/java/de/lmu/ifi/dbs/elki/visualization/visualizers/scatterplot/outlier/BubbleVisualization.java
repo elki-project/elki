@@ -74,8 +74,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek", //
     title = "Visual Evaluation of Outlier Detection Models", //
@@ -144,7 +144,7 @@ public class BubbleVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has OutlierResult oneway - - visualizes
+   * @navhas - visualizes - OutlierResult
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
@@ -282,7 +282,7 @@ public class BubbleVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -17,7 +17,7 @@
  * The Algorithm GDBSCAN and Its Applications<br>
  * Data Mining and Knowledge Discovery, 1998.
  *
- * @apiviz.exclude .*\.Instance$
+ * @opt hide .*\.Instance$
  */
 /*
  * This file is part of ELKI:

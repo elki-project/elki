@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has Polygon
+ * @has - - - Polygon
  */
 @Reference(authors = "P. Graham", //
     title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //

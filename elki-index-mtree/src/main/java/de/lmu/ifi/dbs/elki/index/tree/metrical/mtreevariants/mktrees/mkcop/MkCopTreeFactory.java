@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses MkCoPTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - MkCoPTreeIndex
  * 
  * @param <O> Object type
  */
@@ -68,7 +68,7 @@ public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

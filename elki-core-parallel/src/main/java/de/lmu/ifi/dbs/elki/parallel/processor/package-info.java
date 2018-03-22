@@ -19,13 +19,13 @@
  * As we want to write to some storage at the end, the last processor usually will not have
  * an "output", thus the name "map" is not a good match anymore.
  * 
- * @apiviz.exclude .*\.Instance$
+ * @opt hide .*\.Instance$
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

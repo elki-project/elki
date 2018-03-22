@@ -1,8 +1,8 @@
 /**
  * Visualization package of ELKI
  *
- * @apiviz.exclude elki.utilities
- * @apiviz.exclude java.lang.*
+ * @opt hide elki.utilities
+ * @opt hide java.lang.*
  */
 /*
  * This file is part of ELKI:

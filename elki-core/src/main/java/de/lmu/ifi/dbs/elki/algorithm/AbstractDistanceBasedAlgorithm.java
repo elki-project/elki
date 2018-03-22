@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,9 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.has DistanceFunction
- * @apiviz.excludeSubtypes
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - DistanceFunction
  *
  * @param <O> the type of objects handled by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
@@ -72,7 +71,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extend
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

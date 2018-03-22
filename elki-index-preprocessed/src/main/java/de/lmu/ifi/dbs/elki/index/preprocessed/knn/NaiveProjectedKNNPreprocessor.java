@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  * @since 0.7.0
- * @apiviz.has NaiveProjectedKNNQuery
+ * @has - - - NaiveProjectedKNNQuery
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
@@ -334,7 +334,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
    *
    * @param <V> Vector type
    *
-   * @apiviz.has NaiveProjectedKNNPreprocessor
+   * @has - - - NaiveProjectedKNNPreprocessor
    */
   public static class Factory<V extends NumberVector> implements IndexFactory<V> {
     /**
@@ -388,7 +388,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

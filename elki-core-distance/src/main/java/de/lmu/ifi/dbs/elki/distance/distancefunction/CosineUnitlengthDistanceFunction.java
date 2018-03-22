@@ -111,7 +111,7 @@ public class CosineUnitlengthDistanceFunction implements SpatialPrimitiveDistanc
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

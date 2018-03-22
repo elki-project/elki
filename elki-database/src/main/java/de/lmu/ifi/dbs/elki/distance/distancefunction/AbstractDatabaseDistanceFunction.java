@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.has AbstractDatabaseDistanceFunction.Instance
- * @apiviz.excludeSubtypes
+ * @has - - - AbstractDatabaseDistanceFunction.Instance
  * 
  * @param <O> the type of DatabaseObject to compute the distances in between
  */

@@ -39,9 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses AbstractMTree oneway - - «create»
- * @apiviz.excludeSubtypes
+ * @stereotype factory
+ * @navassoc - create - AbstractMTree
  * 
  * @param <O> Object type
  * @param <N> Node type
@@ -74,7 +73,7 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory.Parameterizer<O> {
     /**

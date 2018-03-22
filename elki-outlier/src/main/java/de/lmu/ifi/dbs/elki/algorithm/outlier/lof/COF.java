@@ -238,7 +238,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

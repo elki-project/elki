@@ -61,8 +61,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SelectionToolCubeVisualization implements VisFactory {
   /**
@@ -108,7 +108,7 @@ public class SelectionToolCubeVisualization implements VisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has RangeSelection oneway - - updates
+   * @navhas - updates - RangeSelection
    */
   public class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
     /**

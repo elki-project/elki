@@ -147,7 +147,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override

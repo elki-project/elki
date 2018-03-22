@@ -161,7 +161,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

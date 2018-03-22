@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,8 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Erich Schubert
  *
- * @apiviz.uses HierarchicalClusteringAlgorithm
- * @apiviz.uses PointerHierarchyRepresentationResult
+ * @assoc - - - HierarchicalClusteringAlgorithm
+ * @assoc - - - PointerHierarchyRepresentationResult
  */
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Semantic Word Clouds with Background Corpus Normalization and t-distributed Stochastic Neighbor Embedding", //
@@ -133,7 +133,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Instance {
     /**
@@ -303,7 +303,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

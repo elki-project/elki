@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  *
  * @author Erich Schubert
  * 
- * @apiviz.uses ClusteringFeature
- * @apiviz.uses NumberVector
+ * @depend - - - ClusteringFeature
+ * @depend - - - NumberVector
  */
 public interface BIRCHAbsorptionCriterion {
   /**

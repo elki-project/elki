@@ -55,7 +55,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.uses MetricalIndexTree
+ * @assoc - - - MetricalIndexTree
  *
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <N> the type of spatial nodes in the spatial index
@@ -190,9 +190,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses MetricalIndexApproximationMaterializeKNNPreprocessor oneway -
-   *              - «create»
+   * @stereotype factory
+   * @navassoc - creates - MetricalIndexApproximationMaterializeKNNPreprocessor
    *
    * @param <O> the type of database objects the preprocessor can be applied to
    * @param <N> the type of spatial nodes in the spatial index
@@ -220,7 +219,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.composedOf WritableDataStore
+ * @composed - - - WritableDataStore
  * 
  * @param <O> Object type
  * @param <R> Stored data type

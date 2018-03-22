@@ -143,7 +143,7 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override

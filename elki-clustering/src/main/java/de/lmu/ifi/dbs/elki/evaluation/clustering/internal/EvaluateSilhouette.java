@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  *
  * @param <O> Object type
  */
@@ -245,7 +245,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

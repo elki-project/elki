@@ -61,12 +61,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Local Outlier Detection Reconsidered: a Generalized View on Locality with
  * Applications to Spatial, Video, and Network Outlier Detection<br>
  * Data Mining and Knowledge Discovery 28(1)
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
- * @apiviz.has LRDProcessor
- * @apiviz.has LOFProcessor
+ *
+ * @has - - - LRDProcessor
+ * @has - - - LOFProcessor
+ *
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
@@ -173,7 +174,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

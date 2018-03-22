@@ -28,12 +28,12 @@
  * DistanceQuery<V> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
  * }
  * 
- * @apiviz.exclude de.lmu.ifi.dbs.elki.application.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.(distance|similarity)function\..*\.
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.*Instance
+ * @opt hide de.lmu.ifi.dbs.elki.application.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.*
+ * @opt hide de.lmu.ifi.dbs.elki.distance.(distance|similarity)function\..*\.
+ * @opt hide de.lmu.ifi.dbs.elki.index.*
+ * @opt hide de.lmu.ifi.dbs.elki.*Instance
  */
 /*
  * This file is part of ELKI:

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.composedOf Projection
+ * @composed - - - Projection
  * 
  * @param <I> Input type
  * @param <O> Output type
@@ -77,7 +77,7 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <I> Input type
    * @param <O> Output type

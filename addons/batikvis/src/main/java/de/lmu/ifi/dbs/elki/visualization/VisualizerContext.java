@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,14 +49,14 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.landmark
- * @apiviz.composedOf StyleLibrary
- * @apiviz.composedOf StylingPolicy
- * @apiviz.composedOf SelectionResult
- * @apiviz.composedOf ResultHierarchy
- * @apiviz.composedOf VisualizationTree
- * @apiviz.composedOf DataStoreListener
- * @apiviz.composedOf VisualizationProcessor
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - StyleLibrary
+ * @composed - - - StylingPolicy
+ * @composed - - - SelectionResult
+ * @composed - - - ResultHierarchy
+ * @composed - - - VisualizationTree
+ * @composed - - - DataStoreListener
+ * @composed - - - VisualizationProcessor
  */
 public class VisualizerContext implements DataStoreListener, Result {
   /**

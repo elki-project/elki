@@ -156,7 +156,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood object type
    */

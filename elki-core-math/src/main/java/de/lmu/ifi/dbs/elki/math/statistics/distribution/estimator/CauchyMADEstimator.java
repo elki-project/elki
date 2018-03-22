@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has CauchyDistribution
+ * @has - - - CauchyDistribution
  */
 @Reference(authors = "D. J. Olive", //
     title = "Applied Robust Statistics", booktitle = "", //
@@ -75,7 +75,7 @@ public class CauchyMADEstimator implements MADDistributionEstimator<CauchyDistri
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

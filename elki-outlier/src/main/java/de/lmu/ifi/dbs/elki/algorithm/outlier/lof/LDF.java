@@ -73,8 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.has KNNQuery
- * @apiviz.has KernelDensityFunction
+ * @has - - - KNNQuery
+ * @has - - - KernelDensityFunction
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -226,7 +226,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> vector type
    */

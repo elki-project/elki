@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -77,9 +77,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 @Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Evaluation of Clusterings - Metrics and Visual Support", //
@@ -133,8 +133,8 @@ public class CircleSegmentsVisualizer implements VisFactory {
    * @author Sascha Goldhofer
    * @author Erich Schubert
    *
-   * @apiviz.uses Segments
-   * @apiviz.has SegmentsStylingPolicy
+   * @assoc - - - Segments
+   * @has - - - SegmentsStylingPolicy
    *
    */
   public class Instance extends AbstractVisualization implements ResultListener {
@@ -670,7 +670,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     private class SegmentListenerProxy implements EventListener {
       /**

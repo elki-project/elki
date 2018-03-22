@@ -191,7 +191,7 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject imp
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Factory implements FeatureVector.Factory<WeightedDiscreteUncertainObject, Number> {
     @Override

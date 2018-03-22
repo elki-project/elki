@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KMeansProcessor
+ * @has - - - KMeansProcessor
  *
  * @param <V> Vector type
  */
@@ -119,7 +119,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

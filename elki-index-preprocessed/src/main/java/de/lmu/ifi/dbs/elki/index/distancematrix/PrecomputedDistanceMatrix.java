@@ -56,9 +56,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has PrecomputedDistanceQuery
- * @apiviz.has PrecomputedKNNQuery
- * @apiviz.has PrecomputedRangeQuery
+ * @has - - - PrecomputedDistanceQuery
+ * @has - - - PrecomputedKNNQuery
+ * @has - - - PrecomputedRangeQuery
  *
  * @param <O> Object type
  */
@@ -352,7 +352,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    *
    * @author Erich Schubert
    *
-   * @apiviz.has PrecomputedDistanceMatrix
+   * @has - - - PrecomputedDistanceMatrix
    *
    * @param <O> Object type
    */
@@ -391,7 +391,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      *
      * @param <O> Object type
      */

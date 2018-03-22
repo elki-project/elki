@@ -150,7 +150,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

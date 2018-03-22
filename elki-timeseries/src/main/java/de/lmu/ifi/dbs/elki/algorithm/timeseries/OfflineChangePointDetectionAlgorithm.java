@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Sebastian Rühl
  * @author Erich Schubert
  *
- * @apiviz.has ChangePoints
+ * @has - - - ChangePoints
  */
 @Title("Off-line Change Point Detection")
 @Description("Detects multiple change points in a time series")
@@ -141,7 +141,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   class Instance {
     /**
@@ -352,7 +352,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

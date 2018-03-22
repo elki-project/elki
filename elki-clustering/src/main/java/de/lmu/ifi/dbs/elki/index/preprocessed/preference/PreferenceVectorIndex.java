@@ -48,8 +48,8 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses PreferenceVectorIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - PreferenceVectorIndex
    * 
    * @param <V> vector type
    */

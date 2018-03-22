@@ -73,7 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf KNNWeightProcessor
+ * @composed - - - KNNWeightProcessor
+ *
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
@@ -155,7 +156,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

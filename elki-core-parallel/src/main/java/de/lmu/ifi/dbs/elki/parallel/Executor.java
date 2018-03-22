@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.parallel.processor.Processor
- * @apiviz.uses SharedVariable
+ * @assoc - - - de.lmu.ifi.dbs.elki.parallel.processor.Processor
+ * @assoc - - - SharedVariable
  */
 public interface Executor {
   /**

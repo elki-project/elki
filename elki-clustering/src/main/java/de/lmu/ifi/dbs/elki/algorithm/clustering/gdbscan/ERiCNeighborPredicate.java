@@ -280,7 +280,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

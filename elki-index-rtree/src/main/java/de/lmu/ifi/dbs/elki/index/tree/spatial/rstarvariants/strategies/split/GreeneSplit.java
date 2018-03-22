@@ -155,7 +155,7 @@ public class GreeneSplit implements SplitStrategy {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

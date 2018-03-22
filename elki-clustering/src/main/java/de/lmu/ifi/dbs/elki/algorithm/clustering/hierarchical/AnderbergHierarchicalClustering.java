@@ -67,8 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf LinkageMethod
- * @apiviz.composedOf PointerHierarchyRepresentationBuilder
+ * @composed - - - LinkageMethod
+ * @composed - - - PointerHierarchyRepresentationBuilder
  *
  * @param <O> Object type
  */
@@ -368,7 +368,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

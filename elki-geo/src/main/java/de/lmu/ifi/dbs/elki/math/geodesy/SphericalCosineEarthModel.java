@@ -87,7 +87,7 @@ public class SphericalCosineEarthModel extends AbstractEarthModel {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

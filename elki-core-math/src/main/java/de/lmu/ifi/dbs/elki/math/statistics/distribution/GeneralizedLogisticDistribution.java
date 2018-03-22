@@ -206,7 +206,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /** Parameters. */

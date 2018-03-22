@@ -141,7 +141,7 @@ public class OnedimensionalDistanceFunction extends AbstractNumberVectorDistance
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

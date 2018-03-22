@@ -407,7 +407,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override

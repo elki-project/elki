@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveDistanceFunction
+ * @assoc - - - AbstractRStarTree
+ * @assoc - - - SpatialPrimitiveDistanceFunction
  */
 @Reference(authors = "J. Kuan, P. Lewis", //
     title = "Fast k nearest neighbour search for R-tree family", //

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  * 
- * @apiviz.uses Clustering
- * @apiviz.composedOf PairCounting
- * @apiviz.composedOf Entropy
- * @apiviz.composedOf EditDistance
- * @apiviz.composedOf BCubed
- * @apiviz.composedOf SetMatchingPurity
+ * @assoc - - - Clustering
+ * @composed - - - PairCounting
+ * @composed - - - Entropy
+ * @composed - - - EditDistance
+ * @composed - - - BCubed
+ * @composed - - - SetMatchingPurity
  */
 public class ClusterContingencyTable {
   /**
@@ -278,7 +278,7 @@ public class ClusterContingencyTable {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static final class Util {
     /**

@@ -71,12 +71,12 @@ import net.jafama.FastMath;
  * E. Müller, M. Schiffer, T. Seidl<br>
  * Adaptive outlierness for subspace outlier ranking<br>
  * Proc. 19th ACM Int. Conf. on Information and Knowledge Management
- * 
+ *
  * @author Viktoria Pleintinger
  * @author Erich Schubert
  * @since 0.5.0
- * 
- * @apiviz.composedOf KernelDensityEstimator
+ *
+ * @composed - - - KernelDensityEstimator
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", //
     title = "Adaptive outlierness for subspace outlier ranking", //
@@ -382,7 +382,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    * 
    * @author Viktoria Pleintinger
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

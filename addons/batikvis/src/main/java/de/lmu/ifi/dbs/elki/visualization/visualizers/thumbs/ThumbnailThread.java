@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses Listener oneway - - signals
+ * @navassoc - signals - Listener
  */
 public class ThumbnailThread extends Thread {
   /**
@@ -99,7 +99,7 @@ public class ThumbnailThread extends Thread {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Task {
     /**

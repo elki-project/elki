@@ -137,7 +137,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
    *
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,26 +21,27 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+
 /**
- * Distance functions valid in a <em>static</em> database context only (i.e. for
- * DBIDRanges)
- * 
+ * Distance functions valid in a <em>static</em> database context only
+ * (i.e. for DBIDRanges)
+ *
  * For any "distance" that cannot be computed for arbitrary objects, only those
  * that exist in the database and referenced by their ID. Furthermore, the IDs
  * must be contiguous.
- * 
+ *
  * Example: external precomputed distances
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
- * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - defined on
+ *
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - "defined on" - de.lmu.ifi.dbs.elki.database.ids.DBIDRange
  */
 public interface DBIDRangeDistanceFunction extends DBIDDistanceFunction {
   /**
    * Compute the distance for two integer offsets.
-   * 
+   *
    * @param i1 First offset
    * @param i2 Second offset
    * @return Distance
@@ -50,7 +51,7 @@ public interface DBIDRangeDistanceFunction extends DBIDDistanceFunction {
   /**
    * Validate the range of DBIDs to use. This will log a warning if an obvious
    * mismatch was found.
-   * 
+   *
    * @param range DBID range
    */
   void checkRange(DBIDRange range);

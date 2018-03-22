@@ -71,8 +71,8 @@ import net.jafama.FastMath;
  * @author Robert Rödler
  * @since 0.5.5
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 // FIXME: for >2 dimensions, cosine doesn't seem to be correct yet.
 public class DistanceFunctionVisualization implements VisFactory {
@@ -205,7 +205,7 @@ public class DistanceFunctionVisualization implements VisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    *
-   * @apiviz.has DBIDSelection oneway - - visualizes
+   * @navhas - visualizes - DBIDSelection
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

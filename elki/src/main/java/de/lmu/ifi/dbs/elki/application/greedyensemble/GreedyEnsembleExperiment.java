@@ -142,7 +142,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Distance modes.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum Distance {
     PEARSON, //
@@ -593,7 +593,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

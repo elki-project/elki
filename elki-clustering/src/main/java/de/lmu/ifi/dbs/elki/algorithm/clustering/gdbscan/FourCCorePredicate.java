@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  */
 @Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
     title = "Computing Clusters of Correlation Connected Objects", //
@@ -106,7 +106,7 @@ public class FourCCorePredicate implements CorePredicate<PreDeConModel> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

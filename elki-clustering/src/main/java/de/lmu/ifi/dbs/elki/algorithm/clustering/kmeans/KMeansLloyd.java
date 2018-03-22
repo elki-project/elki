@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Arthur Zimek
  * @since 0.5.0
  *
- * @apiviz.landmark
- * @apiviz.has KMeansModel
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - KMeansModel
  *
  * @param <V> vector datatype
  */
@@ -98,7 +98,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -133,7 +133,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

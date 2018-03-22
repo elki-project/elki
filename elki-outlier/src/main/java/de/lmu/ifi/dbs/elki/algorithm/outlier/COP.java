@@ -129,7 +129,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum DistanceDist {
     /**
@@ -311,7 +311,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

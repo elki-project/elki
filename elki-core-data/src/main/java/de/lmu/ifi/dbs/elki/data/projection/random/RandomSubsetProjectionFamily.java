@@ -163,7 +163,7 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
     @Override

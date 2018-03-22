@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.has RangeQuery
+ * @has - - - RangeQuery
  *
  * @param <O> Object type
  */
@@ -275,7 +275,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class DoubleIntArrayList {
     /**
@@ -403,7 +403,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

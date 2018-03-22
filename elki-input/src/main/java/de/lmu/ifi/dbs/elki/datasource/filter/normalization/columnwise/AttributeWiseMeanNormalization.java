@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  *
  * @param <V> vector type
  */

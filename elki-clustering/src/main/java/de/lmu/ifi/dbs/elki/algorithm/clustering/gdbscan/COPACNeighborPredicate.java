@@ -170,7 +170,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class COPACModel implements SetDBIDs {
     /**
@@ -277,7 +277,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

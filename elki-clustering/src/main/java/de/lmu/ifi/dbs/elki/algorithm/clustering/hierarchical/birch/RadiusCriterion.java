@@ -91,7 +91,7 @@ public class RadiusCriterion implements BIRCHAbsorptionCriterion {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

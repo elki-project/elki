@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.composedOf LatLngToECEFProjection
+ * @composed - - - LatLngToECEFProjection
  * 
  * @param <O> Object type
  */
@@ -181,7 +181,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has LatLngAsECEFIndex
+   * @has - - - LatLngAsECEFIndex
    * 
    * @param <O> Data type.
    */
@@ -233,7 +233,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      * 
      * @param <O> Outer object type.
      */

@@ -58,8 +58,8 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector> ext
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - AbstractPreferenceVectorIndex
    */
   public abstract static class Factory<V extends NumberVector> implements PreferenceVectorIndex.Factory<V> {
     @Override

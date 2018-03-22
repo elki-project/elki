@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has GeneralizedExtremeValueDistribution
+ * @has - - - GeneralizedExtremeValueDistribution
  */
 @Reference(authors = "J. R. M. Hosking, J. R. Wallis, E. F. Wood", //
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
@@ -164,7 +164,7 @@ public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstim
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

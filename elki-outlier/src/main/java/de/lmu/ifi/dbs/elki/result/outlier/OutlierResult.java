@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.result.*;
  * @author Erich Schubert
  * @since 0.3
  * 
- * @apiviz.landmark
- * @apiviz.composedOf OutlierScoreMeta
- * @apiviz.composedOf DoubleRelation oneway - - contains
- * @apiviz.composedOf OrderingFromRelation
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - OutlierScoreMeta
+ * @navcomposed - - - DoubleRelation
+ * @composed - - - OrderingFromRelation
  */
 public class OutlierResult extends BasicResult {
   /**

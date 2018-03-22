@@ -1,12 +1,12 @@
 /**
  * Result types, representation and handling
  *
- * @apiviz.exclude java.util.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.evaluation.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.workflow.*
+ * @opt hide java.util.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.*
+ * @opt hide de.lmu.ifi.dbs.elki.evaluation.*
+ * @opt hide de.lmu.ifi.dbs.elki.visualization.*
+ * @opt hide de.lmu.ifi.dbs.elki.workflow.*
  */
 /*
  * This file is part of ELKI:

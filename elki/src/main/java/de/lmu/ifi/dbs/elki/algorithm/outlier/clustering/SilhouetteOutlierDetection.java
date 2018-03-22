@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has ClusteringAlgorithm
+ * @has - - - ClusteringAlgorithm
  *
  * @param <O> Object type
  */
@@ -217,7 +217,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

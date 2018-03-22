@@ -157,7 +157,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood type
    * @param <O> Attribute object type

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -277,7 +277,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> object type
    */
@@ -442,7 +442,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     class ItrParents implements It<O> {
       int pos = 0;
@@ -470,7 +470,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     class ItrParentsReverse implements It<O> {
       int pos = nump - 1;
@@ -498,7 +498,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     class ItrChildren implements It<O> {
       int pos = 0;
@@ -526,7 +526,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     class ItrChildrenReverse implements It<O> {
       int pos = numc - 1;
@@ -555,7 +555,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class ItrDesc implements It<O> {
     /**
@@ -639,7 +639,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class ItrAnc implements It<O> {
     /**
@@ -723,7 +723,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class ItrAll implements It<O> {
     int pos;

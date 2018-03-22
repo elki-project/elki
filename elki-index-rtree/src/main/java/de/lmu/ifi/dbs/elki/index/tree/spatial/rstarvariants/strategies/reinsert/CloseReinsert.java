@@ -81,7 +81,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
     @Override

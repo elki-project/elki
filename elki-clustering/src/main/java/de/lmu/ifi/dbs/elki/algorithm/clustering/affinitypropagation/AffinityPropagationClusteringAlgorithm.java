@@ -60,7 +60,8 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.composedOf AffinityPropagationInitialization
+ * @composed - - - AffinityPropagationInitialization
+ *
  * @param <O> object type
  */
 @Title("Affinity Propagation: Clustering by Passing Messages Between Data Points")
@@ -269,7 +270,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> object type
    */

@@ -90,10 +90,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses EM
- * @apiviz.has SubspaceModel
- * @apiviz.has ClusterCandidate
- * @apiviz.has Signature
+ * @assoc - - - EM
+ * @has - - - SubspaceModel
+ * @has - - - ClusterCandidate
+ * @has - - - Signature
  * 
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
@@ -872,7 +872,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * 
    * @author Florian Nuecke
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

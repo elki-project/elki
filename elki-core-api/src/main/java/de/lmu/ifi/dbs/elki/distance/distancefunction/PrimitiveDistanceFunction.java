@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  * 
  * @param <O> input object type
  */

@@ -69,8 +69,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class DendrogramVisualization implements VisFactory {
   /**
@@ -83,7 +83,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum DrawingStyle {
     RECTANGULAR, //
@@ -96,7 +96,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum PositionStyle {
     HALF_POS, //
@@ -598,7 +598,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

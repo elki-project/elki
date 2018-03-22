@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.composedOf String
+ * @composed - - - String
  */
 public class SimpleClassLabel extends ClassLabel {
   /**
@@ -94,7 +94,7 @@ public class SimpleClassLabel extends ClassLabel {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses SimpleClassLabel - - «serializes»
+   * @assoc - serializes - SimpleClassLabel
    */
   public static class Serializer implements ByteBufferSerializer<SimpleClassLabel> {
     @Override
@@ -118,8 +118,8 @@ public class SimpleClassLabel extends ClassLabel {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SimpleClassLabel - - «creates»
-   * @apiviz.stereotype factory
+   * @has - creates - SimpleClassLabel
+   * @stereotype factory
    */
   public static class Factory extends ClassLabel.Factory<SimpleClassLabel> {
     @Override

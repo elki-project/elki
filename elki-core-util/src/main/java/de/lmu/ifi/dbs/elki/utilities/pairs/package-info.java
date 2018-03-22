@@ -19,7 +19,7 @@
  * VM.</li>
  * </ul>
  * 
- * @apiviz.exclude java.lang.
+ * @opt hide java.lang.
  */
 /*
  * This file is part of ELKI:

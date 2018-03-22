@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @author Simon Mittermüller
  * @since 0.2
  *
- * @apiviz.composedOf SaveOptionsPanel
+ * @composed - - - SaveOptionsPanel
  */
 public final class SVGSaveDialog {
   /**

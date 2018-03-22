@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has DoubleVector oneway - «contains/produces»
+ * @navhas - contains/produces - DoubleVector
  */
 public interface UncertainObject extends SpatialComparable, FeatureVector<Double> {
   /**

@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
  * @author Erich Schubert
  * @since 0.5.5
  * 
- * @apiviz.uses IntegerComparator
+ * @assoc - - - IntegerComparator
  */
 @Reference(authors = "V. Yaroslavskiy", //
     title = "Dual-Pivot Quicksort", booktitle = "", //

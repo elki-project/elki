@@ -59,8 +59,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance - - «create»
+ * @stereotype factory
+ * @assoc - create - Instance
  */
 public class SelectionToolLineVisualization implements VisFactory {
   /**
@@ -71,7 +71,7 @@ public class SelectionToolLineVisualization implements VisFactory {
   /**
    * Input modes
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Mode {
     REPLACE, ADD, INVERT
@@ -110,7 +110,7 @@ public class SelectionToolLineVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has DBIDSelection oneway - - updates
+   * @navhas - updates - DBIDSelection
    */
   public class Instance extends AbstractParallelVisualization<NumberVector> implements DragableArea.DragListener {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has MultivariateGaussianModel
+ * @has - - - MultivariateGaussianModel
  *
  * @param <V> vector type
  */
@@ -80,7 +80,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

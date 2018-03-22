@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.composedOf ArrayStaticDBIDs
- * @apiviz.uses DatabaseConnection
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - ArrayStaticDBIDs
+ * @assoc - - - DatabaseConnection
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
 public class StaticArrayDatabase extends AbstractDatabase {
@@ -189,7 +189,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {
     /**

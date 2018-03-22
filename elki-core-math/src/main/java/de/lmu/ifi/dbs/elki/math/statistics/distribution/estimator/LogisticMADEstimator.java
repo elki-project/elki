@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has LogisticDistribution
+ * @has - - - LogisticDistribution
  */
 @Reference(title = "Robust Estimators for Transformed Location Scale Families", //
     authors = "D. J. Olive", booktitle = "", //
@@ -74,7 +74,7 @@ public class LogisticMADEstimator implements MADDistributionEstimator<LogisticDi
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

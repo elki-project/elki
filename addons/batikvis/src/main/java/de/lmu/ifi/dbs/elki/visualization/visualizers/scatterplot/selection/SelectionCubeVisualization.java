@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 // TODO: Does not use the relation. Always enable, but hide in the menu?
 public class SelectionCubeVisualization implements VisFactory {
@@ -106,8 +106,8 @@ public class SelectionCubeVisualization implements VisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has RangeSelection oneway - - visualizes
-   * @apiviz.uses SVGHyperCube
+   * @navhas - visualizes - RangeSelection
+   * @assoc - - - SVGHyperCube
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
@@ -216,7 +216,7 @@ public class SelectionCubeVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has PCAFilteredRunner
+ * @has - - - PCAFilteredRunner
  *
  * @param <NV> Vector type
  */
@@ -138,8 +138,8 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - AbstractFilteredPCAIndex
    */
   public abstract static class Factory<NV extends NumberVector> implements FilteredLocalPCAIndex.Factory<NV> {
     /**
@@ -185,7 +185,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public abstract static class Parameterizer<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**

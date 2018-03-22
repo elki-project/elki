@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.composedOf GeneratorMain
+ * @composed - - - GeneratorMain
  */
 public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /** Dataset tag */
@@ -720,7 +720,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

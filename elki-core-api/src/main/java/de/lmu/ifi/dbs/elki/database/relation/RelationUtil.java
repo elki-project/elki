@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.uses Relation oneway
- * @apiviz.has CollectionFromRelation
- * @apiviz.has RelationObjectIterator
+ * @navassoc - - - Relation
+ * @has - - - CollectionFromRelation
+ * @has - - - RelationObjectIterator
  */
 public final class RelationUtil {
   /**
@@ -269,7 +269,7 @@ public final class RelationUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class AscendingByDoubleRelation implements Comparator<DBIDRef> {
     /**
@@ -298,7 +298,7 @@ public final class RelationUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class DescendingByDoubleRelation implements Comparator<DBIDRef> {
     /**

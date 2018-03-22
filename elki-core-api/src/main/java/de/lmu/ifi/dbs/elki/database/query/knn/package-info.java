@@ -1,8 +1,8 @@
 /**
  * Prepared queries for k nearest neighbor (kNN) queries
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
- * @apiviz.exclude java.util.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.*
+ * @opt hide java.util.*
  */
 /*
  * This file is part of ELKI:

@@ -68,8 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has CoverTreeRangeQuery
- * @apiviz.has CoverTreeKNNQuery
+ * @has - - - CoverTreeRangeQuery
+ * @has - - - CoverTreeKNNQuery
  */
 @Reference(authors = "A. Beygelzimer, S. Kakade, J. Langford", //
     title = "Cover trees for nearest neighbor", //
@@ -104,7 +104,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static final class Node {
     /**
@@ -476,7 +476,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
    *
    * @author Erich Schubert
    *
-   * @apiviz.has CoverTree
+   * @has - - - CoverTree
    *
    * @param <O> Object type
    */
@@ -503,7 +503,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override

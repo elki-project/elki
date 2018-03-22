@@ -453,7 +453,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

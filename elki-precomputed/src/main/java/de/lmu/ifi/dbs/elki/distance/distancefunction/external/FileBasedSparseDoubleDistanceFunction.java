@@ -54,7 +54,7 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.composedOf DistanceCacheWriter
+ * @composed - - - DistanceCacheWriter
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction")
 public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
@@ -194,7 +194,7 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

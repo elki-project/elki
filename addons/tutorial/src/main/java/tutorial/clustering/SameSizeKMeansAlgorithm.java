@@ -363,7 +363,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Meta {
     /**
@@ -416,7 +416,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public class PreferenceComparator implements IntComparator {
     /**
@@ -451,7 +451,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

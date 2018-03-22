@@ -230,7 +230,7 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override

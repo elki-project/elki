@@ -30,9 +30,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  * 
- * @apiviz.has DBID oneway - - «references»
+ * @navhas - references - DBID
  */
 public interface DBIDRef {
   /**

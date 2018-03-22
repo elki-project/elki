@@ -371,7 +371,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

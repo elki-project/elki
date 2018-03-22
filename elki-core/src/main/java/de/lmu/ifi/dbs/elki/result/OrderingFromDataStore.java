@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -130,7 +130,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected final class ImpliedComparator implements Comparator<DBIDRef> {
     @Override
@@ -149,7 +149,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected final class DerivedComparator implements Comparator<DBIDRef> {
     @Override

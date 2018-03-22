@@ -299,7 +299,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractKNNQuery {
     /**
@@ -374,7 +374,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRangeQuery {
     /**
@@ -440,7 +440,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has InMemoryIDistanceIndex
+   * @has - - - InMemoryIDistanceIndex
    * 
    * @param <V> Data type.
    */
@@ -489,7 +489,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      * 
      * @param <V> object type.
      */

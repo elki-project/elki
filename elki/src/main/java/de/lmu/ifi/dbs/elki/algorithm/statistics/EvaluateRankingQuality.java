@@ -182,7 +182,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

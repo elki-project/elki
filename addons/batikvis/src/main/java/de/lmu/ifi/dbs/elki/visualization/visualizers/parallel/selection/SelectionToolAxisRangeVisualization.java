@@ -57,8 +57,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SelectionToolAxisRangeVisualization implements VisFactory {
   /**
@@ -104,7 +104,7 @@ public class SelectionToolAxisRangeVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has RangeSelection oneway - - updates
+   * @navhas - updates - RangeSelection
    */
   public class Instance extends AbstractParallelVisualization<NumberVector> implements DragableArea.DragListener {
     /**

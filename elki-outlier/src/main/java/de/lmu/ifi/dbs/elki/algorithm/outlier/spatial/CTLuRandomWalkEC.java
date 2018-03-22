@@ -239,7 +239,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
    *
    * @author Ahmed Hettab
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <N> Vector type
    */

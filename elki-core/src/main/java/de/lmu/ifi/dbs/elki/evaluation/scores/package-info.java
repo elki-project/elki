@@ -1,7 +1,7 @@
 /**
  * Evaluation of rankings and scorings
  *
- * @apiviz.exclude java.util.*
+ * @opt hide java.util.*
  */
 /*
  * This file is part of ELKI:

@@ -69,7 +69,7 @@ public abstract class AbstractKMeansInitialization implements KMeansInitializati
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

@@ -73,8 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf KNNProcessor
- * @apiviz.composedOf KDistanceProcessor
+ * @composed - - - KNNProcessor
+ * @composed - - - KDistanceProcessor
+ *
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
@@ -149,7 +150,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

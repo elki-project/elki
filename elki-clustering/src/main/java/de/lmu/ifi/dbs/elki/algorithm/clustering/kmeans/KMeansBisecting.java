@@ -178,7 +178,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
    * @author Stephan Baier
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    * @param <M> Model type

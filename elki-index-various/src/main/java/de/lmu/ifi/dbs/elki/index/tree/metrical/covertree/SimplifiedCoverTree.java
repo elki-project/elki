@@ -70,8 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has CoverTreeRangeQuery
- * @apiviz.has CoverTreeKNNQuery
+ * @has - - - CoverTreeRangeQuery
+ * @has - - - CoverTreeKNNQuery
  */
 @Priority(Priority.RECOMMENDED)
 public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>, KNNIndex<O> {
@@ -102,7 +102,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static final class Node {
     /**
@@ -446,7 +446,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
    *
    * @author Erich Schubert
    *
-   * @apiviz.has SimplifiedCoverTree
+   * @has - - - SimplifiedCoverTree
    *
    * @param <O> Object type
    */
@@ -473,7 +473,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override

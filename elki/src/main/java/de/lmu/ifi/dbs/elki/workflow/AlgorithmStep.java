@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has Algorithm
- * @apiviz.has Result
- * @apiviz.uses Database
+ * @has - - - Algorithm
+ * @has - - - Result
+ * @assoc - - - Database
  */
 public class AlgorithmStep implements WorkflowStep {
   /**
@@ -133,7 +133,7 @@ public class AlgorithmStep implements WorkflowStep {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

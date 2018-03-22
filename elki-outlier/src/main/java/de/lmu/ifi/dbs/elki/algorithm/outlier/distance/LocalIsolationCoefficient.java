@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
+ *
  * @param <O> the type of objects handled by this algorithm
  */
 @Reference(authors = "B. Yu, M. Song, L. Wang", //
@@ -152,7 +153,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  */
 @Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
     title = "Density Connected Clustering with Local Subspace Preferences", //
@@ -107,7 +107,7 @@ public class PreDeConCorePredicate implements CorePredicate<PreDeConModel> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -72,7 +72,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  */
 @Reference(authors = "F. B. Baker, L. J. Hubert", //
     title = "Measuring the Power of Hierarchical Cluster Analysis", //
@@ -305,7 +305,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    *
    * @author Stephan Baier
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

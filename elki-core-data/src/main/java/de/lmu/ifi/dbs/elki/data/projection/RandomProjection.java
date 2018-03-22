@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  * 
  * @param <V> Vector type
  */
@@ -121,7 +121,7 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

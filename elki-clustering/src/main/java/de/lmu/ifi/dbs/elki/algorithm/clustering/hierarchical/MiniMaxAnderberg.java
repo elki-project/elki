@@ -359,7 +359,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -32,21 +32,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * SharedNearestNeighborSimilarityFunction with a pattern defined to accept
  * Strings that define a non-negative Integer.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.1
- * 
- * @apiviz.has
- *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
- *             .Factory
- * @apiviz.has Instance oneway - - «create»
- * 
+ *
+ * @composed - - - SharedNearestNeighborIndex.Factory
+ * @navhas - create - Instance
+ *
  * @param <O> object type
  */
 public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex.Factory<O>> {
   /**
    * Constructor.
-   * 
+   *
    * @param indexFactory Index factory.
    */
   public SharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
@@ -55,7 +53,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
 
   /**
    * Compute the intersection size
-   * 
+   *
    * @param neighbors1 SORTED neighbors of first
    * @param neighbors2 SORTED neighbors of second
    * @return Intersection size
@@ -91,11 +89,11 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
 
   /**
    * Instance for a particular database.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses SharedNearestNeighborIndex
-   * 
+   *
+   * @assoc - - - SharedNearestNeighborIndex
+   *
    * @param <O> Object type
    */
   public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>> {
@@ -106,7 +104,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
 
     /**
      * Constructor.
-     * 
+     *
      * @param database Database
      * @param preprocessor Index
      */
@@ -130,11 +128,11 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   * 
+   *
+   * @hidden
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {

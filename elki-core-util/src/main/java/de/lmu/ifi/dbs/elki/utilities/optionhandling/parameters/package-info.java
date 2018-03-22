@@ -4,10 +4,10 @@
  * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
  * documentation!
  *
- * @apiviz.exclude elki.utilities.*
- * @apiviz.exclude gui.configurator.*
- * @apiviz.exclude AbstractParameterizer
- * @apiviz.exclude constraints.ParameterConstraint
+ * @opt hide elki.utilities.*
+ * @opt hide gui.configurator.*
+ * @opt hide AbstractParameterizer
+ * @opt hide constraints.ParameterConstraint
  */
 /*
  * This file is part of ELKI:

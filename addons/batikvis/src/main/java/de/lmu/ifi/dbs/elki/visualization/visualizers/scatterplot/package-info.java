@@ -1,12 +1,12 @@
 /**
  * Visualizers based on scatterplots
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.batikutil.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.svg.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.result.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.data.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener
+ * @opt hide de.lmu.ifi.dbs.elki.visualization.batikutil.*
+ * @opt hide de.lmu.ifi.dbs.elki.visualization.svg.*
+ * @opt hide de.lmu.ifi.dbs.elki.result.*
+ * @opt hide de.lmu.ifi.dbs.elki.index.*
+ * @opt hide de.lmu.ifi.dbs.elki.data.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener
  */
 /*
  * This file is part of ELKI:

@@ -49,8 +49,8 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses FilteredLocalPCAIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - FilteredLocalPCAIndex
    *
    * @param <NV> Vector type
    */

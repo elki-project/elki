@@ -80,7 +80,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
  *
  * @param <O> the type of data objects handled by this algorithm
  */
@@ -231,7 +231,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

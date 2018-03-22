@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.has GeneratorInterface
+ * @has - - - GeneratorInterface
  */
 public class GeneratorMain {
   /**
@@ -170,7 +170,7 @@ public class GeneratorMain {
    * Point (re-)assignment strategy. Default: no change.
    *
    * @author Erich Schubert
-   * @apiviz.exclude
+   * @hidden
    */
   private static class AssignPoint {
     /**
@@ -200,7 +200,7 @@ public class GeneratorMain {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class TestModel extends AssignPoint {
     @Override
@@ -229,7 +229,7 @@ public class GeneratorMain {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class AssignLabelsByDensity extends AssignPoint {
     /**
@@ -288,7 +288,7 @@ public class GeneratorMain {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class AssignLabelsByDistance extends AssignPoint {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,14 +30,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * Represents a list-size parameter constraint. The size of the list parameter (
  * {@link ListParameter}) to be tested has to be equal to the specified list
  * size constraint.
- * 
+ * <p>
  * FIXME: Unfortunately, we cannot have good type safety anymore right now.
- * 
+ *
  * @author Steffi Wanka
  * @since 0.1
- * 
- * @apiviz.uses 
- *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter
+ *
+ * @assoc - - - ListParameter
  */
 public class ListSizeConstraint implements ParameterConstraint<Object> {
   /**
@@ -47,7 +46,7 @@ public class ListSizeConstraint implements ParameterConstraint<Object> {
 
   /**
    * Constructs a list size constraint with the given constraint size.
-   * 
+   *
    * @param size the size constraint for the list parameter
    */
   public ListSizeConstraint(int size) {
@@ -57,7 +56,7 @@ public class ListSizeConstraint implements ParameterConstraint<Object> {
   /**
    * Checks if the list parameter fulfills the size constraint. If not, a
    * parameter exception is thrown.
-   * 
+   *
    * @throws ParameterException, if the size of the list parameter given is not
    *         equal to the list size constraint specified.
    */

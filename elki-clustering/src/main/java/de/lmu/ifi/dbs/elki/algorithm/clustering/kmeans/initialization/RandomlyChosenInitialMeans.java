@@ -108,7 +108,7 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization 
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
     @Override

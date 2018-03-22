@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
  */
 public final class DataStoreUtil {
   /**
@@ -138,7 +138,7 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class AscendingByDoubleDataStore implements Comparator<DBIDRef> {
     /**
@@ -167,7 +167,7 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class DescendingByDoubleDataStore implements Comparator<DBIDRef> {
     /**
@@ -196,7 +196,7 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class AscendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
     /**
@@ -226,7 +226,7 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class DescendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
     /**
@@ -257,7 +257,7 @@ public final class DataStoreUtil {
    * @author Erich Schubert
    * @author Julian Erhard
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class AscendingByIntegerDataStore implements Comparator<DBIDRef> {
     /**
@@ -287,7 +287,7 @@ public final class DataStoreUtil {
    * @author Erich Schubert
    * @author Julian Erhard
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class DescendingByIntegerDataStore implements Comparator<DBIDRef> {
     /**

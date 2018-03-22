@@ -62,8 +62,8 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.has NumberVector
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - NumberVector
  *
  * @param <V> the type of NumberVector used
  */
@@ -367,7 +367,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractStreamingParser.Parameterizer {
     /**

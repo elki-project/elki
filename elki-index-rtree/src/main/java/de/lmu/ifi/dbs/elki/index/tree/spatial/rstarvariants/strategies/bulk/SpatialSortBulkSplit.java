@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * On packing R-trees<br>
  * I. Kamel, C. Faloutsos<br>
  * Proc. 2nd Int. Conf. on Information and Knowledge Management (CIKM)
- * 
- * @apiviz.composedOf SpatialSorter
- * 
+ *
+ * @composed - - - SpatialSorter
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -77,7 +77,7 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

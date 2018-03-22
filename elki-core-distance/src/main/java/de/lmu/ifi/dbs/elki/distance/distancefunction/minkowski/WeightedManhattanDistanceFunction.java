@@ -148,7 +148,7 @@ public class WeightedManhattanDistanceFunction extends WeightedLPNormDistanceFun
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

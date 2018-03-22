@@ -59,8 +59,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has LocalitySensitiveHashFunctionFamily
- * @apiviz.has Instance
+ * @has - - - LocalitySensitiveHashFunctionFamily
+ * @has - - - Instance
  *
  * @param <V> Object type to index
  */
@@ -114,7 +114,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has LocalitySensitiveHashFunction
+   * @has - - - LocalitySensitiveHashFunction
    */
   public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
     /**
@@ -274,7 +274,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     protected class LSHKNNQuery extends AbstractKNNQuery {
       /**
@@ -305,7 +305,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     protected class LSHRangeQuery extends AbstractRangeQuery {
       /**
@@ -337,7 +337,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,8 +53,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SelectionLineVisualization implements VisFactory {
   /**
@@ -94,7 +94,7 @@ public class SelectionLineVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has DBIDSelection oneway - - visualizes
+   * @navhas - visualizes - DBIDSelection
    */
   public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
     /**

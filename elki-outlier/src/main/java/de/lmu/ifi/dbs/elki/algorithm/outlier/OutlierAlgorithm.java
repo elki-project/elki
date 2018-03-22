@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,9 +30,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.excludeSubtypes
- * @apiviz.has OutlierResult
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - OutlierResult
  */
 public interface OutlierAlgorithm extends Algorithm {
   // Note: usually you won't override this method directly, but instead

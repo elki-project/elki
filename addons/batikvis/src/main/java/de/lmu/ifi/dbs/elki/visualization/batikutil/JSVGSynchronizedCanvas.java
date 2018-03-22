@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.composedOf JSVGUpdateSynchronizer
- * @apiviz.has SVGPlot oneway - - displays
+ * @composed - - - JSVGUpdateSynchronizer
+ * @navhas - displays - SVGPlot
  */
 public class JSVGSynchronizedCanvas extends JSVGCanvas {
   /**

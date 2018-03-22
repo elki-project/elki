@@ -153,7 +153,7 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

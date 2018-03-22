@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.uses Reference
+ * @assoc - - - Reference
  */
 public class DocumentReferences {
   private static final String DOIPREFIX = "https://doi.org/";

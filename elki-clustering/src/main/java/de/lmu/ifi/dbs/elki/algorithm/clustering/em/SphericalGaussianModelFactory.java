@@ -44,7 +44,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has SphericalGaussianModel
+ * @has - - - SphericalGaussianModel
  *
  * @param <V> vector type
  */
@@ -88,7 +88,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

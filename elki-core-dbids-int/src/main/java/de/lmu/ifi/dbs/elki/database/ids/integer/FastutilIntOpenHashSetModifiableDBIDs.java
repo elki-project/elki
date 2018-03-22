@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has Itr
+ * @has - - - Itr
  */
 class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
   /**
@@ -239,7 +239,7 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Itr implements IntegerDBIDMIter {
     /**

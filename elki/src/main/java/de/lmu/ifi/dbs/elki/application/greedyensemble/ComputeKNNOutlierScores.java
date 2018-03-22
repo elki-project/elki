@@ -392,7 +392,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractApplication.Parameterizer {
     /**

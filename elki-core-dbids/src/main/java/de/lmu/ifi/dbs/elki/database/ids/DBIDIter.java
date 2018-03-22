@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public interface DBIDIter extends DBIDRef, Iter {
   @Override

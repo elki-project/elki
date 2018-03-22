@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.uses IntegerArrayDBIDs
+ * @assoc - - - IntegerArrayDBIDs
  */
 @Reference(authors = "V. Yaroslavskiy", //
     title = "Dual-Pivot Quicksort", booktitle = "", //

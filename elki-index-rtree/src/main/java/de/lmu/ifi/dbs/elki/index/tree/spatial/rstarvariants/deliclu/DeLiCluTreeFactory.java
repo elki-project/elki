@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses DeLiCluTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - DeLiCluTreeIndex
  * 
  * @param <O> Object type
  */
@@ -65,7 +65,7 @@ public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTre
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override

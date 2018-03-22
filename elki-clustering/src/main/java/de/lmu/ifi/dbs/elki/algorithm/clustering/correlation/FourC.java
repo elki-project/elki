@@ -54,8 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.composedOf FourCNeighborPredicate
- * @apiviz.composedOf FourCCorePredicate
+ * @composed - - - FourCNeighborPredicate
+ * @composed - - - FourCCorePredicate
+ *
  * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
@@ -96,7 +97,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Settings {
     /**
@@ -135,7 +136,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
@@ -265,7 +266,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

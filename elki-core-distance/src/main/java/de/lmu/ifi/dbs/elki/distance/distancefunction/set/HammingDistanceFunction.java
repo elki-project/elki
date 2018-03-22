@@ -171,7 +171,7 @@ public class HammingDistanceFunction extends AbstractSetDistanceFunction<Feature
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

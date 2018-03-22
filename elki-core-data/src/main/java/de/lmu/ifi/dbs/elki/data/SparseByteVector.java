@@ -288,7 +288,7 @@ public class SparseByteVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has SparseByteVector
+   * @has - - - SparseByteVector
    */
   public static class Factory implements SparseNumberVector.Factory<SparseByteVector> {
     @Override
@@ -333,7 +333,7 @@ public class SparseByteVector implements SparseNumberVector {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -348,7 +348,7 @@ public class SparseByteVector implements SparseNumberVector {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses SparseByteVector - - «serializes»
+   * @assoc - serializes - SparseByteVector
    */
   public static class VariableSerializer implements ByteBufferSerializer<SparseByteVector> {
     @Override

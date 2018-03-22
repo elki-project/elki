@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has DBIDRange oneway - - «produces»
+ * @navhas - produces - DBIDRange
  */
 public class FixedDBIDsFilter implements ObjectFilter {
   /**
@@ -73,7 +73,7 @@ public class FixedDBIDsFilter implements ObjectFilter {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

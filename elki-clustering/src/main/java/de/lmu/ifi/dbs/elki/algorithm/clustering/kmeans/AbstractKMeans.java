@@ -72,7 +72,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf KMeansInitialization
+ * @composed - - - KMeansInitialization
  *
  * @param <V> Vector type
  * @param <M> Cluster model type
@@ -604,7 +604,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
     /**

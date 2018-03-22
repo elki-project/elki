@@ -98,7 +98,7 @@ public class CentroidLinkage implements Linkage {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  */
 public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**

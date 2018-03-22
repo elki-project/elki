@@ -59,9 +59,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.composedOf HashSetModifiableDBIDs
- * @apiviz.uses DatabaseConnection
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - HashSetModifiableDBIDs
+ * @assoc - - - DatabaseConnection
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
 public class HashmapDatabase extends AbstractDatabase implements UpdatableDatabase {
@@ -298,7 +298,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {
     /**

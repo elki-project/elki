@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,7 +72,7 @@ public abstract class SinCosTable {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private static class FullTable extends SinCosTable {
     /**
@@ -137,7 +137,7 @@ public abstract class SinCosTable {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private static class HalfTable extends SinCosTable {
     /**
@@ -217,7 +217,7 @@ public abstract class SinCosTable {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private static class QuarterTable extends SinCosTable {
     /**

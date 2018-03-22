@@ -73,8 +73,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.has Itemset
- * @apiviz.uses BitVector
+ * @has - - - Itemset
+ * @assoc - - - BitVector
  */
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
@@ -590,7 +590,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override

@@ -9,7 +9,7 @@
  * pass the result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler
  * ResultHandler}.
  *
- * @apiviz.exclude ^experimentalcode\.
+ * @opt hide ^experimentalcode\.
  */
 /*
  * This file is part of ELKI:

@@ -162,7 +162,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDista
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

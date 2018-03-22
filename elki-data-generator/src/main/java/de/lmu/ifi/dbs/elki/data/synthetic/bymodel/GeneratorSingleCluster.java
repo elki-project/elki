@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.composedOf Distribution
- * @apiviz.composedOf AffineTransformation
+ * @composed - - - Distribution
+ * @composed - - - AffineTransformation
  */
 public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**

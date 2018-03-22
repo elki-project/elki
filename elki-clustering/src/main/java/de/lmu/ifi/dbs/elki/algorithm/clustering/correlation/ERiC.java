@@ -81,12 +81,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.composedOf COPAC
- * @apiviz.composedOf DBSCAN
- * @apiviz.composedOf FirstNEigenPairFilter
- * @apiviz.composedOf PCAFilteredRunner
- * @apiviz.composedOf ERiCNeighborPredicate
- * @apiviz.has CorrelationModel
+ * @composed - - - COPAC
+ * @composed - - - DBSCAN
+ * @composed - - - FirstNEigenPairFilter
+ * @composed - - - PCAFilteredRunner
+ * @composed - - - ERiCNeighborPredicate
+ * @has - - - CorrelationModel
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -363,7 +363,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Settings {
     /**
@@ -409,7 +409,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

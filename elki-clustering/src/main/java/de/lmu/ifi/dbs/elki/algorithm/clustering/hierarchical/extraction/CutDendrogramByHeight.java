@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  *
  * @author Erich Schubert
  *
- * @apiviz.uses HierarchicalClusteringAlgorithm
- * @apiviz.uses PointerHierarchyRepresentationResult
+ * @assoc - - - HierarchicalClusteringAlgorithm
+ * @assoc - - - PointerHierarchyRepresentationResult
  */
 public class CutDendrogramByHeight extends AbstractCutDendrogram implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
@@ -74,7 +74,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Instance extends AbstractCutDendrogram.Instance {
     /**
@@ -108,7 +108,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractCutDendrogram.Parameterizer {
     /**

@@ -64,8 +64,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.uses HierarchicalClusteringAlgorithm
- * @apiviz.uses PointerHierarchyRepresentationResult
+ * @assoc - - - HierarchicalClusteringAlgorithm
+ * @assoc - - - PointerHierarchyRepresentationResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
@@ -124,7 +124,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Instance {
     /**
@@ -366,7 +366,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class TempCluster {
     /**
@@ -441,7 +441,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,10 +42,10 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.composedOf InputStep
- * @apiviz.composedOf AlgorithmStep
- * @apiviz.composedOf EvaluationStep
- * @apiviz.composedOf OutputStep
+ * @composed - - - InputStep
+ * @composed - - - AlgorithmStep
+ * @composed - - - EvaluationStep
+ * @composed - - - OutputStep
  */
 public class KDDTask {
   /**
@@ -132,7 +132,7 @@ public class KDDTask {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     InputStep inputStep = null;

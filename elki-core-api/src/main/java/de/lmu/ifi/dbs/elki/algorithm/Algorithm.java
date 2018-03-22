@@ -34,14 +34,20 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * <p>
  * <b>Note:</b> Any implementation is supposed to provide a constructor without
  * parameters (default constructor).
- * 
+ *
  * @author Arthur Zimek
  * @since 0.1
+ *
+ * @opt nodefillcolor LemonChiffon
+ * @opt operations
+ * @has - - - TypeInformation
+ * @navassoc - - - Result
+ * @depend - - - Database
  */
 public interface Algorithm {
   /**
    * Runs the algorithm.
-   * 
+   *
    * @param database the database to run the algorithm on
    * @return the Result computed by this algorithm
    */
@@ -49,7 +55,7 @@ public interface Algorithm {
 
   /**
    * Get the input type restriction used for negotiating the data query.
-   * 
+   *
    * @return Type restriction
    */
   TypeInformation[] getInputTypeRestriction();

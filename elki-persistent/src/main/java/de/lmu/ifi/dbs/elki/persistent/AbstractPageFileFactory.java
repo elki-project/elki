@@ -58,7 +58,7 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
   /**
    * Parameterization class.
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @author Erich Schubert
    * 

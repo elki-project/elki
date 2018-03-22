@@ -112,7 +112,7 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Itr implements DoubleIntegerDBIDListIter {
     /**

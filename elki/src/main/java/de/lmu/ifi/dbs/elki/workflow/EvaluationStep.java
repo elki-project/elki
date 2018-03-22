@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has Evaluator
- * @apiviz.uses Result
+ * @has - - - Evaluator
+ * @assoc - - - Result
  */
 public class EvaluationStep implements WorkflowStep {
   /**
@@ -79,7 +79,7 @@ public class EvaluationStep implements WorkflowStep {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public class Evaluation implements ResultListener {
     /**
@@ -139,7 +139,7 @@ public class EvaluationStep implements WorkflowStep {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

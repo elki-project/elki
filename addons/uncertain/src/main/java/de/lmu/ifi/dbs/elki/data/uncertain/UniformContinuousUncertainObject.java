@@ -90,7 +90,7 @@ public class UniformContinuousUncertainObject extends AbstractUncertainObject {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Factory implements FeatureVector.Factory<UniformContinuousUncertainObject, Number> {
     @Override

@@ -49,9 +49,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has HistogramResult oneway - - visualizes
+ * @stereotype factory
+ * @navassoc - create - StaticVisualizationInstance
+ * @navhas - visualizes - HistogramResult
  */
 public class HistogramVisualization implements VisFactory {
   /**

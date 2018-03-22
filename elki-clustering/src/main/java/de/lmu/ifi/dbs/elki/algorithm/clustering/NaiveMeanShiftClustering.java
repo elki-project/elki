@@ -222,7 +222,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <V> Vector type
    */

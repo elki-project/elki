@@ -61,7 +61,7 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.uses HiSCPreferenceVectorIndex
+ * @assoc - - - HiSCPreferenceVectorIndex
  * 
  * @param <V> the type of NumberVector handled by the algorithm
  */
@@ -109,7 +109,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
     /**
@@ -284,7 +284,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

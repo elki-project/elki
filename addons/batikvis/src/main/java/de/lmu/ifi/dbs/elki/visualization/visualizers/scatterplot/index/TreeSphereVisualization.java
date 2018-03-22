@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,8 +64,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class TreeSphereVisualization implements VisFactory {
   /**
@@ -81,7 +81,7 @@ public class TreeSphereVisualization implements VisFactory {
   /**
    * Drawing modes.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private enum Modus {
     MANHATTAN, EUCLIDEAN, LPCROSS
@@ -156,8 +156,8 @@ public class TreeSphereVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has AbstractMTree oneway - - visualizes
-   * @apiviz.uses SVGHyperSphere
+   * @navhas - visualizes - AbstractMTree
+   * @assoc - - - SVGHyperSphere
    *
    * @param <N> Tree node type
    * @param <E> Tree entry type
@@ -294,7 +294,7 @@ public class TreeSphereVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     protected boolean fill = false;

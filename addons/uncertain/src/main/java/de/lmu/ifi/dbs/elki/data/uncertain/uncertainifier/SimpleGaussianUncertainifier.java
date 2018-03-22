@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has SimpleGaussianContinuousUncertainObject
+ * @has - - - SimpleGaussianContinuousUncertainObject
  */
 public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussianContinuousUncertainObject> {
   /**
@@ -99,7 +99,7 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

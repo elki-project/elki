@@ -2,15 +2,15 @@
  * Integer-based DBID <em>implementation</em> --
  * <b>do not use directly - always use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil}</b>.
  * 
- * @apiviz.exclude java.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.persistent.*
+ * @opt hide java.*
+ * @opt hide de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
+ * @opt hide de.lmu.ifi.dbs.elki.persistent.*
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

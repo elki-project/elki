@@ -33,7 +33,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs {
   /**

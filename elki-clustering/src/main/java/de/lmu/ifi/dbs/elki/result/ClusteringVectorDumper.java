@@ -198,7 +198,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

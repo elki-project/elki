@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.composedOf DynamicSerializer
- * @apiviz.composedOf StaticSerializer
+ * @composed - - - DynamicSerializer
+ * @composed - - - StaticSerializer
  */
 final class IntegerDBID implements DBID, IntegerDBIDRef {
   /**
@@ -177,7 +177,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Itr implements DBIDArrayIter, IntegerDBIDRef {
     /**

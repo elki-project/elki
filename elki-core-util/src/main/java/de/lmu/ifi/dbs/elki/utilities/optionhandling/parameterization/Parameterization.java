@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,9 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
  * documentation!
  *
- * @apiviz.landmark
- * @apiviz.uses Parameter
- * @apiviz.uses ParameterException
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - Parameter
+ * @assoc - - - ParameterException
  * 
  * @author Erich Schubert
  * @since 0.3

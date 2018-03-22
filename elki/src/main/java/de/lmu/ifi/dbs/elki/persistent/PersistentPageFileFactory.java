@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has PersistentPageFile
+ * @has - - - PersistentPageFile
  * 
  * @param <P> Page type
  */
@@ -64,7 +64,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
   /**
    * Parameterization class.
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @author Erich Schubert
    */

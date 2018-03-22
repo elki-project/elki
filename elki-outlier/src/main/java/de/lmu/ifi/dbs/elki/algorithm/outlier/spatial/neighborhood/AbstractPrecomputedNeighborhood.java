@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,8 +75,8 @@ public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPred
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.has AbstractPrecomputedNeighborhood
+   * @stereotype factory
+   * @has - - - AbstractPrecomputedNeighborhood
    */
   public abstract static class Factory<O> implements NeighborSetPredicate.Factory<O> {
     // Nothing to add.

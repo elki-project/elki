@@ -208,7 +208,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    *
    * @author Julian Erhard
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

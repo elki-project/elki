@@ -62,11 +62,11 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
  * @author Arthur Zimek
  * @since 0.5.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.has Instance
- * @apiviz.composedOf CorePredicate
- * @apiviz.composedOf NeighborPredicate
+ * @has - - - Instance
+ * @composed - - - CorePredicate
+ * @composed - - - NeighborPredicate
  */
 @Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
     title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
@@ -140,8 +140,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf CorePredicate.Instance
-   * @apiviz.composedOf NeighborPredicate.Instance
+   * @composed - - - CorePredicate.Instance
+   * @composed - - - NeighborPredicate.Instance
    */
   public static class Instance<T> {
     /**
@@ -324,7 +324,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

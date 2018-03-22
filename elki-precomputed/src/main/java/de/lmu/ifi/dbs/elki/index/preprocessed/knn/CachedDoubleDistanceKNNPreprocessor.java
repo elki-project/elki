@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -134,9 +134,9 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.landmark
-   * @apiviz.stereotype factory
-   * @apiviz.uses MaterializeKNNPreprocessor oneway - - «create»
+   * @opt nodefillcolor LemonChiffon
+   * @stereotype factory
+   * @navassoc - create - MaterializeKNNPreprocessor
    * 
    * @param <O> The object type
    */
@@ -169,7 +169,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**

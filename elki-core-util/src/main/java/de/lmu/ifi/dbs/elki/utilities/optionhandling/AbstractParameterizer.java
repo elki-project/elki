@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses Parameterization
- * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
- * @apiviz.excludeSubtypes
+ * @assoc - - - Parameterization
+ * @has - - - de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
  */
 public abstract class AbstractParameterizer implements Parameterizer {
   /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
+ * @assoc - - - de.lmu.ifi.dbs.elki.data.ClassLabel
  */
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
@@ -236,7 +236,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

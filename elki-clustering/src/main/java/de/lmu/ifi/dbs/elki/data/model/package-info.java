@@ -1,9 +1,9 @@
 /**
  * Cluster models classes for various algorithms
  *
- * @apiviz.exclude result.textwriter
- * @apiviz.exclude visualization
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm\..*
+ * @opt hide result.textwriter
+ * @opt hide visualization
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm\..*
  */
 /*
  * This file is part of ELKI:

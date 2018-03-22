@@ -89,8 +89,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @since 0.2
  *
- * @apiviz.has LOFResult oneway - - computes
- * @apiviz.has KNNQuery
+ * @navhas - computes - LOFResult
+ * @has - - - KNNQuery
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -478,7 +478,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

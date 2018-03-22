@@ -169,7 +169,7 @@ public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunc
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

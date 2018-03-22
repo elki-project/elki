@@ -3,12 +3,12 @@
  * 
  * @see de.lmu.ifi.dbs.elki.algorithm
  * 
- * @apiviz.exclude database.query
- * @apiviz.exclude java.lang.Comparable
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.Algorithm
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
- * @apiviz.exclude AggarwalYuEvoluationary.Individuum
+ * @opt hide database.query
+ * @opt hide java.lang.Comparable
+ * @opt hide de.lmu.ifi.dbs.elki.utilities
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.Algorithm
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
+ * @opt hide AggarwalYuEvoluationary.Individuum
  */
 /*
  * This file is part of ELKI:

@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.1
  * 
- * @apiviz.has DistanceFunction
+ * @has - - - DistanceFunction
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  */
@@ -163,8 +163,8 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SharedNearestNeighborPreprocessor oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - SharedNearestNeighborPreprocessor
    */
   public static class Factory<O> implements SharedNearestNeighborIndex.Factory<O> {
     /**
@@ -226,7 +226,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

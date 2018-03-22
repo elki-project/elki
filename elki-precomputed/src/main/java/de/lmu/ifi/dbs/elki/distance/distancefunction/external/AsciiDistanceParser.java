@@ -43,10 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.uses CSVReaderFormat
- * @apiviz.composedOf TokenizedReader
- * @apiviz.composedOf Tokenizer
- * @apiviz.uses DistanceCacheWriter
+ * @assoc - - - CSVReaderFormat
+ * @composed - - - TokenizedReader
+ * @composed - - - Tokenizer
+ * @assoc - - - DistanceCacheWriter
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser", //
     "de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser", //
@@ -136,7 +136,7 @@ public class AsciiDistanceParser implements DistanceParser {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -136,7 +136,7 @@ public class COPOutlierScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

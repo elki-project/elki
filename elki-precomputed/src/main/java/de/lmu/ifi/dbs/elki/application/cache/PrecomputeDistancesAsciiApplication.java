@@ -160,7 +160,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**

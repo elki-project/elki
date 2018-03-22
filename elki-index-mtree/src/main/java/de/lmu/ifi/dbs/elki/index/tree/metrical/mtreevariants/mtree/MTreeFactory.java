@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses MTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - MTreeIndex
  * 
  * @param <O> Object type
  */
@@ -67,7 +67,7 @@ public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTree
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

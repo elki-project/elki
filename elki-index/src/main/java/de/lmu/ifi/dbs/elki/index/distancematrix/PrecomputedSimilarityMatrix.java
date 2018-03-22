@@ -58,8 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has PrecomputedSimilarityQuery
- * @apiviz.has PrecomputedSimilarityRangeQuery
+ * @has - - - PrecomputedSimilarityQuery
  *
  * @param <O> Object type
  */
@@ -291,7 +290,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
    *
    * @author Erich Schubert
    *
-   * @apiviz.has PrecomputedSimilarityMatrix
+   * @has - - - PrecomputedSimilarityMatrix
    *
    * @param <O> Object type
    */
@@ -326,7 +325,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      *
      * @param <O> Object type
      */

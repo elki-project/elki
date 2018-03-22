@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.css.CSSClass
+ * @has - - - de.lmu.ifi.dbs.elki.visualization.css.CSSClass
  */
 public class CSSClassManager {
   /**
@@ -166,7 +166,7 @@ public class CSSClassManager {
   /**
    * Class to signal a CSS naming conflict.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public class CSSNamingConflict extends Exception {
     /**

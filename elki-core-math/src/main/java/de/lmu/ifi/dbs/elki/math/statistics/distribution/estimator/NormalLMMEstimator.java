@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has NormalDistribution
+ * @has - - - NormalDistribution
  */
 @Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
@@ -82,7 +82,7 @@ public class NormalLMMEstimator implements LMMDistributionEstimator<NormalDistri
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

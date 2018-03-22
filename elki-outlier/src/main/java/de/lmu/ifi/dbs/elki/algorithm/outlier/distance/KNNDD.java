@@ -69,7 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Erich Schubert
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
+ *
  * @param <O> the type of objects processed by this algorithm
  */
 @Title("KNNDD: k-Nearest Neighbor Data Description")
@@ -167,7 +168,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

@@ -149,7 +149,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
    * @author Stephan Baier
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    * @param <M> Model type

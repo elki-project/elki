@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @author Elke Achtert
  * @since 0.4.0
  * 
- * @apiviz.has Split
+ * @has - - - Split
  */
 @Reference(authors = "Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger", //
     title = "The R*-tree: an efficient and robust access method for points and rectangles", //
@@ -324,7 +324,7 @@ public class TopologicalSplitter implements SplitStrategy {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.composedOf String
+ * @composed - - - String
  */
 public class LabelList {
   /**
@@ -114,10 +114,10 @@ public class LabelList {
 
   /**
    * Serialization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses LabelList - - «serializes»
+   *
+   * @assoc - serializes - SimpleClassLabel
    */
   public static class Serializer implements ByteBufferSerializer<LabelList> {
     @Override

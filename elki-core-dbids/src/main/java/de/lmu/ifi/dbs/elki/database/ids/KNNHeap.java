@@ -29,10 +29,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.landmark
- *
- * @apiviz.uses KNNList - - «serializes to»
- * @apiviz.composedOf DoubleDBIDPair
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - "serializes to" - KNNList
+ * @composed - - - DoubleDBIDPair
  */
 public interface KNNHeap {
   /**
@@ -43,8 +42,8 @@ public interface KNNHeap {
   KNNList toKNNList();
 
   /**
-   * Serialize to a {@link KNNList}, but applying sqrt to every distance. This
-   * empties the heap!
+   * Serialize to a {@link KNNList}, but applying sqrt to every distance.
+   * This empties the heap!
    *
    * @return KNNList with the heaps contents.
    */

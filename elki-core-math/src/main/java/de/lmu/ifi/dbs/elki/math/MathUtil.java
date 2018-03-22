@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public final class MathUtil {
   /**

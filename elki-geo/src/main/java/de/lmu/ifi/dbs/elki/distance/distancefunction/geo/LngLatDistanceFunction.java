@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.composedOf EarthModel
+ * @composed - - - EarthModel
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
@@ -130,7 +130,7 @@ public class LngLatDistanceFunction implements SpatialPrimitiveDistanceFunction<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

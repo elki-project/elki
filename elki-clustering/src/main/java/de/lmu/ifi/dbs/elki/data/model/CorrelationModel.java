@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.composedOf PCAFilteredResult
+ * @composed - - - PCAFilteredResult
  */
 public class CorrelationModel extends SimplePrototypeModel<double[]> {
   /**

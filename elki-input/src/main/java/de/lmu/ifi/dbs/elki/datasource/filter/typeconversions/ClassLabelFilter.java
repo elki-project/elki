@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses LabelList oneway - - «reads»
- * @apiviz.has ClassLabel
+ * @navassoc - reads - LabelList
+ * @has - - - ClassLabel
  */
 @Alias("de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter")
 public class ClassLabelFilter implements ObjectFilter {
@@ -134,7 +134,7 @@ public class ClassLabelFilter implements ObjectFilter {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

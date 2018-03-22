@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.uses PrimitiveDistanceQuery
- * @apiviz.uses EuclideanDistanceFunction
- * @apiviz.uses SquaredEuclideanDistanceFunction
+ * @assoc - - - PrimitiveDistanceQuery
+ * @assoc - - - EuclideanDistanceFunction
+ * @assoc - - - SquaredEuclideanDistanceFunction
  */
 public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> implements LinearScanQuery {
   /**

@@ -1,7 +1,7 @@
 /**
  * Prepared queries for reverse k nearest neighbor (rkNN) queries
  * 
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.*
  */
 /*
  * This file is part of ELKI:

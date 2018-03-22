@@ -155,7 +155,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -36,8 +36,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has DoubleIntegerDBIDKNNList
- * @apiviz.composedOf DoubleIntegerMaxHeap
+ * @has - - - DoubleIntegerDBIDKNNList
+ * @composed - - - DoubleIntegerMaxHeap
  */
 class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
@@ -274,7 +274,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class UnorderedIter implements DoubleDBIDListIter {
     /**

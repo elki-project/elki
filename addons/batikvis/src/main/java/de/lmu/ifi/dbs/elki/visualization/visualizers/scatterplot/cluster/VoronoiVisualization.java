@@ -71,8 +71,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class VoronoiVisualization implements VisFactory {
   /**
@@ -90,7 +90,7 @@ public class VoronoiVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum Mode {
     /**
@@ -193,8 +193,8 @@ public class VoronoiVisualization implements VisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    *
-   * @apiviz.has KMeansModel oneway - - visualizes
-   * @apiviz.has MedoidModel oneway - - visualizes
+   * @navhas - visualizes - KMeansModel
+   * @navhas - visualizes - MedoidModel
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
@@ -326,7 +326,7 @@ public class VoronoiVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

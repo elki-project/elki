@@ -101,7 +101,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     private double walpha;

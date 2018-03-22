@@ -92,7 +92,7 @@ public class LeastEnlargementWithAreaInsertionStrategy implements InsertionStrat
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

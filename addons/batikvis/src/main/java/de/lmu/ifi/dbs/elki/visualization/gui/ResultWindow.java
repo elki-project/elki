@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,14 +61,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @author Remigius Wojdanowski
  * @since 0.3
  *
- * @apiviz.composedOf JSVGSynchronizedCanvas
- * @apiviz.composedOf OverviewPlot
- * @apiviz.composedOf SelectionTableWindow
- * @apiviz.composedOf SVGSaveDialog
- * @apiviz.composedOf LazyCanvasResizer
- * @apiviz.has VisualizerContext
- * @apiviz.uses DetailView oneway
- * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
+ * @composed - - - JSVGSynchronizedCanvas
+ * @composed - - - OverviewPlot
+ * @composed - - - SelectionTableWindow
+ * @composed - - - SVGSaveDialog
+ * @composed - - - LazyCanvasResizer
+ * @has - - - VisualizerContext
+ * @navassoc - - - DetailView
+ * @navassoc - "reacts to" - DetailViewSelectedEvent
  */
 public class ResultWindow extends JFrame implements ResultListener, VisualizationListener {
   /**
@@ -84,7 +84,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
   /**
    * Dynamic menu.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public class DynamicMenu {
     /**

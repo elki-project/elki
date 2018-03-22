@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.has MTreeNode oneway - - contains
+ * @navhas - contains - MTreeNode
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  */

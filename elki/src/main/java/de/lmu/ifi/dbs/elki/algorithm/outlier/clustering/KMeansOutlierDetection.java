@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KMeans
+ * @has - - - KMeans
  *
  * @param <O> Object type
  */
@@ -143,7 +143,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

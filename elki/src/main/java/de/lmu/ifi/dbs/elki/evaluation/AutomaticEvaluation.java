@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,15 +46,15 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.uses OutlierResult
- * @apiviz.uses Clustering
- * @apiviz.composedOf OutlierROCCurve
- * @apiviz.composedOf OutlierPrecisionAtKCurve
- * @apiviz.composedOf OutlierPrecisionRecallCurve
- * @apiviz.composedOf ComputeOutlierHistogram
- * @apiviz.composedOf EvaluateClustering
+ * @assoc - - - OutlierResult
+ * @assoc - - - Clustering
+ * @composed - - - OutlierROCCurve
+ * @composed - - - OutlierPrecisionAtKCurve
+ * @composed - - - OutlierPrecisionRecallCurve
+ * @composed - - - ComputeOutlierHistogram
+ * @composed - - - EvaluateClustering
  */
 public class AutomaticEvaluation implements Evaluator {
   /**
@@ -169,7 +169,7 @@ public class AutomaticEvaluation implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

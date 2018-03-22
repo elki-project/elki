@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * @author Florian Nuecke
  * 
- * @apiviz.has SubspaceModel
+ * @has - - - SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
@@ -166,7 +166,7 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
    * 
    * @author Florian Nuecke
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends DOC.Parameterizer<V> {
     /**

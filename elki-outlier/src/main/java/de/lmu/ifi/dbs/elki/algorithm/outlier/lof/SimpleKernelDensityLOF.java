@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -66,8 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.has KNNQuery
- * @apiviz.has KernelDensityFunction
+ * @has - - - KNNQuery
+ * @has - - - KernelDensityFunction
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -203,7 +203,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> vector type
    */

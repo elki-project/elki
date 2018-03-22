@@ -72,9 +72,9 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has ScalingFunction
- * @apiviz.has File
- * @apiviz.composedOf CSVReaderFormat
+ * @has - - - ScalingFunction
+ * @has - - - File
+ * @composed - - - CSVReaderFormat
  */
 public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -229,7 +229,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

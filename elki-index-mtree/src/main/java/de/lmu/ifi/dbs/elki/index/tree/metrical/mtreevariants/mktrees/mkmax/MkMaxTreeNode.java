@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.has MkMaxEntry oneway - - contains
+ * @navhas - contains - MkMaxEntry
  * 
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  */

@@ -125,7 +125,7 @@ public class SparseLPNormDistanceFunction implements PrimitiveDistanceFunction<S
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

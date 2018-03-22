@@ -1,9 +1,9 @@
 /**
  * Visualizers for various results
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap
- * @apiviz.exclude Visualization.Factory
- * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.gui.*
+ * @opt hide de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap
+ * @opt hide Visualization.Factory
+ * @opt hide de.lmu.ifi.dbs.elki.visualization.gui.*
  */
 /*
  * This file is part of ELKI:

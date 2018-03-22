@@ -44,7 +44,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has DiagonalGaussianModel
+ * @has - - - DiagonalGaussianModel
  *
  * @param <V> vector type
  */
@@ -88,7 +88,7 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

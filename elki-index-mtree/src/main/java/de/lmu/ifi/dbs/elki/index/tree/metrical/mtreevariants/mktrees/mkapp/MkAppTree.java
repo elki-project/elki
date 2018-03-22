@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,8 +54,8 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.composedOf MkAppTreeSettings
- * @apiviz.has MkAppTreeNode oneway - - contains
+ * @composed - - - MkAppTreeSettings
+ * @navhas - contains - MkAppTreeNode
  *
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  */

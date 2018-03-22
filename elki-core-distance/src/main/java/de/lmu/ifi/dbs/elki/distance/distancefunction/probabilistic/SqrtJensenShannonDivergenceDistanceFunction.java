@@ -96,7 +96,7 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends JensenShannonDi
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

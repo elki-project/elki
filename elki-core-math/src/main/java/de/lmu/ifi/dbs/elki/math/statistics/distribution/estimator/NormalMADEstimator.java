@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has NormalDistribution - - estimates
+ * @navassoc - estimates - NormalDistribution
  */
 @Reference(authors = "F. R. Hampel", //
     title = "The Influence Curve and Its Role in Robust Estimation", //
@@ -82,7 +82,7 @@ public class NormalMADEstimator implements MADDistributionEstimator<NormalDistri
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

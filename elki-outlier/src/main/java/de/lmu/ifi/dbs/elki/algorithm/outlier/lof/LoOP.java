@@ -89,7 +89,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
+ *
  * @param <O> type of objects handled by this algorithm
  */
 @Title("LoOP: Local Outlier Probabilities")
@@ -327,7 +328,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

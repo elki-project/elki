@@ -78,8 +78,8 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf VisualizerParameterizer
- * @apiviz.composedOf SimilarityMatrixVisualizer
+ * @composed - - - VisualizerParameterizer
+ * @composed - - - SimilarityMatrixVisualizer
  */
 @Reference(authors = "Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
@@ -279,7 +279,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

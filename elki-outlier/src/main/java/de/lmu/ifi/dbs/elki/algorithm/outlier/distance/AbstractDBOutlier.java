@@ -112,7 +112,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

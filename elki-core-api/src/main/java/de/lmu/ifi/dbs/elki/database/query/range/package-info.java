@@ -2,7 +2,7 @@
  * Prepared queries for &epsilon;-range queries, that return all objects within
  * the radius &epsilon;
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.*
  */
 /*
  * This file is part of ELKI:

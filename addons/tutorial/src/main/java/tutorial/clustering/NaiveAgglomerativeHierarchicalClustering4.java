@@ -87,7 +87,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum Linkage {//
     SINGLE {
@@ -302,7 +302,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

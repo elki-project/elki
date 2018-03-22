@@ -287,7 +287,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class CosineKNNQuery extends AbstractDistanceKNNQuery<V> {
     /**
@@ -323,7 +323,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class ArcCosineKNNQuery extends AbstractDistanceKNNQuery<V> {
     /**
@@ -359,7 +359,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class CosineRangeQuery extends AbstractDistanceRangeQuery<V> {
     /**
@@ -393,7 +393,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected class ArcCosineRangeQuery extends AbstractDistanceRangeQuery<V> {
     /**
@@ -427,7 +427,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has InMemoryInvertedIndex
+   * @has - - - InMemoryInvertedIndex
    * 
    * @param <V> Vector type
    */
@@ -447,7 +447,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      * 
      * @param <V> Vector type
      */

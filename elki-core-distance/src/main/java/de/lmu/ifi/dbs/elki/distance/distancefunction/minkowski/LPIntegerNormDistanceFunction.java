@@ -44,7 +44,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
   /**
@@ -219,7 +219,7 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

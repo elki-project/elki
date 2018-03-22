@@ -93,8 +93,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.has ExternalNeighborhood oneway - - «produces»
+   * @stereotype factory
+   * @navhas - produces - ExternalNeighborhood
    */
   public static class Factory extends AbstractPrecomputedNeighborhood.Factory<Object> {
     /**
@@ -204,7 +204,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

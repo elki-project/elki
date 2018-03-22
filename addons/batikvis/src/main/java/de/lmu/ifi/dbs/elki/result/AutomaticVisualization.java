@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.visualization.gui.ResultWindow;
  * @author Remigius Wojdanowski
  * @since 0.3
  *
- * @apiviz.composedOf VisualizerParameterizer
- * @apiviz.uses ResultWindow oneway
+ * @composed - - - VisualizerParameterizer
+ * @navassoc - - - ResultWindow
  */
 @Alias({ "visualizer", "vis", "ResultVisualizer", "de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer" })
 @Priority(Priority.IMPORTANT + 5)
@@ -130,7 +130,7 @@ public class AutomaticVisualization implements ResultHandler {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import java.util.Arrays;
  *
  * @author Erich Schubert
  *
- * @apiviz.has UnsortedIter
+ * @has - - - UnsortedIter
 ${key.genu || val.genu ? " *\n" : ""}${key.genu ? " * @param "+key.genu+" Key type\n" : ""}${val.genu ? " * @param "+val.genu+" Value type\n" : ""} */
 public class ${classname}${key.gend}${val.gend} implements ${key.boxed.equals("Comparable") ? "Object" : key.boxed}${val.boxed.equals("Comparable") ? "Object" : val.boxed}Heap${key.genu}${val.genu} {
   /**

@@ -94,7 +94,7 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

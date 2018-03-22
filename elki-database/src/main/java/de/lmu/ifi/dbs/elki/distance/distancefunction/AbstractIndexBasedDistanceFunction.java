@@ -34,9 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.has AbstractIndexBasedDistanceFunction.Instance
- * @apiviz.composedOf IndexFactory
- * @apiviz.excludeSubtypes
+ * @has - - - AbstractIndexBasedDistanceFunction.Instance
+ * @composed - - - IndexFactory
  * 
  * @param <O> the type of object to compute the distances in between
  * @param <F> the index factory type
@@ -132,7 +131,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, F extends IndexFacto
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <F> Factory type
    */

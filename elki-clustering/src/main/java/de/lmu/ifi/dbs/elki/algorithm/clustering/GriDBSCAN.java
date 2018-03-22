@@ -86,7 +86,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.1
  *
- * @apiviz.composedOf Instance
+ * @composed - - - Instance
+ *
  * @param <V> the type of vector the algorithm is applied to
  */
 @Title("GriDBSCAN: Using Grid for Accelerating Density-Based Clustering")
@@ -668,7 +669,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Vector type to use
    */

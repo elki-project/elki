@@ -278,7 +278,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
      * 
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public abstract static class Parameterizer<O> extends AbstractParameterizer {
       /**

@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 @Title("Vector and Matrix Math Library")
 public final class VMath {

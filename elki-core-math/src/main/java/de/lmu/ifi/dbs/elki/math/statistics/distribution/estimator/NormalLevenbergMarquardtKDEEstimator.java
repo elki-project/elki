@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has NormalDistribution - - estimates
+ * @navassoc - estimates - NormalDistribution
  */
 public class NormalLevenbergMarquardtKDEEstimator implements DistributionEstimator<NormalDistribution> {
   /**
@@ -106,7 +106,7 @@ public class NormalLevenbergMarquardtKDEEstimator implements DistributionEstimat
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

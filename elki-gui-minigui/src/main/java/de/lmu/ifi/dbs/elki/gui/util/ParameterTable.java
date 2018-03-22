@@ -71,12 +71,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.composedOf ParametersModel
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.FileNameEditor
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ClassListEditor
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.AdjustingEditor
+ * @composed - - - ParametersModel
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.FileNameEditor
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ClassListEditor
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.AdjustingEditor
  */
 public class ParameterTable extends JTable {
   /**
@@ -149,7 +149,7 @@ public class ParameterTable extends JTable {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Handler implements KeyListener {
     @Override
@@ -777,7 +777,7 @@ public class ParameterTable extends JTable {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class DispatchingPanel extends JPanel {
     /**

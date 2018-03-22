@@ -97,7 +97,7 @@ public class AutotuningPCA extends PCARunner {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Cand {
     /** Candidate matrix */
@@ -260,7 +260,7 @@ public class AutotuningPCA extends PCARunner {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends PCARunner.Parameterizer {
     /**

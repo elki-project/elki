@@ -89,7 +89,7 @@ public final class EpanechnikovKernelDensityFunction implements KernelDensityFun
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

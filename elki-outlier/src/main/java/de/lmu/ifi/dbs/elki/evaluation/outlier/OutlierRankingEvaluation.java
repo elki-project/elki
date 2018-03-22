@@ -49,10 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.uses OutlierResult
- * @apiviz.has EvaluationResult oneway - - «create»
+ * @assoc - - - OutlierResult
+ * @navhas - create - EvaluationResult
  */
 public class OutlierRankingEvaluation implements Evaluator {
   /**
@@ -215,7 +215,7 @@ public class OutlierRankingEvaluation implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

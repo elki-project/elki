@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses MkTabTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - MkTabTreeIndex
  * 
  * @param <O> Object type
  */
@@ -64,7 +64,7 @@ public class MkTabTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkTabTr
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
     @Override

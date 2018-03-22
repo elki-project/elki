@@ -79,8 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.2
  * 
- * @apiviz.has SODModel oneway - - computes
- * @apiviz.has SharedNearestNeighborSimilarityFunction
+ * @navhas - computes - SODModel
+ * @has - - - SharedNearestNeighborSimilarityFunction
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -318,7 +318,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

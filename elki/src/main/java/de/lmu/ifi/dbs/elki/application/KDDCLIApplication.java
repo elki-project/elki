@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Arthur Zimek
  * @since 0.3
  * 
- * @apiviz.composedOf KDDTask
+ * @composed - - - KDDTask
  */
 @Alias({ "cli", "kddtask" })
 public class KDDCLIApplication extends AbstractApplication {
@@ -63,7 +63,7 @@ public class KDDCLIApplication extends AbstractApplication {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

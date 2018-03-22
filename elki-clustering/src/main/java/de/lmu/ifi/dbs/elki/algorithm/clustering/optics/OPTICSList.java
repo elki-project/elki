@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf OPTICSList.Instance
+ * @composed - - - OPTICSList.Instance
  *
  * @param <O> the type of objects handled by the algorithm
  */
@@ -247,7 +247,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
     @Override

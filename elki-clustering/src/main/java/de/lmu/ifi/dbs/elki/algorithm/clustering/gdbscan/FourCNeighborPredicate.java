@@ -225,7 +225,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

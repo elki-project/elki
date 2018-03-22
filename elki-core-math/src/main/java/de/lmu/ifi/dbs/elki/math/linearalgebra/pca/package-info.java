@@ -1,9 +1,9 @@
 /**
  * Principal Component Analysis (PCA) and Eigenvector processing
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.transform
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm
+ * @opt hide de.lmu.ifi.dbs.elki.datasource.filter.transform
+ * @opt hide de.lmu.ifi.dbs.elki.index
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm
  */
 /*
  * This file is part of ELKI:

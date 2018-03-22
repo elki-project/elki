@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses AbstractRStarTree oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - AbstractRStarTree
  * 
  * @param <O> Object type
  * @param <N> Node type
@@ -78,7 +78,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    * @param <S> Settings class

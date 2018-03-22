@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.composedOf NumberVector
+ * @composed - - - NumberVector
  */
 public abstract class AbstractVectorIter implements ScoreIter, ArrayIter {
   /**

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has OnDiskArrayPageFile
+ * @has - - - OnDiskArrayPageFile
  * 
  * @param <P> Page type
  */
@@ -64,7 +64,7 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
   /**
    * Parameterization class.
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @author Erich Schubert
    */

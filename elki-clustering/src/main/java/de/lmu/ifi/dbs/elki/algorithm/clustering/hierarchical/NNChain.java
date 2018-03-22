@@ -215,7 +215,7 @@ public class NNChain<O> extends AGNES<O> {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -137,7 +137,7 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
    *
    * @author Alexander Koos
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<UO extends UncertainObject> extends AbstractParameterizer {
     /**

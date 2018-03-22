@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.landmark
- * @apiviz.has NumberVector
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - NumberVector
  *
  * @param <V> the type of NumberVector used
  */
@@ -148,7 +148,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override

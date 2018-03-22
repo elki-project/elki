@@ -108,7 +108,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

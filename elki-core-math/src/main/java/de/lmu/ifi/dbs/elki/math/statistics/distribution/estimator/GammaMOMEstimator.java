@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has GammaDistribution - - estimates
+ * @navassoc - estimates - GammaDistribution
  */
 @Reference(authors = "G. Casella, R. L. Berger", //
     title = "Point Estimation (Chapter 7)", //
@@ -89,7 +89,7 @@ public class GammaMOMEstimator implements MeanVarianceDistributionEstimator<Gamm
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

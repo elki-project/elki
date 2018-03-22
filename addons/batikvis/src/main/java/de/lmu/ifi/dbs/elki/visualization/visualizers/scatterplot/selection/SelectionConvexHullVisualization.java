@@ -53,8 +53,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Robert Rödler
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SelectionConvexHullVisualization implements VisFactory {
   /**
@@ -94,8 +94,8 @@ public class SelectionConvexHullVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has DBIDSelection oneway - - visualizes
-   * @apiviz.uses GrahamScanConvexHull2D
+   * @navhas - visualizes - DBIDSelection
+   * @assoc - - - GrahamScanConvexHull2D
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

@@ -64,10 +64,10 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.landmark
- * @apiviz.uses OutlierResult
- * @apiviz.has ScalingFunction
- * @apiviz.has HistogramResult oneway - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - OutlierResult
+ * @has - - - ScalingFunction
+ * @navhas - create - HistogramResult
  */
 @Alias({ "de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram" })
 public class ComputeOutlierHistogram implements Evaluator {
@@ -230,7 +230,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

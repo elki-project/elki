@@ -70,7 +70,7 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

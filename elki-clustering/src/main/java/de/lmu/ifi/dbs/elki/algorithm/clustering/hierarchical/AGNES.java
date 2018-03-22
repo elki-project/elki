@@ -84,8 +84,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.composedOf LinkageMethod
- * @apiviz.composedOf PointerHierarchyRepresentationBuilder
+ * @composed - - - LinkageMethod
+ * @composed - - - PointerHierarchyRepresentationBuilder
  *
  * @param <O> Object type
  */
@@ -345,7 +345,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

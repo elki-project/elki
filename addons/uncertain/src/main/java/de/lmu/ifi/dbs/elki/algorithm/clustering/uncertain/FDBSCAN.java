@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf FDBSCANNeighborPredicate
+ * @composed - - - FDBSCANNeighborPredicate
  */
 @Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
 @Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the" //
@@ -82,7 +82,7 @@ public class FDBSCAN extends GeneralizedDBSCAN {
    * @author Alexander Koos
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

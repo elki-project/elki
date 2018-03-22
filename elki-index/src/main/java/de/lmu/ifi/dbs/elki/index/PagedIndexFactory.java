@@ -37,9 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory,interface
- * @apiviz.excludeSubtypes
- * @apiviz.composedOf PageFileFactory
+ * @stereotype factory,interface
+ * @composed - - - PageFileFactory
  * 
  * @param <O> Object type
  */
@@ -77,10 +76,10 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   *
+   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

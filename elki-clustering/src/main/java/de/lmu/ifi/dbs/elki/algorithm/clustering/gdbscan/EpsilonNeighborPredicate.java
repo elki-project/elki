@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  *
  * @param <O> object type
  */
@@ -161,7 +161,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> object type
    */

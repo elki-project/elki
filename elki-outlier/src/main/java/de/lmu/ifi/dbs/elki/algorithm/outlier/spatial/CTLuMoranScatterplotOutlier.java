@@ -164,7 +164,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood object type
    */

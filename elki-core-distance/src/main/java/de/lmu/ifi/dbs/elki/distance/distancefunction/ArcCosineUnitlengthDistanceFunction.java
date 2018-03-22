@@ -110,7 +110,7 @@ public class ArcCosineUnitlengthDistanceFunction implements SpatialPrimitiveDist
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

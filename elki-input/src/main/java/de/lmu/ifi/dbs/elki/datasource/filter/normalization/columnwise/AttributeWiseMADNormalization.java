@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @since 0.6.0
  * @param <V> vector type
  *
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization" })

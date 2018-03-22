@@ -95,7 +95,7 @@ public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitializa
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
     @Override

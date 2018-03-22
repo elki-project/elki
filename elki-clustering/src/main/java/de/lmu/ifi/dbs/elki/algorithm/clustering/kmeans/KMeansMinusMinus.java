@@ -59,8 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  *
  * @author Jonas Steinke
  *
- * @apiviz.landmark
- * @apiviz.has KMeansModel
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - KMeansModel
  *
  * @param <V> vector datatype
  */
@@ -114,7 +114,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Instance extends AbstractKMeans.Instance {
     /**
@@ -298,7 +298,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    *
    * @author Jonas Steinke
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     /**

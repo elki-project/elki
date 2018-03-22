@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has WeightedDiscreteUncertainObject
+ * @has - - - WeightedDiscreteUncertainObject
  */
 public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifier<WeightedDiscreteUncertainObject> {
   /**
@@ -86,7 +86,7 @@ public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifi
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractDiscreteUncertainifier.Parameterizer {
     @Override

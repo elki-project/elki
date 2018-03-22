@@ -102,7 +102,7 @@ public class PWM2Estimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

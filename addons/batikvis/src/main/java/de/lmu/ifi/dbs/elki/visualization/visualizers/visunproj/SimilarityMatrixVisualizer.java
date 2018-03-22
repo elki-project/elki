@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SimilarityMatrixVisualizer implements VisFactory {
   /**
@@ -88,7 +88,7 @@ public class SimilarityMatrixVisualizer implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has SimilarityMatrix oneway - 1 visualizes
+   * @navhas - visualizes 1 SimilarityMatrix
    */
   public class Instance extends AbstractVisualization {
     /**

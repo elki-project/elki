@@ -86,7 +86,7 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.has SubspaceModel
+ * @has - - - SubspaceModel
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -731,7 +731,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class DoubleIntInt implements Comparable<DoubleIntInt> {
     protected double first;
@@ -753,7 +753,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Encapsulates the attributes of a cluster.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class PROCLUSCluster {
     /**
@@ -813,7 +813,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
     /**

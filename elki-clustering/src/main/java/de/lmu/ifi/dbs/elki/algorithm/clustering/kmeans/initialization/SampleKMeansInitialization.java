@@ -132,7 +132,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

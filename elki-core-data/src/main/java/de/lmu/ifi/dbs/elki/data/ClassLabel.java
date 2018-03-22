@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -82,8 +82,8 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has ClassLabel - - «creates»
-   * @apiviz.stereotype factory
+   * @has - creates - ClassLabel
+   * @stereotype factory
    */
   public abstract static class Factory<L extends ClassLabel> {
     /**

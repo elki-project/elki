@@ -38,7 +38,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @apiviz.has BitVector
+ * @has - - - BitVector
  */
 @Title("Bit Vector Label Parser")
 @Description("Parses the following format of lines:\n" + //
@@ -108,7 +108,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override

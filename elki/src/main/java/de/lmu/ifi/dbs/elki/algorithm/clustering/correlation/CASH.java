@@ -90,9 +90,9 @@ import net.jafama.FastMath;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.has CASHInterval
- * @apiviz.has ParameterizationFunction
- * @apiviz.has LinearEquationModel
+ * @has - - - CASHInterval
+ * @has - - - ParameterizationFunction
+ * @has - - - LinearEquationModel
  *
  * @param <V> Vector type
  */
@@ -733,7 +733,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

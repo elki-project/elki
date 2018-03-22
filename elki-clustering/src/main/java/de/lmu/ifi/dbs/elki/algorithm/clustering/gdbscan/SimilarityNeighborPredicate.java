@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @apiviz.has Instance
+ * @has - - - Instance
  *
  * @param <O> object type
  */
@@ -159,7 +159,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> object type
    */

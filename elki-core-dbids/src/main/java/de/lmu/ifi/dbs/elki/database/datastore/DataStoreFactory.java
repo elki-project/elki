@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory,interface
- * @apiviz.has WritableDataStore oneway - - «create»
- * @apiviz.has WritableIntegerDataStore oneway - - «create»
- * @apiviz.has WritableDoubleDataStore oneway - - «create»
- * @apiviz.has WritableDBIDDataStore oneway - - «create»
- * @apiviz.has WritableRecordStore oneway - - «create»
+ * @stereotype factory,interface
+ * @navhas - create - WritableDataStore
+ * @navhas - create - WritableIntegerDataStore
+ * @navhas - create - WritableDoubleDataStore
+ * @navhas - create - WritableDBIDDataStore
+ * @navhas - create - WritableRecordStore
  */
 public interface DataStoreFactory {
   /**

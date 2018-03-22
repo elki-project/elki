@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has PolygonsObject
+ * @has - - - PolygonsObject
  */
 public class SimplePolygonParser extends AbstractStreamingParser {
   /**
@@ -244,7 +244,7 @@ public class SimplePolygonParser extends AbstractStreamingParser {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override

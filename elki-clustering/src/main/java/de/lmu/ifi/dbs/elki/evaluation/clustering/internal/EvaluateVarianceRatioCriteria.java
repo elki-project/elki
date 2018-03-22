@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  */
 @Reference(authors = "R. B. Calinski, J. Harabasz", //
     title = "A dendrite method for cluster analysis", //
@@ -233,7 +233,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    *
    * @author Stephan Baier
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

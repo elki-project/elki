@@ -232,7 +232,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
    *
    * @param <O> Object type
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has DistanceFunction
+ * @has - - - DistanceFunction
  * 
  * @param <O> Object type
  */
@@ -171,7 +171,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**

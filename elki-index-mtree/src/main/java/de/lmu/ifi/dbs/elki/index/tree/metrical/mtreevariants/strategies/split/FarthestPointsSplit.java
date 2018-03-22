@@ -71,7 +71,7 @@ public class FarthestPointsSplit<E extends MTreeEntry, N extends AbstractMTreeNo
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree

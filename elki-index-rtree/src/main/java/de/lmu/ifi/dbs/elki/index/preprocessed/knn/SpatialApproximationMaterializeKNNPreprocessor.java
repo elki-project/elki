@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,7 +54,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.uses SpatialIndexTree
+ * @assoc - - - SpatialIndexTree
  *
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
@@ -180,9 +180,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses SpatialApproximationMaterializeKNNPreprocessor oneway - -
-   *              «create»
+   * @stereotype factory
+   * @navassoc - creates - SpatialApproximationMaterializeKNNPreprocessor
    *
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
@@ -209,7 +208,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector> {
       @Override

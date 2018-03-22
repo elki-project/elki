@@ -96,7 +96,7 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -87,11 +87,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Erich Schubert
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.has Instance
- * @apiviz.composedOf CorePredicate
- * @apiviz.composedOf NeighborPredicate
+ * @has - - - Instance
+ * @composed - - - CorePredicate
+ * @composed - - - NeighborPredicate
  */
 @Reference(prefix = "closely related", //
     authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
@@ -166,8 +166,8 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf CorePredicate.Instance
-   * @apiviz.composedOf NeighborPredicate.Instance
+   * @composed - - - CorePredicate.Instance
+   * @composed - - - NeighborPredicate.Instance
    */
   public static class Instance<T> implements Processor {
     /**
@@ -376,7 +376,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     private class Mapper implements Processor.Instance {
       /**
@@ -405,7 +405,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.composedOf SimpleTypeSerializer
- * @apiviz.composedOf VectorTypeSerializer
- * @apiviz.composedOf VectorFieldTypeSerializer
+ * @composed - - - SimpleTypeSerializer
+ * @composed - - - VectorTypeSerializer
+ * @composed - - - VectorFieldTypeSerializer
  */
 public class TypeInformationSerializer implements ByteBufferSerializer<TypeInformation> {
   /**
@@ -143,7 +143,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses SimpleTypeInformation
+   * @assoc - - - SimpleTypeInformation
    */
   static class SimpleTypeSerializer implements ByteBufferSerializer<SimpleTypeInformation<?>> {
     @SuppressWarnings("unchecked")
@@ -220,7 +220,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses VectorTypeInformation
+   * @assoc - - - VectorTypeInformation
    */
   static class VectorTypeSerializer implements ByteBufferSerializer<VectorTypeInformation<?>> {
     @SuppressWarnings("unchecked")
@@ -307,7 +307,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses VectorFieldTypeInformation
+   * @assoc - - - VectorFieldTypeInformation
    */
   static class VectorFieldTypeSerializer implements ByteBufferSerializer<VectorFieldTypeInformation<?>> {
     @SuppressWarnings("unchecked")

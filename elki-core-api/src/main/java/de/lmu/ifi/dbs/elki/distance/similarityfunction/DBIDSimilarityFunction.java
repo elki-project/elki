@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,18 +25,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 /**
  * Interface DBIDSimilarityFunction describes the requirements of any similarity
  * function defined over object IDs.
- * 
+ *
  * @author Elke Achtert
  * @since 0.4.0
- * 
- * @apiviz.landmark
- * @apiviz.uses DBID oneway - - defined on
+ *
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - "defined on" - DBID
  */
 public interface DBIDSimilarityFunction extends PrimitiveSimilarityFunction<DBID> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
-   * 
+   *
    * @param id1 first object id
    * @param id2 second object id
    * @return the similarity between two given DatabaseObjects according to this

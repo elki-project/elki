@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses PrimitiveSimilarityFunction
+ * @depend - - - PrimitiveSimilarityFunction
  * 
  * @param <O> Object type
  */

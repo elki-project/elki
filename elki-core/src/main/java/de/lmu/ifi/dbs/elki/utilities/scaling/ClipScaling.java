@@ -92,7 +92,7 @@ public class ClipScaling implements StaticScalingFunction {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     protected Double min = null;

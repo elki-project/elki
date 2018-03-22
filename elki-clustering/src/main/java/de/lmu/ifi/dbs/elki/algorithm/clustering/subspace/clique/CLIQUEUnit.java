@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.composedOf CLIQUEInterval
- * @apiviz.composedOf ModifiableDBIDs
+ * @composed - - - CLIQUEInterval
+ * @composed - - - ModifiableDBIDs
  * 
  * @param <V> the type of NumberVector this unit contains
  */

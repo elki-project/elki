@@ -65,7 +65,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
  * @author Arthur Zimek
  * @since 0.2
  *
- * @apiviz.has SparseNumberVector
+ * @has - - - SparseNumberVector
  *
  * @param <V> vector type
  */
@@ -206,7 +206,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override

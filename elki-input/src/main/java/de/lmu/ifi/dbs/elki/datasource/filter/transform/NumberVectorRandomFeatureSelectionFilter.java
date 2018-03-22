@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Arthur Zimek
  * @since 0.4.0
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  * 
  * @param <V> vector type
  */
@@ -110,7 +110,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

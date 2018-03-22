@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,11 +44,11 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses MOMDistributionEstimator
- * @apiviz.uses MADDistributionEstimator
- * @apiviz.uses LMMDistributionEstimator
- * @apiviz.uses LogMOMDistributionEstimator
- * @apiviz.uses LogMADDistributionEstimator
+ * @assoc - - - MOMDistributionEstimator
+ * @assoc - - - MADDistributionEstimator
+ * @assoc - - - LMMDistributionEstimator
+ * @assoc - - - LogMOMDistributionEstimator
+ * @assoc - - - LogMADDistributionEstimator
  */
 public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**
@@ -252,7 +252,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**
    * Class to track the best fit.
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @author Erich Schubert
    */
@@ -360,7 +360,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

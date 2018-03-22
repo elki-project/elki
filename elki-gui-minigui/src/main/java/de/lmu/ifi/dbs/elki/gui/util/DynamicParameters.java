@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * @since 0.3
  * 
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters.RemainingOptions
+ * @composed - - - de.lmu.ifi.dbs.elki.gui.util.DynamicParameters.RemainingOptions
  */
 public class DynamicParameters {
   /**
@@ -81,7 +81,7 @@ public class DynamicParameters {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public class Node {
     protected Parameter<?> param;

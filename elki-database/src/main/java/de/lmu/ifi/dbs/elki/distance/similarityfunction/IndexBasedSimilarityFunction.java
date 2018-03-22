@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.index.Index;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has Instance oneway - - «create»
- * @apiviz.landmark
+ * @navhas - create - Instance
+ * @opt nodefillcolor LemonChiffon
  *
  * @param <O> Object type
  */

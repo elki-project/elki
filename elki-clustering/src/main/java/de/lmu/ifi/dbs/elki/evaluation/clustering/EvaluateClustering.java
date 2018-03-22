@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
- * @apiviz.uses ClusterContingencyTable
- * @apiviz.has EvaluateClustering.ScoreResult oneway - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - ClusterContingencyTable
+ * @navhas - create - EvaluateClustering.ScoreResult
  */
 @Alias("de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure")
 public class EvaluateClustering implements Evaluator {
@@ -198,7 +198,7 @@ public class EvaluateClustering implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf ClusterContingencyTable
+   * @composed - - - ClusterContingencyTable
    */
   public static class ScoreResult extends EvaluationResult {
     /**
@@ -273,7 +273,7 @@ public class EvaluateClustering implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class UncertainInstancesVisualization implements VisFactory {
   /**
@@ -96,7 +96,7 @@ public class UncertainInstancesVisualization implements VisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses StylingPolicy
+   * @assoc - - - StylingPolicy
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**

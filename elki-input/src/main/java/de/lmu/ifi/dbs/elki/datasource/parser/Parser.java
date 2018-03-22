@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,9 +30,9 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.landmark
- * @apiviz.uses InputStream
- * @apiviz.has MultipleObjectsBundle oneway - - «create»
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - InputStream
+ * @navhas - create - MultipleObjectsBundle
  */
 public interface Parser {
   /**

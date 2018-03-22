@@ -82,7 +82,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * 
    * @author Arthur Zimek
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum ScalingReference {
     UNITCUBE, STDDEV, MINMAX
@@ -93,7 +93,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * 
    * @author Arthur Zimek
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum NoiseDistribution {
     GAUSSIAN, UNIFORM
@@ -292,7 +292,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * 
    * @author Arthur Zimek
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

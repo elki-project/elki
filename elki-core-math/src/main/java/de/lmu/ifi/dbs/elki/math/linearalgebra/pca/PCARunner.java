@@ -43,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.landmark
- * @apiviz.uses PCAResult oneway - - «create»
- * @apiviz.composedOf CovarianceMatrixBuilder
+ * @opt nodefillcolor LemonChiffon
+ * @navassoc - create - PCAResult
+ * @composed - - - CovarianceMatrixBuilder
  */
 public class PCARunner {
   /**
@@ -130,7 +130,7 @@ public class PCARunner {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

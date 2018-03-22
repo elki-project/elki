@@ -150,7 +150,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood type
    * @param <O> Attribute object type

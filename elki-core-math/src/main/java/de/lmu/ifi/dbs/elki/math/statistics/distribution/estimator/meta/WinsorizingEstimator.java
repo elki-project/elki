@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.uses DistributionEstimator
+ * @assoc - - - DistributionEstimator
  *
  * @param <D> Distribution type
  */
@@ -118,7 +118,7 @@ public class WinsorizingEstimator<D extends Distribution> implements Distributio
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <D> Distribution type
    */

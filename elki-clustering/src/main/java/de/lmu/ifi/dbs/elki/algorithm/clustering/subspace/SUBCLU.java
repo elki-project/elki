@@ -68,9 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.3
  * 
- * @apiviz.uses DBSCAN
- * @apiviz.uses DimensionSelectingSubspaceDistanceFunction
- * @apiviz.has SubspaceModel
+ * @assoc - - - DBSCAN
+ * @assoc - - - DimensionSelectingSubspaceDistanceFunction
+ * @has - - - SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this algorithm
  */
@@ -412,7 +412,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

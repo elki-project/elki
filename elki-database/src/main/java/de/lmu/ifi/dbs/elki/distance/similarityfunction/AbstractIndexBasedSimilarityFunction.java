@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.uses IndexFactory
- * @apiviz.has Instance oneway - - «create»
+ * @assoc - - - IndexFactory
+ * @navhas - create - Instance
  * 
  * @param <O> object type
  * @param <F> index type
@@ -75,7 +75,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFac
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses Index
+   * @assoc - - - Index
    * 
    * @param <O> Object type
    * @param <I> Index type
@@ -119,7 +119,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFac
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
     /**

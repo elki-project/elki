@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class SelectionDotVisualization implements VisFactory {
   /**
@@ -91,7 +91,7 @@ public class SelectionDotVisualization implements VisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has DBIDSelection oneway - - visualizes
+   * @navhas - visualizes - DBIDSelection
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

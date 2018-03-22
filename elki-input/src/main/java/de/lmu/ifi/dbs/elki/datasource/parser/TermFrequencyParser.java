@@ -60,7 +60,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has SparseNumberVector
+ * @has - - - SparseNumberVector
  */
 public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVectorLabelParser<V> {
   /**
@@ -199,7 +199,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     /**

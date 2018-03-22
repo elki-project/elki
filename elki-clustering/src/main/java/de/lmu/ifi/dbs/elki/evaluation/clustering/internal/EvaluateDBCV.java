@@ -268,7 +268,7 @@ public class EvaluateDBCV<O> implements Evaluator {
    *
    * @author Stephan Baier
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

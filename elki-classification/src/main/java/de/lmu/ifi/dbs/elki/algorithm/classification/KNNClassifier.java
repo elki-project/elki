@@ -178,7 +178,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

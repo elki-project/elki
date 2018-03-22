@@ -73,9 +73,9 @@ import net.jafama.FastMath;
  * TODO: add support for dynamic time, and optimize for sparse vectors.
  *
  * @author Erich Schubert
- * 
- * @apiviz.composedOf Instance
- * @apiviz.has ChangePoints
+ *
+ * @composed - - - Instance
+ * @assoc - - - ChangePoints
  */
 @Title("Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds")
 @Reference(authors = "Erich Schubert, Michael Weiler, Hans-Peter Kriegel", //
@@ -134,7 +134,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Instance {
     /**
@@ -249,7 +249,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

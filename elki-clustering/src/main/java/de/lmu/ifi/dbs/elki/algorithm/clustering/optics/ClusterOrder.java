@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  */
 public class ClusterOrder extends BasicResult implements OrderingResult {
   /**

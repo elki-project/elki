@@ -72,12 +72,12 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.landmark
- * @apiviz.composedOf CSSClassManager
- * @apiviz.composedOf UpdateRunner
- * @apiviz.composedOf SVGDocument
- * @apiviz.has Element oneway - - contains
- * @apiviz.has UpdateSynchronizer oneway - - synchronizesWith
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - CSSClassManager
+ * @composed - - - UpdateRunner
+ * @composed - - - SVGDocument
+ * @navhas - contains - Element
+ * @navhas - synchronizesWith - UpdateSynchronizer
  */
 public class SVGPlot {
   /**
@@ -688,7 +688,7 @@ public class SVGPlot {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class CloneNoExport extends CloneInlineImages {
     @Override

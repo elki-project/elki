@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @apiviz.has RangeQuery
+ * @has - - - RangeQuery
  *
  * @param <O> Database object type
  */
@@ -111,7 +111,7 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     @Override

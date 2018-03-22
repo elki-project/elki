@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @author Elke Achtert
  * @since 0.2
  *
- * @apiviz.has MkMaxTreeNode oneway - - contains
+ * @navhas - contains - MkMaxTreeNode
  *
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  */

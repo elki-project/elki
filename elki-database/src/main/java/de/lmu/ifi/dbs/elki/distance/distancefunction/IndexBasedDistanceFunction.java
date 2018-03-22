@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Distance function relying on an index (such as preprocessed neighborhoods).
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
- * 
- * @apiviz.landmark
- * @apiviz.stereotype factory
- * @apiviz.has Instance oneway - - «create»F
- * 
+ *
+ * @opt nodefillcolor LemonChiffon
+ * @stereotype factory
+ * @navassoc - creates - Instance
+ *
  * @param <O> Object type
  */
 public interface IndexBasedDistanceFunction<O> extends DistanceFunction<O> {
@@ -44,15 +44,15 @@ public interface IndexBasedDistanceFunction<O> extends DistanceFunction<O> {
 
   /**
    * Instance interface for Index based distance functions.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <T> Object type
    */
   interface Instance<T, I extends Index> extends DatabaseDistanceQuery<T> {
     /**
      * Get the index used.
-     * 
+     *
      * @return the index used
      */
     I getIndex();

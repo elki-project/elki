@@ -78,7 +78,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   /**
    * Available strategies for determination of the preference vector.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public enum Strategy {
     /**
@@ -399,8 +399,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses DiSHPreferenceVectorIndex oneway - - «create»
+   * @stereotype factory
+   * @navassoc - create - DiSHPreferenceVectorIndex
    *
    * @param <V> Vector type
    */
@@ -496,7 +496,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**

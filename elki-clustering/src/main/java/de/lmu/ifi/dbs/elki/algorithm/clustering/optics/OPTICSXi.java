@@ -70,9 +70,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf OPTICSTypeAlgorithm
- * @apiviz.uses ClusterOrder
- * @apiviz.has SteepAreaResult
+ * @assoc - runs - OPTICSTypeAlgorithm
+ * @assoc - reads - ClusterOrder
+ * @assoc - produces - SteepAreaResult
  */
 @Title("OPTICS Xi Cluster Extraction")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
@@ -406,7 +406,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class SteepScanPosition {
     /**
@@ -514,7 +514,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class SteepArea {
     /**
@@ -580,7 +580,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class SteepDownArea extends SteepArea {
     /**
@@ -630,7 +630,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class SteepUpArea extends SteepArea {
     /**
@@ -655,7 +655,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.has SteepArea
+   * @has - - - SteepArea
    */
   public static class SteepAreaResult implements IterableResult<SteepArea> {
     /**
@@ -694,7 +694,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

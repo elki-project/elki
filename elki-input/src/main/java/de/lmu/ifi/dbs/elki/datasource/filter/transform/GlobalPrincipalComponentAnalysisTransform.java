@@ -65,9 +65,9 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.composedOf PCARunner
- * @apiviz.composedOf CovarianceMatrix
- * @apiviz.composedOf EigenPairFilter
+ * @composed - - - PCARunner
+ * @composed - - - CovarianceMatrix
+ * @composed - - - EigenPairFilter
  * 
  * @param <O> Vector type
  */
@@ -207,7 +207,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

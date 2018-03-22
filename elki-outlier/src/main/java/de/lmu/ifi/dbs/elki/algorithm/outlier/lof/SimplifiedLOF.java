@@ -62,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
+ *
  * @param <O> the type of data objects handled by this algorithm
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
@@ -214,7 +215,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

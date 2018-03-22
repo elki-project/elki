@@ -146,7 +146,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractNumberVect
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

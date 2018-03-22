@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses MkMaxTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - MkMaxTreeIndex
  * 
  * @param <O> Object type
  */
@@ -64,7 +64,7 @@ public class MkMaxTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkMaxTr
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

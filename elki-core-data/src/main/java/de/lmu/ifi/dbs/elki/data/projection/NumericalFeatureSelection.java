@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  * 
  * @param <V> Vector type
  */
@@ -126,7 +126,7 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

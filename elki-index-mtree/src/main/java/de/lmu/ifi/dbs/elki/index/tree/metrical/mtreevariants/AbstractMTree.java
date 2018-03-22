@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,10 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.composedOf MTreeSettings
- * @apiviz.composedOf Statistics
- * @apiviz.has AbstractMTreeNode oneway - - contains
- * @apiviz.excludeSubtypes
+ * @composed - - - MTreeSettings
+ * @composed - - - Statistics
+ * @navhas - contains - AbstractMTreeNode
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
@@ -482,7 +481,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf Counter
+   * @composed - - - Counter
    */
   public class Statistics {
     /**

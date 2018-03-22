@@ -92,8 +92,9 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf GoodnessOfFitTest
- * @apiviz.composedOf OutlierAlgorithm
+ * @composed - - - GoodnessOfFitTest
+ * @composed - - - OutlierAlgorithm
+ *
  * @param <V> vector type
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
@@ -423,7 +424,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class HiCSSubspace extends BitSet {
     /**
@@ -501,7 +502,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * 
    * @author Jan Brusis
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <V> vector type
    */

@@ -6,9 +6,9 @@
  * classical but somewhat obsolete classification schema of clustering
  * algorithms for axis-parallel subspaces.
  * 
- * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm.Abstract
- * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.P3C\.(ClusterCandidate|Signature)
- * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.clique\.
+ * @opt hide ^de.lmu.ifi.dbs.elki.algorithm.Abstract
+ * @opt hide ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.P3C\.(ClusterCandidate|Signature)
+ * @opt hide ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.clique\.
  */
 /*
  * This file is part of ELKI:

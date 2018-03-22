@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,11 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.landmark
- * @apiviz.uses TextWriteable
- * @apiviz.uses TextWriterStream oneway - - writesTo
- * @apiviz.composedOf TextWriterWriterInterface
- * @apiviz.has NamingScheme
+ * @opt nodefillcolor LemonChiffon
+ * @navassoc - writesTo - TextWriterStream
+ * @composed - - - TextWriterWriterInterface
+ * @has - - - NamingScheme
  */
 public class TextWriter {
   /**

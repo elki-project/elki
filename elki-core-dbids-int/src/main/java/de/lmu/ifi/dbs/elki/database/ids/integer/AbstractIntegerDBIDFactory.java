@@ -43,11 +43,11 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses IntegerDBID oneway - - «create»
- * @apiviz.uses IntegerDBIDPair oneway - - «create»
- * @apiviz.uses IntegerDBIDRange oneway - - «create»
- * @apiviz.uses TroveHashSetModifiableDBIDs oneway - - «create»
- * @apiviz.uses IntegerArrayDBIDs oneway - - «create»
+ * @navassoc - create - IntegerDBID
+ * @navassoc - create - IntegerDBIDPair
+ * @navassoc - create - IntegerDBIDRange
+ * @navassoc - create - TroveHashSetModifiableDBIDs
+ * @navassoc - create - IntegerArrayDBIDs
  */
 abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   /**

@@ -68,8 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has SimplifiedLRDProcessor
- * @apiviz.has LOFProcessor
+ * @has - - - SimplifiedLRDProcessor
+ * @has - - - LOFProcessor
+ *
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
@@ -166,7 +167,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <O> Object type
    */

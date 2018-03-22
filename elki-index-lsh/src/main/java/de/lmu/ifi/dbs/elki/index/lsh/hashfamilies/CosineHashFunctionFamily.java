@@ -121,7 +121,7 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
    *
    * @author Evgeniy Faerman
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

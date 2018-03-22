@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
    * Available file types: {@link #INPUT_FILE} denotes an input file,
    * {@link #OUTPUT_FILE} denotes an output file.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum FileType {
     /**

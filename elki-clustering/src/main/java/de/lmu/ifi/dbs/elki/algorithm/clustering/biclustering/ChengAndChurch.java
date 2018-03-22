@@ -143,7 +143,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected interface CellVisitor {
     /** Different modes of operation. */
@@ -167,7 +167,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class BiclusterCandidate {
     /**
@@ -794,7 +794,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <V> Vector type
    */

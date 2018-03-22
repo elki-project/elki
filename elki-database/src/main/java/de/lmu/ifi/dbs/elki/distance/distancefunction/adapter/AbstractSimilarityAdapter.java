@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has Instance
+ * @has - - - Instance
  * 
  * @param <O> object class to process
  */
@@ -140,7 +140,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer<O, S extends SimilarityFunction<? super O>> extends AbstractParameterizer {
     /**

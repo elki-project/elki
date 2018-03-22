@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf FPTree
+ * @composed - - - FPTree
  */
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
     title = "Mining frequent patterns without candidate generation", //
@@ -274,7 +274,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    *
    * @author Erich Schubert
    *
-   * @apiviz.composedOf FPNode
+   * @composed - - - FPNode
    */
   public static class FPTree extends FPNode {
     /**
@@ -477,7 +477,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     interface Collector {
       /**
@@ -645,7 +645,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     interface Translator {
       /**
@@ -674,7 +674,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override

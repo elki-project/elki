@@ -74,8 +74,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.has KDTreeKNNQuery
- * @apiviz.has KDTreeRangeQuery
+ * @has - - - KDTreeKNNQuery
+ * @has - - - KDTreeRangeQuery
+ *
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", //
@@ -154,7 +155,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class CountSortAccesses extends VectorUtil.SortDBIDsBySingleDimension {
     /**
@@ -486,8 +487,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.has MinimalisticMemoryKDTree
+   * @stereotype factory
+   * @has - - - MinimalisticMemoryKDTree
    *
    * @param <O> Vector type
    */
@@ -530,7 +531,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
       /**

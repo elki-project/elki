@@ -81,7 +81,7 @@ public class Kulczynski2SimilarityFunction extends AbstractVectorSimilarityFunct
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -101,7 +101,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

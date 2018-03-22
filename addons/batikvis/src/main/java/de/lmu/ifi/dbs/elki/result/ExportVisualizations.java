@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.composedOf VisualizerParameterizer
+ * @composed - - - VisualizerParameterizer
  */
 @Alias("de.lmu.ifi.dbs.elki.visualization.ExportVisualizations")
 public class ExportVisualizations implements ResultHandler {
@@ -291,7 +291,7 @@ public class ExportVisualizations implements ResultHandler {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

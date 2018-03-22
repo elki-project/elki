@@ -117,7 +117,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

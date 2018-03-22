@@ -119,7 +119,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has LogNormalDistribution
+ * @has - - - LogNormalDistribution
  */
 @Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
@@ -127,7 +127,7 @@ public class LogNormalLMMEstimator implements LMMDistributionEstimator<LogNormal
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

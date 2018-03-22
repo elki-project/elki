@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf Curve
+ * @composed - - - Curve
  */
 public class XYPlot implements Result, Iterable<XYPlot.Curve> {
   /**
@@ -189,7 +189,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public class Itr {
       /**

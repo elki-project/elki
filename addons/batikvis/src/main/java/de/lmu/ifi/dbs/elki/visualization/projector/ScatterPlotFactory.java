@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.has ScatterPlotProjector
+ * @has - - - ScatterPlotProjector
  */
 public class ScatterPlotFactory implements ProjectorFactory {
   /**
@@ -108,7 +108,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

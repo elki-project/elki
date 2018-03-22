@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Arthur Zimek
  * @since 0.5.5
  * 
- * @apiviz.uses NumberVector
+ * @assoc - - - NumberVector
  * 
  * @param <V> Vector type
  */
@@ -112,7 +112,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -31,7 +31,6 @@ import java.util.RandomAccess;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.excludeSubtypes
  * 
  * @param <O> contained object type.
  */

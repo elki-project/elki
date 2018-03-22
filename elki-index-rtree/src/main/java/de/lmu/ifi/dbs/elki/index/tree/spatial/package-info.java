@@ -1,7 +1,7 @@
 /**
  * Tree-based index structures for <em>spatial</em> indexing
  *
- * @apiviz.exclude de.lmu.ifi.dbs.elki.tree.spatial.rstarvariants.deliclu
+ * @opt hide de.lmu.ifi.dbs.elki.tree.spatial.rstarvariants.deliclu
  */
 /*
  * This file is part of ELKI:

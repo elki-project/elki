@@ -183,7 +183,7 @@ public class CLARANSPlus<V> extends CLARANS<V> {
    * 
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Assignment extends CLARANS.Assignment {
     /**
@@ -325,7 +325,7 @@ public class CLARANSPlus<V> extends CLARANS<V> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends CLARANS.Parameterizer<V> {
     @Override

@@ -49,8 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has OnDiskUpperTriangleMatrix
- * @apiviz.has DistanceFunction
+ * @has - - - OnDiskUpperTriangleMatrix
+ * @has - - - DistanceFunction
  * 
  * @param <O> Object type
  */
@@ -140,7 +140,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**

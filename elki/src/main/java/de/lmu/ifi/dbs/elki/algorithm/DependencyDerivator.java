@@ -258,7 +258,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
     /**

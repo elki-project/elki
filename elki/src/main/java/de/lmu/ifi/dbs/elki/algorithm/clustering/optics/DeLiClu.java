@@ -359,7 +359,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   /**
    * Encapsulates an entry in the cluster order.
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public class SpatialObjectPair implements Comparable<SpatialObjectPair> {
     /**
@@ -458,7 +458,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

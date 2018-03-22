@@ -70,8 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.has MedoidModel
- * @apiviz.composedOf KMedoidsInitialization
+ * @has - - - MedoidModel
+ * @composed - - - KMedoidsInitialization
  *
  * @param <V> vector datatype
  */
@@ -195,7 +195,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class Instance {
     /**
@@ -400,7 +400,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

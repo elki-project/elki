@@ -76,8 +76,8 @@ import net.jafama.FastMath;
  * @author Robert Rödler
  * @since 0.5.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class EMClusterVisualization implements VisFactory {
   /**
@@ -125,8 +125,8 @@ public class EMClusterVisualization implements VisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has EMModel oneway - - visualizes
-   * @apiviz.uses GrahamScanConvexHull2D
+   * @navhas - visualizes - EMModel
+   * @assoc - - - GrahamScanConvexHull2D
    */
   // TODO: nicer stacking of n-fold hulls
   // TODO: can we find a proper sphere for 3+ dimensions?

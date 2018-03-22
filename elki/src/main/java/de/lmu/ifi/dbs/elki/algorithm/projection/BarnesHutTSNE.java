@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  *
- * @apiviz.composedOf QuadTree
+ * @has - - - QuadTree
  *
  * @param <O> Object type
  */
@@ -532,7 +532,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

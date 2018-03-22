@@ -163,9 +163,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
    *
    * @author Erich Schubert
    *
-   * @apiviz.stereotype factory
-   * @apiviz.uses PartitionApproximationMaterializeKNNPreprocessor oneway - -
-   *              «create»
+   * @stereotype factory
+   * @navassoc - creates - PartitionApproximationMaterializeKNNPreprocessor
    *
    * @param <O> The object type
    */
@@ -205,7 +204,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**

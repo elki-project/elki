@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.5
  * 
- * @apiviz.composedOf Adapter
- * @apiviz.composedOf Collector
+ * @composed - - - Adapter
+ * @composed - - - Collector
  */
 @Reference(authors = "R. C. Prim", //
     title = "Shortest connection networks and some generalizations", //

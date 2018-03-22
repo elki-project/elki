@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has WeibullDistribution
+ * @has - - - WeibullDistribution
  */
 public class WeibullLMMEstimator implements LMMDistributionEstimator<WeibullDistribution> {
   /**
@@ -148,7 +148,7 @@ public class WeibullLMMEstimator implements LMMDistributionEstimator<WeibullDist
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has MemoryPageFile
+ * @has - - - MemoryPageFile
  * 
  * @param <P> Page type
  */
@@ -50,7 +50,7 @@ public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFacto
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
     @Override

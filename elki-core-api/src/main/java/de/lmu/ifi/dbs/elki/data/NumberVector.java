@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberVectorAdapte
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.landmark
- * @apiviz.exclude de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*
+ * @opt nodefillcolor LemonChiffon
+ * @opt hide de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*
  */
 public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
   /**
@@ -178,7 +178,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has NumberVector
+   * @has - - - NumberVector
    * 
    * @param <V> Vector type
    */

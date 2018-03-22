@@ -104,7 +104,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   protected class Itr implements IntegerDBIDArrayIter {
     /**
@@ -170,7 +170,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Slice implements IntegerArrayDBIDs {
     /**
@@ -242,7 +242,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      */
     private class SliceItr implements IntegerDBIDArrayIter {
       /**

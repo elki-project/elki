@@ -64,7 +64,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

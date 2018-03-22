@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,9 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  * 
- * @apiviz.composedOf EnsembleVoting
- * @apiviz.uses OutlierResult oneway - - reads
- * @apiviz.uses OutlierResult oneway - - «create»
+ * @composed - - - EnsembleVoting
+ * @navassoc - reads - OutlierResult
+ * @navassoc - create - OutlierResult
  */
 public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -168,7 +168,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

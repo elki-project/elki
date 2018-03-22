@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @apiviz.has KNNQuery
+ * @has - - - KNNQuery
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -163,7 +163,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     /**

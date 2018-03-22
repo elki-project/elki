@@ -49,8 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.uses EuclideanDistanceFunction
- * @apiviz.uses SquaredEuclideanDistanceFunction
+ * @assoc - - - EuclideanDistanceFunction
+ * @assoc - - - SquaredEuclideanDistanceFunction
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //

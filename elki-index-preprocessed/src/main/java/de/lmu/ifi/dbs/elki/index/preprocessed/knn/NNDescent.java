@@ -543,7 +543,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
      *
      * @author Evelyn Kirner
      *
-     * @apiviz.exclude
+     * @hidden
      *
      * @param <O> Object type
      */

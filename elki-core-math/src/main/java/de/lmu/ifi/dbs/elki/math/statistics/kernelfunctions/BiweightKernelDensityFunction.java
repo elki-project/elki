@@ -93,7 +93,7 @@ public final class BiweightKernelDensityFunction implements KernelDensityFunctio
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

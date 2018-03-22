@@ -58,10 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.uses OutlierResult
- * @apiviz.has ROCResult oneway - - «create»
+ * @assoc - - - OutlierResult
+ * @navhas - create - ROCResult
  */
 @Alias({ "de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve", //
     "de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve" })
@@ -200,7 +200,7 @@ public class OutlierROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

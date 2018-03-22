@@ -144,7 +144,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private final static class Itr implements IntegerDBIDArrayIter {
     /**

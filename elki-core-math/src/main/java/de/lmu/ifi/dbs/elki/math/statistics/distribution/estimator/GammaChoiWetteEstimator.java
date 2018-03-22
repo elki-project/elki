@@ -39,7 +39,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has GammaDistribution - - estimates
+ * @navassoc - estimates - GammaDistribution
  */
 @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", //
     authors = "S. C. Choi, R. Wette", //
@@ -110,7 +110,7 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

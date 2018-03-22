@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses LoggingConfiguration
+ * @assoc - - - LoggingConfiguration
  */
 public class LoggingStep implements WorkflowStep {
   /**
@@ -89,7 +89,7 @@ public class LoggingStep implements WorkflowStep {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

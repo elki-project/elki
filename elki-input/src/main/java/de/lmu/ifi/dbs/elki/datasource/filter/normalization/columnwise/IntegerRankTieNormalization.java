@@ -116,7 +116,7 @@ public class IntegerRankTieNormalization implements ObjectFilter {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Sorter implements IntComparator {
     /**

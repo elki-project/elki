@@ -57,8 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * @since 0.2
  *
- * @apiviz.uses LoggingConfiguration oneway
- * @apiviz.excludeSubtypes
+ * @navassoc - - - LoggingConfiguration
  */
 public abstract class AbstractApplication {
   /**
@@ -255,7 +254,7 @@ public abstract class AbstractApplication {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

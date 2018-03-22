@@ -49,9 +49,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has XYPlot oneway - - visualizes
+ * @stereotype factory
+ * @navassoc - create - StaticVisualizationInstance
+ * @navhas - visualizes - XYPlot
  */
 public class XYPlotVisualization implements VisFactory {
   /**

@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses LabelList oneway - - «reads»
- * @apiviz.has ExternalID oneway - - «produces»
+ * @navassoc - reads - LabelList
+ * @navhas - produces - ExternalID
  */
 @Alias("de.lmu.ifi.dbs.elki.datasource.filter.ExternalIDFilter")
 public class ExternalIDFilter implements ObjectFilter {
@@ -119,7 +119,7 @@ public class ExternalIDFilter implements ObjectFilter {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

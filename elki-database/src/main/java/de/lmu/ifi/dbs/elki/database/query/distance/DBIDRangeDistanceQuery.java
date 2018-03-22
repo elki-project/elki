@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDRangeDistanceFunction;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.landmark
- * @apiviz.uses DBIDRangeDistanceFunction
+ * @opt nodefillcolor LemonChiffon
+ * @assoc - - - DBIDRangeDistanceFunction
  */
 public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
   /**

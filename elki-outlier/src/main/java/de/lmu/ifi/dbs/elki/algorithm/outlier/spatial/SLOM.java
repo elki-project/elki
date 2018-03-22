@@ -209,7 +209,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood type
    * @param <O> Data Object type

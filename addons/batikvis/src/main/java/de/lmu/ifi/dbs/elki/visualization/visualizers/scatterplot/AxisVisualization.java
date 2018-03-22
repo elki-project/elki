@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,8 +47,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class AxisVisualization implements VisFactory {
   /**
@@ -88,7 +88,7 @@ public class AxisVisualization implements VisFactory {
    * @author Erich Schubert
    * @author Remigius Wojdanowski
    *
-   * @apiviz.uses SVGSimpleLinearAxis
+   * @assoc - - - SVGSimpleLinearAxis
    *
    */
   public class Instance extends AbstractScatterplotVisualization {

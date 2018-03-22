@@ -10,11 +10,11 @@
  * allowed to provide a result that is a fuzzy clustering, does not partition
  * the database complete or is in any other sense a relaxed clustering result.
  * 
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.Algorithm
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.*
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.Algorithm
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm
+ * @opt hide de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.*
  * 
  * @see de.lmu.ifi.dbs.elki.algorithm
  */

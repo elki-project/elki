@@ -144,9 +144,9 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
    *
    * @author Erich Schubert
    *
-   * @apiviz.landmark
-   * @apiviz.stereotype factory
-   * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
+   * @opt nodefillcolor LemonChiffon
+   * @stereotype factory
+   * @navassoc - create - AbstractMaterializeKNNPreprocessor
    *
    * @param <O> The object type
    */
@@ -185,7 +185,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
      *
      * @author Erich Schubert
      *
-     * @apiviz.exclude
+     * @hidden
      *
      * @param <O> Object type
      */

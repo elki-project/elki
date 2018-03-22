@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  *
  * @author Erich Schubert
  *
- * @apiviz.uses CFTree
+ * @depend - - - CFTree
  */
 @Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
@@ -138,7 +138,7 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

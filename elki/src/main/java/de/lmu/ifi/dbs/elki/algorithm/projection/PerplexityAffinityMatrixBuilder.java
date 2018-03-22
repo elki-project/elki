@@ -228,7 +228,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    *
    * @param <O> Object type
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

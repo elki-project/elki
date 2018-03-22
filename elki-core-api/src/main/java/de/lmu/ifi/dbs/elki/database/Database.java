@@ -47,13 +47,13 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @author Elke Achtert
  * @since 0.1
  *
- * @apiviz.landmark
- * @apiviz.has DistanceQuery oneway - - provides
- * @apiviz.has KNNQuery oneway - - provides
- * @apiviz.has RangeQuery oneway - - provides
- * @apiviz.has RKNNQuery oneway - - provides
- * @apiviz.has Relation oneway - - contains
- * @apiviz.has DataStoreListener oneway - - invokes
+ * @opt nodefillcolor LemonChiffon
+ * @navhas - provides - DistanceQuery
+ * @navhas - provides - KNNQuery
+ * @navhas - provides - RangeQuery
+ * @navhas - provides - RKNNQuery
+ * @navhas - contains - Relation
+ * @navhas - invokes - DataStoreListener
  */
 public interface Database extends HierarchicalResult {
   /**

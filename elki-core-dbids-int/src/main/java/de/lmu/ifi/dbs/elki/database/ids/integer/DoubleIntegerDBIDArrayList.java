@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQui
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @apiviz.uses DoubleIntegerArrayQuickSort
+ * @depend - - - DoubleIntegerArrayQuickSort
  */
 class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleIntegerDBIDList {
   /**
@@ -262,7 +262,7 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private class Itr implements DoubleIntegerDBIDListMIter {
     /**

@@ -71,11 +71,11 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @apiviz.landmark
- * @apiviz.composedOf DAFile
- * @apiviz.has PartialVACandidate
- * @apiviz.has PartialVAFileRangeQuery
- * @apiviz.has PartialVAFileKNNQuery
+ * @opt nodefillcolor LemonChiffon
+ * @composed - - - DAFile
+ * @has - - - PartialVACandidate
+ * @has - - - PartialVAFileRangeQuery
+ * @has - - - PartialVAFileKNNQuery
  *
  * @param <V> Vector type
  */
@@ -325,7 +325,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * 
    * TODO: refactor into a common statistics API
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Statistics {
     private Counter scannedBytes;
@@ -742,7 +742,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   /**
    * Compare DAfiles by their worst case distance.
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   protected static class WorstCaseDistComparator implements Comparator<DAFile> {
     private VALPNormDistance dist;
@@ -762,8 +762,8 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.has PartialVAFile
+   * @stereotype factory
+   * @has - - - PartialVAFile
    * 
    * @param <V> Vector type
    */
@@ -814,7 +814,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

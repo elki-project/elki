@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - Instance
  */
 public class MoveObjectsToolVisualization implements VisFactory {
   /**
@@ -101,7 +101,7 @@ public class MoveObjectsToolVisualization implements VisFactory {
    * @author Heidi Kolb
    * @author Erich Schubert
    *
-   * @apiviz.has de.lmu.ifi.dbs.elki.data.NumberVector oneway - - edits
+   * @navhas - edits - de.lmu.ifi.dbs.elki.data.NumberVector
    */
   public class Instance extends AbstractScatterplotVisualization implements DragListener {
     /**

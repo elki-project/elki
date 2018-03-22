@@ -91,8 +91,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has KNNQuery
- * @apiviz.has KernelDensityFunction
+ * @has - - - KNNQuery
+ * @has - - - KernelDensityFunction
  *
  * @param <O> Object type
  */
@@ -330,7 +330,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */

@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has LogNormalDistribution - - estimates
+ * @navassoc - estimates - LogNormalDistribution
  */
 public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEstimator<LogNormalDistribution> {
   /**
@@ -111,7 +111,7 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

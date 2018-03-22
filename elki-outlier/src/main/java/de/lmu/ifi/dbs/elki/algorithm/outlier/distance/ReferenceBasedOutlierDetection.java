@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * @author Erich Schubert
  * @since 0.3
  *
- * @apiviz.composedOf ReferencePointsHeuristic
+ * @composed - - - ReferencePointsHeuristic
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
@@ -277,7 +277,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
     /**

@@ -151,7 +151,7 @@ public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunctio
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

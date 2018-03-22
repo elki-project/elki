@@ -32,22 +32,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * SharedNearestNeighborJaccardDistanceFunction computes the Jaccard
  * coefficient, which is a proper distance metric.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @apiviz.uses
- *              de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
- *              .Factory
- * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - -
- *             «create»
- * 
+ *
+ * @assoc - - - SharedNearestNeighborIndex.Factory
+ * @navhas - create - SharedNearestNeighborJaccardDistanceFunction.Instance
+ *
  * @param <O> object type
  */
 public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractIndexBasedDistanceFunction<O, SharedNearestNeighborIndex.Factory<O>> {
   /**
    * Constructor.
-   * 
+   *
    * @param indexFactory Index factory.
    */
   public SharedNearestNeighborJaccardDistanceFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
@@ -63,17 +60,17 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
 
   /**
    * Actual instance for a dataset.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses SharedNearestNeighborIndex
-   * 
+   *
+   * @assoc - - - SharedNearestNeighborIndex
+   *
    * @param <T> Object type
    */
   public static class Instance<T> extends AbstractIndexBasedDistanceFunction.Instance<T, SharedNearestNeighborIndex<T>, SharedNearestNeighborJaccardDistanceFunction<T>> {
     /**
      * Constructor.
-     * 
+     *
      * @param database Database
      * @param preprocessor Preprocessor
      * @param parent Parent distance
@@ -84,7 +81,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
 
     /**
      * Compute the Jaccard coefficient
-     * 
+     *
      * @param neighbors1 SORTED neighbor ids of first
      * @param neighbors2 SORTED neighbor ids of second
      * @return Jaccard coefficient
@@ -130,10 +127,10 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   *
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractIndexBasedDistanceFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
     @Override

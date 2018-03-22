@@ -31,20 +31,20 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Factory for regular R*-Trees.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @apiviz.landmark factory
- * @apiviz.uses RStarTreeIndex oneway - - «create»
- * 
+ *
+ * @stereotype factory
+ * @navassoc - create - RStarTreeIndex
+ *
  * @param <O> Object type
  */
 @Alias({ "rstar", "r*" })
 public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RTreeSettings> {
   /**
    * Constructor.
-   * 
+   *
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
@@ -64,11 +64,11 @@ public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   * 
+   *
+   * @hidden
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {

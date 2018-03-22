@@ -77,7 +77,7 @@ public class CentroidEuclideanDistance implements BIRCHDistance {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -32,21 +32,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * SharedNearestNeighborSimilarityFunction with a pattern defined to accept
  * Strings that define a non-negative Integer.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
- * @apiviz.has
- *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
- *             .Factory
- * @apiviz.has Instance oneway - - «create»
- * 
+ *
+ * @navhas - - - SharedNearestNeighborIndex.Factory
+ * @navhas - create - Instance
+ *
  * @param <O> object type
  */
 public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex.Factory<O>> implements NormalizedSimilarityFunction<O> {
   /**
    * Constructor.
-   * 
+   *
    * @param indexFactory Index factory.
    */
   public FractionalSharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
@@ -62,11 +60,11 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
   /**
    * Actual instance for a dataset.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses SharedNearestNeighborIndex
-   * 
+   *
+   * @assoc - - - SharedNearestNeighborIndex
+   *
    * @param <T> Object type
    */
   public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>> {
@@ -77,7 +75,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
     /**
      * Constructor.
-     * 
+     *
      * @param database Database
      * @param preprocessor Preprocessor
      */
@@ -88,7 +86,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
     /**
      * Compute the intersection size.
-     * 
+     *
      * @param neighbors1 SORTED neighbor ids of first
      * @param neighbors2 SORTED neighbor ids of second
      * @return Intersection size
@@ -131,11 +129,11 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   * 
+   *
+   * @hidden
+   *
    * @param <O> object type
    */
   public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {

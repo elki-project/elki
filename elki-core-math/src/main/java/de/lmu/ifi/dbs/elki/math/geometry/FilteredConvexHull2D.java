@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
  *
  * @author Erich Schubert
  *
- * @apiviz.has Polygon
- * @apiviz.composedOf GrahamScanConvexHull2D
+ * @has - - - Polygon
+ * @has - - - GrahamScanConvexHull2D
  */
 public class FilteredConvexHull2D {
   /**

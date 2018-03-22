@@ -203,7 +203,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

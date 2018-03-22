@@ -28,14 +28,14 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 
 /**
  * Interface for an index providing nearest neighbor sets.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 public interface SharedNearestNeighborIndex<O> extends Index {
   /**
    * Get the precomputed nearest neighbors
-   * 
+   *
    * @param id Object ID
    * @return Neighbor DBIDs
    */
@@ -43,27 +43,27 @@ public interface SharedNearestNeighborIndex<O> extends Index {
 
   /**
    * Get the number of neighbors
-   * 
+   *
    * @return NN size
    */
   int getNumberOfNeighbors();
 
   /**
    * Factory interface
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SharedNearestNeighborIndex oneway - - «create»
-   * 
+   *
+   * @stereotype factory
+   * @navassoc - create - SharedNearestNeighborIndex
+   *
    * @param <O> The input object type
    */
   interface Factory<O> extends IndexFactory<O> {
     /**
      * Instantiate the index for a given database.
-     * 
+     *
      * @param database Database type
-     * 
+     *
      * @return Index
      */
     @Override
@@ -71,7 +71,7 @@ public interface SharedNearestNeighborIndex<O> extends Index {
 
     /**
      * Get the number of neighbors
-     * 
+     *
      * @return NN size
      */
     int getNumberOfNeighbors();

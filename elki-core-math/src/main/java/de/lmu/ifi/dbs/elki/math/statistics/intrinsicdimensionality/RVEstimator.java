@@ -74,7 +74,7 @@ public class RVEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Oussama Chelly
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

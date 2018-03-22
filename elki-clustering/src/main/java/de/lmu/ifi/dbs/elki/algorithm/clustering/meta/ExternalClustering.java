@@ -78,8 +78,8 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf CSVReaderFormat
- * @apiviz.has Clustering
+ * @composed - - - CSVReaderFormat
+ * @has - - - Clustering
  */
 @Description("Load clustering results from an external file. "//
     + "Each line is expected to consists of one clustering, one integer per point "//
@@ -209,7 +209,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

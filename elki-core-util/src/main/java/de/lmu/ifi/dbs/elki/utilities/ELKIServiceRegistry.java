@@ -69,7 +69,7 @@ public class ELKIServiceRegistry {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Entry {
     /**

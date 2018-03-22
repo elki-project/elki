@@ -93,7 +93,7 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractVecto
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

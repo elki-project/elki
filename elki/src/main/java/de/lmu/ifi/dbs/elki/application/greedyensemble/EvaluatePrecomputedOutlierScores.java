@@ -285,7 +285,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

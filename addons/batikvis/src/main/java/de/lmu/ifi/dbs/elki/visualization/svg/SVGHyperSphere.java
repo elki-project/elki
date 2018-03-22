@@ -33,8 +33,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses SVGPath
- * @apiviz.uses Projection2D
+ * @assoc - - - SVGPath
+ * @assoc - - - Projection2D
  */
 public final class SVGHyperSphere {
   /**

@@ -92,8 +92,8 @@
  * }
  * </pre>
  * 
- * @apiviz.exclude java.util.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
+ * @opt hide java.util.*
+ * @opt hide de.lmu.ifi.dbs.elki.utilities.*
  */
 /*
  * This file is part of ELKI:

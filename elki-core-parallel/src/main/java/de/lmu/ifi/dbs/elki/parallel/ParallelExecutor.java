@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has BlockArrayRunner
- * @apiviz.uses ParallelCore
+ * @has - - - BlockArrayRunner
+ * @assoc - - - ParallelCore
  */
 public final class ParallelExecutor {
   /**
@@ -100,7 +100,7 @@ public final class ParallelExecutor {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses Processor
+   * @assoc - - - Processor
    */
   protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, Executor {
     /**

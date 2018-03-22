@@ -1,7 +1,7 @@
 /**
  * Classes for managing the overview plot
  *
- * @apiviz.exclude java.awt.event.*
+ * @opt hide java.awt.event.*
  */
 /*
  * This file is part of ELKI:

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
+ * @composed - - - de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
 public class ArrayDBIDStore implements WritableDBIDDataStore {
   /**

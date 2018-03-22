@@ -167,7 +167,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
    * 
    * @author Ahmed Hettab
    * 
-   * @apiviz.exclude
+   * @hidden
    * 
    * @param <N> Neighborhood type
    * @param <O> Attributes vector type

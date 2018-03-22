@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * @author Arthur Zimek
  * @since 0.2
  * 
- * @apiviz.composedOf LinearEquationSystem
+ * @composed - - - LinearEquationSystem
  * 
  * @param <V> the type of NumberVector handled by this Result
  */

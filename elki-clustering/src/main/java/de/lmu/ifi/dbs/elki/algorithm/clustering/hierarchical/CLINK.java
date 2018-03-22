@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.has CompleteLinkageMethod
+ * @has - - - CompleteLinkageMethod
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -213,7 +213,7 @@ public class CLINK<O> extends SLINK<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     @Override

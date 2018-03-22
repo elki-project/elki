@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.has CanvasSize
+ * @has - - - CanvasSize
  */
 public interface Projection2D extends Projection {
   /**

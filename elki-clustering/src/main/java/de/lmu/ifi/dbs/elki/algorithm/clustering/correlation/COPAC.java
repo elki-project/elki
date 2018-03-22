@@ -68,8 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @apiviz.has DimensionModel
- * @apiviz.composedOf COPACNeighborPredicate
+ * @has - - - DimensionModel
+ * @composed - - - COPACNeighborPredicate
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -142,7 +142,7 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Settings {
     /**
@@ -176,7 +176,7 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

@@ -60,9 +60,9 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.has WeightFunction
- * @apiviz.has PrimitiveDistanceFunction
- * @apiviz.uses CovarianceMatrix
+ * @has - - - WeightFunction
+ * @has - - - PrimitiveDistanceFunction
+ * @assoc - - - CovarianceMatrix
  */
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
@@ -185,7 +185,7 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

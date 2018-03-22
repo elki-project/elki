@@ -29,9 +29,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @apiviz.landmark
+ * @opt nodefillcolor LemonChiffon
  *
- * @apiviz.has DoubleDBIDPair
+ * @has - - - DoubleDBIDPair
  */
 public interface DoubleDBIDListIter extends DBIDArrayIter {
   /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -155,7 +155,7 @@ public class ShortVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has ShortVector
+   * @has - - - ShortVector
    */
   public static class Factory implements NumberVector.Factory<ShortVector> {
     @Override
@@ -193,7 +193,7 @@ public class ShortVector implements NumberVector {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.exclude
+     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
@@ -210,7 +210,7 @@ public class ShortVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses ShortVector - - «serializes»
+   * @assoc - serializes - ShortVector
    */
   public static class ShortSerializer implements ByteBufferSerializer<ShortVector> {
     @Override
@@ -246,7 +246,7 @@ public class ShortVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses ShortVector - - «serializes»
+   * @assoc - serializes - ShortVector
    */
   public static class VariableSerializer implements ByteBufferSerializer<ShortVector> {
     @Override

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * @author Robert Rödler
  * @since 0.5.5
  * 
- * @apiviz.uses SVGPath
+ * @assoc - - - SVGPath
  */
 public final class SVGArrow {
   /**
@@ -45,7 +45,7 @@ public final class SVGArrow {
    * @author Erich Schubert
    * @author Robert Rödler
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public enum Direction {
     LEFT, DOWN, RIGHT, UP, // SWAPWITH, INSERT

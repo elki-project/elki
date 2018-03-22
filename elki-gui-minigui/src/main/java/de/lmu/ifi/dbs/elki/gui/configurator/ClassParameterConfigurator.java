@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses ClassParameter
+ * @assoc - - - ClassParameter
  */
 public class ClassParameterConfigurator extends AbstractSingleParameterConfigurator<ClassParameter<?>> implements ActionListener, ChangeListener {
   /**

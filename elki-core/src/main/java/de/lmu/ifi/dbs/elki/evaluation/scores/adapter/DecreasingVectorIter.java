@@ -32,7 +32,7 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.composedOf NumberVector
+ * @composed - - - NumberVector
  */
 public class DecreasingVectorIter extends AbstractVectorIter implements IntComparator {
   /**

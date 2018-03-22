@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has SkewGeneralizedNormalDistribution
+ * @has - - - SkewGeneralizedNormalDistribution
  */
 @Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
@@ -115,7 +115,7 @@ public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGen
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

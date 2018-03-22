@@ -481,7 +481,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   private static class Separation {
     /**
@@ -510,7 +510,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

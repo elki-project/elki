@@ -1,8 +1,8 @@
 /**
  * Prepared queries for distances
  *
- * @apiviz.exclude .*Instance
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.distance.*
+ * @opt hide .*Instance
+ * @opt hide de.lmu.ifi.dbs.elki.index.distance.*
  */
 /*
  * This file is part of ELKI:

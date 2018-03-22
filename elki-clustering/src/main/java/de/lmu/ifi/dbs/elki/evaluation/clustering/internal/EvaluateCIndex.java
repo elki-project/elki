@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf NoiseHandling
+ * @composed - - - NoiseHandling
  */
 @Reference(authors = "L. J. Hubert, J. R. Levin", //
     title = "A general statistical framework for assessing categorical clustering in free recall", //
@@ -267,7 +267,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @author Stephan Baier
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

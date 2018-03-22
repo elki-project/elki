@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,8 +58,8 @@ import net.jafama.FastMath;
  *
  * @param <V> vector type
  *
- * @apiviz.uses NumberVector
- * @apiviz.uses DistributionEstimator
+ * @assoc - - - NumberVector
+ * @assoc - - - DistributionEstimator
  */
 public class AttributeWiseBetaNormalization<V extends NumberVector> extends AttributeWiseCDFNormalization<V> {
   /**
@@ -155,7 +155,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

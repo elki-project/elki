@@ -186,7 +186,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends LPNormDistanceFunction.Parameterizer {
     /**

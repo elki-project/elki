@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.has DragListener
- * @apiviz.has Element
+ * @has - - - DragListener
+ * @has - - - Element
  */
 public class DragableArea implements EventListener {
   /**
@@ -329,7 +329,6 @@ public class DragableArea implements EventListener {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.excludeSubtypes
    */
   public interface DragListener {
     /**

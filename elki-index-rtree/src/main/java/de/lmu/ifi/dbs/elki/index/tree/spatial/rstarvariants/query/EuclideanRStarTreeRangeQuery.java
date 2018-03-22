@@ -46,8 +46,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses EuclideanDistanceFunction
- * @apiviz.uses SquaredEuclideanDistanceFunction
+ * @assoc - - - EuclideanDistanceFunction
+ * @assoc - - - SquaredEuclideanDistanceFunction
  */
 @Reference(authors = "J. Kuan, P. Lewis", //
     title = "Fast k nearest neighbour search for R-tree family", //

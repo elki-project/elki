@@ -53,7 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.composedOf Instance
+ * @composed - - - Instance
+ *
  * @param <O> the type of objects handled by the algorithm
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering (implementation using a heap)")
@@ -197,7 +198,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
     @Override

@@ -183,7 +183,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
     @Override

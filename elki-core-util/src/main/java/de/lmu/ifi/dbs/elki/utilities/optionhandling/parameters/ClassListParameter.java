@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.1
  *
- * @apiviz.uses ELKIServiceRegistry
+ * @assoc - - - ELKIServiceRegistry
  *
  * @param <C> Class type
  */

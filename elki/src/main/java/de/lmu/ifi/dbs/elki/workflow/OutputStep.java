@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @apiviz.uses ResultHierarchy
- * @apiviz.has ResultHandler
+ * @assoc - - - ResultHierarchy
+ * @has - - - ResultHandler
  */
 public class OutputStep implements WorkflowStep {
   /**
@@ -103,7 +103,7 @@ public class OutputStep implements WorkflowStep {
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

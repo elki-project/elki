@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses FlatRStarTreeIndex oneway - - «create»
+ * @stereotype factory
+ * @navassoc - create - FlatRStarTreeIndex
  * 
  * @param <O> Object type
  */
@@ -66,7 +66,7 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.exclude
+   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override

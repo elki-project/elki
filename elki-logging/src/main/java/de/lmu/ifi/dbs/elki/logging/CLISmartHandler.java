@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,10 +39,10 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @apiviz.composedOf ProgressTracker
- * @apiviz.uses LogRecord oneway - - processes
- * @apiviz.has Formatter
- * @apiviz.has OutputStreamLogger
+ * @composed - - - ProgressTracker
+ * @navassoc - processes - LogRecord
+ * @has - - - Formatter
+ * @has - - - OutputStreamLogger
  */
 public class CLISmartHandler extends Handler {
   /**

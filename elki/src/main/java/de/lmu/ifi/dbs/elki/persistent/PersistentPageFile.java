@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @apiviz.composedOf PageHeader
- * @apiviz.composedOf RandomAccessFile
+ * @composed - - - PageHeader
+ * @composed - - - RandomAccessFile
  * 
  * @param <P> Page type
  */

@@ -203,7 +203,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    *
    * @author Erich Schubert
    *
-   * @apiviz.exclude
+   * @hidden
    *
    * @param <O> Object type
    */
