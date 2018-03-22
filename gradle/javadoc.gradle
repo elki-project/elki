@@ -15,7 +15,16 @@ def getCommitHash() {
   return ""
 }
 
+// UMLgraph requires graphviz installed, and doesn't work with Java 11 yet.
+def useumlgraph = file('/usr/bin/dot').exists() && !JavaVersion.current().isJava11Compatible()
+
 subprojects {
+  if (useumlgraph) {
+    repositories { maven { url 'https://jitpack.io' } } // for UMLgraph only
+    configurations { umlgraph }
+    dependencies { umlgraph 'com.github.dspinellis:UMLGraph:132f389bcf' } // Via jitpack
+  }
+
   // Javadoc options
   javadoc {
     options {
@@ -50,15 +59,41 @@ subprojects {
         if (commit) footer += """ rev. $commit"""
         footer += """ built at $buildTime"""
       }
-      bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a><!-- so we get to know what people search for: --><script>if(window.location.hostname=="elki-project.github.io"){(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create","UA-87792924-1","auto");ga("send","pageview");}</script>"""
-      addBooleanOption('Xdoclint:none', true)
+      bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a><!-- so we get to know what people search for: --><script>if(window.location.hostname=="elki-project.github.io"||window.location.hostname=="jitpack.io"||window.location.hostname=="javadoc.io"){(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create","UA-87792924-1","auto");ga("send","pageview");}</script>"""
+      // Java 8 was very fragile with respect to HTML
+      if(JavaVersion.current().isJava8()) addBooleanOption('Xdoclint:none', true)
       // Add --allow-script-in-comments if available (some 1.8 versions only)
-      try {
-        if (Class.forName('com.sun.tools.doclets.formats.html.ConfigurationImpl').newInstance().optionLength('--allow-script-in-comments') > 0) {
-          addBooleanOption('-allow-script-in-comments').value = true
-        }
-      } catch (ignored) {}
-      if(JavaVersion.current().isJava9Compatible()) addBooleanOption('html4', true)
+      if(JavaVersion.current().isJava8Compatible()) { addBooleanOption('-allow-script-in-comments').value = true }
+      if(JavaVersion.current().isJava9()) addBooleanOption('html4', true)
+      // UMLgraph is optional - needs graphviz installed, and no Java 11+
+      if (useumlgraph) {
+        doclet = 'org.umlgraph.doclet.UmlGraphDoc'
+        docletpath = configurations.umlgraph.files.asType(List)
+          // addBooleanOption('inferrel', true) // Generates too many multi-edges
+          addBooleanOption('inferdep', true) // Generates too many multi-edges
+          addStringOption('inferdepvis', 'public')
+          // addBooleanOption('qualify', true) // too big with generics
+          addBooleanOption('postfixpackage', true)
+          addBooleanOption('horizontal', true)
+          addBooleanOption('compact', true)
+          addStringOption('hide', 'java.*|fastutil.*|org.apache.*')
+          addStringOption('collpackages', 'java.util.*|fastutil.*|de.lmu.ifi.dbs.elki.utilities.datastructures.*')
+          addStringOption('edgefontsize', '6')
+          addStringOption('edgefontname', 'sans')
+          addStringOption('nodefontsize', '8')
+          addStringOption('nodefontname', 'sans')
+          addStringOption('nodefontclassname', 'sans')
+          addStringOption('nodefontabstractname', 'sans')
+          addStringOption('nodefontclassabstractname', 'sans')
+          addStringOption('nodefontpackagesize', '6')
+          addStringOption('nodefontpackagename', 'sans')
+          addStringOption('nodefonttagname', 'sans')
+          addStringOption('nodefonttagsize', '6')
+          addStringOption('nodesep', '0.1')
+          addStringOption('ranksep', '0.2')
+          addStringOption('outputencoding', 'UTF-8')
+      }
+      tags("hidden:X", "opt:X", "has:X", "navhas:X", "assoc:X", "navassoc:X", "composed:X", "navcomposed:X", "stereotype:X", "depend:X")
     }
     inputs.property("options.footer","") // Ignore: depends on build time.
   }

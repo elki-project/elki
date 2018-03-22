@@ -84,7 +84,7 @@ shadowJar {
   notices.organizationName = "ELKI Development Team"
   notices.organizationURL = "https://elki-project.github.io/"
   notices.inceptionYear = "2005"
-  notices.copyright = "ELKI Data Mining Framework\nCopyright 2016 ELKI Development Team (https://elki-project.github.io/)\nand distributed under the GNU Affero General Public License (AGPL-3+).\n"
+  notices.copyright = "ELKI Data Mining Framework\nCopyright ${year} ELKI Development Team (https://elki-project.github.io/)\nand distributed under the GNU Affero General Public License (AGPL-3+).\n"
   transform notices
   // We compile our own licensing information, as these tend to clash
   exclude "META-INF/license/**"
