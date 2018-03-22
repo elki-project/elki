@@ -7,9 +7,18 @@ eclipse.project.name = 'elki-project'
 // Try to get a git commit id for javadoc
 def getCommitHash() {
   if(!new File(".git").exists()) return ""
-  def head = new File(".git", "HEAD").text.split(":")
-  if (head.length == 1) return head[0].trim().take(12)
-  return new File(".git", head[1].trim()).text.take(12)
+  // requires git installed
+  try {
+    def best = 'git rev-parse HEAD'.execute().text
+    if(best != null && best.length > 5) return best
+  } catch (Exception e) {}
+  // No longer works reliably, because of packed references.
+  try {
+    def head = new File(".git", "HEAD").text.split(":")
+    if (head.length == 1) return head[0].trim().take(12)
+    return new File(".git", head[1].trim()).text.take(12)
+  } catch (Exception e) {}
+  return ""
 }
 
 import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
@@ -253,19 +262,16 @@ eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
 if(project.hasProperty('jacoco')) {
   task codeCoverageReport(type: JacocoReport) {
     dependsOn tasks.test
-    executionData = files()
     subprojects.each {
       dependsOn it.tasks.test
       sourceSets it.sourceSets.main
     }
-    doFirst {
-      executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-      executionData = files(executionData.findAll { it.exists() })
-    }
+    executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
     reports {
       html.enabled = true
       xml.enabled = true
+      csv.enabled = false
       xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
     }
   }
