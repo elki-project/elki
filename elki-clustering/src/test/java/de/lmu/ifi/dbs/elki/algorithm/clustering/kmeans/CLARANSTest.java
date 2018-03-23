@@ -33,13 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for CLARANS
  *
  * @author Erich Schubert
- * @since 0.4.0
  */
 public class CLARANSTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run CLARA with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCLARANS() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
@@ -51,5 +46,18 @@ public class CLARANSTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, result, 0.996);
     testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+  }
+
+  @Test
+  public void testCLARANSNoise() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<MedoidModel> result = new ELKIBuilder<CLARANS<DoubleVector>>(CLARANS.class) //
+        .with(KMeans.K_ID, 3) //
+        .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
+        .with(CLARANS.Parameterizer.NEIGHBORS_ID, .1) //
+        .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
+        .build().run(db);
+    testFMeasure(db, result, 0.913858);
+    testClusterSizes(result, new int[] { 57, 115, 158 });
   }
 }

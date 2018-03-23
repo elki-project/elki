@@ -57,9 +57,15 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * and CLARA and also based on sampling.
  *
  * This implementation tries to balance memory and computation time.
- * By caching the distances to the two nearest medoids, we only need
+ * By caching the distances to the two nearest medoids, we usually only need
  * O(n) instead of O(nk) distance computations for one iteration, at
  * the cost of needing O(2n) memory to store them.
+ *
+ * The implementation is fairly ugly, because we have three solutions (the best
+ * found so far, the current solution, and a neighbor candidate); and for each
+ * point in each solution we need the best and second best assignments. But with
+ * Java 11, we may be able to switch to value types that would clean this code
+ * significantly, without the overhead of O(n) objects.
  *
  * Reference:
  * <p>
@@ -145,7 +151,6 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     // 1. initialize
     double bestscore = Double.POSITIVE_INFINITY;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("CLARANS sampling restarts", numlocal, LOG) : null;
-    DBIDVar oldmed = DBIDUtil.newVar();
     for(int i = 0; i < numlocal; i++) {
       // 2. choose random initial medoids
       // TODO: should we always use uniform sampling, to be closer to the paper?
@@ -161,7 +166,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         for(int r = 0;; r++) {
           cand.seek(rnd.nextInt(ids.size())); // Random point
           if(curr.nearest.doubleValue(cand) > 0) {
-            break; // Not a medoid.
+            break; // Good: not a medoid.
           }
           // We may have many duplicate points
           if(metric && curr.second.doubleValue(cand) == 0) {
@@ -169,24 +174,22 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
             continue step;
           }
           else if(!metric && !curr.medoids.contains(cand)) {
-            break; // Try nevertheless.
+            // Probably not a good candidate, but try nevertheless
+            break;
           }
-          if(r > 1000) {
-            throw new AbortException("Failed to choose a non-medoid. Choose k << N.");
+          if(r >= 1000) {
+            throw new AbortException("Failed to choose a non-medoid in 1000 attempts. Choose k << N.");
           }
           // else: this must be the medoid.
         }
-        // Get the old medoid:
-        curr.medoids.assignVar(curr.assignment.intValue(cand), oldmed);
         // 4 part b. choose a random medoid to replace:
         final int otherm = rnd.nextInt(k);
         // 5. check lower cost
         double cost = curr.computeCostDifferential(cand, otherm, scratch);
-        if(cost >= 0) {
+        if(!(cost < 0)) {
           ++j; // 6. try again
           continue;
         }
-        assert (cost < 0); // NaN?
         total += cost; // cost is negative!
         // Swap:
         Assignment tmp = curr;
@@ -194,6 +197,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         scratch = tmp;
         j = 1;
       }
+      // New best:
       if(total < bestscore) {
         // Swap:
         Assignment tmp = curr;
@@ -217,7 +221,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
   }
 
   /**
-   * Instance for a particular dataset.
+   * Assignment state.
    * 
    * @author Erich Schubert
    */
@@ -248,9 +252,20 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     WritableIntegerDataStore assignment;
 
     /**
+     * Medoid id of the second closest. Needs some more memory, but saves
+     * recomputations in the common case where not much changed.
+     */
+    WritableIntegerDataStore secondid;
+
+    /**
      * Medoids
      */
     ArrayModifiableDBIDs medoids;
+
+    /**
+     * Medoid iterator
+     */
+    DBIDArrayMIter miter;
 
     /**
      * Constructor.
@@ -263,8 +278,10 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
       this.distQ = distQ;
       this.ids = ids;
       this.medoids = medoids;
+      this.miter = medoids.iter();
       this.assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
       this.nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+      this.secondid = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
       this.second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     }
 
@@ -277,6 +294,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * @return Cost change
      */
     protected double computeCostDifferential(DBIDRef h, int mnum, Assignment scratch) {
+      // Update medoids of scratch copy.
       scratch.medoids.clear();
       scratch.medoids.addDBIDs(medoids);
       scratch.medoids.set(mnum, h);
@@ -284,7 +302,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
         if(DBIDUtil.equal(h, j)) {
-          scratch.recompute(j);
+          scratch.recompute(j, mnum, 0., -1, Double.POSITIVE_INFINITY);
           continue;
         }
         // distance(j, i) to nearest medoid
@@ -303,25 +321,39 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
             scratch.assignment.putInt(j, mnum);
             scratch.nearest.putDouble(j, dist_h);
             scratch.second.putDouble(j, distsec);
+            scratch.secondid.putInt(j, jcur);
           }
           else {
+            // Second nearest is the new assignment.
             cost += distsec - distcur;
-            // TODO: don't recompute dist_h, distsec
-            scratch.recompute(j);
+            // We have to recompute, because we do not know the true new second
+            // nearest.
+            scratch.recompute(j, mnum, dist_h, jcur, distsec);
           }
         }
         else if(dist_h < distcur) {
           // Case 1c: j is closer to h than its current medoid
+          // and the current medoid is not removed (jcur != mnum).
           cost += dist_h - distcur;
+          // Second nearest is the previous assignment
           scratch.assignment.putInt(j, mnum);
           scratch.nearest.putDouble(j, dist_h);
           scratch.second.putDouble(j, distcur);
+          scratch.secondid.putInt(j, jcur);
         }
         else { // else Case 1a): j is closer to i than h and m, so no change.
-          // scratch.assignment.putInt(j, jcur);
-          // scratch.nearest.putDouble(j, distcur);
-          // TODO: don't recompute dist_h, distcur
-          scratch.recompute(j);
+          final int jsec = secondid.intValue(j);
+          final double distsec = second.doubleValue(j);
+          // Second nearest is still valid.
+          if(jsec != mnum && distsec <= dist_h) {
+            scratch.assignment.putInt(j, jcur);
+            scratch.nearest.putDouble(j, distcur);
+            scratch.secondid.putInt(j, jsec);
+            scratch.second.putDouble(j, distsec);
+          }
+          else {
+            scratch.recompute(j, jcur, distcur, mnum, dist_h);
+          }
         }
       }
       return cost;
@@ -331,28 +363,38 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * Recompute the assignment of one point.
      *
      * @param id Point id
+     * @param mnum Medoid number for known distance
+     * @param known Known distance
+     * @return cost
      */
-    private void recompute(DBIDRef id) {
-      double mindist = Double.POSITIVE_INFINITY,
+    private double recompute(DBIDRef id, int mnum, double known, int snum, double sknown) {
+      double mindist = mnum >= 0 ? known : Double.POSITIVE_INFINITY,
           mindist2 = Double.POSITIVE_INFINITY;
-      int minIndex = -1;
-      for(DBIDArrayIter miter = medoids.iter(); miter.valid(); miter.advance()) {
-        final double dist = distQ.distance(id, miter);
+      int minIndex = mnum, minIndex2 = -1;
+      for(int i = 0; miter.seek(i).valid(); i++) {
+        if(i == mnum) {
+          continue;
+        }
+        final double dist = i == snum ? sknown : distQ.distance(id, miter);
         if(DBIDUtil.equal(id, miter) || dist < mindist) {
+          minIndex2 = minIndex;
           mindist2 = mindist;
-          minIndex = miter.getOffset();
+          minIndex = i;
           mindist = dist;
         }
         else if(dist < mindist2) {
+          minIndex2 = i;
           mindist2 = dist;
         }
       }
       if(minIndex < 0) {
         throw new AbortException("Too many infinite distances. Cannot assign objects.");
       }
-      assignment.put(id, minIndex);
+      assignment.putInt(id, minIndex);
       nearest.putDouble(id, mindist);
+      secondid.putInt(id, minIndex2);
       second.putDouble(id, mindist2);
+      return mindist;
     }
 
     /**
@@ -361,30 +403,9 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * @return Assignment cost
      */
     protected double assignToNearestCluster() {
-      DBIDArrayIter miter = medoids.iter();
       double cost = 0.;
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        double mindist = Double.POSITIVE_INFINITY,
-            mindist2 = Double.POSITIVE_INFINITY;
-        int minIndex = -1;
-        for(miter.seek(0); miter.valid(); miter.advance()) {
-          final double dist = distQ.distance(iditer, miter);
-          if(DBIDUtil.equal(iditer, miter) || dist < mindist) {
-            mindist2 = mindist;
-            minIndex = miter.getOffset();
-            mindist = dist;
-          }
-          else if(dist < mindist2) {
-            mindist2 = dist;
-          }
-        }
-        if(minIndex < 0) {
-          throw new AbortException("Too many infinite distances. Cannot assign objects.");
-        }
-        assignment.putInt(iditer, minIndex);
-        nearest.putDouble(iditer, mindist);
-        second.putDouble(iditer, mindist2);
-        cost += mindist;
+        cost += recompute(iditer, -1, Double.POSITIVE_INFINITY, -1, Double.POSITIVE_INFINITY);
       }
       return cost;
     }
