@@ -26,7 +26,6 @@
  * </ul></li>
  * <li>Output-related:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.io.FormatUtil}: output formatting.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.batikutil.BatikUtil}: Apache Batik SVG utilities (coordinate transforms screen to canvas).</li>
  * </ul></li>

@@ -212,8 +212,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
-   * @param means a list of k means
+   *
+   * @param miter Iterator over the medoids
    * @param dsum Distance sums
    * @param clusters cluster assignment
    * @param distQ distance query

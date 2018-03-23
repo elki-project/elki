@@ -114,7 +114,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
    * 
    * @param database
    * @param rel
-   * @return
+   * @return Distances sample
    */
   public CollectionResult<double[]> run(Database database, Relation<O> rel) {
     DistanceQuery<O> dq = rel.getDistanceQuery(getDistanceFunction());

@@ -331,8 +331,8 @@ public class NormalDistribution extends AbstractDistribution {
    * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br />
    * "You may use, copy, modify this code for any purpose and without fee."
    * 
-   * @param x parameter value
-   * @return erfcinv(x)
+   * @param y parameter value
+   * @return erfcinv(y)
    */
   @Reference(authors = "T. Ooura", //
       title = "Gamma / Error Functions", //

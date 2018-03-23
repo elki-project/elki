@@ -71,7 +71,6 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * Constructor.
    *
    * @param distanceFunction Distance function to use
-   * @param linkage Linkage method
    */
   public MiniMaxAnderberg(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);

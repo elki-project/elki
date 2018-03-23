@@ -38,13 +38,11 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  */
 public interface SimilarityIndex<O> extends Index {
   /**
-   * Get a KNN query object for the given distance query and k.
+   * Get a similarity query object for the given similarity function.
    *
-   * This function MAY return null, when the given distance is not supported!
-   *
-   * @param distanceFunction Distance function to use.
+   * @param simFunction Similarity function to use.
    * @param hints Hints for the optimizer
-   * @return KNN Query object or {@code null}
+   * @return similarity query object or {@code null}
    */
   SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> simFunction, Object... hints);
 }

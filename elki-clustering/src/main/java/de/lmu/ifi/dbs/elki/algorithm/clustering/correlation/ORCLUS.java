@@ -445,7 +445,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
      * 
      * @param o the object belonging to this cluster.
      * @param id Object id
-     * @param factory Factory object / prototype
      */
     ORCLUSCluster(double[] o, DBIDRef id) {
       this.centroid = o;

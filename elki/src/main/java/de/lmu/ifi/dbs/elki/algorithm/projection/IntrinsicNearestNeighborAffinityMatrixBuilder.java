@@ -123,7 +123,6 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param knnq kNN query
    * @param square Use squared distances
    * @param numberOfNeighbours Number of neighbors to get
-   * @param sigma Desired perplexity
    * @param pij Output of distances
    * @param indices Output of indexes
    * @param initialScale Initial scaling factor

@@ -113,7 +113,6 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    *
    * @param distanceFunction Distance function to use
    * @param k Number of clusters to produce
-   * @param maxiter Maximum number of iterations
    * @param numlocal Number of samples (restarts)
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
@@ -289,7 +288,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * Compute the reassignment cost, for one swap.
      *
      * @param h Current object to swap with any medoid.
-     * @param hcur Current cluster assignment of h.
+     * @param mnum Current cluster assignment of h.
      * @param scratch Scratch assignment to fill.
      * @return Cost change
      */

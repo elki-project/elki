@@ -234,7 +234,7 @@ public class QRDecomposition implements java.io.Serializable {
   /**
    * Least squares solution of A*X = B
    * 
-   * @param B A Matrix with as many rows as A and any number of columns.
+   * @param B The matrix B with as many rows as A and any number of columns.
    * @return X that minimizes the two norm of Q*R*X-B.
    * @throws IllegalArgumentException Matrix row dimensions must agree.
    * @throws ArithmeticException Matrix is rank deficient.
@@ -247,13 +247,13 @@ public class QRDecomposition implements java.io.Serializable {
   /**
    * Least squares solution of A*X = B
    * 
-   * @param B A Matrix with as many rows as A and any number of columns.
+   * @param B The matrix B with as many rows as A and any number of columns (will be overwritten).
    * @return X that minimizes the two norm of Q*R*X-B.
    * @throws IllegalArgumentException Matrix row dimensions must agree.
    * @throws ArithmeticException Matrix is rank deficient.
    */
-  private double[][] solveInplace(double[][] X) {
-    int rows = X.length, nx = X[0].length;
+  private double[][] solveInplace(double[][] B) {
+    int rows = B.length, nx = B[0].length;
     if(rows != m) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
@@ -265,29 +265,29 @@ public class QRDecomposition implements java.io.Serializable {
       for(int j = 0; j < nx; j++) {
         double s = 0.0;
         for(int i = k; i < m; i++) {
-          s += QR[i][k] * X[i][j];
+          s += QR[i][k] * B[i][j];
         }
         s /= QR[k][k];
         for(int i = k; i < m; i++) {
-          X[i][j] -= s * QR[i][k];
+          B[i][j] -= s * QR[i][k];
         }
       }
     }
     // Solve R*X = Y;
     for(int k = n - 1; k >= 0; k--) {
-      final double[] Xk = X[k];
+      final double[] Xk = B[k];
       for(int j = 0; j < nx; j++) {
         Xk[j] /= Rdiag[k];
       }
       for(int i = 0; i < k; i++) {
-        final double[] Xi = X[i];
+        final double[] Xi = B[i];
         final double QRik = QR[i][k];
         for(int j = 0; j < nx; j++) {
           Xi[j] -= Xk[j] * QRik;
         }
       }
     }
-    return X;
+    return B;
   }
 
   /**
@@ -306,13 +306,13 @@ public class QRDecomposition implements java.io.Serializable {
   /**
    * Least squares solution of A*X = b
    * 
-   * @param b A column vector with as many rows as A.
+   * @param b A column vector b with as many rows as A.
    * @return X that minimizes the two norm of Q*R*X-b.
    * @throws IllegalArgumentException Matrix row dimensions must agree.
    * @throws ArithmeticException Matrix is rank deficient.
    */
-  public double[] solveInplace(double[] x) {
-    if(x.length != m) {
+  public double[] solveInplace(double[] b) {
+    if(b.length != m) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(!this.isFullRank()) {
@@ -322,22 +322,22 @@ public class QRDecomposition implements java.io.Serializable {
     for(int k = 0; k < n; k++) {
       double s = 0.0;
       for(int i = k; i < m; i++) {
-        s += QR[i][k] * x[i];
+        s += QR[i][k] * b[i];
       }
       s /= QR[k][k];
       for(int i = k; i < m; i++) {
-        x[i] -= s * QR[i][k];
+        b[i] -= s * QR[i][k];
       }
     }
     // Solve R*X = Y;
     for(int k = n - 1; k >= 0; k--) {
-      x[k] /= Rdiag[k];
+      b[k] /= Rdiag[k];
       for(int i = 0; i < k; i++) {
         final double QRik = QR[i][k];
-        x[i] -= x[k] * QRik;
+        b[i] -= b[k] * QRik;
       }
     }
-    return x;
+    return b;
   }
 
   /**

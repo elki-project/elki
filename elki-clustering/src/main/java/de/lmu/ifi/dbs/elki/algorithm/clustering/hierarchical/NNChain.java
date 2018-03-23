@@ -110,7 +110,6 @@ public class NNChain<O> extends AGNES<O> {
    * algorithms" by Daniel Müllner
    * 
    * @param mat Matrix view
-   * @param dq distance query of the data set
    * @param builder Result builder
    */
   private void nnChainCore(MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {

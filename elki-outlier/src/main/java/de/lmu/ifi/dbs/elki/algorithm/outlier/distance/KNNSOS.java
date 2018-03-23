@@ -115,8 +115,8 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
   /**
    * Run the algorithm.
    * 
-   * @param relation data relation.
-   * @return
+   * @param relation data relation
+   * @return outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
     final int k1 = k + 1; // Query size

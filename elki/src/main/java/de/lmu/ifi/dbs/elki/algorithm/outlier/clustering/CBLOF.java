@@ -213,9 +213,11 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * Compute the CBLOF scores for all the data.
    *
    * @param relation Data to process
-   * @param distanceQuery The query object to be used for distance calculations
+   * @param distance The distance function
    * @param cblofs CBLOF scores
    * @param cblofMinMax Minimum/maximum score tracker
+   * @param largeClusters Large clusters output 
+   * @param smallClusters Small clusters output
    */
   private void computeCBLOFs(Relation<O> relation, NumberVectorDistanceFunction<? super O> distance, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {
     List<NumberVector> largeClusterMeans = new ArrayList<>(largeClusters.size());

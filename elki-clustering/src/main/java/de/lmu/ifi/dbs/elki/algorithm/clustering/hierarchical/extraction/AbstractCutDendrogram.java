@@ -77,7 +77,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    *
    * @param algorithm Algorithm
    * @param hierarchical Extract hierarchical result
-   * @param nosingletons Singletons
    */
   public AbstractCutDendrogram(HierarchicalClusteringAlgorithm algorithm, boolean hierarchical) {
     super();
@@ -161,8 +160,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
 
     /**
      * Extract all clusters from the pi-lambda-representation.
-     *
-     * @param pointerresult Result in pointer representation
      *
      * @return Hierarchical clustering
      */

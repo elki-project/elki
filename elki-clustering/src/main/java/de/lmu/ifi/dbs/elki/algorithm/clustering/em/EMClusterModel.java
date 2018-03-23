@@ -76,7 +76,7 @@ public interface EMClusterModel<M extends MeanModel> {
   /**
    * Finalize the E step.
    * 
-   * @param Weight of the cluster
+   * @param weight weight of the cluster
    * @param prior MAP prior (0 for MLE)
    */
   void finalizeEStep(double weight, double prior);

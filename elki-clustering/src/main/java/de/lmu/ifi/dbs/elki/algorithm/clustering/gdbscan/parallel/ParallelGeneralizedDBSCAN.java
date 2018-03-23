@@ -234,8 +234,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      * Full Constructor
      *
      * @param database Database to process
-     * @param t Type information
-     * @param npred Neighborhood predicates
+     * @param npreds Neighborhood predicate
      * @param corepred Core object predicate
      * @param coremodel Keep track of core points.
      */

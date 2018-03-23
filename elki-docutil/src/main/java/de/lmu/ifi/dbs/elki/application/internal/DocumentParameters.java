@@ -788,10 +788,10 @@ public class DocumentParameters {
   /**
    * Get the restriction class of an option.
    *
-   * @param oid
-   * @param firstopt
-   * @param byopt
-   * @return
+   * @param oid Option ID
+   * @param firstopt Parameter
+   * @param byopt Option to parameter map
+   * @return Restriction class
    */
   private static Class<?> getRestrictionClass(OptionID oid, final Parameter<?> firstopt, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     Class<?> superclass;

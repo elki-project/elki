@@ -102,17 +102,17 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
   private static final Logging LOG = Logging.getLogger(CLIQUE.class);
 
   /**
-   * Holds the value of {@link #XSI_ID}.
+   * Holds the value of {@link Parameterizer#XSI_ID}.
    */
   private int xsi;
 
   /**
-   * Holds the value of {@link #TAU_ID}.
+   * Holds the value of {@link Parameterizer#TAU_ID}.
    */
   private double tau;
 
   /**
-   * Holds the value of {@link #PRUNE_ID}.
+   * Holds the value of {@link Parameterizer#PRUNE_ID}.
    */
   private boolean prune;
 

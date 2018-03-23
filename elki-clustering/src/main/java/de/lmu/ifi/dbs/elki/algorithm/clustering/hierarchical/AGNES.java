@@ -217,10 +217,10 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   /**
    * Perform the next merge step in AGNES.
    *
-   * @param end Avtive set size
-   * @param scratch Scratch space.
+   * @param end Active set size
+   * @param mat Matrix storage
    * @param builder Pointer representation builder
-   * @return x, for shrinking the working set.
+   * @return the index that has disappeared, for shrinking the working set
    */
   protected int findMerge(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {
     assert (end > 0);

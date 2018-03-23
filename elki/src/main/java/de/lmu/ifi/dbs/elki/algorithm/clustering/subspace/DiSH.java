@@ -215,7 +215,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   /**
    * Log cluster sizes in verbose mode.
    * 
-   * @param msg Log message
+   * @param m Log message
    * @param dimensionality Dimensionality
    * @param clustersMap Cluster map
    */

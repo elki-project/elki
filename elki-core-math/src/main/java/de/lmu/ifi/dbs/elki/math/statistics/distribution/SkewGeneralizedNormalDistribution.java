@@ -76,9 +76,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @param skew Skew
    * @param random Random generator
    */
-  public SkewGeneralizedNormalDistribution(double log, double scale, double skew, Random random) {
+  public SkewGeneralizedNormalDistribution(double loc, double scale, double skew, Random random) {
     super(random);
-    this.loc = log;
+    this.loc = loc;
     this.scale = scale;
     this.skew = skew;
   }

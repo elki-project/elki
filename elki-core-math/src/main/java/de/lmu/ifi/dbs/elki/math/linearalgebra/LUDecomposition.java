@@ -270,7 +270,7 @@ public class LUDecomposition implements java.io.Serializable {
   /**
    * Solve A*X = b
    * 
-   * @param B A column vector with as many rows as A
+   * @param b A column vector with as many rows as A
    * @return X so that L*U*X = b(piv)
    * @throws IllegalArgumentException Matrix row dimensions must agree.
    * @throws ArithmeticException Matrix is singular.

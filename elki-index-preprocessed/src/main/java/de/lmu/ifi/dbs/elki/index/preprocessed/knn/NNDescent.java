@@ -405,10 +405,11 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
   /**
    * samples newNeighbors for every object
-   * 
+   *
+   * @param ids All ids
    * @param sampleNewNeighbors Output of sampled new neighbors
-   * @param store - neighbors for every object
    * @param newNeighborHash - new neighbors for every object
+   * @param items Number of items to collect
    * @return Number of new neighbors
    */
   private int sampleNew(DBIDs ids, WritableDataStore<HashSetModifiableDBIDs> sampleNewNeighbors, WritableDataStore<HashSetModifiableDBIDs> newNeighborHash, int items) {
@@ -435,20 +436,16 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * calculates new and old neighbors for database
    * 
-   * @param store - neighbors for every object
-   * @param sampleNewHash - new neighbors for every object
+   * @param sampleNewHash new neighbors for every object
+   * @param newReverseNeighbors new reverse neighbors
+   * @param oldReverseNeighbors old reverse neighbors
    */
   private void reverse(WritableDataStore<HashSetModifiableDBIDs> sampleNewHash, WritableDataStore<HashSetModifiableDBIDs> newReverseNeighbors, WritableDataStore<HashSetModifiableDBIDs> oldReverseNeighbors) {
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNHeap heap = store.get(iditer);
       HashSetDBIDs newNeighbors = sampleNewHash.get(iditer);
       for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-        if(newNeighbors.contains(heapiter)) {
-          newReverseNeighbors.get(heapiter).add(iditer);
-        }
-        else {
-          oldReverseNeighbors.get(heapiter).add(iditer);
-        }
+        (newNeighbors.contains(heapiter) ? newReverseNeighbors : oldReverseNeighbors).get(heapiter).add(iditer);
       }
     }
   }

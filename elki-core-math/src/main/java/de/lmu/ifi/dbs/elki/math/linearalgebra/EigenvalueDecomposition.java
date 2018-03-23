@@ -84,6 +84,57 @@ public class EigenvalueDecomposition {
   private double[] ort;
 
   /**
+   * Check for symmetry, then construct the eigenvalue decomposition
+   *
+   * @param A Square matrix
+   */
+  public EigenvalueDecomposition(double[][] A) {
+    n = A.length;
+    V = new double[n][n];
+    d = new double[n];
+    e = new double[n];
+  
+    boolean issymmetric = true;
+    for(int j = 0; (j < n) && issymmetric; j++) {
+      for(int i = 0; (i < n) && issymmetric; i++) {
+        issymmetric = (A[i][j] == A[j][i]);
+        if(Double.isNaN(A[i][j])) {
+          throw new IllegalArgumentException("NaN in EigenvalueDecomposition!");
+        }
+        if(Double.isInfinite(A[i][j])) {
+          throw new IllegalArgumentException("+-inf in EigenvalueDecomposition!");
+        }
+      }
+    }
+  
+    if(issymmetric) {
+      for(int i = 0; i < n; i++) {
+        System.arraycopy(A[i], 0, V[i], 0, n);
+      }
+  
+      // Tridiagonalize.
+      tred2();
+  
+      // Diagonalize.
+      tql2();
+    }
+    else {
+      H = new double[n][n];
+      ort = new double[n];
+  
+      for(int i = 0; i < n; i++) {
+        System.arraycopy(A[i], 0, H[i], 0, n);
+      }
+  
+      // Reduce to Hessenberg form.
+      orthes();
+  
+      // Reduce Hessenberg to real Schur form.
+      hqr2();
+    }
+  }
+
+  /**
    * Symmetric Householder reduction to tridiagonal form.
    */
   private void tred2() {
@@ -795,65 +846,6 @@ public class EigenvalueDecomposition {
     }
   }
 
-  /*
-   * ------------------------ Constructor ------------------------
-   */
-
-  /**
-   * Check for symmetry, then construct the eigenvalue decomposition
-   *
-   * @param Arg Square matrix
-   */
-  public EigenvalueDecomposition(double[][] A) {
-    n = A.length;
-    V = new double[n][n];
-    d = new double[n];
-    e = new double[n];
-
-    boolean issymmetric = true;
-    for(int j = 0; (j < n) && issymmetric; j++) {
-      for(int i = 0; (i < n) && issymmetric; i++) {
-        issymmetric = (A[i][j] == A[j][i]);
-        if(Double.isNaN(A[i][j])) {
-          throw new IllegalArgumentException("NaN in EigenvalueDecomposition!");
-        }
-        if(Double.isInfinite(A[i][j])) {
-          throw new IllegalArgumentException("+-inf in EigenvalueDecomposition!");
-        }
-      }
-    }
-
-    if(issymmetric) {
-      for(int i = 0; i < n; i++) {
-        System.arraycopy(A[i], 0, V[i], 0, n);
-      }
-
-      // Tridiagonalize.
-      tred2();
-
-      // Diagonalize.
-      tql2();
-    }
-    else {
-      H = new double[n][n];
-      ort = new double[n];
-
-      for(int i = 0; i < n; i++) {
-        System.arraycopy(A[i], 0, H[i], 0, n);
-      }
-
-      // Reduce to Hessenberg form.
-      orthes();
-
-      // Reduce Hessenberg to real Schur form.
-      hqr2();
-    }
-  }
-
-  /*
-   * ------------------------ Public Methods ------------------------
-   */
-
   /**
    * Return the eigenvector matrix
    *
@@ -890,13 +882,9 @@ public class EigenvalueDecomposition {
     double[][] D = new double[n][n];
     for(int i = 0; i < n; i++) {
       final double[] D_i = D[i];
+      final double e_i = e[i];
       D_i[i] = d[i];
-      if(e[i] > 0) {
-        D_i[i + 1] = e[i];
-      }
-      else if(e[i] < 0) {
-        D_i[i - 1] = e[i];
-      }
+      D_i[e_i > 0 ? i + 1 : i - 1] = e_i;
     }
     return D;
   }

@@ -243,7 +243,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Compute density for cluster model at given double[] p-
    *
-   * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#getDensity(de.lmu.ifi.dbs.elki.math.linearalgebra.double[])
+   * @see GeneratorInterface#getDensity(double[])
    */
   @Override
   public double getDensity(double[] p) {

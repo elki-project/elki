@@ -273,7 +273,6 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param dq distance query on the data set
    * @param x index of cluster, x > y
    * @param y index of cluster, y < x
-   * @param dimensions number of dimensions
    */
   protected static void updateEntry(MatrixParadigm mat, DBIDArrayMIter prots, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);

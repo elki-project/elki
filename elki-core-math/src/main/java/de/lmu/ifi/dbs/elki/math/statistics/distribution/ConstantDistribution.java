@@ -56,7 +56,7 @@ public class ConstantDistribution implements Distribution {
    * Probability mass function.
    *
    * @param val Value
-   * @return
+   * @return probability mass pmf(val)
    */
   public double pmf(double val) {
     return (val == c) ? 1. : 0;

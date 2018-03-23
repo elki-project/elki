@@ -364,7 +364,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
      * @param data Input data
      * @param begin Subset begin
      * @param end Subset end
-     * @param cur Current dimension
+     * @param initdim Current dimension
      * @param dims Data dimensionality
      * @param minmax Bounding box
      * @param singletons Output for singletons

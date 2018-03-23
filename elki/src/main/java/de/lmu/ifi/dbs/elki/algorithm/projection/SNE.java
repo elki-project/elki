@@ -134,9 +134,8 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
   /**
    * Constructor with default values.
    *
-   * @param distanceFunction Distance function
+   * @param affinity Affinity matrix builder
    * @param dim Output dimensionality
-   * @param perplexity Desired perplexity
    * @param random Random generator
    */
   public SNE(AffinityMatrixBuilder<? super O> affinity, int dim, RandomFactory random) {
@@ -146,9 +145,8 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param affinity Affinity matrix builder
    * @param dim Output dimensionality
-   * @param perplexity Desired perplexity
    * @param finalMomentum Final momentum
    * @param learningRate Learning rate
    * @param iterations Number of iterations

@@ -207,7 +207,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Set (OR) the update flags.
    *
-   * @param bits Bits to set
+   * @param f update flag
    * @return {@code this}, for method chaining.
    */
   public VisualizationTask with(UpdateFlag f) {
@@ -218,7 +218,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Update if any oft these bits is set.
    *
-   * @param bits Bits to check.
+   * @param f update flag
    * @return {@code true} if any bit is set.
    */
   public boolean has(UpdateFlag f) {
@@ -228,7 +228,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Set a task flag.
    *
-   * @param bits Flag to set
+   * @param f render flag
    * @return {@code this}, for method chaining.
    */
   public VisualizationTask with(RenderFlag f) {
@@ -239,7 +239,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Update if any oft these flags is set.
    *
-   * @param bits Bits to check.
+   * @param f render flag
    * @return {@code true} if any bit is set.
    */
   public boolean has(RenderFlag f) {

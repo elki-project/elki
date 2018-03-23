@@ -235,7 +235,7 @@ public class VisualizerParameterizer {
      * <li>print</li>
      * </ul>
      * These are {@code *.properties} files in the package
-     * {@link de.lmu.ifi.dbs.elki.visualization.style}.
+     * {@code de.lmu.ifi.dbs.elki.visualization.style}.
      * </p>
      */
     public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");

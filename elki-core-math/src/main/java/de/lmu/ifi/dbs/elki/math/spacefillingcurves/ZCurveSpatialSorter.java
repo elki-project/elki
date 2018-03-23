@@ -116,7 +116,6 @@ public class ZCurveSpatialSorter implements SpatialSorter {
    * @param dim Dimension to sort by
    * @param threshold Threshold value
    * @param desc Inversion flag
-   * @param <T> Object type
    * @return Pivot position
    */
   protected static int pivotizeList1D(List<? extends SpatialComparable> objs, int start, int end, int dim, double threshold, boolean desc) {

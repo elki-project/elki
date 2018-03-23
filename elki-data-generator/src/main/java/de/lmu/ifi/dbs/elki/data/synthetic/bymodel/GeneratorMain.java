@@ -311,7 +311,7 @@ public class GeneratorMain {
      *
      * @param generators Generators
      * @param labels Labels ({@code null} if not needed)
-     * @return
+     * @return Cluster centers
      */
     private double[][] clusterCenters(ArrayList<GeneratorInterface> generators, ClassLabel[] labels) {
       final int l = generators.size();

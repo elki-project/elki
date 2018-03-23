@@ -114,7 +114,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * Run the algorithm.
    * 
    * @param relation data relation.
-   * @return
+   * @return outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
     final int k1 = k + 1; // Query size

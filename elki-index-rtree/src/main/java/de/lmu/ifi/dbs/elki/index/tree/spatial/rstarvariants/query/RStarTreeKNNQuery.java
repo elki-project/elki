@@ -234,7 +234,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.hidden
+   * @apiviz.exclude
    */
   static class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
     /**

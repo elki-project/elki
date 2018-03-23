@@ -105,8 +105,8 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   /**
    * Run the algorithm.
    * 
-   * @param relation data relation.
-   * @return
+   * @param relation data relation
+   * @return outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
     DistanceQuery<O> dq = relation.getDistanceQuery(getDistanceFunction());
