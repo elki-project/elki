@@ -1,4 +1,4 @@
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.WardLinkage de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod ward
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.WardLinkage de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod ward MISSQ
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.SingleLinkage de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SingleLinkageMethod single-link single slink nearest nearest-neighbor
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.CompleteLinkage de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CompleteLinkageMethod complete clink complete-link farthest-neighbor
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.GroupAverageLinkage de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod upgma average average-link average-linkage UPGMA
