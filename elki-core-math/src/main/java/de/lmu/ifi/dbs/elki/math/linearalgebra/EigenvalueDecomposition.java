@@ -881,15 +881,15 @@ public class EigenvalueDecomposition {
   public double[][] getD() {
     double[][] D = new double[n][n];
     for(int i = 0; i < n; i++) {
-      final double[] D_i = D[i];
       final double e_i = e[i];
+      final double[] D_i = D[i];
       D_i[i] = d[i];
       if(e_i > 0) {
         D_i[i + 1] = e_i;
       }
-      else {
+      else if (e_i < 0){
         D_i[i - 1] = e_i;
-      }
+      } // else: e_i = 0
     }
     return D;
   }
