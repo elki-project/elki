@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -45,7 +46,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * Important differences:
  * <ol>
- * <li>Leaf entries also store objects</li>
  * <li>Leaf nodes an directory nodes have the same capacity</li>
  * <li>Condensing and memory limits are not implemented</li>
  * <li>Merging refinement (merge-resplit) is not implemented</li>
@@ -143,19 +143,19 @@ public class CFTree {
    * @param id Object ID
    * @param nv Object data
    */
-  public void insert(DBIDRef id, NumberVector nv) {
+  public void insert(NumberVector nv) {
     final int dim = nv.getDimensionality();
     // No root created yet:
     if(root == null) {
-      LeafEntry leaf = new LeafEntry(dim);
-      leaf.add(id, nv);
+      ClusteringFeature leaf = new ClusteringFeature(dim);
+      leaf.addToStatistics(nv);
       root = new TreeNode(dim, capacity);
       root.children[0] = leaf;
       root.addToStatistics(nv);
       ++leaves;
       return;
     }
-    TreeNode other = insert(root, id, nv);
+    TreeNode other = insert(root, nv);
     // Handle root overflow:
     if(other != null) {
       TreeNode newnode = new TreeNode(dim, capacity);
@@ -178,7 +178,7 @@ public class CFTree {
 
     LeafIterator iter = new LeafIterator(root); // Will keep the old root.
     assert (iter.valid());
-    LeafEntry first = iter.get();
+    ClusteringFeature first = iter.get();
 
     leaves = 0;
     // Make a new root node:
@@ -201,7 +201,7 @@ public class CFTree {
   private double estimateThreshold(TreeNode current) {
     ClusteringFeature[] children = current.children;
     double total = 0.;
-    if(children[0] instanceof LeafEntry) {
+    if(!(children[0] instanceof TreeNode)) {
       if(children[1] == null) {
         return 0.;
       }
@@ -250,11 +250,10 @@ public class CFTree {
    * Recursive insertion.
    *
    * @param node Current node
-   * @param id Object id
    * @param nv Object data
    * @return New sibling, if the node was split.
    */
-  private TreeNode insert(TreeNode node, DBIDRef id, NumberVector nv) {
+  private TreeNode insert(TreeNode node, NumberVector nv) {
     // Find closest child:
     ClusteringFeature[] cfs = node.children;
     assert (cfs[0] != null) : "Unexpected empty node!";
@@ -274,30 +273,80 @@ public class CFTree {
       }
     }
 
-    if(best instanceof LeafEntry) {
-      LeafEntry leaf = (LeafEntry) best;
+    // Leaf node:
+    if(!(best instanceof TreeNode)) {
       // Threshold constraint satisfied?
-      if(absorption.squaredCriterion(leaf, nv) <= thresholdsq) {
-        leaf.add(id, nv);
+      if(absorption.squaredCriterion(best, nv) <= thresholdsq) {
+        best.addToStatistics(nv);
         node.addToStatistics(nv);
         return null;
       }
-      leaf = new LeafEntry(nv.getDimensionality());
-      leaf.add(id, nv);
+      best = new ClusteringFeature(nv.getDimensionality());
+      best.addToStatistics(nv);
       ++leaves;
-      if(add(node.children, leaf)) {
+      if(add(node.children, best)) {
         node.addToStatistics(nv); // Update statistics
         return null;
       }
-      return split(node, leaf);
+      return split(node, best);
     }
     assert (best instanceof TreeNode) : "Node is neither child nor inner?";
-    TreeNode newchild = insert((TreeNode) best, id, nv);
+    TreeNode newchild = insert((TreeNode) best, nv);
     if(newchild == null || add(node.children, newchild)) {
       node.addToStatistics(nv); // Update statistics
       return null;
     }
     return split(node, newchild);
+  }
+
+  /**
+   * Find the leaf of a cluster, to get the final cluster assignment.
+   *
+   * In contrast to {@link #insert}, this does not modify the tree.
+   *
+   * @param node Current node
+   * @param nv Object data
+   * @return Leaf this vector should be assigned to
+   */
+  public ClusteringFeature findLeaf(NumberVector nv) {
+    if(root == null) {
+      throw new IllegalStateException("CFTree not yet built.");
+    }
+    return findLeaf(root, nv);
+  }
+
+  /**
+   * Find the leaf of a cluster, to get the final cluster assignment.
+   *
+   * In contrast to {@link #insert}, this does not modify the tree.
+   *
+   * TODO: allow "outliers"?
+   *
+   * @param node Current node
+   * @param nv Object data
+   * @return Leaf this vector should be assigned to
+   */
+  private ClusteringFeature findLeaf(TreeNode node, NumberVector nv) {
+    // Find closest child:
+    ClusteringFeature[] cfs = node.children;
+    assert (cfs[0] != null) : "Unexpected empty node!";
+
+    // Find the best child:
+    ClusteringFeature best = cfs[0];
+    double bestd = distance.squaredDistance(nv, best);
+    for(int i = 1; i < cfs.length; i++) {
+      ClusteringFeature cf = cfs[i];
+      if(cf == null) {
+        break;
+      }
+      double d2 = distance.squaredDistance(nv, cf);
+      if(d2 < bestd) {
+        best = cf;
+        bestd = d2;
+      }
+    }
+
+    return (best instanceof TreeNode) ? findLeaf((TreeNode) best, nv) : best;
   }
 
   /**
@@ -373,7 +422,7 @@ public class CFTree {
    * @param nleaf Leaf entry to add.
    * @return New sibling, if the node was split.
    */
-  private TreeNode insert(TreeNode node, LeafEntry nleaf) {
+  private TreeNode insert(TreeNode node, ClusteringFeature nleaf) {
     // Find closest child:
     ClusteringFeature[] cfs = node.children;
     assert (cfs[0] != null) : "Unexpected empty node!";
@@ -394,12 +443,10 @@ public class CFTree {
     }
 
     assert (best != nleaf);
-    if(best instanceof LeafEntry) {
-      LeafEntry leaf = (LeafEntry) best;
+    if(!(best instanceof TreeNode)) {
       // Threshold constraint satisfied?
-      if(absorption.squaredCriterion(leaf, nleaf) <= thresholdsq) {
-        leaf.addToStatistics(nleaf);
-        leaf.ids.addDBIDs(nleaf.getIDs());
+      if(absorption.squaredCriterion(best, nleaf) <= thresholdsq) {
+        best.addToStatistics(nleaf);
         node.addToStatistics(nleaf);
         return null;
       }
@@ -459,7 +506,7 @@ public class CFTree {
     /**
      * Current leaf entry.
      */
-    private LeafEntry current;
+    private ClusteringFeature current;
 
     /**
      * Constructor.
@@ -482,7 +529,7 @@ public class CFTree {
      *
      * @return Current leaf (if valid, {@code null} otherwise).
      */
-    public LeafEntry get() {
+    public ClusteringFeature get() {
       return current;
     }
 
@@ -492,11 +539,10 @@ public class CFTree {
       while(queue.size() > 0) {
         // Pop last element
         ClusteringFeature f = queue.remove(queue.size() - 1);
-        if(f instanceof LeafEntry) {
-          current = (LeafEntry) f;
+        if(!(f instanceof TreeNode)) { // lead
+          current = f;
           break;
         }
-        assert (f instanceof TreeNode) : "Node is neither child nor inner?";
         for(ClusteringFeature c : ((TreeNode) f).children) {
           if(c == null) {
             break;
@@ -505,49 +551,6 @@ public class CFTree {
         }
       }
       return this;
-    }
-  }
-
-  /**
-   * Leaf entry.
-   * 
-   * @author Erich Schubert
-   */
-  public static class LeafEntry extends ClusteringFeature {
-    /**
-     * Data objects stored in the node.
-     */
-    // TODO: we store the size twice.
-    private ModifiableDBIDs ids;
-
-    /**
-     * Constructor.
-     *
-     * @param dimensionality Dimensionality
-     */
-    private LeafEntry(int dimensionality) {
-      super(dimensionality);
-      this.ids = DBIDUtil.newArray();
-    }
-
-    /**
-     * Add a point to a node.
-     * 
-     * @param id Object id.
-     * @param nv Vector
-     */
-    private void add(DBIDRef id, NumberVector nv) {
-      this.ids.add(id);
-      this.addToStatistics(nv);
-    }
-
-    /**
-     * Get the leaf entry IDs.
-     *
-     * @return Object IDs
-     */
-    public DBIDs getIDs() {
-      return ids;
     }
   }
 
@@ -580,9 +583,7 @@ public class CFTree {
     for(int i = 0; i < n.getDimensionality(); i++) {
       buf.append(' ').append(n.centroid(i));
     }
-    if(n instanceof LeafEntry) {
-      buf.append(" - ").append(((LeafEntry) n).n);
-    }
+    buf.append(" - ").append(n.n);
     buf.append('\n');
     if(n instanceof TreeNode) {
       ClusteringFeature[] children = ((TreeNode) n).children;
@@ -656,7 +657,7 @@ public class CFTree {
       final double max = maxleaves <= 1 ? maxleaves * ids.size() : maxleaves;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        tree.insert(it, relation.get(it));
+        tree.insert(relation.get(it));
         if(tree.leaves > max) {
           if(LOG.isVerbose()) {
             LOG.verbose("Compacting CF-tree.");

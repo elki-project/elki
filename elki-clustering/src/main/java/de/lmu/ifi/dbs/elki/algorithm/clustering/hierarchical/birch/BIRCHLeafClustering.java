@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -28,6 +31,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -98,14 +104,26 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     CFTree tree = cffactory.newTree(relation.getDBIDs(), relation);
+    // The CFTree does not store points. We have to reassign them (and the
+    // quality is better than if we used the initial assignment, because centers
+    // move in particular in the beginning, so we always had many outliers.
+    Map<ClusteringFeature, ModifiableDBIDs> idmap = new HashMap<ClusteringFeature, ModifiableDBIDs>(tree.leaves);
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      ClusteringFeature cf = tree.findLeaf(relation.get(iter));
+      ModifiableDBIDs ids = idmap.get(cf);
+      if(ids == null) {
+        idmap.put(cf, ids = DBIDUtil.newArray(cf.n));
+      }
+      ids.add(iter);
+    }
     Clustering<MeanModel> result = new Clustering<>("BIRCH-leaves", "BIRCH leaves");
-    for(CFTree.LeafIterator iter = tree.leafIterator(); iter.valid(); iter.advance()) {
-      CFTree.LeafEntry leaf = iter.get();
+    for(Map.Entry<ClusteringFeature, ModifiableDBIDs> ent : idmap.entrySet()) {
+      ClusteringFeature leaf = ent.getKey();
       double[] center = new double[dim];
       for(int i = 0; i < dim; i++) {
         center[i] = leaf.centroid(i);
       }
-      result.addToplevelCluster(new Cluster<>(leaf.getIDs(), new MeanModel(center)));
+      result.addToplevelCluster(new Cluster<>(ent.getValue(), new MeanModel(center)));
     }
     return result;
   }
