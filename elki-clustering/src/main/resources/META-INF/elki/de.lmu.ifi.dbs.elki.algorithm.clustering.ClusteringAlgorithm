@@ -11,6 +11,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarch
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.BIRCHLeafClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly

@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.DiameterCriterion D
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.RadiusCriterion R
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.EuclideanDistanceCriterion

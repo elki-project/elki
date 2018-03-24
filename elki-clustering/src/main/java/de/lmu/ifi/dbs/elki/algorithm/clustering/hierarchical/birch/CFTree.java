@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * points easily, we need to store the point IDs, and it is not possible to
  * implement the originally proposed page size management at the same time.
  * 
- * Condensing and merging refinement are possible, and improvements are welcome!
+ * Condensing and merging refinement are possible, and improvements to this code
+ * are welcome - please send a pull request!
  * 
  * References:
  * <p>
@@ -677,27 +678,27 @@ public class CFTree {
       /**
        * Distance function parameter.
        */
-      private static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
+      public static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
 
       /**
        * Absorption parameter.
        */
-      private static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
+      public static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
 
       /**
        * Distance threshold.
        */
-      private static final OptionID THRESHOLD_ID = new OptionID("cftree.threshold", "Threshold for adding points to existing nodes in the CF-Tree.");
+      public static final OptionID THRESHOLD_ID = new OptionID("cftree.threshold", "Threshold for adding points to existing nodes in the CF-Tree.");
 
       /**
        * Branching factor.
        */
-      private static final OptionID BRANCHING_ID = new OptionID("cftree.branching", "Maximum branching factor of the CF-Tree");
+      public static final OptionID BRANCHING_ID = new OptionID("cftree.branching", "Maximum branching factor of the CF-Tree");
 
       /**
        * Maximum number of leaves.
        */
-      private static final OptionID MAXLEAVES_ID = new OptionID("cftree.maxleaves", "Maximum number of leaves (if less than 1, the values is assumed to be relative)");
+      public static final OptionID MAXLEAVES_ID = new OptionID("cftree.maxleaves", "Maximum number of leaves (if less than 1, the values is assumed to be relative)");
 
       /**
        * BIRCH distance function to use

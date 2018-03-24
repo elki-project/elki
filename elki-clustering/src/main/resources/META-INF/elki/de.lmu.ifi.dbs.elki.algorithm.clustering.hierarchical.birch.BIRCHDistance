@@ -1,0 +1,5 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.VarianceIncreaseDistance D4
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.CentroidEuclideanDistance D0
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.CentroidManhattanDistance D1
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.AverageInterclusterDistance D2
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.AverageIntraclusterDistance D3

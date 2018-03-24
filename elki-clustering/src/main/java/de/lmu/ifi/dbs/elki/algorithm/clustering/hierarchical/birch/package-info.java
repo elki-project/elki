@@ -1,11 +1,8 @@
-/**
- * BIRCH clustering.
- */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2017
+ Copyright (C) 2018
  ELKI Development Team
 
  This program is free software: you can redistribute it and/or modify
@@ -20,5 +17,8 @@
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * BIRCH clustering.
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;

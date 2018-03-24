@@ -1,10 +1,8 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
-
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +18,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import java.util.Arrays;
 

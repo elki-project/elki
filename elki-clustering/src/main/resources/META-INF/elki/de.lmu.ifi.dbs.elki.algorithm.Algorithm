@@ -21,6 +21,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxAnderberg
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMax
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.BIRCHLeafClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly

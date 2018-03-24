@@ -1,10 +1,8 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
-
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +18,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Centroid Euclidean distance.
+ * Average intercluster distance.
  * 
  * Reference:
  * <p>
@@ -38,39 +37,41 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Alias({ "D0" })
+@Alias({ "D2" })
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
     url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf")
-public class CentroidEuclideanDistance implements BIRCHDistance {
+public class AverageInterclusterDistance implements BIRCHDistance {
   /**
    * Static instance.
    */
-  public static final CentroidEuclideanDistance STATIC = new CentroidEuclideanDistance();
+  public static final AverageInterclusterDistance STATIC = new AverageInterclusterDistance();
 
   @Override
   public double squaredDistance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v.doubleValue(i);
-      sum += dx * dx;
+    final int dim = v.getDimensionality();
+    assert (dim == cf.getDimensionality());
+    // Dot product:
+    double sum = 0;
+    for(int d = 0; d < dim; d++) {
+      sum += v.doubleValue(d) * cf.ls[d];
     }
-    return sum;
+    sum = /* 1. * */ cf.sumOfSumOfSquares() + cf.n * ClusteringFeature.sumOfSquares(v) - 2 * sum;
+    return sum > 0 ? sum / cf.n : 0;
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v.centroid(i);
-      sum += dx * dx;
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    final int dim = cf1.getDimensionality();
+    assert (dim == cf2.getDimensionality());
+    // Dot product:
+    double sum = 0;
+    for(int d = 0; d < dim; d++) {
+      sum += cf1.ls[d] * cf2.ls[d];
     }
-    return sum;
+    sum = cf2.n * cf1.sumOfSumOfSquares() + cf1.n * cf2.sumOfSumOfSquares() - 2 * sum;
+    return sum > 0 ? sum / (cf1.n * (long) cf2.n) : 0;
   }
 
   /**
@@ -82,7 +83,7 @@ public class CentroidEuclideanDistance implements BIRCHDistance {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected CentroidEuclideanDistance makeInstance() {
+    protected AverageInterclusterDistance makeInstance() {
       return STATIC;
     }
   }

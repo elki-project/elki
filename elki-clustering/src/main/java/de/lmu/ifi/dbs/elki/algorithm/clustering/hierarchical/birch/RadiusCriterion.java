@@ -1,10 +1,8 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
-
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +18,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -38,47 +37,53 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @author Erich Schubert
  */
-@Alias("D")
+@Alias("R")
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "http://dx.doi.org/10.1145/233269.233324")
-public class DiameterCriterion implements BIRCHAbsorptionCriterion {
+public class RadiusCriterion implements BIRCHAbsorptionCriterion {
   /**
    * Static instance.
    */
-  public static final DiameterCriterion STATIC = new DiameterCriterion();
+  public static final RadiusCriterion STATIC = new RadiusCriterion();
 
   @Override
   public double squaredCriterion(ClusteringFeature f1, NumberVector n) {
     if(f1.n <= 0) {
       return 0.;
     }
-    double sum1 = f1.ss, sum2 = 0.;
-    for(int i = 0; i < f1.ls.length; i++) {
-      double x = n.doubleValue(i);
-      sum1 += x * x;
-      double v = f1.ls[i] + x;
-      sum2 += v * v;
+    final int dim = f1.ls.length;
+    final double div = 1. / (f1.n + 1);
+    // Sum_d sum_i squares
+    double sum = f1.sumOfSumOfSquares();
+    for(int d = 0; d < dim; d++) {
+      double v = n.doubleValue(d);
+      sum += v * v;
     }
-    double diameter = (sum1 * (f1.n + 1) - sum2);
-    return diameter > 0 ? diameter * 2. / ((f1.n + 1.) * f1.n) : 0.;
+    sum *= div;
+    // Sum_d square sum_i
+    for(int d = 0; d < dim; d++) {
+      double v = (f1.ls[d] + n.doubleValue(d)) * div;
+      sum -= v * v;
+    }
+    return sum;
   }
 
   @Override
   public double squaredCriterion(ClusteringFeature f1, ClusteringFeature f2) {
-    int n12 = f1.n + f2.n;
-    if(n12 <= 0) {
+    final int n12 = f1.n + f2.n;
+    if(n12 <= 1) {
       return 0.;
     }
-    double sum1 = f1.ss + f2.ss;
-    double sum2 = 0.;
-    for(int i = 0; i < f1.ls.length; i++) {
-      double v = f1.ls[i] + f2.ls[i];
-      sum2 += v * v;
+    final int dim = f1.ls.length;
+    final double div = 1. / n12;
+    double sum = (f1.sumOfSumOfSquares() + f2.sumOfSumOfSquares()) * div;
+    for(int i = 0; i < dim; i++) {
+      double v = (f1.ls[i] + f2.ls[i]) * div;
+      sum -= v * v;
     }
-    double diameter = (sum1 * n12 - sum2);
-    return diameter > 0 ? diameter * 2. / (n12 * (n12 - 1L)) : 0.;
+    return sum;
   }
 
   /**
@@ -88,7 +93,7 @@ public class DiameterCriterion implements BIRCHAbsorptionCriterion {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected DiameterCriterion makeInstance() {
+    protected RadiusCriterion makeInstance() {
       return STATIC;
     }
   }
