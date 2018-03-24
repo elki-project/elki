@@ -93,7 +93,7 @@ public class EigenvalueDecomposition {
     V = new double[n][n];
     d = new double[n];
     e = new double[n];
-  
+
     boolean issymmetric = true;
     for(int j = 0; (j < n) && issymmetric; j++) {
       for(int i = 0; (i < n) && issymmetric; i++) {
@@ -106,29 +106,29 @@ public class EigenvalueDecomposition {
         }
       }
     }
-  
+
     if(issymmetric) {
       for(int i = 0; i < n; i++) {
         System.arraycopy(A[i], 0, V[i], 0, n);
       }
-  
+
       // Tridiagonalize.
       tred2();
-  
+
       // Diagonalize.
       tql2();
     }
     else {
       H = new double[n][n];
       ort = new double[n];
-  
+
       for(int i = 0; i < n; i++) {
         System.arraycopy(A[i], 0, H[i], 0, n);
       }
-  
+
       // Reduce to Hessenberg form.
       orthes();
-  
+
       // Reduce Hessenberg to real Schur form.
       hqr2();
     }
@@ -884,7 +884,12 @@ public class EigenvalueDecomposition {
       final double[] D_i = D[i];
       final double e_i = e[i];
       D_i[i] = d[i];
-      D_i[e_i > 0 ? i + 1 : i - 1] = e_i;
+      if(e_i > 0) {
+        D_i[i + 1] = e_i;
+      }
+      else {
+        D_i[i - 1] = e_i;
+      }
     }
     return D;
   }
