@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
+package de.lmu.ifi.dbs.elki.data.projection.random;
 
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -151,7 +150,7 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
      */
     private double[] projectDense(NumberVector in, double[] ret) {
       final int k = this.k;
-      final double dim = MathUtil.min(buf.length, in.getDimensionality());
+      final double dim = Math.min(buf.length, in.getDimensionality());
       for(int i = 0; i < dim; i++) {
         final boolean[] row = mat[i];
         double vali = in.doubleValue(i);

@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
+package de.lmu.ifi.dbs.elki.data.projection.random;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -46,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.6.0
  */
 @Reference(authors = "L. Breiman", //
-title = "Bagging predictors", //
-booktitle = "Machine learning 24.2", //
-url = "http://dx.doi.org/10.1007/BF00058655")
+    title = "Bagging predictors", //
+    booktitle = "Machine learning 24.2", //
+    url = "http://dx.doi.org/10.1007/BF00058655")
 public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.
@@ -63,19 +62,17 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
   public Projection generateProjection(int idim, int odim) {
     int[] dims;
     if(odim < idim) {
-      dims = Arrays.copyOf(randomPermutation(MathUtil.sequence(0, idim), random), odim);
+      dims = Arrays.copyOf(randomPermutation(sequence(idim), random), odim);
     }
     else if(odim == idim) {
-      dims = randomPermutation(MathUtil.sequence(0, idim), random);
+      dims = randomPermutation(sequence(idim), random);
     }
     else {
-      int mdim = idim;
-      while(mdim < odim) {
-        mdim += idim;
-      }
+      final int mdim = ((odim - 1) / idim + 1) * idim;
       dims = new int[mdim];
-      for(int i = 0; i < mdim; i++) {
-        dims[i] = i % idim;
+      for(int i = 0, j = 0; i < mdim; i++) {
+        dims[i] = j++;
+        j = j == idim ? 0 : j;
       }
       dims = Arrays.copyOf(randomPermutation(dims, random), odim);
     }
@@ -87,7 +84,7 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
    *
    * Knuth / Fisher-Yates style shuffle
    *
-   * FIXME: move to shared code.
+   * TODO: move to shared code.
    *
    * @param out Existing output array
    * @param random Random generator.
@@ -102,6 +99,22 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
       out[i] = tmp;
     }
     return out;
+  }
+
+  /**
+   * Generate the integer sequence 0 .. e-1
+   *
+   * TODO: move to shared code.
+   *
+   * @param e End (exclusive)
+   * @return End
+   */
+  private static int[] sequence(int e) {
+    int[] a = new int[e];
+    for(int i = 0; i < a.length; i++) {
+      a[i] = i;
+    }
+    return a;
   }
 
   /**

@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
+package de.lmu.ifi.dbs.elki.data.projection.random;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Random projections using Cauchy distributions (1-stable).
@@ -37,16 +38,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.6.0
  */
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
-    title = "Locality-sensitive hashing scheme based on p-stable distributions", //
-    booktitle = "Proc. 20th Symposium on Computational Geometry", //
-    url = "http://dx.doi.org/10.1145/997817.997857")
-public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFamily {
+title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+booktitle = "Proc. 20th Symposium on Computational Geometry", //
+url = "http://dx.doi.org/10.1145/997817.997857")
+public class CauchyRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.
    *
    * @param random Random number generator.
    */
-  public GaussianRandomProjectionFamily(RandomFactory random) {
+  public CauchyRandomProjectionFamily(RandomFactory random) {
     super(random);
   }
 
@@ -56,7 +57,7 @@ public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFami
     for(int i = 0; i < odim; ++i) {
       double[] row = matrix[i];
       for(int j = 0; j < idim; ++j) {
-        row[j] = random.nextGaussian();
+        row[j] = FastMath.tan(Math.PI * (random.nextDouble() - .5));
       }
     }
     return new MatrixProjection(matrix);
@@ -71,8 +72,8 @@ public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFami
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
     @Override
-    protected GaussianRandomProjectionFamily makeInstance() {
-      return new GaussianRandomProjectionFamily(random);
+    protected CauchyRandomProjectionFamily makeInstance() {
+      return new CauchyRandomProjectionFamily(random);
     }
   }
 }

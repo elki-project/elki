@@ -21,8 +21,8 @@
 package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily.Projection;
+import de.lmu.ifi.dbs.elki.data.projection.random.RandomProjectionFamily;
+import de.lmu.ifi.dbs.elki.data.projection.random.RandomProjectionFamily.Projection;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**

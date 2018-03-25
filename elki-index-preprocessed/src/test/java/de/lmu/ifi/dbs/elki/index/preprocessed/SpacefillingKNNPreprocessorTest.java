@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.projection.random.*;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.*;
@@ -35,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.BinarySplitSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
@@ -44,7 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Regression test for space-filling curve NN search
+ * Regression test for space-filling curve NN search.
+ *
+ * Note: as these are approximate indexes, there is a dependency on the random
+ * generator, so we use fixed seeds. But this regression test may fail when,
+ * e.g., the random generator is modified.
  */
 public class SpacefillingKNNPreprocessorTest {
   // the following values depend on the data set used!
@@ -62,7 +66,7 @@ public class SpacefillingKNNPreprocessorTest {
   int shoulds = 330;
 
   @Test
-  public void testPreprocessor() {
+  public void testAchlioptas() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
@@ -82,6 +86,146 @@ public class SpacefillingKNNPreprocessorTest {
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
     config.addParameter(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
+    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    preproc.initialize();
+    // add as index
+    db.getHierarchy().add(rel, preproc);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+
+    // test queries
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    // also test partial queries, forward only
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+  }
+
+  @Test
+  public void testCauchy() {
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
+
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+
+    // get linear queries
+    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+
+    // get preprocessed queries
+    ListParameterization config = new ListParameterization();
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
+        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
+            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, CauchyRandomProjectionFamily.class);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
+    config.addParameter(CauchyRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
+    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    preproc.initialize();
+    // add as index
+    db.getHierarchy().add(rel, preproc);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+
+    // test queries
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    // also test partial queries, forward only
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+  }
+
+  @Test
+  public void testGaussian() {
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
+
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+
+    // get linear queries
+    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+
+    // get preprocessed queries
+    ListParameterization config = new ListParameterization();
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
+        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
+            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, GaussianRandomProjectionFamily.class);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
+    config.addParameter(GaussianRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
+    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    preproc.initialize();
+    // add as index
+    db.getHierarchy().add(rel, preproc);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+
+    // test queries
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    // also test partial queries, forward only
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+  }
+
+  @Test
+  public void testSubset() {
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
+
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+
+    // get linear queries
+    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+
+    // get preprocessed queries
+    ListParameterization config = new ListParameterization();
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
+        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
+            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, RandomSubsetProjectionFamily.class);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
+    config.addParameter(RandomSubsetProjectionFamily.Parameterizer.RANDOM_ID, 0L);
+    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    preproc.initialize();
+    // add as index
+    db.getHierarchy().add(rel, preproc);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+
+    // test queries
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    // also test partial queries, forward only
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+  }
+
+  @Test
+  public void testHenzinger() {
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
+
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+
+    // get linear queries
+    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+
+    // get preprocessed queries
+    ListParameterization config = new ListParameterization();
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
+        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
+            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, SimplifiedRandomHyperplaneProjectionFamily.class);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
+    config.addParameter(SimplifiedRandomHyperplaneProjectionFamily.Parameterizer.RANDOM_ID, 1L);
     SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
     SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
     preproc.initialize();

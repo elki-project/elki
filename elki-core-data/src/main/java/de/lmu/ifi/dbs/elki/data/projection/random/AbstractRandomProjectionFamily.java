@@ -18,14 +18,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
+package de.lmu.ifi.dbs.elki.data.projection.random;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -95,7 +94,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
       if(in instanceof SparseNumberVector) {
         return projectSparse((SparseNumberVector) in, ret);
       }
-      final int dim = MathUtil.min(buf.length, in.getDimensionality());
+      final int dim = Math.min(buf.length, in.getDimensionality());
       assert (ret.length >= matrix.length) : "Output buffer too small!";
       // Copy vector into local buffer
       for(int i = 0; i < dim; i++) {
