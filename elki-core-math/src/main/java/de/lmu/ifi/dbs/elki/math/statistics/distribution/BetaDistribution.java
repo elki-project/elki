@@ -113,7 +113,6 @@ public class BetaDistribution extends AbstractDistribution {
     if(a <= 0.0 || b <= 0.0) {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
     }
-
     this.alpha = a;
     this.beta = b;
     this.logbab = logBeta(a, b);
@@ -121,30 +120,18 @@ public class BetaDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if(val < 0. || val > 1.) {
-      return 0.;
-    }
-    if(val == 0.) {
-      return (alpha > 1.) ? 0. : (alpha < 1.) ? Double.POSITIVE_INFINITY : beta;
-    }
-    if(val == 1.) {
-      return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
-    }
-    return FastMath.exp(-logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
+    return (val < 0. || val > 1.) ? 0. : //
+        val == 0. ? (alpha > 1. ? 0. : alpha < 1. ? Double.POSITIVE_INFINITY : beta) : //
+            val == 1. ? (beta > 1. ? 0. : beta < 1. ? Double.POSITIVE_INFINITY : alpha) : //
+                FastMath.exp(-logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   @Override
   public double logpdf(double val) {
-    if(val < 0. || val > 1.) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    if(val == 0.) {
-      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(beta);
-    }
-    if(val == 1.) {
-      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(alpha);
-    }
-    return -logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
+    return (val < 0. || val > 1.) ? Double.NEGATIVE_INFINITY : //
+        val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : FastMath.log(beta)) : //
+            val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : FastMath.log(alpha)) : //
+                -logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   @Override
@@ -162,33 +149,17 @@ public class BetaDistribution extends AbstractDistribution {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
     double bt = FastMath.exp(-logbab + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
-    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
-      return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
-    }
-    else {
-      return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
-    }
+    return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
+        ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
+        : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
   }
 
   @Override
   public double quantile(double x) {
-    // Valid parameters
-    if(x < 0 || x > 1 || Double.isNaN(x)) {
-      return Double.NaN;
-    }
-    if(x == 0) {
-      return 0.0;
-    }
-    if(x == 1) {
-      return 1.0;
-    }
-    // Simpler to compute inverse?
-    if(x > 0.5) {
-      return 1 - rawQuantile(1 - x, beta, alpha, logbab);
-    }
-    else {
-      return rawQuantile(x, alpha, beta, logbab);
-    }
+    return (x < 0 || x > 1 || Double.isNaN(x)) ? Double.NaN : //
+        x == 0 ? 0 : x == 1 ? 1 : x > 0.5 //
+            ? 1 - rawQuantile(1 - x, beta, alpha, logbab) //
+            : rawQuantile(x, alpha, beta, logbab);
   }
 
   @Override
@@ -224,19 +195,11 @@ public class BetaDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double val, double alpha, double beta) {
-    if(alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
-      return Double.NaN;
-    }
-    if(val < 0. || val > 1.) {
-      return 0.;
-    }
-    if(val == 0.) {
-      return (alpha > 1.) ? 0. : (alpha < 1.) ? Double.POSITIVE_INFINITY : beta;
-    }
-    if(val == 1.) {
-      return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
-    }
-    return FastMath.exp(-logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
+    return (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) ? Double.NaN : //
+        (val < 0. || val > 1.) ? 0. : //
+            val == 0. ? (alpha > 1. ? 0. : alpha < 1. ? Double.POSITIVE_INFINITY : beta) : //
+                val == 1. ? (beta > 1. ? 0. : beta < 1. ? Double.POSITIVE_INFINITY : alpha) : //
+                    FastMath.exp(-logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   /**
@@ -248,19 +211,11 @@ public class BetaDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double logpdf(double val, double alpha, double beta) {
-    if(alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
-      return Double.NaN;
-    }
-    if(val < 0. || val > 1.) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    if(val == 0.) {
-      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(beta);
-    }
-    if(val == 1.) {
-      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(alpha);
-    }
-    return -logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
+    return (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) ? Double.NaN : //
+        (val < 0. || val > 1.) ? Double.NEGATIVE_INFINITY : //
+            val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : FastMath.log(beta)) //
+                : val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : FastMath.log(alpha)) //
+                    : -logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   /**
@@ -297,12 +252,9 @@ public class BetaDistribution extends AbstractDistribution {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
     double bt = FastMath.exp(-logBeta(alpha, beta) + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
-    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
-      return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
-    }
-    else {
-      return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
-    }
+    return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
+        ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
+        : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
   }
 
   /**
@@ -406,26 +358,10 @@ public class BetaDistribution extends AbstractDistribution {
    * @return Probit for Beta distribution
    */
   public static double quantile(double p, double alpha, double beta) {
-    // Valid parameters
-    if(Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0.) {
-      return Double.NaN;
-    }
-    if(p < 0 || p > 1) {
-      return Double.NaN;
-    }
-    if(p == 0) {
-      return 0.0;
-    }
-    if(p == 1) {
-      return 1.0;
-    }
-    // Simpler to compute inverse?
-    if(p > 0.5) {
-      return 1 - rawQuantile(1 - p, beta, alpha, logBeta(beta, alpha));
-    }
-    else {
-      return rawQuantile(p, alpha, beta, logBeta(alpha, beta));
-    }
+    return (Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0. || p < 0 || p > 1) ? Double.NaN : //
+        p == 0 ? 0. : p == 1 ? 1. : p > 0.5 //
+            ? 1 - rawQuantile(1 - p, beta, alpha, logBeta(beta, alpha)) //
+            : rawQuantile(p, alpha, beta, logBeta(alpha, beta));
   }
 
   /**

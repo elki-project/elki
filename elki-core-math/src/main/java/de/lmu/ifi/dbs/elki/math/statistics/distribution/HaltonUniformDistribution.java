@@ -207,34 +207,28 @@ public class HaltonUniformDistribution implements Distribution {
 
   @Override
   public double pdf(double val) {
-    if(val < min || val > max) {
-      return 0.0;
-    }
-    return 1.0 / len;
+    return !(val >= min) || val > max ? //
+        (val == val ? 0. : Double.NaN) //
+        : (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
   }
 
   @Override
   public double logpdf(double val) {
-    if(!(val >= min) || val > max) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    return (len > 0.) ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
+    return !(val >= min) || val > max ? //
+        (val == val ? Double.NEGATIVE_INFINITY : Double.NaN) //
+        : len > 0. ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override
   public double cdf(double val) {
-    if(val < min) {
-      return 0.0;
-    }
-    if(val > max) {
-      return 1.0;
-    }
-    return (val - min) / len;
+    return !(val > min) ? (val == val ? 0. : Double.NaN) //
+        : val >= max ? 1. //
+            : len > 0. ? (val - min) / len : .5;
   }
 
   @Override
   public double quantile(double val) {
-    return min + len * val;
+    return val >= 0 && val <= 1 ? min + len * val : Double.NaN;
   }
 
   /**
@@ -246,8 +240,7 @@ public class HaltonUniformDistribution implements Distribution {
   private long inverse(double current) {
     // Represent to base b.
     short[] digits = new short[maxi];
-    int j;
-    for(j = 0; j < maxi; j++) {
+    for(int j = 0; j < maxi; j++) {
       current *= base;
       digits[j] = (short) current;
       current -= digits[j];
@@ -256,7 +249,7 @@ public class HaltonUniformDistribution implements Distribution {
       }
     }
     long inv = 0;
-    for(j = maxi - 1; j >= 0; j--) {
+    for(int j = maxi - 1; j >= 0; j--) {
       inv = inv * base + digits[j];
     }
     return inv;

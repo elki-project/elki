@@ -165,10 +165,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double cdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if(x <= 0.) {
-      return 0.;
-    }
-    return GammaDistribution.regularizedGammaP(k, FastMath.log1p(x) * theta);
+    return x <= 0. ? 0. : GammaDistribution.regularizedGammaP(k, FastMath.log1p(x) * theta);
   }
 
   /**
@@ -181,10 +178,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double logcdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if(x <= 0.) {
-      return 0.;
-    }
-    return GammaDistribution.logregularizedGammaP(k, FastMath.log1p(x) * theta);
+    return x <= 0. ? -Double.NEGATIVE_INFINITY : GammaDistribution.logregularizedGammaP(k, FastMath.log1p(x) * theta);
   }
 
   /**
@@ -197,10 +191,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if(x <= 0.) {
-      return 0.;
-    }
-    return FastMath.pow(theta, k) / GammaDistribution.gamma(k) * FastMath.pow(1+x, -(theta + 1.)) * FastMath.pow(FastMath.log1p(x), k - 1.);
+    return x <= 0. ? 0. : FastMath.pow(theta, k) / GammaDistribution.gamma(k) * FastMath.pow(1 + x, -(theta + 1.)) * FastMath.pow(FastMath.log1p(x), k - 1.);
   }
 
   /**

@@ -142,7 +142,7 @@ public class ChiDistribution extends AbstractDistribution {
   public static double cdf(double val, double dof) {
     double v = val * val * .5;
     // regularizedGammaP will return NaN for infinite values!
-    return val < 0. ? 0. : v < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(dof * .5, v) : 1.;
+    return val < 0. ? 0. : v < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(dof * .5, v) : v == v ? 1. : Double.NaN;
   }
 
   // FIXME: implement!

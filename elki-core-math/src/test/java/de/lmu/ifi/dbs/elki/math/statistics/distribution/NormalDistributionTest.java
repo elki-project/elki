@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Random;
 
 import org.junit.Test;
@@ -37,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @since 0.5.0
  */
 public class NormalDistributionTest extends AbstractDistributionTest {
+  @Test
+  public void testERF() {
+    assertEquals("Not NaN for NaN", Double.NaN, NormalDistribution.erf(Double.NaN), 0.);
+  }
+
   @Test
   public void testPDF() {
     load("norm.ascii.gz");

@@ -717,14 +717,14 @@ public class GammaDistribution extends AbstractDistribution {
     final int MAXIT = 1000;
 
     // Avoid degenerates
-    if(Double.isNaN(p) || Double.isNaN(k) || Double.isNaN(theta)) {
+    if(!(p >= 0) || p > 1 || Double.isNaN(k) || Double.isNaN(theta)) {
       return Double.NaN;
     }
     // Range check
-    if(p <= 0) {
+    if(p == 0) {
       return 0;
     }
-    if(p >= 1) {
+    if(p == 1) {
       return Double.POSITIVE_INFINITY;
     }
     // Shape parameter check

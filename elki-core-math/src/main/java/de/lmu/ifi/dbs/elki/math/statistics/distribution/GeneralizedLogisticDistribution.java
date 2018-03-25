@@ -108,8 +108,8 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * @return PDF
    */
   public static double pdf(double val, double loc, double scale, double shape) {
-    if(val == Double.POSITIVE_INFINITY || val == Double.NEGATIVE_INFINITY) {
-      return 0.;
+    if(!(val < Double.POSITIVE_INFINITY && val > Double.NEGATIVE_INFINITY)) {
+      return val == val ? 0. : Double.NaN;
     }
     val = (val - loc) / scale;
     double e = FastMath.exp(-val);
@@ -124,8 +124,6 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
 
   /**
    * log Probability density function.
-   * 
-   * TODO: untested.
    * 
    * @param val Value
    * @param loc Location

@@ -61,14 +61,14 @@ public class UniformDistribution extends AbstractDistribution {
    */
   public UniformDistribution(double min, double max, RandomFactory random) {
     super(random);
-    if (Double.isInfinite(min) || Double.isInfinite(max)) {
+    if(Double.isInfinite(min) || Double.isInfinite(max)) {
       throw new ArithmeticException("Infinite values given for uniform distribution.");
     }
-    if (Double.isNaN(min) || Double.isNaN(max)) {
+    if(Double.isNaN(min) || Double.isNaN(max)) {
       throw new ArithmeticException("NaN values given for uniform distribution.");
     }
     // Swap parameters if they were given incorrectly.
-    if (min > max) {
+    if(min > max) {
       double tmp = min;
       min = max;
       max = tmp;
@@ -87,14 +87,14 @@ public class UniformDistribution extends AbstractDistribution {
    */
   public UniformDistribution(double min, double max, Random random) {
     super(random);
-    if (Double.isInfinite(min) || Double.isInfinite(max)) {
+    if(Double.isInfinite(min) || Double.isInfinite(max)) {
       throw new ArithmeticException("Infinite values given for uniform distribution.");
     }
-    if (Double.isNaN(min) || Double.isNaN(max)) {
+    if(Double.isNaN(min) || Double.isNaN(max)) {
       throw new ArithmeticException("NaN values given for uniform distribution.");
     }
     // Swap parameters if they were given incorrectly.
-    if (min > max) {
+    if(min > max) {
       double tmp = min;
       min = max;
       max = tmp;
@@ -116,34 +116,28 @@ public class UniformDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if (!(val >= min) || val > max) {
-      return 0.0;
-    }
-    return (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
+    return !(val >= min) || val > max ? //
+        (val == val ? 0. : Double.NaN) //
+        : (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
   }
 
   @Override
   public double logpdf(double val) {
-    if (!(val >= min) || val > max) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    return (len > 0.) ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
+    return !(val >= min) || val > max ? //
+        (val == val ? Double.NEGATIVE_INFINITY : Double.NaN) //
+        : len > 0. ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override
   public double cdf(double val) {
-    if (!(val > min)) {
-      return 0.;
-    }
-    if (val >= max) {
-      return 1.;
-    }
-    return (len > 0.) ? (val - min) / len : .5;
+    return !(val > min) ? (val == val ? 0. : Double.NaN) //
+        : val >= max ? 1. //
+            : len > 0. ? (val - min) / len : .5;
   }
 
   @Override
   public double quantile(double val) {
-    return min + len * val;
+    return val >= 0 && val <= 1 ? min + len * val : Double.NaN;
   }
 
   @Override
@@ -196,12 +190,12 @@ public class UniformDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter minP = new DoubleParameter(MIN_ID);
-      if (config.grab(minP)) {
+      if(config.grab(minP)) {
         min = minP.doubleValue();
       }
 
       DoubleParameter maxP = new DoubleParameter(MAX_ID);
-      if (config.grab(maxP)) {
+      if(config.grab(maxP)) {
         max = maxP.doubleValue();
       }
     }

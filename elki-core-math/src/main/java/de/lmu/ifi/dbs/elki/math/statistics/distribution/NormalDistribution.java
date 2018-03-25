@@ -317,8 +317,11 @@ public class NormalDistribution extends AbstractDistribution {
       y *= y;
       y = 1 - y * y;
     }
-    else {
+    else if(w == w) {
       y = 1;
+    }
+    else {
+      return Double.NaN;
     }
     return x < 0 ? -y : y;
   }

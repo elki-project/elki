@@ -195,7 +195,7 @@ public class WeibullDistribution extends AbstractDistribution {
   public static double cdf(double val, double k, double lambda, double theta) {
     return (val > theta) ? //
         (1.0 - FastMath.exp(-FastMath.pow((val - theta) / lambda, k))) //
-        : 0.0;
+        : val == val ? 0.0 : Double.NaN;
   }
 
   @Override

@@ -120,18 +120,12 @@ public class ExponentialDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if(val < location) {
-      return 0.;
-    }
-    return rate * FastMath.exp(-rate * (val - location));
+    return val < location ? 0. : rate * FastMath.exp(-rate * (val - location));
   }
 
   @Override
   public double logpdf(double val) {
-    if(val < location) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    return FastMath.log(rate) - rate * (val - location);
+    return val < location ? Double.NEGATIVE_INFINITY : FastMath.log(rate) - rate * (val - location);
   }
 
   /**
@@ -142,10 +136,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double val, double rate) {
-    if(val < 0.) {
-      return 0.;
-    }
-    return rate * FastMath.exp(-rate * val);
+    return val < 0. ? 0. : rate * FastMath.exp(-rate * val);
   }
 
   /**
@@ -156,18 +147,12 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double logpdf(double val, double rate) {
-    if(val < 0.) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    return FastMath.log(rate) - rate * val;
+    return val < 0. ? Double.NEGATIVE_INFINITY : FastMath.log(rate) - rate * val;
   }
 
   @Override
   public double cdf(double val) {
-    if(val < location) {
-      return 0.;
-    }
-    return 1 - FastMath.exp(-rate * (val - location));
+    return val < location ? 0. : 1 - FastMath.exp(-rate * (val - location));
   }
 
   /**
@@ -178,15 +163,12 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return cumulative density
    */
   public static double cdf(double val, double rate) {
-    if(val < 0.) {
-      return 0.;
-    }
-    return 1 - FastMath.exp(-rate * val);
+    return val < 0. ? 0. : 1 - FastMath.exp(-rate * val);
   }
 
   @Override
   public double quantile(double val) {
-    return -FastMath.log(1 - val) / rate + location;
+    return val >= 0 && val <= 1 ? -FastMath.log(1 - val) / rate + location : Double.NaN;
   }
 
   /**
@@ -197,7 +179,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double rate) {
-    return -FastMath.log(1 - val) / rate;
+    return val >= 0 && val <= 1 ? -FastMath.log(1 - val) / rate : Double.NaN;
   }
 
   /**
@@ -239,8 +221,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID) //
-          .setDefaultValue(0.);
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID, 0.);
       if(config.grab(locP)) {
         location = locP.doubleValue();
       }

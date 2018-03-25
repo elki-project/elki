@@ -163,7 +163,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double mu, double shape) {
     if(!(x > 0) || x == Double.POSITIVE_INFINITY) {
-      return 0;
+      return x == x ? 0 : Double.NaN;
     }
     final double v = (x - mu) / mu;
     double t1 = FastMath.sqrt(shape / (MathUtil.TWOPI * x * x * x));
@@ -180,7 +180,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
    */
   public static double logpdf(double x, double mu, double shape) {
     if(!(x > 0) || x == Double.POSITIVE_INFINITY) {
-      return Double.NEGATIVE_INFINITY;
+      return x == x ? Double.NEGATIVE_INFINITY : Double.NaN;
     }
     final double v = (x - mu) / mu;
     return v < Double.MAX_VALUE ? 0.5 * FastMath.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
@@ -196,7 +196,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
    */
   public static double cdf(double x, double mu, double shape) {
     if(!(x > 0.)) {
-      return 0.;
+      return x == x ? 0. : Double.NaN;
     }
     // TODO: accelerate by caching exp(2 * shape / mu).
     final double v0 = x / mu;

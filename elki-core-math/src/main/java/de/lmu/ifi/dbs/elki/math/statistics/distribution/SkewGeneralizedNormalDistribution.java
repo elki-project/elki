@@ -180,6 +180,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma, double skew) {
+    if (x != x) {
+      return Double.NaN;
+    }
     x = (x - mu) / sigma; // Scale
     if(skew == 0.) {
       return MathUtil.ONE_BY_SQRTTWOPI / sigma * FastMath.exp(-.5 * x * x);
@@ -200,6 +203,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @return log PDF of the given normal distribution at x.
    */
   public static double logpdf(double x, double mu, double sigma, double skew) {
+    if (x != x) {
+      return Double.NaN;
+    }
     x = (x - mu) / sigma;
     if(skew == 0.) {
       return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma) - .5 * x * x;

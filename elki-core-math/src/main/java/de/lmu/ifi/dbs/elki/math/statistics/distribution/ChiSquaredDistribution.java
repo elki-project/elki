@@ -92,10 +92,8 @@ public class ChiSquaredDistribution extends GammaDistribution {
       return Double.NaN;
     }
     final double k = dof * .5;
-    if(Math.abs(k - 1.0) < Double.MIN_NORMAL) {
-      return FastMath.exp(-x * 2.0) * 2.0;
-    }
-    return FastMath.exp((k - 1.0) * FastMath.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
+    return (Math.abs(k - 1.0) < Double.MIN_NORMAL) ? FastMath.exp(-x * 2.0) * 2.0 : //
+        FastMath.exp((k - 1.0) * FastMath.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
   }
 
   /**

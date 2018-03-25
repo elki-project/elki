@@ -201,7 +201,7 @@ public class LogLogisticDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double shape, double location, double scale) {
-    return scale * FastMath.pow(val / (1. - val), 1. / shape) + location;
+    return val < 0 || val > 1 ? Double.NaN : scale * FastMath.pow(val / (1. - val), 1. / shape) + location;
   }
 
   @Override

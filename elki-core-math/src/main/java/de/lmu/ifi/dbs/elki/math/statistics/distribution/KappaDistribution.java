@@ -141,10 +141,7 @@ public class KappaDistribution extends AbstractDistribution {
       return 0;
     }
     val = FastMath.exp(-val);
-    if(Double.isInfinite(val)) {
-      return 0;
-    }
-    return val / scale * FastMath.exp(logc * (1. - shape2));
+    return Double.isInfinite(val) ? 0. : val / scale * FastMath.exp(logc * (1. - shape2));
   }
 
   @Override
@@ -201,6 +198,9 @@ public class KappaDistribution extends AbstractDistribution {
     if(val == Double.POSITIVE_INFINITY) {
       return 1.;
     }
+    if(val != val) {
+      return Double.NaN;
+    }
     if(shape1 == 0.) {
       val = FastMath.exp(-val);
     }
@@ -250,6 +250,9 @@ public class KappaDistribution extends AbstractDistribution {
     if(val == Double.POSITIVE_INFINITY) {
       return 0.;
     }
+    if(val != val) {
+      return Double.NaN;
+    }
     if(shape1 == 0.) {
       val = FastMath.exp(-val);
     }
@@ -291,27 +294,16 @@ public class KappaDistribution extends AbstractDistribution {
     }
     if(val == 0.) {
       if(shape2 <= 0.) {
-        if(shape1 < 0.) {
-          return loc + scale / shape1;
-        }
-        else {
-          return Double.NEGATIVE_INFINITY;
-        }
+        return shape1 < 0. ? loc + scale / shape1 : Double.NEGATIVE_INFINITY;
       }
       else {
-        if(shape1 != 0.) {
-          return loc + scale / shape1 * (1. - FastMath.pow(shape2, -shape1));
-        }
-        else {
-          return loc + scale * FastMath.log(shape2);
-        }
+        return loc + (shape1 != 0. //
+            ? scale / shape1 * (1. - FastMath.pow(shape2, -shape1)) //
+            : scale * FastMath.log(shape2));
       }
     }
     if(val == 1.) {
-      if(shape1 <= 0.) {
-        return Double.NEGATIVE_INFINITY;
-      }
-      return loc + scale / shape1;
+      return shape1 <= 0. ? Double.NEGATIVE_INFINITY : loc + scale / shape1;
     }
     val = -FastMath.log(val);
     if(shape2 != 0.) {
@@ -331,8 +323,7 @@ public class KappaDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    double u = random.nextDouble();
-    return quantile(u, location, scale, shape1, shape2);
+    return quantile(random.nextDouble(), location, scale, shape1, shape2);
   }
 
   @Override

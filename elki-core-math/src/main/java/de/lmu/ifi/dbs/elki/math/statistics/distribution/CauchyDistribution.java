@@ -172,10 +172,10 @@ public class CauchyDistribution extends AbstractDistribution {
    * @return PDF value
    */
   public static double quantile(double x, double location, double shape) {
-    return (x <= .5) ? (x == .5) ? location //
-        : (x == 0.) ? Double.NEGATIVE_INFINITY //
+    return (x == .5) ? location : (x <= .5) //
+        ? x <= 0. ? x < 0. ? Double.NaN : Double.NEGATIVE_INFINITY //
             : location - shape / FastMath.tan(Math.PI * x) //
-        : (x == 1.) ? Double.POSITIVE_INFINITY //
+        : x >= 1. ? x > 1. ? Double.NaN : Double.POSITIVE_INFINITY //
             : location + shape / FastMath.tan(Math.PI * (1 - x));
   }
 

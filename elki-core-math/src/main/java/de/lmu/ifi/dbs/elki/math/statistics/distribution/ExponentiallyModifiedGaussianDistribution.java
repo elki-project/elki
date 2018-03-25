@@ -170,7 +170,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return erfc > 0. ? .5 * lambda * FastMath.exp(lambda * (lss * .5 - dx)) * erfc : 0.;
+    return erfc > 0. ? .5 * lambda * FastMath.exp(lambda * (lss * .5 - dx)) * erfc : (x == x) ? 0. : Double.NaN;
   }
 
   /**
@@ -186,7 +186,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return erfc > 0 ? FastMath.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : Double.NEGATIVE_INFINITY;
+    return erfc > 0 ? FastMath.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : (x == x) ? Double.NEGATIVE_INFINITY : Double.NaN;
   }
 
   /**

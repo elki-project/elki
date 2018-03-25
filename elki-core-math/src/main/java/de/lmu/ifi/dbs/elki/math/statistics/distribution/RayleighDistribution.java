@@ -130,8 +130,8 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double pdf(double x, double sigma) {
-    if(x <= 0. || x == Double.POSITIVE_INFINITY) {
-      return 0.;
+    if(!(x > 0.) || x == Double.POSITIVE_INFINITY) {
+      return x == x ? 0. : Double.NaN;
     }
     final double xs = x / sigma;
     final double v = FastMath.exp(-.5 * xs * xs);
@@ -151,8 +151,8 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double logpdf(double x, double sigma) {
-    if(x <= 0. || x == Double.POSITIVE_INFINITY) {
-      return Double.NEGATIVE_INFINITY;
+    if(!(x > 0.) || x == Double.POSITIVE_INFINITY) {
+      return x == x ? Double.NEGATIVE_INFINITY : Double.NaN;
     }
     final double xs = x / sigma, xs2 = xs * xs;
     return xs2 < Double.POSITIVE_INFINITY ? FastMath.log(xs / sigma) - .5 * xs2 : Double.NEGATIVE_INFINITY;

@@ -172,6 +172,9 @@ public class ExpGammaDistribution extends AbstractDistribution {
     if(x == Double.POSITIVE_INFINITY) {
       return 1.;
     }
+    if(x != x) {
+      return Double.NaN;
+    }
     final double e = FastMath.exp((x - shift) * theta);
     return e < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(k, e) : 1.;
   }
@@ -201,6 +204,9 @@ public class ExpGammaDistribution extends AbstractDistribution {
     if(x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
       return 0.;
     }
+    if(x != x) {
+      return Double.NaN;
+    }
     x = (x - shift) * theta;
     final double ex = FastMath.exp(x);
     return ex < Double.POSITIVE_INFINITY ? FastMath.exp(k * x - ex - GammaDistribution.logGamma(k)) * theta : 0.;
@@ -217,6 +223,9 @@ public class ExpGammaDistribution extends AbstractDistribution {
   public static double logpdf(double x, double k, double theta, double shift) {
     if(x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
+    }
+    if(x != x) {
+      return Double.NaN;
     }
     x = (x - shift) * theta;
     double ex = FastMath.exp(x);
