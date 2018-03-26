@@ -152,8 +152,10 @@ public class AbstractDistributionTest {
   public void checkQuantile(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
     assertEquals("Not NaN for NaN", Double.NaN, d.quantile(Double.NaN), 0.);
+    assertEquals("Not NaN for -inf", Double.NaN, d.quantile(Double.NEGATIVE_INFINITY), 0.);
     assertEquals("Not NaN for -1", Double.NaN, d.quantile(-1), 0.);
     assertEquals("Not NaN for 2", Double.NaN, d.quantile(2), 0.);
+    assertEquals("Not NaN for inf", Double.NaN, d.quantile(Double.POSITIVE_INFINITY), 0.);
     assertNotNull("Key not in test data: " + key, data);
     int maxerrlev = -15;
     for(int i = 0; i < data.length;) {
