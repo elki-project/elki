@@ -146,6 +146,8 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * Instance for a single data set.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   class Instance {
     /**
@@ -355,6 +357,8 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * Parameterization class.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

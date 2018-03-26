@@ -181,6 +181,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * this is probably worth the 2*n doubles in storage.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class Instance {
     /**

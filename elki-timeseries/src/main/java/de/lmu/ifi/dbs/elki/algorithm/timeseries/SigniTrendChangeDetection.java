@@ -132,6 +132,8 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * Instance for one data set.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected class Instance {
     /**

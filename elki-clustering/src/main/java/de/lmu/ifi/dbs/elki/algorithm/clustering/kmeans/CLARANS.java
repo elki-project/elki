@@ -223,6 +223,8 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    * Assignment state.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class Assignment {
     /**

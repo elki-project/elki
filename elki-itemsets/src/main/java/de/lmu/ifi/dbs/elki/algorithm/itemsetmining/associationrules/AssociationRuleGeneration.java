@@ -130,6 +130,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * 
    * @author Erich Schubert
    *
+   * @apiviz.exclude
    */
   public class Instance {
     /**
@@ -284,6 +285,8 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * <b>Do not use this for storage.</b>
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class PartialItemset extends Itemset {
     /**
@@ -338,6 +341,8 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * TODO: optimize case of length 1.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class ItemsetSearcher {
     /**
@@ -457,6 +462,8 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * Parameterization class.
    *
    * @author Frederic Sautter
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

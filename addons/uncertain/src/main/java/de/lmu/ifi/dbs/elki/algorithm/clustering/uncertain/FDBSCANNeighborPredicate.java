@@ -143,6 +143,8 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    *
    * @author Alexander Koos
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Instance implements NeighborPredicate.Instance<DBIDs> {
     /**

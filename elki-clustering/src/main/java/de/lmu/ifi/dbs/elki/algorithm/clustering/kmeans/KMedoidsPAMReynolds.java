@@ -92,6 +92,8 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
    * Instance for a single dataset.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class Instance extends KMedoidsPAM.Instance {
     /**
