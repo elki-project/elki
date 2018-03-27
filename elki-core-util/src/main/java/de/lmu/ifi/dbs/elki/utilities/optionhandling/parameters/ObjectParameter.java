@@ -146,9 +146,4 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     return (instance != null) ? instance : (instance = super.instantiateClass(config));
     // NOTE: instance may remain null here, when instantiateClass failed.
   }
-
-  @Override
-  public Object getGivenValue() {
-    return (instance != null) ? instance : super.getGivenValue();
-  }
 }

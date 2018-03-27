@@ -122,11 +122,6 @@ public class MergedParameterization implements Parameterization {
   }
 
   @Override
-  public boolean hasErrors() {
-    return current.hasErrors();
-  }
-
-  @Override
   public void reportError(ParameterException e) {
     inner.reportError(e);
   }

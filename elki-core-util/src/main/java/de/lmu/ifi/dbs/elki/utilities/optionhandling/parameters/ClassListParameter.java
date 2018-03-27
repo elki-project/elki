@@ -226,56 +226,29 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     return instances;
   }
 
-  /**
-   * Provides a description string listing all classes for the given superclass
-   * or interface as specified in the properties.
-   *
-   * @return a description string listing all classes for the given superclass
-   *         or interface as specified in the properties
-   */
-  public String restrictionString() {
-    String pkgName = restrictionClass.getPackage().getName();
-    StringBuilder info = new StringBuilder(500);
-    info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
+  @Override
+  protected StringBuilder describeValues(StringBuilder buf) {
+    if(restrictionClass == null || restrictionClass == Object.class) {
+      return buf;
+    }
+    buf.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
         .append(restrictionClass.getName()) //
         .append(FormatUtil.NEWLINE);
 
     List<Class<?>> known = getKnownImplementations();
     if(!known.isEmpty()) {
-      info.append("Known classes (default package ").append(pkgName).append("):") //
+      String pkgName = restrictionClass.getPackage().getName();
+      buf.append("Known classes (default package ").append(pkgName).append("):") //
           .append(FormatUtil.NEWLINE);
       for(Class<?> c : known) {
         String name = c.getName();
         final boolean stripPrefix = name.length() > pkgName.length() && name.startsWith(pkgName) && name.charAt(pkgName.length()) == '.';
-        info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
+        buf.append("->").append(FormatUtil.NONBREAKING_SPACE) //
             .append(name, stripPrefix ? pkgName.length() + 1 : 0, name.length()) //
             .append(FormatUtil.NEWLINE);
       }
     }
-    return info.toString();
-  }
-
-  /**
-   * This class sometimes provides a list of value descriptions.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
-   */
-  @Override
-  public boolean hasValuesDescription() {
-    return restrictionClass != null && restrictionClass != Object.class;
-  }
-
-  /**
-   * Return a description of known valid classes.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
-   */
-  @Override
-  public String getValuesDescription() {
-    if(restrictionClass != null && restrictionClass != Object.class) {
-      return restrictionString();
-    }
-    return "";
+    return buf;
   }
 
   @Override

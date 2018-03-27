@@ -123,16 +123,6 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
   }
 
   @Override
-  public Object getGivenValue() {
-    Object r = super.getGivenValue();
-    if(r != null && seed != null) {
-      super.givenValue = RandomFactory.get(seed);
-      r = super.givenValue;
-    }
-    return r;
-  }
-
-  @Override
   public String getValueAsString() {
     return (seed != null) ? seed.toString() : "null";
   }

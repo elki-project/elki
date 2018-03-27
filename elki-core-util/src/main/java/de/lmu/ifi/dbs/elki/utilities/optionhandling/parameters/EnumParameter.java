@@ -44,14 +44,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * // ...
  * 
  * // Parameterization.
- * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class);
+ * EnumParameter&lt;MyEnum&gt; param = new
+ * EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class);
  * // OR
- * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, MyEnum.VALUE1);
+ * EnumParameter&lt;MyEnum&gt; param = new
+ * EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, MyEnum.VALUE1);
  * // OR
- * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, true);
+ * EnumParameter&lt;MyEnum&gt; param = new
+ * EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, true);
  * 
  * if(config.grab(param)) {
- *   myEnumParameter = param.getValue();
+ * myEnumParameter = param.getValue();
  * }
  * 
  * </p>
@@ -132,24 +135,13 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
     return getValue().name();
   }
 
-  /**
-   * This class sometimes provides a list of value descriptions.
-   * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
-   */
   @Override
-  public boolean hasValuesDescription() {
-    return true;
-  }
-
-  @Override
-  public String getValuesDescription() {
-    StringBuilder buf = new StringBuilder();
+  protected StringBuilder describeValues(StringBuilder buf) {
     buf.append("One of:").append(FormatUtil.NEWLINE);
     for(String s : getPossibleValues()) {
       buf.append("->").append(FormatUtil.NONBREAKING_SPACE).append(s).append(FormatUtil.NEWLINE);
     }
-    return buf.toString();
+    return buf;
   }
 
   /**

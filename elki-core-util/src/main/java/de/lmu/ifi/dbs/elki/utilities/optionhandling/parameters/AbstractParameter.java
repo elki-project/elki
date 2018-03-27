@@ -139,20 +139,14 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @Override
   public boolean hasDefaultValue() {
-    return !(defaultValue == null);
-  }
-
-  @Override
-  public void useDefaultValue() {
-    setValueInternal(defaultValue);
-    defaultValueTaken = true;
+    return defaultValue != null;
   }
 
   @Override
   public boolean tryDefaultValue() throws UnspecifiedParameterException {
     // Assume default value instead.
     if(hasDefaultValue()) {
-      useDefaultValue();
+      setValueInternal(defaultValue);
       return true;
     }
     if(isOptional()) {
@@ -190,14 +184,13 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     return defaultValue;
   }
 
-  @Override
-  public boolean hasValuesDescription() {
-    return false;
-  }
-
-  @Override
-  public String getValuesDescription() {
-    return "";
+  /**
+   * Describe the valid values.
+   * 
+   * @return String explaining valid values (e.g. a class list)
+   */
+  protected StringBuilder describeValues(StringBuilder description) {
+    return description;
   }
 
   @Override
@@ -205,12 +198,9 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     StringBuilder description = new StringBuilder(1000);
     // description.append(getParameterType()).append(" ");
     description.append(shortDescription).append(FormatUtil.NEWLINE);
-    if(hasValuesDescription()) {
-      final String valuesDescription = getValuesDescription();
-      description.append(valuesDescription);
-      if(!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
-        description.append(FormatUtil.NEWLINE);
-      }
+    describeValues(description);
+    if(!FormatUtil.endsWith(description, FormatUtil.NEWLINE)) {
+      description.append(FormatUtil.NEWLINE);
     }
     if(hasDefaultValue()) {
       description.append("Default: ").append(getDefaultValueAsString()).append(FormatUtil.NEWLINE);
@@ -291,11 +281,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
       LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + this.optionid.getName() + "\"", new Throwable());
     }
     return this.value;
-  }
-
-  @Override
-  public Object getGivenValue() {
-    return this.givenValue;
   }
 
   @Override

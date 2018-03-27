@@ -53,11 +53,6 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  public boolean hasErrors() {
-    return !errors.isEmpty();
-  }
-
-  @Override
   public boolean grab(Parameter<?> opt) {
     return false;
   }

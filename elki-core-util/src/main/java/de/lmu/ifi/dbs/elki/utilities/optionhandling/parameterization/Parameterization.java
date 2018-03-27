@@ -121,7 +121,9 @@ public interface Parameterization {
    * 
    * @return Success code
    */
-  boolean hasErrors();
+  default boolean hasErrors() {
+    return !getErrors().isEmpty();
+  }
 
   /**
    * Try to instantiate a particular class.

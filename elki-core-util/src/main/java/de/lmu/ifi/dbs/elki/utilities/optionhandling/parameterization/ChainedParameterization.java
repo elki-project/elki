@@ -58,7 +58,6 @@ public class ChainedParameterization extends AbstractParameterization {
     for(Parameterization p : ps) {
       chain.add(p);
     }
-    //logger.warning("Chain length: "+chain.size()+ " for "+this);
   }
 
   /**
@@ -68,7 +67,6 @@ public class ChainedParameterization extends AbstractParameterization {
    */
   public void appendParameterization(Parameterization p) {
     chain.add(p);
-    //logger.warning("Chain length: "+chain.size()+ " for "+this);
   }
   
   @Override

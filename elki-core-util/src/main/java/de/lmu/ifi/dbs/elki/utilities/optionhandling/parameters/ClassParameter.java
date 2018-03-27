@@ -157,42 +157,24 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     return "<class>";
   }
 
-  /**
-   * This class sometimes provides a list of value descriptions.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
-   */
   @Override
-  public boolean hasValuesDescription() {
-    return restrictionClass != null && restrictionClass != Object.class;
-  }
-
-  /**
-   * Return a description of known valid classes.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
-   */
-  @Override
-  public String getValuesDescription() {
-    if(restrictionClass != null && restrictionClass != Object.class) {
-      StringBuilder info = new StringBuilder(500);
-      info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
-          .append(restrictionClass.getName()).append(FormatUtil.NEWLINE);
-
-      List<Class<?>> known = getKnownImplementations();
-      if(!known.isEmpty()) {
-        info.append("Known classes (default package ")//
-            .append(restrictionClass.getPackage().getName())//
-            .append("):").append(FormatUtil.NEWLINE);
-        for(Class<?> c : known) {
-          info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
-              .append(canonicalClassName(c, getRestrictionClass())) //
-              .append(FormatUtil.NEWLINE);
-        }
-      }
-      return info.toString();
+  protected StringBuilder describeValues(StringBuilder info) {
+    if(restrictionClass == null || restrictionClass == Object.class) {
+      return info;
     }
-    return "";
+    info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
+        .append(restrictionClass.getName()) //
+        .append(FormatUtil.NEWLINE);
+
+    List<Class<?>> known = getKnownImplementations();
+    if(!known.isEmpty()) {
+      for(Class<?> c : known) {
+        info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
+            .append(canonicalClassName(c, getRestrictionClass())) //
+            .append(FormatUtil.NEWLINE);
+      }
+    }
+    return info;
   }
 
   @Override

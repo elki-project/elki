@@ -58,7 +58,7 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
       finishGridRow();
     }
 
-    if(!param.tookDefaultValue() && param.isDefined() && param.getGivenValue() != null) {
+    if(!param.tookDefaultValue() && param.isDefined()) {
       value.addItem(param.getValueAsString());
       value.setSelectedIndex(0);
     }

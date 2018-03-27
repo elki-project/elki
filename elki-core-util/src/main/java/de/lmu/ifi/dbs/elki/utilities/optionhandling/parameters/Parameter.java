@@ -59,13 +59,6 @@ public interface Parameter<T> {
   boolean hasDefaultValue();
 
   /**
-   * Sets the default value of this parameter as the actual value of this
-   * parameter.
-   */
-  // TODO: can we do this more elegantly?
-  void useDefaultValue();
-
-  /**
    * Handle default values for a parameter.
    * 
    * @return Return code: {@code true} if it has a default value, {@code false}
@@ -116,20 +109,6 @@ public interface Parameter<T> {
    */
   // TODO: change this to return a string value?
   T getDefaultValue();
-
-  /**
-   * Whether this class has a list of default values.
-   * 
-   * @return whether the class has a description of valid values.
-   */
-  boolean hasValuesDescription();
-
-  /**
-   * Return a string explaining valid values.
-   * 
-   * @return String explaining valid values (e.g. a class list)
-   */
-  String getValuesDescription();
 
   /**
    * Returns the extended description of the option which includes the option's
@@ -187,13 +166,6 @@ public interface Parameter<T> {
    * @return the option's value.
    */
   T getValue();
-
-  /**
-   * Get the last given value. May return {@code null}
-   * 
-   * @return Given value
-   */
-  Object getGivenValue();
 
   /**
    * Checks if the given argument is valid for this option.

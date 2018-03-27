@@ -25,7 +25,12 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Formatter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Utility methods for output formatting of various number objects
@@ -1041,16 +1046,15 @@ public final class FormatUtil {
     // This is almost a binary search - 10 cases is not a power of two, and we
     // assume that the smaller values are more frequent.
     return //
-    (x < 10000) ? // 1-4 vs. 5-10
-    /**/(x < 100) ? // 1-2 vs. 3-4
-    /*   */((x < 10) ? 1 : 2) : //
-    /*   */((x < 1000) ? 3 : 4) : //
-    /**/(x < 1000000) ? // 5-6 vs. 7-10
-    /*  */((x < 100000) ? 5 : 6) : // 5-6
-    /*  */(x < 100000000) ? // 7-8 vs. 9-10
-    /*    */((x < 10000000) ? 7 : 8) : // 7-8
-    /*    */((x < 1000000000) ? 9 : 10) // 9-10
-    ;
+    (x < 10000) // 1-4 vs. 5-10
+        ? (x < 100) // 1-2 vs. 3-4
+            ? ((x < 10) ? 1 : 2) //
+            : ((x < 1000) ? 3 : 4) //
+        : (x < 1000000) // 5-6 vs. 7-10
+            ? ((x < 100000) ? 5 : 6) // 5-6
+            : (x < 100000000) // 7-8 vs. 9-10
+                ? ((x < 10000000) ? 7 : 8) // 7-8
+                : ((x < 1000000000) ? 9 : 10); // 9-10
   }
 
   /**
@@ -1066,17 +1070,37 @@ public final class FormatUtil {
       // Avoid overflow on extreme negative
       return (x == Long.MIN_VALUE) ? 20 : stringSize(-x) + 1;
     }
-    // This is almost a binary search.
+    // This is almost a binary search - 10 cases is not a power of two, and we
+    // assume that the smaller values are more frequent.
     return (x <= Integer.MAX_VALUE) ? stringSize((int) x) : //
-        (x < 10000000000000L) ? // 10-13 vs. 14-19
-        /**/(x < 100000000000L) ? // 10-11 vs. 12-13
-        /*   */((x < 10000000000L) ? 10 : 11) : //
-        /*   */((x < 1000000000000L) ? 12 : 13) : //
-        /**/(x < 1000000000000000L) ? // 14-15 vs. 16-19
-        /*  */((x < 100000000000000L) ? 14 : 15) : // 14-15
-        /*  */(x < 100000000000000000L) ? // 16-17 vs. 18-19
-        /*    */((x < 10000000000000000L) ? 16 : 17) : // 16-17
-        /*    */((x < 1000000000000000000L) ? 18 : 19) // 18-19
-    ;
+        (x < 10000000000000L) // 10-13 vs. 14-19
+            ? (x < 100000000000L) // 10-11 vs. 12-13
+                ? ((x < 10000000000L) ? 10 : 11) //
+                : ((x < 1000000000000L) ? 12 : 13) //
+            : (x < 1000000000000000L) // 14-15 vs. 16-19
+                ? ((x < 100000000000000L) ? 14 : 15) // 14-15
+                : (x < 100000000000000000L) // 16-17 vs. 18-19
+                    ? ((x < 10000000000000000L) ? 16 : 17) // 16-17
+                    : ((x < 1000000000000000000L) ? 18 : 19); // 18-19
+  }
+
+  /**
+   * Similar to {@link String#endsWith(String)} but for buffers.
+   *
+   * @param buf Buffer
+   * @param end End
+   * @return
+   */
+  public static boolean endsWith(CharSequence buf, CharSequence end) {
+    int len = end.length(), start = buf.length() - len;
+    if(start < 0) {
+      return false;
+    }
+    for(int i = 0; i < len; i++, start++) {
+      if(buf.charAt(start) != end.charAt(i)) {
+        return false;
+      }
+    }
+    return false;
   }
 }

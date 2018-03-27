@@ -100,7 +100,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       textfield.setText(cp.getValueAsString());
     }
     textfield.setPreferredSize(new Dimension(400, textfield.getPreferredSize().height));
-    if(!param.tookDefaultValue() && param.isDefined() && param.getGivenValue() != null) {
+    if(!param.tookDefaultValue() && param.isDefined()) {
       textfield.setText(param.getValueAsString());
       // FIXME: pre-select the current / default value in tree!
     }

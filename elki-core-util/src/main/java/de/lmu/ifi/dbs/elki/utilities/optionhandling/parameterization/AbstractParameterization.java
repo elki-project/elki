@@ -51,11 +51,6 @@ public abstract class AbstractParameterization implements Parameterization {
   }
 
   @Override
-  public boolean hasErrors() {
-    return !errors.isEmpty();
-  }
-
-  @Override
   public void reportError(ParameterException e) {
     errors.add(e);
   }
