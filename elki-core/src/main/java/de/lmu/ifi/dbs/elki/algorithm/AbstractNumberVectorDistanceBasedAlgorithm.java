@@ -83,7 +83,7 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R extends Re
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

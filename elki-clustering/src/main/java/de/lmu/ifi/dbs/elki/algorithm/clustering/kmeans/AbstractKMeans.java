@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
@@ -413,7 +414,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterDistanceFunction(Parameterization config) {
-      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(distanceFunction != null //
@@ -442,7 +443,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterMaxIter(Parameterization config) {
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0).addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }

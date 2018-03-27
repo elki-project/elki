@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -971,7 +972,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
         h = hP.getValue();
       }
 
-      ObjectParameter<LPNormDistanceFunction> distP = AbstractDistanceBasedAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, LPNormDistanceFunction.class);
+      ObjectParameter<LPNormDistanceFunction> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         distfunc = distP.instantiateClass(config);
       }

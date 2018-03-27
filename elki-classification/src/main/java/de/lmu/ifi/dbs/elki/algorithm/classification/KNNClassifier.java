@@ -208,7 +208,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         distanceFunction = distP.instantiateClass(config);
       }

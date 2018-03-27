@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.projection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -243,7 +244,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     @Override
     protected void makeOptions(Parameterization config) {
       // Override: super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = AbstractDistanceBasedAlgorithm.makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

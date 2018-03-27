@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -364,7 +365,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<NumberVectorDistanceFunction<? super NumberVector>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

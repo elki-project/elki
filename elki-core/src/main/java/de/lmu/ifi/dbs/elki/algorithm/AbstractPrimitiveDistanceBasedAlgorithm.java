@@ -85,7 +85,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R extends Resul
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

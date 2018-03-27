@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -329,7 +329,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceP)) {
         distance = distanceP.instantiateClass(config);
       }

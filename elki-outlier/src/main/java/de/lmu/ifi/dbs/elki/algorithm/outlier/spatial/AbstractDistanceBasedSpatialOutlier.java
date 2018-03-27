@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -38,11 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Non-spatial object type
  */
 public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends AbstractNeighborhoodOutlier<N> {
-  /**
-   * Parameter to specify the non spatial distance function to use
-   */
-  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = new OptionID("spatialoutlier.nonspatialdistance", "The distance function to use for non spatial attributes");
-
   /**
    * The distance function to use
    */
@@ -81,6 +77,11 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
    */
   public abstract static class Parameterizer<N, O> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
+     * Parameter to specify the non spatial distance function to use
+     */
+    public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = new OptionID("spatialoutlier.nonspatialdistance", "The distance function to use for non spatial attributes");
+
+    /**
      * The distance function to use on the non-spatial attributes.
      */
     protected PrimitiveDistanceFunction<O> distanceFunction = null;
@@ -88,7 +89,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

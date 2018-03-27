@@ -26,12 +26,10 @@ import java.lang.reflect.Method;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>
@@ -142,18 +140,6 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
    * @return the static logger
    */
   protected abstract Logging getLogger();
-
-  /**
-   * Make a default distance function configuration option.
-   * 
-   * @param <F> Distance function type
-   * @param defaultDistanceFunction Default value
-   * @param restriction Restriction class
-   * @return Parameter object
-   */
-  public static <F extends DistanceFunction<?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
-    return new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
-  }
 
   /**
    * Parameter to specify the algorithm to run.

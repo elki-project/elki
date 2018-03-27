@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -701,7 +702,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

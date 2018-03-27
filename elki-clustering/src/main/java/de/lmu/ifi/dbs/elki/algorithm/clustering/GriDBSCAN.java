@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Assignment;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Border;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Core;
@@ -696,7 +697,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected void makeOptions(Parameterization config) {
       // Disabled: super.makeOptions(config);
       // Because we currently only allow Lp norms:
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, LPNormDistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

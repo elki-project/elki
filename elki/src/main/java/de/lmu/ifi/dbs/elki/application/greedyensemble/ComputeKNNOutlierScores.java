@@ -28,14 +28,28 @@ import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.FastABOD;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.*;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNDD;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNSOS;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.LocalIsolationCoefficient;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.ISOS;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.*;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.COF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -71,7 +85,6 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
-
 import net.jafama.FastMath;
 
 /**
@@ -474,7 +487,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<DistanceFunction<? super O>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }

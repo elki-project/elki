@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.Linkage;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.SingleLinkage;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.linkage.WardLinkage;
@@ -380,7 +381,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     @Override
     protected void makeOptions(Parameterization config) {
       // We don't call super, because we want a different default distance.
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

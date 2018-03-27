@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -344,7 +344,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
