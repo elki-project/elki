@@ -38,7 +38,7 @@ import elki.logging.LoggingConfiguration;
 import elki.utilities.ELKIServiceLoader;
 import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Perform some consistency checks on classes that cannot be specified as Java
@@ -116,7 +116,7 @@ public class CheckParameterizables {
       throw new AbortException("Error enumerating service folders.", e);
     }
 
-    final String internal =elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
+    final String internal = Parameterizer.class.getPackage().getName();
     for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false)) {
       // Classes in the same package are special and don't cause warnings.
       if(cls.getName().startsWith(internal)) {
@@ -135,11 +135,11 @@ public class CheckParameterizables {
         boolean expectedParameterizer = checkSupertypes(cls);
         if(state == State.NO_CONSTRUCTOR && expectedParameterizer) {
           LOG.verbose("Class " + cls.getName() + //
-          " implements a parameterizable interface, but doesn't have a public and parameterless constructor!");
+              " implements a parameterizable interface, but doesn't have a public and parameterless constructor!");
         }
         if(state == State.INSTANTIABLE && !expectedParameterizer) {
           LOG.verbose("Class " + cls.getName() + //
-          " has a parameterizer, but there is no service file for any of its interfaces.");
+              " has a parameterizer, but there is no service file for any of its interfaces.");
         }
       }
       catch(NoClassDefFoundError e) {
@@ -180,9 +180,9 @@ public class CheckParameterizables {
   private State checkV3Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
     // check for a V3 Parameterizer class
     for(Class<?> inner : cls.getDeclaredClasses()) {
-      if(AbstractParameterizer.class.isAssignableFrom(inner)) {
+      if(Parameterizer.class.isAssignableFrom(inner)) {
         try {
-          Class<? extends AbstractParameterizer> pcls = inner.asSubclass(AbstractParameterizer.class);
+          Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
           pcls.newInstance();
           if(checkParameterizer(cls, pcls)) {
             if(state == State.INSTANTIABLE) {
@@ -191,7 +191,7 @@ public class CheckParameterizables {
             state = State.INSTANTIABLE;
           }
         }
-        catch(Exception|Error e) {
+        catch(Exception | Error e) {
           LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e.getMessage());
           // continue. Probably non-public
         }
@@ -212,7 +212,7 @@ public class CheckParameterizables {
     return state;
   }
 
-  private boolean checkParameterizer(Class<?> cls, Class<? extends AbstractParameterizer> par) {
+  private boolean checkParameterizer(Class<?> cls, Class<? extends Parameterizer> par) {
     int checkResult = 0;
     try {
       par.getConstructor();
@@ -237,11 +237,11 @@ public class CheckParameterizables {
       }
     }
     catch(Exception e) {
-      LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + ": " + e);
+      LOG.warning("No proper Par.makeInstance for " + cls.getName() + ": " + e);
       return false;
     }
     if(checkResult > 1) {
-      LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + " found!");
+      LOG.warning("No proper Par.makeInstance for " + cls.getName() + " found!");
     }
     return checkResult == 1;
   }

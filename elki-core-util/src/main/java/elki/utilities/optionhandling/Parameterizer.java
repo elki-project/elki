@@ -39,5 +39,17 @@ public interface Parameterizer {
    * 
    * @param config Parameterization
    */
-  void configure(Parameterization config);
+  default void configure(Parameterization config) {
+    // Nothing to do by default;
+  }
+
+  /**
+   * Make an instance after successful configuration.
+   * 
+   * Note: your class should return the exact type, only this very broad
+   * interface should use {@code Object} as return type.
+   *
+   * @return a new instance
+   */
+  Object make();
 }

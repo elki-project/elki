@@ -28,7 +28,6 @@ import org.junit.Test;
 
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import elki.utilities.optionhandling.parameterization.UnParameterization;
@@ -51,9 +50,9 @@ public class ParameterizationTest {
   private void checkV3Parameterization(Class<?> cls) throws NoClassDefFoundError {
     boolean first = true;
     for(Class<?> inner : cls.getDeclaredClasses()) {
-      if(AbstractParameterizer.class.isAssignableFrom(inner)) {
+      if(Parameterizer.class.isAssignableFrom(inner)) {
         try {
-          Class<? extends AbstractParameterizer> pcls = inner.asSubclass(AbstractParameterizer.class);
+          Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
           pcls.newInstance();
           assertTrue("More than one parameterization method in class " + cls.getName(), first);
           checkMakeInstance(cls, pcls);
@@ -71,14 +70,14 @@ public class ParameterizationTest {
     }
   }
 
-  private void checkMakeInstance(Class<?> cls, Class<? extends AbstractParameterizer> par) {
+  private void checkMakeInstance(Class<?> cls, Class<? extends Parameterizer> par) {
     try {
       par.getConstructor();
       final Method[] methods = par.getDeclaredMethods();
       boolean hasMakeInstance = false;
       for(int i = 0; i < methods.length; ++i) {
         final Method meth = methods[i];
-        if(meth.getName().equals("makeInstance")) {
+        if(meth.getName().equals("make")) {
           // Check for empty signature
           if(meth.getParameterTypes().length == 0) {
             // And check for proper return type.
@@ -88,10 +87,10 @@ public class ParameterizationTest {
           }
         }
       }
-      assertTrue("No suitable makeInstance() for " + cls.getName(), hasMakeInstance);
+      assertTrue("No suitable make() for " + cls.getName(), hasMakeInstance);
     }
     catch(Exception e) {
-      fail("No proper Parameterizer.makeInstance for " + cls.getName() + ": " + e);
+      fail("No proper Par.make() for " + cls.getName() + ": " + e);
     }
   }
 }

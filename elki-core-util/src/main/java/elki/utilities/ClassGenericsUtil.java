@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -112,16 +111,45 @@ public final class ClassGenericsUtil {
     try {
       // Try a V3 parameterization class
       Parameterizer par = getParameterizer(c);
-      if(par instanceof AbstractParameterizer) {
-        return r.cast(((AbstractParameterizer) par).make(config));
-      }
-      // Try a default constructor.
-      return r.cast(c.getConstructor().newInstance());
+      return r.cast(par != null ? make(par, config) //
+          // Try a default constructor.
+          : c.getConstructor().newInstance());
     }
     catch(InstantiationException | InvocationTargetException
         | IllegalAccessException | NoSuchMethodException e) {
       throw new ClassInstantiationException(e);
     }
+  }
+
+  /**
+   * Method to configure a class, then instantiate when the configuration step
+   * was successful.
+   * 
+   * <b>Don't call this directly use unless you know what you are doing. <br />
+   * Instead, use {@link Parameterization#tryInstantiate(Class)}!</b>
+   * 
+   * Otherwise, {@code null} will be returned, and the resulting errors can be
+   * retrieved from the {@link Parameterization} parameter object. In general,
+   * you should be checking the {@link Parameterization} object for errors
+   * before accessing the returned value, since it may be {@code null}
+   * unexpectedly otherwise.
+   * 
+   * @param config Parameterization
+   * @return Instance or {@code null}
+   */
+  public static Object make(Parameterizer par, Parameterization config) {
+    Object owner = par.getClass().getDeclaringClass();
+    config = config.descend(owner != null ? owner : par);
+    par.configure(config);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    Object ret = par.make();
+    if(ret == null) {
+      throw new AbortException("makeInstance() returned null!");
+    }
+    return ret;
   }
 
   /**
