@@ -97,7 +97,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
         obj = RandomFactory.get(seed);
       }
       catch(NumberFormatException e) {
-        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
+        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
     }
     super.setValue(obj);
@@ -118,7 +118,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
       return RandomFactory.get(Long.valueOf(obj.toString()));
     }
     catch(NullPointerException | NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
     }
   }
 

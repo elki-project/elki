@@ -142,7 +142,7 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
       // do extra validation:
       for(Object o : l) {
         if(!(o instanceof double[])) {
-          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
+          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getOptionID().getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?
@@ -155,7 +155,7 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
     if(obj instanceof String) {
       String[] vectors = VECTOR_SPLIT.split((String) obj);
       if(vectors.length == 0) {
-        throw new WrongParameterValueException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is empty!");
+        throw new WrongParameterValueException("Wrong parameter format! Given list of vectors for parameter \"" + getOptionID().getName() + "\" is empty!");
       }
       ArrayList<double[]> vecs = new ArrayList<>();
 
@@ -179,7 +179,7 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
       }
       return vecs;
     }
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of double values!");
+    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a list of double values!");
   }
 
   @Override

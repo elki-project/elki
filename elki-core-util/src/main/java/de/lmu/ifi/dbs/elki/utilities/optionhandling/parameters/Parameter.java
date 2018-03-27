@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -45,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 public interface Parameter<T> {
   /**
    * Sets the default value of this parameter.
-   * 
+   *
    * @param defaultValue default value of this parameter
    * @return the parameter itself, for chaining
    */
@@ -53,14 +55,14 @@ public interface Parameter<T> {
 
   /**
    * Checks if this parameter has a default value.
-   * 
+   *
    * @return true, if this parameter has a default value, false otherwise
    */
   boolean hasDefaultValue();
 
   /**
    * Handle default values for a parameter.
-   * 
+   *
    * @return Return code: {@code true} if it has a default value, {@code false}
    *         if it is optional without a default value. Exception if it is a
    *         required parameter!
@@ -70,7 +72,7 @@ public interface Parameter<T> {
 
   /**
    * Specifies if this parameter is an optional parameter.
-   * 
+   *
    * @param opt true if this parameter is optional, false otherwise
    * @return the parameter itself, for chaining
    */
@@ -78,7 +80,7 @@ public interface Parameter<T> {
 
   /**
    * Checks if this parameter is an optional parameter.
-   * 
+   *
    * @return true if this parameter is optional, false otherwise
    */
   boolean isOptional();
@@ -86,7 +88,7 @@ public interface Parameter<T> {
   /**
    * Checks if the default value of this parameter was taken as the actual
    * parameter value.
-   * 
+   *
    * @return true, if the default value was taken as actual parameter value,
    *         false otherwise
    */
@@ -94,7 +96,7 @@ public interface Parameter<T> {
 
   /**
    * Returns true if the value of the option is defined, false otherwise.
-   * 
+   *
    * @return true if the value of the option is defined, false otherwise.
    */
   boolean isDefined();
@@ -103,7 +105,7 @@ public interface Parameter<T> {
    * Returns the default value of the parameter.
    * <p/>
    * If the parameter has no default value, the method returns <b>null</b>.
-   * 
+   *
    * @return the default value of the parameter, <b>null</b> if the parameter
    *         has no default value.
    */
@@ -111,44 +113,29 @@ public interface Parameter<T> {
   T getDefaultValue();
 
   /**
-   * Returns the extended description of the option which includes the option's
-   * type, the short description and the default value (if specified).
-   * 
-   * @return the option's description.
-   */
-  String getFullDescription();
-
-  /**
    * Return the OptionID of this option.
-   * 
+   *
    * @return Option ID
    */
   OptionID getOptionID();
 
   /**
-   * Returns the name of the option.
-   * 
-   * @return the option's name.
-   */
-  String getName();
-
-  /**
    * Returns the short description of the option.
-   * 
+   *
    * @return the option's short description.
    */
   String getShortDescription();
 
   /**
    * Sets the short description of the option.
-   * 
+   *
    * @param description the short description to be set
    */
   void setShortDescription(String description);
 
   /**
    * Sets the value of the option.
-   * 
+   *
    * @param obj the option's value to be set
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
@@ -157,12 +144,12 @@ public interface Parameter<T> {
 
   /**
    * Returns the value of the option.
-   * 
+   *
    * You should use either
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}
    * or {@link #isDefined} to test if getValue() will return a well-defined
    * value.
-   * 
+   *
    * @return the option's value.
    */
   T getValue();
@@ -181,30 +168,45 @@ public interface Parameter<T> {
    * Returns a string representation of the parameter's type (e.g. an
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter}
    * should return {@code <int>}).
-   * 
+   *
    * @return a string representation of the parameter's type
    */
   String getSyntax();
 
   /**
    * Get the value as string. May return {@code null}
-   * 
+   *
    * @return Value as string
    */
   String getValueAsString();
 
   /**
    * Get the default value as string.
-   * 
+   *
    * @return default value
    */
   String getDefaultValueAsString();
 
   /**
+   * Describe the valid values.
+   *
+   * @param description Buffer to append to
+   * @return Buffer
+   */
+  StringBuilder describeValues(StringBuilder description);
+  
+  /**
    * Add an additional constraint.
-   * 
+   *
    * @param constraint Constraint to add.
    * @return the parameter itself, for chaining
    */
   Parameter<T> addConstraint(ParameterConstraint<? super T> constraint);
+
+  /**
+   * Get the parameter constraints.
+   *
+   * @return Parameter constraints
+   */
+  List<ParameterConstraint<? super T>> getConstraints();
 }

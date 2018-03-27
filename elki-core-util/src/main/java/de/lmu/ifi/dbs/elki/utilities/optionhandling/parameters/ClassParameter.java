@@ -158,7 +158,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   }
 
   @Override
-  protected StringBuilder describeValues(StringBuilder info) {
+  public StringBuilder describeValues(StringBuilder info) {
     if(restrictionClass == null || restrictionClass == Object.class) {
       return info;
     }

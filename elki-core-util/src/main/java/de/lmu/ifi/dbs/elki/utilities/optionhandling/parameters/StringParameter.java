@@ -66,7 +66,7 @@ public class StringParameter extends AbstractParameter<StringParameter, String> 
       return (String) obj;
     }
     // TODO: allow anything convertible by toString()?
-    throw new WrongParameterValueException("String parameter " + getName() + " is not a string.");
+    throw new WrongParameterValueException("String parameter " + getOptionID().getName() + " is not a string.");
   }
 
   /**

@@ -83,10 +83,10 @@ public class PatternParameter extends AbstractParameter<PatternParameter, Patter
         return Pattern.compile((String) obj, Pattern.CASE_INSENSITIVE);
       }
       catch(PatternSyntaxException e) {
-        throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getName() + "\" is no valid regular expression!");
+        throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getOptionID().getName() + "\" is no valid regular expression!");
       }
     }
-    throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getName() + "\" is of unknown type!");
+    throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getOptionID().getName() + "\" is of unknown type!");
   }
 
   /**

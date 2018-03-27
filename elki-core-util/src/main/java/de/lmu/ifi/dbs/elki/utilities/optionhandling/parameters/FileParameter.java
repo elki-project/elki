@@ -105,7 +105,7 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
     if(obj instanceof String) {
       return new File((String) obj);
     }
-    throw new WrongParameterValueException("Parameter \"" + getName() + "\": Unsupported value given!");
+    throw new WrongParameterValueException("Parameter \"" + getOptionID().getName() + "\": Unsupported value given!");
   }
 
   @Override
@@ -118,7 +118,7 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
         if(obj.exists()) {
           return true;
         }
-        throw new WrongParameterValueException("Given file " + obj.getPath() + " for parameter \"" + getName() + "\" does not exist!\n");
+        throw new WrongParameterValueException("Given file " + obj.getPath() + " for parameter \"" + getOptionID().getName() + "\" does not exist!\n");
       }
       catch(SecurityException e) {
         throw new WrongParameterValueException("Given file \"" + obj.getPath() + "\" cannot be read, access denied!\n" + e.getMessage());

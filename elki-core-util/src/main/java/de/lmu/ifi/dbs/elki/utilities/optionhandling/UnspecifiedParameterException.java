@@ -46,7 +46,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
    */
   public UnspecifiedParameterException(Parameter<?> parameter) {
     super(parameter, null, "requires a value.");
-    this.parameter = parameter.getName();
+    this.parameter = parameter.getOptionID().getName();
   }
 
   /**

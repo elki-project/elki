@@ -43,7 +43,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason, Throwable cause) {
-    super(parameter, reason + formatRead(read) + "\nExpected: " + parameter.getFullDescription() + formatCause(cause), cause);
+    super(parameter, reason + formatRead(read) + "\nExpected: " + parameter.getOptionID().getDescription() + formatCause(cause), cause);
   }
 
   /**

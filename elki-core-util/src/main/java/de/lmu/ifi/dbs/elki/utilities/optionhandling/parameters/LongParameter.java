@@ -69,7 +69,7 @@ public class LongParameter extends NumberParameter<LongParameter, Long> {
       return ParseUtil.parseLongBase10(obj.toString());
     }
     catch(NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a long value, read: " + obj + "!\n");
     }
   }
 

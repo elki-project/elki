@@ -22,10 +22,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -184,38 +184,9 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     return defaultValue;
   }
 
-  /**
-   * Describe the valid values.
-   * 
-   * @return String explaining valid values (e.g. a class list)
-   */
-  protected StringBuilder describeValues(StringBuilder description) {
-    return description;
-  }
-
   @Override
-  public String getFullDescription() {
-    StringBuilder description = new StringBuilder(1000);
-    // description.append(getParameterType()).append(" ");
-    description.append(shortDescription).append(FormatUtil.NEWLINE);
-    describeValues(description);
-    if(!FormatUtil.endsWith(description, FormatUtil.NEWLINE)) {
-      description.append(FormatUtil.NEWLINE);
-    }
-    if(hasDefaultValue()) {
-      description.append("Default: ").append(getDefaultValueAsString()).append(FormatUtil.NEWLINE);
-    }
-    if(constraints != null && !constraints.isEmpty()) {
-      description.append((constraints.size() == 1) ? "Constraint: " : "Constraints: ");
-      for(int i = 0; i < constraints.size(); i++) {
-        if(i > 0) {
-          description.append(", ");
-        }
-        description.append(constraints.get(i).getDescription(getName()));
-      }
-      description.append('.').append(FormatUtil.NEWLINE);
-    }
-    return description.toString();
+  public StringBuilder describeValues(StringBuilder description) {
+    return description;
   }
 
   /**
@@ -240,11 +211,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   }
 
   @Override
-  public String getName() {
-    return optionid.getName();
-  }
-
-  @Override
   public String getShortDescription() {
     return shortDescription;
   }
@@ -263,7 +229,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
         return;
       }
     }
-    throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
+    throw new InvalidParameterException("Value for option \"" + getOptionID().getName() + "\" did not validate: " + obj.toString());
   }
 
   /**
@@ -278,7 +244,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   @Override
   public final T getValue() {
     if(this.value == null) {
-      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + this.optionid.getName() + "\"", new Throwable());
+      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + getOptionID().getName() + "\"", new Throwable());
     }
     return this.value;
   }
@@ -311,10 +277,12 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   @SuppressWarnings("unchecked")
   @Override
   public THIS addConstraint(ParameterConstraint<? super T> constraint) {
-    if(constraints == null) {
-      this.constraints = new ArrayList<>(1);
-    }
-    constraints.add(constraint);
+    (constraints != null ? constraints : (constraints = new ArrayList<>(2))).add(constraint);
     return (THIS) this;
+  }
+
+  @Override
+  public List<ParameterConstraint<? super T>> getConstraints() {
+    return Collections.unmodifiableList(this.constraints);
   }
 }

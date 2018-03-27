@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -60,7 +61,7 @@ public final class OptionUtil {
   public static <O extends Parameter<?>> String optionsNamesToString(List<O> options) {
     StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < options.size(); i++) {
-      buffer.append(options.get(i).getName());
+      buffer.append(options.get(i).getOptionID().getName());
       if(i != options.size() - 1) {
         buffer.append(',');
       }
@@ -79,7 +80,7 @@ public final class OptionUtil {
   public static <O extends Parameter<?>> String optionsNamesToString(O[] options) {
     StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < options.length; i++) {
-      buffer.append(options[i].getName());
+      buffer.append(options[i].getOptionID().getName());
       if(i != options.length - 1) {
         buffer.append(',');
       }
@@ -98,7 +99,7 @@ public final class OptionUtil {
   public static <N extends Parameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
     StringBuilder buffer = new StringBuilder(1000).append('[');
     for(int i = 0; i < parameters.size(); i++) {
-      buffer.append(parameters.get(i).getName()).append(':') //
+      buffer.append(parameters.get(i).getOptionID().getName()).append(':') //
           .append(parameters.get(i).getValueAsString());
       if(i != parameters.size() - 1) {
         buffer.append(", ");
@@ -119,10 +120,38 @@ public final class OptionUtil {
   public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<TrackedParameter> options) {
     for(TrackedParameter pair : options) {
       println(buf//
-          .append(SerializedParameterization.OPTION_PREFIX).append(pair.getParameter().getName()) //
+          .append(SerializedParameterization.OPTION_PREFIX).append(pair.getParameter().getOptionID().getName()) //
           .append(' ').append(pair.getParameter().getSyntax()).append(FormatUtil.NEWLINE), //
-          width, pair.getParameter().getFullDescription(), indent);
+          width, getFullDescription(pair.getParameter()), indent);
     }
+  }
+
+  /**
+   * Format a parameter description.
+   * 
+   * @param param
+   * @return Parameter description
+   */
+  public static <T> String getFullDescription(Parameter<T> param) {
+    StringBuilder description = new StringBuilder(1000);
+    // description.append(getParameterType()).append(" ");
+    description.append(param.getShortDescription()).append(FormatUtil.NEWLINE);
+    param.describeValues(description);
+    if(!FormatUtil.endsWith(description, FormatUtil.NEWLINE)) {
+      description.append(FormatUtil.NEWLINE);
+    }
+    if(param.hasDefaultValue()) {
+      description.append("Default: ").append(param.getDefaultValueAsString()).append(FormatUtil.NEWLINE);
+    }
+    List<ParameterConstraint<? super T>> constraints = param.getConstraints();
+    if(constraints != null && !constraints.isEmpty()) {
+      description.append((constraints.size() == 1) ? "Constraint: " : "Constraints: ");
+      for(int i = 0; i < constraints.size(); i++) {
+        description.append(i > 0 ? ", " : "").append(constraints.get(i).getDescription(param.getOptionID().getName()));
+      }
+      description.append('.').append(FormatUtil.NEWLINE);
+    }
+    return description.toString();
   }
 
   /**

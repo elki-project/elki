@@ -459,7 +459,7 @@ public class DocumentParameters {
         Element elemdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
         {
           Element elemtt = htmldoc.createElement(HTMLUtil.HTML_TT_TAG);
-          elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + opt.getName() + " " + opt.getSyntax());
+          elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + opt.getOptionID().getName() + " " + opt.getSyntax());
           elemdt.appendChild(elemtt);
         }
         classdl.appendChild(elemdt);
@@ -589,7 +589,7 @@ public class DocumentParameters {
       for(Parameter<?> opt : byclass.get(cls)) {
         out.printitem("* ");
         out.print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
-            .print(opt.getName()).print(' ').print(opt.getSyntax()) //
+            .print(opt.getOptionID().getName()).print(' ').print(opt.getSyntax()) //
             .println("}}}");
         if(opt.getShortDescription() != null) {
           appendMultilineTextWiki(out, opt.getShortDescription());
@@ -708,13 +708,13 @@ public class DocumentParameters {
       // Anchor for references
       {
         Element optan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-        optan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, firstopt.getName());
+        optan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, firstopt.getOptionID().getName());
         optdt.appendChild(optan);
       }
       // option name
       {
         Element elemtt = htmldoc.createElement(HTMLUtil.HTML_TT_TAG);
-        elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + firstopt.getName() + " " + firstopt.getSyntax());
+        elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + firstopt.getOptionID().getName() + " " + firstopt.getSyntax());
         optdt.appendChild(elemtt);
       }
       maindl.appendChild(optdt);
@@ -830,7 +830,7 @@ public class DocumentParameters {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       out.indent = 1;
       out.printitem("").print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
-          .print(firstopt.getName()).print(' ').print(firstopt.getSyntax()).println("}}}:: ");
+          .print(firstopt.getOptionID().getName()).print(' ').print(firstopt.getSyntax()).println("}}}:: ");
       out.newline = 1; // No BR needed, we increase the indent.
       out.indent = 2;
 

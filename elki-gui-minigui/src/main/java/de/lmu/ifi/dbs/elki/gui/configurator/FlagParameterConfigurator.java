@@ -49,7 +49,7 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
     constraints.gridwidth = 2;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 1.0;
-    value = new JCheckBox(param.getName());
+    value = new JCheckBox(param.getOptionID().getName());
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setSelected(param.isTrue());
     }

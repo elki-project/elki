@@ -69,7 +69,7 @@ public class IntParameter extends NumberParameter<IntParameter, Integer> {
       return ParseUtil.parseIntBase10(obj.toString());
     }
     catch(NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires an integer value, read: " + obj + "!\n");
     }
   }
 

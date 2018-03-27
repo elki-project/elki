@@ -98,7 +98,7 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
     if(obj instanceof Integer) {
       return new int[] { (Integer) obj };
     }
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Integer values!");
+    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a list of Integer values!");
   }
 
   @Override

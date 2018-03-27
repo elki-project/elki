@@ -76,7 +76,7 @@ public class Flag extends AbstractParameter<Flag, Boolean> {
     if(obj != null && NOT_SET.equals(obj.toString())) {
       return Boolean.FALSE;
     }
-    throw new WrongParameterValueException("Wrong value for flag \"" + getName() + "\". Allowed values:\n" + SET + " or " + NOT_SET);
+    throw new WrongParameterValueException("Wrong value for flag \"" + getOptionID().getName() + "\". Allowed values:\n" + SET + " or " + NOT_SET);
   }
 
   /**
@@ -95,7 +95,7 @@ public class Flag extends AbstractParameter<Flag, Boolean> {
   @Override
   protected boolean validate(Boolean obj) throws ParameterException {
     if(obj == null) {
-      throw new WrongParameterValueException("Boolean option '" + getName() + "' got 'null' value.");
+      throw new WrongParameterValueException("Boolean option '" + getOptionID().getName() + "' got 'null' value.");
     }
     return true;
   }

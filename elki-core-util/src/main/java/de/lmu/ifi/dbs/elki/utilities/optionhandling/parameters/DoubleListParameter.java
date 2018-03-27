@@ -79,7 +79,7 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, doub
     if(obj instanceof Double) {
       return new double[] { (Double) obj };
     }
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Double values!");
+    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a list of Double values!");
   }
 
   @Override

@@ -124,10 +124,10 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
         return Enum.valueOf(enumClass, (String) obj);
       }
       catch(IllegalArgumentException ex) {
-        throw new WrongParameterValueException("Enum parameter " + getName() + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
+        throw new WrongParameterValueException("Enum parameter " + getOptionID().getName() + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
       }
     }
-    throw new WrongParameterValueException("Enum parameter " + getName() + " is not given as a string.");
+    throw new WrongParameterValueException("Enum parameter " + getOptionID().getName() + " is not given as a string.");
   }
 
   @Override
@@ -136,7 +136,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
   }
 
   @Override
-  protected StringBuilder describeValues(StringBuilder buf) {
+  public StringBuilder describeValues(StringBuilder buf) {
     buf.append("One of:").append(FormatUtil.NEWLINE);
     for(String s : getPossibleValues()) {
       buf.append("->").append(FormatUtil.NONBREAKING_SPACE).append(s).append(FormatUtil.NEWLINE);

@@ -116,7 +116,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
       // do extra validation:
       for(Object o : l) {
         if(!(o instanceof Class)) {
-          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
+          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getOptionID().getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?
@@ -139,7 +139,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
       String[] classes = SPLIT.split((String) obj);
       // TODO: allow empty lists (and list constraints) to enforce length?
       if(classes.length == 0) {
-        throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
+        throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getOptionID().getName() + "\" is either empty or has the wrong format!");
       }
 
       List<Class<? extends C>> cls = new ArrayList<>(classes.length);
@@ -153,7 +153,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
       return cls;
     }
     // INCOMPLETE
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Class values!");
+    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a list of Class values!");
   }
 
   @Override
@@ -227,7 +227,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   }
 
   @Override
-  protected StringBuilder describeValues(StringBuilder buf) {
+  public StringBuilder describeValues(StringBuilder buf) {
     if(restrictionClass == null || restrictionClass == Object.class) {
       return buf;
     }

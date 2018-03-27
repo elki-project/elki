@@ -43,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 public class SerializedParameterization extends AbstractParameterization {
   /**
    * Prefix of option markers on the command line.
-   * <p/>
+   *
    * The option markers are supposed to be given on the command line with
-   * leading -.
+   * leading <code>-</code>.
    */
   public static final String OPTION_PREFIX = "-";
 
@@ -117,7 +117,7 @@ public class SerializedParameterization extends AbstractParameterization {
         // throw new NoParameterValueException(cur + " is no parameter!");
       }
 
-      if(opt.getName().regionMatches(0, cur, 1, Math.max(opt.getName().length(), cur.length() - 1))) {
+      if(opt.getOptionID().getName().regionMatches(0, cur, 1, Math.max(opt.getOptionID().getName().length(), cur.length() - 1))) {
         // Consume.
         piter.remove();
         // check if the option is a parameter or a flag

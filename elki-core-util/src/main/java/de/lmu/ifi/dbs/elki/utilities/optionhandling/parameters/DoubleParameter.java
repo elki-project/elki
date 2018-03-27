@@ -68,7 +68,7 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
       return ParseUtil.parseDouble(obj.toString());
     }
     catch(NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getOptionID().getName() + "\" requires a double value, read: " + obj + "!\n");
     }
   }
 

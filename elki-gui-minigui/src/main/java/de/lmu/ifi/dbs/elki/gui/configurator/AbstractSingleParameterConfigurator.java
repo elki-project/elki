@@ -53,7 +53,7 @@ public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?>
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 0;
-    label = new JLabel(param.getName());
+    label = new JLabel(param.getOptionID().getName());
     label.setAlignmentX(0.0f);
     label.setToolTipText(param.getShortDescription());
     parent.add(label, constraints);
