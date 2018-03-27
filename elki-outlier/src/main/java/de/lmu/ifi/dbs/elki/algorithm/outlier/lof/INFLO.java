@@ -29,11 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -153,12 +149,12 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
   /**
    * Compute neighborhoods
    *
-   * @param relation
-   * @param knnQuery
-   * @param pruned
-   * @param knns
-   * @param rnns
-   * @param density
+   * @param relation Data relation
+   * @param knnQuery kNN query function
+   * @param pruned Pruned objects
+   * @param knns kNN storage
+   * @param rnns reverse kNN storage
+   * @param density Density estimation
    */
   protected void computeNeighborhoods(Relation<O> relation, KNNQuery<O> knnQuery, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> knns, WritableDataStore<ModifiableDBIDs> rnns, WritableDoubleDataStore density) {
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -170,6 +166,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
+        // See algorithm 2 in the INFLO paper, two-way-search.
         if(getKNN(niter, knnQuery, knns, density).contains(iter)) {
           rnns.get(niter).add(iter);
           rnns.get(iter).add(niter);
@@ -194,18 +191,20 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param inflominmax Output of minimum and maximum
    */
   protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> knns, WritableDataStore<ModifiableDBIDs> rnns, WritableDoubleDataStore density, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
+    HashSetModifiableDBIDs set = DBIDUtil.newHashSet();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(pruned.contains(iter)) {
         inflos.putDouble(iter, 1.);
         inflominmax.put(1.);
         continue;
       }
-      ModifiableDBIDs knn = knns.get(iter), rnn = rnns.get(iter);
-      knn.addDBIDs(rnn);
+      set.clear();
+      set.addDBIDs(knns.get(iter));
+      set.addDBIDs(rnns.get(iter));
       // Compute mean density of NN \cup RNN
       double sum = 0.;
       int c = 0;
-      for(DBIDIter niter = knn.iter(); niter.valid(); niter.advance()) {
+      for(DBIDIter niter = set.iter(); niter.valid(); niter.advance()) {
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }

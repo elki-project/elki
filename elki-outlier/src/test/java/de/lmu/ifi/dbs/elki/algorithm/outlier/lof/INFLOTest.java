@@ -40,7 +40,7 @@ public class INFLOTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<INFLO<DoubleVector>>(INFLO.class) //
         .with(INFLO.Parameterizer.K_ID, 30).build().run(db);
-    testAUC(db, "Noise", result, 0.9401666);
-    testSingleScore(result, 945, 1.23659841);
+    testAUC(db, "Noise", result, 0.9406296);
+    testSingleScore(result, 945, 1.34558209);
   }
 }
