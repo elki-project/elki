@@ -23,6 +23,7 @@ package elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
@@ -240,5 +241,20 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   @Override
   public int size() {
     return getValue().size();
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<List<? extends C>> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(instantiateClasses(config));
+      return true;
+    }
+    return false;
   }
 }

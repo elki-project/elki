@@ -22,11 +22,13 @@ package elki.utilities.optionhandling.parameters;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.UnspecifiedParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying a file.
@@ -129,5 +131,20 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
    */
   public FileType getFileType() {
     return fileType;
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<File> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
   }
 }

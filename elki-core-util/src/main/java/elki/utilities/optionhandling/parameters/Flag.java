@@ -24,6 +24,7 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Option class specifying a flag object.
@@ -133,5 +134,39 @@ public class Flag extends AbstractParameter<Flag, Boolean> {
    */
   public boolean isFalse() {
     return isDefined() && !getValue().booleanValue();
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, BooleanConsumer consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue().booleanValue());
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Represents an operation that accepts a single {@code boolean}-valued
+   * argument and returns no result. This is the primitive type specialization
+   * of {@link java.util.function.Consumer} for {@code boolean}. Unlike most
+   * other functional interfaces, {@code BooleanConsumer} is expected to operate
+   * via side-effects.
+   *
+   * @see java.util.function.Consumer
+   */
+  @FunctionalInterface
+  public interface BooleanConsumer {
+    /**
+     * Performs this operation on the given argument.
+     *
+     * @param value the input argument
+     */
+    void accept(boolean value);
   }
 }

@@ -20,10 +20,13 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.function.Consumer;
+
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.UnspecifiedParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying a string.
@@ -45,7 +48,7 @@ public class StringParameter extends AbstractParameter<StringParameter, String> 
 
   /**
    * Constructs a string parameter with the given optionID.
-   * 
+   *
    * @param optionID the unique id of the parameter
    */
   public StringParameter(OptionID optionID) {
@@ -77,5 +80,20 @@ public class StringParameter extends AbstractParameter<StringParameter, String> 
   @Override
   public String getSyntax() {
     return "<string>";
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<String> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
   }
 }

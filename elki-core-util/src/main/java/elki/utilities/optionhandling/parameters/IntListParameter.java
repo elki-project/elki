@@ -20,10 +20,13 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.function.Consumer;
+
 import elki.utilities.io.ParseUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying a list of integer values.
@@ -124,5 +127,20 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
       dimensions[d >>> 6] |= 1L << (d & 0x3F);
     }
     return dimensions;
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<int[]> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
   }
 }

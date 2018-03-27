@@ -20,10 +20,13 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.function.IntConsumer;
+
 import elki.utilities.io.ParseUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying an integer value.
@@ -90,5 +93,20 @@ public class IntParameter extends NumberParameter<IntParameter, Integer> {
    */
   public int intValue() {
     return getValue().intValue();
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, IntConsumer consumer) {
+    if(config.grab(this)) {
+      consumer.accept(intValue());
+      return true;
+    }
+    return false;
   }
 }

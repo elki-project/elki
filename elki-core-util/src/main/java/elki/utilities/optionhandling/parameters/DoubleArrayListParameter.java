@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import elki.utilities.io.FormatUtil;
 import elki.utilities.io.ParseUtil;
@@ -31,6 +32,7 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.ParameterConstraint;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying a list of vectors.
@@ -173,5 +175,20 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
   @Override
   public String getSyntax() {
     return "<double_11,...,double_1n:...:double_m1,...,double_mn>";
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<List<double[]>> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
   }
 }

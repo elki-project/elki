@@ -22,12 +22,14 @@ package elki.utilities.optionhandling.parameters;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.UnspecifiedParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying an enum type.
@@ -153,14 +155,26 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
    */
   private String joinEnumNames(String separator) {
     E[] enumTypes = enumClass.getEnumConstants();
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(enumTypes.length * 20);
     for(int i = 0; i < enumTypes.length; ++i) {
-      if(i > 0) {
-        sb.append(separator);
-      }
-      sb.append(enumTypes[i].name());
+      sb.append(enumTypes[i].name()).append(separator);
     }
+    sb.setLength(Math.max(0, sb.length() - separator.length()));
     return sb.toString();
   }
 
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<E> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
+  }
 }

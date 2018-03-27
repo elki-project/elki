@@ -20,12 +20,15 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.function.Consumer;
+
 import elki.utilities.datastructures.range.IntGenerator;
 import elki.utilities.datastructures.range.ParseIntRanges;
 import elki.utilities.datastructures.range.StaticIntGenerator;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying ranges of integer values.
@@ -77,7 +80,7 @@ public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParamet
 
   /**
    * Returns a string representation of the parameter's type.
-   * 
+   * <p>
    * For a full documentation, see {@link ParseIntRanges}.
    *
    * @return &quot;&lt;start,+=increment,end,...,start,*=factor,end,int1,int2&gt;&quot;
@@ -85,5 +88,20 @@ public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParamet
   @Override
   public String getSyntax() {
     return "<start,+=increment,end,...,start,*=factor,end,int1,int2>";
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, Consumer<IntGenerator> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(getValue());
+      return true;
+    }
+    return false;
   }
 }

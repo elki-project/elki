@@ -20,9 +20,12 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.function.DoubleConsumer;
+
 import elki.utilities.io.ParseUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter specifying a double value.
@@ -89,5 +92,20 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
    */
   public double doubleValue() {
     return getValue().doubleValue();
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid
+   */
+  public boolean grab(Parameterization config, DoubleConsumer consumer) {
+    if(config.grab(this)) {
+      consumer.accept(doubleValue());
+      return true;
+    }
+    return false;
   }
 }

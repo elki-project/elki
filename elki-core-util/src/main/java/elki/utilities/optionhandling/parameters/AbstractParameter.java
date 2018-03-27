@@ -207,7 +207,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
    * 
    * @param val Value
    */
-  protected final void setValueInternal(T val) {
+  protected void setValueInternal(T val) {
     this.value = this.givenValue = val;
   }
 

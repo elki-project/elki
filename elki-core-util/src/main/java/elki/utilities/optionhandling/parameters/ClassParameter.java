@@ -21,6 +21,7 @@
 package elki.utilities.optionhandling.parameters;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import elki.logging.Logging;
 import elki.utilities.ClassGenericsUtil;
@@ -250,5 +251,20 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    */
   public List<Class<?>> getKnownImplementations() {
     return ELKIServiceRegistry.findAllImplementations(getRestrictionClass());
+  }
+
+  /**
+   * Get the parameter.
+   *
+   * @param config Parameterization
+   * @param consumer Output consumer
+   * @return {@code true} if valid;
+   */
+  public boolean grab(Parameterization config, Consumer<C> consumer) {
+    if(config.grab(this)) {
+      consumer.accept(instantiateClass(config));
+      return true;
+    }
+    return false;
   }
 }
