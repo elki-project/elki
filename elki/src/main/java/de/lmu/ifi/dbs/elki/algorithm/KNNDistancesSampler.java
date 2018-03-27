@@ -218,13 +218,6 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
      */
     private RandomFactory rnd;
 
-    /**
-     * Constructor.
-     */
-    public Parameterizer() {
-      super();
-    }
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
