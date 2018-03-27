@@ -33,14 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -59,11 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
@@ -88,9 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @apiviz.has SpaceFillingKNNQuery
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
-title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
-booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
-url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
+    title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
+    booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+    url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
 public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNIndex<O> {
   /**
    * Class logger
@@ -101,7 +90,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
    * The representation we are bound to.
    */
   protected final Relation<O> relation;
-  
+
   /**
    * Spatial curve generators
    */
@@ -561,14 +550,14 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
         if(config.grab(windowP)) {
           window = windowP.getValue();
         }
-        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
-        variantsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(variantsP)) {
           variants = variantsP.getValue();
         }
-        IntParameter dimP = new IntParameter(DIM_ID);
-        dimP.setOptional(true);
-        dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter dimP = new IntParameter(DIM_ID) //
+            .setOptional(true) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(dimP)) {
           odim = dimP.intValue();
         }

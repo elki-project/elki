@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.workflow;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -160,10 +160,9 @@ public class EvaluationStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      List<Class<? extends Evaluator>> def = new ArrayList<>(1);
-      def.add(AutomaticEvaluation.class);
+      List<Class<? extends Evaluator>> def = Arrays.asList(AutomaticEvaluation.class);
       // evaluator parameter
-      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(EVALUATOR_ID, Evaluator.class);
+      ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(EVALUATOR_ID, Evaluator.class);
       evaluatorP.setDefaultValue(def);
       if(config.grab(evaluatorP)) {
         evaluators = evaluatorP.instantiateClasses(config);

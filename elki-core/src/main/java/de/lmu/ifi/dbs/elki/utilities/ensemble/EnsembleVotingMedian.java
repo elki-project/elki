@@ -81,9 +81,9 @@ public class EnsembleVotingMedian implements EnsembleVoting {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      quantileP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      quantileP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(quantileP)) {
         quantile = quantileP.getValue();
       }

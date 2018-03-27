@@ -156,14 +156,14 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter gridP = new IntParameter(GRID_ID, 1);
-      gridP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter gridP = new IntParameter(GRID_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(gridP)) {
         gridres = gridP.getValue();
       }
 
-      DoubleParameter gridscaleP = new DoubleParameter(GRID_SCALE_ID, 1.0);
-      gridscaleP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter gridscaleP = new DoubleParameter(GRID_SCALE_ID, 1.0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(gridscaleP)) {
         gridscale = gridscaleP.getValue();
       }

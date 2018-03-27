@@ -400,8 +400,8 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(5));
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(new GreaterConstraint(5));
       if(config.grab(kP)) {
         k = kP.intValue();
       }
@@ -409,9 +409,9 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       if(config.grab(distP)) {
         dist = distP.getValue();
       }
-      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.001);
-      expectP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      expectP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.001) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(expectP)) {
         expect = expectP.doubleValue();
       }

@@ -84,8 +84,8 @@ public class LaplaceKernelFunction extends AbstractVectorSimilarityFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID, 1.);
-      sigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      final DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }

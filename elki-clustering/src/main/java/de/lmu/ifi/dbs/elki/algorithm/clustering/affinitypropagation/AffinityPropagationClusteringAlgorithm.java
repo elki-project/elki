@@ -322,14 +322,14 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
       if(config.grab(param)) {
         initialization = param.instantiateClass(config);
       }
-      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, .5);
-      lambdaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      lambdaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, .5) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(lambdaP)) {
         lambda = lambdaP.doubleValue();
       }
-      final IntParameter convergenceP = new IntParameter(CONVERGENCE_ID, 15);
-      convergenceP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter convergenceP = new IntParameter(CONVERGENCE_ID, 15) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(convergenceP)) {
         convergence = convergenceP.intValue();
       }

@@ -181,8 +181,8 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }

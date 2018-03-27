@@ -219,14 +219,14 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
       super.makeOptions(config);
 
       DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, 0.1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(quantileP)) {
         quantile = quantileP.doubleValue();
       }
 
       DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
       }

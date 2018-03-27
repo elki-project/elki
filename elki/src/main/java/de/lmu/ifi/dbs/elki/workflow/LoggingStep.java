@@ -113,8 +113,8 @@ public class LoggingStep implements WorkflowStep {
           verbose++;
         }
       }
-      final StringParameter debugP = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID);
-      debugP.setOptional(true);
+      final StringParameter debugP = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID) //
+          .setOptional(true);
       if (config.grab(debugP)) {
         String[] opts = debugP.getValue().split(",");
         levels = new String[opts.length][];

@@ -493,15 +493,14 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
-      samplingP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      samplingP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      samplingP.setOptional(true);
+      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .setOptional(true);
       if(config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }
       final RandomParameter rndP = new RandomParameter(SEED_ID);
-      rndP.setOptional(true);
       if(config.grab(rndP)) {
         seed = rndP.getValue();
       }
@@ -510,7 +509,8 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
         includeSelf = includeP.isTrue();
       }
       IntParameter maxkP = new IntParameter(MAXK_ID) //
-      .setOptional(true);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true);
       if(config.grab(maxkP)) {
         maxk = maxkP.intValue();
       }

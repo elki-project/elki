@@ -378,14 +378,14 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         family = familyP.instantiateClass(config);
       }
 
-      IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter lP = new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         l = lP.intValue();
       }
 
-      IntParameter bucketsP = new IntParameter(BUCKETS_ID);
-      bucketsP.setDefaultValue(7919); // Primes work best, apparently.
+      IntParameter bucketsP = new IntParameter(BUCKETS_ID) //
+          .setDefaultValue(7919); // Primes work best, apparently.
       bucketsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(bucketsP)) {
         numberOfBuckets = bucketsP.intValue();

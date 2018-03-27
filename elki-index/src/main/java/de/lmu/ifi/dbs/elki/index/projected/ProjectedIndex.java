@@ -569,9 +569,9 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
           norefine = norefineF.isTrue();
         }
         if(!norefine) {
-          DoubleParameter kmultP = new DoubleParameter(K_MULTIPLIER_ID);
-          kmultP.setDefaultValue(1.0);
-          kmultP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+          DoubleParameter kmultP = new DoubleParameter(K_MULTIPLIER_ID) //
+              .setDefaultValue(1.0) //
+              .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
           if(config.grab(kmultP)) {
             kmulti = kmultP.doubleValue();
           }

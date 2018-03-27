@@ -369,14 +369,14 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter numclustersP = new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID);
-      numclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter numclustersP = new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }
 
-      EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class);
-      linkageP.setDefaultValue(Linkage.WARD);
+      EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class) //
+          .setDefaultValue(Linkage.WARD);
       if(config.grab(linkageP)) {
         linkage = linkageP.getValue();
       }

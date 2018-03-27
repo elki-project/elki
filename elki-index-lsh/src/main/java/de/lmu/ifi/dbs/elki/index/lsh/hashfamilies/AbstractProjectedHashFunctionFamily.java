@@ -149,14 +149,14 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
         random = randP.getValue();
       }
 
-      DoubleParameter widthP = new DoubleParameter(WIDTH_ID);
-      widthP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter widthP = new DoubleParameter(WIDTH_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(widthP)) {
         width = widthP.doubleValue();
       }
 
-      IntParameter lP = new IntParameter(NUMPROJ_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter lP = new IntParameter(NUMPROJ_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         k = lP.intValue();
       }

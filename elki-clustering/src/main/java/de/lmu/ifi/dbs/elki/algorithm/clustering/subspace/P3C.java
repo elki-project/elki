@@ -937,42 +937,42 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       super.makeOptions(config);
 
       {
-        DoubleParameter param = new DoubleParameter(ALPHA_THRESHOLD_ID, .001);
-        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        param.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+        DoubleParameter param = new DoubleParameter(ALPHA_THRESHOLD_ID, .001) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
         if(config.grab(param)) {
           alpha = param.getValue();
         }
       }
 
       {
-        DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-4);
-        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        param.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+        DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-4) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
         if(config.grab(param)) {
           poissonThreshold = param.getValue();
         }
       }
 
       {
-        IntParameter param = new IntParameter(MAX_EM_ITERATIONS_ID, 20);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+        IntParameter param = new IntParameter(MAX_EM_ITERATIONS_ID, 20) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
         if(config.grab(param)) {
           maxEmIterations = param.getValue();
         }
       }
 
       {
-        DoubleParameter param = new DoubleParameter(EM_DELTA_ID, 1.e-5);
-        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        DoubleParameter param = new DoubleParameter(EM_DELTA_ID, 1.e-5) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if(config.grab(param)) {
           emDelta = param.getValue();
         }
       }
 
       {
-        IntParameter param = new IntParameter(MIN_CLUSTER_SIZE_ID, 1);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter param = new IntParameter(MIN_CLUSTER_SIZE_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(param)) {
           minClusterSize = param.getValue();
         }

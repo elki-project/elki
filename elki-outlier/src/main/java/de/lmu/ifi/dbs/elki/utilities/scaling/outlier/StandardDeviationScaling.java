@@ -216,8 +216,8 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter meanP = new DoubleParameter(MEAN_ID);
-      meanP.setOptional(true);
+      DoubleParameter meanP = new DoubleParameter(MEAN_ID) //
+          .setOptional(true);
       if(config.grab(meanP)) {
         fixedmean = meanP.getValue();
       }

@@ -257,7 +257,7 @@ public class DynamicParameters {
      */
     public RemainingOptions() {
       super(REMAINING_OPTIONS_ID);
-      super.setOptional(true);
+      this.setOptional(true);
     }
   }
 }

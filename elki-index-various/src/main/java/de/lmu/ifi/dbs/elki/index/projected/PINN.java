@@ -135,20 +135,20 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
         inner = innerP.instantiateClass(config);
       }
 
-      IntParameter tP = new IntParameter(T_ID);
-      tP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter tP = new IntParameter(T_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(tP)) {
         t = tP.intValue();
       }
 
-      DoubleParameter sP = new DoubleParameter(S_ID, 1.);
-      sP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      DoubleParameter sP = new DoubleParameter(S_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
       if(config.grab(sP)) {
         s = sP.doubleValue();
       }
 
-      DoubleParameter hP = new DoubleParameter(H_ID, 3.);
-      hP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      DoubleParameter hP = new DoubleParameter(H_ID, 3.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
       if(config.grab(hP)) {
         h = hP.doubleValue();
       }

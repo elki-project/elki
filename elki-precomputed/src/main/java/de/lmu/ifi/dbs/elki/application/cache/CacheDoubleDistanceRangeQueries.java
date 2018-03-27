@@ -240,8 +240,8 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
-      final DoubleParameter kpar = new DoubleParameter(RADIUS_ID);
-      kpar.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      final DoubleParameter kpar = new DoubleParameter(RADIUS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(kpar)) {
         radius = kpar.doubleValue();
       }

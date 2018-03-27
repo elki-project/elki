@@ -200,7 +200,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 20) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         numbins = param.getValue();
       }

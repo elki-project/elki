@@ -243,8 +243,8 @@ public class TooltipScoreVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter digitsP = new IntParameter(DIGITS_ID, 4);
-      digitsP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter digitsP = new IntParameter(DIGITS_ID, 4) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
 
       if(config.grab(digitsP)) {
         int digits = digitsP.intValue();

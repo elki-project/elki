@@ -167,8 +167,8 @@ public class WeightedUncertainSplitFilter extends AbstractConversionFilter<Numbe
       if(config.grab(dimsP)) {
         dims = dimsP.intValue();
         // Add additional constraints:
-        probP.addConstraint(new LessConstraint(dimsP.intValue()));
-        probP.addConstraint(new GreaterEqualConstraint(-dimsP.intValue()));
+        probP.addConstraint(new LessConstraint(dimsP.intValue())) //
+            .addConstraint(new GreaterEqualConstraint(-dimsP.intValue()));
       }
       if(config.grab(probP)) {
         probcol = probP.intValue();

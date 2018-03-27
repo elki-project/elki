@@ -304,8 +304,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KMeans.K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
@@ -315,8 +315,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }

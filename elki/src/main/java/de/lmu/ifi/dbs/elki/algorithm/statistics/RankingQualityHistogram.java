@@ -172,8 +172,8 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 100);
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 100) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         numbins = param.getValue();
       }

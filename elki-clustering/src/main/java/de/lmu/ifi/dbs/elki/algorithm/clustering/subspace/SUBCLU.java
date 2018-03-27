@@ -485,8 +485,8 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
         epsilon = epsilonP.getValue();
       }
 
-      IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter minptsP = new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }

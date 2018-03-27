@@ -175,7 +175,8 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
       if(config.grab(krateP)) {
         krate = krateP.doubleValue();
       }
-      DoubleParameter samplesP = new DoubleParameter(SAMPLES_ID, .1);
+      DoubleParameter samplesP = new DoubleParameter(SAMPLES_ID, .1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplesP)) {
         samples = samplesP.doubleValue();
       }

@@ -208,9 +208,9 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.01);
-      expectP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      expectP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.01) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(expectP)) {
         expect = expectP.getValue();
       }

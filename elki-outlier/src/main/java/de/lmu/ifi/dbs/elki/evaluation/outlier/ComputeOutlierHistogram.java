@@ -292,14 +292,14 @@ public class ComputeOutlierHistogram implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      positiveClassNameP.setOptional(true);
+      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID) //
+          .setOptional(true);
       if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
 
-      IntParameter binsP = new IntParameter(BINS_ID, 50);
-      binsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter binsP = new IntParameter(BINS_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(binsP)) {
         bins = binsP.getValue();
       }

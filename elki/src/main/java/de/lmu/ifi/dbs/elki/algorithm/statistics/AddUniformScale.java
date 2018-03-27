@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Pseudo "algorithm" that computes the global min/max for a relation across all
@@ -97,19 +96,5 @@ public class AddUniformScale implements Algorithm {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  /**
-   * Parameterization class.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected AddUniformScale makeInstance() {
-      return new AddUniformScale();
-    }
   }
 }

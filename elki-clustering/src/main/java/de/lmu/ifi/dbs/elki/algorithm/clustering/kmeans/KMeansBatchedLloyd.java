@@ -315,8 +315,8 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter blocksP = new IntParameter(BLOCKS_ID, 10);
-      blocksP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter blocksP = new IntParameter(BLOCKS_ID, 10) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(blocksP)) {
         blocks = blocksP.intValue();
       }

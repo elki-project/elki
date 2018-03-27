@@ -565,8 +565,8 @@ public class NormalDistribution extends AbstractDistribution {
         mu = muP.doubleValue();
       }
 
-      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
-      sigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }

@@ -153,8 +153,8 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
         family = familyP.instantiateClass(config);
       }
 
-      IntParameter dimP = new IntParameter(DIMENSIONALITY_ID);
-      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter dimP = new IntParameter(DIMENSIONALITY_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(dimP)) {
         dimensionality = dimP.intValue();
       }

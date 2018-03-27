@@ -238,8 +238,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter partitionsP = new IntParameter(PARTITIONS_ID);
-        partitionsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+        final IntParameter partitionsP = new IntParameter(PARTITIONS_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(partitionsP)) {
           partitions = partitionsP.getValue();
         }

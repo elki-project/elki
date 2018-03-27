@@ -273,8 +273,8 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter lP = new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         l = lP.getValue();
       }

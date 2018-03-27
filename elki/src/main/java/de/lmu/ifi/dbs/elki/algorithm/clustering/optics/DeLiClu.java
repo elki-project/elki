@@ -491,8 +491,8 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter minptsP = new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }

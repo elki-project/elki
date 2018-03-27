@@ -167,15 +167,15 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter palphaP = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, DEFAULT_PALPHA);
-      palphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      palphaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      DoubleParameter palphaP = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, DEFAULT_PALPHA) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(palphaP)) {
         palpha = palphaP.getValue();
       }
 
-      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
-      walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }

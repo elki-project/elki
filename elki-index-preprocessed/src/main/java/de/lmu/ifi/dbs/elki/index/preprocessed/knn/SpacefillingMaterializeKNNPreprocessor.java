@@ -376,8 +376,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
         if(config.grab(windowP)) {
           window = windowP.getValue();
         }
-        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
-        variantsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(variantsP)) {
           variants = variantsP.getValue();
         }

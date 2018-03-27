@@ -141,13 +141,13 @@ public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction i
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE);
-      degreeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(degreeP)) {
         degree = degreeP.intValue();
       }
-      final DoubleParameter biasP = new DoubleParameter(BIAS_ID);
-      biasP.setOptional(true);
+      final DoubleParameter biasP = new DoubleParameter(BIAS_ID) //
+          .setOptional(true);
       if(config.grab(biasP)) {
         bias = biasP.doubleValue();
       }

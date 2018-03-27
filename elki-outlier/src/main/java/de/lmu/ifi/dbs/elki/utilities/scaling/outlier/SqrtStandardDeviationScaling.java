@@ -217,14 +217,14 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minP = new DoubleParameter(MIN_ID);
-      minP.setOptional(true);
+      DoubleParameter minP = new DoubleParameter(MIN_ID) //
+          .setOptional(true);
       if(config.grab(minP)) {
         min = minP.doubleValue();
       }
 
-      DoubleParameter meanP = new DoubleParameter(MEAN_ID);
-      meanP.setOptional(true);
+      DoubleParameter meanP = new DoubleParameter(MEAN_ID) //
+          .setOptional(true);
       if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }

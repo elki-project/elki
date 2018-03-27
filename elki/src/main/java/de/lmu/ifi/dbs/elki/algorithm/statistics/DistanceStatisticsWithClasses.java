@@ -444,8 +444,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, 20);
-      numbinP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, 20) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(numbinP)) {
         numbin = numbinP.getValue();
       }

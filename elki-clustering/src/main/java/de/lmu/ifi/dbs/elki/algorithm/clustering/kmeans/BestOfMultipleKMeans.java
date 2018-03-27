@@ -191,8 +191,8 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
     @Override
     protected void makeOptions(Parameterization config) {
-      IntParameter trialsP = new IntParameter(TRIALS_ID);
-      trialsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter trialsP = new IntParameter(TRIALS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(trialsP)) {
         trials = trialsP.intValue();
       }

@@ -719,8 +719,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       DoubleParameter gridP = new DoubleParameter(GRID_ID) //
       .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(epsilon > 0.) {
-        gridP.setDefaultValue(10. * epsilon);
-        gridP.addConstraint(new GreaterEqualConstraint(1. * epsilon));
+        gridP.setDefaultValue(10. * epsilon) //
+            .addConstraint(new GreaterEqualConstraint(1. * epsilon));
       }
       if(config.grab(gridP)) {
         gridwidth = gridP.doubleValue();

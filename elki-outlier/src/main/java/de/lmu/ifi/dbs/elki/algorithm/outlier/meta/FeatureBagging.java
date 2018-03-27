@@ -304,13 +304,13 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }
-      IntParameter numP = new IntParameter(NUM_ID);
-      numP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter numP = new IntParameter(NUM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(numP)) {
         num = numP.getValue();
       }

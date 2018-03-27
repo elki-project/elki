@@ -220,9 +220,9 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter shareP = new DoubleParameter(SHARE_ID);
-        shareP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        shareP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+        DoubleParameter shareP = new DoubleParameter(SHARE_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
         if(config.grab(shareP)) {
           share = shareP.getValue();
         }

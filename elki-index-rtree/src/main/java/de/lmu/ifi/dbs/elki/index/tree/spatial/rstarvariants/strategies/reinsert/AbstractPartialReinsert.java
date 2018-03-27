@@ -90,9 +90,9 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter reinsertAmountP = new DoubleParameter(REINSERT_AMOUNT_ID, 0.3);
-      reinsertAmountP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      reinsertAmountP.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+      DoubleParameter reinsertAmountP = new DoubleParameter(REINSERT_AMOUNT_ID, 0.3) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
       if(config.grab(reinsertAmountP)) {
         reinsertAmount = reinsertAmountP.getValue();
       }

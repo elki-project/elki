@@ -184,8 +184,8 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       if(config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.25);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.25) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

@@ -210,14 +210,14 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter mP = new IntParameter(HiCS.Parameterizer.M_ID, 50);
-      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter mP = new IntParameter(HiCS.Parameterizer.M_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(mP)) {
         m = mP.intValue();
       }
 
-      final DoubleParameter alphaP = new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      final DoubleParameter alphaP = new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

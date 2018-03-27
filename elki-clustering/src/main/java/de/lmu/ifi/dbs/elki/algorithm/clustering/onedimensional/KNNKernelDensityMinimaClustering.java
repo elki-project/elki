@@ -339,8 +339,8 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter dimP = new IntParameter(DIM_ID, 0);
-      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter dimP = new IntParameter(DIM_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimP)) {
         dim = dimP.intValue();
       }
@@ -355,14 +355,14 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
         mode = modeP.getValue();
       }
 
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
 
-      IntParameter windowP = new IntParameter(WINDOW_ID);
-      windowP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter windowP = new IntParameter(WINDOW_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(windowP)) {
         minwindow = windowP.intValue();
       }

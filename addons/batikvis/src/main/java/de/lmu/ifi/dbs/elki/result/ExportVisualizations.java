@@ -362,8 +362,8 @@ public class ExportVisualizations implements ResultHandler {
         output = outputP.getValue();
       }
 
-      DoubleParameter ratioP = new DoubleParameter(RATIO_ID, 1.33);
-      ratioP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter ratioP = new DoubleParameter(RATIO_ID, 1.33) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(ratioP)) {
         ratio = ratioP.doubleValue();
       }

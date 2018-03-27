@@ -171,8 +171,8 @@ public class AutomaticVisualization implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID);
-      titleP.setOptional(true);
+      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID) //
+          .setOptional(true);
       if(config.grab(titleP)) {
         title = titleP.getValue();
       }

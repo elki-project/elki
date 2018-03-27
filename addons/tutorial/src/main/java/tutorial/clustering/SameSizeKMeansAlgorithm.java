@@ -484,8 +484,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         }
       }
 
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
@@ -495,8 +495,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, -1);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, -1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }

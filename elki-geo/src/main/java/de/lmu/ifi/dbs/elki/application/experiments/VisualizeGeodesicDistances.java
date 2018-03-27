@@ -282,8 +282,8 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       out = super.getParameterOutputFile(config, "Output image file name.");
-      IntParameter stepsP = new IntParameter(STEPS_ID);
-      stepsP.setOptional(true);
+      IntParameter stepsP = new IntParameter(STEPS_ID) //
+          .setOptional(true);
       if(config.grab(stepsP)) {
         steps = stepsP.intValue();
       }

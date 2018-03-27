@@ -118,8 +118,8 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
         pageFileFactory = pffP.instantiateClass(config);
       }
 
-      IntParameter cacheSizeP = new IntParameter(CACHE_SIZE_ID);
-      cacheSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter cacheSizeP = new IntParameter(CACHE_SIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(cacheSizeP)) {
         cacheSize = cacheSizeP.getValue();
       }

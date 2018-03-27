@@ -277,8 +277,8 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter pK = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }

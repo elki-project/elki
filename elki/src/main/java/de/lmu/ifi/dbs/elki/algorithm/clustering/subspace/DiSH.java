@@ -922,14 +922,14 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001);
-      epsilonP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
 
-      IntParameter muP = new IntParameter(MU_ID, 1);
-      muP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter muP = new IntParameter(MU_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(muP)) {
         mu = muP.intValue();
       }

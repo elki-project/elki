@@ -585,14 +585,14 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter mP = new IntParameter(M_ID, 50);
-      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter mP = new IntParameter(M_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(mP)) {
         m = mP.intValue();
       }
 
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.1);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
@@ -607,8 +607,8 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
         statTest = testP.instantiateClass(config);
       }
 
-      final IntParameter cutoffP = new IntParameter(LIMIT_ID, 100);
-      cutoffP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter cutoffP = new IntParameter(LIMIT_ID, 100) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(cutoffP)) {
         cutoff = cutoffP.intValue();
       }

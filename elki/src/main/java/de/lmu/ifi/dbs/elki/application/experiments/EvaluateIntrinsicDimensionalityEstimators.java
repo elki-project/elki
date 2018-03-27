@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -488,15 +489,18 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startP = new IntParameter(STARTK_ID, 3);
+      IntParameter startP = new IntParameter(STARTK_ID, 3) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(startP)) {
         startk = startP.intValue();
       }
-      IntParameter maxkP = new IntParameter(MAXK_ID, 20);
+      IntParameter maxkP = new IntParameter(MAXK_ID, 20) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(maxkP)) {
         maxk = maxkP.intValue();
       }
-      IntParameter samplesP = new IntParameter(SAMPLE_ID, 1000);
+      IntParameter samplesP = new IntParameter(SAMPLE_ID, 1000) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesP)) {
         samples = samplesP.intValue();
       }
@@ -504,7 +508,8 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
       if(config.grab(seedP)) {
         rnd = seedP.getValue();
       }
-      IntParameter dimP = new IntParameter(DIM_ID);
+      IntParameter dimP = new IntParameter(DIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(dimP)) {
         dim = dimP.intValue();
       }

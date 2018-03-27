@@ -222,13 +222,13 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
 
       DoubleParameter percentageP = new DoubleParameter(SAMPLING_ID, 1.) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }

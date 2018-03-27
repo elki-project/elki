@@ -230,8 +230,8 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
-      final IntParameter kpar = new IntParameter(K_ID);
-      kpar.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter kpar = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kpar)) {
         k = kpar.intValue();
       }

@@ -196,8 +196,8 @@ public class ResultWriter implements ResultHandler {
         warnoverwrite = !overwriteF.getValue();
       }
 
-      PatternParameter filterP = new PatternParameter(FILTER_PATTERN_ID);
-      filterP.setOptional(true);
+      PatternParameter filterP = new PatternParameter(FILTER_PATTERN_ID) //
+          .setOptional(true);
       if (config.grab(filterP)) {
         filter = filterP.getValue();
       }

@@ -253,15 +253,15 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
-      samplingP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      samplingP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      samplingP.setOptional(true);
+      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .setOptional(true);
       if(config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }

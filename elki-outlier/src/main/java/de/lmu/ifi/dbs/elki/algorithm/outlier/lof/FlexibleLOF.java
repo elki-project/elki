@@ -33,11 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -114,10 +110,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander", //
-title = "LOF: Identifying Density-Based Local Outliers", //
-booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
-url = "http://dx.doi.org/10.1145/342009.335388")
-public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements OutlierAlgorithm {
+    title = "LOF: Identifying Density-Based Local Outliers", //
+    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
+    url = "http://dx.doi.org/10.1145/342009.335388")
+public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -540,15 +536,15 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(KREF_ID);
-      pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter pK = new IntParameter(KREF_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         krefer = pK.intValue();
       }
 
-      final IntParameter pK2 = new IntParameter(KREACH_ID);
-      pK2.setOptional(true);
-      pK2.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter pK2 = new IntParameter(KREACH_ID)//
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK2)) {
         kreach = pK2.intValue();
       }
@@ -556,7 +552,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
         kreach = krefer;
       }
 
-      final ObjectParameter<DistanceFunction<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class);
       reachDistP.setOptional(true);
       if(config.grab(reachDistP)) {
         reachabilityDistanceFunction = reachDistP.instantiateClass(config);

@@ -108,9 +108,9 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      alphaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

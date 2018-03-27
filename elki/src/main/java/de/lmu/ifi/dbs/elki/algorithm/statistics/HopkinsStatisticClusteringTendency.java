@@ -381,7 +381,8 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
         k = kP.getValue();
       }
 
-      IntParameter sampleP = new IntParameter(SAMPLESIZE_ID);
+      IntParameter sampleP = new IntParameter(SAMPLESIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleP)) {
         sampleSize = sampleP.getValue();
       }

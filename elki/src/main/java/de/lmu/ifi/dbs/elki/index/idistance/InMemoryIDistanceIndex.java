@@ -538,7 +538,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
         }
 
         IntParameter kP = new IntParameter(K_ID)//
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(kP)) {
           k = kP.intValue();
         }

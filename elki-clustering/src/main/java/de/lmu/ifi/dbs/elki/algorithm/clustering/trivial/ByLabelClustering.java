@@ -269,8 +269,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
         multiple = multipleF.getValue();
       }
 
-      PatternParameter noisepatP = new PatternParameter(NOISE_ID);
-      noisepatP.setOptional(true);
+      PatternParameter noisepatP = new PatternParameter(NOISE_ID) //
+          .setOptional(true);
       if(config.grab(noisepatP)) {
         noisepat = noisepatP.getValue();
       }

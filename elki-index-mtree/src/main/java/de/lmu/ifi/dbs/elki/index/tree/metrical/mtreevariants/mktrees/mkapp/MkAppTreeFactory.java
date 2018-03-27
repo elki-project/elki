@@ -91,14 +91,14 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         settings.kmax = kP.getValue();
       }
 
-      IntParameter pP = new IntParameter(P_ID);
-      pP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter pP = new IntParameter(P_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pP)) {
         settings.p = pP.getValue();
       }

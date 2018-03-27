@@ -293,8 +293,8 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
      * @param config Parameterization
      */
     protected void configK(Parameterization config) {
-      final IntParameter param = new IntParameter(K_ID);
-      param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter param = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(param)) {
         k = param.getValue();
       }

@@ -262,8 +262,8 @@ public class LogNormalDistribution extends AbstractDistribution {
         logmean = logmeanP.doubleValue();
       }
 
-      DoubleParameter logsigmaP = new DoubleParameter(LOGSTDDEV_ID);
-      logsigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter logsigmaP = new DoubleParameter(LOGSTDDEV_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(logsigmaP)) {
         logsigma = logsigmaP.doubleValue();
       }

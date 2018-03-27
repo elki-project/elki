@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -160,7 +161,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
-      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();
+      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
+          mvdrerr = new MeanVariance();
       int misses = 0;
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         if(pattern == null || pattern.matcher(lrel.get(iditer)).find()) {
@@ -225,7 +227,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
       final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
-      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();
+      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
+          mvdrerr = new MeanVariance();
       int misses = 0;
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
@@ -358,12 +361,13 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
+      IntParameter kP = new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
-      PatternParameter patternP = new PatternParameter(PATTERN_ID);
-      patternP.setOptional(true);
+      PatternParameter patternP = new PatternParameter(PATTERN_ID) //
+          .setOptional(true);
       if(config.grab(patternP)) {
         pattern = patternP.getValue();
       }
@@ -374,8 +378,9 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
           queries = queryP.instantiateClass(config);
         }
       }
-      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
-      samplingP.setOptional(true);
+      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .setOptional(true);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
       }

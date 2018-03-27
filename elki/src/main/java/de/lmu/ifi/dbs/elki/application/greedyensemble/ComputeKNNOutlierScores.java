@@ -484,8 +484,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       if(config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
-      IntParameter startkP = new IntParameter(STARTK_ID);
-      startkP.setOptional(true);
+      IntParameter startkP = new IntParameter(STARTK_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true);
       if(config.grab(startkP)) {
         startk = startkP.getValue();
       }

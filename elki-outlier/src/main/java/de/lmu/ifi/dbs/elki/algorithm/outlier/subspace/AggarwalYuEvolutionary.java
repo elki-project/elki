@@ -696,8 +696,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter mP = new IntParameter(M_ID);
-      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter mP = new IntParameter(M_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(mP)) {
         m = mP.getValue();
       }

@@ -479,13 +479,13 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024);
-        pagesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();
         }
-        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID);
-        partitionsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(partitionsP)) {
           numpart = partitionsP.getValue();
         }

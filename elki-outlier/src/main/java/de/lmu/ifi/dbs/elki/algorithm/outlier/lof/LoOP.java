@@ -395,8 +395,8 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kcompP = new IntParameter(KCOMP_ID);
-      kcompP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter kcompP = new IntParameter(KCOMP_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kcompP)) {
         kcomp = kcompP.intValue();
       }
@@ -406,9 +406,9 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         comparisonDistanceFunction = compDistP.instantiateClass(config);
       }
 
-      final IntParameter kreachP = new IntParameter(KREACH_ID);
-      kreachP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      kreachP.setOptional(true);
+      final IntParameter kreachP = new IntParameter(KREACH_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true);
       if(config.grab(kreachP)) {
         kreach = kreachP.intValue();
       }
@@ -422,8 +422,8 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       }
 
       // TODO: make default 1.0?
-      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 2.0);
-      lambdaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 2.0) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(lambdaP)) {
         lambda = lambdaP.doubleValue();
       }

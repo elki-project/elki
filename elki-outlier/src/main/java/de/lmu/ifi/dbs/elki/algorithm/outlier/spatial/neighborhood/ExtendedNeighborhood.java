@@ -218,8 +218,8 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
        * @return number of steps, default 1
        */
       public static int getParameterSteps(Parameterization config) {
-        final IntParameter param = new IntParameter(STEPS_ID);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        final IntParameter param = new IntParameter(STEPS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(param)) {
           return param.getValue();
         }

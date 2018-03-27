@@ -202,8 +202,8 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(KMeans.K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter kP = new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(kP)) {
         k = kP.intValue();
       }

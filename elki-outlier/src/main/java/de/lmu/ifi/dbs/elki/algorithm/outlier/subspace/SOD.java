@@ -375,14 +375,14 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
         similarityFunction = simP.instantiateClass(config);
       }
 
-      final IntParameter knnP = new IntParameter(KNN_ID);
-      knnP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter knnP = new IntParameter(KNN_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(knnP)) {
         knn = knnP.getValue();
       }
 
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

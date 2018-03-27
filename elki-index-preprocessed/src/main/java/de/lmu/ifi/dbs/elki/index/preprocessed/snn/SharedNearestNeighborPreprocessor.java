@@ -261,8 +261,8 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID);
-        numberOfNeighborsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(numberOfNeighborsP)) {
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }

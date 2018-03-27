@@ -32,15 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -80,15 +72,15 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @apiviz.has NaiveProjectedKNNQuery
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
-title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
-booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
-url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
+    title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
+    booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+    url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
 public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KNNIndex<O> {
   /**
    * The representation we are bound to.
    */
   protected final Relation<O> relation;
-	  
+
   /**
    * Class logger.
    */
@@ -446,9 +438,9 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
         if(config.grab(windowP)) {
           window = windowP.getValue();
         }
-        IntParameter projectionsP = new IntParameter(PROJECTIONS_ID);
-        projectionsP.setOptional(true);
-        projectionsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter projectionsP = new IntParameter(PROJECTIONS_ID) //
+            .setOptional(true) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(projectionsP)) {
           projections = projectionsP.getValue();
         }
