@@ -192,7 +192,7 @@ public class DimensionSelectingLatLngDistanceFunction implements SpatialPrimitiv
       }
       // Non-formalized parameter constraint:
       if(dimlat == dimlng) {
-        config.reportError(new WrongParameterValueException("Parameters " + dimlatP.getName() + " and " + dimlngP.getName() + " should be different columns."));
+        config.reportError(new WrongParameterValueException(dimlatP, "and", dimlngP, "should be different columns."));
       }
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
       if(config.grab(modelP)) {

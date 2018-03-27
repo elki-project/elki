@@ -83,10 +83,27 @@ public class ParameterException extends Exception {
    * @return Combined error message
    */
   public static String prefixParameterToMessage(Parameter<?> p, String message) {
-    StringBuilder buf = new StringBuilder(100 + message.length());
-    buf.append(p instanceof Flag ? "Flag '" : "Parameter '") //
+    return new StringBuilder(100 + message.length()) //
+        .append(p instanceof Flag ? "Flag '" : "Parameter '") //
         .append(p.getOptionID().getName()) //
-        .append("' ").append(message);
-    return buf.toString();
+        .append("' ").append(message).toString();
+  }
+
+  /**
+   * Prefix parameters to error message.
+   *
+   * @param p Parameter
+   * @param p2 Parameter
+   * @param message Error message
+   * @return Combined error message
+   */
+  public static String prefixParametersToMessage(Parameter<?> p, String mid, Parameter<?> p2, String message) {
+    return new StringBuilder(200 + mid.length() + message.length())//
+        .append(p instanceof Flag ? "Flag '" : "Parameter '") //
+        .append(p.getOptionID().getName()) //
+        .append("' ").append(mid) //
+        .append(p instanceof Flag ? " Flag '" : " Parameter '") //
+        .append(p.getOptionID().getName()) //
+        .append(message.length() > 0 ? "' " : "'.").append(message).toString();
   }
 }

@@ -424,7 +424,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
       }
       // Non-formalized parameter constraint:
       if(minima != null && maxima != null && minima.length != maxima.length) {
-        config.reportError(new WrongParameterValueException("Parameters " + minimaP.getName() + " and " + maximaP.getName() + " must have the same number of values."));
+        config.reportError(new WrongParameterValueException(minimaP, "and", maximaP, "must have the same number of values."));
       }
     }
 

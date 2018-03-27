@@ -173,7 +173,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
       }
       // Non-formalized parameter constraint: min < max
       if(min >= max) {
-        config.reportError(new WrongParameterValueException("Parameter " + minP.getName() + " must be less than " + maxP.getName()));
+        config.reportError(new WrongParameterValueException(minP, "must be less than", maxP, ""));
       }
     }
 

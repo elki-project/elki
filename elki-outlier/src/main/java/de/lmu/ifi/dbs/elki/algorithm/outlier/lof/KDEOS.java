@@ -416,7 +416,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
       }
       // Non-formalized parameter constraint: k_min <= k_max
       if(kmin > kmax) {
-        config.reportError(new WrongParameterValueException("Parameter " + kminP.getName() + " must be at most " + kmaxP.getName()));
+        config.reportError(new WrongParameterValueException(kminP, "must be at most", kmaxP, ""));
       }
 
       DoubleParameter scaleP = new DoubleParameter(KERNEL_SCALE_ID)//

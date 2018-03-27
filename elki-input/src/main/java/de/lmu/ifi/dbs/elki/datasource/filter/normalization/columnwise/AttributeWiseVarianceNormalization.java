@@ -271,13 +271,13 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
 
         for(double d : stddev) {
           if(d == 0.) {
-            config.reportError(new WrongParameterValueException("Standard deviations must not be 0."));
+            config.reportError(new WrongParameterValueException(stddevP, stddevP.getValueAsString(), "Standard deviations must not be 0."));
           }
         }
       }
       // Non-formalized parameter constraint:
       if(mean != null && stddev != null && mean.length != stddev.length) {
-        config.reportError(new WrongParameterValueException("Parameters " + meanP.getName() + " and " + stddevP.getName() + " must have the same number of values."));
+        config.reportError(new WrongParameterValueException(meanP, "and", stddevP, "must have the same number of values."));
       }
     }
 

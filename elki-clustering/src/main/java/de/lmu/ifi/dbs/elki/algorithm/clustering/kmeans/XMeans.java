@@ -358,7 +358,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       }
       // Non-formalized parameter constraint: k_min <= k_max
       if(k_min > k_max) {
-        config.reportError(new WrongParameterValueException("Parameter " + kMinP.getName() + " must be at most " + kMaxP.getName()));
+        config.reportError(new WrongParameterValueException(kMinP, "must be at most", kMaxP, ""));
       }
 
       getParameterInitialization(config);

@@ -218,7 +218,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       }
       // Non-formalized parameter constraint: t1 >= t2
       if(t1 < t2) {
-        config.reportError(new WrongParameterValueException("Parameter " + t1P.getName() + " should be at least " + t2P.getName()));
+        config.reportError(new WrongParameterValueException(t1P, "must be larger than", t2P, ""));
       }
     }
 

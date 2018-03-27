@@ -38,7 +38,7 @@ public class WrongParameterValueException extends ParameterException {
    * Thrown by a Parameterizable object in case of wrong parameter format.
    * 
    * @param parameter the parameter that has a wrong value
-   * @param read the value of the parameter read by the option handler
+   * @param read the value of the parameter read
    * @param reason detailed error description
    * @param cause the cause
    */
@@ -50,11 +50,22 @@ public class WrongParameterValueException extends ParameterException {
    * Thrown by a Parameterizable object in case of wrong parameter format.
    * 
    * @param parameter the parameter that has a wrong value
-   * @param read the value of the parameter read by the option handler
+   * @param read the value of the parameter read
    * @param reason detailed error description
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason) {
     this(parameter, read, reason, null);
+  }
+
+  /**
+   * Thrown by a Parameterizable object in case of wrong parameter format.
+   * 
+   * @param parameter the parameter that has a wrong value
+   * @param parameter2 the second parameter that has a wrong value
+   * @param reason detailed error description
+   */
+  public WrongParameterValueException(Parameter<?> parameter, String mid, Parameter<?> parameter2, String reason) {
+    super(prefixParametersToMessage(parameter, mid, parameter2, reason));
   }
 
   /**
