@@ -153,20 +153,14 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class);
-      if(config.grab(estimatorP)) {
-        estimator = estimatorP.instantiateClass(config);
-      }
-      DoubleParameter krateP = new DoubleParameter(KRATE_ID, 50) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(krateP)) {
-        krate = krateP.doubleValue();
-      }
-      DoubleParameter samplesP = new DoubleParameter(SAMPLES_ID, .1) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(samplesP)) {
-        samples = samplesP.doubleValue();
-      }
+      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class) //
+          .grab(config, x -> estimator = x);
+      new DoubleParameter(KRATE_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> krate = x);
+      new DoubleParameter(SAMPLES_ID, .1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> samples = x);
     }
 
     @Override

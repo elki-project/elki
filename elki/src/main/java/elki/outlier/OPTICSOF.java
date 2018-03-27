@@ -183,11 +183,9 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(param)) {
-        minpts = param.getValue();
-      }
+      new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> minpts = x);
     }
 
     @Override

@@ -316,37 +316,23 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      if(!new PatternParameter(PATTERN_ID) //
+          .setOptional(true) //
+          .grab(config, x -> pattern = x)) //
+      {
+        new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+            .setOptional(true) //
+            .grab(config, x -> queries = x);
       }
-      PatternParameter patternP = new PatternParameter(PATTERN_ID) //
-          .setOptional(true);
-      if(config.grab(patternP)) {
-        pattern = patternP.getValue();
-      }
-      else {
-        ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
-            .setOptional(true);
-        if(config.grab(queryP)) {
-          queries = queryP.instantiateClass(config);
-        }
-      }
-      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+      new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.doubleValue();
-      }
-      Flag forceP = new Flag(FORCE_ID);
-      if(config.grab(forceP)) {
-        forcelinear = forceP.isTrue();
-      }
-      RandomParameter randomP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> sampling = x);
+      new Flag(FORCE_ID).grab(config, x -> forcelinear = x);
+      new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT).grab(config, x -> random = x);
     }
 
     @Override

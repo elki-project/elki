@@ -246,16 +246,10 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<ClusteringAlgorithm<?>> clusterP = new ObjectParameter<>(CLUSTERING_ID, ClusteringAlgorithm.class);
-      if(config.grab(clusterP)) {
-        clusterer = clusterP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
+      new ObjectParameter<ClusteringAlgorithm<?>>(CLUSTERING_ID, ClusteringAlgorithm.class) //
+          .grab(config, x -> clusterer = x);
+      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
     }
 
     @Override

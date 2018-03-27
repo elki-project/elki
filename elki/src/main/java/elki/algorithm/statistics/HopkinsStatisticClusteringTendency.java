@@ -362,38 +362,22 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter repP = new IntParameter(REP_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(repP)) {
-        rep = repP.getValue();
-      }
-
-      IntParameter kP = new IntParameter(K_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      IntParameter sampleP = new IntParameter(SAMPLESIZE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(sampleP)) {
-        sampleSize = sampleP.getValue();
-      }
-      RandomParameter randomP = new RandomParameter(SEED_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
-
-      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID)//
+      new IntParameter(REP_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> rep = x);
+      new IntParameter(K_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(SAMPLESIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> sampleSize = x);
+      new RandomParameter(SEED_ID).grab(config, x -> random = x);
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
           .setOptional(true);
-      if(config.grab(minimaP)) {
-        minima = minimaP.getValue().clone();
-      }
-      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID)//
-          .setOptional(!minimaP.isDefined());
-      if(config.grab(maximaP)) {
-        maxima = maximaP.getValue().clone();
-      }
+      minimaP.grab(config, x -> minima = x.clone());
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID) //
+          .setOptional(minima == null);
+      maximaP.grab(config, x -> maxima = x.clone());
       // Non-formalized parameter constraint:
       if(minima != null && maxima != null && minima.length != maxima.length) {
         config.reportError(new WrongParameterValueException(minimaP, "and", maximaP, "must have the same number of values."));

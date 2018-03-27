@@ -181,15 +181,11 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel>> algP = new ObjectParameter<>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
-      if(config.grab(algP)) {
-        algorithm = algP.instantiateClass(config);
-      }
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.25) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
+      new ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel>>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class) //
+          .grab(config, x -> algorithm = x);
+      new DoubleParameter(ALPHA_ID, 0.25) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

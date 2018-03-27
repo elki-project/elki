@@ -218,29 +218,15 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, 0.1) //
+      new DoubleParameter(QUANTILE_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(quantileP)) {
-        quantile = quantileP.doubleValue();
-      }
-
-      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.doubleValue();
-      }
-
-      Flag nozerosF = new Flag(NOZEROS_ID);
-      if(config.grab(nozerosF)) {
-        nozeros = nozerosF.isTrue();
-      }
-
-      RandomParameter randP = new RandomParameter(SEED_ID);
-      if(config.grab(randP)) {
-        rand = randP.getValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> quantile = x);
+      new DoubleParameter(SAMPLING_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> sampling = x);
+      new Flag(NOZEROS_ID).grab(config, x -> nozeros = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rand = x);
     }
 
     @Override

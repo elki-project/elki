@@ -448,22 +448,12 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, 20) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(numbinP)) {
-        numbin = numbinP.getValue();
-      }
-
-      final Flag exactF = new Flag(EXACT_ID);
-      if(config.grab(exactF)) {
-        exact = exactF.getValue();
-      }
-
+      new IntParameter(HISTOGRAM_BINS_ID, 20) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> numbin = x);
+      new Flag(EXACT_ID).grab(config, x -> exact = x);
       if(!exact) {
-        final Flag samplingF = new Flag(SAMPLING_ID);
-        if(config.grab(samplingF)) {
-          sampling = samplingF.getValue();
-        }
+        new Flag(SAMPLING_ID).grab(config, x -> sampling = x);
       }
     }
 

@@ -806,30 +806,19 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minPts = minptsP.getValue();
-      }
-      IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(maxlevelP)) {
-        maxLevel = maxlevelP.getValue();
-      }
-      IntParameter mindimP = new IntParameter(MINDIM_ID, 1)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(mindimP)) {
-        minDim = mindimP.getValue();
-      }
-      DoubleParameter jitterP = new DoubleParameter(JITTER_ID)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(jitterP)) {
-        jitter = jitterP.getValue();
-      }
-      Flag adjustF = new Flag(ADJUST_ID);
-      if(config.grab(adjustF)) {
-        adjust = adjustF.getValue();
-      }
+      new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minPts = x);
+      new IntParameter(MAXLEVEL_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> maxLevel = x);
+      new IntParameter(MINDIM_ID, 1)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minDim = x);
+      new DoubleParameter(JITTER_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> jitter = x);
+      new Flag(ADJUST_ID).grab(config, x -> adjust = x);
     }
 
     @Override

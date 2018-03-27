@@ -151,22 +151,15 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter param = new DoubleParameter(RADIUS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(param)) {
-        radius = param.doubleValue();
-      }
-      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+      new DoubleParameter(RADIUS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> radius = x);
+      new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.getValue();
-      }
-      final RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        random = rndP.getValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> sampling = x);
+      new RandomParameter(SEED_ID).grab(config, x -> random = x);
     }
 
     @Override

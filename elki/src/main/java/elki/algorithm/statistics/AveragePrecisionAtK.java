@@ -252,26 +252,16 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.getValue();
-      }
-      final RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        seed = rndP.getValue();
-      }
-      final Flag includeP = new Flag(INCLUDESELF_ID);
-      if(config.grab(includeP)) {
-        includeSelf = includeP.isTrue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> sampling = x);
+      new RandomParameter(SEED_ID).grab(config, x -> seed = x);
+      new Flag(INCLUDESELF_ID).grab(config, x -> includeSelf = x);
     }
 
     @Override

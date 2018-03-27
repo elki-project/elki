@@ -299,31 +299,18 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(outputAccuracyP)) {
-        outputAccuracy = outputAccuracyP.getValue();
-      }
-
-      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID) //
+      new IntParameter(OUTPUT_ACCURACY_ID, 4) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> outputAccuracy = x);
+      new IntParameter(SAMPLE_SIZE_ID) //
           .setOptional(true) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(sampleSizeP)) {
-        sampleSize = sampleSizeP.getValue();
-      }
-
-      Flag randomSampleF = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE_ID);
-      if(config.grab(randomSampleF)) {
-        randomSample = randomSampleF.getValue();
-      }
-      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if(config.grab(pcaP)) {
-        pca = pcaP.instantiateClass(config);
-      }
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if(config.grab(filterP)) {
-        filter = filterP.instantiateClass(config);
-      }
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> sampleSize = x);
+      new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE_ID).grab(config, x -> randomSample = x);
+      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> pca = x);
+      new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
+          .grab(config, x -> filter = x);
     }
 
     @Override

@@ -40,6 +40,7 @@ import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -158,11 +159,9 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter thresholdP = new DoubleParameter(THRESHOLD_ID);
-      if(config.grab(thresholdP)) {
-        threshold = thresholdP.doubleValue();
-      }
+      new DoubleParameter(THRESHOLD_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> threshold = x);
     }
 
     @Override

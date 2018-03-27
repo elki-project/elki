@@ -720,30 +720,24 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
+      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
 
-      IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.getValue();
-        if(minpts <= 2) {
-          LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
-        }
-      }
+      new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> {
+            minpts = x;
+            if(minpts <= 2) {
+              LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
+            }
+          });
 
-      DoubleParameter gridP = new DoubleParameter(GRID_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(epsilon > 0.) {
-        gridP.setDefaultValue(10. * epsilon) //
-            .addConstraint(new GreaterEqualConstraint(1. * epsilon));
-      }
-      if(config.grab(gridP)) {
-        gridwidth = gridP.doubleValue();
-      }
+      new DoubleParameter(GRID_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .setDefaultValue(epsilon > 0 ? 10. * epsilon : 1.) //
+          .addConstraint(new GreaterEqualConstraint(1. * epsilon)) //
+          .grab(config, x -> gridwidth = x);
     }
 
     @Override

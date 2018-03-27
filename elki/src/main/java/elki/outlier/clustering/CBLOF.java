@@ -322,29 +322,17 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<NumberVectorDistance<? super O>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceP)) {
-        distance = distanceP.instantiateClass(config);
-      }
-
-      final DoubleParameter pA = new DoubleParameter(ALPHPA_ID)//
+      new ObjectParameter<NumberVectorDistance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new DoubleParameter(ALPHPA_ID)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(pA)) {
-        alpha = pA.doubleValue();
-      }
-
-      final DoubleParameter pB = new DoubleParameter(BETA_ID)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
-      if(config.grab(pB)) {
-        beta = pB.doubleValue();
-      }
-
-      ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>> clusterP = new ObjectParameter<>(CLUSTERING_ID, ClusteringAlgorithm.class, SortMeans.class);
-      if(config.grab(clusterP)) {
-        clusteringAlgorithm = clusterP.instantiateClass(config);
-      }
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new DoubleParameter(BETA_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+          .grab(config, x -> beta = x);
+      new ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>>(CLUSTERING_ID, ClusteringAlgorithm.class, SortMeans.class) //
+          .grab(config, x -> clusteringAlgorithm = x);
     }
 
     @Override

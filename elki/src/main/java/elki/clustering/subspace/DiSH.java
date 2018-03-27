@@ -887,30 +887,24 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.doubleValue();
-      }
-
-      IntParameter muP = new IntParameter(MU_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(muP)) {
-        mu = muP.intValue();
-      }
-
+      new DoubleParameter(EPSILON_ID, 0.001) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
+      new IntParameter(MU_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> mu = x);
       configDiSHPreprocessor(config, epsilon, mu);
     }
 
     public void configDiSHPreprocessor(Parameterization config, double epsilon, int minpts) {
-      ListParameterization dishParameters = new ListParameterization();
-      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, epsilon);
-      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts);
-      ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
+      ChainedParameterization dishchain = new ChainedParameterization(//
+          new ListParameterization() //
+              .addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, epsilon) //
+              .addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts), //
+          config);
       dishchain.errorsTo(config);
 
-      final Class<DiSHPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DiSHPreferenceVectorIndex.Factory.class);
+      Class<DiSHPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DiSHPreferenceVectorIndex.Factory.class);
       dishPreprocessor = dishchain.tryInstantiate(cls);
     }
 

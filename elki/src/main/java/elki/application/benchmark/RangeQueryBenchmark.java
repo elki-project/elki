@@ -289,21 +289,14 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
-          .setOptional(true);
-      if(config.grab(queryP)) {
-        queries = queryP.instantiateClass(config);
-      }
-      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+      new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+          .setOptional(true) //
+          .grab(config, x -> queries = x);
+      new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.doubleValue();
-      }
-      RandomParameter randomP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> sampling = x);
+      new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT).grab(config, x -> random = x);
     }
 
     @Override

@@ -222,22 +222,13 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      DoubleParameter percentageP = new DoubleParameter(SAMPLING_ID, 1.) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(percentageP)) {
-        percentage = percentageP.getValue();
-      }
-
-      RandomParameter randomP = new RandomParameter(SEED_ID);
-      if(config.grab(randomP)) {
-        rnd = randomP.getValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(SAMPLING_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> percentage = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

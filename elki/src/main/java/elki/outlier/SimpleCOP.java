@@ -207,19 +207,13 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if(config.grab(pcaP)) {
-        pca = pcaP.instantiateClass(config);
-      }
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if(config.grab(filterP)) {
-        filter = filterP.instantiateClass(config);
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<PCARunner>(PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> pca = x);
+      new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
+          .grab(config, x -> filter = x);
     }
 
     @Override

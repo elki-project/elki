@@ -474,11 +474,9 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.getValue();
-      }
+      new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x);
       Class<DeLiCluTreeFactory<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(DeLiCluTreeFactory.class);
       indexer = config.tryInstantiate(clz);
     }

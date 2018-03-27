@@ -162,11 +162,8 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<KMeans<O, ?>> clusterP = new ObjectParameter<>(CLUSTERING_ID, KMeans.class, LloydKMeans.class);
-      if(config.grab(clusterP)) {
-        clusterer = clusterP.instantiateClass(config);
-      }
+      new ObjectParameter<KMeans<O, ?>>(CLUSTERING_ID, KMeans.class, LloydKMeans.class) //
+          .grab(config, x -> clusterer = x);
     }
 
     @Override

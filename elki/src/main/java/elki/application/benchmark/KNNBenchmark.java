@@ -240,30 +240,19 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distance = distP.instantiateClass(config);
-      }
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
-          .setOptional(true);
-      if(config.grab(queryP)) {
-        queries = queryP.instantiateClass(config);
-      }
-      DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID) //
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+          .setOptional(true) //
+          .grab(config, x -> queries = x);
+      new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.doubleValue();
-      }
-      RandomParameter randomP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> sampling = x);
+      new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT).grab(config, x -> random = x);
     }
 
     @Override

@@ -376,25 +376,17 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<AffinityPropagationInitialization<O>> param = new ObjectParameter<>(INITIALIZATION_ID, AffinityPropagationInitialization.class, DistanceBasedInitializationWithMedian.class);
-      if(config.grab(param)) {
-        initialization = param.instantiateClass(config);
-      }
-      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, .5) //
+      new ObjectParameter<AffinityPropagationInitialization<O>>(INITIALIZATION_ID, AffinityPropagationInitialization.class, DistanceBasedInitializationWithMedian.class) //
+          .grab(config, x -> initialization = x);
+      new DoubleParameter(LAMBDA_ID, .5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(lambdaP)) {
-        lambda = lambdaP.doubleValue();
-      }
-      final IntParameter convergenceP = new IntParameter(CONVERGENCE_ID, 15) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(convergenceP)) {
-        convergence = convergenceP.intValue();
-      }
-      final IntParameter maxiterP = new IntParameter(MAXITER_ID, 1000);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.intValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> lambda = x);
+      new IntParameter(CONVERGENCE_ID, 15) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> convergence = x);
+      new IntParameter(MAXITER_ID, 1000) //
+          .grab(config, x -> maxiter = x);
     }
 
     @Override
