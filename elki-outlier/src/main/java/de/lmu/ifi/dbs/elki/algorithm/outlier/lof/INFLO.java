@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,19 +25,21 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -64,6 +66,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Data Mining, 2006.
  * </p>
  *
+ * There is an error in the two-way search algorithm proposed in the article
+ * above. It does not correctly compute the RNN, but it will find only those RNN
+ * that are in the kNN, making the entire RNN computation redundant, as it uses
+ * the kNN + RNN later anyway.
+ * 
+ * Given the errors in the INFLO paper, as of ELKI 0.8, we do:
+ * <ul>
+ * <li>Assume \( IS_k(p) := kNN(p) \cup RkNN(p) \)</li>
+ * <li>Implement the pruning of two-way search, i.e., use INFLO=1 if
+ * \( |kNN(p) \cap RkNN(p)|\geq m\cdot |kNN(p)| \)</li>
+ * </ul>
+ *
  * @author Ahmed Hettab
  * @author Erich Schubert
  * @since 0.3
@@ -75,9 +89,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "W. Jin, A. Tung, J. Han, and W. Wang", //
-title = "Ranking outliers using symmetric neighborhood relationship", //
-booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
-url = "http://dx.doi.org/10.1007/11731139_68")
+    title = "Ranking outliers using symmetric neighborhood relationship", //
+    booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
+    url = "http://dx.doi.org/10.1007/11731139_68")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.INFLO")
 public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -93,7 +107,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
   /**
    * Number of neighbors to use.
    */
-  private int k;
+  private int kplus1;
 
   /**
    * Constructor with parameters.
@@ -105,7 +119,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
   public INFLO(DistanceFunction<? super O> distanceFunction, double m, int k) {
     super(distanceFunction);
     this.m = m;
-    this.k = k;
+    this.kplus1 = k + 1;
   }
 
   /**
@@ -116,29 +130,32 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k + 1, DatabaseQuery.HINT_HEAVY_USE);
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("INFLO", 3) : null;
 
+    // Step one: find the kNN
+    LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), kplus1);
+
+    // Step two: find the RkNN, minus kNN.
+    LOG.beginStep(stepprog, 2, "Materialize reverse NN.");
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
-    // KNNS
-    WritableDataStore<ModifiableDBIDs> knns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // RNNS
     WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
-    // density
-    WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-    // init knns and rnns
+    // init the rNN
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      knns.put(iditer, DBIDUtil.newArray());
       rnns.put(iditer, DBIDUtil.newArray());
     }
+    computeNeighborhoods(relation, knnq, pruned, rnns);
 
-    computeNeighborhoods(relation, knnQuery, pruned, knns, rnns, density);
-
+    // Step three: compute INFLO scores
+    LOG.beginStep(stepprog, 3, "Compute INFLO scores.");
     // Calculate INFLO for any Object
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     // Note: this modifies knns, by adding rknns!
-    computeINFLO(relation, pruned, knns, rnns, density, inflos, inflominmax);
+    computeINFLO(relation, pruned, knnq, rnns, inflos, inflominmax);
+    LOG.setCompleted(stepprog);
+    LOG.statistics(new LongStatistic(INFLO.class.getName() + ".pruned", pruned.size()));
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Influence Outlier Score", "inflo-outlier", inflos, relation.getDBIDs());
@@ -147,36 +164,49 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
   }
 
   /**
-   * Compute neighborhoods
+   * Compute the reverse kNN minus the kNN.
+   *
+   * This is based on algorithm 2 (two-way search) from the INFLO paper, but
+   * unfortunately this algorithm does not compute the RkNN correctly, but
+   * rather \( RkNN \cap kNN \), which is quite useless given that we will use
+   * the union of that with kNN later on. Therefore, we decided to rather follow
+   * what appears to be the idea of the method, not the literal pseudocode
+   * included.
    *
    * @param relation Data relation
    * @param knnQuery kNN query function
-   * @param pruned Pruned objects
-   * @param knns kNN storage
-   * @param rnns reverse kNN storage
-   * @param density Density estimation
+   * @param pruned Pruned objects: with too many neighbors
+   * @param rNNminuskNNs reverse kNN storage
    */
-  protected void computeNeighborhoods(Relation<O> relation, KNNQuery<O> knnQuery, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> knns, WritableDataStore<ModifiableDBIDs> rnns, WritableDoubleDataStore density) {
+  private void computeNeighborhoods(Relation<O> relation, KNNQuery<O> knnQuery, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> rNNminuskNNs) {
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding RkNN", relation.size(), LOG) : null;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      // if not visited count=0
-      int count = rnns.get(iter).size();
-      DBIDs knn = getKNN(iter, knnQuery, knns, density);
+      DBIDs knn = knnQuery.getKNNForDBID(iter, kplus1);
+      int count = 1; // The point itself.
       for(DBIDIter niter = knn.iter(); niter.valid(); niter.advance()) {
         // Ignore the query point itself.
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
-        // See algorithm 2 in the INFLO paper, two-way-search.
-        if(getKNN(niter, knnQuery, knns, density).contains(iter)) {
-          rnns.get(niter).add(iter);
-          rnns.get(iter).add(niter);
+        // As we did not initialize count with the rNN size, we check all
+        // neighbors here. The cost of this is O(k) though, but we save O(kN)
+        // memory in return. Even just populating this will be similar.
+        if(knnQuery.getKNNForDBID(niter, kplus1).contains(iter)) {
           count++;
         }
+        else {
+          // In contrast to INFLO pseudocode, we only update if it is not found,
+          // i.e., if it is in RkNN \setminus kNN, to save memory.
+          rNNminuskNNs.get(niter).add(iter);
+        }
       }
+      // INFLO pruning rule
       if(count >= knn.size() * m) {
         pruned.add(iter);
       }
+      LOG.incrementProcessed(prog);
     }
+    LOG.ensureCompleted(prog);
   }
 
   /**
@@ -184,23 +214,31 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @param relation Data relation
    * @param pruned Pruned objects
-   * @param knns kNN storage
-   * @param rnns reverse kNN storage
-   * @param density Density estimation
-   * @param inflos Inflo score storage
+   * @param knn kNN query
+   * @param rNNminuskNNs reverse kNN storage
+   * @param inflos INFLO score storage
    * @param inflominmax Output of minimum and maximum
    */
-  protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> knns, WritableDataStore<ModifiableDBIDs> rnns, WritableDoubleDataStore density, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
+  protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, KNNQuery<O> knnq, WritableDataStore<ModifiableDBIDs> rNNminuskNNs, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing INFLOs", relation.size(), LOG) : null;
     HashSetModifiableDBIDs set = DBIDUtil.newHashSet();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(pruned.contains(iter)) {
         inflos.putDouble(iter, 1.);
         inflominmax.put(1.);
+        LOG.incrementProcessed(prog);
+        continue;
+      }
+      final KNNList knn = knnq.getKNNForDBID(iter, kplus1);
+      if(knn.getKNNDistance() == 0.) {
+        inflos.putDouble(iter, 1.);
+        inflominmax.put(1.);
+        LOG.incrementProcessed(prog);
         continue;
       }
       set.clear();
-      set.addDBIDs(knns.get(iter));
-      set.addDBIDs(rnns.get(iter));
+      set.addDBIDs(knn);
+      set.addDBIDs(rNNminuskNNs.get(iter));
       // Compute mean density of NN \cup RNN
       double sum = 0.;
       int c = 0;
@@ -208,40 +246,22 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
-        sum += density.doubleValue(niter);
+        final double kdist = knnq.getKNNForDBID(niter, kplus1).getKNNDistance();
+        if(kdist <= 0) {
+          sum = Double.POSITIVE_INFINITY;
+          c++;
+          break;
+        }
+        sum += 1. / kdist;
         c++;
       }
-      double denP = density.doubleValue(iter);
-      final double inflo;
-      if(denP > 0.) {
-        inflo = denP < Double.POSITIVE_INFINITY ? sum / (c * denP) : 1.;
-      }
-      else {
-        inflo = sum == 0 ? 1. : Double.POSITIVE_INFINITY;
-      }
+      sum *= knn.getKNNDistance();
+      final double inflo = sum == 0 ? 1. : sum / c;
       inflos.putDouble(iter, inflo);
-      // update minimum and maximum
       inflominmax.put(inflo);
+      LOG.incrementProcessed(prog);
     }
-  }
-
-  /**
-   * Get the (forward only) kNN of an object, including the query point
-   *
-   * @param q Query point
-   * @param knnQuery Query function
-   * @param knns kNN storage
-   * @param density Density storage
-   * @return Neighbor list
-   */
-  protected DBIDs getKNN(DBIDIter q, KNNQuery<O> knnQuery, WritableDataStore<ModifiableDBIDs> knns, WritableDoubleDataStore density) {
-    ModifiableDBIDs s = knns.get(q);
-    if(s.size() == 0) {
-      KNNList listQ = knnQuery.getKNNForDBID(q, k + 1);
-      s.addDBIDs(listQ);
-      density.putDouble(q, 1. / listQ.getKNNDistance());
-    }
-    return s;
+    LOG.ensureCompleted(prog);
   }
 
   @Override
@@ -290,13 +310,13 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter mP = new DoubleParameter(M_ID, 1.0)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(mP)) {
         m = mP.doubleValue();
       }
 
       final IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
