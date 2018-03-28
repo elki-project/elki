@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @since 0.2
  *
  * @apiviz.landmark
+ * @apiviz.uses TextWriteable
  * @apiviz.uses TextWriterStream oneway - - writesTo
  * @apiviz.composedOf TextWriterWriterInterface
  * @apiviz.has NamingScheme

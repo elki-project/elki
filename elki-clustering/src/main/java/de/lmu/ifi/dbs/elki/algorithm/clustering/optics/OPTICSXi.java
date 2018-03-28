@@ -66,9 +66,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf OPTICSTypeAlgorithm oneway - «runs»
- * @apiviz.uses ClusterOrder oneway - «reads»
- * @apiviz.has SteepAreaResult oneway - «produces»
+ * @apiviz.composedOf OPTICSTypeAlgorithm
+ * @apiviz.uses ClusterOrder
+ * @apiviz.has SteepAreaResult
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
 @Priority(Priority.RECOMMENDED)

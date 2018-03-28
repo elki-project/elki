@@ -35,6 +35,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf ChangePoint
  */
 public class ChangePoints extends BasicResult implements TextWriteable {
   /**

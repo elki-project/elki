@@ -289,8 +289,10 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   /**
    * Iterate over all objects in the heap, not ordered.
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   private class UnorderedIter implements DoubleDBIDListIter {
     /**

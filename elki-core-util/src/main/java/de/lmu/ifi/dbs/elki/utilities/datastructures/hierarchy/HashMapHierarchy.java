@@ -722,6 +722,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * Iterator over all known elements, by insertion order.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   private class ItrAll implements It<O> {
     int pos;

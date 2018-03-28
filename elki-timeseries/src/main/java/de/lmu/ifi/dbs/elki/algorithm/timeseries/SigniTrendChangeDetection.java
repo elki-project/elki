@@ -76,6 +76,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf Instance
+ * @apiviz.has ChangePoints
  */
 @Title("Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds")
 @Reference(authors = "E. Schubert, M. Weiler, H. Kriegel", //

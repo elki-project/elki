@@ -26,6 +26,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * BIRCH absorption criterion.
  *
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ClusteringFeature
+ * @apiviz.uses NumberVector
  */
 public interface BIRCHAbsorptionCriterion {
   /**
@@ -39,7 +42,7 @@ public interface BIRCHAbsorptionCriterion {
 
   /**
    * Quality when merging two CFs.
-   * 
+   *
    * @param f1 First clustering feature
    * @param f2 Second clustering feature
    * @return Quality

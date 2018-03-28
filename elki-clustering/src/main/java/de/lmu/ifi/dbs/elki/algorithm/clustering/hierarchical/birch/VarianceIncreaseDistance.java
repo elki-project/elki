@@ -90,9 +90,9 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

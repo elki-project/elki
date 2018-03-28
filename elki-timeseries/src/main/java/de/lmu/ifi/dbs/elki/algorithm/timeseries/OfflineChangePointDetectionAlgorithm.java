@@ -71,6 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
+ *
+ * @apiviz.has ChangePoints
  */
 @Title("Off-line Change Point Detection")
 @Description("Detects multiple change points in a time series")

@@ -25,14 +25,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Interface for double-valued relations.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
 public interface DoubleRelation extends ModifiableRelation<Double> {
   /**
    * Get the representation of an object.
-   * 
+   *
    * @param id Object ID
    * @return object instance
    */
@@ -49,7 +49,7 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
 
   /**
    * Set an object representation.
-   * 
+   *
    * @param id Object ID
    * @param val Value
    */
@@ -76,8 +76,10 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
 
   /**
    * Consumer for (DBIDRef, double) pairs.
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   @FunctionalInterface
   interface Consumer {

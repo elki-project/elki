@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @apiviz.landmark
  * @apiviz.has VisualizerContext
  * @apiviz.has VisFactory
+ * @apiviz.composedOf RenderFlag
+ * @apiviz.composedOf UpdateFlag
  */
 public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**

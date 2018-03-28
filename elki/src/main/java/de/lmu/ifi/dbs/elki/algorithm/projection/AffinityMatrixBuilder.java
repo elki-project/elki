@@ -25,15 +25,17 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Interface for computing an affinity matrix.
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Input relation type
+ *
+ * @apiviz.has AffinityMatrix
  */
 public interface AffinityMatrixBuilder<O> {
   /**
    * Compute the affinity matrix.
-   * 
+   *
    * @param relation Data relation
    * @param initialScale initial scale
    * @return Affinity matrix

@@ -24,17 +24,20 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
  * Distance function for BIRCH clustering.
- * 
+ *
  * For performance we (usually) use squared distances.
- * 
+ *
  * The exception to this rule is Manhattan.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.uses ClusteringFeature
+ * @apiviz.uses NumberVector
  */
 public interface BIRCHDistance {
   /**
    * Distance of a vector to a clustering feature.
-   * 
+   *
    * @param v Vector
    * @param cf Clustering Feature
    * @return Distance
@@ -43,7 +46,7 @@ public interface BIRCHDistance {
 
   /**
    * Distance between two clustering features.
-   * 
+   *
    * @param c1 First clustering feature
    * @param c2 Second clustering feature
    * @return Distance

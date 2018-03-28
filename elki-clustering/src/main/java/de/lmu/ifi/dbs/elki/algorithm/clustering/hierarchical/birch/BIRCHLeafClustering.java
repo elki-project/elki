@@ -58,8 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Data. Min. Knowl. Discovery
  * </p>
  *
- * 
  * @author Erich Schubert
+ *
+ * @apiviz.uses CFTree
  */
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //

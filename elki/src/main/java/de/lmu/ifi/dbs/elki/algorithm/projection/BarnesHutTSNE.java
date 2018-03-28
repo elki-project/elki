@@ -63,6 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  *
+ * @apiviz.composedOf QuadTree
+ *
  * @param <O> Object type
  */
 @Reference(authors = "L. van der Maaten", //

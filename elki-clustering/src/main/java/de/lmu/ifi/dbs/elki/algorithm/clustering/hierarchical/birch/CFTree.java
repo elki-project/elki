@@ -43,21 +43,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Partial implementation of the CFTree as used by BIRCH.
- * 
+ *
  * Important differences:
  * <ol>
  * <li>Leaf nodes an directory nodes have the same capacity</li>
  * <li>Condensing and memory limits are not implemented</li>
  * <li>Merging refinement (merge-resplit) is not implemented</li>
  * </ol>
- * 
+ *
  * Because we want to be able to track the cluster assignments of all data
  * points easily, we need to store the point IDs, and it is not possible to
  * implement the originally proposed page size management at the same time.
- * 
+ *
  * Condensing and merging refinement are possible, and improvements to this code
  * are welcome - please send a pull request!
- * 
+ *
  * References:
  * <p>
  * T. Zhang and R. Ramakrishnan and M. Livny<br />
@@ -69,8 +69,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * BIRCH: A New Data Clustering Algorithm and Its Applications<br />
  * Data Min. Knowl. Discovery
  * </p>
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf ClusteringFeature
+ * @apiviz.has LeafIterator
  */
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
@@ -672,8 +675,10 @@ public class CFTree {
 
     /**
      * Parameterization class for CFTrees.
-     * 
+     *
      * @author Erich Schubert
+     *
+     * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

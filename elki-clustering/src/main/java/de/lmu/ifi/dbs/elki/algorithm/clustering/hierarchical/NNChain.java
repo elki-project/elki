@@ -220,6 +220,8 @@ public class NNChain<O> extends AGNES<O> {
    * 
    * @author Erich Schubert
    *
+   * @apiviz.exclude
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AGNES.Parameterizer<O> {

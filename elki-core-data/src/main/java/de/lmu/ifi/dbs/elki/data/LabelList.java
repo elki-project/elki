@@ -117,7 +117,7 @@ public class LabelList {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses SimpleClassLabel - - «serializes»
+   * @apiviz.uses LabelList - - «serializes»
    */
   public static class Serializer implements ByteBufferSerializer<LabelList> {
     @Override

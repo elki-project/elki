@@ -27,14 +27,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Average intercluster distance.
- * 
+ *
  * Reference:
  * <p>
  * Data Clustering for Very Large Datasets Plus Applications<br />
  * T. Zhang<br />
  * Doctoral Dissertation, 1997.
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Alias({ "D2" })
@@ -76,9 +76,9 @@ public class AverageInterclusterDistance implements BIRCHDistance {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

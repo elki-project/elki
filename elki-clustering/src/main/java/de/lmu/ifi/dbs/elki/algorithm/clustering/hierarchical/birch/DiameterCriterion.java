@@ -82,8 +82,10 @@ public class DiameterCriterion implements BIRCHAbsorptionCriterion {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

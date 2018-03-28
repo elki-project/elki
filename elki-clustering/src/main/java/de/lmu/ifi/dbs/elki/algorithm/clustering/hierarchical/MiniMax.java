@@ -407,9 +407,11 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Julian Erhard
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    *
    * @param <O> Object type
    */

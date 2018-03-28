@@ -64,6 +64,8 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
    *
    * @author Erich Schubert
    *
+   * @apiviz.exclude
+   *
    * @param <A> Array type
    */
   private static class ReverseAdapter<A> implements NumberArrayAdapter<Double, A> {
