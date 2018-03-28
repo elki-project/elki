@@ -1,5 +1,5 @@
 /**
- * <p><b>Parameter handling and option descriptions.</b></p> 
+ * Parameter handling and option descriptions.
  * 
  * <ol>
  * <li><b>Option ID</b>: Any parameter <em>must</em> have an {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID OptionID}.<br />
@@ -8,7 +8,7 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code  // Defining option IDs
+ * <blockquote><pre>{@code // Defining option IDs
  * public static final OptionID DISTANCE_FUNCTION_ID =
  *   OptionID.getOrCreateOptionID(
  *     "algorithm.distancefunction",
@@ -47,7 +47,7 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code  // Defining Parameters
+ * <blockquote><pre>{@code // Defining Parameters
  * final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
  *   new ObjectParameter<DistanceFunction<O, D>>(
  *     DISTANCE_FUNCTION_ID,
