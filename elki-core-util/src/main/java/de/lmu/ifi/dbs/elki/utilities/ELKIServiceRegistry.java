@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 import java.lang.reflect.Modifier;
-import java.net.URLClassLoader;
 import java.util.*;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -41,7 +40,7 @@ public class ELKIServiceRegistry {
   /**
    * Class loader
    */
-  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ELKIServiceRegistry.class.getClassLoader();
+  private static final ClassLoader CLASSLOADER = ELKIServiceRegistry.class.getClassLoader();
 
   /**
    * Factory class postfix.

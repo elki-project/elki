@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,7 +49,7 @@ public class ELKIServiceScanner {
   /**
    * Class loader
    */
-  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ELKIServiceScanner.class.getClassLoader();
+  private static final ClassLoader CLASSLOADER = ELKIServiceScanner.class.getClassLoader();
 
   /**
    * Factory class postfix.
