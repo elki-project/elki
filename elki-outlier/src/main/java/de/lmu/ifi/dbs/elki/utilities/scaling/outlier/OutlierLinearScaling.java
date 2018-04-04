@@ -189,7 +189,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
         }
       }
     }
-    factor = (max - min);
+    factor = max > min ? max - min : 1.;
   }
 
   @Override
@@ -245,7 +245,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
         }
       }
     }
-    factor = (max - min);
+    factor = max > min ? max - min : 1.;
   }
 
   @Override
