@@ -72,13 +72,13 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.range.IntGenerator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntGeneratorParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
@@ -132,19 +132,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   final DistanceFunction<? super O> distf;
 
   /**
-   * Starting value of k.
+   * Range of k.
    */
-  final int startk;
-
-  /**
-   * k step size
-   */
-  final int stepk;
-
-  /**
-   * Maximum value of k
-   */
-  final int maxk;
+  final IntGenerator ks;
 
   /**
    * Output file
@@ -171,20 +161,16 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    *
    * @param inputstep Input step
    * @param distf Distance function
-   * @param startk Starting value of k
-   * @param stepk K step size
-   * @param maxk Maximum k value
+   * @param ks K parameter range
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
    * @param scaling Scaling function
    * @param disable Pattern for disabling methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable) {
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator ks, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable) {
     super();
     this.distf = distf;
-    this.startk = startk;
-    this.stepk = stepk;
-    this.maxk = maxk;
+    this.ks = ks;
     this.inputstep = inputstep;
     this.bylabel = bylabel;
     this.outfile = outfile;
@@ -197,7 +183,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
     // Ensure we don't go beyond the relation size:
-    final int maxk = Math.min(this.maxk, relation.size() - 1);
+    final int maxk = Math.min(ks.getMax(), relation.size() - 1);
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
@@ -237,80 +223,76 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // Label outlier result (reference)
       writeResult(fout, ids, bylabel.run(database), new IdentityScaling(), "bylabel");
 
-      final int startk = (this.startk > 0) ? this.startk : this.stepk;
-      final int startkmin2 = (startk >= 2) ? startk : (startk + stepk);
-      final int startkmin3 = (startk >= 3) ? startk : (startkmin2 >= 3) ? startkmin2 : (startkmin2 + stepk);
-
       // Output function:
       BiConsumer<String, OutlierResult> out = (kstr, result) -> writeResult(fout, ids, result, scaling, kstr);
 
       // KNN
-      runForEachK("KNN", startk, stepk, maxk, //
+      runForEachK("KNN", 0, //
           k -> new KNNOutlier<O>(distf, k) //
               .run(database, relation), out);
       // KNN Weight
-      runForEachK("KNNW", startk, stepk, maxk, //
+      runForEachK("KNNW", 0, //
           k -> new KNNWeightOutlier<O>(distf, k) //
               .run(database, relation), out);
       // Run LOF
-      runForEachK("LOF", startk, stepk, maxk, //
+      runForEachK("LOF", 0, //
           k -> new LOF<O>(k, distf) //
               .run(database, relation), out);
       // Run Simplified-LOF
-      runForEachK("SimplifiedLOF", startk, stepk, maxk, //
+      runForEachK("SimplifiedLOF", 0, //
           k -> new SimplifiedLOF<O>(k, distf) //
               .run(database, relation), out);
       // LoOP
-      runForEachK("LoOP", startk, stepk, maxk, //
+      runForEachK("LoOP", 0, //
           k -> new LoOP<O>(k, k, distf, distf, 1.0) //
               .run(database, relation), out);
       // LDOF
-      runForEachK("LDOF", startkmin2, stepk, maxk, //
+      runForEachK("LDOF", 2, //
           k -> new LDOF<O>(distf, k) //
               .run(database, relation), out);
       // Run ODIN
-      runForEachK("ODIN", startk, stepk, maxk, //
+      runForEachK("ODIN", 0, //
           k -> new ODIN<O>(distf, k) //
               .run(database, relation), out);
       // Run FastABOD
-      runForEachK("FastABOD", startkmin3, stepk, maxk, //
+      runForEachK("FastABOD", 3, //
           k -> new FastABOD<O>(new PolynomialKernelFunction(2), k) //
               .run(database, relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
-      runForEachK("KDEOS", startkmin2, stepk, maxk, //
+      runForEachK("KDEOS", 2, //
           k -> new KDEOS<O>(distf, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
-              0.5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2)//
+              2. * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2)//
                   .run(database, relation), out);
       // Run LDF
-      runForEachK("LDF", startk, stepk, maxk, //
+      runForEachK("LDF", 0, //
           k -> new LDF<O>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1) //
               .run(database, relation), out);
       // Run INFLO
-      runForEachK("INFLO", startk, stepk, maxk, //
+      runForEachK("INFLO", 0, //
           k -> new INFLO<O>(distf, 1.0, k) //
               .run(database, relation), out);
       // Run COF
-      runForEachK("COF", startk, stepk, maxk, //
+      runForEachK("COF", 0, //
           k -> new COF<O>(k, distf) //
               .run(database, relation), out);
       // Run simple Intrinsic dimensionality
-      runForEachK("Intrinsic", startkmin2, stepk, maxk, //
+      runForEachK("Intrinsic", 2, //
           k -> new IntrinsicDimensionalityOutlier<O>(distf, k, AggregatedHillEstimator.STATIC) //
               .run(database, relation), out);
       // Run IDOS
-      runForEachK("IDOS", startkmin2, stepk, maxk, //
+      runForEachK("IDOS", 2, //
           k -> new IDOS<O>(distf, AggregatedHillEstimator.STATIC, k, k) //
               .run(database, relation), out);
       // Run simple kernel-density LOF variant
-      runForEachK("KDLOF", startkmin2, stepk, maxk, //
+      runForEachK("KDLOF", 2, //
           k -> new SimpleKernelDensityLOF<O>(k, distf, GaussianKernelDensityFunction.KERNEL) //
               .run(database, relation), out);
       // Run DWOF (need pairwise distances, too)
-      runForEachK("DWOF", startkmin2, stepk, maxk, //
+      runForEachK("DWOF", 2, //
           k -> new DWOF<O>(distf, k, 1.1) //
               .run(database, relation), out);
       // Run LIC
-      runForEachK("LIC", startk, stepk, maxk, //
+      runForEachK("LIC", 0, //
           k -> new LocalIsolationCoefficient<O>(distf, k) //
               .run(database, relation), out);
       // Run VOV (requires a vector field).
@@ -319,20 +301,20 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
         @SuppressWarnings("unchecked")
         final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
-        runForEachK("VOV", startk, stepk, maxk, //
+        runForEachK("VOV", 0, //
             k -> new VarianceOfVolume<DoubleVector>(k, df) //
                 .run(database, rel), out);
       }
       // Run KNN DD
-      runForEachK("KNNDD", startk, stepk, maxk, //
+      runForEachK("KNNDD", 0, //
           k -> new KNNDD<O>(distf, k) //
               .run(database, relation), out);
       // Run KNN SOS
-      runForEachK("KNNSOS", startk, stepk, maxk, //
+      runForEachK("KNNSOS", 0, //
           k -> new KNNSOS<O>(distf, k) //
               .run(relation), out);
       // Run ISOS
-      runForEachK("ISOS", startkmin2, stepk, maxk, //
+      runForEachK("ISOS", 2, //
           k -> new ISOS<O>(distf, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
     }
@@ -368,29 +350,29 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * Iterate over the k range.
    *
    * @param prefix Prefix string
-   * @param startk Start k
-   * @param stepk Step k
-   * @param maxk Max k
+   * @param mink Minimum value of k for this method
    * @param runner Runner to run
    * @param out Output function
    */
-  private void runForEachK(String prefix, int startk, int stepk, int maxk, IntFunction<OutlierResult> runner, BiConsumer<String, OutlierResult> out) {
+  private void runForEachK(String prefix, int mink, IntFunction<OutlierResult> runner, BiConsumer<String, OutlierResult> out) {
     if(isDisabled(prefix)) {
       LOG.verbose("Skipping (disabled): " + prefix);
       return; // Disabled
     }
     LOG.verbose("Running " + prefix);
-    final int digits = (int) FastMath.ceil(FastMath.log10(maxk + 1));
+    final int digits = (int) FastMath.ceil(FastMath.log10(ks.getMax() + 1));
     final String format = "%s-%0" + digits + "d";
-    for(int k = startk; k <= maxk; k += stepk) {
-      Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
-      OutlierResult result = runner.apply(k);
-      LOG.statistics(time.end());
-      if(result != null) {
-        out.accept(String.format(Locale.ROOT, format, prefix, k), result);
-        result.getHierarchy().removeSubtree(result);
+    ks.forEach(k -> {
+      if(k >= mink) {
+        Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
+        OutlierResult result = runner.apply(k);
+        LOG.statistics(time.end());
+        if(result != null) {
+          out.accept(String.format(Locale.ROOT, format, prefix, k), result);
+          result.getHierarchy().removeSubtree(result);
+        }
       }
-    }
+    });
   }
 
   /**
@@ -412,19 +394,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractApplication.Parameterizer {
     /**
-     * Option ID for k step size.
+     * Option ID for k parameter range
      */
-    public static final OptionID STEPK_ID = new OptionID("stepk", "Step size for k.");
-
-    /**
-     * Option ID for k start size.
-     */
-    public static final OptionID STARTK_ID = new OptionID("startk", "Minimum value for k.");
-
-    /**
-     * Option ID for k step size.
-     */
-    public static final OptionID MAXK_ID = new OptionID("maxk", "Maximum value for k.");
+    public static final OptionID KS_ID = new OptionID("ks", "Range of k. This accepts multiple ranges, such as 1,2,..,10,20,..,100");
 
     /**
      * Option ID for scaling class.
@@ -439,17 +411,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * k step size
      */
-    int stepk;
-
-    /**
-     * starting value of k
-     */
-    int startk;
-
-    /**
-     * Maximum value of k
-     */
-    int maxk;
+    IntGenerator ks;
 
     /**
      * Data source
@@ -491,25 +453,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }
-      // k parameters
-      IntParameter stepkP = new IntParameter(STEPK_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(stepkP)) {
-        stepk = stepkP.getValue();
-      }
-      IntParameter startkP = new IntParameter(STARTK_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .setOptional(true);
-      if(config.grab(startkP)) {
-        startk = startkP.getValue();
-      }
-      else {
-        startk = stepk;
-      }
-      IntParameter maxkP = new IntParameter(MAXK_ID)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(maxkP)) {
-        maxk = maxkP.getValue();
+      IntGeneratorParameter kP = new IntGeneratorParameter(KS_ID);
+      if(config.grab(kP)) {
+        ks = kP.getValue();
       }
       bylabel = config.tryInstantiate(ByLabelOutlier.class);
       // Output
@@ -530,7 +476,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     @Override
     protected ComputeKNNOutlierScores<O> makeInstance() {
-      return new ComputeKNNOutlierScores<>(inputstep, distf, startk, stepk, maxk, bylabel, outfile, scaling, disable);
+      return new ComputeKNNOutlierScores<>(inputstep, distf, ks, bylabel, outfile, scaling, disable);
     }
   }
 
