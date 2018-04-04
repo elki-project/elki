@@ -92,7 +92,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
   @Override
   public double getKNNDistance() {
-    return inner.get(k).doubleValue();
+    return inner.get(k - 1).doubleValue();
   }
 
   @Override
