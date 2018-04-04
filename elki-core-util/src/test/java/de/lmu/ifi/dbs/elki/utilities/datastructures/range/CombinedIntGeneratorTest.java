@@ -42,9 +42,11 @@ public class CombinedIntGeneratorTest {
     CombinedIntGenerator empty = new CombinedIntGenerator(Collections.emptyList());
     LinearIntGenerator linear = new LinearIntGenerator(10, 5, 20);
     ExponentialIntGenerator exponential = new ExponentialIntGenerator(50, 5, 1250);
-    int[] sortedAnswer = { 1, 2, 3, 10, 15, 20, 50, 250, 1250 };
 
     CombinedIntGenerator combined = new CombinedIntGenerator(empty, fixed, empty, exponential, linear);
+    int[] sortedAnswer = { 1, 2, 3, 10, 15, 20, 50, 250, 1250 };
+    String ser = "1,2,3,50,*=5,1250,10,+=5,20";
+
     assertEquals("Minimum wrong", 1, combined.getMin());
     assertEquals("Maximum wrong", 1250, combined.getMax());
 
@@ -56,5 +58,7 @@ public class CombinedIntGeneratorTest {
     combined.forEach(out::add);
     out.sort();
     assertTrue("Generated list does not match.", Arrays.equals(sortedAnswer, out.toArray()));
+
+    assertEquals("Serialization incorrect.", ser, combined.serializeTo(new StringBuilder()).toString());
   }
 }

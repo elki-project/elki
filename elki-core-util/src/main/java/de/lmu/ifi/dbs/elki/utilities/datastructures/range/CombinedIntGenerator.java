@@ -105,4 +105,25 @@ public class CombinedIntGenerator implements IntGenerator {
       gen.forEach(c);
     }
   }
+
+  @Override
+  public StringBuilder serializeTo(StringBuilder buf) {
+    boolean first = true;
+    for(IntGenerator gen : generators) {
+      if(gen.getMin() > gen.getMax()) {
+        continue;
+      }
+      if(!first) {
+        buf.append(',');
+      }
+      first = false;
+      buf = gen.serializeTo(buf);
+    }
+    return buf;
+  }
+
+  @Override
+  public String toString() {
+    return serializeTo(new StringBuilder(1000)).toString();
+  }
 }

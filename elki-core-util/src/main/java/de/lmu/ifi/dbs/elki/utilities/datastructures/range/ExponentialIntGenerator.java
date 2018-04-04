@@ -88,4 +88,14 @@ public class ExponentialIntGenerator implements IntGenerator {
       }
     }
   }
+
+  @Override
+  public StringBuilder serializeTo(StringBuilder buf) {
+    return buf.append(start).append(",*=").append(factor).append(',').append(end);
+  }
+
+  @Override
+  public String toString() {
+    return serializeTo(new StringBuilder(100)).toString();
+  }
 }

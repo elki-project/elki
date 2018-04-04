@@ -60,4 +60,12 @@ public interface IntGenerator {
    * @param c Consumer
    */
   void forEach(IntConsumer c);
+
+  /**
+   * Produce a textual representation.
+   *
+   * @param buf Output buffer.
+   * @return Buffer
+   */
+  StringBuilder serializeTo(StringBuilder buf);
 }
