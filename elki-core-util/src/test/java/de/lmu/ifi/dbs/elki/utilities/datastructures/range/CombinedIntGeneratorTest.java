@@ -20,15 +20,13 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.range;
 
+import static de.lmu.ifi.dbs.elki.utilities.datastructures.range.ParseIntRangesTest.collect;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 
 /**
  * Test of combined iterator.
@@ -44,21 +42,17 @@ public class CombinedIntGeneratorTest {
     ExponentialIntGenerator exponential = new ExponentialIntGenerator(50, 5, 1250);
 
     CombinedIntGenerator combined = new CombinedIntGenerator(empty, fixed, empty, exponential, linear);
-    int[] sortedAnswer = { 1, 2, 3, 10, 15, 20, 50, 250, 1250 };
+    int[] sortedAnswer = { 1, 2, 3, 50, 250, 1250, 10, 15, 20 };
     String ser = "1,2,3,50,*=5,1250,10,+=5,20";
 
     assertEquals("Minimum wrong", 1, combined.getMin());
     assertEquals("Maximum wrong", 1250, combined.getMax());
 
-    IntegerArray out = new IntegerArray();
-    combined.forEach(out::add);
-    out.sort();
-    assertTrue("Generated list does not match.", Arrays.equals(sortedAnswer, out.toArray()));
-    out.clear(); // generate again.F
-    combined.forEach(out::add);
-    out.sort();
-    assertTrue("Generated list does not match.", Arrays.equals(sortedAnswer, out.toArray()));
+    assertArrayEquals("Generated list does not match.", sortedAnswer, collect(combined));
+    assertArrayEquals("Generated list does not match.", sortedAnswer, collect(combined));
 
     assertEquals("Serialization incorrect.", ser, combined.serializeTo(new StringBuilder()).toString());
+    IntGenerator parsed = ParseIntRanges.parseIntRanges(ser);
+    assertArrayEquals("Prased generator does not match.", sortedAnswer, collect(parsed));
   }
 }
