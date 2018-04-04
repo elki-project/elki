@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.SOS;
@@ -120,7 +118,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
     KNNQuery<O> knnq = relation.getKNNQuery(getDistanceFunction(), k1);
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
     ModifiableDoubleDBIDList dists = DBIDUtil.newDistanceDBIDList(k + 10);
@@ -136,20 +134,26 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       try {
         double id = estimateID(it, ki, p);
         adjustDistances(it, ki, knns.getKNNDistance(), id, dists);
-        // We now continue with the modified distances:
+        // We now continue with the modified distances below.
         // Compute affinities
         SOS.computePi(it, di, p, perplexity, logPerp);
         // Normalization factor:
         double s = SOS.sumOfProbabilities(it, di, p);
-        if(s > 0) {
+        if(s > 0.) {
           nominateNeighbors(it, di, p, 1. / s, scores);
         }
       }
       catch(ArithmeticException e) {
-        // ID estimation failed, supposedly constant values.
-        if(knns.size() > 1) {
-          Arrays.fill(p, 1. / (knns.size() - 1));
-          nominateNeighbors(it, di, p, 1., scores);
+        // ID estimation failed, supposedly constant values because of too many
+        // duplicate points, or too small k. Fall back to KNNSOS.
+        // Note: this looks almost identical to the above, but uses ki instead
+        // of the adjusted distances di!
+        // Compute affinities
+        SOS.computePi(it, ki, p, perplexity, logPerp);
+        // Normalization factor:
+        double s = SOS.sumOfProbabilities(it, ki, p);
+        if(s > 0.) {
+          nominateNeighbors(it, ki, p, 1. / s, scores);
         }
       }
       LOG.incrementProcessed(prog);

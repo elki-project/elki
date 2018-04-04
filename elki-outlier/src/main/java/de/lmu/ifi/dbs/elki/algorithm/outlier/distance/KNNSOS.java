@@ -122,7 +122,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
     KNNQuery<O> knnq = relation.getKNNQuery(getDistanceFunction(), k1);
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("KNNSOS scores", relation.size(), LOG) : null;
