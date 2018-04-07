@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.5.5
  */
 public class RandomParameter extends AbstractParameter<RandomParameter, RandomFactory> {
+  private static final String GLOBAL_RANDOM_STR = "global random";
+
   /**
    * Seed value, if used
    */
@@ -55,7 +57,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
    *        will be created.
    */
   public RandomParameter(OptionID optionID, RandomFactory defaultValue) {
-    super(optionID, defaultValue);
+    super(optionID, defaultValue != null ? defaultValue : RandomFactory.DEFAULT);
   }
 
   /**
@@ -71,7 +73,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
 
   @Override
   public String getSyntax() {
-    return "<long|Random>";
+    return "<long>";
   }
 
   @Override
@@ -88,7 +90,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
       seed = Long.valueOf(((Number) obj).longValue());
       obj = RandomFactory.get(seed);
     }
-    else if("global random".equals(obj)) {
+    else if(GLOBAL_RANDOM_STR.equals(obj) || "global".equals(obj)) {
       obj = RandomFactory.DEFAULT;
     }
     else {
@@ -124,13 +126,15 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
 
   @Override
   public String getValueAsString() {
-    return (seed != null) ? seed.toString() : "null";
+    return (seed != null) ? seed.toString() //
+        : (defaultValue != null) ? defaultValue.toString() //
+            : "null";
   }
 
   @Override
   public String getDefaultValueAsString() {
     if(defaultValue == RandomFactory.DEFAULT) {
-      return "global random";
+      return GLOBAL_RANDOM_STR;
     }
     return super.getDefaultValueAsString();
   }

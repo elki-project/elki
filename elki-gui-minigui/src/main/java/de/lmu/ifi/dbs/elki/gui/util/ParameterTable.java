@@ -97,12 +97,12 @@ public class ParameterTable extends JTable {
   /**
    * Color for optional parameters (with no default value)
    */
-  static final Color COLOR_OPTIONAL = new Color(0xDFFFDF);
+  static final Color COLOR_OPTIONAL = new Color(0xEFFFEF);
 
   /**
    * Color for parameters having a default value.
    */
-  static final Color COLOR_DEFAULT_VALUE = new Color(0xDFDFDF);
+  static final Color COLOR_DEFAULT_VALUE = new Color(0xEFEFEF);
 
   /**
    * Containing frame.

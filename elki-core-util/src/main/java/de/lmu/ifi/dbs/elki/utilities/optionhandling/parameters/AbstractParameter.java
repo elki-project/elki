@@ -147,6 +147,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     // Assume default value instead.
     if(hasDefaultValue()) {
       setValueInternal(defaultValue);
+      defaultValueTaken = true;
       return true;
     }
     if(isOptional()) {
