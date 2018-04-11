@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.datasource.parser.StreamingParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileListParameter.FilesType;
@@ -154,6 +155,14 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**
+     * Parameter that specifies the name of the input files to be parsed.
+     * <p>
+     * Key: {@code -dbc.in}
+     * </p>
+     */
+    public static final OptionID INPUT_ID = FileBasedDatabaseConnection.Parameterizer.INPUT_ID;
+
+    /**
      * The input files.
      */
     private List<File> files;
@@ -161,7 +170,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileListParameter filesP = new FileListParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, FilesType.INPUT_FILES);
+      FileListParameter filesP = new FileListParameter(INPUT_ID, FilesType.INPUT_FILES);
       if(config.grab(filesP)) {
         files = filesP.getValue();
       }
