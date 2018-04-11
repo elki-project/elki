@@ -134,7 +134,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   /**
    * Range of k.
    */
-  final IntGenerator ks;
+  final IntGenerator krange;
 
   /**
    * Output file
@@ -161,16 +161,16 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    *
    * @param inputstep Input step
    * @param distf Distance function
-   * @param ks K parameter range
+   * @param krange K parameter range
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
    * @param scaling Scaling function
    * @param disable Pattern for disabling methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator ks, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable) {
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable) {
     super();
     this.distf = distf;
-    this.ks = ks;
+    this.krange = krange;
     this.inputstep = inputstep;
     this.bylabel = bylabel;
     this.outfile = outfile;
@@ -183,7 +183,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
     // Ensure we don't go beyond the relation size:
-    final int maxk = Math.min(ks.getMax(), relation.size() - 1);
+    final int maxk = Math.min(krange.getMax(), relation.size() - 1);
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
@@ -360,9 +360,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       return; // Disabled
     }
     LOG.verbose("Running " + prefix);
-    final int digits = (int) FastMath.ceil(FastMath.log10(ks.getMax() + 1));
+    final int digits = (int) FastMath.ceil(FastMath.log10(krange.getMax() + 1));
     final String format = "%s-%0" + digits + "d";
-    ks.forEach(k -> {
+    krange.forEach(k -> {
       if(k >= mink) {
         Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
         OutlierResult result = runner.apply(k);
@@ -396,7 +396,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * Option ID for k parameter range
      */
-    public static final OptionID KS_ID = new OptionID("ks", "Range of k. This accepts multiple ranges, such as 1,2,..,10,20,..,100");
+    public static final OptionID KRANGE_ID = new OptionID("krange", "Range of k. This accepts multiple ranges, such as 1,2,..,10,20,..,100");
 
     /**
      * Option ID for scaling class.
@@ -411,7 +411,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * k step size
      */
-    IntGenerator ks;
+    IntGenerator krange;
 
     /**
      * Data source
@@ -453,9 +453,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }
-      IntGeneratorParameter kP = new IntGeneratorParameter(KS_ID);
+      IntGeneratorParameter kP = new IntGeneratorParameter(KRANGE_ID);
       if(config.grab(kP)) {
-        ks = kP.getValue();
+        krange = kP.getValue();
       }
       bylabel = config.tryInstantiate(ByLabelOutlier.class);
       // Output
@@ -476,7 +476,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     @Override
     protected ComputeKNNOutlierScores<O> makeInstance() {
-      return new ComputeKNNOutlierScores<>(inputstep, distf, ks, bylabel, outfile, scaling, disable);
+      return new ComputeKNNOutlierScores<>(inputstep, distf, krange, bylabel, outfile, scaling, disable);
     }
   }
 
