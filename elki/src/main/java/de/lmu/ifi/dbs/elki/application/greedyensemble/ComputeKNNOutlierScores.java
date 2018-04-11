@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -212,6 +212,12 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     if(!isDisabled("DWOF") && maxk > 100) {
       LOG.warning("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
     }
+    if(!isDisabled("COF") && maxk > 100) {
+      LOG.warning("Note: COF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " COF to disable.");
+    }
+    if(!isDisabled("INFLO") && maxk > 100) {
+        LOG.warning("Note: INFLO has O(k^2) complexity. Use -" + Parameterizer.DISABLE_ID.getName() + " INFLO to disable.");
+      }
 
     final DBIDs ids = relation.getDBIDs();
 
@@ -227,72 +233,72 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       BiConsumer<String, OutlierResult> out = (kstr, result) -> writeResult(fout, ids, result, scaling, kstr);
 
       // KNN
-      runForEachK("KNN", 0, //
+      runForEachK("KNN", 0, maxk, //
           k -> new KNNOutlier<O>(distf, k) //
               .run(database, relation), out);
       // KNN Weight
-      runForEachK("KNNW", 0, //
+      runForEachK("KNNW", 0, maxk, //
           k -> new KNNWeightOutlier<O>(distf, k) //
               .run(database, relation), out);
       // Run LOF
-      runForEachK("LOF", 0, //
+      runForEachK("LOF", 0, maxk, //
           k -> new LOF<O>(k, distf) //
               .run(database, relation), out);
       // Run Simplified-LOF
-      runForEachK("SimplifiedLOF", 0, //
+      runForEachK("SimplifiedLOF", 0, maxk, //
           k -> new SimplifiedLOF<O>(k, distf) //
               .run(database, relation), out);
       // LoOP
-      runForEachK("LoOP", 0, //
+      runForEachK("LoOP", 0, maxk, //
           k -> new LoOP<O>(k, k, distf, distf, 1.0) //
               .run(database, relation), out);
       // LDOF
-      runForEachK("LDOF", 2, //
+      runForEachK("LDOF", 2, maxk, //
           k -> new LDOF<O>(distf, k) //
               .run(database, relation), out);
       // Run ODIN
-      runForEachK("ODIN", 0, //
+      runForEachK("ODIN", 0, maxk, //
           k -> new ODIN<O>(distf, k) //
               .run(database, relation), out);
       // Run FastABOD
-      runForEachK("FastABOD", 3, //
+      runForEachK("FastABOD", 3, maxk, //
           k -> new FastABOD<O>(new PolynomialKernelFunction(2), k) //
               .run(database, relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
-      runForEachK("KDEOS", 2, //
+      runForEachK("KDEOS", 2, maxk, //
           k -> new KDEOS<O>(distf, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
               2. * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2)//
                   .run(database, relation), out);
       // Run LDF
-      runForEachK("LDF", 0, //
+      runForEachK("LDF", 0, maxk, //
           k -> new LDF<O>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1) //
               .run(database, relation), out);
       // Run INFLO
-      runForEachK("INFLO", 0, //
+      runForEachK("INFLO", 0, maxk, //
           k -> new INFLO<O>(distf, 1.0, k) //
               .run(database, relation), out);
       // Run COF
-      runForEachK("COF", 0, //
+      runForEachK("COF", 0, maxk, //
           k -> new COF<O>(k, distf) //
               .run(database, relation), out);
       // Run simple Intrinsic dimensionality
-      runForEachK("Intrinsic", 2, //
+      runForEachK("Intrinsic", 2, maxk, //
           k -> new IntrinsicDimensionalityOutlier<O>(distf, k, AggregatedHillEstimator.STATIC) //
               .run(database, relation), out);
       // Run IDOS
-      runForEachK("IDOS", 2, //
+      runForEachK("IDOS", 2, maxk, //
           k -> new IDOS<O>(distf, AggregatedHillEstimator.STATIC, k, k) //
               .run(database, relation), out);
       // Run simple kernel-density LOF variant
-      runForEachK("KDLOF", 2, //
+      runForEachK("KDLOF", 2, maxk, //
           k -> new SimpleKernelDensityLOF<O>(k, distf, GaussianKernelDensityFunction.KERNEL) //
               .run(database, relation), out);
       // Run DWOF (need pairwise distances, too)
-      runForEachK("DWOF", 2, //
+      runForEachK("DWOF", 2, maxk, //
           k -> new DWOF<O>(distf, k, 1.1) //
               .run(database, relation), out);
       // Run LIC
-      runForEachK("LIC", 0, //
+      runForEachK("LIC", 0, maxk, //
           k -> new LocalIsolationCoefficient<O>(distf, k) //
               .run(database, relation), out);
       // Run VOV (requires a vector field).
@@ -301,20 +307,20 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
         @SuppressWarnings("unchecked")
         final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
-        runForEachK("VOV", 0, //
+        runForEachK("VOV", 0, maxk, //
             k -> new VarianceOfVolume<DoubleVector>(k, df) //
                 .run(database, rel), out);
       }
       // Run KNN DD
-      runForEachK("KNNDD", 0, //
+      runForEachK("KNNDD", 0, maxk, //
           k -> new KNNDD<O>(distf, k) //
               .run(database, relation), out);
       // Run KNN SOS
-      runForEachK("KNNSOS", 0, //
+      runForEachK("KNNSOS", 0, maxk, //
           k -> new KNNSOS<O>(distf, k) //
               .run(relation), out);
       // Run ISOS
-      runForEachK("ISOS", 2, //
+      runForEachK("ISOS", 2, maxk, //
           k -> new ISOS<O>(distf, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
     }
@@ -351,10 +357,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    *
    * @param prefix Prefix string
    * @param mink Minimum value of k for this method
+   * @param maxk Maximum value of k for this method
    * @param runner Runner to run
    * @param out Output function
    */
-  private void runForEachK(String prefix, int mink, IntFunction<OutlierResult> runner, BiConsumer<String, OutlierResult> out) {
+  private void runForEachK(String prefix, int mink, int maxk, IntFunction<OutlierResult> runner, BiConsumer<String, OutlierResult> out) {
     if(isDisabled(prefix)) {
       LOG.verbose("Skipping (disabled): " + prefix);
       return; // Disabled
@@ -363,7 +370,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final int digits = (int) FastMath.ceil(FastMath.log10(krange.getMax() + 1));
     final String format = "%s-%0" + digits + "d";
     krange.forEach(k -> {
-      if(k >= mink) {
+      if(k >= mink && k <= maxk) {
         Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
         OutlierResult result = runner.apply(k);
         LOG.statistics(time.end());
