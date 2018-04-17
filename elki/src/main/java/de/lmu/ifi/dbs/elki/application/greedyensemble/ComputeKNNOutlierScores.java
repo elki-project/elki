@@ -203,11 +203,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     }
 
     // Warn for some known slow methods and large k:
-    if(!isDisabled("LDOF") && maxk > 100) {
-      LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
-    }
     if(!isDisabled("FastABOD") && maxk > 100) {
       LOG.warning("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
+    }
+    if(!isDisabled("LDOF") && maxk > 100) {
+      LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
     }
     if(!isDisabled("DWOF") && maxk > 100) {
       LOG.warning("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
@@ -215,9 +215,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     if(!isDisabled("COF") && maxk > 100) {
       LOG.warning("Note: COF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " COF to disable.");
     }
-    if(!isDisabled("INFLO") && maxk > 100) {
-        LOG.warning("Note: INFLO has O(k^2) complexity. Use -" + Parameterizer.DISABLE_ID.getName() + " INFLO to disable.");
-      }
 
     final DBIDs ids = relation.getDBIDs();
 

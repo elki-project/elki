@@ -26,10 +26,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
@@ -139,21 +136,28 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     // Step two: find the RkNN, minus kNN.
     LOG.beginStep(stepprog, 2, "Materialize reverse NN.");
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
+    // kNNS
+    WritableDataStore<SetDBIDs> knns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, SetDBIDs.class);
+    // We first need to convert the kNN into sets, because of performance below.
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      knns.put(iditer, DBIDUtil.ensureSet(knnq.getKNNForDBID(iditer, kplus1)));
+    }
     // RNNS
-    WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
+    WritableDataStore<ModifiableDBIDs> rnnMinusKNNs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // init the rNN
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      rnns.put(iditer, DBIDUtil.newArray());
+      rnnMinusKNNs.put(iditer, DBIDUtil.newArray());
     }
-    computeNeighborhoods(relation, knnq, pruned, rnns);
+    computeNeighborhoods(relation, knns, pruned, rnnMinusKNNs);
+    // We do not need the set-copy of the knns anymore
+    knns.clear();
 
     // Step three: compute INFLO scores
     LOG.beginStep(stepprog, 3, "Compute INFLO scores.");
     // Calculate INFLO for any Object
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    // Note: this modifies knns, by adding rknns!
-    computeINFLO(relation, pruned, knnq, rnns, inflos, inflominmax);
+    computeINFLO(relation, pruned, knnq, rnnMinusKNNs, inflos, inflominmax);
     LOG.setCompleted(stepprog);
     LOG.statistics(new LongStatistic(INFLO.class.getName() + ".pruned", pruned.size()));
 
@@ -178,10 +182,10 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param pruned Pruned objects: with too many neighbors
    * @param rNNminuskNNs reverse kNN storage
    */
-  private void computeNeighborhoods(Relation<O> relation, KNNQuery<O> knnQuery, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> rNNminuskNNs) {
+  private void computeNeighborhoods(Relation<O> relation, DataStore<SetDBIDs> knns, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> rNNminuskNNs) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding RkNN", relation.size(), LOG) : null;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBIDs knn = knnQuery.getKNNForDBID(iter, kplus1);
+      DBIDs knn = knns.get(iter);
       int count = 1; // The point itself.
       for(DBIDIter niter = knn.iter(); niter.valid(); niter.advance()) {
         // Ignore the query point itself.
@@ -189,9 +193,8 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
           continue;
         }
         // As we did not initialize count with the rNN size, we check all
-        // neighbors here. The cost of this is O(k) though, but we save O(kN)
-        // memory in return. Even just populating this will be similar.
-        if(knnQuery.getKNNForDBID(niter, kplus1).contains(iter)) {
+        // neighbors here.
+        if(knns.get(niter).contains(iter)) {
           count++;
         }
         else {
