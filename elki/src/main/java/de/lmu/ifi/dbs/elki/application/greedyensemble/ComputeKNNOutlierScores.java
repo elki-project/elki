@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntGeneratorParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
@@ -94,7 +95,9 @@ import net.jafama.FastMath;
  *
  * Since some algorithms can be too slow to run on large data sets and for large
  * values of k, they can be disabled. For example
- * <tt>-disable '(LDOF|FastABOD)'</tt> disables these two methods.
+ * <tt>-disable '(LDOF|DWOF|COF|FastABOD)'</tt> disables these two methods
+ * completely. Alternatively, you can use the parameter <tt>-ksquaremax</tt>
+ * to control the maximum k for these four methods separately.
  *
  * For methods where k=1 does not make sense, this value will be skipped, and
  * the procedure will commence at 1+stepsize.
@@ -157,6 +160,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   Pattern disable = null;
 
   /**
+   * Maximum k for O(k^2) methods.
+   */
+  int ksquarestop = 1000;
+
+  /**
    * Constructor.
    *
    * @param inputstep Input step
@@ -166,8 +174,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * @param outfile Output file
    * @param scaling Scaling function
    * @param disable Pattern for disabling methods
+   * @param ksquarestop Maximum k for O(k^2) methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable) {
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
     super();
     this.distf = distf;
     this.krange = krange;
@@ -176,6 +185,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     this.outfile = outfile;
     this.scaling = scaling;
     this.disable = disable;
+    this.ksquarestop = ksquarestop;
   }
 
   @Override
@@ -203,16 +213,17 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     }
 
     // Warn for some known slow methods and large k:
-    if(!isDisabled("FastABOD") && maxk > 100) {
+    int maxksq = Math.min(maxk, ksquarestop);
+    if(!isDisabled("FastABOD") && maxksq > 1000) {
       LOG.warning("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
     }
-    if(!isDisabled("LDOF") && maxk > 100) {
+    if(!isDisabled("LDOF") && maxksq > 1000) {
       LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
     }
-    if(!isDisabled("DWOF") && maxk > 100) {
+    if(!isDisabled("DWOF") && maxksq > 1000) {
       LOG.warning("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
     }
-    if(!isDisabled("COF") && maxk > 100) {
+    if(!isDisabled("COF") && maxksq > 1000) {
       LOG.warning("Note: COF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " COF to disable.");
     }
 
@@ -250,7 +261,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           k -> new LoOP<O>(k, k, distf, distf, 1.0) //
               .run(database, relation), out);
       // LDOF
-      runForEachK("LDOF", 2, maxk, //
+      runForEachK("LDOF", 2, maxksq, //
           k -> new LDOF<O>(distf, k) //
               .run(database, relation), out);
       // Run ODIN
@@ -258,7 +269,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           k -> new ODIN<O>(distf, k) //
               .run(database, relation), out);
       // Run FastABOD
-      runForEachK("FastABOD", 3, maxk, //
+      runForEachK("FastABOD", 3, maxksq, //
           k -> new FastABOD<O>(new PolynomialKernelFunction(2), k) //
               .run(database, relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
@@ -275,7 +286,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           k -> new INFLO<O>(distf, 1.0, k) //
               .run(database, relation), out);
       // Run COF
-      runForEachK("COF", 0, maxk, //
+      runForEachK("COF", 0, maxksq, //
           k -> new COF<O>(k, distf) //
               .run(database, relation), out);
       // Run simple Intrinsic dimensionality
@@ -291,7 +302,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           k -> new SimpleKernelDensityLOF<O>(k, distf, GaussianKernelDensityFunction.KERNEL) //
               .run(database, relation), out);
       // Run DWOF (need pairwise distances, too)
-      runForEachK("DWOF", 2, maxk, //
+      runForEachK("DWOF", 2, maxksq, //
           k -> new DWOF<O>(distf, k, 1.1) //
               .run(database, relation), out);
       // Run LIC
@@ -413,6 +424,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     public static final OptionID DISABLE_ID = new OptionID("disable", "Disable methods (regular expression, case insensitive, anchored).");
 
     /**
+     * Option ID with an additional bound on k.
+     */
+    public static final OptionID KSQUARE_ID = new OptionID("ksquaremax", "Maximum k for methods with O(k^2) cost.");
+
+    /**
      * k step size
      */
     IntGenerator krange;
@@ -447,6 +463,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
      */
     Pattern disable = null;
 
+    /**
+     * Maximum k for O(k^2) methods.
+     */
+    int ksquarestop = 100;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -476,11 +497,15 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       if(config.grab(disableP)) {
         disable = disableP.getValue();
       }
+      IntParameter ksqP = new IntParameter(KSQUARE_ID, 100);
+      if(config.grab(ksqP)) {
+        ksquarestop = ksqP.intValue();
+      }
     }
 
     @Override
     protected ComputeKNNOutlierScores<O> makeInstance() {
-      return new ComputeKNNOutlierScores<>(inputstep, distf, krange, bylabel, outfile, scaling, disable);
+      return new ComputeKNNOutlierScores<>(inputstep, distf, krange, bylabel, outfile, scaling, disable, ksquarestop);
     }
   }
 
