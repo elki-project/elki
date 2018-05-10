@@ -20,11 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.gui;
 
-import java.awt.Toolkit;
-import java.lang.reflect.Method;
-
-import javax.swing.RepaintManager;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -35,11 +32,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @since 0.5.5
  */
 public final class GUIUtil {
-  /**
-   * Enable thread repaint debugging.
-   */
-  public static final boolean THREAD_REPAINT_DEBUG = false;
-
   /**
    * Whether to prefer the GTK look and feel on Unix.
    */
@@ -56,33 +48,17 @@ public final class GUIUtil {
    * Setup look at feel.
    */
   public static void setLookAndFeel() {
-    // If enabled, setup thread debugging.
-    if(THREAD_REPAINT_DEBUG) {
-      try {
-        Class<?> cls = ClassLoader.getSystemClassLoader().loadClass("org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager");
-        RepaintManager.setCurrentManager((RepaintManager) cls.newInstance());
-      }
-      catch(Exception e) {
-        // ignore
-      }
-    }
-    if(PREFER_GTK) {
-      try {
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        // Note: we don't want to *require* these classes
-        // But if they exist, we're going to try using them.
-        Class<?> suntoolkit = Class.forName("sun.awt.SunToolkit");
-        Method testm = suntoolkit.getMethod("isNativeGTKAvailable");
-        if(suntoolkit.isInstance(toolkit) && (Boolean) testm.invoke(toolkit)) {
-          UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-          return;
+    try {
+      if(PREFER_GTK) {
+        LookAndFeelInfo[] lfs = UIManager.getInstalledLookAndFeels();
+        for(LookAndFeelInfo lf : lfs) {
+          if(lf.getClassName().contains("GTK")) {
+            UIManager.setLookAndFeel(lf.getClassName());
+            return;
+          }
         }
       }
-      catch(Exception e) {
-        // ignore
-      }
-    }
-    try {
+      // Fallback:
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
     catch(Exception e) {
@@ -95,7 +71,7 @@ public final class GUIUtil {
    * 
    * @param logger logger
    */
-  public static void logUncaughtExceptions(final Logging logger) {
+  public static void logUncaughtExceptions(Logging logger) {
     try {
       Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
         @Override
