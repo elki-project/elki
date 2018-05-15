@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.FilteredConvexHull2D;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
@@ -128,7 +128,7 @@ public class SelectionConvexHullVisualization implements VisFactory {
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
         DBIDs selection = selContext.getSelectedIds();
-        GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+        FilteredConvexHull2D hull = new FilteredConvexHull2D();
         for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
           try {
             final double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));

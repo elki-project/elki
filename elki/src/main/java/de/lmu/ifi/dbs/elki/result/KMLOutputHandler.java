@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.FilteredConvexHull2D;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
@@ -514,7 +514,7 @@ public class KMLOutputHandler implements ResultHandler {
   private DoubleObjPair<Polygon> buildHullsRecursively(Cluster<Model> clu, Hierarchy<Cluster<Model>> hier, Map<Object, DoubleObjPair<Polygon>> hulls, Relation<? extends NumberVector> coords) {
     final DBIDs ids = clu.getIDs();
 
-    GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D hull = new FilteredConvexHull2D();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       hull.add(coords.get(iter).toArray());
     }

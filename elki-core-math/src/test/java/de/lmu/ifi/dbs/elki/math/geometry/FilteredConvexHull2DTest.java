@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,17 +29,14 @@ import java.util.Random;
 import org.junit.Test;
 
 /**
- * Unit test for graham scan convex hulls.
- *
- * TODO: as this test shows, we sometimes create too complex hulls on colinear
- * points!
+ * Test filtered convex hulls.
  *
  * @author Erich Schubert
  */
-public class GrahamScanConvexHull2DTest {
+public class FilteredConvexHull2DTest {
   @Test
   public void simple() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     t.add(0, 0);
     t.add(1, 0);
     t.add(0, 1);
@@ -49,17 +46,18 @@ public class GrahamScanConvexHull2DTest {
 
   @Test
   public void simple2() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     t.add(0, 0);
     t.add(0, 1);
     t.add(1, 0);
     t.add(1, 1);
+    t.add(.5, .5);
     assertEquals("Hull size not as expected.", 4, t.getHull().size());
   }
 
   @Test
   public void duplicates() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     t.add(0, 0);
     t.add(0, 0);
     t.add(0, 0);
@@ -69,7 +67,7 @@ public class GrahamScanConvexHull2DTest {
 
   @Test
   public void degeneratre() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     t.add(0, 0);
     t.add(0, 0);
     t.add(0, 0);
@@ -79,13 +77,12 @@ public class GrahamScanConvexHull2DTest {
     t.add(1, 1);
     t.add(1, 1);
     t.add(2, 2);
-    // TODO: Size 2 would be enough!
     assertEquals("Hull size not as expected.", 3, t.getHull().size());
   }
 
   @Test
   public void random() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     Random r = new Random(0L);
     for(int i = 0; i < 1000; i++) {
       t.add(r.nextDouble(), r.nextDouble());
@@ -95,7 +92,7 @@ public class GrahamScanConvexHull2DTest {
 
   @Test
   public void difficult() {
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     t.add(47.82, 13.0);
     t.add(47.825, 13.0);
     t.add(47.82, 13.005);
@@ -131,9 +128,13 @@ public class GrahamScanConvexHull2DTest {
       double a = i * 2 * Math.PI / size;
       pts.add(new double[] { Math.sin(a), Math.cos(a) });
     }
-    Collections.shuffle(pts, new Random(0L));
+    Collections.shuffle(pts, new Random(1L));
+    for(int i = 0; i < size; i++) {
+      double a = i * 2 * Math.PI / size;
+      pts.add(new double[] { Math.sin(a) * .01, Math.cos(a) * .01 });
+    }
 
-    GrahamScanConvexHull2D t = new GrahamScanConvexHull2D();
+    FilteredConvexHull2D t = new FilteredConvexHull2D();
     for(double[] p : pts) {
       t.add(p);
     }

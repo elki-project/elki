@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
-import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.FilteredConvexHull2D;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
@@ -265,8 +265,8 @@ public class ClusterHullVisualization implements VisFactory {
         coremodel = cids.size() > 0;
       }
 
-      GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
-      GrahamScanConvexHull2D hull2 = coremodel ? new GrahamScanConvexHull2D() : null;
+      FilteredConvexHull2D hull = new FilteredConvexHull2D();
+      FilteredConvexHull2D hull2 = coremodel ? new FilteredConvexHull2D() : null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         final double[] projv = proj.fastProjectDataToRenderSpace(rel.get(iter));
         if(projv[0] != projv[0] || projv[1] != projv[1]) {

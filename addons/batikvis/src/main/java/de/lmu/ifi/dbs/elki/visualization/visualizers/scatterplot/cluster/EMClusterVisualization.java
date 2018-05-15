@@ -20,7 +20,15 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,7 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.FilteredConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
@@ -58,7 +66,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-
 import net.jafama.FastMath;
 
 /**
@@ -346,7 +353,7 @@ public class EMClusterVisualization implements VisFactory {
      * @return Polygon
      */
     protected Polygon makeHull(double[][] pc) {
-      GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+      FilteredConvexHull2D hull = new FilteredConvexHull2D();
 
       double[] diag = new double[] { 0, 0 };
       for(int j = 0; j < pc.length; j++) {
@@ -377,7 +384,7 @@ public class EMClusterVisualization implements VisFactory {
      * @return Polygon
      */
     protected Polygon makeHullComplex(double[][] pc) {
-      GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+      FilteredConvexHull2D hull = new FilteredConvexHull2D();
 
       double[] diag = new double[] { 0, 0 };
       for(int j = 0; j < pc.length; j++) {
