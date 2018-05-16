@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -35,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.IterableIt;
 
 /**
  * Result class for clusterings. Can be used for both hierarchical and
@@ -155,39 +155,9 @@ public class Clustering<M extends Model> extends BasicResult {
    * @return Iterator
    */
   public It<Cluster<M>> iterToplevelClusters() {
-    return new It<Cluster<M>>() {
-      Iterator<Cluster<M>> iter;
-
-      Cluster<M> cur;
-
-      { // Constructor.
-        iter = toplevelclusters.iterator();
-        advance();
-      }
-
-      @Override
-      public boolean valid() {
-        return cur != null;
-      }
-
-      @Override
-      public It<Cluster<M>> advance() {
-        if(iter.hasNext()) {
-          cur = iter.next();
-        }
-        else {
-          cur = null;
-        }
-        return this;
-      }
-
-      @Override
-      public Cluster<M> get() {
-        return cur;
-      }
-    };
+    return new IterableIt<>(toplevelclusters);
   }
-  
+
   /**
    * Collect all clustering results from a Result
    *

@@ -20,73 +20,56 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.RandomAccess;
 
 /**
- * ELKI style Iterator for array lists.
+ * ELKI style Iterator wrapper for collections.
  * 
- * Note: this implementation is only efficient for lists with efficient random
- * access and seeking (i.e. ArrayLists, but not Linked Lists!)
+ * Note: for collections implementing {@link RandomAccess}, always use
+ * {@link ArrayListIter} instead (less wrapping)!
  * 
  * @author Erich Schubert
- * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  * 
  * @param <O> contained object type.
  */
-public class ArrayListIter<O> implements ArrayIter, It<O> {
+public class IterableIt<O> implements It<O> {
   /**
-   * The array list to iterate over.
+   * The proxied iterator.
    */
-  final List<O> data;
+  final Iterator<O> inner;
 
   /**
-   * Current position.
+   * Current object.
    */
-  int pos = 0;
+  Object cur;
+
+  /**
+   * End sentinel value.
+   */
+  private static final Object END_VALUE = new Object();
 
   /**
    * Constructor.
    * 
    * @param data Data array.
    */
-  public ArrayListIter(List<O> data) {
+  public IterableIt(Iterable<O> data) {
     super();
-    this.data = data;
+    this.inner = data.iterator();
+    cur = inner.hasNext() ? inner.next() : END_VALUE;
   }
 
   @Override
   public boolean valid() {
-    return pos < data.size() && pos >= 0;
+    return cur != END_VALUE;
   }
 
   @Override
-  public ArrayListIter<O> advance() {
-    pos++;
-    return this;
-  }
-
-  @Override
-  public int getOffset() {
-    return pos;
-  }
-
-  @Override
-  public ArrayListIter<O> advance(int count) {
-    pos += count;
-    return this;
-  }
-
-  @Override
-  public ArrayListIter<O> retract() {
-    pos--;
-    return this;
-  }
-
-  @Override
-  public ArrayListIter<O> seek(int off) {
-    pos = off;
+  public It<O> advance() {
+    cur = inner.hasNext() ? inner.next() : END_VALUE;
     return this;
   }
 
@@ -95,7 +78,8 @@ public class ArrayListIter<O> implements ArrayIter, It<O> {
    * 
    * @return current element
    */
+  @SuppressWarnings("unchecked")
   public O get() {
-    return data.get(pos);
+    return cur != END_VALUE ? (O) cur : null;
   }
 }
