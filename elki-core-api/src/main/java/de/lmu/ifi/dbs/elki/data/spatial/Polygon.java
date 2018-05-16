@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
@@ -58,6 +59,7 @@ public class Polygon implements SpatialComparable {
    */
   public Polygon(List<double[]> points) {
     super();
+    assert (points instanceof RandomAccess);
     this.points = points;
     // Compute the bounds.
     if(!points.isEmpty()) {
@@ -77,8 +79,18 @@ public class Polygon implements SpatialComparable {
     }
   }
 
+  /**
+   * Constructor.
+   * 
+   * @param points Polygon points
+   * @param minx Minimum x value
+   * @param maxx Maximum x value
+   * @param miny Minimum y value
+   * @param maxy Maximum y value
+   */
   public Polygon(List<double[]> points, double minx, double maxx, double miny, double maxy) {
     super();
+    assert (points instanceof RandomAccess);
     this.points = points;
     this.min = new double[] { minx, miny };
     this.max = new double[] { maxx, maxy };
@@ -252,5 +264,32 @@ public class Polygon implements SpatialComparable {
       pre = cur;
     }
     return c;
+  }
+
+  /**
+   * Compute the polygon area (geometric, not geographic) using the Shoelace
+   * formula.
+   *
+   * This is appropriate for simple polygons in the cartesian plane only.
+   *
+   * @return Area
+   */
+  public double areaShoelace() {
+    if(points.size() <= 1) {
+      return 0.;
+    }
+    double agg = 0.;
+    Iterator<double[]> iter = points.iterator();
+    double[] first = iter.next(), cur = null;
+    double px = first[0], py = first[1];
+    while(iter.hasNext()) {
+      cur = iter.next();
+      double x = cur[0], y = cur[1];
+      agg += x * py - y * px;
+      px = x;
+      py = y;
+    }
+    agg += first[0] * py - first[1] * px;
+    return Math.abs(agg * .5);
   }
 }
