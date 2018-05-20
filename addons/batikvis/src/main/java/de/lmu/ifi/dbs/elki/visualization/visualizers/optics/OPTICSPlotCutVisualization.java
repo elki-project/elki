@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -73,7 +74,8 @@ public class OPTICSPlotCutVisualization implements VisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
       context.addVis(p, new VisualizationTask(this, NAME, p.getResult(), null) //
-          .level(VisualizationTask.LEVEL_INTERACTIVE));
+          .level(VisualizationTask.LEVEL_INTERACTIVE) //
+          .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT));
     });
   }
 

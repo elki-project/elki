@@ -75,6 +75,7 @@ public class OPTICSClusterVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
+      // Child results, once OPTICSXi runs after the actual OPTICS algorithm.
       VisualizationTree.findNewResults(context, p.getResult()).filter(Clustering.class).forEach(clus -> {
         if(clus.getToplevelClusters().size() == 0) {
           return;
@@ -92,9 +93,26 @@ public class OPTICSClusterVisualization implements VisFactory {
           LOG.warning("Clustering with no cluster detected.", e);
         }
       });
+      // Also check parents, the current default behavior of OPTICSXi.
+      context.getHierarchy().iterAncestors(p.getResult()).filter(Clustering.class).forEach(clus -> {
+        if(clus.getToplevelClusters().size() == 0) {
+          return;
+        }
+        try {
+          Cluster<?> firstcluster = ((Clustering<?>) clus).getToplevelClusters().iterator().next();
+          if(firstcluster.getModel() instanceof OPTICSModel) {
+            context.addVis(p, new VisualizationTask(this, NAME, clus, null) //
+                .level(VisualizationTask.LEVEL_DATA));
+            // TODO: use and react to style policy!
+          }
+        }
+        catch(Exception e) {
+          // Empty clustering? Shouldn't happen.
+          LOG.warning("Clustering with no cluster detected.", e);
+        }
+      });
     });
-    // TODO: also run when a new clustering is added, instead of just new
-    // projections?
+    // TODO: run when a new clustering is added, instead of projections?
   }
 
   @Override
