@@ -269,17 +269,28 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             // Case a) is the default
           }
           // This NOT in the original article - please credit ELKI:
-          // ensure that the predecessor is in the current cluster. This filter
-          // removes common artifacts from the Xi method
+          // ensure that the predecessor is in the current cluster.
+          // This filter removes common artifacts from the Xi method
           if(!nocorrect) {
+            double startval = clusterOrderResult.reachability.doubleValue(tmp.seek(cstart));
             simplify: while(cend > cstart) {
-              clusterOrderResult.predecessor.assignVar(tmp.seek(cend), tmp2);
+              tmp.seek(cend);
+              // If the reachability is less than the first points', then there
+              // must be some point inbetween that "reached" the current point.
+              if(clusterOrderResult.reachability.doubleValue(tmp) < startval) {
+                break simplify;
+              }
+              clusterOrderResult.predecessor.assignVar(tmp, tmp2);
+              // "Slow" search for predecessor:
               for(int i = cstart; i < cend; i++) {
                 if(DBIDUtil.equal(tmp2, tmp.seek(i))) {
                   break simplify;
                 }
               }
-              // Not found.
+              // Not found, prune the last point
+              if(LOG.isDebuggingFinest()) {
+                LOG.debugFinest("Pruned one point by predecessor rule.");
+              }
               --cend;
             }
           }
@@ -305,15 +316,12 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
           OPTICSModel model = new OPTICSModel(cstart, cend);
           Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
           // Build the hierarchy
-          {
-            Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
-            while(iter.hasNext()) {
-              Cluster<OPTICSModel> clus = iter.next();
-              OPTICSModel omodel = clus.getModel();
-              if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
-                clustering.addChildCluster(cluster, clus);
-                iter.remove();
-              }
+          for(Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator(); iter.hasNext();) {
+            Cluster<OPTICSModel> clus = iter.next();
+            OPTICSModel omodel = clus.getModel();
+            if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
+              clustering.addChildCluster(cluster, clus);
+              iter.remove(); // Not a top-level cluster
             }
           }
           curclusters.add(cluster);
