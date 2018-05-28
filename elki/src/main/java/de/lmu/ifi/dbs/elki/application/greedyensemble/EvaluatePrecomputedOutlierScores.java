@@ -62,8 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * </ul>
  *
  * The evaluation assumes that high scores correspond to outliers, unless the
- * method name matches the pattern given using {@link Parameterizer#REVERSED_ID}
- * (Default: <tt>(ODIN|ABOD)</tt>).
+ * method name matches the pattern given using
+ * {@link Parameterizer#REVERSED_ID}.
+ * The default value matches several scores known to use reversed values.
  *
  * @author Erich Schubert
  * @author Guilherme Oliveira Campos
@@ -74,6 +75,11 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
    * Get static logger.
    */
   private static final Logging LOG = Logging.getLogger(EvaluatePrecomputedOutlierScores.class);
+
+  /**
+   * Pattern to match a set of known reversed scores.
+   */
+  public static final String KNOWN_REVERSED = "(ODIN|DWOF|gaussian-model|silhouette|OutRank|OUTRES|aggarwal.?yu|ABOD)";
 
   /**
    * The data input file.
@@ -196,19 +202,19 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     if(name != null) {
       fout.append("\"Name\",");
     }
-    fout.append("\"Algorithm\",\"k\"");
-    fout.append(",\"ROC AUC\"");
-    fout.append(",\"Average Precision\"");
-    fout.append(",\"R-Precision\"");
-    fout.append(",\"Maximum F1\"");
-    fout.append(",\"DCG\"");
-    fout.append(",\"NDCG\"");
-    fout.append(",\"Adjusted ROC AUC\"");
-    fout.append(",\"Adjusted Average Precision\"");
-    fout.append(",\"Adjusted R-Precision\"");
-    fout.append(",\"Adjusted Maximum F1\"");
-    fout.append(",\"Adjusted DCG\"");
-    fout.append('\n');
+    fout.append("\"Algorithm\",\"k\"") //
+        .append(",\"ROC AUC\"") //
+        .append(",\"Average Precision\"") //
+        .append(",\"R-Precision\"") //
+        .append(",\"Maximum F1\"") //
+        .append(",\"DCG\"") //
+        .append(",\"NDCG\"") //
+        .append(",\"Adjusted ROC AUC\"") //
+        .append(",\"Adjusted Average Precision\"") //
+        .append(",\"Adjusted R-Precision\"") //
+        .append(",\"Adjusted Maximum F1\"") //
+        .append(",\"Adjusted DCG\"") //
+        .append('\n');
   }
 
   private void processRow(PrintStream fout, NumberVector vec, String label) {
@@ -225,7 +231,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
       return;
     }
     AbstractVectorIter iter = reverse.matcher(label).find() ? new IncreasingVectorIter(vec) : new DecreasingVectorIter(vec);
-    double rate = positive.numPositive() / (double) positive.getDimensionality();
+    double expected = positive.numPositive() / (double) positive.getDimensionality();
     double auc = ROCEvaluation.STATIC.evaluate(positive, iter.seek(0));
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
     double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(positive, iter.seek(0));
@@ -233,9 +239,9 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     double dcg = DCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
     double ndcg = NDCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
     double adjauc = 2 * auc - 1;
-    double adjrprecision = (rprecision - rate) / (1 - rate);
-    double adjavep = (avep - rate) / (1 - rate);
-    double adjmaxf1 = (maxf1 - rate) / (1 - rate);
+    double adjrprecision = (rprecision - expected) / (1 - expected);
+    double adjavep = (avep - expected) / (1 - expected);
+    double adjmaxf1 = (maxf1 - expected) / (1 - expected);
     double adjdcg = (ndcg - endcg) / (1 - endcg);
     final int p = label.lastIndexOf('-');
     String prefix = label.substring(0, p);
@@ -244,20 +250,20 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     if(name != null) {
       fout.append('"').append(name).append("\",");
     }
-    fout.append('"').append(prefix).append('"');
-    fout.append(',').append(Integer.toString(k));
-    fout.append(',').append(Double.toString(auc));
-    fout.append(',').append(Double.toString(avep));
-    fout.append(',').append(Double.toString(rprecision));
-    fout.append(',').append(Double.toString(maxf1));
-    fout.append(',').append(Double.toString(dcg));
-    fout.append(',').append(Double.toString(ndcg));
-    fout.append(',').append(Double.toString(adjauc));
-    fout.append(',').append(Double.toString(adjavep));
-    fout.append(',').append(Double.toString(adjrprecision));
-    fout.append(',').append(Double.toString(adjmaxf1));
-    fout.append(',').append(Double.toString(adjdcg));
-    fout.append('\n');
+    fout.append('"').append(prefix).append('"') //
+        .append(',').append(Integer.toString(k)) //
+        .append(',').append(Double.toString(auc)) //
+        .append(',').append(Double.toString(avep)) //
+        .append(',').append(Double.toString(rprecision)) //
+        .append(',').append(Double.toString(maxf1)) //
+        .append(',').append(Double.toString(dcg)) //
+        .append(',').append(Double.toString(ndcg)) //
+        .append(',').append(Double.toString(adjauc)) //
+        .append(',').append(Double.toString(adjavep)) //
+        .append(',').append(Double.toString(adjrprecision)) //
+        .append(',').append(Double.toString(adjmaxf1)) //
+        .append(',').append(Double.toString(adjdcg)) //
+        .append('\n');
   }
 
   /**
@@ -341,7 +347,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         name = nameP.getValue();
       }
       // Pattern for reversed methods:
-      PatternParameter reverseP = new PatternParameter(REVERSED_ID, "(ODIN|DWOF|gaussian-model|silhouette|OutRank|OUTRES|aggarwal.?yu|ABOD)");
+      PatternParameter reverseP = new PatternParameter(REVERSED_ID, KNOWN_REVERSED);
       if(config.grab(reverseP)) {
         reverse = reverseP.getValue();
       }
