@@ -46,7 +46,7 @@ import net.jafama.FastMath;
     title = "Generalized expansion dimension", //
     booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
     url = "http://dx.doi.org/10.1109/ICDMW.2012.94")
-public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class GEDEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -59,7 +59,7 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = countLeadingZeros(data, adapter, end);
+    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     if(end - begin < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
+public class PWM2Estimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -53,7 +53,7 @@ public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = countLeadingZeros(data, adapter, end);
+    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     if(end - begin <= 3) {
       if(end - begin == 2) { // Fallback to MoM
         double v1 = adapter.getDouble(data, begin) / adapter.getDouble(data, begin + 1);

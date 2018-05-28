@@ -34,4 +34,9 @@ public class EnsembleEstimatorTest extends AbstractIntrinsicDimensionalityEstima
     regressionTest(est, 5, 1000, 0L, 4.8704752769340836);
     regressionTest(est, 7, 10000, 0L, 6.946161496762817);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(EnsembleEstimator.STATIC);
+  }
 }

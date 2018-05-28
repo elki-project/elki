@@ -34,4 +34,9 @@ public class ZipfEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorT
     regressionTest(est, 5, 1000, 0L, 4.702443328729227);
     regressionTest(est, 7, 10000, 0L, 6.943453727205677);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(ZipfEstimator.STATIC);
+  }
 }

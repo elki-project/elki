@@ -43,7 +43,7 @@ import net.jafama.FastMath;
     title = "Tail-Index Estimates in Small Samples", //
     booktitle = "Journal of Business & Economic Statistics", //
     url = "http://dx.doi.org/10.1198/073500101316970421")
-public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class AggregatedHillEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

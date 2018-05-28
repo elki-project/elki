@@ -44,7 +44,7 @@ import net.jafama.FastMath;
     title = "A simple general approach to inference about the tail of a distribution", //
     booktitle = "The annals of statistics 3(5)", //
     url = "http://dx.doi.org/10.1214/aos/1176343247")
-public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class HillEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

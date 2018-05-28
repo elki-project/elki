@@ -34,4 +34,9 @@ public class PWMEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTe
     regressionTest(est, 5, 1000, 0L, 4.891606982612564);
     regressionTest(est, 7, 10000, 0L, 6.959066158235904);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(PWMEstimator.STATIC);
+  }
 }

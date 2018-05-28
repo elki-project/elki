@@ -34,4 +34,9 @@ public class HillEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorT
     regressionTest(e, 5, 1000, 0L, 4.848665990083162);
     regressionTest(e, 7, 10000, 0L, 6.945428878740164);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(HillEstimator.STATIC);
+  }
 }

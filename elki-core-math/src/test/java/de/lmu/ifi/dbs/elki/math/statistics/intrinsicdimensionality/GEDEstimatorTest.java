@@ -34,4 +34,9 @@ public class GEDEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTe
     regressionTest(est, 5, 1000, 0L, 4.895086664189283);
     regressionTest(est, 7, 10000, 0L, 6.970114678708026);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(GEDEstimator.STATIC);
+  }
 }

@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Estimating Local Intrinsic Dimensionality", //
     booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
     url = "http://dx.doi.org/10.1145/2783258.2783405")
-public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class MOMEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

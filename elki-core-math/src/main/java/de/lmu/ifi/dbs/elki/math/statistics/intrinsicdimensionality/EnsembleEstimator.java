@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class EnsembleEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class EnsembleEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

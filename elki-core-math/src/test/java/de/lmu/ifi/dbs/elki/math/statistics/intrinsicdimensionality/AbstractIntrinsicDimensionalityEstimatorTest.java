@@ -52,4 +52,13 @@ public abstract class AbstractIntrinsicDimensionalityEstimatorTest {
     assertEquals("Accuracy of " + est.getClass().getSimpleName(), edim, est.estimate(Arrays.copyOfRange(data, zeros, data.length)), 1e-8);
     assertEquals("Accuracy of " + est.getClass().getSimpleName(), edim, est.estimate(data), 1e-8);
   }
+
+  /**
+   * Test with all zero data.
+   *
+   * @param est Estimator.
+   */
+  protected static void testZeros(IntrinsicDimensionalityEstimator est) {
+    est.estimate(new double[] { 0., 0., 0., 0. });
+  }
 }

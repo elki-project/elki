@@ -44,7 +44,7 @@ import net.jafama.FastMath;
     title = "Estimating Local Intrinsic Dimensionality", //
     booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
     url = "http://dx.doi.org/10.1145/2783258.2783405")
-public class RVEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class RVEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -52,7 +52,7 @@ public class RVEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = countLeadingZeros(data, adapter, end);
+    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     final int k = end - begin;
     if(k < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");

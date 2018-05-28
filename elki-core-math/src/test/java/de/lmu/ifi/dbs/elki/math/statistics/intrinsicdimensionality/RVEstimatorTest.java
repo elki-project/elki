@@ -34,4 +34,9 @@ public class RVEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTes
     regressionTest(est, 5, 1000, 0L, 5.05005440246909);
     regressionTest(est, 7, 10000, 0L, 6.9778378824587275);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(RVEstimator.STATIC);
+  }
 }

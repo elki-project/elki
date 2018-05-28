@@ -58,7 +58,7 @@ import net.jafama.FastMath;
     title = "On Least Squares Estimates of an Exponential Tail Coefficient", //
     booktitle = "Statistics & Risk Modeling. Band 14, Heft 4", //
     url = "http://dx.doi.org/10.1524/strm.1996.14.4.353")
-public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -66,7 +66,7 @@ public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = countLeadingZeros(data, adapter, end);
+    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     final int len = end - begin;
     if(len < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");

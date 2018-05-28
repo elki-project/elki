@@ -34,4 +34,9 @@ public class LMomentsEstimatorTest extends AbstractIntrinsicDimensionalityEstima
     regressionTest(est, 5, 1000, 0L, 4.8417151683258215);
     regressionTest(est, 7, 10000, 0L, 6.932108185670673);
   }
+
+  @Test(expected = ArithmeticException.class)
+  public void testFailWithZeros() {
+    testZeros(LMomentsEstimator.STATIC);
+  }
 }
