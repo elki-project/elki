@@ -234,7 +234,7 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
     // Optimize
     for(int it = 0; it < iterations; it++) {
       double qij_sum = computeQij(qij, sol);
-      computeGradient(pij, qij, qij_sum, sol, meta);
+      computeGradient(pij, qij, 1. / qij_sum, sol, meta);
       updateSolution(sol, meta, it);
       LOG.incrementProcessed(prog);
     }
@@ -285,11 +285,11 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
    * 
    * @param pij Desired affinity matrix
    * @param qij Projected affinity matrix
-   * @param qij_sum Normalization factor
+   * @param qij_isum Normalization factor
    * @param sol Current solution coordinates
    * @param meta Point metadata
    */
-  protected void computeGradient(AffinityMatrix pij, double[][] qij, double qij_sum, double[][] sol, double[] meta) {
+  protected void computeGradient(AffinityMatrix pij, double[][] qij, double qij_isum, double[][] sol, double[] meta) {
     final int dim3 = dim * 3;
     int size = pij.size();
     for(int i = 0, off = 0; i < size; i++, off += dim3) {
@@ -302,7 +302,7 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
         final double[] sol_j = sol[j];
         final double qij_ij = qij_i[j];
         // Qij after scaling!
-        final double q = MathUtil.max(qij_ij / qij_sum, MIN_QIJ);
+        final double q = MathUtil.max(qij_ij * qij_isum, MIN_QIJ);
         double a = 4 * (pij.get(i, j) - q); // SNE gradient
         for(int k = 0; k < dim; k++) {
           meta[off + k] += a * (sol_i[k] - sol_j[k]);
