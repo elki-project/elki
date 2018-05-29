@@ -4,323 +4,35 @@ apply plugin: 'eclipse'
 description = "ELKI - Parent Project"
 eclipse.project.name = 'elki-project'
 
-// Try to get a git commit id for javadoc
-def getCommitHash() {
-  if(!new File(".git").exists()) return ""
-  // requires git installed
-  try {
-    def best = 'git rev-parse HEAD'.execute().text
-    if(best != null && best.length > 5) return best
-  } catch (Exception e) {}
-  // No longer works reliably, because of packed references.
-  try {
-    def head = new File(".git", "HEAD").text.split(":")
-    if (head.length == 1) return head[0].trim().take(12)
-    return new File(".git", head[1].trim()).text.take(12)
-  } catch (Exception e) {}
-  return ""
-}
-
-import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
-import org.gradle.plugins.ide.api.PropertiesGeneratorTask;
-import org.gradle.api.internal.PropertiesTransformer;
-import org.gradle.util.ConfigureUtil;
-
-// Class to allow updating arbitrary properties files
-class PropertiesFile extends PropertiesPersistableConfigurationObject {
-    public PropertiesFile(PropertiesTransformer t) { super(t); }
-    @Override protected void load(Properties properties) { }
-    @Override protected void store(Properties properties) { }
-    @Override protected String getDefaultResourceName() { return ""; }
-    @Override public void loadDefaults() { load(new StringBufferInputStream("")); }
-}
-
-// Task to update arbitrary properties files (set outputFile)
-class PropertiesFileTask extends PropertiesGeneratorTask<PropertiesFile> {
-    private final PropertiesFileContentMerger file;
-    public PropertiesFileTask() { file = new PropertiesFileContentMerger(getTransformer()); }
-    protected PropertiesFile create() { return new PropertiesFile(getTransformer()); }
-    protected void configure(PropertiesFile props) {
-        file.getBeforeMerged().execute(props); file.getWhenMerged().execute(props);
-    }
-    public void file(Closure closure) { ConfigureUtil.configure(closure, file); }
-}
-
 allprojects  {
   apply plugin: 'java-library'
-  apply plugin: 'eclipse'
-  if(project.hasProperty('jacoco')) apply plugin: 'jacoco'
+  apply plugin: 'maven-publish' // Not strictly necessary, but convenient
+  repositories { jcenter(); }
 
   group = 'de.lmu.ifi.dbs.elki'
   version = '0.7.2-SNAPSHOT'
 
-  repositories {
-    jcenter();
-  }
-  ext.description = description
-  ext.year = new Date().format('yyyy')
-  ext.vendor = "ELKI Development Team"
-  ext.url = "https://elki-project.github.io/"
-  ext.isSnapshot = version.endsWith("-SNAPSHOT")
-  ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
-
-  // For tests depending on other module's tests
-  configurations { testOutput.extendsFrom testCompile }
-
-  eclipse {
-    // Not supported by Buildship: pathVariables 'M2_REPO': new File(repositories.MavenLocal.url)
-    project {
-      natures 'org.eclipse.buildship.core.gradleprojectnature'
-    }
-    classpath {
-      // Causes duplicate files, because Eclipse copies resoures to this folder
-      // defaultOutputDir = "build/classes/main" as File
-      downloadSources = true
-    }
-    jdt.file {
-      withProperties {
-        it.load new FileInputStream("$rootDir/conventions/elkiformatter.properties" as String)
-      }
-    }
-  }
-  task eclipseUIPreferences(type: PropertiesFileTask) {
-    description = "Generate Eclipse UI settings"
-    outputFile = "$projectDir/.settings/org.eclipse.jdt.ui.prefs" as File
-    file { withProperties {
-      it.load new FileInputStream("$rootDir/conventions/codetemplates.properties" as String)
-	} }
-  }
-  tasks.eclipse.dependsOn eclipseUIPreferences
-  task eclipseBuildshipPreferences(type: PropertiesFileTask) {
-    description = "Generate Eclipse buildship settings"
-    outputFile = "$projectDir/.settings/org.eclipse.buildship.core.prefs" as File
-  }
-  tasks.eclipse.dependsOn eclipseBuildshipPreferences
-  // Enable logging, but with output disabled, for code coverage
-  if(project.hasProperty('jacoco')) {
-    task testWithLogging(type: Test) {
-      systemProperty "java.util.logging.config.file", "$rootDir/elki-logging/src/test/resources/de/lmu/ifi/dbs/elki/logging/logging.properties"
-      enableAssertions = true
-    }
-    test.dependsOn testWithLogging
-  }
-}
-
-subprojects {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
   compileJava.options.encoding = 'UTF-8'
 
-  // Some jar options
-  afterEvaluate { // Otherwise, project.description does not work?
-    jar {
-      manifest {
-        attributes(
-          "Implementation-Title" : project.description ?: project.name,
-          "Implementation-Version" : project.version,
-          "Implementation-Vendor" : project.vendor,
-          "Implementation-Vendor-Id" : project.group,
-          "Implementation-URL" : project.url,
-        )
-      }
-    }
-  }
-  processResources {
-    from("$rootDir/elki/src/main/resources/META-INF") {
-      include "NOTICE"
-      into "META-INF"
-    }
-    from("$rootDir/elki/src/main/resources/de/lmu/ifi/dbs/elki/LICENSE.txt") {
-      rename "\\.txt\$", ""
-      into "license"
-    }
-  }
-  // Build test jars:
-  task testJar(type: Jar) {
-    classifier = 'tests'
-    from sourceSets.test.output
-  }
-  artifacts.testOutput testJar
-  // Build source jars:
-  task packageSources(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-  }
-  artifacts.archives packageSources
-  // Build javadoc jars:
-  task packageJavadoc(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-  }
-  artifacts.archives packageJavadoc
+  ext.vendor = "ELKI Development Team"
+  ext.url = "https://elki-project.github.io/"
+  ext.year = new Date().format('yyyy')
 
-  // Javadoc options
-  javadoc {
-    options {
-      encoding = 'UTF-8'
-      docEncoding = 'UTF-8'
-      stylesheetFile = "$rootDir/elki/src/main/javadoc/stylesheet.css" as File
-      noTree = false
-      noNavBar = false
-      noIndex = false
-      noHelp = true
-      splitIndex = true
-      author = true
-      use = true
-      memberLevel = JavadocMemberLevel.PRIVATE
-      noDeprecated = false
-      noDeprecatedList = false
-      docFilesSubDirs = true
-      docTitle = 'ELKI'
-      windowTitle = 'ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures'
-      if (new File("src/main/javadoc/overview.html").exists()) overview = "src/main/javadoc/overview.html"
-      group('Algorithms', ['de.lmu.ifi.dbs.elki.algorithm*'])
-      group('Databases and Index Structures', ['de.lmu.ifi.dbs.elki.database*', 'de.lmu.ifi.dbs.elki.index*', 'de.lmu.ifi.dbs.elki.datasource*', 'de.lmu.ifi.dbs.elki.persistent*'])
-      group('Datatypes and Distance Functions', ['de.lmu.ifi.dbs.elki.data', 'de.lmu.ifi.dbs.elki.data.*', 'de.lmu.ifi.dbs.elki.distance*'])
-      group('Evaluation', ['de.lmu.ifi.dbs.elki.evalu*'])
-      group('GUI and Visualization', ['de.lmu.ifi.dbs.elki.gui*', 'de.lmu.ifi.dbs.elki.vis*'])
-      group('Utilities and Miscellaneous', ['de.lmu.ifi.dbs.elki', 'de.lmu.ifi.dbs.elki.*'])
-      group('Tutorial Code and Examples', ['tutorial', 'tutorial.*'])
-      header = """<img src="{@docRoot}/figures/elki-logo-200.png" width="200"><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>"""
-      footer = """ELKI version $project.version"""
-      if (isSnapshot) {
-        def commit = getCommitHash()
-        if (commit) footer += """ rev. $commit"""
-        footer += """ built at $buildTime"""
-      }
-      bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a><!-- so we get to know what people search for: --><script>if(window.location.hostname=="elki-project.github.io"){(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create","UA-87792924-1","auto");ga("send","pageview");}</script>"""
-      links = [
-        "http://trove4j.sourceforge.net/javadocs/",
-        "http://www.w3.org/2003/01/dom2-javadoc/",
-        "https://xmlgraphics.apache.org/batik/javadoc/"
-      ]
-      addBooleanOption('Xdoclint:none', true)
-      // Add --allow-script-in-comments if available (some 1.8 versions only)
-      try {
-        if (Class.forName('com.sun.tools.doclets.formats.html.ConfigurationImpl').newInstance().optionLength('--allow-script-in-comments') > 0) {
-          addBooleanOption('-allow-script-in-comments').value = true
-        }
-      } catch (ignored) {}
-    }
-  }
-  // Resources to copy to every javadoc
-  task copyDocResources(type: Copy) {
-    from("$rootDir/elki/src/main/javadoc") {
-      include "**/stylesheet.css"
-      include "**/elki-logo-200.png"
-    }
-    from("$projectDir/src/main/javadoc") {
-      exclude "overview.html"
-    }
-    into "$project.buildDir/docs/javadoc"
-  }
-  javadoc.dependsOn copyDocResources
-  // Additional documentation: parameters
-  task documentParameters(type: JavaExec) {
-    description "Generate parameter documentation"
-    group = "Documentation"
-    classpath = sourceSets.test.runtimeClasspath
-    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentParameters'
-    args "$project.buildDir/docs/javadoc/parameters-byclass.html"
-    args "$project.buildDir/docs/javadoc/parameters-byopt.html"
-  }
-  // To use, add javadoc.dependsOn documentParameters
-  // Additional documentation: references
-  task documentReferences(type: JavaExec) {
-    description "Generate references list"
-    group = "Documentation"
-    classpath = sourceSets.test.runtimeClasspath
-    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentReferences'
-    args "$project.buildDir/docs/javadoc/references.html"
-    args "$project.buildDir/docs/references.md"
-  }
-  // To use, add javadoc.dependsOn documentReferences
-  // Collect dependencies
-  task collectDependencies(type: Sync) {
-    description = "Collect dependencies"
-    group = "Build"
-    from configurations.runtime
-    into "$project.buildDir/libs/lib"
-  }
-  jar.dependsOn collectDependencies
+  ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
+  ext.isSnapshot = version.endsWith("-SNAPSHOT")
+  ext.needsSigning = !ext.isSnapshot
+
+  // For tests depending on other module's tests
+  configurations { testOutput.extendsFrom testCompile }
 }
 
-configurations {
-  // For bundle
-  enabledModules {
-    transitive false
-    extendsFrom runtime
-  }
-}
+apply from: 'gradle/modules.gradle'
+apply from: 'gradle/package.gradle'
+apply from: 'gradle/javadoc.gradle'
+apply from: 'gradle/jacoco.gradle'
+apply from: 'gradle/eclipse.gradle'
+apply from: 'gradle/dependencyPlot.gradle'
+apply from: 'gradle/signing.gradle'
 
-dependencies {
-  def depsExclude = [ rootProject.path, ":elki-bundle" ]
-  rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.each { enabledModules it }
-}
-
-eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
-
-if(project.hasProperty('jacoco')) {
-  task codeCoverageReport(type: JacocoReport) {
-    dependsOn tasks.test
-    subprojects.each {
-      dependsOn it.tasks.test
-      sourceSets it.sourceSets.main
-    }
-    executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    reports {
-      html.enabled = true
-      xml.enabled = true
-      csv.enabled = false
-      xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
-    }
-  }
-  check.dependsOn codeCoverageReport
-}
-
-task dependencyPlot { doLast {
-  def includeTest = false
-  def includeExternal = false
-  def depsExclude = [ rootProject.path, ":elki-bundle" ]
-  def projs = rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.sort()
-  new File("dep.dot").withWriter { out ->
-    out.println "digraph dependencies {"
-    out.println "graph[rankdir=TB,nodesep=.25,ranksep=.25,ratio=compress,margin=0];"
-    out.println "node[shape=box,margin=.05,height=0,width=0];"
-
-    // External dependencies, nodes:
-    if (includeExternal)
-      projs.collectMany {
-        Project p -> p.configurations.compile.allDependencies }.findAll {
-        !(it instanceof ProjectDependency) }.unique().sort().each { dep ->
-        def n = "${dep.group}:${dep.name}"
-        out.println "\"${n}\" [label=\"${dep.group}\\n${dep.name}\",color=blue,fontcolor=blue];"
-      }
-    // Internal depdenencies, nodes:
-    projs.each { dep ->
-      def n = "${dep.group}:${dep.name}"
-      out.println "\"${n}\" [label=\"${dep.name}\"];"
-    }
-
-    projs.each { Project p ->
-      def s = "${p.group}:${p.name}"
-      // p.configurations.all.collectMany { con -> con.allDependencies }.unique().each { dep ->
-      def seen = new HashSet()
-      p.configurations.compile.allDependencies.each { dep ->
-        def t = "${dep.group}:${dep.name}"
-        if(seen.add(t) && (dep instanceof ProjectDependency || includeExternal)) {
-          out.println "\"${s}\" -> \"${t}\";"
-        }
-      }
-      p.configurations.testCompile.allDependencies.each { dep ->
-        def t = "${dep.group}:${dep.name}"
-        if(seen.add(t) && includeTest && (dep instanceof ProjectDependency || includeExternal)) {
-          out.println "\"${s}\" -> \"${t}\" [color=grey];"
-        }
-      }
-    }
-
-    out.println "}"
-  }
-} }

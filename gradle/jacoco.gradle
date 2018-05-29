@@ -1,0 +1,27 @@
+if(project.hasProperty('jacoco')) {
+  // Enable logging, but with output disabled, for code coverage
+  allprojects {
+    apply plugin: 'jacoco'
+    task testWithLogging(type: Test) {
+      systemProperty "java.util.logging.config.file", "$rootDir/elki-logging/src/test/resources/de/lmu/ifi/dbs/elki/logging/logging.properties"
+    }
+    test.dependsOn testWithLogging
+  }
+
+  task codeCoverageReport(type: JacocoReport) {
+    dependsOn tasks.test
+    subprojects.each {
+      dependsOn it.tasks.test
+      sourceSets it.sourceSets.main
+    }
+    executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    reports {
+      html.enabled = true
+      xml.enabled = true
+      csv.enabled = false
+      xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
+    }
+  }
+  check.dependsOn codeCoverageReport
+}

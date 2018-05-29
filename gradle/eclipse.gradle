@@ -1,0 +1,57 @@
+import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
+import org.gradle.plugins.ide.api.PropertiesGeneratorTask;
+import org.gradle.api.internal.PropertiesTransformer;
+import org.gradle.util.ConfigureUtil;
+
+// Class to allow updating arbitrary properties files
+class PropertiesFile extends PropertiesPersistableConfigurationObject {
+    public PropertiesFile(PropertiesTransformer t) { super(t); }
+    @Override protected void load(Properties properties) { }
+    @Override protected void store(Properties properties) { }
+    @Override protected String getDefaultResourceName() { return ""; }
+    @Override public void loadDefaults() { load(new StringBufferInputStream("")); }
+}
+
+// Task to update arbitrary properties files (set outputFile)
+class PropertiesFileTask extends PropertiesGeneratorTask<PropertiesFile> {
+    private final PropertiesFileContentMerger file;
+    public PropertiesFileTask() { file = new PropertiesFileContentMerger(getTransformer()); }
+    protected PropertiesFile create() { return new PropertiesFile(getTransformer()); }
+    protected void configure(PropertiesFile props) {
+        file.getBeforeMerged().execute(props); file.getWhenMerged().execute(props);
+    }
+    public void file(Closure closure) { ConfigureUtil.configure(closure, file); }
+}
+
+allprojects  {
+  apply plugin: 'eclipse'
+  eclipse {
+    // Not supported by Buildship: pathVariables 'M2_REPO': new File(repositories.MavenLocal.url)
+    project {
+      natures 'org.eclipse.buildship.core.gradleprojectnature'
+    }
+    classpath {
+      // Causes duplicate files, because Eclipse copies resoures to this folder
+      // defaultOutputDir = "build/classes/main" as File
+      downloadSources = true
+    }
+    jdt.file {
+      withProperties {
+        it.load new FileInputStream("$rootDir/conventions/elkiformatter.properties" as String)
+      }
+    }
+  }
+  task eclipseUIPreferences(type: PropertiesFileTask) {
+    description = "Generate Eclipse UI settings"
+    outputFile = "$projectDir/.settings/org.eclipse.jdt.ui.prefs" as File
+    file { withProperties {
+      it.load new FileInputStream("$rootDir/conventions/codetemplates.properties" as String)
+    } }
+  }
+  tasks.eclipse.dependsOn eclipseUIPreferences
+  task eclipseBuildshipPreferences(type: PropertiesFileTask) {
+    description = "Generate Eclipse buildship settings"
+    outputFile = "$projectDir/.settings/org.eclipse.buildship.core.prefs" as File
+  }
+  tasks.eclipse.dependsOn eclipseBuildshipPreferences
+}

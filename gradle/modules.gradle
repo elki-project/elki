@@ -1,0 +1,13 @@
+configurations {
+  // For bundle
+  enabledModules {
+    transitive false
+    extendsFrom runtime
+  }
+}
+dependencies {
+  def depsExclude = [ rootProject.path, ":elki-bundle" ]
+  rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.each { enabledModules it }
+}
+eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
+

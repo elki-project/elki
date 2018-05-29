@@ -1,0 +1,39 @@
+subprojects {
+  processResources {
+    from("$rootDir/elki/src/main/resources/META-INF") {
+      include "NOTICE"
+      into "META-INF"
+    }
+    from("$rootDir/elki/src/main/resources/de/lmu/ifi/dbs/elki/LICENSE.txt") {
+      rename "\\.txt\$", ""
+      into "license"
+    }
+  }
+  // Build test jars:
+  task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+  }
+  artifacts.testOutput testJar
+  // Build source jars:
+  task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+  artifacts.archives sourceJar
+  // Build javadoc jars:
+  task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+  }
+  artifacts.archives javadocJar
+  // Collect dependencies
+  task collectDependencies(type: Sync) {
+    description = "Collect dependencies"
+    group = "Build"
+    from configurations.runtime
+    into "$project.buildDir/libs/lib"
+  }
+  jar.dependsOn collectDependencies
+}
+

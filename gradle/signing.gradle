@@ -1,0 +1,98 @@
+// Add some metadata for MavenCentral
+def customizePom(pom, project) { pom.withXml {
+  asNode().children().last() + {
+    name project.description
+    url 'https://elki-project.github.io/'
+    resolveStrategy = Closure.DELEGATE_FIRST
+    issueManagement {
+      system 'GitHub'
+      url 'https://github.com/elki-project/elki/issues'
+    }
+    licenses {
+      license {
+        name 'GNU Affero General Public License (AGPL) version 3.0'
+        url 'http://www.gnu.org/licenses/agpl-3.0.txt'
+      }
+    }
+    scm {
+      url 'https://github.com/elki-project/elki'
+      connection 'scm:git:git://github.com/elki-project/elki.git'
+      developerConnection 'scm:git:ssh://git@github.com/elki-project/elki.git'
+    }
+    organization {
+      name "ELKI Development Team"
+      url "https://elki-project.github.io/team"
+    }
+    developers {
+      developer {
+        name "Erich Schubert"
+      }
+      developer {
+        name "Arthur Zimek"
+      }
+    }
+  }
+} }
+
+def unusedSignPom(pom) { pom.withXml {
+  // Store pom for signing
+  def pomFile = file("${project.buildDir}/generated-pom.xml")
+  writeTo(pomFile)
+  def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+  artifact(pomAscFile) {
+    classifier = null
+    extension = 'pom.asc'
+  }
+} }
+
+if (needsSigning) { subprojects { // We only publish subprojects
+  apply plugin: 'signing'
+  task signPom(type: Sign) {
+    sign project.file("${project.buildDir}/publications/maven/pom-default.xml")
+    outputs.upToDateWhen { false }
+    // onlyIf { needsSigning }
+  }
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        from components.java
+        artifact(sourceJar)  { classifier = 'sources' }
+        artifact(javadocJar) { classifier = 'javadoc' }
+        customizePom(pom, project)
+
+        if (needsSigning && false) {
+          project.tasks.withType(Sign) {
+            signatures.all {
+              def type = it.type.equals('xml.asc') ? 'pom.asc' : it.type
+              artifact source: it.file, classifier: it.classifier, extension: type
+            }
+          }
+        }
+      }
+      // if (project.shadow) shadow(MavenPublication) { publication -> project.shadow.component(publication) }
+    }
+    // For publishing to maven central.
+    // Add the sonatype data to gradle.properties!
+    repositories {
+      maven {
+        url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+        if (project.hasProperty("sonatypeUsername"))
+          credentials {
+            username sonatypeUsername
+            password sonatypePassword
+          }
+      }
+    }
+  }
+  signing {
+    useGpgCmd()
+    required { needsSigning && gradle.taskGraph.hasTask("uploadArchives") }
+    // sign configurations.archives
+    sign publishing.publications.maven
+  }
+  model {
+    // tasks.publishMavenPublicationToMavenLocal { dependsOn project.tasks.withType(Sign) }
+    tasks.publishMavenPublicationToMavenRepository { dependsOn project.tasks.withType(Sign) }
+    tasks.signPom { dependsOn tasks.generatePomFileForMavenPublication }
+  }
+} }

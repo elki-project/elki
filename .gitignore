@@ -1,11 +1,32 @@
-/**/target/
-/**/build/
-/**/bin/
+# Generic backup files
+/**/*~
+/**/*.bak
+/**/*.sav
+/**/.DS_Store
+# Eclipse
 /**/.project
 /**/.settings
 /**/.classpath
+# IntelliJ
+/**/*.iml
+/**/*.iws
+/**/*.ipr
+/**/.idea/
+# NetBeans
+/**/nbproject/private/
+/**/nbbuild/
+/**/dist/
+/**/nbdist/
+/**/nbactions.xml
+/**/nb-configuration.xml
+# Output folders and files
+/**/target/
+/**/build/
+/**/bin/
+/elki-bundle*.jar
+# Build and configuration
 /**/.gradle
-/**/*~
+/**/gradle.properties
+# Usage
 /MiniGUI-saved-settings.txt
 /local/
-/elki-bundle*.jar
