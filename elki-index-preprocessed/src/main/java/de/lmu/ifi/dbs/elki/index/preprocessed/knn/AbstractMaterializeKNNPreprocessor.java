@@ -137,6 +137,9 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
   @Override
   public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, Object... hints) {
+    if(distQ != distanceQuery && !distanceFunction.equals(distQ.getDistanceFunction())) {
+      return null;
+    }
     // k max supported?
     for(Object hint : hints) {
       if(hint instanceof Integer) {
