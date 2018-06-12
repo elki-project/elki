@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the Variance of Volume algorithm.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class VarianceOfVolumeTest extends AbstractOutlierAlgorithmTest {
   @Test
@@ -41,7 +41,7 @@ public class VarianceOfVolumeTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<VarianceOfVolume<DoubleVector>>(VarianceOfVolume.class) //
         .with(VarianceOfVolume.Parameterizer.K_ID, 10) //
         .build().run(db);
-    testSingleScore(result, 1293, 2.0733100852601836e13);
     testAUC(db, "Noise", result, 0.9306946778);
+    testSingleScore(result, 1293, 37.1063484);
   }
 }

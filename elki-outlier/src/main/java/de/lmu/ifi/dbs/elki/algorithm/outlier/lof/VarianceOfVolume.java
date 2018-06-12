@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -64,8 +65,11 @@ import net.jafama.FastMath;
  * The volume is estimated by the distance to the k-nearest neighbor, then the
  * variance of volume is computed.
  *
- * Unfortuately, this approach needs an enormous numerical precision, and may
- * not work for high-dimensional, non-normalized data.
+ * Unfortunately, this approach needs an enormous numerical precision, and may
+ * not work for high-dimensional, non-normalized data. We therefore divide each
+ * volume by the average across the data set. This means values are even less
+ * comparable across data sets, but this avoids some of the numerical problems
+ * of this method.
  *
  * Reference:
  * <p>
@@ -82,9 +86,9 @@ import net.jafama.FastMath;
  * @param <O> the type of data objects handled by this algorithm
  */
 @Reference(authors = "T. Hu, and S. Y. Sung", //
-title = "Detecting pattern-based outliers", //
-booktitle = "Pattern Recognition Letters 24(16)", //
-url = "http://dx.doi.org/10.1016/S0167-8655(03)00165-X")
+    title = "Detecting pattern-based outliers", //
+    booktitle = "Pattern Recognition Letters 24(16)", //
+    url = "http://dx.doi.org/10.1016/S0167-8655(03)00165-X")
 public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -155,6 +159,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Volume", ids.size(), LOG) : null;
     double scaleconst = MathUtil.SQRTPI * FastMath.pow(GammaDistribution.gamma(1 + dim * .5), -1. / dim);
     boolean warned = false;
+    double sum = 0.;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double dk = knnq.getKNNForDBID(iter, k).getKNNDistance();
       double vol = dk > 0 ? MathUtil.powi(dk * scaleconst, dim) : 0.;
@@ -163,7 +168,12 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
         warned = true;
       }
       vols.putDouble(iter, vol);
+      sum += vol;
       LOG.incrementProcessed(prog);
+    }
+    double scaling = ids.size() / sum;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      vols.putDouble(iter, vols.doubleValue(iter) * scaling);
     }
     LOG.ensureCompleted(prog);
   }
@@ -197,7 +207,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
         LOG.warning("Variance of Volumes has hit double precision limits, results are not reliable.");
         warned = true;
       }
-      vov = (knns.size() > 1 && vov < Double.POSITIVE_INFINITY) ? vov / (knns.size() - 1) : Double.POSITIVE_INFINITY;
+      vov = (vov < Double.POSITIVE_INFINITY) ? vov / (knns.size() - 1) : Double.POSITIVE_INFINITY;
       vovs.putDouble(iter, vov);
       // update minimum and maximum
       vovminmax.put(vov);
@@ -243,7 +253,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.intValue();
       }
