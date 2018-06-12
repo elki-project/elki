@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,18 +27,19 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -53,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -115,12 +117,103 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
   @Override
   public OutlierResult run(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    DoubleMinMax minmaxabod = new DoubleMinMax();
+    if(kernelFunction.getClass() == LinearKernelFunction.class) {
+      if(!kNNABOD(db, relation, ids, abodvalues, minmaxabod)) {
+        // Fallback, if we do not have an index.
+        fastABOD(db, relation, ids, abodvalues, minmaxabod);
+      }
+    }
+    else {
+      fastABOD(db, relation, ids, abodvalues, minmaxabod);
+    }
+
+    // Build result representation.
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-Based Outlier Degree", "abod-outlier", abodvalues, relation.getDBIDs());
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
+    return new OutlierResult(scoreMeta, scoreResult);
+  }
+
+  /**
+   * Simpler kNN based, can use more indexing.
+   *
+   * @param db Database
+   * @param relation Data relation
+   * @param ids IDs
+   * @param abodvalues Score storage
+   * @param minmaxabod Min/max storage
+   * @return {@code true} if kNN were available and usable.
+   */
+  private boolean kNNABOD(Database db, Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
+    DistanceQuery<V> dq = db.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
+    KNNQuery<V> knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    boolean squared = true;
+    if(knnq == null) {
+      dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+      knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+      if(knnq == null) {
+        return false;
+      }
+      squared = false;
+    }
+    SimilarityQuery<V> lk = db.getSimilarityQuery(relation, LinearKernelFunction.STATIC);
+    int k1 = k + 1; // We will get the query point back by the knnq.
+
+    MeanVariance s = new MeanVariance();
+    for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
+      KNNList nl = knnq.getKNNForDBID(pA, k1);
+      double simAA = lk.similarity(pA, pA);
+
+      s.reset();
+      DoubleDBIDListIter iB = nl.iter(), iC = nl.iter();
+      for(; iB.valid(); iB.advance()) {
+        double dAB = iB.doubleValue();
+        double simAB = lk.similarity(pA, iB);
+        if(!(dAB > 0.)) {
+          continue;
+        }
+        for(iC.seek(iB.getOffset() + 1); iC.valid(); iC.advance()) {
+          double dAC = iC.doubleValue();
+          double simAC = lk.similarity(pA, iC);
+          if(!(dAC > 0.)) {
+            continue;
+          }
+          // Exploit bilinearity of scalar product:
+          // <B-A, C-A> = <B, C-A> - <A,C-A>
+          // = <B,C> - <B,A> - <A,C> + <A,A>
+          double simBC = lk.similarity(iB, iC);
+          double numerator = simBC - simAB - simAC + simAA;
+          if(squared) {
+            double div = 1. / (dAB * dAC);
+            s.put(numerator * div, FastMath.sqrt(div));
+          }
+          else {
+            double sqrtdiv = 1. / (dAB * dAC);
+            s.put(numerator * sqrtdiv * sqrtdiv, sqrtdiv);
+          }
+        }
+      }
+      final double abof = s.getNaiveVariance();
+      minmaxabod.put(abof);
+      abodvalues.putDouble(pA, abof);
+    }
+    return true;
+  }
+
+  /**
+   * Full kernel-based version.
+   *
+   * @param db Database
+   * @param relation Data relation
+   * @param ids IDs
+   * @param abodvalues Score storage
+   * @param minmaxabod Min/max storage
+   */
+  private void fastABOD(Database db, Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
     // Build a kernel matrix, to make O(n^3) slightly less bad.
     SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
-
-    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
-    DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
     KNNHeap nn = DBIDUtil.newHeap(k);
@@ -166,17 +259,10 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           s.put(numerator * div, FastMath.sqrt(div));
         }
       }
-      // Sample variance probably would probably be better, but the ABOD
-      // publication uses the naive variance.
       final double abof = s.getNaiveVariance();
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
     }
-
-    // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-Based Outlier Degree", "abod-outlier", abodvalues, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   @Override
