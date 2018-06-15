@@ -317,6 +317,10 @@ public class DendrogramVisualization implements VisFactory {
           final int o2 = pos.intValue(pa), p2 = cspol.getStyleForDBID(pa);
           double x2 = coord.getX(o2), y2 = coord.getY(o2),
               y3 = proy.applyAsDouble(h), x3 = coord.combine(o1, o2, y3);
+          if(!Double.isFinite(x1) || !Double.isFinite(y1) || !Double.isFinite(x2) || !Double.isFinite(y2) || !Double.isFinite(x3) || !Double.isFinite(y3)) {
+            LoggingUtil.warning("Infinite or NaN values in dendrogram.");
+            continue;
+          }
           switch(DendrogramVisualization.this.style){
           case RECTANGULAR:
             if(p1 == p2) {
