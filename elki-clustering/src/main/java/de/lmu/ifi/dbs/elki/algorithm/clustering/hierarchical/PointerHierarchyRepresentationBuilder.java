@@ -20,14 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -142,7 +137,6 @@ public class PointerHierarchyRepresentationBuilder {
       prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     }
     assert prototypes != null;
-    assert DBIDUtil.compare(cur, par) > 0 : "By convention, the objects with the larger ID must merge into the one with the smaller.";
     parent.putDBID(cur, par);
     prototypes.putDBID(cur, prototype);
     double olddist = parentDistance.putDouble(cur, distance);
