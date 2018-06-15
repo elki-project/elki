@@ -285,10 +285,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath moveTo(double x, double y) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY //
-        && y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(SVGConstants.PATH_MOVE, x, y);
-    }
+    append(SVGConstants.PATH_MOVE, x, y);
     return this;
   }
 
@@ -632,13 +629,18 @@ public class SVGPath {
    * @param ds coordinates.
    */
   private void append(String action, double... ds) {
+    if(lastaction == null) {
+      assert (action == "M") : "Paths must begin with a move to the initial position!";
+    }
     if(lastaction != action) {
       buf.append(action);
       lastaction = action;
     }
     for(double d : ds) {
-      buf.append(SVGUtil.FMT.format(d));
-      buf.append(' ');
+      if(!Double.isFinite(d)) {
+        throw new IllegalArgumentException("Cannot draw an infinite/NaN position.");
+      }
+      buf.append(SVGUtil.FMT.format(d)).append(' ');
     }
   }
 
@@ -663,6 +665,10 @@ public class SVGPath {
    */
   public Element makeElement(Document document) {
     Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
+    // We usually generate an extra space at the end. Remove it.
+    if(buf.length() > 0 && buf.charAt(buf.length() - 1) == ' ') {
+      buf.setLength(buf.length() - 1);
+    }
     elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
     return elem;
   }
