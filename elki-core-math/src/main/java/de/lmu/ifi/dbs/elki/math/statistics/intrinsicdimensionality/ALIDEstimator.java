@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -108,21 +108,6 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
       }
     }
     return -a / sum;
-  }
-
-  @Override
-  public double estimate(double[] distances) {
-    throw new UnsupportedOperationException("The ALID estimator can only be used with neighbor queries.");
-  }
-
-  @Override
-  public double estimate(double[] distances, int size) {
-    throw new UnsupportedOperationException("The ALID estimator can only be used with neighbor queries.");
-  }
-
-  @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter) {
-    throw new UnsupportedOperationException("The ALID estimator can only be used with neighbor queries.");
   }
 
   @Override
