@@ -88,7 +88,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @param <O> Object type
  */
-@Reference(authors = "C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish", title = "Indexing the distance: An efficient method to knn processing", booktitle = "In Proceedings of the 27th International Conference on Very Large Data Bases", url = "http://www.vldb.org/conf/2001/P421.pdf")
+@Reference(authors = "C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish", //
+    title = "Indexing the distance: An efficient method to knn processing", //
+    booktitle = "Proc. 27th Int. Conf. on Very Large Data Bases", //
+    url = "http://www.vldb.org/conf/2001/P421.pdf")
 public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
@@ -123,7 +126,9 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
   /**
    * Second reference, for documentation generation.
    */
-  @Reference(authors = "H. V. Jagadish, B. C. Ooi, K. L. Tan, C. Yu, R. Zhang", title = "iDistance: An adaptive B+-tree based indexing method for nearest neighbor search", booktitle = "ACM Transactions on Database Systems (TODS), 30(2), 364-397")
+  @Reference(authors = "H. V. Jagadish, B. C. Ooi, K. L. Tan, C. Yu, R. Zhang", //
+      title = "iDistance: An adaptive B+-tree based indexing method for nearest neighbor search", //
+      booktitle = "ACM Transactions on Database Systems (TODS), 30(2), 364-397")
   public static final Void SECOND_REFERENCE = null;
 
   /**
