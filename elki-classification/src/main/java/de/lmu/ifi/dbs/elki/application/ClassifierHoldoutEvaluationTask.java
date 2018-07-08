@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
   /**
    * Indexes to add.
    */
-  protected Collection<IndexFactory<?, ?>> indexFactories;
+  protected Collection<IndexFactory<?>> indexFactories;
 
   /**
    * Classifier to evaluate.
@@ -95,7 +95,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
    * @param algorithm Classification algorithm
    * @param holdout Evaluation holdout
    */
-  public ClassifierHoldoutEvaluationTask(DatabaseConnection databaseConnection, Collection<IndexFactory<?, ?>> indexFactories, Classifier<O> algorithm, Holdout holdout) {
+  public ClassifierHoldoutEvaluationTask(DatabaseConnection databaseConnection, Collection<IndexFactory<?>> indexFactories, Classifier<O> algorithm, Holdout holdout) {
     this.databaseConnection = databaseConnection;
     this.indexFactories = indexFactories;
     this.algorithm = algorithm;
@@ -174,7 +174,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     /**
      * Indexes to add.
      */
-    protected Collection<IndexFactory<?, ?>> indexFactories;
+    protected Collection<IndexFactory<?>> indexFactories;
 
     /**
      * Classifier to evaluate.
@@ -195,7 +195,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
-      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<>(AbstractDatabase.Parameterizer.INDEX_ID, IndexFactory.class, true);
+      final ObjectListParameter<IndexFactory<?>> indexFactoryP = new ObjectListParameter<>(AbstractDatabase.Parameterizer.INDEX_ID, IndexFactory.class, true);
       if(config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }

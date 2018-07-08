@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -105,7 +105,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   /**
    * The relation we predend to index.
    */
-  Relation<O> relation;
+  Relation<? extends O> relation;
 
   /**
    * The view that we really index.
@@ -137,7 +137,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * @param norefine Refinement disable flag.
    * @param kmulti Multiplicator for k
    */
-  public ProjectedIndex(Relation<O> relation, Projection<O, I> proj, Relation<I> view, Index inner, boolean norefine, double kmulti) {
+  public ProjectedIndex(Relation<? extends O> relation, Projection<O, I> proj, Relation<I> view, Index inner, boolean norefine, double kmulti) {
     super();
     this.relation = relation;
     this.view = view;
@@ -413,7 +413,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * @param <O> Outer object type.
    * @param <I> Inner object type.
    */
-  public static class Factory<O, I> implements IndexFactory<O, ProjectedIndex<O, I>> {
+  public static class Factory<O, I> implements IndexFactory<O> {
     /**
      * Projection to use.
      */
@@ -422,7 +422,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     /**
      * Inner index factory.
      */
-    IndexFactory<I, ?> inner;
+    IndexFactory<I> inner;
 
     /**
      * Whether to use a materialized view, or a virtual view.
@@ -448,7 +448,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * @param norefine Disable refinement of distances
      * @param kmulti Multiplicator for k.
      */
-    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize, boolean norefine, double kmulti) {
+    public Factory(Projection<O, I> proj, IndexFactory<I> inner, boolean materialize, boolean norefine, double kmulti) {
       super();
       this.proj = proj;
       this.inner = inner;
@@ -532,7 +532,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       /**
        * Inner index factory.
        */
-      IndexFactory<I, ?> inner;
+      IndexFactory<I> inner;
 
       /**
        * Whether to use a materialized view, or a virtual view.
@@ -556,7 +556,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         if(config.grab(projP)) {
           proj = projP.instantiateClass(config);
         }
-        ObjectParameter<IndexFactory<I, ?>> innerP = new ObjectParameter<>(INDEX_ID, IndexFactory.class);
+        ObjectParameter<IndexFactory<I>> innerP = new ObjectParameter<>(INDEX_ID, IndexFactory.class);
         if(config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,23 +39,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
- * @param <I> index type
+ * @param <F> index type
  */
-public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> implements IndexBasedSimilarityFunction<O> {
+public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFactory<O>> implements IndexBasedSimilarityFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
    * Key: {@code -similarityfunction.preprocessor}
    * </p>
    */
-  protected IndexFactory<O, I> indexFactory;
+  protected F indexFactory;
 
   /**
    * Constructor.
    * 
    * @param indexFactory
    */
-  public AbstractIndexBasedSimilarityFunction(IndexFactory<O, I> indexFactory) {
+  public AbstractIndexBasedSimilarityFunction(F indexFactory) {
     super();
     this.indexFactory = indexFactory;
   }
@@ -124,7 +124,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> i
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
     /**
      * Parameter to specify the preprocessor to be used.
      * <p>

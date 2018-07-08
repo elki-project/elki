@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,22 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> Object type
  */
-public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeIndex<O>, MkAppTreeSettings<O>> {
-  /**
-   * Parameter for nolog
-   */
-  public static final OptionID NOLOG_ID = new OptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
-
-  /**
-   * Parameter for k
-   */
-  public static final OptionID K_ID = new OptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Parameter for p
-   */
-  public static final OptionID P_ID = new OptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
-
+public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
   /**
    * Constructor.
    * 
@@ -88,6 +73,21 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
+    /**
+     * Parameter for nolog
+     */
+    public static final OptionID NOLOG_ID = new OptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
+
+    /**
+     * Parameter for k
+     */
+    public static final OptionID K_ID = new OptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
+
+    /**
+     * Parameter for p
+     */
+    public static final OptionID P_ID = new OptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

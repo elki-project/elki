@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdKNNTree<O>, RdkNNSettings> {
+public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdkNNSettings> {
   /**
    * Parameter for k
    */

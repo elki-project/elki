@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * 
  * @param <O> Object type
  */
-@Alias({"rstar", "r*"})
-public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, RTreeSettings> {
+@Alias({ "rstar", "r*" })
+public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RTreeSettings> {
   /**
    * Constructor.
    * 

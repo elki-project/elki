@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @apiviz.uses 
+ * @apiviz.uses
  *              de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
  *              .Factory
  * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - -
@@ -44,13 +44,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractIndexBasedDistanceFunction<O, SharedNearestNeighborIndex<O>> {
+public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractIndexBasedDistanceFunction<O, SharedNearestNeighborIndex.Factory<O>> {
   /**
    * Constructor.
    * 
    * @param indexFactory Index factory.
    */
-  public SharedNearestNeighborJaccardDistanceFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+  public SharedNearestNeighborJaccardDistanceFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
     super(indexFactory);
   }
 
@@ -135,7 +135,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractIndexBasedDistanceFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O> extends AbstractIndexBasedDistanceFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

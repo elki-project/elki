@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,9 +61,9 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector> ext
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
    */
-  public abstract static class Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I> {
+  public abstract static class Factory<V extends NumberVector> implements PreferenceVectorIndex.Factory<V> {
     @Override
-    public abstract I instantiate(Relation<V> relation);
+    public abstract PreferenceVectorIndex<V> instantiate(Relation<V> relation);
 
     @Override
     public TypeInformation getInputTypeRestriction() {

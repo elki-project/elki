@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,12 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> Object type
  */
-public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O>, MkCoPEntry, MkCoPTreeIndex<O>, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
-  /**
-   * Parameter for k
-   */
-  public static final OptionID K_ID = new OptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
-
+public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
   /**
    * Constructor.
    * 
@@ -78,6 +73,11 @@ public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
+    /**
+     * Parameter for k
+     */
+    public static final OptionID K_ID = new OptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

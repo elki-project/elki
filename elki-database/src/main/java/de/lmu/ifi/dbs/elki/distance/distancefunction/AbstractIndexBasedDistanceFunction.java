@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,23 +39,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of object to compute the distances in between
- * @param <I> the type of Index used
+ * @param <F> the index factory type
  */
-public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index> extends AbstractDatabaseDistanceFunction<O> implements IndexBasedDistanceFunction<O> {
+public abstract class AbstractIndexBasedDistanceFunction<O, F extends IndexFactory<O>> extends AbstractDatabaseDistanceFunction<O> implements IndexBasedDistanceFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
    * Key: {@code -distancefunction.preprocessor}
    * </p>
    */
-  protected IndexFactory<O, I> indexFactory;
+  protected F indexFactory;
 
   /**
    * Constructor.
    * 
    * @param indexFactory Index factory
    */
-  public AbstractIndexBasedDistanceFunction(IndexFactory<O, I> indexFactory) {
+  public AbstractIndexBasedDistanceFunction(F indexFactory) {
     super();
     this.indexFactory = indexFactory;
   }
@@ -139,7 +139,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index> ext
    * 
    * @param <F> Factory type
    */
-  public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
     /**
      * The index factory we use.
      */

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,9 +53,8 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
    * @apiviz.uses FilteredLocalPCAIndex oneway - - «create»
    *
    * @param <NV> Vector type
-   * @param <I> Index type produced
    */
-  interface Factory<NV extends NumberVector, I extends FilteredLocalPCAIndex<NV>> extends IndexFactory<NV, I> {
+  interface Factory<NV extends NumberVector> extends IndexFactory<NV> {
     /**
      * Instantiate the index for a given database.
      *
@@ -64,6 +63,6 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector> extends Index {
      * @return Index
      */
     @Override
-    I instantiate(Relation<NV> relation);
+    FilteredLocalPCAIndex<NV> instantiate(Relation<NV> relation);
   }
 }

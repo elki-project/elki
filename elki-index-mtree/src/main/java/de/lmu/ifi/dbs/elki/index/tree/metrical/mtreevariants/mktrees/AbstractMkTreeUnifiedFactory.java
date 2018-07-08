@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, I extends AbstractMkTree<O, N, E, S> & Index, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory<O, N, E, I, S> {
+public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory<O, N, E, S> {
   /**
    * Constructor.
    * 
@@ -84,6 +83,6 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, N, E, ?, S> makeInstance();
+    protected abstract AbstractMkTreeUnifiedFactory<O, N, E, S> makeInstance();
   }
 }

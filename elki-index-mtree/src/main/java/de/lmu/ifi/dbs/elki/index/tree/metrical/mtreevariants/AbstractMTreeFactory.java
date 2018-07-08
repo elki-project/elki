@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.PagedIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MinimumEnlargementInsert;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, I extends AbstractMTree<O, N, E, S> & Index, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory<O> {
   /**
    * Tree settings.
    */
@@ -119,15 +118,15 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
       super.makeOptions(config);
       settings = makeSettings();
       ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-      if (config.grab(distanceFunctionP)) {
+      if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
       ObjectParameter<MTreeSplit<O, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
-      if (config.grab(splitStrategyP)) {
+      if(config.grab(splitStrategyP)) {
         settings.splitStrategy = splitStrategyP.instantiateClass(config);
       }
       ObjectParameter<MTreeInsert<O, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
-      if (config.grab(insertStrategyP)) {
+      if(config.grab(insertStrategyP)) {
         settings.insertStrategy = insertStrategyP.instantiateClass(config);
       }
     }
@@ -135,6 +134,6 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     abstract protected S makeSettings();
 
     @Override
-    protected abstract AbstractMTreeFactory<O, N, E, ?, ?> makeInstance();
+    protected abstract AbstractMTreeFactory<O, N, E, ?> makeInstance();
   }
 }

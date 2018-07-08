@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,77 +41,72 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * @apiviz.composedOf PageFileFactory
  * 
- * @param <O>
- *            Object type
- * @param <I>
- *            Index type
+ * @param <O> Object type
  */
-public abstract class PagedIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
-	/**
-	 * Page file factory.
-	 */
-	private PageFileFactory<?> pageFileFactory;
+public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
+  /**
+   * Page file factory.
+   */
+  private PageFileFactory<?> pageFileFactory;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param pageFileFactory
-	 *            Page file factory
-	 */
-	public PagedIndexFactory(PageFileFactory<?> pageFileFactory) {
-		super();
-		this.pageFileFactory = pageFileFactory;
-	}
+  /**
+   * Constructor.
+   * 
+   * @param pageFileFactory
+   *        Page file factory
+   */
+  public PagedIndexFactory(PageFileFactory<?> pageFileFactory) {
+    super();
+    this.pageFileFactory = pageFileFactory;
+  }
 
-	/**
-	 * Make the page file for this index.
-	 * 
-	 * @param <N>
-	 *            page type
-	 * @param cls
-	 *            Class information
-	 * @return Page file
-	 */
-	protected <N extends Page & Externalizable> PageFile<N> makePageFile(Class<N> cls) {
-		@SuppressWarnings("unchecked")
-		final PageFileFactory<N> castFactory = (PageFileFactory<N>) pageFileFactory;
-		return castFactory.newPageFile(cls);
-	}
+  /**
+   * Make the page file for this index.
+   * 
+   * @param <N>
+   *        page type
+   * @param cls
+   *        Class information
+   * @return Page file
+   */
+  protected <N extends Page & Externalizable> PageFile<N> makePageFile(Class<N> cls) {
+    @SuppressWarnings("unchecked")
+    final PageFileFactory<N> castFactory = (PageFileFactory<N>) pageFileFactory;
+    return castFactory.newPageFile(cls);
+  }
 
-	/**
-	 * Parameterization class.
-	 * 
-	 * @author Erich Schubert
-	 * 
-	 * @apiviz.exclude
-	 */
-	public abstract static class Parameterizer<O> extends AbstractParameterizer {
-		/**
-		 * Optional parameter that specifies the factory type of pagefile to use
-		 * for the index.
-		 * <p>
-		 * Key: {@code -index.pagefile}
-		 * </p>
-		 */
-		public static final OptionID PAGEFILE_ID = new OptionID("index.pagefile",
-				"The pagefile factory for storing the index.");
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+    /**
+     * Optional parameter that specifies the factory type of pagefile to use
+     * for the index.
+     * <p>
+     * Key: {@code -index.pagefile}
+     * </p>
+     */
+    public static final OptionID PAGEFILE_ID = new OptionID("index.pagefile", "The pagefile factory for storing the index.");
 
-		/**
-		 * Page file factory.
-		 */
-		protected PageFileFactory<?> pageFileFactory;
+    /**
+     * Page file factory.
+     */
+    protected PageFileFactory<?> pageFileFactory;
 
-		@Override
-		protected void makeOptions(Parameterization config) {
-			super.makeOptions(config);
-			ObjectParameter<PageFileFactory<?>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class,
-					MemoryPageFileFactory.class);
-			if (config.grab(pffP)) {
-				pageFileFactory = pffP.instantiateClass(config);
-			}
-		}
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<PageFileFactory<?>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class, MemoryPageFileFactory.class);
+      if(config.grab(pffP)) {
+        pageFileFactory = pffP.instantiateClass(config);
+      }
+    }
 
-		@Override
-		protected abstract PagedIndexFactory<O, ?> makeInstance();
-	}
+    @Override
+    protected abstract PagedIndexFactory<O> makeInstance();
+  }
 }

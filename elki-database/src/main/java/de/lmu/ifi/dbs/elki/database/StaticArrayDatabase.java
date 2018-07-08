@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -86,7 +86,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
    * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
-  public StaticArrayDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?, ?>> indexFactories) {
+  public StaticArrayDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?>> indexFactories) {
     super();
     this.databaseConnection = databaseConnection;
     this.ids = null;
@@ -154,10 +154,10 @@ public class StaticArrayDatabase extends AbstractDatabase {
         getHierarchy().add(this, relation);
 
         // Try to add indexes where appropriate
-        for(IndexFactory<?, ?> factory : indexFactories) {
+        for(IndexFactory<?> factory : indexFactories) {
           if(factory.getInputTypeRestriction().isAssignableFromType(ometa)) {
             @SuppressWarnings("unchecked")
-            final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
+            final IndexFactory<Object> ofact = (IndexFactory<Object>) factory;
             @SuppressWarnings("unchecked")
             final Relation<Object> orep = (Relation<Object>) relation;
             final Index index = ofact.instantiate(orep);
@@ -197,7 +197,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
     /**
      * Indexes to add.
      */
-    private Collection<IndexFactory<?, ?>> indexFactories;
+    private Collection<IndexFactory<?>> indexFactories;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -208,7 +208,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
-      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<>(INDEX_ID, IndexFactory.class, true);
+      final ObjectListParameter<IndexFactory<?>> indexFactoryP = new ObjectListParameter<>(INDEX_ID, IndexFactory.class, true);
       if(config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }

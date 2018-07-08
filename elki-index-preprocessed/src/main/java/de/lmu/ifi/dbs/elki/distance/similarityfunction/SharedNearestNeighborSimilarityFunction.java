@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,20 +36,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * @since 0.2
  * 
- * @apiviz.has 
+ * @apiviz.has
  *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
  *             .Factory
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
  */
-public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>> {
+public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex.Factory<O>> {
   /**
    * Constructor.
    * 
    * @param indexFactory Index factory.
    */
-  public SharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+  public SharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
     super(indexFactory);
   }
 
@@ -137,7 +137,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

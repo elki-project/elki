@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
@@ -41,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @author Erich Schubert
  * 
  * @param <O> object type
- * @param <X> actual tree type
+ * @param <N> node type
  */
-public abstract class AbstractXTreeFactory<O extends NumberVector, N extends AbstractXTreeNode<N>, X extends AbstractRStarTree<N, SpatialEntry, XTreeSettings> & Index> extends AbstractRStarTreeFactory<O, N, SpatialEntry, X, XTreeSettings> {
+public abstract class AbstractXTreeFactory<O extends NumberVector, N extends AbstractXTreeNode<N>> extends AbstractRStarTreeFactory<O, N, SpatialEntry, XTreeSettings> {
   /**
    * Constructor.
    * 
@@ -109,24 +107,24 @@ public abstract class AbstractXTreeFactory<O extends NumberVector, N extends Abs
       final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, 0.3);
       MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if (config.grab(MIN_FANOUT_PARAMETER)) {
+      if(config.grab(MIN_FANOUT_PARAMETER)) {
         settings.relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
       }
       final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, 0.3);
       REINSERT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       REINSERT_PARAMETER.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if (config.grab(REINSERT_PARAMETER)) {
+      if(config.grab(REINSERT_PARAMETER)) {
         float reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
         settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
       }
       final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
       MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if (config.grab(MAX_OVERLAP_PARAMETER)) {
+      if(config.grab(MAX_OVERLAP_PARAMETER)) {
         settings.max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
       }
       final EnumParameter<XTreeSettings.Overlap> OVERLAP_TYPE_PARAMETER = new EnumParameter<>(OVERLAP_TYPE_ID, XTreeSettings.Overlap.class, XTreeSettings.Overlap.VOLUME_OVERLAP);
-      if (config.grab(OVERLAP_TYPE_PARAMETER)) {
+      if(config.grab(OVERLAP_TYPE_PARAMETER)) {
         settings.overlap_type = OVERLAP_TYPE_PARAMETER.getValue();
       }
     }

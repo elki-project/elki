@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,15 +34,14 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @apiviz.excludeSubtypes
  *
  * @param <V> Input object type
- * @param <I> Index type
  */
-public interface IndexFactory<V, I extends Index> {
+public interface IndexFactory<V> {
   /**
    * Sets the database in the distance function of this index (if existing).
    * 
    * @param relation the relation to index
    */
-  I instantiate(Relation<V> relation);
+  Index instantiate(Relation<V> relation);
 
   /**
    * Get the input type restriction used for negotiating the data query.

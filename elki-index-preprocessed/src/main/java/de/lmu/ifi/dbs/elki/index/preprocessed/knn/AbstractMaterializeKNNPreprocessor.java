@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -146,7 +146,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
         break;
       }
     }
-    return new PreprocessorKNNQuery<>(relation, this);
+    return new PreprocessorKNNQuery<O>(relation, this);
   }
 
   /**
@@ -160,7 +160,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
    *
    * @param <O> The object type
    */
-  public abstract static class Factory<O> implements IndexFactory<O, KNNIndex<O>> {
+  public abstract static class Factory<O> implements IndexFactory<O> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * materialized. must be an integer greater than 1.

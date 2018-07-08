@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,9 +52,8 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
    * @apiviz.uses PreferenceVectorIndex oneway - - «create»
    * 
    * @param <V> vector type
-   * @param <I> index type
    */
-  interface Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
+  interface Factory<V extends NumberVector> extends IndexFactory<V> {
     /**
      * Instantiate the index for a given database.
      * 
@@ -63,6 +62,6 @@ public interface PreferenceVectorIndex<NV extends NumberVector> extends Index {
      * @return Index
      */
     @Override
-    I instantiate(Relation<V> relation);
+    PreferenceVectorIndex<V> instantiate(Relation<V> relation);
   }
 }

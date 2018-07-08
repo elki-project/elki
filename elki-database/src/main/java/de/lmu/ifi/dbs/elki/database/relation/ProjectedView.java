@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
   /**
    * The wrapped representation where we get the IDs from.
    */
-  private final Relation<IN> inner;
+  private final Relation<? extends IN> inner;
 
   /**
    * The projection we use.
@@ -58,7 +58,7 @@ public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
    * @param inner Inner relation
    * @param projection Projection function
    */
-  public ProjectedView(Relation<IN> inner, Projection<IN, OUT> projection) {
+  public ProjectedView(Relation<? extends IN> inner, Projection<IN, OUT> projection) {
     super();
     this.inner = inner;
     this.projection = projection;

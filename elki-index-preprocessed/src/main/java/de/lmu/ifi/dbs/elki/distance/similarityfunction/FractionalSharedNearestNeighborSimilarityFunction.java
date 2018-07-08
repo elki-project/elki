@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,20 +36,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * @since 0.2
  * 
- * @apiviz.has 
+ * @apiviz.has
  *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
  *             .Factory
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
  */
-public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>> implements NormalizedSimilarityFunction<O> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex.Factory<O>> implements NormalizedSimilarityFunction<O> {
   /**
    * Constructor.
    * 
    * @param indexFactory Index factory.
    */
-  public FractionalSharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+  public FractionalSharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O> indexFactory) {
     super(indexFactory);
   }
 
@@ -97,15 +97,17 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
       int intersection = 0;
       DBIDIter iter1 = neighbors1.iter();
       DBIDIter iter2 = neighbors2.iter();
-      while (iter1.valid() && iter2.valid()) {
+      while(iter1.valid() && iter2.valid()) {
         final int comp = DBIDUtil.compare(iter1, iter2);
-        if (comp == 0) {
+        if(comp == 0) {
           intersection++;
           iter1.advance();
           iter2.advance();
-        } else if (comp < 0) {
+        }
+        else if(comp < 0) {
           iter1.advance();
-        } else // iter2 < iter1
+        }
+        else // iter2 < iter1
         {
           iter2.advance();
         }
@@ -136,7 +138,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
    * 
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

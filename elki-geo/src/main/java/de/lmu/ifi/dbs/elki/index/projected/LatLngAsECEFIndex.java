@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,7 +87,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
    * @param inner Index to wrap.
    * @param norefine Refinement disable flag.
    */
-  public LatLngAsECEFIndex(Relation<O> relation, Projection<O, O> proj, Relation<O> view, Index inner, boolean norefine) {
+  public LatLngAsECEFIndex(Relation<? extends O> relation, Projection<O, O> proj, Relation<O> view, Index inner, boolean norefine) {
     super(relation, proj, view, inner, norefine, 1.0);
   }
 
@@ -199,7 +199,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
      * @param norefine Flag to disable refinement of distances
      * @param model Earth model
      */
-    public Factory(IndexFactory<O, ?> inner, boolean materialize, boolean norefine, EarthModel model) {
+    public Factory(IndexFactory<O> inner, boolean materialize, boolean norefine, EarthModel model) {
       super(new LatLngToECEFProjection<O>(model), inner, materialize, norefine, 1.0);
     }
 
@@ -241,7 +241,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
       /**
        * Inner index factory.
        */
-      IndexFactory<O, ?> inner;
+      IndexFactory<O> inner;
 
       /**
        * Whether to use a materialized view, or a virtual view.
@@ -266,7 +266,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
           model = modelP.instantiateClass(config);
         }
 
-        ObjectParameter<IndexFactory<O, ?>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
+        ObjectParameter<IndexFactory<O>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
         if(config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }

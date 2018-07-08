@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  */
 @Alias({ "mtree", "m" })
-public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTreeEntry, MTreeIndex<O>, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
+public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * Constructor.
    * 

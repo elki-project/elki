@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -475,7 +475,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
    * @param <O> Vector type
    */
   @Alias({ "smallkd", "kd" })
-  public static class Factory<O extends NumberVector> implements IndexFactory<O, SmallMemoryKDTree<O>> {
+  public static class Factory<O extends NumberVector> implements IndexFactory<O> {
     /**
      * Maximum size of leaf nodes.
      */

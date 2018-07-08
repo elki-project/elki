@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -88,8 +88,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     MetricalIndexTree<O, N, E> index = getMetricalIndex(relation);
 
     createStorage();
-    MeanVariance pagesize = new MeanVariance();
-    MeanVariance ksize = new MeanVariance();
+    MeanVariance pagesize = new MeanVariance(), ksize = new MeanVariance();
     if(log.isVerbose()) {
       log.verbose("Approximating nearest neighbor lists to database objects");
     }
@@ -151,7 +150,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
-  private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
+  private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<? extends O> relation) throws IllegalStateException {
     MetricalIndexTree<O, N, E> ret = null;
     for(It<MetricalIndexTree<O, N, E>> iter = relation.getHierarchy().iterDescendants(relation).filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {

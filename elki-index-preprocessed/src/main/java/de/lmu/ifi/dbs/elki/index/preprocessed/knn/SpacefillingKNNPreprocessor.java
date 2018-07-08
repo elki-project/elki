@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -410,7 +410,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
    *
    * @apiviz.has SpacefillingKNNPreprocessor
    */
-  public static class Factory<V extends NumberVector> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
+  public static class Factory<V extends NumberVector> implements IndexFactory<V> {
     /**
      * Spatial curve generators
      */

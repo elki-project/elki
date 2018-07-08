@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -238,7 +238,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    *
    * @param <O> Object type
    */
-  public abstract static class Factory<O, I extends AbstractCoverTree<O>> implements IndexFactory<O, I> {
+  public abstract static class Factory<O> implements IndexFactory<O> {
     /**
      * Holds the instance of the trees distance function.
      */

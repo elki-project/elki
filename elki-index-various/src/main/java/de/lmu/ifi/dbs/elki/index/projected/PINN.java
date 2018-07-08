@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,7 +68,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
    * @param h Neighborhood size multiplicator
    * @param random Random generator factory
    */
-  public PINN(IndexFactory<O, ?> inner, int t, double s, double h, RandomFactory random) {
+  public PINN(IndexFactory<O> inner, int t, double s, double h, RandomFactory random) {
     super(new RandomProjection<O>(t, new AchlioptasRandomProjectionFamily(s, random)), inner, true, false, h);
   }
 
@@ -105,7 +105,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     /**
      * Inner index factory.
      */
-    IndexFactory<O, ?> inner;
+    IndexFactory<O> inner;
 
     /**
      * Dimensionality.
@@ -130,7 +130,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<IndexFactory<O, ?>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
+      ObjectParameter<IndexFactory<O>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
       if(config.grab(innerP)) {
         inner = innerP.instantiateClass(config);
       }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
-public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O, XTreeNode, XTreeIndex<O>> {
+public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O, XTreeNode> {
   public XTreeFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
     super(pageFileFactory, settings);
   }
@@ -40,7 +40,7 @@ public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O
   protected Class<XTreeNode> getNodeClass() {
     return XTreeNode.class;
   }
-  
+
   public static class Parameterizer<O extends NumberVector> extends AbstractXTreeFactory.Parameterizer<O> {
     @Override
     protected XTreeFactory<O> makeInstance() {

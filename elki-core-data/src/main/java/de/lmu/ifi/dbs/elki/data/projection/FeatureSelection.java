@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -88,7 +88,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
 
   @SuppressWarnings("unchecked")
   @Override
-  public void initialize(SimpleTypeInformation<V> in) {
+  public void initialize(SimpleTypeInformation<? extends V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
     factory = (FeatureVector.Factory<V, F>) vin.getFactory();
     if(vin.getDimensionality() < mindim) {

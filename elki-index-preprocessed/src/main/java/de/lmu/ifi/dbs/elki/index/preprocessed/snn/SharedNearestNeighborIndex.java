@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,9 +57,8 @@ public interface SharedNearestNeighborIndex<O> extends Index {
    * @apiviz.uses SharedNearestNeighborIndex oneway - - «create»
    * 
    * @param <O> The input object type
-   * @param <I> Index type produced
    */
-  interface Factory<O, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
+  interface Factory<O> extends IndexFactory<O> {
     /**
      * Instantiate the index for a given database.
      * 
@@ -68,7 +67,7 @@ public interface SharedNearestNeighborIndex<O> extends Index {
      * @return Index
      */
     @Override
-    I instantiate(Relation<O> database);
+    SharedNearestNeighborIndex<O> instantiate(Relation<O> database);
 
     /**
      * Get the number of neighbors

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -123,7 +123,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
    * @apiviz.landmark
    * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory<V extends NumberVector> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
+  public static class Factory<V extends NumberVector> extends AbstractFilteredPCAIndex.Factory<V> {
     /**
      * Number of neighbors to query.
      */
@@ -181,7 +181,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter kP = new IntParameter(K_ID) //
-        .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(kP)) {
           k = kP.intValue();
         }

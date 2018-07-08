@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * 
  * @param <O> Object type
  */
-public class MkMaxTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkMaxTreeNode<O>, MkMaxEntry, MkMaxTreeIndex<O>, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
+public class MkMaxTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkMaxTreeNode<O>, MkMaxEntry, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
   /**
    * Constructor.
    * 

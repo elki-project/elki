@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -449,7 +449,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @param <V> Data type.
    */
-  public static class Factory<V> implements IndexFactory<V, InMemoryIDistanceIndex<V>> {
+  public static class Factory<V> implements IndexFactory<V> {
     /**
      * Distance function to use.
      */

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -416,7 +416,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector> implements IndexFactory<V, VAFile<V>> {
+  public static class Factory<V extends NumberVector> implements IndexFactory<V> {
     /**
      * Number of partitions to use in each dimension.
      * 

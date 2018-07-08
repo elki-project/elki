@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.PagedIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
@@ -51,9 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
- * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E, S> & Index, S extends RTreeSettings> extends PagedIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends RTreeSettings> extends PagedIndexFactory<O> {
   /**
    * Tree settings
    */
@@ -161,6 +159,6 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     }
 
     @Override
-    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?, ?> makeInstance();
+    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance();
   }
 }

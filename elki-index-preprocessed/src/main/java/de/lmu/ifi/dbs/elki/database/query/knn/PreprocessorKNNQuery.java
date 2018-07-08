@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
    * @param relation Relation to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Relation<O> relation, AbstractMaterializeKNNPreprocessor<O> preprocessor) {
+  public PreprocessorKNNQuery(Relation<? extends O> relation, AbstractMaterializeKNNPreprocessor<O> preprocessor) {
     super();
     this.relation = relation;
     this.preprocessor = preprocessor;

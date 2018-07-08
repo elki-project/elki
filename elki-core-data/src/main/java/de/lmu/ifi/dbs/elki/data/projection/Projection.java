@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ public interface Projection<IN, OUT> {
    * 
    * @param in Data type to use for projecting.
    */
-  void initialize(SimpleTypeInformation<IN> in);
+  void initialize(SimpleTypeInformation<? extends IN> in);
 
   /**
    * Project a single instance.

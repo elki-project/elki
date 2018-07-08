@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -146,7 +146,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public abstract static class Factory<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I> {
+  public abstract static class Factory<NV extends NumberVector> implements FilteredLocalPCAIndex.Factory<NV> {
     /**
      * Holds the instance of the distance function specified by
      * {@link Parameterizer#PCA_DISTANCE_ID}.
@@ -178,7 +178,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
     }
 
     @Override
-    public abstract I instantiate(Relation<NV> relation);
+    public abstract AbstractFilteredPCAIndex<NV> instantiate(Relation<NV> relation);
 
     @Override
     public TypeInformation getInputTypeRestriction() {
