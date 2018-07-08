@@ -124,7 +124,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param ids Object IDs
    * @return Data store
    */
-  @SuppressWarnings("unchecked")
   public WritableDataStore<KNNList> run(Relation<V> relation, DBIDs ids) {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
@@ -133,8 +132,20 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     if(indexes.size() != 1) {
       throw new MissingPrerequisitesException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
-    // FIXME: Ensure were looking at the right relation!
     SpatialIndexTree<N, E> index = indexes.iterator().next();
+    return run(index, ids);
+  }
+
+  /**
+   * Inner run method. This returns a double store, and is used by
+   * {@link de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor}
+   *
+   * @param index Index to process
+   * @param ids Object IDs
+   * @return Data store
+   */
+  public WritableDataStore<KNNList> run(SpatialIndexTree<N, E> index, DBIDs ids) {
+    @SuppressWarnings("unchecked")
     SpatialPrimitiveDistanceFunction<V> distFunction = (SpatialPrimitiveDistanceFunction<V>) getDistanceFunction();
 
     // data pages
@@ -144,9 +155,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
     // Initialize with the page self-pairing
     for(int i = 0; i < ps_candidates.size(); i++) {
-      E pr_entry = ps_candidates.get(i);
-      N pr = index.getNode(pr_entry);
-      heaps.add(initHeaps(distFunction, pr));
+      heaps.add(initHeaps(distFunction, index.getNode(ps_candidates.get(i))));
     }
 
     // Build priority queue
@@ -197,13 +206,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
         if(dor && dos) {
           processDataPages(distFunction, pr_heaps, ps_heaps, pr, ps);
         }
-        else {
-          if(dor) {
-            processDataPages(distFunction, pr_heaps, null, pr, ps);
-          }
-          else /* dos */ {
-            processDataPages(distFunction, ps_heaps, null, ps, pr);
-          }
+        else if(dor) {
+          processDataPages(distFunction, pr_heaps, null, pr, ps);
+        }
+        else /* if(dos) */ {
+          processDataPages(distFunction, ps_heaps, null, ps, pr);
         }
         LOG.incrementProcessed(fprogress);
       }

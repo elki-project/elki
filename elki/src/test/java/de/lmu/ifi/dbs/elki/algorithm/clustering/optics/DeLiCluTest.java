@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,12 +29,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full DeLiClu run, and compares the result with a clustering
@@ -53,16 +50,13 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
    */
   @Test
   public void testDeLiCluResults() {
-    ListParameterization indexparams = new ListParameterization();
-    // We need a special index for this algorithm:
-    indexparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, DeLiCluTreeFactory.class);
-    indexparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000);
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
         .with(DeLiClu.Parameterizer.MINPTS_ID, 18) //
         .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000) //
         .build().run(db);
     // Test F-Measure
     Clustering<Model> rbl = new ByLabelClustering().run(db);
