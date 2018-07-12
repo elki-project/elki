@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,5 +37,7 @@ public interface VisualizationMenuAction extends VisualizationItem {
    *
    * @return {@code true} when enabled.
    */
-  boolean enabled();
+  default boolean enabled() {
+    return true;
+  }
 }

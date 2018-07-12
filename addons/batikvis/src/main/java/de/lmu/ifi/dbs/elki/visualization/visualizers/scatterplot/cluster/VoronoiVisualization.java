@@ -183,11 +183,6 @@ public class VoronoiVisualization implements VisFactory {
       }
       context.visChanged(task);
     }
-
-    @Override
-    public boolean enabled() {
-      return true;
-    }
   }
 
   /**

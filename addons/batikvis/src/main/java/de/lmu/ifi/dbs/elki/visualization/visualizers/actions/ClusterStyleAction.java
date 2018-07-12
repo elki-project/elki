@@ -102,10 +102,8 @@ public class ClusterStyleAction implements VisFactory {
     @Override
     public boolean enabled() {
       StylingPolicy sp = context.getStylingPolicy();
-      if(!(sp instanceof ClusterStylingPolicy)) {
-        return true;
-      }
-      return ((ClusterStylingPolicy) sp).getClustering() != c;
+      return !(sp instanceof ClusterStylingPolicy) || //
+          ((ClusterStylingPolicy) sp).getClustering() != c;
     }
   }
 }

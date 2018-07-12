@@ -198,11 +198,6 @@ public class DendrogramVisualization implements VisFactory {
       }
       context.visChanged(task);
     }
-
-    @Override
-    public boolean enabled() {
-      return true;
-    }
   }
 
   /**
