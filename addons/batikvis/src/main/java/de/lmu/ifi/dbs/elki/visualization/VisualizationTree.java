@@ -84,7 +84,10 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public void visChanged(VisualizationItem item) {
     for(int i = vlistenerList.size(); --i >= 0;) {
-      vlistenerList.get(i).visualizationChanged(item);
+      final VisualizationListener listener = vlistenerList.get(i);
+      if(listener != null) {
+        listener.visualizationChanged(item);
+      }
     }
   }
 
