@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -141,9 +141,7 @@ public class HistogramVisualization implements VisFactory {
       csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, style.getLineWidth(StyleLibrary.PLOT));
       plot.addCSSClassOrLogError(csscls);
 
-      Element line = path[d].makeElement(plot);
-      line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, csscls.getName());
-      layer.appendChild(line);
+      layer.appendChild(path[d].makeElement(plot, csscls.getName()));
     }
 
     return new StaticVisualizationInstance(context, task, plot, width, height, layer);

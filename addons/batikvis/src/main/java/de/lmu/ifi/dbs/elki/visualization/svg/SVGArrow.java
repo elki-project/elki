@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,8 @@ public final class SVGArrow {
   /**
    * Draw an arrow at the given position.
    * 
-   * Note: the arrow is an unstyled svg path. You need to apply style afterwards.
+   * Note: the arrow is an unstyled svg path. You need to apply style
+   * afterwards.
    * 
    * @param svgp Plot to draw to
    * @param dir Direction to draw
@@ -84,36 +85,19 @@ public final class SVGArrow {
    * @return SVG Element
    */
   public static Element makeArrow(SVGPlot svgp, Direction dir, double x, double y, double size) {
-    final SVGPath path = new SVGPath();
     final double hs = size / 2.;
 
     switch(dir){
     case LEFT:
-      path.drawTo(x + hs, y + hs);
-      path.drawTo(x - hs, y);
-      path.drawTo(x + hs, y - hs);
-      path.drawTo(x + hs, y + hs);
-      break;
+      return new SVGPath().drawTo(x + hs, y + hs).drawTo(x - hs, y).drawTo(x + hs, y - hs).drawTo(x + hs, y + hs).close().makeElement(svgp);
     case DOWN:
-      path.drawTo(x - hs, y - hs);
-      path.drawTo(x + hs, y - hs);
-      path.drawTo(x, y + hs);
-      path.drawTo(x - hs, y - hs);
-      break;
+      return new SVGPath().drawTo(x - hs, y - hs).drawTo(x + hs, y - hs).drawTo(x, y + hs).drawTo(x - hs, y - hs).close().makeElement(svgp);
     case RIGHT:
-      path.drawTo(x - hs, y - hs);
-      path.drawTo(x + hs, y);
-      path.drawTo(x - hs, y + hs);
-      path.drawTo(x - hs, y - hs);
-      break;
+      return new SVGPath().drawTo(x - hs, y - hs).drawTo(x + hs, y).drawTo(x - hs, y + hs).drawTo(x - hs, y - hs).close().makeElement(svgp);
     case UP:
-      path.drawTo(x - hs, y + hs);
-      path.drawTo(x, y - hs);
-      path.drawTo(x + hs, y + hs);
-      path.drawTo(x - hs, y + hs);
-      break;
+      return new SVGPath().drawTo(x - hs, y + hs).drawTo(x, y - hs).drawTo(x + hs, y + hs).drawTo(x - hs, y + hs).close().makeElement(svgp);
+    default:
+      throw new RuntimeException("Unexpected direction: " + dir);
     }
-    path.close();
-    return path.makeElement(svgp);
   }
 }

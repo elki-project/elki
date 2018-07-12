@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
@@ -42,7 +41,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
@@ -162,9 +160,7 @@ public class PolygonVisualization implements VisFactory {
             // close path.
             path.drawTo(f[0], f[1]);
           }
-          Element e = path.makeElement(svgp);
-          SVGUtil.addCSSClass(e, POLYS);
-          layer.appendChild(e);
+          layer.appendChild(path.makeElement(svgp, POLYS));
         }
         catch(ObjectNotFoundException e) {
           // ignore.

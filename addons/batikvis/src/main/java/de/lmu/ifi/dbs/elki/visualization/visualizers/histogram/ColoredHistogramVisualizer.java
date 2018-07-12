@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -296,9 +296,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
             paths[i].lineTo(xsize * right, ysize * (1 - lasty[i]));
           }
           paths[i].lineTo(xsize * right, ysize * 1);
-          Element elem = paths[i].makeElement(svgp);
-          SVGUtil.addCSSClass(elem, BIN + (off + i - 1));
-          layer.appendChild(elem);
+          layer.appendChild(paths[i].makeElement(svgp, BIN + (off + i - 1)));
         }
       }
       svgp.updateStyleElement();

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -43,7 +42,6 @@ import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -145,10 +143,8 @@ public class SelectionConvexHullVisualization implements VisFactory {
         if(chres != null && chres.size() >= 3) {
           SVGPath path = new SVGPath(chres);
 
-          Element selHull = path.makeElement(svgp);
-          SVGUtil.addCSSClass(selHull, SELECTEDHULL);
           // TODO: use relative selection size for opacity?
-          layer.appendChild(selHull);
+          layer.appendChild(path.makeElement(svgp, SELECTEDHULL));
         }
       }
     }

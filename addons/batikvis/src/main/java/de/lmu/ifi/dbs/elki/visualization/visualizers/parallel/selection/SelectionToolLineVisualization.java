@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
@@ -125,11 +124,6 @@ public class SelectionToolLineVisualization implements VisFactory {
     Element rtag;
 
     /**
-     * Element for the rectangle to add listeners
-     */
-    Element etag;
-
-    /**
      * Constructor.
      *
      * @param context Visualizer context
@@ -149,14 +143,10 @@ public class SelectionToolLineVisualization implements VisFactory {
       super.fullRedraw();
       addCSSClasses(svgp);
 
-      rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
-      layer.appendChild(rtag);
+      layer.appendChild(rtag = svgp.svgElement(SVGConstants.SVG_G_TAG, CSS_RANGEMARKER));
 
-      // etag: sensitive area
-      DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.5 * getMarginTop(), getSizeX() + .2 * getMarginLeft(), getMarginTop() * 1.5 + getSizeY(), this);
-      etag = drag.getElement();
-      layer.appendChild(etag);
+      // Clickable area
+      layer.appendChild(new DragableArea(svgp, -.1 * getMarginLeft(), -.5 * getMarginTop(), getSizeX() + .2 * getMarginLeft(), getMarginTop() * 1.5 + getSizeY(), this).getElement());
     }
 
     /**
@@ -206,15 +196,7 @@ public class SelectionToolLineVisualization implements VisFactory {
       if(evt instanceof DOMMouseEvent) {
         DOMMouseEvent domme = (DOMMouseEvent) evt;
         // TODO: visual indication of mode possible?
-        if(domme.getShiftKey()) {
-          return Mode.ADD;
-        }
-        else if(domme.getCtrlKey()) {
-          return Mode.INVERT;
-        }
-        else {
-          return Mode.REPLACE;
-        }
+        return domme.getShiftKey() ? Mode.ADD : domme.getCtrlKey() ? Mode.INVERT : Mode.REPLACE;
       }
       // Default mode is replace.
       return Mode.REPLACE;
@@ -230,23 +212,15 @@ public class SelectionToolLineVisualization implements VisFactory {
     private void updateSelection(Mode mode, SVGPoint p1, SVGPoint p2) {
       DBIDSelection selContext = context.getSelection();
       // Note: we rely on SET semantics below!
-      final HashSetModifiableDBIDs selection;
-      if(selContext == null || mode == Mode.REPLACE) {
-        selection = DBIDUtil.newHashSet();
-      }
-      else {
-        selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-      }
+      final HashSetModifiableDBIDs selection = (selContext == null || mode == Mode.REPLACE) ? DBIDUtil.newHashSet() //
+          : DBIDUtil.newHashSet(selContext.getSelectedIds());
       int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
       DBIDs ids = SamplingResult.getSamplingResult(relation).getSample();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
         if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
           if(mode == Mode.INVERT) {
-            if(!selection.contains(iter)) {
-              selection.add(iter);
-            }
-            else {
+            if(!selection.add(iter)) {
               selection.remove(iter);
             }
           }
@@ -263,18 +237,15 @@ public class SelectionToolLineVisualization implements VisFactory {
 
     private int[] getAxisRange(double x1, double x2) {
       final int dim = proj.getVisibleDimensions();
-      int minaxis = 0;
-      int maxaxis = 0;
+      int minaxis = 0, maxaxis = 0;
       boolean minx = true;
-      boolean maxx = false;
       int count = -1;
       for(int i = 0; i < dim; i++) {
         if(minx && getVisibleAxisX(i) > x1) {
           minaxis = count;
           minx = false;
-          maxx = true;
         }
-        if(maxx && (getVisibleAxisX(i) > x2 || i == dim - 1)) {
+        if(!minx && (getVisibleAxisX(i) > x2 || i == dim - 1)) {
           maxaxis = count + 1;
           if(i == dim - 1 && getVisibleAxisX(i) <= x2) {
             maxaxis++;

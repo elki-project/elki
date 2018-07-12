@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -47,7 +46,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -170,13 +168,10 @@ public class ClusterStarVisualization implements VisFactory {
 
         SVGPath star = new SVGPath();
         for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
-          double[] obj = proj.fastProjectDataToRenderSpace(rel.get(id));
-          star.moveTo(obj);
+          star.moveTo(proj.fastProjectDataToRenderSpace(rel.get(id)));
           star.drawTo(mean);
         }
-        Element stare = star.makeElement(svgp);
-        SVGUtil.setCSSClass(stare, CSS_MEAN_STAR + "_" + cnum);
-        layer.appendChild(stare);
+        layer.appendChild(star.makeElement(svgp, CSS_MEAN_STAR + "_" + cnum));
       }
       svgp.updateStyleElement();
     }

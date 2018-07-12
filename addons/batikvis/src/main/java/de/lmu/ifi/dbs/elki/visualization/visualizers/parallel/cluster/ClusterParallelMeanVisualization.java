@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -48,7 +47,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
@@ -169,7 +167,6 @@ public class ClusterParallelMeanVisualization implements VisFactory {
         for(int i = 0; i < mean.length; i++) {
           path.drawTo(getVisibleAxisX(i), mean[i]);
         }
-        Element meanline = path.makeElement(svgp);
 
         String cnam = CLUSTERMEAN + cnum;
         if(!svgp.getCSSClassManager().contains(cnam)) {
@@ -183,8 +180,7 @@ public class ClusterParallelMeanVisualization implements VisFactory {
 
           svgp.addCSSClassOrLogError(cls);
         }
-        SVGUtil.addCSSClass(meanline, cnam);
-        layer.appendChild(meanline);
+        layer.appendChild(path.makeElement(svgp, cnam));
       }
     }
   }

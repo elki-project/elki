@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -675,6 +675,19 @@ public class SVGPath {
    */
   public Element makeElement(SVGPlot plot) {
     Element elem = plot.svgElement(SVGConstants.SVG_PATH_TAG);
+    elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
+    return elem;
+  }
+
+  /**
+   * Turn the path buffer into an SVG element.
+   *
+   * @param plot Plot context (= element factory)
+   * @param cssclass CSS class
+   * @return SVG Element
+   */
+  public Element makeElement(SVGPlot plot, String cssclass) {
+    Element elem = plot.svgElement(SVGConstants.SVG_PATH_TAG, cssclass);
     elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
     return elem;
   }

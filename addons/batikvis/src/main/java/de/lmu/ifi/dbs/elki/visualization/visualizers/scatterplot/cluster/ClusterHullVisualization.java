@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -63,7 +62,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -197,10 +195,7 @@ public class ClusterHullVisualization implements VisFactory {
             final double corefact = (mpair == null) ? 1.0 : .5;
             final double opacity = corefact * baseopacity * Math.sqrt(relativeSize * relativeArea);
             addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
-
-            Element hulls = path.makeElement(svgp);
-            SVGUtil.addCSSClass(hulls, CLUSTERHULL + cpol.getStyleForCluster(clu));
-            layer.appendChild(hulls);
+            layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
           }
           // For core density models, over-plot the core:
           if(mpair != null && mpair.second != null && mpair.second.size() > 1) {
@@ -211,10 +206,7 @@ public class ClusterHullVisualization implements VisFactory {
             final double relativeSize = mpair.first / rel.size();
             final double opacity = .5 * baseopacity * Math.sqrt(relativeSize * relativeArea);
             addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
-
-            Element hulls = path.makeElement(svgp);
-            SVGUtil.addCSSClass(hulls, CLUSTERHULL + cpol.getStyleForCluster(clu));
-            layer.appendChild(hulls);
+            layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
           }
         }
       }
@@ -238,11 +230,8 @@ public class ClusterHullVisualization implements VisFactory {
             polys.add(new Polygon(ps));
           }
           for(Polygon p : polys) {
-            SVGPath path = new SVGPath(p);
-            Element hulls = path.makeElement(svgp);
             addCSSClasses(svgp, cpol.getStyleForCluster(clu), baseopacity * weight / rel.size());
-            SVGUtil.addCSSClass(hulls, CLUSTERHULL + cpol.getStyleForCluster(clu));
-            layer.appendChild(hulls);
+            layer.appendChild(new SVGPath(p).makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
           }
         }
       }

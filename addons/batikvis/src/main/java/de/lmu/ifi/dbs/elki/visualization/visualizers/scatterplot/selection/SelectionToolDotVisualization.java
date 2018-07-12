@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -121,11 +120,6 @@ public class SelectionToolDotVisualization implements VisFactory {
     Element rtag;
 
     /**
-     * Element for the rectangle to add listeners
-     */
-    Element etag;
-
-    /**
      * Constructor.
      *
      * @param context Visualizer context
@@ -145,15 +139,9 @@ public class SelectionToolDotVisualization implements VisFactory {
       setupCanvas();
       addCSSClasses(svgp);
 
-      //
-      rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
-      layer.appendChild(rtag);
-
+      layer.appendChild(rtag = svgp.svgElement(SVGConstants.SVG_G_TAG, CSS_RANGEMARKER));
       // etag: sensitive area
-      DragableArea drag = new DragableArea(svgp, -0.6 * StyleLibrary.SCALE, -0.7 * StyleLibrary.SCALE, 1.3 * StyleLibrary.SCALE, 1.4 * StyleLibrary.SCALE, this);
-      etag = drag.getElement();
-      layer.appendChild(etag);
+      layer.appendChild(new DragableArea(svgp, -0.6 * StyleLibrary.SCALE, -0.7 * StyleLibrary.SCALE, 1.3 * StyleLibrary.SCALE, 1.4 * StyleLibrary.SCALE, this).getElement());
     }
 
     /**
@@ -203,15 +191,7 @@ public class SelectionToolDotVisualization implements VisFactory {
       if(evt instanceof DOMMouseEvent) {
         DOMMouseEvent domme = (DOMMouseEvent) evt;
         // TODO: visual indication of mode possible?
-        if(domme.getShiftKey()) {
-          return Mode.ADD;
-        }
-        else if(domme.getCtrlKey()) {
-          return Mode.INVERT;
-        }
-        else {
-          return Mode.REPLACE;
-        }
+        return domme.getShiftKey() ? Mode.ADD : domme.getCtrlKey() ? Mode.INVERT : Mode.REPLACE;
       }
       // Default mode is replace.
       return Mode.REPLACE;
@@ -228,21 +208,13 @@ public class SelectionToolDotVisualization implements VisFactory {
     private void updateSelection(Mode mode, Projection2D proj, SVGPoint p1, SVGPoint p2) {
       DBIDSelection selContext = context.getSelection();
       // Note: we rely on SET semantics below!
-      HashSetModifiableDBIDs selection;
-      if(selContext == null || mode == Mode.REPLACE) {
-        selection = DBIDUtil.newHashSet();
-      }
-      else {
-        selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-      }
+      HashSetModifiableDBIDs selection = (selContext == null || mode == Mode.REPLACE) ? DBIDUtil.newHashSet() //
+          : DBIDUtil.newHashSet(selContext.getSelectedIds());
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double[] vec = proj.fastProjectDataToRenderSpace(rel.get(iditer));
         if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
           if(mode == Mode.INVERT) {
-            if(!selection.contains(iditer)) {
-              selection.add(iditer);
-            }
-            else {
+            if(!selection.add(iditer)) {
               selection.remove(iditer);
             }
           }

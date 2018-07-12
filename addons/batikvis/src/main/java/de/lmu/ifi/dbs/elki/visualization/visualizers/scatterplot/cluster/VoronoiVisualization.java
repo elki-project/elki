@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
+
+import static de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw.drawDelaunay;
+import static de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw.drawFakeVoronoi;
+import static de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw.drawVoronoi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +58,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -279,29 +281,21 @@ public class VoronoiVisualization implements VisFactory {
       }
       if(means.size() == 2) {
         if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
-          Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
-          SVGUtil.addCSSClass(path, KMEANSBORDER);
-          layer.appendChild(path);
+          layer.appendChild(drawFakeVoronoi(proj, means).makeElement(svgp, KMEANSBORDER));
         }
         if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
-          Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0)))//
-              .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
-          SVGUtil.addCSSClass(path, KMEANSBORDER);
-          layer.appendChild(path);
+          layer.appendChild(new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0)))//
+              .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp, KMEANSBORDER));
         }
       }
       else {
         // Compute Delaunay Triangulation
         ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
         if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
-          Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
-          SVGUtil.addCSSClass(path, KMEANSBORDER);
-          layer.appendChild(path);
+          layer.appendChild(drawVoronoi(proj, delaunay, means).makeElement(svgp, KMEANSBORDER));
         }
         if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
-          Element path = VoronoiDraw.drawDelaunay(proj, delaunay, means).makeElement(svgp);
-          SVGUtil.addCSSClass(path, KMEANSBORDER);
-          layer.appendChild(path);
+          layer.appendChild(drawDelaunay(proj, delaunay, means).makeElement(svgp, KMEANSBORDER));
         }
       }
     }

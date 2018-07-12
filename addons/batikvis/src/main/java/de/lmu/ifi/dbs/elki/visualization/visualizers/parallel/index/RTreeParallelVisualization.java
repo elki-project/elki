@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
@@ -201,10 +200,7 @@ public class RTreeParallelVisualization implements VisFactory {
       }
       path.close();
 
-      Element intervals = path.makeElement(svgp);
-
-      SVGUtil.addCSSClass(intervals, INDEX + depth);
-      layer.appendChild(intervals);
+      layer.appendChild(path.makeElement(svgp, INDEX + depth));
 
       if(!(entry instanceof LeafEntry)) {
         N node = rtree.getNode(entry);

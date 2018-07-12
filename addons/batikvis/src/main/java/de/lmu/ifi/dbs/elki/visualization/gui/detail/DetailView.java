@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -142,14 +142,13 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     // Make a background
     CSSClass cls = new CSSClass(this, "background");
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
-    Element bg = this.svgElement(SVGConstants.SVG_RECT_TAG);
+    addCSSClassOrLogError(cls);
+    Element bg = this.svgElement(SVGConstants.SVG_RECT_TAG, cls.getName());
     SVGUtil.setAtt(bg, SVGConstants.SVG_X_ATTRIBUTE, "0");
     SVGUtil.setAtt(bg, SVGConstants.SVG_Y_ATTRIBUTE, "0");
     SVGUtil.setAtt(bg, SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
     SVGUtil.setAtt(bg, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
     SVGUtil.setAtt(bg, NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
-    addCSSClassOrLogError(cls);
-    SVGUtil.setCSSClass(bg, cls.getName());
 
     // Note that we rely on this being called before any other drawing routines.
     getRoot().appendChild(bg);
@@ -359,7 +358,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     if(vis == null) { // Unknown only.
       boolean include = false;
       for(It<Projector> it = context.getVisHierarchy().iterAncestors(current).filter(Projector.class); it.valid(); it.advance()) {
-        if((item.proj != null && item.proj.getProjector() == it.get()) || taskmap.containsKey(it.get())) {
+        if((item.proj != null && item.proj.getProjector() == it.get())) {
           include = true;
           break;
         }
@@ -373,16 +372,10 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       lazyRefresh();
     }
     else {
-      Element prevlayer = layermap.get(vis);
       Element layer = vis.getLayer();
-      if(prevlayer != layer) {
-        lazyRefresh();
-      }
-      else {
-        boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-        if(task.isVisible() != isVisible) {
-          lazyRefresh(); // Visibility has changed.
-        }
+      if(layer != layermap.get(vis) || //
+          task.isVisible() != !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY))) {
+        lazyRefresh(); // Visibility has changed.
       }
     }
   }

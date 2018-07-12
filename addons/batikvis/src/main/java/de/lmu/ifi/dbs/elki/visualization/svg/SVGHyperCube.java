@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -252,19 +252,14 @@ public final class SVGHyperCube {
         continue;
       }
       final double[] edge = r_edges.get(i);
-      final double x_i = minx + edge[0];
-      if(!isFinite(x_i)) {
+      final double x_i = minx + edge[0], y_i = miny + edge[1];
+      if(!isFinite(x_i) || !isFinite(y_i)) {
         continue;
       }
-      final double y_i = miny + edge[1];
-      if(!isFinite(y_i)) {
-        continue;
-      }
-      path.moveTo(minx, miny);
-      path.drawTo(x_i, y_i);
+      path.moveTo(minx, miny).drawTo(x_i, y_i);
       // Recursion
       BitsUtil.setI(b, i);
-      recDrawEdges(path, x_i, y_i , r_edges, b);
+      recDrawEdges(path, x_i, y_i, r_edges, b);
       BitsUtil.clearI(b, i);
     }
   }
@@ -310,19 +305,18 @@ public final class SVGHyperCube {
         if(!isFinite(dxj)) {
           continue;
         }
-        pbuf.delete(0, pbuf.length()); // Clear
-        pbuf.append(SVGUtil.fmt(minx)).append(',');
-        pbuf.append(SVGUtil.fmt(miny)).append(' ');
-        pbuf.append(SVGUtil.fmt(xi)).append(',');
-        pbuf.append(SVGUtil.fmt(yi)).append(' ');
-        pbuf.append(SVGUtil.fmt(xi + dxj)).append(',');
-        pbuf.append(SVGUtil.fmt(yi + dyj)).append(' ');
-        pbuf.append(SVGUtil.fmt(minx + dxj)).append(',');
-        pbuf.append(SVGUtil.fmt(miny + dyj));
+        pbuf.delete(0, pbuf.length()) // Clear
+            .append(SVGUtil.fmt(minx)).append(',') //
+            .append(SVGUtil.fmt(miny)).append(' ') //
+            .append(SVGUtil.fmt(xi)).append(',') //
+            .append(SVGUtil.fmt(yi)).append(' ') //
+            .append(SVGUtil.fmt(xi + dxj)).append(',') //
+            .append(SVGUtil.fmt(yi + dyj)).append(' ') //
+            .append(SVGUtil.fmt(minx + dxj)).append(',') //
+            .append(SVGUtil.fmt(miny + dyj));
 
-        Element poly = plot.svgElement(SVGConstants.SVG_POLYGON_TAG);
+        Element poly = plot.svgElement(SVGConstants.SVG_POLYGON_TAG, cls);
         SVGUtil.setAtt(poly, SVGConstants.SVG_POINTS_ATTRIBUTE, pbuf.toString());
-        SVGUtil.setCSSClass(poly, cls);
         group.appendChild(poly);
       }
       // Recursion

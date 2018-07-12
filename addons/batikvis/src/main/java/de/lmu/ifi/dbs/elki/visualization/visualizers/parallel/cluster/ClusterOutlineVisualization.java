@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -54,7 +53,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
@@ -227,10 +225,8 @@ public class ClusterOutlineVisualization implements VisFactory {
         }
         weight = (weight > 0.) ? (dim * StyleLibrary.SCALE) / weight : 1.;
 
-        Element intervals = path.makeElement(svgp);
         addCSSClasses(svgp, cpol.getStyleForCluster(clus), baseopacity * weight * ids.size() / relation.size());
-        SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
-        layer.appendChild(intervals);
+        layer.appendChild(path.makeElement(svgp, CLUSTERAREA + cnum));
       }
     }
 

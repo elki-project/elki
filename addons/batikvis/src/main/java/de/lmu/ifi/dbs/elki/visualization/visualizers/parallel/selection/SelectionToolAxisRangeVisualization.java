@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
@@ -120,11 +119,6 @@ public class SelectionToolAxisRangeVisualization implements VisFactory {
     private Element rtag;
 
     /**
-     * Element for the rectangle to add listeners
-     */
-    private Element etag;
-
-    /**
      * Constructor.
      *
      * @param context Visualizer context
@@ -145,14 +139,10 @@ public class SelectionToolAxisRangeVisualization implements VisFactory {
       addCSSClasses(svgp);
 
       // rtag: tag for the selected rect
-      rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
-      layer.appendChild(rtag);
+      layer.appendChild(rtag = svgp.svgElement(SVGConstants.SVG_G_TAG, CSS_RANGEMARKER));
 
       // etag: sensitive area
-      DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.1 * getMarginTop(), getSizeX() + getMarginLeft() * .2, getSizeY() + getMarginTop() * .2, this);
-      etag = drag.getElement();
-      layer.appendChild(etag);
+      layer.appendChild(new DragableArea(svgp, -.1 * getMarginLeft(), -.1 * getMarginTop(), getSizeX() + getMarginLeft() * .2, getSizeY() + getMarginTop() * .2, this).getElement());
     }
 
     /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -153,20 +153,15 @@ public class DistanceFunctionVisualization implements VisFactory {
     double[] range1, range2;
     {
       // Rotation plane:
-      double[] p1 = proj.fastProjectRenderToDataSpace(selPoint[0] + 10, selPoint[1]);
-      double[] p2 = proj.fastProjectRenderToDataSpace(selPoint[0], selPoint[1] + 10);
       double[] pm = mid.toArray();
       // Compute relative vectors
-      minusEquals(p1, pm);
-      minusEquals(p2, pm);
+      double[] p1 = minusEquals(proj.fastProjectRenderToDataSpace(selPoint[0] + 10, selPoint[1]), pm);
+      double[] p2 = minusEquals(proj.fastProjectRenderToDataSpace(selPoint[0], selPoint[1] + 10), pm);
       // Scale p1 and p2 to unit length:
       timesEquals(p1, 1. / euclideanLength(p1));
       timesEquals(p2, 1. / euclideanLength(p2));
-      {
-        double test = scalarProduct(p1, p2);
-        if(Math.abs(test) > 1E-10) {
-          LoggingUtil.warning("Projection does not seem to be orthogonal?");
-        }
+      if(Math.abs(scalarProduct(p1, p2)) > 1E-10) {
+        LoggingUtil.warning("Projection does not seem to be orthogonal?");
       }
       // Project onto p1, p2:
       double l1 = scalarProduct(pm, p1), l2 = scalarProduct(pm, p2);
@@ -178,11 +173,8 @@ public class DistanceFunctionVisualization implements VisFactory {
       double r21 = +cangle * l1 + sangle * l2, r22 = -sangle * l1 + cangle * l2;
       // Build rotated vectors - remove projected component, add rotated
       // component:
-      double[] r1 = copy(pm), r2 = copy(pm);
-      plusTimesEquals(r1, p1, -l1 + r11);
-      plusTimesEquals(r1, p2, -l2 + r12);
-      plusTimesEquals(r2, p1, -l1 + r21);
-      plusTimesEquals(r2, p2, -l2 + r22);
+      double[] r1 = plusTimesEquals(plusTimes(pm, p1, -l1 + r11), p2, -l2 + r12);
+      double[] r2 = plusTimesEquals(plusTimes(pm, p1, -l1 + r21), p2, -l2 + r22);
       // Project to render space:
       range1 = proj.fastProjectDataToRenderSpace(r1);
       range2 = proj.fastProjectDataToRenderSpace(r2);
@@ -192,27 +184,18 @@ public class DistanceFunctionVisualization implements VisFactory {
     {
       CanvasSize viewport = proj.estimateViewport();
       minusEquals(range1, pointOfOrigin);
+      plusEquals(timesEquals(range1, viewport.continueToMargin(pointOfOrigin, range1)), pointOfOrigin);
       minusEquals(range2, pointOfOrigin);
-      timesEquals(range1, viewport.continueToMargin(pointOfOrigin, range1));
-      timesEquals(range2, viewport.continueToMargin(pointOfOrigin, range2));
-      plusEquals(range1, pointOfOrigin);
-      plusEquals(range2, pointOfOrigin);
+      plusEquals(timesEquals(range2, viewport.continueToMargin(pointOfOrigin, range2)), pointOfOrigin);
       // Go backwards into the other direction - the origin might not be in the
       // viewport!
       double[] start1 = minus(pointOfOrigin, range1);
+      plusEquals(timesEquals(start1, viewport.continueToMargin(range1, start1)), range1);
       double[] start2 = minus(pointOfOrigin, range2);
-      timesEquals(start1, viewport.continueToMargin(range1, start1));
-      timesEquals(start2, viewport.continueToMargin(range2, start2));
-      plusEquals(start1, range1);
-      plusEquals(start2, range2);
+      plusEquals(timesEquals(start2, viewport.continueToMargin(range2, start2)), range2);
 
       // TODO: add filled variant?
-      SVGPath path = new SVGPath();
-      path.moveTo(start1);
-      path.lineTo(range1);
-      path.moveTo(start2);
-      path.lineTo(range2);
-      return path.makeElement(svgp);
+      return new SVGPath().moveTo(start1).lineTo(range1).moveTo(start2).lineTo(range2).makeElement(svgp);
     }
   }
 
@@ -310,12 +293,10 @@ public class DistanceFunctionVisualization implements VisFactory {
               dist = drawCosine(svgp, proj, refvec, maxangle);
             }
             else {
-              dist = null;
+              continue;
             }
-            if(dist != null) {
-              SVGUtil.addCSSClass(dist, DISTANCEFUNCTION);
-              layer.appendChild(dist);
-            }
+            SVGUtil.addCSSClass(dist, DISTANCEFUNCTION);
+            layer.appendChild(dist);
           }
         }
       }

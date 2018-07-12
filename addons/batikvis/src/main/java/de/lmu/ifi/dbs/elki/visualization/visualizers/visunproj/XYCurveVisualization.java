@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -103,8 +103,7 @@ public class XYCurveVisualization implements VisFactory {
       final double y = 1 - scaley.getScaled(iterator.getY());
       path.drawTo(sizex * x, sizey * y);
     }
-    Element line = path.makeElement(plot);
-    line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
+    Element line = path.makeElement(plot, SERIESID);
 
     // add axes
     try {

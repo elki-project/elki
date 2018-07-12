@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -289,8 +289,7 @@ public class EMClusterVisualization implements VisFactory {
                 p1);
             path.close();
 
-            Element ellipse = path.makeElement(svgp);
-            SVGUtil.addCSSClass(ellipse, sname);
+            Element ellipse = path.makeElement(svgp, sname);
             if(cls != null) {
               double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
               cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
@@ -312,8 +311,8 @@ public class EMClusterVisualization implements VisFactory {
      * @return out
      */
     private double[] equalsPlusTimes(double[] out, double[] x, double[] y, double a) {
-      out[0] = x[0] + y[0] * a;
-      out[1] = x[1] + y[1] * a;
+      out[0] = y[0] * a + x[0];
+      out[1] = y[1] * a + x[1];
       return out;
     }
 
@@ -335,8 +334,7 @@ public class EMClusterVisualization implements VisFactory {
           path.drawTo(plusTimes(cent, chres.get(p), i));
         }
         path.close();
-        Element ellipse = path.makeElement(svgp);
-        SVGUtil.addCSSClass(ellipse, sname);
+        Element ellipse = path.makeElement(svgp, sname);
         if(cls != null) {
           double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
@@ -457,9 +455,7 @@ public class EMClusterVisualization implements VisFactory {
         }
         path.close();
 
-        Element ellipse = path.makeElement(svgp);
-
-        SVGUtil.addCSSClass(ellipse, sname);
+        Element ellipse = path.makeElement(svgp, sname);
         if(cls != null) {
           double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);

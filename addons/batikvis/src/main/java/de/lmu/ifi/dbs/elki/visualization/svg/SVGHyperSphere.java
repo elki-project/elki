@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,28 +68,22 @@ public final class SVGHyperSphere {
     for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
-      v_mid[dim] -= radius;
-      v_mid[dim] -= radius;
+      v_mid[dim] -= radius * 2;
       double[] p2 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] += radius;
       for(int dim2 = BitsUtil.nextSetBit(dims, 0); dim2 >= 0; dim2 = BitsUtil.nextSetBit(dims, dim2 + 1)) {
         if(dim < dim2) {
           v_mid[dim2] += radius;
           double[] p3 = proj.fastProjectDataToRenderSpace(v_mid);
-          v_mid[dim2] -= radius;
-          v_mid[dim2] -= radius;
+          v_mid[dim2] -= radius * 2;
           double[] p4 = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] += radius;
 
-          path.moveTo(p1[0], p1[1]);
-          path.drawTo(p3[0], p3[1]);
-          path.moveTo(p1[0], p1[1]);
-          path.drawTo(p4[0], p4[1]);
-          path.moveTo(p2[0], p2[1]);
-          path.drawTo(p3[0], p3[1]);
-          path.moveTo(p2[0], p2[1]);
-          path.drawTo(p4[0], p4[1]);
-          path.close();
+          path.moveTo(p1[0], p1[1]).drawTo(p3[0], p3[1]) //
+              .moveTo(p1[0], p1[1]).drawTo(p4[0], p4[1]) //
+              .moveTo(p2[0], p2[1]).drawTo(p3[0], p3[1]) //
+              .moveTo(p2[0], p2[1]).drawTo(p4[0], p4[1]) //
+              .close();
         }
       }
     }
@@ -113,8 +107,7 @@ public final class SVGHyperSphere {
     for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
-      v_mid[dim] -= radius;
-      v_mid[dim] -= radius;
+      v_mid[dim] -= radius * 2;
       double[] p2 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] += radius;
       // delta vector
@@ -125,8 +118,7 @@ public final class SVGHyperSphere {
         if(dim < dim2) {
           v_mid[dim2] += radius;
           double[] p3 = proj.fastProjectDataToRenderSpace(v_mid);
-          v_mid[dim2] -= radius;
-          v_mid[dim2] -= radius;
+          v_mid[dim2] -= radius * 2;
           double[] p4 = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] += radius;
           // delta vector
@@ -134,12 +126,12 @@ public final class SVGHyperSphere {
           dt2[dim2] = radius;
           double[] d2 = proj.fastProjectRelativeDataToRenderSpace(dt2);
 
-          path.moveTo(p1[0], p1[1]);
-          path.cubicTo(p1[0] + d2[0] * EUCLIDEAN_KAPPA, p1[1] + d2[1] * EUCLIDEAN_KAPPA, p3[0] + d1[0] * EUCLIDEAN_KAPPA, p3[1] + d1[1] * EUCLIDEAN_KAPPA, p3[0], p3[1]);
-          path.cubicTo(p3[0] - d1[0] * EUCLIDEAN_KAPPA, p3[1] - d1[1] * EUCLIDEAN_KAPPA, p2[0] + d2[0] * EUCLIDEAN_KAPPA, p2[1] + d2[1] * EUCLIDEAN_KAPPA, p2[0], p2[1]);
-          path.cubicTo(p2[0] - d2[0] * EUCLIDEAN_KAPPA, p2[1] - d2[1] * EUCLIDEAN_KAPPA, p4[0] - d1[0] * EUCLIDEAN_KAPPA, p4[1] - d1[1] * EUCLIDEAN_KAPPA, p4[0], p4[1]);
-          path.cubicTo(p4[0] + d1[0] * EUCLIDEAN_KAPPA, p4[1] + d1[1] * EUCLIDEAN_KAPPA, p1[0] - d2[0] * EUCLIDEAN_KAPPA, p1[1] - d2[1] * EUCLIDEAN_KAPPA, p1[0], p1[1]);
-          path.close();
+          path.moveTo(p1[0], p1[1]) //
+              .cubicTo(p1[0] + d2[0] * EUCLIDEAN_KAPPA, p1[1] + d2[1] * EUCLIDEAN_KAPPA, p3[0] + d1[0] * EUCLIDEAN_KAPPA, p3[1] + d1[1] * EUCLIDEAN_KAPPA, p3[0], p3[1]) //
+              .cubicTo(p3[0] - d1[0] * EUCLIDEAN_KAPPA, p3[1] - d1[1] * EUCLIDEAN_KAPPA, p2[0] + d2[0] * EUCLIDEAN_KAPPA, p2[1] + d2[1] * EUCLIDEAN_KAPPA, p2[0], p2[1]) //
+              .cubicTo(p2[0] - d2[0] * EUCLIDEAN_KAPPA, p2[1] - d2[1] * EUCLIDEAN_KAPPA, p4[0] - d1[0] * EUCLIDEAN_KAPPA, p4[1] - d1[1] * EUCLIDEAN_KAPPA, p4[0], p4[1]) //
+              .cubicTo(p4[0] + d1[0] * EUCLIDEAN_KAPPA, p4[1] + d1[1] * EUCLIDEAN_KAPPA, p1[0] - d2[0] * EUCLIDEAN_KAPPA, p1[1] - d2[1] * EUCLIDEAN_KAPPA, p1[0], p1[1]) //
+              .close();
         }
       }
     }
@@ -160,29 +152,14 @@ public final class SVGHyperSphere {
     final double[] v_mid = mid.toArray();
     final long[] dims = proj.getVisibleDimensions2D();
 
-    final double kappax, kappay;
-    if(p > 1.) {
-      final double kappal = FastMath.pow(0.5, 1. / p);
-      kappax = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
-      kappay = 0;
-    }
-    else if(p < 1.) {
-      final double kappal = 1 - FastMath.pow(0.5, 1. / p);
-      kappax = 0;
-      kappay = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
-    }
-    else {
-      kappax = 0;
-      kappay = 0;
-    }
-    // LoggingUtil.warning("kappax: " + kappax + " kappay: " + kappay);
+    double kappax = p > 1 ? Math.min(1.3, 4. * (2 * FastMath.pow(0.5, 1. / p) - 1) / 3.) : 0;
+    double kappay = p < 1 ? Math.min(1.3, 4. * (2 * (1 - FastMath.pow(0.5, 1. / p)) - 1) / 3.) : 0;
 
     SVGPath path = new SVGPath();
     for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
       v_mid[dim] += radius;
       double[] pvp0 = proj.fastProjectDataToRenderSpace(v_mid);
-      v_mid[dim] -= radius;
-      v_mid[dim] -= radius;
+      v_mid[dim] -= radius * 2;
       double[] pvm0 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] += radius;
       // delta vector
@@ -193,8 +170,7 @@ public final class SVGHyperSphere {
         if(dim < dim2) {
           v_mid[dim2] += radius;
           double[] pv0p = proj.fastProjectDataToRenderSpace(v_mid);
-          v_mid[dim2] -= radius;
-          v_mid[dim2] -= radius;
+          v_mid[dim2] -= radius * 2;
           double[] pv0m = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] += radius;
           // delta vector
@@ -204,32 +180,32 @@ public final class SVGHyperSphere {
 
           if(p > 1) {
             // p > 1
-            path.moveTo(pvp0[0], pvp0[1]);
             // support points, p0 to 0p
             final double s_pp1_x = pvp0[0] + v0d[0] * kappax;
             final double s_pp1_y = pvp0[1] + v0d[1] * kappax;
             final double s_pp2_x = pv0p[0] + vd0[0] * kappax;
             final double s_pp2_y = pv0p[1] + vd0[1] * kappax;
-            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, pv0p[0], pv0p[1]);
             // support points, 0p to m0
             final double s_mp1_x = pv0p[0] - vd0[0] * kappax;
             final double s_mp1_y = pv0p[1] - vd0[1] * kappax;
             final double s_mp2_x = pvm0[0] + v0d[0] * kappax;
             final double s_mp2_y = pvm0[1] + v0d[1] * kappax;
-            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, pvm0[0], pvm0[1]);
             // support points, m0 to 0m
             final double s_mm1_x = pvm0[0] - v0d[0] * kappax;
             final double s_mm1_y = pvm0[1] - v0d[1] * kappax;
             final double s_mm2_x = pv0m[0] - vd0[0] * kappax;
             final double s_mm2_y = pv0m[1] - vd0[1] * kappax;
-            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, pv0m[0], pv0m[1]);
             // support points, 0m to p0
             final double s_pm1_x = pv0m[0] + vd0[0] * kappax;
             final double s_pm1_y = pv0m[1] + vd0[1] * kappax;
             final double s_pm2_x = pvp0[0] - v0d[0] * kappax;
             final double s_pm2_y = pvp0[1] - v0d[1] * kappax;
-            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]);
-            path.close();
+            path.moveTo(pvp0[0], pvp0[1]) //
+                .cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, pv0p[0], pv0p[1]) //
+                .cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, pvm0[0], pvm0[1]) //
+                .cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, pv0m[0], pv0m[1]) //
+                .cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]) //
+                .close();
           }
           else if(p < 1) {
             // p < 1
@@ -243,21 +219,21 @@ public final class SVGHyperSphere {
             final double s_v0m_x = pv0m[0] + v0d[0] * kappay;
             final double s_v0m_y = pv0m[1] + v0d[1] * kappay;
             // Draw the star
-            path.moveTo(pvp0[0], pvp0[1]);
-            path.cubicTo(s_vp0_x, s_vp0_y, s_v0p_x, s_v0p_y, pv0p[0], pv0p[1]);
-            path.cubicTo(s_v0p_x, s_v0p_y, s_vm0_x, s_vm0_y, pvm0[0], pvm0[1]);
-            path.cubicTo(s_vm0_x, s_vm0_y, s_v0m_x, s_v0m_y, pv0m[0], pv0m[1]);
-            path.cubicTo(s_v0m_x, s_v0m_y, s_vp0_x, s_vp0_y, pvp0[0], pvp0[1]);
-            path.close();
+            path.moveTo(pvp0[0], pvp0[1]) //
+                .cubicTo(s_vp0_x, s_vp0_y, s_v0p_x, s_v0p_y, pv0p[0], pv0p[1]) //
+                .cubicTo(s_v0p_x, s_v0p_y, s_vm0_x, s_vm0_y, pvm0[0], pvm0[1]) //
+                .cubicTo(s_vm0_x, s_vm0_y, s_v0m_x, s_v0m_y, pv0m[0], pv0m[1]) //
+                .cubicTo(s_v0m_x, s_v0m_y, s_vp0_x, s_vp0_y, pvp0[0], pvp0[1]) //
+                .close();
           }
           else {
             // p == 1 - Manhattan
-            path.moveTo(pvp0[0], pvp0[1]);
-            path.lineTo(pv0p[0], pv0p[1]);
-            path.lineTo(pvm0[0], pvm0[1]);
-            path.lineTo(pv0m[0], pv0m[1]);
-            path.lineTo(pvp0[0], pvp0[1]);
-            path.close();
+            path.moveTo(pvp0[0], pvp0[1]) //
+                .lineTo(pv0p[0], pv0p[1]) //
+                .lineTo(pvm0[0], pvm0[1]) //
+                .lineTo(pv0m[0], pv0m[1]) //
+                .lineTo(pvp0[0], pvp0[1]) //
+                .close();
           }
         }
       }
@@ -282,13 +258,10 @@ public final class SVGHyperSphere {
     for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
-      v_mid[dim] -= radius;
-      path.moveTo(p1[0], p1[1]);
-      v_mid[dim] -= radius;
+      v_mid[dim] -= radius * 2;
       double[] p2 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] += radius;
-      path.drawTo(p2[0], p2[1]);
-      path.close();
+      path.moveTo(p1[0], p1[1]).drawTo(p2[0], p2[1]).close();
     }
     return path.makeElement(svgp);
   }

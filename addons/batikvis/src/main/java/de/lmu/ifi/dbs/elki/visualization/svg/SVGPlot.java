@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -228,6 +228,19 @@ public class SVGPlot {
   }
 
   /**
+   * Create a SVG element in the SVG namespace. Non-static version.
+   *
+   * @param name node name
+   * @param cssclass CSS class
+   * @return new SVG element.
+   */
+  public Element svgElement(String name, String cssclass) {
+    Element elem = SVGUtil.svgElement(document, name);
+    elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
+    return elem;
+  }
+
+  /**
    * Create a SVG rectangle
    *
    * @param x X coordinate
@@ -435,7 +448,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException|IllegalAccessException e) {
+    catch(InstantiationException | IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
     }
   }
@@ -453,7 +466,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException|IllegalAccessException e) {
+    catch(InstantiationException | IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
     }
   }
@@ -471,7 +484,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException|IllegalAccessException e) {
+    catch(InstantiationException | IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
     }
   }

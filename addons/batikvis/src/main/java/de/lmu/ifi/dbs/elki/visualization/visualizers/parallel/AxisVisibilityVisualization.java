@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -190,9 +190,7 @@ public class AxisVisibilityVisualization implements VisFactory {
       path.relativeLineTo(qs, qs);
       path.relativeMoveTo(0, -qs);
       path.relativeLineTo(-qs, qs);
-      Element cross = path.makeElement(svgp);
-      SVGUtil.addCSSClass(cross, SAV_CROSS);
-      layer.appendChild(cross);
+      layer.appendChild(path.makeElement(svgp, SAV_CROSS));
 
       Element rect = svgp.svgRect(xpos, ypos, buttonsize, buttonsize);
       SVGUtil.addCSSClass(rect, SAV_BUTTON);

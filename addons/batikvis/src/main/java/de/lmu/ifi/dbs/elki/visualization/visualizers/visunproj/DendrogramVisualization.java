@@ -354,9 +354,7 @@ public class DendrogramVisualization implements VisFactory {
           if(!path.isStarted()) {
             continue;
           }
-          Element elem = path.makeElement(svgp);
-          SVGUtil.setCSSClass(elem, (i > 0 ? KEY_HIERLINE + "_" + (i + mins - 1) : KEY_HIERLINE));
-          layer.appendChild(elem);
+          layer.appendChild(path.makeElement(svgp, (i > 0 ? KEY_HIERLINE + "_" + (i + mins - 1) : KEY_HIERLINE)));
         }
       }
       else {
@@ -387,9 +385,7 @@ public class DendrogramVisualization implements VisFactory {
             break;
           }
         }
-        Element elem = dendrogram.makeElement(svgp);
-        SVGUtil.setCSSClass(elem, KEY_HIERLINE);
-        layer.appendChild(elem);
+        layer.appendChild(dendrogram.makeElement(svgp, KEY_HIERLINE));
       }
 
       final double margin = style.getSize(StyleLibrary.MARGIN);

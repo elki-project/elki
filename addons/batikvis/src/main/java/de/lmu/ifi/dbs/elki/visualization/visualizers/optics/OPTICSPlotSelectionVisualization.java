@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,11 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -120,11 +124,6 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
     protected static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
 
     /**
-     * Element for the events
-     */
-    private Element etag;
-
-    /**
      * Element for the marker
      */
     private Element mtag;
@@ -149,14 +148,10 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
       makeLayerElement();
       addCSSClasses();
 
-      mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
+      layer.appendChild(mtag = svgp.svgElement(SVGConstants.SVG_G_TAG));
       addMarker();
 
-      DragableArea drag = new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this);
-      etag = drag.getElement();
-      // mtag first, etag must be the top Element
-      layer.appendChild(mtag);
-      layer.appendChild(etag);
+      layer.appendChild(new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this).getElement());
     }
 
     /**
@@ -259,16 +254,8 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
     private Mode getInputMode(Event evt) {
       if(evt instanceof DOMMouseEvent) {
         DOMMouseEvent domme = (DOMMouseEvent) evt;
-        // TODO: visual indication of mode possible?
-        if(domme.getShiftKey()) {
-          return Mode.ADD;
-        }
-        else if(domme.getCtrlKey()) {
-          return Mode.INVERT;
-        }
-        else {
-          return Mode.REPLACE;
-        }
+        // TODO: visual indication ofF mode possible?
+        return domme.getShiftKey() ? Mode.ADD : domme.getCtrlKey() ? Mode.INVERT : Mode.REPLACE;
       }
       // Default mode is replace.
       return Mode.REPLACE;
@@ -282,8 +269,7 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
      * @return Index of the object
      */
     private int getSelectedIndex(ClusterOrder order, SVGPoint cPt) {
-      int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
-      return mouseActIndex;
+      return (int) ((cPt.getX() / plotwidth) * order.size());
     }
 
     /**
@@ -301,20 +287,12 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
       }
 
       DBIDSelection selContext = context.getSelection();
-      HashSetModifiableDBIDs selection;
-      if(selContext == null || mode == Mode.REPLACE) {
-        selection = DBIDUtil.newHashSet();
-      }
-      else {
-        selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-      }
+      HashSetModifiableDBIDs selection = (selContext == null || mode == Mode.REPLACE) ? DBIDUtil.newHashSet() //
+          : DBIDUtil.newHashSet(selContext.getSelectedIds());
 
       for(DBIDArrayIter it = order.iter().seek(begin); it.getOffset() <= end; it.advance()) {
         if(mode == Mode.INVERT) {
-          if(!selection.contains(it)) {
-            selection.add(it);
-          }
-          else {
+          if(!selection.add(it)) {
             selection.remove(it);
           }
         }

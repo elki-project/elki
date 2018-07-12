@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -681,7 +681,7 @@ public final class SVGUtil {
     double cos1st = tmp.value;
 
     double sin2nd = FastMath.sinAndCos(angleStart + angleDelta, tmp);
-    double cos2nd = tmp.value;
+    double cos2nd = tmp.value; // Note: tmp is modified!
 
     double inner1stx = centerx + (innerRadius * sin1st);
     double inner1sty = centery - (innerRadius * cos1st);
@@ -693,15 +693,10 @@ public final class SVGUtil {
     double outer2ndx = centerx + (outerRadius * sin2nd);
     double outer2ndy = centery - (outerRadius * cos2nd);
 
-    double largeArc = 0;
-    if(angleDelta >= Math.PI) {
-      largeArc = 1;
-    }
-
-    SVGPath path = new SVGPath(inner1stx, inner1sty);
-    path.lineTo(outer1stx, outer1sty);
-    path.ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy);
-    path.lineTo(inner2ndx, inner2ndy);
+    double largeArc = angleDelta >= Math.PI ? 1 : 0;
+    SVGPath path = new SVGPath(inner1stx, inner1sty).lineTo(outer1stx, outer1sty) //
+        .ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy) //
+        .lineTo(inner2ndx, inner2ndy);
     if(innerRadius > 0) {
       path.ellipticalArc(innerRadius, innerRadius, 0, largeArc, 0, inner1stx, inner1sty);
     }
