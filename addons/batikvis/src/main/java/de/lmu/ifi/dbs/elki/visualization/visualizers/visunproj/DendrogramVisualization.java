@@ -311,7 +311,10 @@ public class DendrogramVisualization implements VisFactory {
           final int o1 = pos.intValue(it), p1 = cspol.getStyleForDBID(it);
           double x1 = coord.getX(o1), y1 = coord.getY(o1);
           if(DBIDUtil.equal(it, pa)) {
-            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(proy.applyAsDouble(h));
+            double y = proy.applyAsDouble(h);
+            if(Double.isFinite(y)) {
+              paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y);
+            }
             continue; // Root
           }
           final int o2 = pos.intValue(pa), p2 = cspol.getStyleForDBID(pa);
@@ -370,7 +373,10 @@ public class DendrogramVisualization implements VisFactory {
           final int o1 = pos.intValue(it);
           double x1 = coord.getX(o1), y1 = coord.getY(o1);
           if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
-            dendrogram.moveTo(x1, y1).verticalLineTo(proy.applyAsDouble(h));
+            double y = proy.applyAsDouble(h);
+            if(Double.isFinite(y)) {
+              dendrogram.moveTo(x1, y1).verticalLineTo(y);
+            }
             continue; // Root
           }
           final int o2 = pos.intValue(pa);

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
@@ -39,64 +38,109 @@ public class SVGPath {
   /**
    * String buffer for building the path.
    */
-  private StringBuilder buf = new StringBuilder();
+  private StringBuilder buf = new StringBuilder(200);
 
   /**
    * The last action we did, to not add unnecessary commands
    */
-  private String lastaction = null;
+  private char lastaction = 0;
 
   /**
-   * The absolute "smooth cubic to" SVG path command (missing from
-   * SVGConstants).
+   * Close path command.
    */
-  public static final String PATH_SMOOTH_CUBIC_TO = "S";
+  public static final char PATH_CLOSE = 'Z';
 
   /**
-   * The lower case version (relative) line to command.
+   * Absolute line to command.
    */
-  public static final String PATH_LINE_TO_RELATIVE = SVGConstants.PATH_LINE_TO.toLowerCase();
+  public static final char PATH_LINE_TO = 'L';
 
   /**
-   * The lower case version (relative) move command.
+   * Relative line to command.
    */
-  public static final String PATH_MOVE_RELATIVE = SVGConstants.PATH_MOVE.toLowerCase();
+  public static final char PATH_LINE_TO_RELATIVE = 'l';
 
   /**
-   * The lower case version (relative) horizontal line to command.
+   * Absolute move command.
    */
-  public static final String PATH_HORIZONTAL_LINE_TO_RELATIVE = SVGConstants.PATH_HORIZONTAL_LINE_TO.toLowerCase();
+  public static final char PATH_MOVE = 'M';
 
   /**
-   * The lower case version (relative) vertical line to command.
+   * Relative move command.
    */
-  public static final String PATH_VERTICAL_LINE_TO_RELATIVE = SVGConstants.PATH_VERTICAL_LINE_TO.toLowerCase();
+  public static final char PATH_MOVE_RELATIVE = 'm';
 
   /**
-   * The lower case version (relative) cubic line to command.
+   * Absolute horizontal line to command.
    */
-  public static final String PATH_CUBIC_TO_RELATIVE = SVGConstants.PATH_CUBIC_TO.toLowerCase();
+  public static final char PATH_HORIZONTAL_LINE_TO = 'H';
 
   /**
-   * The lower case version (relative) smooth cubic to command.
+   * Relative horizontal line to command.
    */
-  public static final String PATH_SMOOTH_CUBIC_TO_RELATIVE = PATH_SMOOTH_CUBIC_TO.toLowerCase();
+  public static final char PATH_HORIZONTAL_LINE_TO_RELATIVE = 'h';
 
   /**
-   * The lower case version (relative) quadratic interpolation to command.
+   * Absolute vertical line to command.
    */
-  public static final String PATH_QUAD_TO_RELATIVE = SVGConstants.PATH_QUAD_TO.toLowerCase();
+  public static final char PATH_VERTICAL_LINE_TO = 'V';
 
   /**
-   * The lower case version (relative) smooth quadratic interpolation to
+   * Relative vertical line to command.
+   */
+  public static final char PATH_VERTICAL_LINE_TO_RELATIVE = 'v';
+
+  /**
+   * Absolute cubic line to command.
+   */
+  public static final char PATH_CUBIC_TO = 'C';
+
+  /**
+   * Relative cubic line to command.
+   */
+  public static final char PATH_CUBIC_TO_RELATIVE = 'c';
+
+  /**
+   * Absolute "smooth cubic to" SVG path command.
+   */
+  public static final char PATH_SMOOTH_CUBIC_TO = 'S';
+
+  /**
+   * Relative smooth cubic to command.
+   */
+  public static final char PATH_SMOOTH_CUBIC_TO_RELATIVE = 's';
+
+  /**
+   * Absolute quadratic interpolation to command.
+   */
+  public static final char PATH_QUAD_TO = 'Q';
+
+  /**
+   * Relative quadratic interpolation to command.
+   */
+  public static final char PATH_QUAD_TO_RELATIVE = 'q';
+
+  /**
+   * Absolute smooth quadratic interpolation to
    * command.
    */
-  public static final String PATH_SMOOTH_QUAD_TO_RELATIVE = SVGConstants.PATH_SMOOTH_QUAD_TO.toLowerCase();
+  public static final char PATH_SMOOTH_QUAD_TO = 'T';
 
   /**
-   * The lower case version (relative) path arc command.
+   * Relative smooth quadratic interpolation to
+   * command.
    */
-  public static final String PATH_ARC_RELATIVE = SVGConstants.PATH_ARC.toLowerCase();
+  public static final char PATH_SMOOTH_QUAD_TO_RELATIVE = 't';
+
+  /**
+   * Absolute path arc command.
+   */
+  public static final char PATH_ARC = 'A';
+
+  /**
+   * Relative path arc command.
+   */
+  public static final char PATH_ARC_RELATIVE = 'a';
 
   /**
    * Empty path constructor.
@@ -172,7 +216,7 @@ public class SVGPath {
    * @return Path freshness
    */
   public boolean isStarted() {
-    return lastaction != null;
+    return lastaction != 0;
   }
 
   /**
@@ -183,11 +227,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath lineTo(double x, double y) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY //
-        && y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(SVGConstants.PATH_LINE_TO, x, y);
-    }
-    return this;
+    return append(PATH_LINE_TO).append(x).append(y);
   }
 
   /**
@@ -208,11 +248,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeLineTo(double x, double y) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY //
-        && y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(PATH_LINE_TO_RELATIVE, x, y);
-    }
-    return this;
+    return append(PATH_LINE_TO_RELATIVE).append(x).append(y);
   }
 
   /**
@@ -232,10 +268,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath horizontalLineTo(double x) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY) {
-      append(SVGConstants.PATH_HORIZONTAL_LINE_TO, x);
-    }
-    return this;
+    return append(PATH_HORIZONTAL_LINE_TO).append(x);
   }
 
   /**
@@ -245,10 +278,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeHorizontalLineTo(double x) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY) {
-      append(PATH_HORIZONTAL_LINE_TO_RELATIVE, x);
-    }
-    return this;
+    return append(PATH_HORIZONTAL_LINE_TO_RELATIVE).append(x);
   }
 
   /**
@@ -258,10 +288,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath verticalLineTo(double y) {
-    if(y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(SVGConstants.PATH_VERTICAL_LINE_TO, y);
-    }
-    return this;
+    return append(PATH_VERTICAL_LINE_TO).append(y);
   }
 
   /**
@@ -271,10 +298,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeVerticalLineTo(double y) {
-    if(y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(PATH_VERTICAL_LINE_TO_RELATIVE, y);
-    }
-    return this;
+    return append(PATH_VERTICAL_LINE_TO_RELATIVE).append(y);
   }
 
   /**
@@ -285,8 +309,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath moveTo(double x, double y) {
-    append(SVGConstants.PATH_MOVE, x, y);
-    return this;
+    return append(PATH_MOVE).append(x).append(y);
   }
 
   /**
@@ -307,11 +330,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeMoveTo(double x, double y) {
-    if(x > Double.NEGATIVE_INFINITY && x < Double.POSITIVE_INFINITY //
-        && y > Double.NEGATIVE_INFINITY && y < Double.POSITIVE_INFINITY) {
-      append(PATH_MOVE_RELATIVE, x, y);
-    }
-    return this;
+    return append(PATH_MOVE_RELATIVE).append(x).append(y);
   }
 
   /**
@@ -336,8 +355,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath cubicTo(double c1x, double c1y, double c2x, double c2y, double x, double y) {
-    append(SVGConstants.PATH_CUBIC_TO, c1x, c1y, c2x, c2y, x, y);
-    return this;
+    return append(PATH_CUBIC_TO).append(c1x).append(c1y).append(c2x).append(c2y).append(x).append(y);
   }
 
   /**
@@ -349,8 +367,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath cubicTo(double[] c1xy, double[] c2xy, double[] xy) {
-    append(SVGConstants.PATH_CUBIC_TO, c1xy[0], c1xy[1], c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_CUBIC_TO).append(c1xy[0]).append(c1xy[1]).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -365,8 +382,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeCubicTo(double c1x, double c1y, double c2x, double c2y, double x, double y) {
-    append(PATH_CUBIC_TO_RELATIVE, c1x, c1y, c2x, c2y, x, y);
-    return this;
+    return append(PATH_CUBIC_TO_RELATIVE).append(c1x).append(c1y).append(c2x).append(c2y).append(x).append(y);
   }
 
   /**
@@ -378,8 +394,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeCubicTo(double[] c1xy, double[] c2xy, double[] xy) {
-    append(PATH_CUBIC_TO_RELATIVE, c1xy[0], c1xy[1], c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_CUBIC_TO_RELATIVE).append(c1xy[0]).append(c1xy[1]).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -392,8 +407,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath smoothCubicTo(double c2x, double c2y, double x, double y) {
-    append(PATH_SMOOTH_CUBIC_TO, c2x, c2y, x, y);
-    return this;
+    return append(PATH_SMOOTH_CUBIC_TO).append(c2x).append(c2y).append(x).append(y);
   }
 
   /**
@@ -404,8 +418,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath smoothCubicTo(double[] c2xy, double[] xy) {
-    append(PATH_SMOOTH_CUBIC_TO, c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_SMOOTH_CUBIC_TO).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -418,8 +431,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeSmoothCubicTo(double c2x, double c2y, double x, double y) {
-    append(PATH_SMOOTH_CUBIC_TO_RELATIVE, c2x, c2y, x, y);
-    return this;
+    return append(PATH_SMOOTH_CUBIC_TO_RELATIVE).append(c2x).append(c2y).append(x).append(y);
   }
 
   /**
@@ -430,8 +442,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeSmoothCubicTo(double[] c2xy, double[] xy) {
-    append(PATH_SMOOTH_CUBIC_TO_RELATIVE, c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_SMOOTH_CUBIC_TO_RELATIVE).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -444,8 +455,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath quadTo(double c1x, double c1y, double x, double y) {
-    append(SVGConstants.PATH_QUAD_TO, c1x, c1y, x, y);
-    return this;
+    return append(PATH_QUAD_TO).append(c1x).append(c1y).append(x).append(y);
   }
 
   /**
@@ -456,8 +466,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath quadTo(double[] c1xy, double[] xy) {
-    append(SVGConstants.PATH_QUAD_TO, c1xy[0], c1xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_QUAD_TO).append(c1xy[0]).append(c1xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -470,8 +479,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeQuadTo(double c1x, double c1y, double x, double y) {
-    append(PATH_QUAD_TO_RELATIVE, c1x, c1y, x, y);
-    return this;
+    return append(PATH_QUAD_TO_RELATIVE).append(c1x).append(c1y).append(x).append(y);
   }
 
   /**
@@ -482,8 +490,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeQuadTo(double[] c1xy, double[] xy) {
-    append(PATH_QUAD_TO_RELATIVE, c1xy[0], c1xy[1], xy[0], xy[1]);
-    return this;
+    return append(PATH_QUAD_TO_RELATIVE).append(c1xy[0]).append(c1xy[1]).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -494,8 +501,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath smoothQuadTo(double x, double y) {
-    append(SVGConstants.PATH_SMOOTH_QUAD_TO, x, y);
-    return this;
+    return append(PATH_SMOOTH_QUAD_TO).append(x).append(y);
   }
 
   /**
@@ -505,8 +511,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath smoothQuadTo(double[] xy) {
-    append(SVGConstants.PATH_SMOOTH_QUAD_TO, xy[0], xy[1]);
-    return this;
+    return append(PATH_SMOOTH_QUAD_TO).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -517,8 +522,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeSmoothQuadTo(double x, double y) {
-    append(PATH_SMOOTH_QUAD_TO_RELATIVE, x, y);
-    return this;
+    return append(PATH_SMOOTH_QUAD_TO_RELATIVE).append(x).append(y);
   }
 
   /**
@@ -528,8 +532,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath relativeSmoothQuadTo(double[] xy) {
-    append(PATH_SMOOTH_QUAD_TO_RELATIVE, xy[0], xy[1]);
-    return this;
+    return append(PATH_SMOOTH_QUAD_TO_RELATIVE).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -544,8 +547,7 @@ public class SVGPath {
    * @param y new coordinates
    */
   public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
-    append(SVGConstants.PATH_ARC, rx, ry, ar, la, sp, x, y);
-    return this;
+    return append(PATH_ARC).append(rx).append(ry).append(ar).append(la).append(sp).append(x).append(y);
   }
 
   /**
@@ -559,8 +561,7 @@ public class SVGPath {
    * @param xy new coordinates
    */
   public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double[] xy) {
-    append(SVGConstants.PATH_ARC, rx, ry, ar, la, sp, xy[0], xy[1]);
-    return this;
+    return append(PATH_ARC).append(rx).append(ry).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -573,8 +574,7 @@ public class SVGPath {
    * @param xy new coordinates
    */
   public SVGPath ellipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
-    append(SVGConstants.PATH_ARC, rxy[0], rxy[1], ar, la, sp, xy[0], xy[1]);
-    return this;
+    return append(PATH_ARC).append(rxy[0]).append(rxy[1]).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -589,8 +589,7 @@ public class SVGPath {
    * @param y new coordinates
    */
   public SVGPath relativeEllipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
-    append(PATH_ARC_RELATIVE, rx, ry, ar, la, sp, x, y);
-    return this;
+    return append(PATH_ARC_RELATIVE).append(rx).append(ry).append(ar).append(la).append(sp).append(x).append(y);
   }
 
   /**
@@ -604,8 +603,7 @@ public class SVGPath {
    * @param xy new coordinates
    */
   public SVGPath relativeEllipticalArc(double rx, double ry, double ar, double la, double sp, double[] xy) {
-    append(PATH_ARC_RELATIVE, rx, ry, ar, la, sp, xy[0], xy[1]);
-    return this;
+    return append(PATH_ARC_RELATIVE).append(rx).append(ry).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
   }
 
   /**
@@ -618,30 +616,43 @@ public class SVGPath {
    * @param xy new coordinates
    */
   public SVGPath relativeEllipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
-    append(PATH_ARC_RELATIVE, rxy[0], rxy[1], ar, la, sp, xy[0], xy[1]);
-    return this;
+    return append(PATH_ARC_RELATIVE).append(rxy[0]).append(rxy[1]).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
   }
 
   /**
    * Append an action to the current path.
    *
    * @param action Current action
-   * @param ds coordinates.
    */
-  private void append(String action, double... ds) {
-    if(lastaction == null) {
-      assert (action == "M") : "Paths must begin with a move to the initial position!";
-    }
+  private SVGPath append(char action) {
+    assert lastaction != 0 || action == PATH_MOVE : "Paths must begin with a move to the initial position!";
     if(lastaction != action) {
       buf.append(action);
       lastaction = action;
     }
-    for(double d : ds) {
-      if(!Double.isFinite(d)) {
-        throw new IllegalArgumentException("Cannot draw an infinite/NaN position.");
-      }
-      buf.append(SVGUtil.FMT.format(d)).append(' ');
+    return this;
+  }
+
+  /**
+   * Append a value to the current path.
+   *
+   * @param x coordinate.
+   */
+  private SVGPath append(double x) {
+    if(!Double.isFinite(x)) {
+      throw new IllegalArgumentException("Cannot draw an infinite/NaN position.");
     }
+    if(x >= 0) {
+      final int l = buf.length();
+      if(l > 0) {
+        char c = buf.charAt(l - 1);
+        assert c != 'e' && c != 'E' : "Invalid exponential in path";
+        if(c >= '0' && c <= '9')
+          buf.append(' ');
+      }
+    }
+    buf.append(SVGUtil.FMT.format(x));
+    return this;
   }
 
   /**
@@ -650,27 +661,12 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath close() {
-    if(lastaction != SVGConstants.PATH_CLOSE) {
-      buf.append(SVGConstants.PATH_CLOSE);
-      lastaction = SVGConstants.PATH_CLOSE;
+    assert lastaction != 0 : "Paths must begin with a move to the initial position!";
+    if(lastaction != PATH_CLOSE) {
+      buf.append(' ').append(PATH_CLOSE);
+      lastaction = PATH_CLOSE;
     }
     return this;
-  }
-
-  /**
-   * Turn the path buffer into an SVG element.
-   *
-   * @param document Document context (= element factory)
-   * @return SVG Element
-   */
-  public Element makeElement(Document document) {
-    Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
-    // We usually generate an extra space at the end. Remove it.
-    if(buf.length() > 0 && buf.charAt(buf.length() - 1) == ' ') {
-      buf.setLength(buf.length() - 1);
-    }
-    elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
-    return elem;
   }
 
   /**
@@ -687,7 +683,8 @@ public class SVGPath {
 
   /**
    * Turn the path buffer into an SVG element.
-   *
+   * O
+   * 
    * @param plot Plot context (= element factory)
    * @param cssclass CSS class
    * @return SVG Element

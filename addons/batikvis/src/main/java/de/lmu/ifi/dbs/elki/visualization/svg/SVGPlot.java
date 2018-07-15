@@ -236,7 +236,9 @@ public class SVGPlot {
    */
   public Element svgElement(String name, String cssclass) {
     Element elem = SVGUtil.svgElement(document, name);
-    elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
+    if(cssclass != null) {
+      elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
+    }
     return elem;
   }
 

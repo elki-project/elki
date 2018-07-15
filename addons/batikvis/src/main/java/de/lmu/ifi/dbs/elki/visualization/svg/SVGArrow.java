@@ -52,26 +52,6 @@ public final class SVGArrow {
   }
 
   /**
-   * Constant for "up"
-   */
-  public static final Direction UP = Direction.UP;
-
-  /**
-   * Constant for "down"
-   */
-  public static final Direction DOWN = Direction.DOWN;
-
-  /**
-   * Constant for "right"
-   */
-  public static final Direction RIGHT = Direction.RIGHT;
-
-  /**
-   * Constant for "left"
-   */
-  public static final Direction LEFT = Direction.LEFT;
-
-  /**
    * Draw an arrow at the given position.
    * 
    * Note: the arrow is an unstyled svg path. You need to apply style
@@ -97,7 +77,7 @@ public final class SVGArrow {
     case UP:
       return new SVGPath().drawTo(x - hs, y + hs).drawTo(x, y - hs).drawTo(x + hs, y + hs).drawTo(x - hs, y + hs).close().makeElement(svgp);
     default:
-      throw new RuntimeException("Unexpected direction: " + dir);
+      throw new IllegalArgumentException("Unexpected direction: " + dir);
     }
   }
 }
