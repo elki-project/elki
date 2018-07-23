@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.composedOf Collector
  */
 @Reference(authors = "R. C. Prim", //
-title = "Shortest connection networks and some generalizations", //
-booktitle = "Bell System Technical Journal, 36 (1957)")
+    title = "Shortest connection networks and some generalizations", //
+    booktitle = "Bell System Technical Journal, 36 (1957)")
 public class PrimsMinimumSpanningTree {
   /**
    * Adapter class for double[][] matrixes.
@@ -85,7 +85,7 @@ public class PrimsMinimumSpanningTree {
     // We always start at "random" node 0
     // Note: we use this below in the "j" loop!
     int current = 0;
-    connected[0] = 1;
+    connected[current] = 1;
     best[current] = 0;
 
     // Search
@@ -151,7 +151,7 @@ public class PrimsMinimumSpanningTree {
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
       // Note: we assume we started with 0, and can thus skip it
-      for(int j = 1; j < n; ++j) {
+      for(int j = 0; j < n; ++j) {
         if(connected[j] == 1) {
           continue;
         }
@@ -160,7 +160,7 @@ public class PrimsMinimumSpanningTree {
           best[j] = dist;
           src[j] = current;
         }
-        if(best[j] < newbestd) {
+        if(best[j] < newbestd || newbesti == -1) {
           newbestd = best[j];
           newbesti = j;
         }
@@ -242,6 +242,7 @@ public class PrimsMinimumSpanningTree {
    * 
    * @author Erich Schubert
    */
+  @FunctionalInterface
   public interface Collector {
     /**
      * Add a new edge to the output.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -52,5 +54,26 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, clustering, 0.686953412);
     testClusterSizes(clustering, new int[] { 1, 200, 437 });
+  }
+
+  /**
+   * Regression test against github #46O
+   */
+  @Test
+  public void testHDBSCANCornerCase() {
+    Database db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 1, 0 }, { 0, 1 } }), null);
+    db.initialize();
+    new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .build().run(db);
+    db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 0 } }), null);
+    db.initialize();
+    new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .build().run(db);
   }
 }
