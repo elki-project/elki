@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,18 +23,20 @@ package de.lmu.ifi.dbs.elki.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -113,10 +115,14 @@ public abstract class AbstractIndexStructureTest {
    *
    * @param inputparams
    */
-  protected void testExactEuclidean(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  protected void testExactEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
-    inputparams.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    ListParameterization inputparams = new ListParameterization() //
+        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    if(factory != null) {
+      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+    }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
@@ -166,10 +172,14 @@ public abstract class AbstractIndexStructureTest {
    *
    * @param inputparams
    */
-  protected void testExactCosine(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  protected void testExactCosine(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
-    inputparams.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    ListParameterization inputparams = new ListParameterization() //
+        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    if(factory != null) {
+      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+    }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistanceFunction.STATIC);
@@ -211,6 +221,34 @@ public abstract class AbstractIndexStructureTest {
         DoubleVector c2 = DoubleVector.wrap(cosshouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
+    }
+  }
+
+  /**
+   * Test degenerate case: single point.
+   * 
+   * @param factory
+   */
+  protected void testSinglePoint(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    ArrayAdapterDatabaseConnection dbc = new ArrayAdapterDatabaseConnection(new double[][] { { 1, 0 } });
+    Database db = new StaticArrayDatabase(dbc, factory != null ? Arrays.asList(factory) : null);
+    db.initialize();
+    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    DBIDRef first = rep.iterDBIDs();
+    if(expectKNNQuery != null) {
+      KNNQuery<DoubleVector> knnq = rep.getKNNQuery(dist);
+      assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
+      KNNList knn = knnq.getKNNForDBID(first, 1);
+      assertEquals("Wrong number of knn results", 1, knn.size());
+      assertTrue("Wrong knn result", DBIDUtil.equal(knn.iter(), first));
+    }
+    if(expectRangeQuery != null) {
+      RangeQuery<DoubleVector> rangeq = rep.getRangeQuery(dist);
+      assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
+      DoubleDBIDList range = rangeq.getRangeForDBID(first, 0);
+      assertEquals("Wrong number of range results", 1, range.size());
+      assertTrue("Wrong range result", DBIDUtil.equal(range.iter(), first));
     }
   }
 }

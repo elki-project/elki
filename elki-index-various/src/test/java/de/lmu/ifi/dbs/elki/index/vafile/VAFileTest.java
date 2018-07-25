@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,8 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the VAfile index.
@@ -38,9 +37,9 @@ public class VAFileTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testVAFile() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, VAFile.Factory.class);
-    spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
-    testExactEuclidean(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
+    VAFile.Factory<?> factory = new ELKIBuilder<>(VAFile.Factory.class) //
+        .with(VAFile.Factory.PARTITIONS_ID, 4).build();
+    testExactEuclidean(factory, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
+    testSinglePoint(factory, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
   }
 }

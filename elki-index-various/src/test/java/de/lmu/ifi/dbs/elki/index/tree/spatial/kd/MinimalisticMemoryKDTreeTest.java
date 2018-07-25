@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,8 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.kd;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the k-d-tree index.
@@ -34,12 +33,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class MinimalisticMemoryKDTreeTest extends AbstractIndexStructureTest {
   /**
-   * Test {@link MinimalisticMemoryKDTree} using a file based database connection.
+   * Test {@link MinimalisticMemoryKDTree} using a file based database
+   * connection.
    */
   @Test
   public void testMinimalisticMemoryKDTree() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MinimalisticMemoryKDTree.Factory.class);
-    testExactEuclidean(spatparams, MinimalisticMemoryKDTree.KDTreeKNNQuery.class, MinimalisticMemoryKDTree.KDTreeRangeQuery.class);
+    MinimalisticMemoryKDTree.Factory<?> factory = new ELKIBuilder<>(MinimalisticMemoryKDTree.Factory.class).build();
+    testExactEuclidean(factory, MinimalisticMemoryKDTree.KDTreeKNNQuery.class, MinimalisticMemoryKDTree.KDTreeRangeQuery.class);
+    testSinglePoint(factory, MinimalisticMemoryKDTree.KDTreeKNNQuery.class, MinimalisticMemoryKDTree.KDTreeRangeQuery.class);
   }
 }

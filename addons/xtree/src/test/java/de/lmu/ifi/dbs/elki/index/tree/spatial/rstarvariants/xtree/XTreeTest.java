@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,12 +22,11 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the X-tree index.
@@ -44,9 +43,8 @@ public class XTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testXTree() {
-    ListParameterization xtreeparams = new ListParameterization();
-    xtreeparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, XTreeFactory.class);
-    xtreeparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactEuclidean(xtreeparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    XTreeFactory<?> factory = new ELKIBuilder<>(XTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300).build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 }

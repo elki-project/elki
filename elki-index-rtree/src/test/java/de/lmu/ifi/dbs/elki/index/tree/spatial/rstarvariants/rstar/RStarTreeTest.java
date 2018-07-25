@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,18 +22,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.AdaptiveSortTileRecursiveBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.FileOrderBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.MaxExtensionBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.MaxExtensionSortTileRecursiveBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.OneDimSortBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.SpatialSortBulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.*;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.AngTanLinearSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.GreeneSplit;
@@ -44,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the R*-tree index.
@@ -58,15 +52,12 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRStarTree() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -76,19 +67,14 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRStarTreeFast() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
-    spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
-    spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class) //
+        .with(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -96,17 +82,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRTreeLinearSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeLinearSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeLinearSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -114,17 +96,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRTreeQuadraticSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -132,17 +110,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRTreeGreeneSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, GreeneSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, GreeneSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, GreeneSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -150,17 +124,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRTreeAngTanLinearSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, AngTanLinearSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, AngTanLinearSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -168,17 +138,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testFileOrderBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, FileOrderBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, FileOrderBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -186,17 +152,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testMaxExtensionBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -204,17 +166,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testOneDimSortBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, OneDimSortBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, OneDimSortBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -223,19 +181,14 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testZCurveSpatialSortBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, ZCurveSpatialSorter.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, ZCurveSpatialSorter.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, ZCurveSpatialSorter.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -244,19 +197,14 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testHilbertSpatialSortBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, HilbertSpatialSorter.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, HilbertSpatialSorter.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, HilbertSpatialSorter.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -265,19 +213,14 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testPeanoSpatialSortBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, PeanoSpatialSorter.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, PeanoSpatialSorter.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, PeanoSpatialSorter.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -286,19 +229,14 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testBinarySplitSpatialSortBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, BinarySplitSpatialSorter.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class);
-    spatparams.addParameter(SpatialSortBulkSplit.Parameterizer.SORTER_ID, BinarySplitSpatialSorter.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, BinarySplitSpatialSorter.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -306,17 +244,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testSortTileRecursiveBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -325,17 +259,13 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testMaxExtensionSortTileRecursiveBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -344,16 +274,12 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testAdaptiveSortTileRecursiveBulkSplit() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class);
-    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    //
-    spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class);
-    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
+        .build();
+    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 }

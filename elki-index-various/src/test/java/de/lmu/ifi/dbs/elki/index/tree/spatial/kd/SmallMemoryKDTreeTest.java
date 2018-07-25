@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,8 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.kd;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the k-d-tree index.
@@ -38,8 +37,8 @@ public class SmallMemoryKDTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testSmallMemoryKDTree() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, SmallMemoryKDTree.Factory.class);
-    testExactEuclidean(spatparams, SmallMemoryKDTree.KDTreeKNNQuery.class, SmallMemoryKDTree.KDTreeRangeQuery.class);
+    SmallMemoryKDTree.Factory<?> factory = new ELKIBuilder<>(SmallMemoryKDTree.Factory.class).build();
+    testExactEuclidean(factory, SmallMemoryKDTree.KDTreeKNNQuery.class, SmallMemoryKDTree.KDTreeRangeQuery.class);
+    testSinglePoint(factory, SmallMemoryKDTree.KDTreeKNNQuery.class, SmallMemoryKDTree.KDTreeRangeQuery.class);
   }
 }

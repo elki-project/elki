@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,8 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the partial VAfile index.
@@ -38,9 +37,9 @@ public class PartialVAFileTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testPartialVAFile() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, PartialVAFile.Factory.class);
-    spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
-    testExactEuclidean(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    PartialVAFile.Factory<?> factory = new ELKIBuilder<>(PartialVAFile.Factory.class) //
+        .with(PartialVAFile.Factory.PARTITIONS_ID, 4).build();
+    testExactEuclidean(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    testSinglePoint(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
   }
 }

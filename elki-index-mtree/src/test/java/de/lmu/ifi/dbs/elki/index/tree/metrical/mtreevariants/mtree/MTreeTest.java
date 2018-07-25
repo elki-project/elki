@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,12 +22,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the M-tree.
@@ -40,10 +40,10 @@ public class MTreeTest extends AbstractIndexStructureTest {
    * Test {@link MTree} using a file based database connection.
    */
   @Test
-  public void testMetrical() {
-    ListParameterization metparams = new ListParameterization();
-    metparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MTreeFactory.class);
-    metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactEuclidean(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
+  public void testEuclidean() {
+    MTreeFactory<DoubleVector> factory = new ELKIBuilder<>(MTreeFactory.class) //
+        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300).build();
+    testExactEuclidean(factory, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
+    testSinglePoint(factory, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
 }

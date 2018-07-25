@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,8 @@ package de.lmu.ifi.dbs.elki.index.invertedlist;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for the iDistance index.
@@ -38,8 +37,9 @@ public class InMemoryInvertedIndexTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testInvertedIndex() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, InMemoryInvertedIndex.Factory.class);
-    testExactCosine(spatparams, InMemoryInvertedIndex.CosineKNNQuery.class, InMemoryInvertedIndex.CosineRangeQuery.class);
+    // We could have used "new InMemoryInvertedIndex.Factory()", but we also
+    // want to test the parameterizer code.
+    InMemoryInvertedIndex.Factory<?> factory = new ELKIBuilder<>(InMemoryInvertedIndex.Factory.class).build();
+    testExactCosine(factory, InMemoryInvertedIndex.CosineKNNQuery.class, InMemoryInvertedIndex.CosineRangeQuery.class);
   }
 }
