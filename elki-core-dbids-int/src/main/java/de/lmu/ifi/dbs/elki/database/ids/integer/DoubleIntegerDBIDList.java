@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -80,9 +80,8 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
    * @param size Initial size
    */
   protected DoubleIntegerDBIDList(int size) {
-    this.dists = new double[size];
-    this.ids = new int[size];
-    // This is default: this.size = 0;
+    this.dists = size > 0 ? new double[size] : EMPTY_DISTS;
+    this.ids = size > 0 ? new int[size] : EMPTY_IDS;
   }
 
   @Override
@@ -153,7 +152,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
       return;
     }
     final int len = dists.length;
-    final int newlength = len + (len >> 1);
+    final int newlength = len + (len >> 1) + 1;
     double[] odists = dists;
     dists = new double[newlength];
     System.arraycopy(odists, 0, dists, 0, odists.length);
