@@ -111,3 +111,5 @@ shadowJar {
   exclude "it/unimi/dsi/fastutil/booleans/" // fastutil
   exclude "it/unimi/dsi/fastutil/shorts/" // fastutil
 }
+
+assemble.dependsOn shadowJar
