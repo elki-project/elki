@@ -82,7 +82,7 @@ public class BalancedDistribution implements DistributionStrategy {
       assign.addToSecond(node.getEntry(i2), dis2[i2]);
       assigned[i2] = true;
     }
-    assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getFirstAssignments().size() + " != " + n;
+    assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getSecondAssignments().size() + " != " + n;
     assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : "Not balanced: " + assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
     return assign;
   }

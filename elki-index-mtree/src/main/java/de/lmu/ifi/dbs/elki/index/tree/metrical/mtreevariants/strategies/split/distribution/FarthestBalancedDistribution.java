@@ -22,53 +22,49 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.d
 
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 
 /**
- * Generalized hyperplane entry distribution strategy of the M-tree.
- *
- * This strategy does not produce balanced trees, but often produces faster
- * access times, according to the original publication.
- *
- * Reference:
- * <p>
- * P. Ciaccia, M. Patella, and P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
- * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
+ * Balanced entry distribution strategy of the M-tree, beginning with the most
+ * difficult points first. This should produce smaller covers.
  *
  * @author Erich Schubert
  */
-@Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
-    title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
-    booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
-    url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class GeneralizedHyperplaneDistribution implements DistributionStrategy {
+public class FarthestBalancedDistribution implements DistributionStrategy {
   @Override
   public <E extends MTreeEntry> Assignments<E> distribute(AbstractNode<E> node, int routing1, double[] dis1, int routing2, double[] dis2) {
-    final int n = node.getNumEntries();
+    final int n = node.getNumEntries(), l = n - 2;
     assert dis1.length == n && dis2.length == n;
+    int[] idx1 = new int[l];
+    for(int i = 0, j = 0; i < n; i++) {
+      if(i != routing1 && i != routing2) {
+        idx1[j++] = i;
+      }
+    }
+
+    // Descending, by max distance to routing objects:
+    IntegerArrayQuickSort.sort(idx1, 0, l, (a, b) -> Double.compare(Math.max(dis1[b], dis2[b]), Math.max(dis1[a], dis2[a])));
+
     final E e1 = node.getEntry(routing1), e2 = node.getEntry(routing2);
-    Assignments<E> assign = new Assignments<>(e1.getRoutingObjectID(), e2.getRoutingObjectID(), n - 1);
+    Assignments<E> assign = new Assignments<>(e1.getRoutingObjectID(), e2.getRoutingObjectID(), (n + 1) >> 1);
     assign.addToFirst(e1, 0.);
     assign.addToSecond(e2, 0.);
 
-    for(int i = 0, c1 = 1, c2 = 1; i < n; ++i) {
-      if(i == routing1 || i == routing2) {
-        continue;
-      }
-      final double d1 = dis1[i], d2 = dis2[i];
-      if(d1 < d2 || (d1 == d2 && c1 < c2)) {
+    final int h = (n + 1) >> 1;
+    for(int p = 0, s1 = 1, s2 = 1; p < l; ++p) {
+      int i = idx1[p];
+      double d1 = dis1[i], d2 = dis2[i];
+      if(s2 == h || (s1 != h && (d1 < d2 || (d1 == d2 && s1 < s2)))) {
         assign.addToFirst(node.getEntry(i), d1);
-        ++c1;
+        s1++;
       }
       else {
         assign.addToSecond(node.getEntry(i), d2);
-        ++c2;
+        s2++;
       }
     }
     assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getSecondAssignments().size() + " != " + n;
+    assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : "Not balanced: " + assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
     return assign;
   }
 }
