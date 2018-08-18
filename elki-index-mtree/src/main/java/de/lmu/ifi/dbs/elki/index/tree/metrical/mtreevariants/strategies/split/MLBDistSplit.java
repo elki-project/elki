@@ -74,16 +74,16 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
    */
   @Override
   public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {
-    final int n = node.getNumEntries(), l = n - 2;
-    double[] distanceMatrix = computeDistanceMatrix(tree, node);
+    final int n = node.getNumEntries();
+    double[][] distanceMatrix = computeDistanceMatrix(tree, node);
 
     // choose first and second routing object
     int besti = -1, bestj = -1;
     double currentMaxDist = Double.NEGATIVE_INFINITY;
     for(int i = 0; i < n; i++) {
-      int row = i * n;
+      double[] row_i = distanceMatrix[i];
       for(int j = i + 1; j < n; j++) {
-        double distance = distanceMatrix[row + j];
+        double distance = row_i[j];
         if(distance > currentMaxDist) {
           besti = i;
           bestj = j;
@@ -92,10 +92,7 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
       }
     }
 
-    int[] idx1 = new int[l], idx2 = new int[l];
-    double[] dis1 = new double[l], dis2 = new double[l];
-    distancesFromDistanceMatrix(distanceMatrix, n, besti, idx1, dis1, bestj, idx2, dis2);
-    return distributor.distribute(node, besti, idx1, dis1, bestj, idx2, dis2);
+    return distributor.distribute(node, besti, distanceMatrix[besti], bestj, distanceMatrix[bestj]);
   }
 
   /**

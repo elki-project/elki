@@ -70,18 +70,15 @@ public class MMRadSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, 
    */
   @Override
   public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {
-    final int n = node.getNumEntries(), l = n - 2;
-    double[] distanceMatrix = computeDistanceMatrix(tree, node);
-    int[] idx1 = new int[l], idx2 = new int[l];
-    double[] dis1 = new double[l], dis2 = new double[l];
+    final int n = node.getNumEntries();
+    double[][] distanceMatrix = computeDistanceMatrix(tree, node);
 
     double miSumCR = Double.POSITIVE_INFINITY;
     boolean leaf = node.isLeaf();
     Assignments<E> bestAssignment = null;
     for(int i = 0; i < n; i++) {
       for(int j = i + 1; j < n; j++) {
-        distancesFromDistanceMatrix(distanceMatrix, n, i, idx1, dis1, j, idx2, dis2);
-        Assignments<E> currentAssignments = distributor.distribute(node, i, idx1, dis1, j, idx2, dis2);
+        Assignments<E> currentAssignments = distributor.distribute(node, i, distanceMatrix[i], j, distanceMatrix[j]);
 
         double maxCR = Math.max(currentAssignments.computeFirstCover(leaf), currentAssignments.computeSecondCover(leaf));
         if(maxCR < miSumCR) {

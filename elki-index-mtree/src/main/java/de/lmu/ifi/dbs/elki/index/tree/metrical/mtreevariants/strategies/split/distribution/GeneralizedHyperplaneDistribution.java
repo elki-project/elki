@@ -22,11 +22,13 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.d
 
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Balanced entry distribution strategy of the M-tree.
+ * Generalized hyperplane entry distribution strategy of the M-tree.
+ *
+ * This strategy does not produce balanced trees, but often produces faster
+ * access times, according to the original publication.
  *
  * Reference:
  * <p>
@@ -42,48 +44,31 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class BalancedDistribution implements DistributionStrategy {
+public class GeneralizedHyperplaneDistribution implements DistributionStrategy {
   @Override
   public <E extends MTreeEntry> Assignments<E> distribute(AbstractNode<E> node, int routing1, double[] dis1, int routing2, double[] dis2) {
-    final int n = node.getNumEntries(), l = n - 2;
+    final int n = node.getNumEntries();
     assert dis1.length == n && dis2.length == n;
-    int[] idx1 = new int[l], idx2 = new int[l];
-    for(int i = 0, j = 0; i < n; i++) {
-      if(i != routing1 && i != routing2) {
-        idx1[j] = idx2[j] = i;
-        ++j;
-      }
-    }
-
-    IntegerArrayQuickSort.sort(idx1, 0, l, (a, b) -> Double.compare(dis1[a], dis1[b]));
-    IntegerArrayQuickSort.sort(idx2, 0, l, (a, b) -> Double.compare(dis2[a], dis2[b]));
-
     final E e1 = node.getEntry(routing1), e2 = node.getEntry(routing2);
     Assignments<E> assign = new Assignments<>(e1.getRoutingObjectID(), e2.getRoutingObjectID(), (n + 1) >> 1);
     assign.addToFirst(e1, 0.);
     assign.addToSecond(e2, 0.);
 
-    boolean[] assigned = new boolean[n]; // Faster random access
-    assign: for(int p1 = 0, p2 = 0, i1, i2; p1 < l && p2 < l; ++p1, ++p2) {
-      // Next unassigned object in first set.
-      while(assigned[i1 = idx1[p1]]) {
-        if(++p1 >= l) {
-          break assign;
-        }
+    for(int p1 = 0, c1 = 0, c2 = 0; p1 < n; ++p1) {
+      if(p1 == routing1 || p1 == routing2) {
+        continue;
       }
-      assign.addToFirst(node.getEntry(i1), dis1[i1]);
-      assigned[i1] = true;
-      // Next unassigned object in second set.
-      while(assigned[i2 = idx2[p2]]) {
-        if(++p2 >= l) {
-          break assign;
-        }
+      final double d1 = dis1[p1], d2 = dis2[p1];
+      if(d1 < d2 || (d1 == d2 && c1 < c2)) {
+        assign.addToFirst(node.getEntry(p1), d1);
+        ++c1;
       }
-      assign.addToSecond(node.getEntry(i2), dis2[i2]);
-      assigned[i2] = true;
+      else {
+        assign.addToSecond(node.getEntry(p1), d2);
+        ++c2;
+      }
     }
     assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getFirstAssignments().size() + " != " + n;
-    assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : "Not balanced: " + assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
     return assign;
   }
 }

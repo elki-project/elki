@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -87,27 +86,22 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
    */
   @Override
   public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {
-    final int n = node.getNumEntries(), l = n - 2;
+    final int n = node.getNumEntries();
     int pos1 = random.nextInt(n), pos2 = random.nextInt(n - 1);
     pos2 = pos2 >= pos1 ? pos2 + 1 : pos2;
 
     // Build distance arrays:
-    int[] idx1 = new int[l], idx2 = new int[l];
-    double[] dis1 = new double[l], dis2 = new double[l];
+    double[] dis1 = new double[n], dis2 = new double[n];
     E e1 = node.getEntry(pos1), e2 = node.getEntry(pos2);
-    for(int j = 0, i = 0; j < n; j++) {
-      if(j == pos1 || j == pos2) {
+    for(int i = 0; i < n; i++) {
+      if(i == pos1 || i == pos2) {
         continue;
       }
-      final E ej = node.getEntry(j);
+      final E ej = node.getEntry(i);
       dis1[i] = tree.distance(e1, ej);
       dis2[i] = tree.distance(e2, ej);
-      idx1[i] = idx2[i] = j;
-      i++;
     }
-    DoubleIntegerArrayQuickSort.sort(dis1, idx1, l);
-    DoubleIntegerArrayQuickSort.sort(dis2, idx2, l);
-    return distributor.distribute(node, pos1, idx1, dis1, pos2, idx2, dis2);
+    return distributor.distribute(node, pos1, dis1, pos2, dis2);
   }
 
   /**

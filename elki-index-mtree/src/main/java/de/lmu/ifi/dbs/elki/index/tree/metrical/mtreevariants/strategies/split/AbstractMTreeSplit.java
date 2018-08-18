@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.BalancedDistribution;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.GeneralizedHyperplaneDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -50,8 +49,7 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
 
   /**
    * Constructor.
-   * O
-   * 
+   *
    * @param distributor Entry distribution strategy
    */
   public AbstractMTreeSplit(DistributionStrategy distributor) {
@@ -65,47 +63,18 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
    * @param node Node
    * @return Distance matrix
    */
-  protected static <E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> double[] computeDistanceMatrix(AbstractMTree<?, N, E, ?> tree, N node) {
+  protected static <E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> double[][] computeDistanceMatrix(AbstractMTree<?, N, E, ?> tree, N node) {
     final int n = node.getNumEntries();
-    double[] distancematrix = new double[n * n];
+    double[][] distancematrix = new double[n][n];
     // Build distance matrix
     for(int i = 0; i < n; i++) {
       E ei = node.getEntry(i);
-      for(int j = i + 1, b = i * n + j; j < n; j++, b++) {
-        double distance = tree.distance(ei, node.getEntry(j));
-        distancematrix[b] = distance;
-        distancematrix[j * n + i] = distance; // Symmetry
+      double[] row_i = distancematrix[i];
+      for(int j = i + 1; j < n; j++) {
+        row_i[j] = distancematrix[j][i] = tree.distance(ei, node.getEntry(j));
       }
     }
     return distancematrix;
-  }
-
-  /**
-   * Extract the distances from a distance matrix.
-   * 
-   * @param distanceMatrix Distance matrix
-   * @param n Number of entries
-   * @param routing1 First routing object index
-   * @param idx1 Output: neighbor index
-   * @param dis1 Output: neighbor distance
-   * @param routing2 Second routing object index
-   * @param idx2 Output: neighbor index
-   * @param dis2 Output: neighbor distance
-   */
-  protected static void distancesFromDistanceMatrix(double[] distanceMatrix, int n, int routing1, int[] idx1, double[] dis1, int routing2, int[] idx2, double[] dis2) {
-    for(int i = 0, j = 0, off = 0; i < n; i++, off += n) {
-      if(i == routing1 || i == routing2) {
-        continue;
-      }
-      // Look up the distances of o to o1 / o2
-      dis1[j] = distanceMatrix[off + routing1];
-      idx1[j] = i;
-      dis2[j] = distanceMatrix[off + routing2];
-      idx2[j] = i;
-      j++;
-    }
-    DoubleIntegerArrayQuickSort.sort(dis1, idx1, n - 2);
-    DoubleIntegerArrayQuickSort.sort(dis2, idx2, n - 2);
   }
 
   /**
@@ -132,7 +101,7 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistributionStrategy> distributorP = new ObjectParameter<>(DISTRIBUTOR_ID, DistributionStrategy.class, BalancedDistribution.class);
+      ObjectParameter<DistributionStrategy> distributorP = new ObjectParameter<>(DISTRIBUTOR_ID, DistributionStrategy.class, GeneralizedHyperplaneDistribution.class);
       if(config.grab(distributorP)) {
         distributor = distributorP.instantiateClass(config);
       }
