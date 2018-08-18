@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Encapsulates the required methods for a split of a node in an M-Tree. The
- * routing objects are chosen according to the M_LB_DIST strategy.
+ * Encapsulates the required methods for a split of a node in an M-Tree.
+ * The routing objects are chosen according to the M_LB_DIST strategy.
  *
  * Reference:
  * <p>
@@ -65,7 +65,7 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
    * Selects the second object of the specified node to be promoted and stored
    * into the parent node and partitions the entries according to the M_LB_DIST
    * strategy.
-   * <p/>
+   *
    * This strategy considers all possible pairs of objects and chooses the pair
    * of objects for which the distance is maximum.
    * 
@@ -75,24 +75,38 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
   @Override
   public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {
     final int n = node.getNumEntries();
-    double[][] distanceMatrix = computeDistanceMatrix(tree, node);
 
     // choose first and second routing object
-    int besti = -1, bestj = -1;
-    double currentMaxDist = Double.NEGATIVE_INFINITY;
-    for(int i = 0; i < n; i++) {
-      double[] row_i = distanceMatrix[i];
-      for(int j = i + 1; j < n; j++) {
-        double distance = row_i[j];
-        if(distance > currentMaxDist) {
-          besti = i;
-          bestj = j;
-          currentMaxDist = distance;
-        }
+    int b1 = 0, b2 = 0;
+    double dist1 = node.getEntry(0).getParentDistance(), dist2 = dist1;
+    if(Double.isNaN(dist1)) {
+      // Root split does not yet have parent distances!
+      // As a fallback, use the two farthest points.
+      return new FarthestPointsSplit<E, N>(distributor).split(tree, node);
+    }
+    for(int i = 1; i < n; i++) {
+      double dist = node.getEntry(i).getParentDistance();
+      if(dist < dist1) {
+        dist1 = dist;
+        b1 = i;
+      }
+      else if(dist > dist2 || (dist == dist2 && i == 1)) {
+        dist2 = dist;
+        b2 = i;
       }
     }
+    E e1 = node.getEntry(b1), e2 = node.getEntry(b2);
+    double[] rowi = new double[n], rowj = new double[n];
+    for(int i = 0; i < n; i++) {
+      if(i == b1 || i == b2) {
+        continue;
+      }
+      E ei = node.getEntry(i);
+      rowi[i] = tree.distance(e1, ei);
+      rowj[i] = tree.distance(e2, ei);
+    }
 
-    return distributor.distribute(node, besti, distanceMatrix[besti], bestj, distanceMatrix[bestj]);
+    return distributor.distribute(node, b1, rowi, b2, rowj);
   }
 
   /**
