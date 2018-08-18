@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,21 +45,14 @@ public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<
   private double distance;
 
   /**
-   * The index of the entry in its parent's child array.
-   */
-  private int index;
-
-  /**
    * Constructs a new DistanceEntry object with the specified parameters.
    * 
    * @param entry the entry of the Index
    * @param distance the distance value belonging to the entry
-   * @param index the index of the entry in its parent' child array
    */
-  public DistanceEntry(E entry, double distance, int index) {
+  public DistanceEntry(E entry, double distance) {
     this.entry = entry;
     this.distance = distance;
-    this.index = index;
   }
 
   /**
@@ -81,15 +74,6 @@ public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<
   }
 
   /**
-   * Returns the index of this entry in its parents child array.
-   * 
-   * @return the index of this entry in its parents child array
-   */
-  public int getIndex() {
-    return index;
-  }
-
-  /**
    * Compares this object with the specified object for order.
    * 
    * @param o the Object to be compared.
@@ -102,7 +86,8 @@ public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<
   public int compareTo(DistanceEntry<E> o) {
     int comp = Double.compare(distance, o.distance);
     return comp;
-    // return comp != 0 ? comp : entry.getEntryID().compareTo(o.entry.getEntryID());
+    // return comp != 0 ? comp :
+    // entry.getEntryID().compareTo(o.entry.getEntryID());
   }
 
   /**

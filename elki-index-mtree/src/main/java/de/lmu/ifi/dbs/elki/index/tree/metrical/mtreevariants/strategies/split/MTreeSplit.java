@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -79,18 +79,16 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
     int[] idx1 = new int[l], idx2 = new int[l];
     double[] dis1 = new double[l], dis2 = new double[l];
 
-    Assignments<E> assign = new Assignments<>((n + 1) >> 1);
-    assign.setFirstRoutingObject(routingObject1);
-    assign.setSecondRoutingObject(routingObject2);
+    Assignments<E> assign = new Assignments<>(routingObject1, routingObject2, (n + 1) >> 1);
     for(int i = 0, j = 0; i < n; i++) {
       final E ent = node.getEntry(i);
       final DBID id = ent.getRoutingObjectID();
       if(DBIDUtil.equal(id, routingObject1)) {
-        assign.addToFirst(ent, 0., i);
+        assign.addToFirst(ent, 0.);
         continue;
       }
       if(DBIDUtil.equal(id, routingObject2)) {
-        assign.addToSecond(ent, 0., i);
+        assign.addToSecond(ent, 0.);
         continue;
       }
       // determine the distance of o to o1 / o2
@@ -132,18 +130,16 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
     int[] idx1 = new int[l], idx2 = new int[l];
     double[] dis1 = new double[l], dis2 = new double[l];
 
-    Assignments<E> assign = new Assignments<>((n + 1) >> 1);
+    Assignments<E> assign = new Assignments<>(node.getEntry(routingEntNum1).getRoutingObjectID(), node.getEntry(routingEntNum2).getRoutingObjectID(), (n + 1) >> 1);
     // determine the nearest neighbors
     for(int i = 0, j = 0; i < node.getNumEntries(); i++) {
       final E ent = node.getEntry(i);
       if(i == routingEntNum1) {
-        assign.setFirstRoutingObject(ent.getRoutingObjectID());
-        assign.addToFirst(ent, 0., i);
+        assign.addToFirst(ent, 0.);
         continue;
       }
       if(i == routingEntNum2) {
-        assign.setSecondRoutingObject(ent.getRoutingObjectID());
-        assign.addToSecond(ent, 0., i);
+        assign.addToSecond(ent, 0.);
         continue;
       }
       // Look up the distances of o to o1 / o2
@@ -188,10 +184,10 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
       i = idx[++pos];
     }
     if(second) {
-      assign.addToSecond(node.getEntry(i), dis[pos], i);
+      assign.addToSecond(node.getEntry(i), dis[pos]);
     }
     else {
-      assign.addToFirst(node.getEntry(i), dis[pos], i);
+      assign.addToFirst(node.getEntry(i), dis[pos]);
     }
     BitsUtil.setI(assigned, i);
     return ++pos;

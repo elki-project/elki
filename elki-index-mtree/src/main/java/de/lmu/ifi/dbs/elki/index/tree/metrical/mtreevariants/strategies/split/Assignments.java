@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,26 +72,13 @@ public class Assignments<E extends MTreeEntry> {
   }
 
   /**
-   * Constructor.
-   * 
-   * @param size Maximum number of entries per list
-   */
-  public Assignments(int size) {
-    this.id1 = null;
-    this.id2 = null;
-    this.firstAssignments = new ArrayList<>(size);
-    this.secondAssignments = new ArrayList<>(size);
-  }
-
-  /**
    * Add an entry to the first set.
    * 
    * @param ent Entry
    * @param dist Distance
-   * @param pos Position in parent
    */
-  public void addToFirst(E ent, double dist, int pos) {
-    firstAssignments.add(new DistanceEntry<>(ent, dist, pos));
+  public void addToFirst(E ent, double dist) {
+    firstAssignments.add(new DistanceEntry<>(ent, dist));
   }
 
   /**
@@ -129,10 +116,9 @@ public class Assignments<E extends MTreeEntry> {
    * 
    * @param ent Entry
    * @param dist Distance
-   * @param pos Position in parent
    */
-  public void addToSecond(E ent, double dist, int pos) {
-    secondAssignments.add(new DistanceEntry<>(ent, dist, pos));
+  public void addToSecond(E ent, double dist) {
+    secondAssignments.add(new DistanceEntry<>(ent, dist));
   }
 
   /**
@@ -169,23 +155,5 @@ public class Assignments<E extends MTreeEntry> {
    */
   public List<DistanceEntry<E>> getSecondAssignments() {
     return secondAssignments;
-  }
-
-  /**
-   * Set the first routing object.
-   * 
-   * @param routingObjectID First routing object
-   */
-  public void setFirstRoutingObject(DBID routingObjectID) {
-    this.id1 = routingObjectID;
-  }
-
-  /**
-   * Set the second routing object.
-   * 
-   * @param routingObjectID Second routing object
-   */
-  public void setSecondRoutingObject(DBID routingObjectID) {
-    this.id2 = routingObjectID;
   }
 }
