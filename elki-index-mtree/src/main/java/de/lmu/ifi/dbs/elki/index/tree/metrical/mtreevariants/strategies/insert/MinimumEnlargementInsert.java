@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,26 +27,26 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Default insertion strategy for the M-tree.
- * 
+ * Minimum enlargement insert - default insertion strategy for the M-tree.
+ *
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br />
- * In Proceedings of 23rd International Conference on Very Large Data Bases
- * (VLDB'97), August 25-29, 1997, Athens, Greece
+ * P. Ciaccia, M. Patella, and P. Zezula<br />
+ * M-tree: An Efficient Access Method for Similarity Search in Metric
+ * Spaces<br />
+ * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
-title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
-booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
-url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> implements MTreeInsert<O, N, E> {
+@Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
+    title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+    booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
+    url = "http://www.vldb.org/conf/1997/P426.PDF")
+public class MinimumEnlargementInsert<N extends AbstractMTreeNode<?, N, E>, E extends MTreeEntry> implements MTreeInsert<E, N> {
   @Override
-  public IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object) {
+  public IndexTreePath<E> choosePath(AbstractMTree<?, N, E, ?> tree, E object) {
     return choosePath(tree, object, tree.getRootPath());
   }
 
@@ -59,7 +59,7 @@ public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E
    * @param subtree the subtree to be tested for insertion
    * @return the path of the appropriate subtree to insert the given object
    */
-  private IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
+  private IndexTreePath<E> choosePath(AbstractMTree<?, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
     N node = tree.getNode(subtree.getEntry());
 
     // leaf

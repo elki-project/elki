@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -36,30 +37,29 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
  * routing objects are chosen according to the RANDOM strategy.
- * 
+ *
  * Note: only the routing objects are chosen at random, this is not a random
  * assignment!
- * 
+ *
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br />
- * In Proceedings of 23rd International Conference on Very Large Data Bases
- * (VLDB'97), August 25-29, 1997, Athens, Greece
+ * P. Ciaccia, M. Patella, and P. Zezula<br />
+ * M-tree: An Efficient Access Method for Similarity Search in Metric
+ * Spaces<br />
+ * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  * </p>
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
- * 
- * @param <O> the type of DatabaseObject to be stored in the M-Tree
+ *
+ * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
- * @param <E> the type of MetricalEntry used in the M-Tree
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
-title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
-booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
-url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
+@Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
+    title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+    booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
+    url = "http://www.vldb.org/conf/1997/P426.PDF")
+public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends MTreeSplit<E, N> {
   /**
    * Random generator.
    */
@@ -83,16 +83,28 @@ public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTre
    * @param node the node to be split
    */
   @Override
-  public Assignments<E> split(AbstractMTree<O, N, E, ?> tree, N node) {
-    final int n = node.getNumEntries();
-    int pos1 = random.nextInt(n);
-    int pos2 = random.nextInt(n - 1);
-    if(pos2 >= pos1) {
-      ++pos2;
+  public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {
+    final int n = node.getNumEntries(), l = n - 2;
+    int pos1 = random.nextInt(n), pos2 = random.nextInt(n - 1);
+    pos2 = pos2 >= pos1 ? pos2 + 1 : pos2;
+
+    // Build distance arrays:
+    int[] idx1 = new int[l], idx2 = new int[l];
+    double[] dis1 = new double[l], dis2 = new double[l];
+    E e1 = node.getEntry(pos1), e2 = node.getEntry(pos2);
+    for(int j = 0, i = 0; j < n; j++) {
+      if(j == pos1 || j == pos2) {
+        continue;
+      }
+      final E ej = node.getEntry(j);
+      dis1[i] = tree.distance(e1, ej);
+      dis2[i] = tree.distance(e2, ej);
+      idx1[i] = idx2[i] = j;
+      i++;
     }
-    DBID id1 = node.getEntry(pos1).getRoutingObjectID();
-    DBID id2 = node.getEntry(pos2).getRoutingObjectID();
-    return balancedPartition(tree, node, id1, id2);
+    DoubleIntegerArrayQuickSort.sort(dis1, idx1, l);
+    DoubleIntegerArrayQuickSort.sort(dis2, idx2, l);
+    return distributor.distribute(node, pos1, idx1, dis1, pos2, idx2, dis2);
   }
 
   /**
@@ -102,11 +114,10 @@ public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTre
    * 
    * @apiviz.exclude
    * 
-   * @param <O> the type of DatabaseObject to be stored in the M-Tree
+   * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
-   * @param <E> the type of MetricalEntry used in the M-Tree
    */
-  public static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends AbstractParameterizer {
+  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractParameterizer {
     /**
      * Option ID for the random generator.
      */
@@ -127,7 +138,7 @@ public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTre
     }
 
     @Override
-    protected RandomSplit<O, N, E> makeInstance() {
+    protected RandomSplit<E, N> makeInstance() {
       return new RandomSplit<>(rnd);
     }
   }

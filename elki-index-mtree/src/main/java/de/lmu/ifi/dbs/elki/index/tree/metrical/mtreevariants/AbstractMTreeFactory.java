@@ -121,11 +121,11 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
       if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-      ObjectParameter<MTreeSplit<O, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
+      ObjectParameter<MTreeSplit<E, N>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
       if(config.grab(splitStrategyP)) {
         settings.splitStrategy = splitStrategyP.instantiateClass(config);
       }
-      ObjectParameter<MTreeInsert<O, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
+      ObjectParameter<MTreeInsert<E, N>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
       if(config.grab(insertStrategyP)) {
         settings.insertStrategy = insertStrategyP.instantiateClass(config);
       }

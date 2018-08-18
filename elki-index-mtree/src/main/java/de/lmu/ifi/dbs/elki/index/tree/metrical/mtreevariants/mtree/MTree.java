@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br />
- * In Proceedings of 23rd International Conference on Very Large Data Bases
- * (VLDB'97), August 25-29, 1997, Athens, Greece
+ * P. Ciaccia, M. Patella, and P. Zezula<br />
+ * M-tree: An Efficient Access Method for Similarity Search in Metric
+ * Spaces<br />
+ * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  * </p>
  * 
  * @author Elke Achtert
@@ -53,7 +53,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
+    title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+    booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
+    url = "http://www.vldb.org/conf/1997/P426.PDF")
 abstract public class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * The logger for this class.

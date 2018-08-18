@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @author Erich Schubert
  * @since 0.2
  */
-public interface MTreeInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> {
+public interface MTreeInsert<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> {
   /**
    * Choose the subpath to insert into.
    * 
@@ -44,5 +44,5 @@ public interface MTreeInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends 
    * @param object Object to insert
    * @return Path to insertion node
    */
-  IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object);
+  IndexTreePath<E> choosePath(AbstractMTree<?, N, E, ?> tree, E object);
 }

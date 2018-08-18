@@ -43,10 +43,10 @@ public class MTreeSettings<O, N extends AbstractMTreeNode<O, N, E>, E extends MT
   /**
    * Splitting strategy.
    */
-  protected MTreeSplit<O, N, E> splitStrategy;
+  protected MTreeSplit<E, N> splitStrategy;
 
   /**
    * Insertion strategy.
    */
-  protected MTreeInsert<O, N, E> insertStrategy;
+  protected MTreeInsert<E, N> insertStrategy;
 }
