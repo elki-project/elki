@@ -26,9 +26,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -59,17 +59,20 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends MTreeSplit<E, N> {
+public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit<E, N> {
   /**
    * Random generator.
    */
   private Random random;
 
   /**
-   * Creates a new split object.
+   * Constructor.
+   *
+   * @param distributor Distribution strategy
+   * @param rnd Random generator
    */
-  public RandomSplit(RandomFactory rnd) {
-    super();
+  public RandomSplit(DistributionStrategy distributor, RandomFactory rnd) {
+    super(distributor);
     this.random = rnd.getSingleThreadedRandom();
   }
 
@@ -109,15 +112,15 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    */
-  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractParameterizer {
+  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Parameterizer<E, N> {
     /**
      * Option ID for the random generator.
      */
@@ -139,7 +142,7 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
 
     @Override
     protected RandomSplit<E, N> makeInstance() {
-      return new RandomSplit<>(rnd);
+      return new RandomSplit<>(distributor, rnd);
     }
   }
 }

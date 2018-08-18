@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -50,12 +51,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")
 @Alias("de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit")
-public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends MTreeSplit<E, N> {
+public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit<E, N> {
   /**
-   * Creates a new split object.
+   * Constructor.
+   *
+   * @param distributor Distribution strategy
    */
-  public MLBDistSplit() {
-    super();
+  public MLBDistSplit(DistributionStrategy distributor) {
+    super(distributor);
   }
 
   /**
@@ -93,5 +96,22 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
     double[] dis1 = new double[l], dis2 = new double[l];
     distancesFromDistanceMatrix(distanceMatrix, n, besti, idx1, dis1, bestj, idx2, dis2);
     return distributor.distribute(node, besti, idx1, dis1, bestj, idx2, dis2);
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   *
+   * @param <E> the type of MTreeEntry used in the M-Tree
+   * @param <N> the type of AbstractMTreeNode used in the M-Tree
+   */
+  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Parameterizer<E, N> {
+    @Override
+    protected MLBDistSplit<E, N> makeInstance() {
+      return new MLBDistSplit<>(distributor);
+    }
   }
 }

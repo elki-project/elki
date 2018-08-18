@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -48,12 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MMRadSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends MTreeSplit<E, N> {
+public class MMRadSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit<E, N> {
   /**
-   * Creates a new split object.
+   * Constructor.
+   *
+   * @param distributor Distribution strategy
    */
-  public MMRadSplit() {
-    super();
+  public MMRadSplit(DistributionStrategy distributor) {
+    super(distributor);
   }
 
   /**
@@ -88,5 +91,22 @@ public class MMRadSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, 
       }
     }
     return bestAssignment;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   *
+   * @param <E> the type of MTreeEntry used in the M-Tree
+   * @param <N> the type of AbstractMTreeNode used in the M-Tree
+   */
+  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Parameterizer<E, N> {
+    @Override
+    protected MMRadSplit<E, N> makeInstance() {
+      return new MMRadSplit<>(distributor);
+    }
   }
 }

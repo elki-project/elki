@@ -41,21 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class BalancedDistribution {
-  /**
-   * Creates a balanced partition of the entries of the specified node.
-   * 
-   * @param node the node to be split
-   * @param routing1 the entry number of the first routing object
-   * @param idx1 Sorted indexes of sorted objects (by distance from first)
-   * @param dis1 Distances from first routing object
-   * @param routing2 the entry number of the second routing object
-   * @param idx2 Sorted indexes of sorted objects (by distance from second)
-   * @param dis2 Distances from second routing object
-   * @param <E> entry type
-   * @return an assignment that holds a balanced partition of the entries of the
-   *         specified node
-   */
+public class BalancedDistribution implements DistributionStrategy {
+  @Override
   public <E extends MTreeEntry> Assignments<E> distribute(AbstractNode<E> node, int routing1, int[] idx1, double[] dis1, int routing2, int[] idx2, double[] dis2) {
     final int n = node.getNumEntries(), l = n - 2;
     final E e1 = node.getEntry(routing1), e2 = node.getEntry(routing2);
