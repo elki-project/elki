@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 @Reference(authors = "W. Klement, P. A. Flach, N. Japkowicz, S. Matwin", //
 title = "Smooth Receiver Operating Characteristics (smROC) Curves", //
 booktitle = "In: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML-PKDD'11)", //
-url = "http://dx.doi.org/10.1007/978-3-642-23783-6_13")
+url = "https://doi.org/10.1007/978-3-642-23783-6_13")
 public class OutlierSmROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.

@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Henzinger", //
 title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
 booktitle = "Proc. 29th ACM Conference on Research and Development in Information Retrieval. ACM SIGIR, 2006", //
-url = "http://dx.doi.org/10.1145/1148170.1148222")
+url = "https://doi.org/10.1145/1148170.1148222")
 public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProjectionFamily {
   /**
    * Random generator.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+    booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+    url = "https://doi.org/10.1145/2463676.2463696")
 public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircularMSTLayout3DPC.Node> {
   /**
    * Constructor.
@@ -92,7 +95,7 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
    */
   private void computeWeights(Node node) {
     int wsum = 0;
-    for (Node child : node.children) {
+    for(Node child : node.children) {
       computeWeights(child);
       wsum += child.weight;
     }
@@ -115,7 +118,7 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
 
     double cpos = aoff;
     double cwid = awid / node.weight;
-    for (Node c : node.children) {
+    for(Node c : node.children) {
       computePositions(c, depth + 1, cpos, cwid * c.weight, maxdepth);
       cpos += cwid * c.weight;
     }

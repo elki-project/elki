@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * Reference:
  * <p>
- * L. van der Maaten<br />
+ * L. J. P. van der Maaten<br />
  * Accelerating t-SNE using Tree-Based Algorithms<br />
  * Journal of Machine Learning Research 15
  * </p>
@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-@Reference(authors = "L. van der Maaten", //
+@Reference(authors = "L. J. P. van der Maaten", //
     title = "Accelerating t-SNE using Tree-Based Algorithms", //
     booktitle = "Journal of Machine Learning Research 15", //
     url = "http://dl.acm.org/citation.cfm?id=2697068")
@@ -556,7 +556,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         theta = tethaP.getValue();
       }
     }
-    
+
     @Override
     protected Class<?> getDefaultAffinity() {
       return NearestNeighborAffinityMatrixBuilder.class;

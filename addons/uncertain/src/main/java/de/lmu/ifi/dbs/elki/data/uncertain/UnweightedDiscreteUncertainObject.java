@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 @Reference(authors = "N. Dalvi, C. Ré, D. Suciu", //
 title = "Probabilistic databases: diamonds in the dirt", //
 booktitle = "Communications of the ACM 52, 7", //
-url = "http://dx.doi.org/10.1145/1538788.1538810")
+url = "https://doi.org/10.1145/1538788.1538810")
 public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.

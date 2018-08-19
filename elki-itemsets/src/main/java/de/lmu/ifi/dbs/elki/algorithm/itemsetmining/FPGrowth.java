@@ -68,8 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * <p>
  * J. Han, J. Pei, Y. Yin<br />
  * Mining frequent patterns without candidate generation<br />
- * In proceedings of the 2000 ACM SIGMOD international conference on Management
- * of data.
+ * In Proc. ACM SIGMOD Int. Conf. Management of Data (SIGMOD 2000)
  * </p>
  *
  * @author Erich Schubert
@@ -79,8 +78,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
     title = "Mining frequent patterns without candidate generation", //
-    booktitle = "Proceedings of the 2000 ACM SIGMOD international conference on Management of data ", //
-    url = "http://dx.doi.org/10.1145/342009.335372")
+    booktitle = "Proc. ACM SIGMOD Int. Conf. Management of Data (SIGMOD 2000)", //
+    url = "https://doi.org/10.1145/342009.335372")
 @Priority(Priority.RECOMMENDED)
 public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
   /**

@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung", //
 title = "Enhancing effectiveness of outlier detections for low density patterns", //
 booktitle = "In Advances in Knowledge Discovery and Data Mining", //
-url = "http://dx.doi.org/10.1007/3-540-47887-6_53")
+url = "https://doi.org/10.1007/3-540-47887-6_53")
 public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

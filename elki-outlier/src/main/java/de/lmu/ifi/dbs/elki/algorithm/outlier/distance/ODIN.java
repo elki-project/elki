@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "V. Hautamäki and I. Kärkkäinen and P. Fränti", //
 title = "Outlier detection using k-nearest neighbour graph", //
 booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
-url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
+url = "https://doi.org/10.1109/ICPR.2004.1334558")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN" })
 public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

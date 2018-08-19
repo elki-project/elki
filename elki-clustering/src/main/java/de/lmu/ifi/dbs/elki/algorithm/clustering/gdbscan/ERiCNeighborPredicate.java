@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", //
 title = "On Exploring Complex Relationships of Correlation Clusters", //
 booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
-url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
+url = "https://doi.org/10.1109/SSDBM.2007.21")
 public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPredicate<DBIDs> {
   /**
    * The logger for this class.

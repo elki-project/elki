@@ -58,7 +58,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Podani", //
     title = "New Combinatorial Clustering Methods", //
     booktitle = "Vegetatio 81(1/2)", //
-    url = "http://dx.doi.org/10.1007/978-94-009-2432-1_5")
+    url = "https://doi.org/10.1007/978-94-009-2432-1_5")
 @Alias({ "variance", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MinimumVarianceLinkageMethod" })
 public class MinimumVarianceLinkage implements Linkage {
   /**

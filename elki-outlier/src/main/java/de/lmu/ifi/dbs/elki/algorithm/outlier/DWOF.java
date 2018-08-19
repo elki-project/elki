@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -78,12 +78,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
  * </p>
  *
+ * Reference:
  * <p>
- * Reference: <br>
- * Rana Momtaz, Nesma Mohssen and Mohammad A. Gowayyed: DWOF: A Robust
- * Density-Based OutlierDetection Approach. <br>
- * In: Pattern Recognition and Image Analysis , Proc. 6th Iberian Conference,
- * IbPRIA 2013, Funchal, Madeira, Portugal, June 5-7, 2013.
+ * Rana Momtaz, Nesma Mohssen and Mohammad A. Gowayyed:<br>
+ * DWOF: A Robust Density-Based OutlierDetection Approach.<br>
+ * Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)
  * </p>
  *
  * @author Omar Yousry
@@ -94,8 +93,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("DWOF: Dynamic Window Outlier Factor")
 @Description("Algorithm to compute dynamic-window outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "R. Momtaz, N. Mohssen, M. A. Gowayyed", //
-title = "DWOF: A Robust Density-Based Outlier Detection Approach", //
-booktitle = "Pattern Recognition and Image Analysis, Proc. 6th Iberian Conference, IbPRIA 2013, Funchal, Madeira, Portugal, 2013.", url = "http://dx.doi.org/10.1007%2F978-3-642-38628-2_61")
+    title = "DWOF: A Robust Density-Based Outlier Detection Approach", //
+    booktitle = "Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)", //
+    url = "https://doi.org/10.1007/978-3-642-38628-2_61")
 public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -371,13 +371,13 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       // The super class has the distance function parameter!
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
-      .setDefaultValue(1.1) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
+          .setDefaultValue(1.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }

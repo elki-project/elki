@@ -40,7 +40,7 @@ public final class BiweightKernelDensityFunction implements KernelDensityFunctio
   /**
    * Canonical bandwidth: 35^(1/5)
    */
-  @Reference(authors = "J.S. Marron, D. Nolan", title = "Canonical kernels for density estimation", booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", url = "http://dx.doi.org/10.1016/0167-7152(88)90050-8")
+  @Reference(authors = "J.S. Marron, D. Nolan", title = "Canonical kernels for density estimation", booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", url = "https://doi.org/10.1016/0167-7152(88)90050-8")
   public static final double CANONICAL_BANDWIDTH = Math.pow(35., .2);
 
   /**

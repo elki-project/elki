@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * Reference:
  * <p>
- * L.J.P. van der Maaten, G.E. Hinton<br />
+ * L. J. P. van der Maaten, G. E. Hinton<br />
  * Visualizing High-Dimensional Data Using t-SNE<br />
  * Journal of Machine Learning Research 9 2008
  * </p>
@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-@Reference(authors = "L.J.P. van der Maaten, G.E. Hinton", //
+@Reference(authors = "L. J. P. van der Maaten, G. E. Hinton", //
     title = "Visualizing High-Dimensional Data Using t-SNE", //
     booktitle = "Journal of Machine Learning Research 9 2008", //
     url = "http://www.jmlr.org/papers/v9/vandermaaten08a.html")

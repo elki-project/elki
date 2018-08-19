@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
 title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
 booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", //
-url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
+url = "https://doi.org/10.1007/978-3-540-69497-7_27")
 public class AutotuningPCA extends PCARunner {
   /**
    * Filter to select eigenvectors.

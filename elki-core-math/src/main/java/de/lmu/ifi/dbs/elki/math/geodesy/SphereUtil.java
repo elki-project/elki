@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ import net.jafama.DoubleWrapper;
  * 
  * The majority of formulas are adapted from:
  * <p>
- * Ed Williams<br />
+ * E. Williams<br />
  * Aviation Formulary<br />
  * Online: http://williams.best.vwh.net/avform.htm
  * </p>
@@ -55,7 +55,7 @@ import net.jafama.DoubleWrapper;
  * @author Niels Dörre
  * @since 0.5.5
  */
-@Reference(authors = "Ed Williams", //
+@Reference(authors = "E. Williams", //
     title = "Aviation Formulary", //
     booktitle = "", //
     url = "http://williams.best.vwh.net/avform.htm")
@@ -155,7 +155,7 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance on unit sphere
    */
-  @Reference(authors = "Sinnott, R. W.", //
+  @Reference(authors = "R. W. Sinnott", //
       title = "Virtues of the Haversine", //
       booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
@@ -181,7 +181,7 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance on unit sphere
    */
-  @Reference(authors = "Sinnott, R. W.", //
+  @Reference(authors = "R. W. Sinnott", //
       title = "Virtues of the Haversine", //
       booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
@@ -542,7 +542,7 @@ public final class SphereUtil {
       return 0.;
     }
     final double crs12 = atan2(yE, xE);
-    final double crs1Q = atan2(yQ, xQ);  
+    final double crs1Q = atan2(yQ, xQ);
     return asin(sqrt(a) * sqrt(1 - a) * 2 * sin(crs1Q - crs12));
     // final double angDist1Q = a < 1 ? 2 * asin(sqrt(a)) : 0;
     // return asin(sin(angDist1Q) * sin(crs1Q - crs12));
@@ -653,9 +653,9 @@ public final class SphereUtil {
    * 
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
+   * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -668,8 +668,8 @@ public final class SphereUtil {
    */
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
-      booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
-      url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
+      booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     return latlngMinDistRad(deg2rad(plat), deg2rad(plng), deg2rad(rminlat), deg2rad(rminlng), deg2rad(rmaxlat), deg2rad(rmaxlng));
   }
@@ -689,9 +689,9 @@ public final class SphereUtil {
    * 
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
+   * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -702,10 +702,10 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance on unit sphere.
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
-      booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
-      url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
+      booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: add support for rectangles crossing the +-180 deg boundary!
 
@@ -762,9 +762,9 @@ public final class SphereUtil {
    * 
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
+   * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -775,10 +775,10 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
-      booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
-      url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
+      booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: add support for rectangles crossing the +-180 deg boundary!
 

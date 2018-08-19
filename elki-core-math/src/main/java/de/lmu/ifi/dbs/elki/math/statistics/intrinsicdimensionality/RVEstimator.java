@@ -43,7 +43,7 @@ import net.jafama.FastMath;
 @Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
     title = "Estimating Local Intrinsic Dimensionality", //
     booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
-    url = "http://dx.doi.org/10.1145/2783258.2783405")
+    url = "https://doi.org/10.1145/2783258.2783405")
 public class RVEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

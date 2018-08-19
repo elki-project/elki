@@ -52,7 +52,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Gao, P.-N. Tan", //
     title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
     booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
-    url = "http://dx.doi.org/10.1109/ICDM.2006.43")
+    url = "https://doi.org/10.1109/ICDM.2006.43")
 public class MixtureModelOutlierScalingFunction implements OutlierScalingFunction {
   /**
    * The logger for this class.

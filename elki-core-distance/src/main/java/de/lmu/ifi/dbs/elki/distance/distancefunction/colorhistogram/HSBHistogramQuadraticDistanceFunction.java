@@ -50,7 +50,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J. R. Smith, S. F. Chang", //
     title = "VisualSEEk: a fully automated content-based image query system", //
     booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", //
-    url = "http://dx.doi.org/10.1145/244130.244151")
+    url = "https://doi.org/10.1145/244130.244151")
 public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadraticDistanceFunction {
   /**
    * Constructor.

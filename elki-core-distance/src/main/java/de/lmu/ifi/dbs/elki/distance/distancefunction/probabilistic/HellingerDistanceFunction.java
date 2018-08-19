@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "E. Hellinger", //
     title = "Neue Begründung der Theorie quadratischer Formen von unendlichvielen Veränderlichen", //
-    booktitle = "Journal für die reine und angewandte Mathematik ", //
+    booktitle = "Journal für die reine und angewandte Mathematik", //
     url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002166941")
 @Alias({ "hellinger", "bhattacharyya" })
 public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunction implements PrimitiveSimilarityFunction<NumberVector> {
@@ -102,7 +102,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     }
     return agg;
   }
-  
+
   @Override
   public boolean isSymmetric() {
     return true;

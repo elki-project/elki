@@ -88,7 +88,7 @@ import net.jafama.FastMath;
 @Reference(authors = "T. Hu, and S. Y. Sung", //
     title = "Detecting pattern-based outliers", //
     booktitle = "Pattern Recognition Letters 24(16)", //
-    url = "http://dx.doi.org/10.1016/S0167-8655(03)00165-X")
+    url = "https://doi.org/10.1016/S0167-8655(03)00165-X")
 public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

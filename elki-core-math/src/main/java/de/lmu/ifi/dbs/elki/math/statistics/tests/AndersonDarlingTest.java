@@ -65,7 +65,7 @@ import net.jafama.FastMath;
 @Reference(authors = "T. W. Anderson, and D. A. Darling", //
     title = "Asymptotic theory of certain 'goodness of fit' criteria based on stochastic processes", //
     booktitle = "Annals of mathematical statistics 23(2)", //
-    url = "http://dx.doi.org/10.1214/aoms/1177729437")
+    url = "https://doi.org/10.1214/aoms/1177729437")
 public class AndersonDarlingTest {
   /**
    * Private constructor. Static methods only.
@@ -167,7 +167,7 @@ public class AndersonDarlingTest {
   @Reference(authors = "M. A. Stephens", //
       title = "EDF Statistics for Goodness of Fit and Some Comparisons", //
       booktitle = "Journal of the American Statistical Association, Volume 69, Issue 347", //
-      url = "http://dx.doi.org/10.1080/01621459.1974.10480196")
+      url = "https://doi.org/10.1080/01621459.1974.10480196")
   public static double removeBiasNormalDistribution(double A2, int n) {
     return A2 * (1 + 4. / n - 25. / (n * n));
   }

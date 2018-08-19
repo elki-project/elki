@@ -96,7 +96,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "L. Kaufman and P. J. Rousseeuw", //
     title = "Agglomerative Nesting (Program AGNES)", //
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
-    url = "http://dx.doi.org/10.1002/9780470316801.ch5")
+    url = "https://doi.org/10.1002/9780470316801.ch5")
 @Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
 public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
@@ -127,7 +127,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   @Reference(authors = "P. H. Sneath", //
       title = "The application of computers to taxonomy", //
       booktitle = "Journal of general microbiology, 17(1)", //
-      url = "http://dx.doi.org/10.1099/00221287-17-1-201")
+      url = "https://doi.org/10.1099/00221287-17-1-201")
   public static final Void ADDITIONAL_REFERENCE = null;
 
   /**

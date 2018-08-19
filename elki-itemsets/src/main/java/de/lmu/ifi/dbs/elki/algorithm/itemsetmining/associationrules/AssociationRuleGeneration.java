@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,14 +51,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * Reference:
  * <p>
- * Mohammed J. Zaki and Wagner Meira Jr.</br>
+ * M. J. Zaki and W. Meira Jr.</br>
  * Data mining and analysis: fundamental concepts and algorithms</br>
  * Cambridge University Press, 2014</br>
  * </p>
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "Mohammed J. Zaki and Wagner Meira Jr.", //
+@Reference(authors = "M. J. Zaki and W. Meira Jr.", //
     title = "Data mining and analysis: fundamental concepts and algorithms", //
     booktitle = "Cambridge University Press, 2014")
 public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRuleResult> {

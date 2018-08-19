@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, and P. Zezula<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br />
  * M-tree: An Efficient Access Method for Similarity Search in Metric
  * Spaces<br />
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  */
-@Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF")

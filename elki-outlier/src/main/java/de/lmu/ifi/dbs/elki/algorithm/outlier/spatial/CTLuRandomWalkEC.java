@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -56,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -65,11 +61,11 @@ import net.jafama.FastMath;
  * easily extended to higher dimensional data by using an distance function
  * instead of the absolute difference.
  *
+ * Reference:
  * <p>
  * X. Liu and C.-T. Lu and F. Chen:<br>
  * Spatial outlier detection: random walk based approaches,<br>
- * in Proc. 18th SIGSPATIAL International Conference on Advances in Geographic
- * Information Systems, 2010
+ * in Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems
  * </p>
  *
  * @author Ahmed Hettab
@@ -80,9 +76,9 @@ import net.jafama.FastMath;
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", //
-title = "Spatial outlier detection: random walk based approaches", //
-booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems", //
-url = "http://dx.doi.org/10.1145/1869790.1869841")
+    title = "Spatial outlier detection: random walk based approaches", //
+    booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
+    url = "https://doi.org/10.1145/1869790.1869841")
 public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.

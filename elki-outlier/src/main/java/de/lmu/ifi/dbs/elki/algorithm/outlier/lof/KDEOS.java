@@ -100,7 +100,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Generalized Outlier Detection with Flexible Kernel Density Estimates", //
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM), Philadelphia, PA, 2014", //
-    url = "http://dx.doi.org/10.1137/1.9781611973440.63")
+    url = "https://doi.org/10.1137/1.9781611973440.63")
 public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

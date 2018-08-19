@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * Reference: <br>
  * <p>
- * A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and
+ * A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor,
  * D. A. Keim.<br />
  * Automated Analytical Methods to Support Visual Exploration of High-
  * Dimensional Data. <br/>
@@ -44,10 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Robert Rödler
  * @since 0.5.5
  */
-@Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim", //
-title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", //
-booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", //
-url = "http://dx.doi.org/10.1109/TVCG.2010.242")
+@Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, D. A. Keim", //
+    title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", //
+    booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", //
+    url = "https://doi.org/10.1109/TVCG.2010.242")
 public class HSMDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.

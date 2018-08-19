@@ -90,7 +90,7 @@ import net.jafama.FastMath;
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
 title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
 booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
-url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
+url = "https://doi.org/10.1109/ICDE.2003.1260802")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.ALOCI")
 public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

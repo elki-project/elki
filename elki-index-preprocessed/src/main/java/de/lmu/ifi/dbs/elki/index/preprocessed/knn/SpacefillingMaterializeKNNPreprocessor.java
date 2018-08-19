@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
 title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
 booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
-url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
+url = "https://doi.org/10.1007/978-3-319-18123-3_2")
 public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Class logger

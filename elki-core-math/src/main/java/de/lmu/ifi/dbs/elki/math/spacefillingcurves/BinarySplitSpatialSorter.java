@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. L. Bentley", //
     title = "Multidimensional binary search trees used for associative searching", //
     booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
-    url = "http://dx.doi.org/10.1145/361002.361007")
+    url = "https://doi.org/10.1145/361002.361007")
 public class BinarySplitSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

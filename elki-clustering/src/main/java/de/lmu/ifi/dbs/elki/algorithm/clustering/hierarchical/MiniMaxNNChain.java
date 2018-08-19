@@ -59,7 +59,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 @Reference(authors = "F. Murtagh", //
     title = "A survey of recent advances in hierarchical clustering algorithms", //
     booktitle = "The Computer Journal 26(4)", //
-    url = "http://dx.doi.org/10.1093/comjnl/26.4.354")
+    url = "https://doi.org/10.1093/comjnl/26.4.354")
 public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "R. Sibson", //
     title = "SLINK: An optimally efficient algorithm for the single-link cluster method", //
     booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
-    url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
+    url = "https://doi.org/10.1093/comjnl/16.1.30")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", //
     "single-link", "single-linkage" })
 @Priority(Priority.RECOMMENDED)

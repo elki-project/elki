@@ -93,7 +93,7 @@ import net.jafama.FastMath;
 @Reference(authors = "S. Mahran and K. Mahar", //
 title = "Using grid for accelerating density-based clustering", //
 booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
-url = "http://dx.doi.org/10.1109/CIT.2008.4594646")
+url = "https://doi.org/10.1109/CIT.2008.4594646")
 public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

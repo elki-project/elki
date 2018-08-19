@@ -82,7 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "S. Ramaswamy, and R. Rastogi, and K. Shim", //
     title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
     booktitle = "Proc. Int. Conf. on Management of Data, 2000", //
-    url = "http://dx.doi.org/10.1145/342009.335437")
+    url = "https://doi.org/10.1145/342009.335437")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier", "knno" })
 @Priority(Priority.RECOMMENDED)
 public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

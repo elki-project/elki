@@ -55,7 +55,7 @@ import net.jafama.FastMath;
 @Reference(authors = "G. Schwarz", //
 title = "Estimating the dimension of a model", //
 booktitle = "The annals of statistics 6.2", //
-url = "http://dx.doi.org/10.1214/aos/1176344136")
+url = "https://doi.org/10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {

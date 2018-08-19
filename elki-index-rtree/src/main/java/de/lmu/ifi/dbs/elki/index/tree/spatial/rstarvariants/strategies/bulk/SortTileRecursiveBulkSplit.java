@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Leutenegger, S.T. and Lopez, M.A. and Edgington, J.", title = "STR: A simple and efficient algorithm for R-tree packing", booktitle = "Proc. 13th International Conference on Data Engineering, 1997", url = "http://dx.doi.org/10.1109/ICDE.1997.582015")
+@Reference(authors = "Leutenegger, S.T. and Lopez, M.A. and Edgington, J.", title = "STR: A simple and efficient algorithm for R-tree packing", booktitle = "Proc. 13th International Conference on Data Engineering, 1997", url = "https://doi.org/10.1109/ICDE.1997.582015")
 @Alias({"str", "STR"})
 public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**

@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", //
 title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
-url = "http://dx.doi.org/10.1145/304181.304187")
+url = "https://doi.org/10.1145/304181.304187")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS")
 public class OPTICSHeap<O> extends AbstractOPTICS<O> {
   /**

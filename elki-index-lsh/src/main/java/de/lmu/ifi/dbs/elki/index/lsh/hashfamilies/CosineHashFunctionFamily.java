@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M.S. Charikar", //
 title = "Similarity estimation techniques from rounding algorithms", //
 booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
-url = "https://dx.doi.org/10.1145/509907.509965")
+url = "https://doi.org/10.1145/509907.509965")
 public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Projection family to use.

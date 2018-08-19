@@ -83,7 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Hans-Peter Kriegel and Martin Pfeifle", //
 title = "Density-based clustering of uncertain data", //
 booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (KDD'05)", //
-url = "http://dx.doi.org/10.1145/1081870.1081955")
+url = "https://doi.org/10.1145/1081870.1081955")
 public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
   /**
    * Epsilon radius

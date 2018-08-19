@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. R. Bray and J. T. Curtis", //
     title = "An ordination of the upland forest communities of southern Wisconsin", //
     booktitle = "Ecological monographs 27.4", //
-    url = "http://dx.doi.org/10.2307/1942268")
+    url = "https://doi.org/10.2307/1942268")
 public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.

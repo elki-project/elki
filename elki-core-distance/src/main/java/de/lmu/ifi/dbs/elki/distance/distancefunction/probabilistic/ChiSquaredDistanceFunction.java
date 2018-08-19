@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
     title = "Empirical evaluation of dissimilarity measures for color and texture", //
     booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
-    url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
+    url = "https://doi.org/10.1109/ICCV.1999.790412")
 public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!

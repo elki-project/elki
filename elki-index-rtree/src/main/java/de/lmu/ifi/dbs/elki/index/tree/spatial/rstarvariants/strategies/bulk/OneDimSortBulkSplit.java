@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Roussopoulos, N. and Leifker, D.", title = "Direct spatial search on pictorial databases using packed R-trees", booktitle = "ACM SIGMOD Record 14-4", url = "http://dx.doi.org/10.1145/971699.318900")
+@Reference(authors = "Roussopoulos, N. and Leifker, D.", title = "Direct spatial search on pictorial databases using packed R-trees", booktitle = "ACM SIGMOD Record 14-4", url = "https://doi.org/10.1145/971699.318900")
 public class OneDimSortBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance.

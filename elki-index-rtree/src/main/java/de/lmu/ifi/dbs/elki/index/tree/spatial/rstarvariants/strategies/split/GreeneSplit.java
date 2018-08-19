@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Diane Greene", title = "An implementation and performance analysis of spatial data access methods", booktitle = "Proceedings of the Fifth International Conference on Data Engineering", url = "http://dx.doi.org/10.1109/ICDE.1989.47268")
+@Reference(authors = "Diane Greene", title = "An implementation and performance analysis of spatial data access methods", booktitle = "Proceedings of the Fifth International Conference on Data Engineering", url = "https://doi.org/10.1109/ICDE.1989.47268")
 public class GreeneSplit implements SplitStrategy {
   /**
    * Static instance.

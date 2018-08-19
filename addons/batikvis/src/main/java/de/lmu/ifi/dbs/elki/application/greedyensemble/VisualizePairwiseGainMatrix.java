@@ -86,7 +86,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
     booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.", //
-    url = "http://dx.doi.org/10.1137/1.9781611972825.90")
+    url = "https://doi.org/10.1137/1.9781611972825.90")
 public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Get static logger.

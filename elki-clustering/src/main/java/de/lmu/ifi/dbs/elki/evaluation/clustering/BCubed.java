@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "A. Bagga and B. Baldwin", //
 title = "Entity-based cross-document coreferencing using the Vector Space Model", //
 booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
-url = "http://dx.doi.org/10.3115/980451.980859")
+url = "https://doi.org/10.3115/980451.980859")
 public class BCubed {
   /**
    * Result cache

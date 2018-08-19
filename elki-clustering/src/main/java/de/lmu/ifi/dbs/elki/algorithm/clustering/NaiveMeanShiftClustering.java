@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-@Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "http://dx.doi.org/10.1109/34.400568")
+@Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "https://doi.org/10.1109/34.400568")
 public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.

@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", //
     title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", //
     booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", //
-    url = "http://dx.doi.org/10.1145/956750.956777")
+    url = "https://doi.org/10.1145/956750.956777")
 public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Keeps the currently set pDelta.

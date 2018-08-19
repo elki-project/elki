@@ -67,7 +67,7 @@ import net.jafama.FastMath;
 @Reference(title = "Randomized halton sequences", //
     authors = "X. Wang and F. J. Hickernell", //
     booktitle = "Mathematical and Computer Modelling Vol. 32 (7)", //
-    url = "http://dx.doi.org/10.1016/S0895-7177(00)00178-3")
+    url = "https://doi.org/10.1016/S0895-7177(00)00178-3")
 public class HaltonUniformDistribution implements Distribution {
   /**
    * Minimum

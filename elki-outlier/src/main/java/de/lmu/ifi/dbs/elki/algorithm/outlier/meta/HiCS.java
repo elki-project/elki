@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ import net.jafama.FastMath;
  * 
  * Reference:
  * <p>
- * F. Keller and E. Müller and K. Böhm:<br />
+ * F. Keller, E. Müller, K. Böhm:<br />
  * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br />
  * in: Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012), Washington,
  * DC, USA
@@ -101,10 +101,10 @@ import net.jafama.FastMath;
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
-@Reference(authors = "F. Keller and E. Müller and K. Böhm", //
-title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
-booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", //
-url = "http://dx.doi.org/10.1109/ICDE.2012.88")
+@Reference(authors = "F. Keller, E. Müller, K. Böhm", //
+    title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
+    booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", //
+    url = "https://doi.org/10.1109/ICDE.2012.88")
 public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class.

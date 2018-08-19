@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
-@Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 9(4), 412-429, 2006", url = "http://dx.doi.org/10.1007/s10115-005-0200-2")
+@Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 9(4), 412-429, 2006", url = "https://doi.org/10.1007/s10115-005-0200-2")
 public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
    * The logger for this class.

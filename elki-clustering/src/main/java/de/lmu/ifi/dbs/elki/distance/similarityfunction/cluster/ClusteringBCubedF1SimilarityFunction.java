@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "Bagga, A. and Baldwin, B.", //
 title = "Entity-based cross-document coreferencing using the Vector Space Model", //
 booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
-url = "http://dx.doi.org/10.3115/980451.980859")
+url = "https://doi.org/10.3115/980451.980859")
 public class ClusteringBCubedF1SimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.

@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <O> Attribute object type
  */
 @Title("Spatial Outlier Factor")
-@Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proc. 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
+@Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proc. 3rd International Conference on Image and Graphics", url = "https://doi.org/10.1109/ICIG.2004.53")
 public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
    * The logger for this class.

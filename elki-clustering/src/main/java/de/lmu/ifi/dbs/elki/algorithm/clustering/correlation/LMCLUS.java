@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,9 +72,9 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * Robert Haralick, Rave Harpaz<br />
- * Linear manifold clustering in high dimensional spaces by stochastic search
- * <br/>
+ * R. Haralick, R. Harpaz<br>
+ * Linear manifold clustering in high dimensional spaces by stochastic
+ * search<br>
  * In: Pattern Recognition volume 40, Issue 10
  * </p>
  *
@@ -88,10 +88,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Robert Haralick, Rave Harpaz", //
+@Reference(authors = "R. Haralick, R. Harpaz", //
     title = "Linear manifold clustering in high dimensional spaces by stochastic search", //
     booktitle = "Pattern Recognition volume 40, Issue 10", //
-    url = "http://dx.doi.org/10.1016/j.patcog.2007.01.020")
+    url = "https://doi.org/10.1016/j.patcog.2007.01.020")
 public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

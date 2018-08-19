@@ -86,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Z. He, X. Xu, and S. Deng", //
     title = "Discovering cluster-based local outliers", //
     booktitle = "Pattern Recognition Letters 24(9-10)", //
-    url = "http://dx.doi.org/10.1016/S0167-8655(03)00003-5")
+    url = "https://doi.org/10.1016/S0167-8655(03)00003-5")
 public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

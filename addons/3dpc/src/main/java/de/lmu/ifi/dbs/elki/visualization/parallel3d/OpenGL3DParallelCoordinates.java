@@ -105,7 +105,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @param <O> Object type
  */
 @Alias({ "3dpc", "3DPC" })
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "https://doi.org/10.1145/2463676.2463696")
 public class OpenGL3DParallelCoordinates<O extends NumberVector> implements ResultHandler {
   /**
    * Logging class.

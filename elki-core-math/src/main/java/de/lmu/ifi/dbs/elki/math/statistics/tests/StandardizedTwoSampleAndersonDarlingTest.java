@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "F. W. Scholz, and M. A. Stephens", //
 title = "K-sample Anderson–Darling tests", //
 booktitle = "Journal of the American Statistical Association, 82(399)", //
-url = "http://dx.doi.org/10.1080/01621459.1987.10478517")
+url = "https://doi.org/10.1080/01621459.1987.10478517")
 public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTest {
   /**
    * Static instance.
@@ -70,14 +70,14 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
   @Reference(authors = "D. A. Darling", //
   title = "The Kolmogorov-Smirnov, Cramer-von Mises tests", //
   booktitle = "Annals of mathematical statistics 28(4)", //
-  url = "http://dx.doi.org/10.1214/aoms/1177706788")
+  url = "https://doi.org/10.1214/aoms/1177706788")
   public static final Void ADDITIONAL_REFERENCE_1 = null;
 
   /** More detailed discussion by Pettitt */
   @Reference(authors = "A. N. Pettitt", //
   title = "A two-sample Anderson-Darling rank statistic",//
   booktitle = "Biometrika 63 (1)", //
-  url = "http://dx.doi.org/10.1093/biomet/63.1.161")
+  url = "https://doi.org/10.1093/biomet/63.1.161")
   public static final Void ADDITIONAL_REFERENCE_2 = null;
 
   @Override

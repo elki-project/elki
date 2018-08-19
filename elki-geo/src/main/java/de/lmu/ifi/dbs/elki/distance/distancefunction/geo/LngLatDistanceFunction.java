@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This implementation allows index accelerated queries using R*-trees (by
  * providing a point-to-rectangle minimum distance), as published in:
  * <p>
- * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
  * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
- * 13th Int. Symposium on Advances in Spatial and Temporal Databases
+ * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
  * </p>
  * 
  * @author Erich Schubert
@@ -52,6 +52,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.composedOf EarthModel
  */
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
+    title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+    booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
+    url = "https://doi.org/10.1007/978-3-642-40235-7_9")
 public class LngLatDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Earth model to use.
@@ -72,10 +76,6 @@ public class LngLatDistanceFunction implements SpatialPrimitiveDistanceFunction<
   }
 
   @Override
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
-      title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
-      booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
-      url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -67,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Reference:
  * <p>
  * New Algorithms for Fast Discovery of Association Rules<br />
- * M.J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li<br />
+ * M. J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li<br />
  * Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining
  * </p>
  * 
@@ -75,9 +71,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.7.0
  */
 @Reference(title = "New Algorithms for Fast Discovery of Association Rules", //
-authors = "M.J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li", //
-booktitle = "Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining", //
-url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php")
+    authors = "M. J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li", //
+    booktitle = "Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining", //
+    url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php")
 public class Eclat extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.

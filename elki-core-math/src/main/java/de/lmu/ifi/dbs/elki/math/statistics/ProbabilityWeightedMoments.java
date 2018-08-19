@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
     booktitle = "Technometrics 27.3", //
-    url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
+    url = "https://doi.org/10.1080/00401706.1985.10488049")
 public final class ProbabilityWeightedMoments {
   /**
    * Private constructor, use static methods!

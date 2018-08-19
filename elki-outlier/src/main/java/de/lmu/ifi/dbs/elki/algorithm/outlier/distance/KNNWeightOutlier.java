@@ -89,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "F. Angiulli, C. Pizzuti", //
 title = "Fast Outlier Detection in High Dimensional Spaces", //
 booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", //
-url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
+url = "https://doi.org/10.1007/3-540-45681-3_2")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier", "knnw" })
 public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

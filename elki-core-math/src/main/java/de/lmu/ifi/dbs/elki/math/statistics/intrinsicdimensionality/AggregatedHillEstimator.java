@@ -42,7 +42,7 @@ import net.jafama.FastMath;
 @Reference(authors = "R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm", //
     title = "Tail-Index Estimates in Small Samples", //
     booktitle = "Journal of Business & Economic Statistics", //
-    url = "http://dx.doi.org/10.1198/073500101316970421")
+    url = "https://doi.org/10.1198/073500101316970421")
 public class AggregatedHillEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

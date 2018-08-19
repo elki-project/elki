@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
-@Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
+@Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "https://doi.org/10.1109/ICICS.1997.652114")
 public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQuery<O> {
   /**
    * The index to use

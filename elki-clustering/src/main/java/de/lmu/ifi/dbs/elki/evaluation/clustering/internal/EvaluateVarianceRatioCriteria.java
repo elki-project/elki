@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Reference(authors = "R. B. Calinski and J. Harabasz", //
     title = "A dendrite method for cluster analysis", //
     booktitle = "Communications in Statistics-theory and Methods, 3(1)", //
-    url = "http://dx.doi.org/10.1080/03610927408827101")
+    url = "https://doi.org/10.1080/03610927408827101")
 @Alias({ "calinski-harabasz" })
 public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**F

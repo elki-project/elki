@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger",//
 title = "Density Connected Clustering with Local Subspace Preferences",//
 booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004",//
-url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
+url = "https://doi.org/10.1109/ICDM.2004.10087")
 public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.

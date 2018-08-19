@@ -112,7 +112,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
       authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
       title = "A new scalable parallel DBSCAN algorithm using the disjoint-set data structure", //
       booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
-      url = "http://dx.doi.org/10.1109/SC.2012.9")
+      url = "https://doi.org/10.1109/SC.2012.9")
   public static final Void ADDITIONAL_REFERENCE = null;
 
   /**

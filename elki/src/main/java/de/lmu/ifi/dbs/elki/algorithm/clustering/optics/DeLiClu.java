@@ -88,7 +88,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger", //
     title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", //
     booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
-    url = "http://dx.doi.org/10.1007/11731139_16")
+    url = "https://doi.org/10.1007/11731139_16")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })
 public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**

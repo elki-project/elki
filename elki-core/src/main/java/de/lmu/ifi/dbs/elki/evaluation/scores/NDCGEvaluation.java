@@ -46,7 +46,7 @@ import net.jafama.FastMath;
 @Reference(authors = "K. Järvelin, J. Kekäläinen", //
     title = "Cumulated gain-based evaluation of IR techniques", //
     booktitle = "ACM Transactions on Information Systems (TOIS)", //
-    url = "http://dx.doi.org/10.1145/582415.582418")
+    url = "https://doi.org/10.1145/582415.582418")
 public class NDCGEvaluation implements ScoreEvaluation {
   /**
    * Static instance

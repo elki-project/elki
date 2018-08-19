@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "S. Lloyd", //
     title = "Least squares quantization in PCM", //
     booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", //
-    url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
+    url = "https://doi.org/10.1109/TIT.1982.1056489")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans" })
 public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {

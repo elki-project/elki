@@ -102,7 +102,7 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
       authors = "M.A. Fischler, R.C. Bolles", //
       booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
-      url = "http://dx.doi.org/10.1145/358669.358692")
+      url = "https://doi.org/10.1145/358669.358692")
   @Override
   public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);

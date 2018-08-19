@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * W. Dong and C. Moses and K. Li<br />
  * Efficient k-nearest neighbor graph construction for generic similarity
  * measures<br />
- * In Proc. 20th international conference on World Wide Web WWW'11
+ * In Proc. 20th Int. Conf. on World Wide Web (WWW'11)
  * </p>
  *
  * @author Evelyn Kirner
@@ -61,8 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Reference(authors = "W. Dong and C. Moses and K. Li", //
     title = "Efficient k-nearest neighbor graph construction for generic similarity measures", //
-    booktitle = "Proc. 20th international conference on World Wide Web WWW'11", //
-    url = "http://dx.doi.org/10.1145/1963405.1963487")
+    booktitle = "Proc. 20th Int. Conf. on World Wide Web (WWW'11)", //
+    url = "https://doi.org/10.1145/1963405.1963487")
 public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,9 +57,8 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * Davoud Moulavi, Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg
- * Sander<br />
- * D. Moulavi et al.<br />
+ * Davoud Moulavi, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur Zimek,
+ * Jörg Sander<br />
  * Density-Based Clustering Validation<br />
  * In: Proc. 14th SIAM International Conference on Data Mining (SDM).
  * </p>
@@ -68,10 +67,10 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type
  */
-@Reference(authors = "Davoud Moulavi, Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg Sander", //
+@Reference(authors = "Davoud Moulavi, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur Zimek, Jörg Sander", //
     title = "Density-Based Clustering Validation", //
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM)", //
-    url = "http://dx.doi.org/10.1137/1.9781611973440.96")
+    url = "https://doi.org/10.1137/1.9781611973440.96")
 public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Distance function to use.

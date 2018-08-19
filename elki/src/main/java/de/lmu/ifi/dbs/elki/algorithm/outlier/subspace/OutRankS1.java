@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("OutRank: ranking outliers in high dimensional data")
 @Description("Ranking outliers in high dimensional data - score 1")
-@Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", title = "OutRank: ranking outliers in high dimensional data", booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank), Cancun, Mexico", url = "http://dx.doi.org/10.1109/ICDEW.2008.4498387")
+@Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", title = "OutRank: ranking outliers in high dimensional data", booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank), Cancun, Mexico", url = "https://doi.org/10.1109/ICDEW.2008.4498387")
 public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "A. Beygelzimer, S. Kakade, J. Langford", //
 title = "Cover trees for nearest neighbor", //
 booktitle = "In Proc. 23rd International Conference on Machine Learning (ICML)", //
-url = "http://dx.doi.org/10.1145/1143844.1143857")
+url = "https://doi.org/10.1145/1143844.1143857")
 public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.

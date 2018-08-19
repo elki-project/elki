@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,10 +53,8 @@ import net.jafama.FastMath;
  * Reference:
  * <p>
  * Outlier detection for high dimensional data<br />
- * C.C. Aggarwal, P. S. Yu<br />
- * International Conference on Management of Data Proceedings of the 2001 ACM
- * SIGMOD international conference on Management of data 2001, Santa Barbara,
- * California, United States
+ * C.C. Aggarwal, P. S. Yu <br />
+ * Proc. 2001 ACM SIGMOD international conference on Management of data
  * </p>
  * 
  * @author Ahmed Hettab
@@ -66,9 +64,9 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  */
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", //
-title = "Outlier detection for high dimensional data", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", //
-url = "http://dx.doi.org/10.1145/375663.375668")
+    title = "Outlier detection for high dimensional data", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
+    url = "https://doi.org/10.1145/375663.375668")
 public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Symbolic value for subspaces not in use.
@@ -238,12 +236,12 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
       final IntParameter phiP = new IntParameter(PHI_ID)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(phiP)) {
         phi = phiP.getValue();
       }

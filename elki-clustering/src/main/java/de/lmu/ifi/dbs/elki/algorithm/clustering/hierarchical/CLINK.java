@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "D. Defays", //
 title = "An Efficient Algorithm for the Complete Link Cluster Method", //
 booktitle = "The Computer Journal 20.4", //
-url = "http://dx.doi.org/10.1093/comjnl/20.4.364")
+url = "https://doi.org/10.1093/comjnl/20.4.364")
 @Alias("Defays")
 public class CLINK<O> extends SLINK<O> {
   /**

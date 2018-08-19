@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "H.-P. Kriegel and M. Pfeifle", //
 title = "Density-based clustering of uncertain data", //
 booktitle = "KDD05", //
-url = "http://dx.doi.org/10.1145/1081870.1081955")
+url = "https://doi.org/10.1145/1081870.1081955")
 public class FDBSCAN extends GeneralizedDBSCAN {
   /**
    * Constructor that initialized GeneralizedDBSCAN.

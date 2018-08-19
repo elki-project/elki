@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", //
     title = "A Monte Carlo algorithm for fast projective clustering", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
-    url = "http://dx.doi.org/10.1145/564691.564739")
+    url = "https://doi.org/10.1145/564691.564739")
 public class FastDOC<V extends NumberVector> extends DOC<V> {
   /**
    * The logger for this class.

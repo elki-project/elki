@@ -60,7 +60,7 @@ import net.jafama.FastMath;
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
     booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-    url = "http://dx.doi.org/10.1137/1.9781611972818.2")
+    url = "https://doi.org/10.1137/1.9781611972818.2")
 public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Effective parameters.

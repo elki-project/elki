@@ -81,7 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
     booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
-    url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
+    url = "https://doi.org/10.1007/978-3-642-37456-2_14")
 public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

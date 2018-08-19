@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "S. D. Lee, B. Kao, R. Cheng", //
 title = "Reducing UK-means to K-means", //
 booktitle = "ICDM Data Mining Workshops, 2007", //
-url = "http://dx.doi.org/10.1109/ICDMW.2007.40")
+url = "https://doi.org/10.1109/ICDMW.2007.40")
 public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>> {
   /**
    * CLass logger.

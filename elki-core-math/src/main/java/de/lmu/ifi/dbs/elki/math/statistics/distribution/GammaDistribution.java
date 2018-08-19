@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -617,8 +617,8 @@ public class GammaDistribution extends AbstractDistribution {
    * 
    * Reference:
    * <p>
-   * Algorithm AS 91: The percentage points of the $\chi^2$ distribution<br />
    * D.J. Best, D. E. Roberts<br />
+   * Algorithm AS 91: The percentage points of the χ² distribution<br />
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
    * </p>
    * 
@@ -627,9 +627,10 @@ public class GammaDistribution extends AbstractDistribution {
    * @param g log(nu)
    * @return Probit for chi squared
    */
-  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", //
-      authors = "D.J. Best, D. E. Roberts", //
-      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  @Reference(authors = "D.J. Best, D. E. Roberts", //
+      title = "Algorithm AS 91: The percentage points of the χ² distribution", //
+      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
+      url = "https://doi.org/10.2307/2347113")
   protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
     final double EPS1 = 1e-14; // Approximation quality
     // Sanity checks
@@ -699,8 +700,8 @@ public class GammaDistribution extends AbstractDistribution {
    * 
    * Reference:
    * <p>
-   * Algorithm AS 91: The percentage points of the $\chi^2$ distribution<br />
    * D.J. Best, D. E. Roberts<br />
+   * Algorithm AS 91: The percentage points of the χ² distribution<br />
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
    * </p>
    * 
@@ -709,9 +710,10 @@ public class GammaDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
-  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", //
-      authors = "D.J. Best, D. E. Roberts", //
-      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  @Reference(authors = "D.J. Best, D. E. Roberts", //
+      title = "Algorithm AS 91: The percentage points of the χ² distribution", //
+      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
+      url = "https://doi.org/10.2307/2347113")
   public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;

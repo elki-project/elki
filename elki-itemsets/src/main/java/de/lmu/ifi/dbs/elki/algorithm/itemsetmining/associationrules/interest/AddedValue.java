@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "S. Sahar, Sigal, Y. Mansour", //
     title = "Empirical evaluation of interest-level criteria", //
     booktitle = "Proc. SPIE 3695, Data Mining and Knowledge Discovery: Theory, Tools, and Technology", //
-    url = "http://dx.doi.org/10.1117/12.339991")
+    url = "https://doi.org/10.1117/12.339991")
 public class AddedValue implements InterestingnessMeasure {
   /**
    * Constructor.

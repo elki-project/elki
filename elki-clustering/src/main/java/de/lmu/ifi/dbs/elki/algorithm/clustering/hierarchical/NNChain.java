@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "F. Murtagh", //
     title = "A survey of recent advances in hierarchical clustering algorithms", //
     booktitle = "The Computer Journal 26(4)", //
-    url = "http://dx.doi.org/10.1093/comjnl/26.4.354")
+    url = "https://doi.org/10.1093/comjnl/26.4.354")
 public class NNChain<O> extends AGNES<O> {
   /**
    * Class logger.

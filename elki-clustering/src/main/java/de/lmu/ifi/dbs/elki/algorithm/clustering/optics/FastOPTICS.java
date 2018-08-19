@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "J. Schneider and M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
     booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
-    url = "http://dx.doi.org/10.1145/2505515.2505590")
+    url = "https://doi.org/10.1145/2505515.2505590")
 public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * Class logger.

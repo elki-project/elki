@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", //
     title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
     booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", //
-    url = "http://dx.doi.org/10.1145%2F347090.347123")
+    url = "https://doi.org/10.1145/347090.347123")
 public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.

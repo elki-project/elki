@@ -166,7 +166,7 @@ public class SetMatchingPurity {
   @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
       title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
       booktitle = "Inf. Retrieval, vol. 12, no. 5", //
-      url = "http://dx.doi.org/10.1007/s10791-009-9106-z")
+      url = "https://doi.org/10.1007/s10791-009-9106-z")
   public double fMeasureFirst() {
     return smFFirst;
   }
@@ -186,7 +186,7 @@ public class SetMatchingPurity {
   @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
       title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
       booktitle = "Inf. Retrieval, vol. 12, no. 5", //
-      url = "http://dx.doi.org/10.1007/s10791-009-9106-z")
+      url = "https://doi.org/10.1007/s10791-009-9106-z")
   public double fMeasureSecond() {
     return smFSecond;
   }

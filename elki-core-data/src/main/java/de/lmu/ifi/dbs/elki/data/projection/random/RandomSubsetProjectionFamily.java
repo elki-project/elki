@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "L. Breiman", //
     title = "Bagging predictors", //
     booktitle = "Machine learning 24.2", //
-    url = "http://dx.doi.org/10.1007/BF00058655")
+    url = "https://doi.org/10.1007/BF00058655")
 public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.

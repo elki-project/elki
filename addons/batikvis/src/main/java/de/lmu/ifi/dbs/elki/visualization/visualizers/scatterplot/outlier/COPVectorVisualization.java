@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
-    url = "http://dx.doi.org/10.1109/ICDM.2012.21")
+    url = "https://doi.org/10.1109/ICDM.2012.21")
 public class COPVectorVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.

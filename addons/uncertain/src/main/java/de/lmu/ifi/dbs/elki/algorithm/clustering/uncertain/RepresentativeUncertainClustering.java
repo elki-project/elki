@@ -110,7 +110,7 @@ import net.jafama.FastMath;
 @Reference(authors = "Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur Zimek, Mathias Renz", //
     title = "Representative clustering of uncertain data", //
     booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
-    url = "http://dx.doi.org/10.1145/2623330.2623725")
+    url = "https://doi.org/10.1145/2623330.2623725")
 public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.

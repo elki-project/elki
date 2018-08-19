@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,9 +75,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 @Reference(authors = "P. J. Rousseeuw", //
-title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
-booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
-url = "http://dx.doi.org/10.1016%2F0377-0427%2887%2990125-7")
+    title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
+    booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
+    url = "https://doi.org/10.1016/0377-0427(87)90125-7")
 public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Logger for debug output.

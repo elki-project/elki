@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "R. W. Hamming", //
     title = "Error detecting and error correcting codes", //
     booktitle = "Bell System technical journal, 29(2)", //
-    url = "http://dx.doi.org/10.1002/j.1538-7305.1950.tb00463.x")
+    url = "https://doi.org/10.1002/j.1538-7305.1950.tb00463.x")
 public class HammingDistanceFunction extends AbstractSetDistanceFunction<FeatureVector<?>> implements NumberVectorDistanceFunction<FeatureVector<?>> {
   /**
    * Static instance.

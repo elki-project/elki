@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ import net.jafama.FastMath;
  * 
  * Reference:
  * <p>
- * E. Schubert, M. Weiler, H. Kriegel<br />
+ * Erich Schubert, Michael Weiler, Hans-Peter Kriegel<br />
  * Signi-Trend: scalable detection of emerging topics in textual streams by
  * hashed significance thresholds<br />
  * Proc. 20th ACM SIGKDD international conference on Knowledge discovery and
@@ -79,10 +79,10 @@ import net.jafama.FastMath;
  * @apiviz.has ChangePoints
  */
 @Title("Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds")
-@Reference(authors = "E. Schubert, M. Weiler, H. Kriegel", //
+@Reference(authors = "Erich Schubert, Michael Weiler, Hans-Peter Kriegel", //
     title = "Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds", //
     booktitle = "Proc. 20th ACM SIGKDD international conference on Knowledge discovery and data mining", //
-    url = "http://dx.doi.org/10.1145/2623330.2623740")
+    url = "https://doi.org/10.1145/2623330.2623740")
 @Priority(Priority.RECOMMENDED)
 public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
   /**

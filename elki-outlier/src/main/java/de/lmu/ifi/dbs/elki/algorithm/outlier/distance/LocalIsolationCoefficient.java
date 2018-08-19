@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "B. Yu, and M. Song, and L. Wang", //
 title = "Local Isolation Coefficient-Based Outlier Mining Algorithm", //
 booktitle = "Int. Conf. on Information Technology and Computer Science (ITCS) 2009", //
-url = "http://dx.doi.org/10.1109/ITCS.2009.230")
+url = "https://doi.org/10.1109/ITCS.2009.230")
 public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

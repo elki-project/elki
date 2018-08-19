@@ -80,7 +80,7 @@ import net.jafama.FastMath;
 @Reference(authors = "J. H. Ward Jr", //
     title = "Hierarchical grouping to optimize an objective function", //
     booktitle = "Journal of the American statistical association 58.301", //
-    url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
+    url = "https://doi.org/10.1080/01621459.1963.10500845")
 @Alias({ "ward", "MISSQ", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
 @Priority(Priority.IMPORTANT + 1)
 public class WardLinkage implements Linkage {

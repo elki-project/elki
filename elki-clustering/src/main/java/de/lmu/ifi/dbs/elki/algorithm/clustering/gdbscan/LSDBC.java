@@ -78,7 +78,7 @@ import net.jafama.FastMath;
 @Reference(authors = "E. Biçici and D. Yuret", //
     title = "Locally Scaled Density Based Clustering", //
     booktitle = "Adaptive and Natural Computing Algorithms", //
-    url = "http://dx.doi.org/10.1007/978-3-540-71618-1_82")
+    url = "https://doi.org/10.1007/978-3-540-71618-1_82")
 @Priority(Priority.IMPORTANT)
 public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**

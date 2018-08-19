@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //
     booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
-    url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
+    url = "https://doi.org/10.1007/3-540-60159-7_6")
 public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNQuery<O> {
   /**
    * Squared euclidean distance function.

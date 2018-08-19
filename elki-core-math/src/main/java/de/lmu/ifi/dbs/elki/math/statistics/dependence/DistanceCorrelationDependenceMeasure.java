@@ -51,7 +51,7 @@ import net.jafama.FastMath;
 @Reference(authors = "Székely, G. J., Rizzo, M. L., & Bakirov, N. K.", //
 title = "Measuring and testing dependence by correlation of distances", //
 booktitle = "The Annals of Statistics, 35(6), 2769-2794", //
-url = "http://dx.doi.org/10.1214/009053607000000505")
+url = "https://doi.org/10.1214/009053607000000505")
 public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.

@@ -70,7 +70,7 @@ import net.jafama.FastMath;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
     booktitle = "Proc. 20th Int.l Conf. on Scientific and Statistical Database Management (SSDBM)", //
-    url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
+    url = "https://doi.org/10.1007/978-3-540-69497-7_27")
 public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Holds the weight function.
