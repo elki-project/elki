@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * Class to sort an int array, using a modified quicksort.
@@ -64,7 +65,7 @@ public class IntegerArrayQuickSort {
    * @param data Data to sort
    * @param comp Comparator
    */
-  public static void sort(int[] data, IntegerComparator comp) {
+  public static void sort(int[] data, IntComparator comp) {
     sort(data, 0, data.length, comp);
   }
 
@@ -76,7 +77,7 @@ public class IntegerArrayQuickSort {
    * @param end Last index (exclusive)
    * @param comp Comparator
    */
-  public static void sort(int[] data, int start, int end, IntegerComparator comp) {
+  public static void sort(int[] data, int start, int end, IntComparator comp) {
     quickSort(data, start, end, comp);
   }
 
@@ -88,7 +89,7 @@ public class IntegerArrayQuickSort {
    * @param end Last index (exclusive!)
    * @param comp Comparator
    */
-  private static void quickSort(int[] data, final int start, final int end, IntegerComparator comp) {
+  private static void quickSort(int[] data, final int start, final int end, IntComparator comp) {
     final int len = end - start;
     final int last = end - 1;
     if(len < INSERTION_THRESHOLD) {
@@ -188,7 +189,7 @@ public class IntegerArrayQuickSort {
    * @param end Last index (exclusive!)
    * @param comp Comparator
    */
-  private static void insertionSort(int[] data, final int start, final int end, IntegerComparator comp) {
+  private static void insertionSort(int[] data, final int start, final int end, IntComparator comp) {
     // Classic insertion sort.
     for(int i = start + 1; i < end; i++) {
       final int cur = data[i];
@@ -219,7 +220,7 @@ public class IntegerArrayQuickSort {
    * @param m5 Pivot candidate position
    * @param comp Comparator
    */
-  private static void sort5(int[] data, int m1, int m2, int m3, int m4, int m5, IntegerComparator comp) {
+  private static void sort5(int[] data, int m1, int m2, int m3, int m4, int m5, IntComparator comp) {
     // Sort m1, m2
     if(comp.compare(data[m1], data[m2]) > 0) {
       final int tmp = data[m2];

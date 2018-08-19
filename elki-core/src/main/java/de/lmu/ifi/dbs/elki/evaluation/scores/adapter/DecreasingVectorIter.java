@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+
+import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * Class to iterate over a number vector in decreasing order.
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
  * 
  * @apiviz.composedOf NumberVector
  */
-public class DecreasingVectorIter extends AbstractVectorIter implements IntegerComparator {
+public class DecreasingVectorIter extends AbstractVectorIter implements IntComparator {
   /**
    * Constructor.
    * 

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,12 +53,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * K-means variation that produces equally sized clusters.
@@ -418,7 +418,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @apiviz.exclude
    */
-  public class PreferenceComparator implements IntegerComparator {
+  public class PreferenceComparator implements IntComparator {
     /**
      * Meta to use for comparison.
      */
@@ -435,7 +435,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
      * @param c Meta to sort by
      * @return The comparator
      */
-    public IntegerComparator select(Meta c) {
+    public IntComparator select(Meta c) {
       this.c = c;
       return this;
     }

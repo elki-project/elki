@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,12 +63,7 @@ public class IntegerArrayQuickSortTest {
     }
 
     // Run QuickSort and validate monotonicity.
-    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(data[x], data[y]);
-      }
-    });
+    IntegerArrayQuickSort.sort(idx, (x, y) -> Double.compare(data[x], data[y]));
     double prev = data[idx[0]];
     for(int i = 1; i < size; i++) {
       double val = data[idx[i]];
@@ -88,12 +83,7 @@ public class IntegerArrayQuickSortTest {
     }
 
     // Run QuickSort and validate monotonicity.
-    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return (x < y) ? -1 : (x == y) ? 0 : +1;
-      }
-    });
+    IntegerArrayQuickSort.sort(idx, (x, y) -> (x < y) ? -1 : (x == y) ? 0 : +1);
 
     int prev = idx[0];
     for(int i = 1; i < size; i++) {
@@ -114,12 +104,7 @@ public class IntegerArrayQuickSortTest {
     }
 
     // Run QuickSort and validate monotonicity.
-    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return (x < y) ? -1 : (x == y) ? 0 : +1;
-      }
-    });
+    IntegerArrayQuickSort.sort(idx, (x, y) -> (x < y) ? -1 : (x == y) ? 0 : +1);
 
     int prev = idx[0];
     for(int i = 1; i < size; i++) {

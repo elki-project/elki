@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -263,12 +262,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
         idx[j++] = i;
       }
     }
-    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Integer.compare(counts[y], counts[x]);
-      }
-    });
+    IntegerArrayQuickSort.sort(idx, (x, y) -> Integer.compare(counts[y], counts[x]));
     Arrays.fill(positions, -1);
     for(int i = 0; i < idx.length; i++) {
       positions[idx[i]] = i;

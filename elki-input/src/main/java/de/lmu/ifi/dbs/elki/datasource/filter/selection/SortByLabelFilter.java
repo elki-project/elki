@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -69,17 +68,10 @@ public class SortByLabelFilter implements ObjectFilter {
     }
     // Sort by labels - identify a label column
     final int lblcol = FilterUtil.findLabelColumn(objects);
-    if (lblcol == -1) {
+    if(lblcol == -1) {
       throw new AbortException("No label column found - cannot sort by label.");
     }
-    IntegerArrayQuickSort.sort(offsets, new IntegerComparator() {
-      @Override
-      public int compare(int o1, int o2) {
-        String l1 = objects.data(o1, lblcol).toString();
-        String l2 = objects.data(o2, lblcol).toString();
-        return l1.compareToIgnoreCase(l2);
-      }
-    });
+    IntegerArrayQuickSort.sort(offsets, (o1, o2) -> objects.data(o1, lblcol).toString().compareToIgnoreCase(objects.data(o2, lblcol).toString()));
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for(int j = 0; j < objects.metaLength(); j++) {

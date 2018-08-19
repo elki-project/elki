@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,8 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+
+import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * Normalize vectors according to their rank in the attributes.
@@ -117,7 +118,7 @@ public class IntegerRankTieNormalization implements ObjectFilter {
    * 
    * @apiviz.exclude
    */
-  private static class Sorter implements IntegerComparator {
+  private static class Sorter implements IntComparator {
     /**
      * Column to use for sorting.
      */

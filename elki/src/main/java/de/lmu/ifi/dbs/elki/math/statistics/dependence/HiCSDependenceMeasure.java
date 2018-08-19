@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,9 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.7.0
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
-booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
-url = "http://dx.doi.org/10.1145/2463676.2463696")
+    title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+    booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+    url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Monte-Carlo iterations
@@ -111,18 +110,8 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
 
     // Sorted copies for slicing.
     int[] s1 = MathUtil.sequence(0, len), s2 = MathUtil.sequence(0, len);
-    IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(adapter1.getDouble(data1, x), adapter1.getDouble(data1, y));
-      }
-    });
-    IntegerArrayQuickSort.sort(s2, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(adapter2.getDouble(data2, x), adapter2.getDouble(data2, y));
-      }
-    });
+    IntegerArrayQuickSort.sort(s1, (x, y) -> Double.compare(adapter1.getDouble(data1, x), adapter1.getDouble(data1, y)));
+    IntegerArrayQuickSort.sort(s2, (x, y) -> Double.compare(adapter2.getDouble(data2, x), adapter2.getDouble(data2, y)));
 
     // Distributions for testing
     double[] fullValues = new double[len];

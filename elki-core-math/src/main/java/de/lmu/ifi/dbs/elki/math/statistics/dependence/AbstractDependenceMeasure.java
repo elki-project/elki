@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 
 /**
  * Abstract base class for dependence measures.
@@ -162,12 +161,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    */
   public static <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     int[] s1 = MathUtil.sequence(0, len);
-    IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y));
-      }
-    });
+    IntegerArrayQuickSort.sort(s1, (x, y) -> Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y)));
     return s1;
   }
 

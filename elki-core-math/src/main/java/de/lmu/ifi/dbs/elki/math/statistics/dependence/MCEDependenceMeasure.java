@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
@@ -48,9 +47,9 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 @Reference(authors = "D. Guo", //
-title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", //
-booktitle = "Information Visualization, 2(4)", //
-url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
+    title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", //
+    booktitle = "Information Visualization, 2(4)", //
+    url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
 public class MCEDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.
@@ -101,12 +100,7 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
       tmp[i] = adapter1.getDouble(data1, i);
     }
     // Sort indexes:
-    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(tmp[x], tmp[y]);
-      }
-    });
+    IntegerArrayQuickSort.sort(idx, (x, y) -> Double.compare(tmp[x], tmp[y]));
     Arrays.sort(tmp); // Should yield the same ordering
 
     ArrayList<int[]> ret = new ArrayList<>(1 << depth);
