@@ -36,6 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,7 +48,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -61,6 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @apiviz.uses Reference
  */
 public class DocumentReferences {
+  private static final String DOIPREFIX = "https://doi.org/";
+
   private static final String CSSFILE = "stylesheet.css";
 
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
@@ -75,11 +78,11 @@ public class DocumentReferences {
    */
   public static void main(String[] args) {
     if(args.length < 1 || args.length > 2) {
-      LoggingUtil.warning("I need exactly one or two file names to operate!");
+      LOG.warning("I need exactly one or two file names to operate!");
       System.exit(1);
     }
-    if(!args[0].endsWith(".html") || (args.length > 1 && !args[1].endsWith(".trac"))) {
-      LoggingUtil.warning("File name doesn't end in expected extension!");
+    if(!args[0].endsWith(".html") || (args.length > 1 && !args[1].endsWith(".md"))) {
+      LOG.warning("File name doesn't end in expected extension!");
       System.exit(1);
     }
 
@@ -91,17 +94,17 @@ public class DocumentReferences {
       HTMLUtil.writeXHTML(refdoc, refstream);
     }
     catch(IOException e) {
-      LoggingUtil.exception("IO Exception writing HTML output.", e);
+      LOG.exception("IO Exception writing HTML output.", e);
       System.exit(1);
     }
     if(args.length > 1) {
       File refwiki = new File(args[1]);
       try (FileOutputStream reffow = new FileOutputStream(refwiki); //
           PrintStream refstreamW = new PrintStream(reffow, false, "UTF-8")) {
-        documentReferencesWiki(refs, refstreamW);
+        documentReferencesMarkdown(refs, refstreamW);
       }
       catch(IOException e) {
-        LoggingUtil.exception("IO Exception writing Wiki output.", e);
+        LOG.exception("IO Exception writing Wiki output.", e);
         System.exit(1);
       }
     }
@@ -176,7 +179,7 @@ public class DocumentReferences {
 
             // Link back to original class
             Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
+            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(cls));
             classa.setTextContent(cls.getName());
             classdt.appendChild(classa);
           }
@@ -188,7 +191,7 @@ public class DocumentReferences {
 
             // Link back to original class
             Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForPackageName(pkg.getName()));
+            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(pkg));
             classa.setTextContent(pkg.getName());
             classdt.appendChild(classa);
           }
@@ -242,58 +245,70 @@ public class DocumentReferences {
     return htmldoc;
   }
 
-  private static void documentReferencesWiki(List<Pair<Reference, TreeSet<Object>>> refs, PrintStream refstreamW) {
+  private static void documentReferencesMarkdown(List<Pair<Reference, TreeSet<Object>>> refs, PrintStream refstreamW) {
     for(Pair<Reference, TreeSet<Object>> pair : refs) {
       // JavaDoc links for relevant classes and packages.
       boolean first = true;
       for(Object o : pair.second) {
         if(!first) {
-          refstreamW.println(",[[br]]");
+          refstreamW.append(",\\\\\n");
         }
         if(o instanceof Class<?>) {
           Class<?> cls = (Class<?>) o;
-          refstreamW.print("[[javadoc(");
-          refstreamW.print(cls.getName());
-          refstreamW.print(',');
-          refstreamW.print(cls.getName());
-          refstreamW.print(")]]");
+          refstreamW.append('[').append(cls.getName()).append("](./releases/current/doc/") //
+              .append(linkFor(cls)).append(')');
         }
         else if(o instanceof Package) {
           Package pkg = (Package) o;
-          refstreamW.print("[[javadoc(");
-          refstreamW.print(pkg.getName());
-          refstreamW.print(',');
-          refstreamW.print(pkg.getName());
-          refstreamW.print(")]]");
+          refstreamW.append('[').append(pkg.getName()).append("](./releases/current/doc/") //
+              .append(linkFor(pkg)).append(')');
         }
         first = false;
       }
-      refstreamW.println();
+      refstreamW.append("\\\\\n");
 
-      String indent = " ";
       {
         Reference ref = pair.first;
         // Prefix
         if(ref.prefix().length() > 0) {
-          refstreamW.println(indent + ref.prefix() + " [[br]]");
+          markdownEscape(refstreamW, ref.prefix()).append("\\\\\n");
         }
         // Authors
-        refstreamW.println(indent + "By: " + ref.authors() + " [[br]]");
+        refstreamW.append("By: ").append(ref.authors());
         // Title
-        refstreamW.println(indent + "'''" + ref.title() + "'''" + " [[br]]");
+        markdownEscape(refstreamW.append("\\\\\n**"), ref.title()).append("**");
         // Booktitle
-        if(ref.booktitle().length() > 0) {
-          String prefix = ref.booktitle().startsWith("Online:") ? "" : "In: ";
-          refstreamW.println(indent + prefix + ref.booktitle() + " [[br]]");
+        if(ref.booktitle().length() > 0 && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
+          markdownEscape(refstreamW.append(ref.booktitle().startsWith("Online:") ? "\\\\\n" : "\\\\\nIn: "), ref.booktitle());
         }
         // URL
         if(ref.url().length() > 0) {
-          refstreamW.println(indent + "Online: [" + ref.url() + "][[br]]");
+          if(ref.url().startsWith(DOIPREFIX)) {
+            refstreamW.append("\\\\\n[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
+                .append("](").append(ref.url()).append(")");
+          }
+          else {
+            refstreamW.append("\\\\\nOnline: <").append(ref.url()).append('>');
+          }
         }
       }
-      refstreamW.println();
-      refstreamW.println();
+      refstreamW.append("\n\n");
     }
+  }
+
+  private static final Pattern ESCAPE_MARKDOWN = Pattern.compile("[*<>\\\\]");
+
+  private static PrintStream markdownEscape(PrintStream out, String str) {
+    if(str.isEmpty()) {
+      return out;
+    }
+    Matcher m = ESCAPE_MARKDOWN.matcher(str);
+    int p = 0;
+    while(m.find()) {
+      out.append(str, p, m.start()).append('\\');
+      p = m.start();
+    }
+    return out.append(str, p, str.length());
   }
 
   private static List<Pair<Reference, TreeSet<Object>>> sortedReferences() {
@@ -395,12 +410,12 @@ public class DocumentReferences {
     }
   }
 
-  private static String linkForClassName(String name) {
-    return name.replace('.', '/') + ".html";
+  private static String linkFor(Class<?> cls) {
+    return cls.getName().replace('.', '/') + ".html";
   }
 
-  private static String linkForPackageName(String name) {
-    return name.replace('.', '/') + "/package-summary.html";
+  private static String linkFor(Package name) {
+    return name.getName().replace('.', '/') + "/package-summary.html";
   }
 
   /**
