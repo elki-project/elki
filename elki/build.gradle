@@ -32,12 +32,6 @@ jar {
   }
 }
 
-// Resources
-processResources {
-  filesMatching('**/elki.properties') {
-    expand('project': project)
-  }
-}
 javadoc.dependsOn documentParameters
 javadoc.dependsOn documentReferences
 

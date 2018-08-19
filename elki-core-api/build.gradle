@@ -3,3 +3,10 @@ dependencies {
   compile project(':elki-core-dbids')
   testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }
+
+// Resources: insert version number
+processResources {
+  filesMatching('**/elki.properties') {
+    expand('project': project)
+  }
+}
