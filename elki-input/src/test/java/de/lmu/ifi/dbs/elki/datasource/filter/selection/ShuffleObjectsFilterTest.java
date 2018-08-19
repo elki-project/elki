@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,9 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "sorted-data-1.csv";
-    ShuffleObjectsFilter filter = new ELKIBuilder<>(ShuffleObjectsFilter.class).build();
+    ShuffleObjectsFilter filter = new ELKIBuilder<>(ShuffleObjectsFilter.class)//
+        .with(ShuffleObjectsFilter.Parameterizer.SEED_ID, 0)//
+        .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);
