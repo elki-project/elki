@@ -16,6 +16,7 @@ dependencies {
   project.parent.subprojects.findAll { !bundleExclude.contains(it.path) }.each {
     compile it
     doc files(it.sourceSets.main.java.srcDirs)
+    testRuntime files(it.sourceSets.main.java.outputDir)
   }
   testCompile project(':elki-docutil')
 }
