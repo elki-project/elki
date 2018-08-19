@@ -26,11 +26,16 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree.
  * The routing objects are chosen according to the M_LB_DIST strategy.
+ * 
+ * The benefit of this strategy is that it works with precomputed distances from
+ * the parent, while most other strategies would require $O(n^2)$ distance
+ * computations. So if construction time is critical, this is a good choice.
  *
  * Reference:
  * <p>
@@ -46,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  */
+@Priority(Priority.RECOMMENDED)
 @Reference(authors = "P. Ciaccia and M. Patella and P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
