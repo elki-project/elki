@@ -34,6 +34,10 @@ import net.jafama.FastMath;
  * Utility functions for use with vectors.
  *
  * Note: obviously, many functions are class methods or database related.
+ * 
+ * TODO: add more precise but slower O(n^2) angle computation according to:
+ * Computing the Angle between Vectors, P. Schatte
+ * Journal of Computing, Volume 63, Number 1 (1999)
  *
  * @author Erich Schubert
  * @since 0.3
@@ -59,7 +63,7 @@ public final class VectorUtil {
    */
   public static <V extends NumberVector> V randomVector(NumberVector.Factory<V> factory, int dim, Random r) {
     double[] data = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       data[i] = r.nextDouble();
     }
     return factory.newNumberVector(data);
@@ -179,10 +183,11 @@ public final class VectorUtil {
       final int d1 = v1.iterDim(i1);
       while(d2 < d1 && d2 < dim2) {
         final double val = v2.doubleValue(d2);
-        l2 += val;
+        l2 += val * val;
         ++d2;
       }
       if(d2 < dim2) {
+        assert (d1 == d2) : "Dimensions not ordered";
         final double val1 = v1.iterDoubleValue(i1);
         final double val2 = v2.doubleValue(d2);
         l1 += val1 * val1;
@@ -190,7 +195,8 @@ public final class VectorUtil {
         cross += val1 * val2;
         i1 = v1.iterAdvance(i1);
         ++d2;
-      } else {
+      }
+      else {
         final double val = v1.iterDoubleValue(i1);
         l1 += val * val;
         i1 = v1.iterAdvance(i1);
@@ -226,10 +232,6 @@ public final class VectorUtil {
             angleSparseDense((SparseNumberVector) v2, v1) : //
             angleDense(v1, v2);
   }
-
-  // TODO: add more precise but slower O(n^2) angle computation according to:
-  // Computing the Angle between Vectors, P. Schatte
-  // Journal of Computing, Volume 63, Number 1 (1999)
 
   /**
    * Compute the minimum angle between two rectangles.
@@ -286,7 +288,7 @@ public final class VectorUtil {
         l2 += min2 * min2;
       } // else: 0
     }
-    final double cross = Math.max(s1, Math.abs(s2));
+    final double cross = Math.max(Math.abs(s1), Math.abs(s2));
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
             FastMath.sqrt((cross / l1) * (cross / l2));
@@ -332,6 +334,117 @@ public final class VectorUtil {
         (l1 == 0. || l2 == 0.) ? 1. : //
             FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
+  }
+
+  /**
+   * Compute the dot product of two dense vectors.
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return dot product
+   */
+  public static double dotDense(NumberVector v1, NumberVector v2) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
+    double dot = 0;
+    for(int k = 0; k < mindim; k++) {
+      dot += v1.doubleValue(k) * v2.doubleValue(k);
+    }
+    return dot;
+  }
+
+  /**
+   * Compute the dot product for two sparse vectors.
+   *
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @return dot product
+   */
+  public static double dotSparse(SparseNumberVector v1, SparseNumberVector v2) {
+    double dot = 0.;
+    int i1 = v1.iter(), i2 = v2.iter();
+    while(v1.iterValid(i1) && v2.iterValid(i2)) {
+      final int d1 = v1.iterDim(i1), d2 = v2.iterDim(i2);
+      if(d1 < d2) {
+        i1 = v1.iterAdvance(i1);
+      }
+      else if(d2 < d1) {
+        i2 = v2.iterAdvance(i2);
+      }
+      else { // d1 == d2
+        dot += v1.iterDoubleValue(i1) * v2.iterDoubleValue(i2);
+        i1 = v1.iterAdvance(i1);
+        i2 = v2.iterAdvance(i2);
+      }
+    }
+    return dot;
+  }
+
+  /**
+   * Compute the dot product for a sparse and a dense vector.
+   *
+   * @param v1 Sparse first vector
+   * @param v2 Dense second vector
+   * @return dot product
+   */
+  public static double dotSparseDense(SparseNumberVector v1, NumberVector v2) {
+    final int dim2 = v2.getDimensionality();
+    double dot = 0.;
+    for(int i1 = v1.iter(); v1.iterValid(i1);) {
+      final int d1 = v1.iterDim(i1);
+      if(d1 >= dim2) {
+        break;
+      }
+      dot += v1.iterDoubleValue(i1) * v2.doubleValue(d1);
+      i1 = v1.iterAdvance(i1);
+    }
+    return dot;
+  }
+
+  /**
+   * Compute the dot product of the angle between two vectors.
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Dot product
+   */
+  public static double dot(NumberVector v1, NumberVector v2) {
+    // Java Hotspot appears to optimize these better than if-then-else:
+    return v1 instanceof SparseNumberVector ? //
+        v2 instanceof SparseNumberVector ? //
+            dotSparse((SparseNumberVector) v1, (SparseNumberVector) v2) : //
+            dotSparseDense((SparseNumberVector) v1, v2) : //
+        v2 instanceof SparseNumberVector ? //
+            dotSparseDense((SparseNumberVector) v2, v1) : //
+            dotDense(v1, v2);
+  }
+
+  /**
+   * Compute the minimum angle between two rectangles, assuming unit length
+   * vectors
+   *
+   * @param v1 first rectangle
+   * @param v2 second rectangle
+   * @return Angle
+   */
+  public static double minDot(SpatialComparable v1, SpatialComparable v2) {
+    if(v1 instanceof NumberVector && v2 instanceof NumberVector) {
+      return dot((NumberVector) v1, (NumberVector) v2);
+    }
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
+    // Essentially, we want to compute this:
+    // absmax(v1.transposeTimes(v2));
+    double s1 = 0, s2 = 0;
+    for(int k = 0; k < mindim; k++) {
+      final double min1 = v1.getMin(k), max1 = v1.getMax(k);
+      final double min2 = v2.getMin(k), max2 = v2.getMax(k);
+      final double p1 = min1 * min2, p2 = min1 * max2;
+      final double p3 = max1 * min2, p4 = max1 * max2;
+      s1 += Math.max(Math.max(p1, p2), Math.max(p3, p4));
+      s2 += Math.min(Math.min(p1, p2), Math.min(p3, p4));
+    }
+    return Math.max(Math.abs(s1), Math.abs(s2));
   }
 
   /**

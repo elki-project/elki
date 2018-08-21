@@ -5,7 +5,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction l
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction maximum max chebyshev de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction minimum min de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction arccos
+de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineUnitlengthDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction cosine
+de.lmu.ifi.dbs.elki.distance.distancefunction.CosineUnitlengthDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction bray-curtis braycurtis sorensen dice sorensen-dice
 de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction canberra
 de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction

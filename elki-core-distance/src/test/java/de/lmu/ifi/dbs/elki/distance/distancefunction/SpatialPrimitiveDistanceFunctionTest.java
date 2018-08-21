@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * 
  * @author Erich Schubert
  * @since 0.5.0
- * 
  */
 public class SpatialPrimitiveDistanceFunctionTest {
   @Test
@@ -140,7 +139,7 @@ public class SpatialPrimitiveDistanceFunctionTest {
     }
   }
 
-  protected void compareDistances(NumberVector v1, ModifiableHyperBoundingBox mbr, NumberVector v2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
+  public static void compareDistances(NumberVector v1, ModifiableHyperBoundingBox mbr, NumberVector v2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
     double exact = dist.distance(v1, v2);
     double mind = dist.minDist(v1, v2);
     double mbrd = dist.minDist(v1, mbr);

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
@@ -53,12 +53,7 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
 
   @Override
   public double similarity(final NumberVector o1, final NumberVector o2) {
-    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
-    double sim = 0.;
-    for(int i = 0; i < dim; i++) {
-      sim += o1.doubleValue(i) * o2.doubleValue(i);
-    }
-    return sim;
+    return VectorUtil.dot(o1, o2);
   }
 
   @Override

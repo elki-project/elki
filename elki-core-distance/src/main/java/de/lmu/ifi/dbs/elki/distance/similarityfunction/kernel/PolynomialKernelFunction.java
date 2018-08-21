@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorSimilarityFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -82,14 +82,9 @@ public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction i
 
   @Override
   public double similarity(NumberVector o1, NumberVector o2) {
-    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
-    double sim = 0.;
-    for(int i = 0; i < dim; i++) {
-      sim += o1.doubleValue(i) * o2.doubleValue(i);
-    }
-    return MathUtil.powi(sim + bias, degree);
+    return MathUtil.powi(VectorUtil.dot(o1, o2) + bias, degree);
   }
-  
+
   @Override
   public boolean isSymmetric() {
     return true;
