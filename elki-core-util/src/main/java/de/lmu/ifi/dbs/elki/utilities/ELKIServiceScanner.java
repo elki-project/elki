@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -133,48 +133,44 @@ public class ELKIServiceScanner {
     if(MASTER_CACHE != null) {
       return;
     }
-    Enumeration<URL> cps;
     try {
-      cps = CLASSLOADER.getResources("");
+      Enumeration<URL> cps = CLASSLOADER.getResources("");
+      List<Class<?>> res = new ArrayList<>();
+      while(cps.hasMoreElements()) {
+        URL u = cps.nextElement();
+        // Scan file sources only.
+        if(!"file".equals(u.getProtocol())) {
+          continue;
+        }
+        try {
+          Iterator<String> it = new DirClassIterator(new File(u.toURI()));
+          while(it.hasNext()) {
+            try {
+              Class<?> cls = CLASSLOADER.loadClass(it.next());
+              // skip classes where we can't get a full name.
+              if(cls.getCanonicalName() == null) {
+                continue;
+              }
+              res.add(cls);
+            }
+            catch(Exception | Error e) {
+              continue;
+            }
+          }
+        }
+        catch(URISyntaxException e) {
+          LOG.warning("Incorrect classpath entry: " + u);
+          continue;
+        }
+      }
+      MASTER_CACHE = Collections.unmodifiableList(res);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest("Classes found by scanning the development classpath: " + MASTER_CACHE.size());
+      }
     }
     catch(IOException e) {
       LOG.exception(e);
       return;
-    }
-    List<Class<?>> res = new ArrayList<>();
-    while(cps.hasMoreElements()) {
-      URL u = cps.nextElement();
-      // Scan file sources only.
-      if(!"file".equals(u.getProtocol())) {
-        continue;
-      }
-      File path;
-      try {
-        path = new File(u.toURI());
-      }
-      catch(URISyntaxException e) {
-        LOG.warning("Incorrect classpath entry: " + u);
-        continue;
-      }
-      Iterator<String> it = new DirClassIterator(path);
-      while(it.hasNext()) {
-        String classname = it.next();
-        try {
-          Class<?> cls = CLASSLOADER.loadClass(classname);
-          // skip classes where we can't get a full name.
-          if(cls.getCanonicalName() == null) {
-            continue;
-          }
-          res.add(cls);
-        }
-        catch(Exception | Error e) {
-          continue;
-        }
-      }
-    }
-    MASTER_CACHE = Collections.unmodifiableList(res);
-    if(LOG.isDebuggingFinest() && !MASTER_CACHE.isEmpty()) {
-      LOG.debugFinest("Classes found by scanning the development classpath: " + MASTER_CACHE.size());
     }
   }
 
@@ -208,7 +204,6 @@ public class ELKIServiceScanner {
       if(prefix.charAt(prefix.length() - 1) != File.separatorChar) {
         prefix = prefix + File.separatorChar;
       }
-
       this.folders.add(path);
     }
 
@@ -217,7 +212,7 @@ public class ELKIServiceScanner {
       if(files.isEmpty()) {
         findNext();
       }
-      return (!files.isEmpty());
+      return !files.isEmpty();
     }
 
     /**
@@ -257,36 +252,58 @@ public class ELKIServiceScanner {
       if(files.isEmpty()) {
         findNext();
       }
-      if(!files.isEmpty()) {
-        return files.remove(files.size() - 1);
-      }
-      return null;
+      return !files.isEmpty() ? files.remove(files.size() - 1) : null;
     }
   }
 
   /**
    * Sort classes by their class name. Package first, then class.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
    */
-  public static class ClassSorter implements Comparator<Class<?>> {
+  public static Comparator<Class<?>> SORT_BY_NAME = new Comparator<Class<?>>() {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
-      Package p1 = o1.getPackage();
-      Package p2 = o2.getPackage();
-      if(p1 == null) {
-        return -1;
-      }
-      if(p2 == null) {
-        return 1;
-      }
-      int pkgcmp = p1.getName().compareTo(p2.getName());
-      if(pkgcmp != 0) {
-        return pkgcmp;
-      }
-      return o1.getCanonicalName().compareTo(o2.getCanonicalName());
+      return comparePackageClass(o1, o2);
     }
+  };
+
+  /**
+   * Compare two classes, by package name first.
+   *
+   * @param o1 First class
+   * @param o2 Second class
+   * @return Comparison result
+   */
+  private static int comparePackageClass(Class<?> o1, Class<?> o2) {
+    return o1.getPackage() == o2.getPackage() ? //
+        o1.getCanonicalName().compareTo(o2.getCanonicalName()) //
+        : o1.getPackage() == null ? -1 : o2.getPackage() == null ? +1 //
+            : o1.getPackage().getName().compareTo(o2.getPackage().getName());
   }
+
+  /**
+   * Get the priority of a class, or its outer class.
+   *
+   * @param o1 Class
+   * @return Priority
+   */
+  private static int classPriority(Class<?> o1) {
+    Priority p = o1.getAnnotation(Priority.class);
+    if(p == null) {
+      Class<?> pa = o1.getDeclaringClass();
+      p = (pa != null) ? pa.getAnnotation(Priority.class) : null;
+    }
+    return p != null ? p.value() : Priority.DEFAULT;
+  }
+
+  /**
+   * Comparator to sort classes by priority, then alphabetic.
+   */
+  public static final Comparator<Class<?>> SORT_BY_PRIORITY = new Comparator<Class<?>>() {
+    @Override
+    public int compare(Class<?> o1, Class<?> o2) {
+      int c = Integer.compare(classPriority(o2), classPriority(o1));
+      c = c != 0 ? c : comparePackageClass(o1, o2);
+      return c != 0 ? c : o1.getCanonicalName().compareTo(o2.getCanonicalName());
+    }
+  };
 }

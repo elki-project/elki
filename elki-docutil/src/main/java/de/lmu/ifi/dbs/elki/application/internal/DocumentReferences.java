@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,8 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -100,7 +97,7 @@ public class DocumentReferences {
     if(args.length > 1) {
       File refwiki = new File(args[1]);
       try (FileOutputStream reffow = new FileOutputStream(refwiki); //
-          PrintStream refstreamW = new PrintStream(reffow, false, "UTF-8")) {
+          MarkdownDocStream refstreamW = new MarkdownDocStream(reffow)) {
         documentReferencesMarkdown(refs, refstreamW);
       }
       catch(IOException e) {
@@ -245,13 +242,13 @@ public class DocumentReferences {
     return htmldoc;
   }
 
-  private static void documentReferencesMarkdown(List<Pair<Reference, TreeSet<Object>>> refs, PrintStream refstreamW) {
+  private static void documentReferencesMarkdown(List<Pair<Reference, TreeSet<Object>>> refs, MarkdownDocStream refstreamW) {
     for(Pair<Reference, TreeSet<Object>> pair : refs) {
       // JavaDoc links for relevant classes and packages.
       boolean first = true;
       for(Object o : pair.second) {
         if(!first) {
-          refstreamW.append(",\\\\\n");
+          refstreamW.append(',').lf();
         }
         if(o instanceof Class<?>) {
           Class<?> cls = (Class<?>) o;
@@ -265,50 +262,37 @@ public class DocumentReferences {
         }
         first = false;
       }
-      refstreamW.append("\\\\\n");
+      refstreamW.lf();
 
       {
         Reference ref = pair.first;
         // Prefix
         if(ref.prefix().length() > 0) {
-          markdownEscape(refstreamW, ref.prefix()).append("\\\\\n");
+          refstreamW.escaped(ref.prefix()).lf();
         }
         // Authors
-        refstreamW.append("By: ").append(ref.authors());
-        // Title
-        markdownEscape(refstreamW.append("\\\\\n**"), ref.title()).append("**");
+        refstreamW //
+            // authors
+            .append(ref.authors()).lf() //
+            // Title
+            .append("**").escaped(ref.title()).append("**").lf();
         // Booktitle
         if(ref.booktitle().length() > 0 && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
-          markdownEscape(refstreamW.append(ref.booktitle().startsWith("Online:") ? "\\\\\n" : "\\\\\nIn: "), ref.booktitle());
+          refstreamW.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
         }
         // URL
         if(ref.url().length() > 0) {
           if(ref.url().startsWith(DOIPREFIX)) {
-            refstreamW.append("\\\\\n[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
-                .append("](").append(ref.url()).append(")");
+            refstreamW.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
+                .append("](").append(ref.url()).append(")").lf();
           }
           else {
-            refstreamW.append("\\\\\nOnline: <").append(ref.url()).append('>');
+            refstreamW.append("Online: <").append(ref.url()).append('>').lf();
           }
         }
       }
-      refstreamW.append("\n\n");
+      refstreamW.par();
     }
-  }
-
-  private static final Pattern ESCAPE_MARKDOWN = Pattern.compile("[*<>\\\\]");
-
-  private static PrintStream markdownEscape(PrintStream out, String str) {
-    if(str.isEmpty()) {
-      return out;
-    }
-    Matcher m = ESCAPE_MARKDOWN.matcher(str);
-    int p = 0;
-    while(m.find()) {
-      out.append(str, p, m.start()).append('\\');
-      p = m.start();
-    }
-    return out.append(str, p, str.length());
   }
 
   private static List<Pair<Reference, TreeSet<Object>>> sortedReferences() {

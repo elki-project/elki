@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,7 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
 
 /**
  * Build a tree of available classes for use in Swing UIs.
@@ -67,7 +66,7 @@ public final class ClassTree {
     String prefix = rootpkg != null ? rootpkg + "." : null;
 
     Class<?>[] choic = choices.toArray(new Class<?>[choices.size()]);
-    Arrays.sort(choic, SORT_BY_PRIORITY);
+    Arrays.sort(choic, ELKIServiceScanner.SORT_BY_PRIORITY);
     for(Class<?> impl : choic) {
       String name = impl.getName();
       name = (prefix != null && name.startsWith(prefix)) ? name.substring(prefix.length()) : name;
@@ -143,34 +142,6 @@ public final class ClassTree {
     }
     return cur;
   }
-
-  /**
-   * Comparator to sort classes by priority.
-   */
-  private static final Comparator<Class<?>> SORT_BY_PRIORITY = new Comparator<Class<?>>() {
-    @Override
-    public int compare(Class<?> o1, Class<?> o2) {
-      int c = Integer.compare(priority(o2), priority(o1));
-      // Fall back to alphabetic.
-      c = c != 0 ? c : o1.getName().compareToIgnoreCase(o2.getName());
-      return c;
-    }
-
-    /**
-     * Get the priority of a class.
-     *
-     * @param o1 Class
-     * @return Priority
-     */
-    private int priority(Class<?> o1) {
-      Priority p = o1.getAnnotation(Priority.class);
-      if(p == null) {
-        Class<?> pa = o1.getDeclaringClass();
-        p = (pa != null) ? pa.getAnnotation(Priority.class) : null;
-      }
-      return p != null ? p.value() : Priority.DEFAULT;
-    }
-  };
 
   /**
    * Tree node representing a single class.

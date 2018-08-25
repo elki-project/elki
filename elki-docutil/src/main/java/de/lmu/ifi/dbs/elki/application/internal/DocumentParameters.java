@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,10 +25,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,6 +49,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
@@ -124,12 +127,12 @@ public class DocumentParameters {
       LOG.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
-    if(args.length > 2 && !args[2].endsWith(".trac")) {
-      LOG.warning("Third file name doesn't end with .trac!");
+    if(args.length > 2 && !args[2].endsWith(".md")) {
+      LOG.warning("Third file name doesn't end with .md!");
       System.exit(1);
     }
-    if(args.length > 3 && !args[3].endsWith(".trac")) {
-      LOG.warning("Fourth file name doesn't end with .trac!");
+    if(args.length > 3 && !args[3].endsWith(".md")) {
+      LOG.warning("Fourth file name doesn't end with .md!");
       System.exit(1);
     }
     File byclsname = new File(args[0]);
@@ -138,14 +141,10 @@ public class DocumentParameters {
     File byoptnamew = args.length >= 4 ? new File(args[3]) : null;
 
     try {
-      Files.createDirectories(byclsname.toPath().getParent());
-      Files.createDirectories(byoptname.toPath().getParent());
-      if(byclsnamew != null) {
-        Files.createDirectories(byclsnamew.toPath().getParent());
-      }
-      if(byoptnamew != null) {
-        Files.createDirectories(byoptnamew.toPath().getParent());
-      }
+      createDirectories(byclsname.toPath().getParent());
+      createDirectories(byoptname.toPath().getParent());
+      createDirectories(byclsnamew != null ? byclsnamew.toPath().getParent() : null);
+      createDirectories(byoptnamew != null ? byoptnamew.toPath().getParent() : null);
     }
     catch(IOException e) {
       LOG.exception(e);
@@ -173,8 +172,8 @@ public class DocumentParameters {
     }
     if(byclsnamew != null) {
       try (FileOutputStream byclassfo = new FileOutputStream(byclsnamew); //
-          PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo), false, "UTF-8")) {
-        makeByClassOverviewWiki(byclass, new WikiStream(byclassstream));
+          MarkdownDocStream byclassstream = new MarkdownDocStream(byclassfo)) {
+        makeByClassOverviewWiki(byclass, byclassstream);
       }
       catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
@@ -194,8 +193,8 @@ public class DocumentParameters {
 
     if(byoptnamew != null) {
       try (FileOutputStream byoptfo = new FileOutputStream(byoptnamew); //
-          PrintStream byoptstream = new PrintStream(new BufferedOutputStream(byoptfo))) {
-        makeByOptOverviewWiki(byopt, new WikiStream(byoptstream));
+          MarkdownDocStream byoptstream = new MarkdownDocStream(byoptfo)) {
+        makeByOptOverviewMarkdown(byopt, byoptstream);
       }
       catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
@@ -206,13 +205,17 @@ public class DocumentParameters {
     System.exit(0);
   }
 
+  private static void createDirectories(Path parent) throws IOException {
+    if(parent != null) {
+      Files.createDirectories(parent);
+    }
+  }
+
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    List<Class<?>> objs = ELKIServiceRegistry.findAllImplementations(Object.class, false, true);
-    Collections.sort(objs, new ELKIServiceScanner.ClassSorter());
     Class<?> appc = appBaseClass();
-    for(final Class<?> cls : objs) {
+    for(final Class<?> cls : sorted(ELKIServiceRegistry.findAllImplementations(Object.class, false, true))) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
@@ -313,22 +316,18 @@ public class DocumentParameters {
     catch(java.lang.NoClassDefFoundError e) {
       return null;
     }
-    catch(RuntimeException e) {
-      // Not parameterizable, usually not even found ...
-      LOG.warning("RuntimeException: ", e);
-      return null;
-    }
-    catch(Exception e) {
+    catch(Exception | java.lang.Error e) {
       // Not parameterizable.
-      return null;
-    }
-    catch(java.lang.Error e) {
-      // Not parameterizable.
-      LOG.warning("Error: ", e);
+      LOG.warning(e.getMessage(), e);
       return null;
     }
   }
 
+  /**
+   * Helper class to instantiate a class to get its parameters.
+   *
+   * @author Erich Schubert
+   */
   private static class Instancer implements Runnable {
     /**
      * Class to instantiate.
@@ -388,11 +387,9 @@ public class DocumentParameters {
     DOMImplementation impl = builder.getDOMImplementation();
     Document htmldoc = impl.createDocument(HTMLUtil.HTML_NAMESPACE, HTMLUtil.HTML_HTML_TAG, null);
     // head
-    Element head = htmldoc.createElement(HTMLUtil.HTML_HEAD_TAG);
-    htmldoc.getDocumentElement().appendChild(head);
+    Node head = htmldoc.getDocumentElement().appendChild(htmldoc.createElement(HTMLUtil.HTML_HEAD_TAG));
     // body
-    Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
-    htmldoc.getDocumentElement().appendChild(body);
+    Node body = htmldoc.getDocumentElement().appendChild(htmldoc.createElement(HTMLUtil.HTML_BODY_TAG));
     // modification warnings
     head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
     body.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
@@ -428,10 +425,7 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
-
-    for(Class<?> cls : classes) {
+    for(Class<?> cls : sorted(byclass.keySet())) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -491,129 +485,38 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  /**
-   * Write to a Wiki format.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  private static class WikiStream {
-    PrintStream out;
-
-    int indent = 0;
-
-    // Newline mode.
-    int newline = 0;
-
-    WikiStream(PrintStream out) {
-      this.out = out;
-      this.newline = -1;
-    }
-
-    WikiStream print(String p) {
-      insertNewline();
-      out.print(p);
-      return this;
-    }
-
-    WikiStream print(char c) {
-      insertNewline();
-      out.print(c);
-      return this;
-    }
-
-    WikiStream insertNewline() {
-      if(newline == 2) {
-        out.print("[[br]]");
-      }
-      if(newline != 0) {
-        printIndent();
-        newline = 0;
-      }
-      return this;
-    }
-
-    WikiStream printIndent() {
-      if(newline > 0) {
-        out.println();
-      }
-      for(int i = indent; i > 0; i--) {
-        out.print(' ');
-      }
-      return this;
-    }
-
-    WikiStream println(String p) {
-      insertNewline();
-      out.print(p);
-      newline = 2;
-      return this;
-    }
-
-    WikiStream println() {
-      newline = 2;
-      return this;
-    }
-
-    WikiStream printitem(String item) {
-      printIndent();
-      newline = 0;
-      print(item);
-      return this;
-    }
-
-    WikiStream javadocLink(Class<?> cls, Class<?> base) {
-      insertNewline();
-      out.print("[[javadoc(");
-      out.print(cls.getCanonicalName());
-      if(base != null) {
-        out.print(',');
-        out.print(ClassParameter.canonicalClassName(cls, base));
-      }
-      out.print(")]]");
-      return this;
-    }
-  }
-
-  private static void makeByClassOverviewWiki(Map<Class<?>, List<Parameter<?>>> byclass, WikiStream out) {
-    List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
+  private static void makeByClassOverviewWiki(Map<Class<?>, List<Parameter<?>>> byclass, MarkdownDocStream out) {
     Class<?> base = getBaseClass();
-
-    for(Class<?> cls : classes) {
-      out.indent = 0;
-      out.printitem("'''").javadocLink(cls, base).println("''':");
-      out.indent = 1;
-      out.newline = 1; // No BR needed, we increase the indent.
+    for(Class<?> cls : sorted(byclass.keySet())) {
+      out.indent(0).javadocLink(cls, base, "`").append(':').nl();
       for(Parameter<?> opt : byclass.get(cls)) {
-        out.printitem("* ");
-        out.print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
-            .print(opt.getOptionID().getName()).print(' ').print(opt.getSyntax()) //
-            .println("}}}");
+        out.indent(0).append("- `").append(SerializedParameterization.OPTION_PREFIX) //
+            .append(opt.getOptionID().getName()).append(' ').append(opt.getSyntax()) //
+            .append("`").lf().indent(2);
         if(opt.getShortDescription() != null) {
-          appendMultilineTextWiki(out, opt.getShortDescription());
+          out.append(opt.getShortDescription()).lf();
         }
         // class restriction?
         if(opt instanceof ClassParameter<?>) {
-          appendClassRestrictionWiki(out, ((ClassParameter<?>) opt).getRestrictionClass());
+          appendClassRestrictionMarkdown(out.lf(), ((ClassParameter<?>) opt).getRestrictionClass());
         }
         // default value?
         if(opt.hasDefaultValue()) {
-          appendDefaultValueWiki(out, opt);
+          appendDefaultValueMarkdown(out.lf(), opt);
         }
         // known values?
         if(FULL_WIKI_OUTPUT) {
           if(opt instanceof ClassParameter<?>) {
             Class<?> restriction = ((ClassParameter<?>) opt).getRestrictionClass();
-            appendKnownImplementationsWiki(out, restriction);
+            appendKnownImplementationsMarkdown(out.lf(), restriction);
           }
           else if(opt instanceof ClassListParameter<?>) {
             Class<?> restriction = ((ClassListParameter<?>) opt).getRestrictionClass();
-            appendKnownImplementationsWiki(out, restriction);
+            appendKnownImplementationsMarkdown(out.lf(), restriction);
           }
         }
       }
+      out.par();
     }
   }
 
@@ -628,12 +531,6 @@ public class DocumentParameters {
     }
     catch(ClassNotFoundException e) {
       return null; // Just worse links, not serious.
-    }
-  }
-
-  private static void appendMultilineTextWiki(WikiStream out, String text) {
-    for(String line : text.split("\n")) {
-      out.println(line);
     }
   }
 
@@ -689,18 +586,10 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    final Comparator<OptionID> osort = new SortByOption();
-    final Comparator<Class<?>> csort = new ELKIServiceScanner.ClassSorter();
-    Comparator<Pair<Parameter<?>, Class<?>>> psort = new Comparator<Pair<Parameter<?>, Class<?>>>() {
-      @Override
-      public int compare(Pair<Parameter<?>, Class<?>> o1, Pair<Parameter<?>, Class<?>> o2) {
-        int c = osort.compare(o1.first.getOptionID(), o2.first.getOptionID());
-        return (c != 0) ? c : csort.compare(o1.second, o2.second);
-      }
-    };
+    final Comparator<Pair<Parameter<?>, Class<?>>> psort = SORT_BY_OPTIONID_PRIORITY;
 
     List<OptionID> opts = new ArrayList<>(byopt.keySet());
-    Collections.sort(opts, osort);
+    Collections.sort(opts, SORT_BY_OPTIONID);
     for(OptionID oid : opts) {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
@@ -822,62 +711,57 @@ public class DocumentParameters {
     return superclass;
   }
 
-  private static void makeByOptOverviewWiki(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt, WikiStream out) {
+  private static void makeByOptOverviewMarkdown(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt, MarkdownDocStream out) {
     List<OptionID> opts = new ArrayList<>(byopt.keySet());
-    Collections.sort(opts, new SortByOption());
-
+    Collections.sort(opts, SORT_BY_OPTIONID);
     for(OptionID oid : opts) {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
-      out.indent = 1;
-      out.printitem("").print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
-          .print(firstopt.getOptionID().getName()).print(' ').print(firstopt.getSyntax()).println("}}}:: ");
-      out.newline = 1; // No BR needed, we increase the indent.
-      out.indent = 2;
-
-      appendMultilineTextWiki(out, firstopt.getShortDescription());
+      out.indent(0).append("`").append(SerializedParameterization.OPTION_PREFIX) //
+          .append(firstopt.getOptionID().getName()).append(' ').append(firstopt.getSyntax()).append("`: ").lf()//
+          .indent(2).append(firstopt.getShortDescription()).lf();
       // class restriction?
       Class<?> superclass = getRestrictionClass(oid, firstopt, byopt);
       if(superclass != null) {
-        appendClassRestrictionWiki(out, superclass);
+        appendClassRestrictionMarkdown(out.lf(), superclass);
       }
       // default value?
       if(firstopt.hasDefaultValue()) {
-        appendDefaultValueWiki(out, firstopt);
+        appendDefaultValueMarkdown(out.lf(), firstopt);
       }
       if(FULL_WIKI_OUTPUT) {
         // known values?
         if(superclass != null) {
-          appendKnownImplementationsWiki(out, superclass);
+          appendKnownImplementationsMarkdown(out.lf(), superclass);
         }
         // List of classes that use this parameter
-        out.println("Used by:");
+        out.append("Used by:").nl();
         for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
-          out.indent = 3;
-          out.printitem("* ").javadocLink(clinst.getSecond(), null).println();
+          out.indent(2).append("- ").javadocLink(clinst.getSecond(), null, "").nl().indent(4);
           if(clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
             ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
             if(cls.getRestrictionClass() != null) {
               // TODO: if it is null, it could still be different!
               if(!cls.getRestrictionClass().equals(superclass)) {
-                appendClassRestrictionWiki(out, cls.getRestrictionClass());
+                appendClassRestrictionMarkdown(out, cls.getRestrictionClass());
               }
             }
             else {
-              appendNoClassRestrictionWiki(out);
+              appendNoClassRestrictionMarkdown(out);
             }
           }
           Parameter<?> param = clinst.getFirst();
           if(param.getDefaultValue() != null) {
             if(!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
-              appendDefaultValueWiki(out, param);
+              appendDefaultValueMarkdown(out, param);
             }
           }
           else if(firstopt.getDefaultValue() != null) {
-            appendNoDefaultValueWiki(out);
+            appendNoDefaultValueMarkdown(out);
           }
-          out.println();
+          out.lf();
         }
       }
+      out.par();
     }
   }
 
@@ -892,12 +776,7 @@ public class DocumentParameters {
     assert (restriction != null);
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
-    if(restriction.isInterface()) {
-      p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_IMPLEMENTING));
-    }
-    else {
-      p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_EXTENDING));
-    }
+    p.appendChild(htmldoc.createTextNode(restriction.isInterface() ? HEADER_CLASS_RESTRICTION_IMPLEMENTING : HEADER_CLASS_RESTRICTION_EXTENDING));
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
     defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(restriction.getName()));
     defa.setTextContent(restriction.getName());
@@ -912,15 +791,15 @@ public class DocumentParameters {
     elemdd.appendChild(p);
   }
 
-  private static void appendClassRestrictionWiki(WikiStream out, Class<?> restriction) {
+  private static void appendClassRestrictionMarkdown(MarkdownDocStream out, Class<?> restriction) {
     assert (restriction != null);
-    out.print(HEADER_CLASS_RESTRICTION) //
-        .print(restriction.isInterface() ? HEADER_CLASS_RESTRICTION_IMPLEMENTING : HEADER_CLASS_RESTRICTION_EXTENDING) //
-        .javadocLink(restriction, null).println();
+    out.append(HEADER_CLASS_RESTRICTION) //
+        .append(restriction.isInterface() ? HEADER_CLASS_RESTRICTION_IMPLEMENTING : HEADER_CLASS_RESTRICTION_EXTENDING) //
+        .javadocLink(restriction, null, "").lf();
   }
 
-  private static void appendNoClassRestrictionWiki(WikiStream out) {
-    out.print(HEADER_CLASS_RESTRICTION).print(NO_CLASS_RESTRICTION).println();
+  private static void appendNoClassRestrictionMarkdown(MarkdownDocStream out) {
+    out.append(HEADER_CLASS_RESTRICTION).append(NO_CLASS_RESTRICTION).lf();
   }
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, Class<?> restriction, Element elemdd) {
@@ -931,7 +810,7 @@ public class DocumentParameters {
         p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
         elemdd.appendChild(p);
         Element ul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
-        for(Class<?> c : iter) {
+        for(Class<?> c : sorted(iter)) {
           Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
           Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
           defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
@@ -941,29 +820,18 @@ public class DocumentParameters {
         }
         elemdd.appendChild(ul);
       }
-      // FIXME: The following currently cannot be used:
-      // Report when not in properties file.
-      // Iterator<Class<?>> clss = new
-      // ELKIServiceLoader(opt.getRestrictionClass()).load();
-      // if(!clss.hasNext() &&
-      // !opt.getRestrictionClass().getName().startsWith("experimentalcode.")) {
-      // LOG.warning(opt.getRestrictionClass().getName() + " not in properties.
-      // No autocompletion available in release GUI.");
-      // }
     }
   }
 
-  private static void appendKnownImplementationsWiki(WikiStream out, Class<?> restriction) {
+  private static void appendKnownImplementationsMarkdown(MarkdownDocStream out, Class<?> restriction) {
     List<Class<?>> implementations = ELKIServiceRegistry.findAllImplementations(restriction);
     if(implementations.isEmpty()) {
       return;
     }
-    out.println(HEADER_KNOWN_IMPLEMENTATIONS);
-    out.indent++;
-    for(Class<?> c : implementations) {
-      out.printitem("* ").javadocLink(c, restriction).println();
+    out.append(HEADER_KNOWN_IMPLEMENTATIONS).nl();
+    for(Class<?> c : sorted(implementations)) {
+      out.append("- ").javadocLink(c, restriction, "").nl();
     }
-    out.indent--;
   }
 
   /**
@@ -974,20 +842,20 @@ public class DocumentParameters {
    * @param optdd HTML Element
    */
   private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?> par, Element optdd) {
-    if(par.hasDefaultValue()) {
-      Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
-      p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
-      if(par instanceof ClassParameter<?>) {
-        appendDefaultClassLink(htmldoc, par, p);
-      }
-      else if(par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) {
-        p.appendChild(htmldoc.createTextNode("use global random seed"));
-      }
-      else {
-        p.appendChild(htmldoc.createTextNode(par.getDefaultValueAsString()));
-      }
-      optdd.appendChild(p);
+    if(!par.hasDefaultValue()) {
+      return;
     }
+    Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+    p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
+    if(par instanceof ClassParameter<?>) {
+      appendDefaultClassLink(htmldoc, par, p);
+    }
+    else {
+      p.appendChild(htmldoc.createTextNode( //
+          (par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) //
+              ? "use global random seed" : par.getDefaultValueAsString()));
+    }
+    optdd.appendChild(p);
   }
 
   /**
@@ -1003,22 +871,21 @@ public class DocumentParameters {
     optdd.appendChild(p);
   }
 
-  private static void appendDefaultValueWiki(WikiStream out, Parameter<?> par) {
-    out.print(HEADER_DEFAULT_VALUE);
+  private static void appendDefaultValueMarkdown(MarkdownDocStream out, Parameter<?> par) {
+    out.append(HEADER_DEFAULT_VALUE);
     if(par instanceof ClassParameter<?>) {
       final Class<?> name = ((ClassParameter<?>) par).getDefaultValue();
-      out.javadocLink(name, null).println();
-    }
-    else if(par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) {
-      out.println("use global random seed");
+      out.javadocLink(name, null, "").lf();
     }
     else {
-      out.println(par.getDefaultValueAsString());
+      out.append(//
+          (par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) //
+              ? "use global random seed" : par.getDefaultValueAsString()).lf();
     }
   }
 
-  private static void appendNoDefaultValueWiki(WikiStream out) {
-    out.print(HEADER_DEFAULT_VALUE).println(NO_DEFAULT_VALUE);
+  private static void appendNoDefaultValueMarkdown(MarkdownDocStream out) {
+    out.append(HEADER_DEFAULT_VALUE).append(NO_DEFAULT_VALUE).lf();
   }
 
   /**
@@ -1032,16 +899,35 @@ public class DocumentParameters {
   }
 
   /**
-   * Sort parameters by their option
+   * Sort a collection of classes.
    *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
+   * @param cls Classes to sort
+   * @return Sorted list
    */
-  protected static class SortByOption implements Comparator<OptionID> {
+  private static Class<?>[] sorted(Collection<Class<?>> cls) {
+    Class<?>[] sorted = cls.toArray(new Class<?>[cls.size()]);
+    Arrays.sort(sorted, ELKIServiceScanner.SORT_BY_NAME);
+    return sorted;
+  }
+
+  /**
+   * Sort parameters by their option id.
+   */
+  protected static Comparator<OptionID> SORT_BY_OPTIONID = new Comparator<OptionID>() {
     @Override
     public int compare(OptionID o1, OptionID o2) {
       return o1.getName().compareToIgnoreCase(o2.getName());
     }
-  }
+  };
+
+  /**
+   * Sort parameters by OptionID, then class priority.
+   */
+  protected static Comparator<Pair<Parameter<?>, Class<?>>> SORT_BY_OPTIONID_PRIORITY = new Comparator<Pair<Parameter<?>, Class<?>>>() {
+    @Override
+    public int compare(Pair<Parameter<?>, Class<?>> o1, Pair<Parameter<?>, Class<?>> o2) {
+      int c = SORT_BY_OPTIONID.compare(o1.first.getOptionID(), o2.first.getOptionID());
+      return (c != 0) ? c : ELKIServiceScanner.SORT_BY_PRIORITY.compare(o1.second, o2.second);
+    }
+  };
 }
