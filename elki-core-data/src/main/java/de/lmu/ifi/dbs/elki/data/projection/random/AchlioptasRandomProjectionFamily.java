@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.data.projection.random;
 
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     authors = "D. Achlioptas", //
     booktitle = "Proc. 20th ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems", //
     url = "https://doi.org/10.1145/375551.375608")
+@Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily")
 public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Projection sparsity.

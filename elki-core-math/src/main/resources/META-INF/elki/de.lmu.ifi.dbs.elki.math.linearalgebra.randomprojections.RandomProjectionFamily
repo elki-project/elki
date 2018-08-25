@@ -1,5 +1,0 @@
-de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily
-de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily
-de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.CauchyRandomProjectionFamily
-de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomSubsetProjectionFamily
-de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.SimplifiedRandomHyperplaneProjectionFamily

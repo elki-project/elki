@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -47,9 +48,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.7.0
  */
 @Reference(authors = "M. Henzinger", //
-title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
-booktitle = "Proc. 29th ACM Conference on Research and Development in Information Retrieval. ACM SIGIR, 2006", //
-url = "https://doi.org/10.1145/1148170.1148222")
+    title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
+    booktitle = "Proc. 29th ACM Conference on Research and Development in Information Retrieval. ACM SIGIR, 2006", //
+    url = "https://doi.org/10.1145/1148170.1148222")
+@Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.SimplifiedRandomHyperplaneProjectionFamily")
 public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProjectionFamily {
   /**
    * Random generator.

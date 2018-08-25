@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.data.projection.random;
 
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -40,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Locality-sensitive hashing scheme based on p-stable distributions", //
     booktitle = "Proc. 20th Symposium on Computational Geometry", //
     url = "https://doi.org/10.1145/997817.997857")
+@Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily")
 public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.

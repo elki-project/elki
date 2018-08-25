@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Bagging predictors", //
     booktitle = "Machine learning 24.2", //
     url = "https://doi.org/10.1007/BF00058655")
+@Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomSubsetProjectionFamily")
 public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.
