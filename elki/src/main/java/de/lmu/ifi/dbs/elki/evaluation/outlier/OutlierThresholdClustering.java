@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 
 /**
  * Pseudo clustering algorithm that builds clusters based on their outlier
@@ -87,8 +87,8 @@ public class OutlierThresholdClustering implements Evaluator {
 
   private Clustering<Model> split(OutlierResult or) {
     DoubleRelation scores = or.getScores();
-    if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(or);
+    if(scaling instanceof OutlierScaling) {
+      ((OutlierScaling) scaling).prepare(or);
     }
     ArrayList<ModifiableDBIDs> idlists = new ArrayList<>(threshold.length + 1);
     for(int i = 0; i <= threshold.length; i++) {

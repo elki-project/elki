@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 import net.jafama.FastMath;
 
@@ -119,7 +119,7 @@ public class KMLOutputHandler implements ResultHandler {
   /**
    * Scaling function
    */
-  OutlierScalingFunction scaling;
+  OutlierScaling scaling;
 
   /**
    * Compatibility mode.
@@ -139,7 +139,7 @@ public class KMLOutputHandler implements ResultHandler {
    * @param compat Compatibility mode
    * @param autoopen Automatically open
    */
-  public KMLOutputHandler(File filename, OutlierScalingFunction scaling, boolean compat, boolean autoopen) {
+  public KMLOutputHandler(File filename, OutlierScaling scaling, boolean compat, boolean autoopen) {
     super();
     this.filename = filename;
     this.scaling = scaling;
@@ -668,7 +668,7 @@ public class KMLOutputHandler implements ResultHandler {
     /**
      * Scaling function
      */
-    OutlierScalingFunction scaling;
+    OutlierScaling scaling;
 
     /**
      * Compatibility mode
@@ -689,7 +689,7 @@ public class KMLOutputHandler implements ResultHandler {
         filename = outputP.getValue();
       }
 
-      ObjectParameter<OutlierScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, OutlierLinearScaling.class);
+      ObjectParameter<OutlierScaling> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScaling.class, OutlierLinearScaling.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

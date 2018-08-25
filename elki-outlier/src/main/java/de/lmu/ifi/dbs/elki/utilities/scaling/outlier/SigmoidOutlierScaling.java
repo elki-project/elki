@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -52,11 +53,12 @@ import net.jafama.FastMath;
     title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
     booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
     url = "https://doi.org/10.1109/ICDM.2006.43")
-public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
+@Alias("de.lmu.ifi.dbs.elki.utilities.scaling.outlier.SigmoidOutlierScalingFunction")
+public class SigmoidOutlierScaling implements OutlierScaling {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(SigmoidOutlierScalingFunction.class);
+  private static final Logging LOG = Logging.getLogger(SigmoidOutlierScaling.class);
 
   /**
    * Sigmoid parameter

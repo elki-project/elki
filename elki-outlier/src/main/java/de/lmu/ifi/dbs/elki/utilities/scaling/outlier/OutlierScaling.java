@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * @author Erich Schubert
  * @since 0.3
  */
-public interface OutlierScalingFunction extends ScalingFunction {
+public interface OutlierScaling extends ScalingFunction {
   /**
    * Prepare is called once for each data set, before getScaled() will be
    * called. This function can be used to extract global parameters such as
@@ -51,7 +51,7 @@ public interface OutlierScalingFunction extends ScalingFunction {
    * allow access to the metadata.
    * 
    * @param array Data to process
-   * @param adapter Array adapter 
+   * @param adapter Array adapter
    */
   <A> void prepare(A array, NumberArrayAdapter<?, A> adapter);
 }

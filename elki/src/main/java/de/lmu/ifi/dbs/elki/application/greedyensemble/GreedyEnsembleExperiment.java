@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
@@ -532,8 +532,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     if(scaling == null) {
       return;
     }
-    if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER);
+    if(scaling instanceof OutlierScaling) {
+      ((OutlierScaling) scaling).prepare(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER);
     }
     for(int i = 0; i < raw.length; i++) {
       final double newval = scaling.getScaled(raw[i]);

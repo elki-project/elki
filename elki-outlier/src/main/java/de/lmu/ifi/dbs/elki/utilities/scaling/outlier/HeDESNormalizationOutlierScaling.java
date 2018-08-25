@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.4.0
  */
 @Reference(authors = "H. V. Nguyen, H. H. Ang, V. Gopalkrishnan", title = "Mining Outliers with Ensemble of Heterogeneous Detectors on Random Subspaces", booktitle = "Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA 2010)", url = "https://doi.org/10.1007/978-3-642-12026-8_29")
-public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction {
+public class HeDESNormalizationOutlierScaling implements OutlierScaling {
   /**
    * Mean
    */

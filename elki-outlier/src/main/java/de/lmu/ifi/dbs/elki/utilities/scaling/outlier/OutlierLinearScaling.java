@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.3
  */
-public class OutlierLinearScaling implements OutlierScalingFunction {
+public class OutlierLinearScaling implements OutlierScaling {
   /**
    * Parameter to specify a fixed minimum to use.
    * <p>

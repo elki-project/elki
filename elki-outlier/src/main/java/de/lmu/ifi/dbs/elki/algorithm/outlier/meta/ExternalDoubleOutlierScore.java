@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 
 /**
  * External outlier detection scores, loading outlier scores from an external
@@ -204,8 +204,8 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling
-    if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(or);
+    if(scaling instanceof OutlierScaling) {
+      ((OutlierScaling) scaling).prepare(or);
     }
     DoubleMinMax mm = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

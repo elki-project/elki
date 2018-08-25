@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,10 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -53,11 +55,12 @@ import net.jafama.FastMath;
     title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
     booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
     url = "https://doi.org/10.1109/ICDM.2006.43")
-public class MixtureModelOutlierScalingFunction implements OutlierScalingFunction {
+@Alias("de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MixtureModelOutlierScalingFunction")
+public class MixtureModelOutlierScaling implements OutlierScaling {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(MixtureModelOutlierScalingFunction.class);
+  private static final Logging LOG = Logging.getLogger(MixtureModelOutlierScaling.class);
 
   /**
    * Parameter mu of the gaussian distribution (outliers)

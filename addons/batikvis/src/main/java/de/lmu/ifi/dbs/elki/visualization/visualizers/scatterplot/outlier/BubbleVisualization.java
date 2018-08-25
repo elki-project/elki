@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -101,9 +101,9 @@ public class BubbleVisualization implements VisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
+    if(settings.scaling != null && settings.scaling instanceof OutlierScaling) {
       final OutlierResult outlierResult = task.getResult();
-      ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
+      ((OutlierScaling) settings.scaling).prepare(outlierResult);
     }
     return new Instance(context, task, plot, width, height, proj);
   }

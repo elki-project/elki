@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 import net.jafama.FastMath;
@@ -334,8 +334,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * @param label Identification label
    */
   void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
-    if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(result);
+    if(scaling instanceof OutlierScaling) {
+      ((OutlierScaling) scaling).prepare(result);
     }
     out.append(label);
     DoubleRelation scores = result.getScores();

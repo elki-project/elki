@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 title = "Interpreting and Unifying Outlier Scores", //
 booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
 url = "https://doi.org/10.1137/1.9781611972818.2")
-public class OutlierGammaScaling implements OutlierScalingFunction {
+public class OutlierGammaScaling implements OutlierScaling {
   /**
    * Normalization flag.
    * 

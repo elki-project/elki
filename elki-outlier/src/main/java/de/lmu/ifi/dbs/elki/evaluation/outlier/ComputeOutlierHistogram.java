@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 
 /**
  * Compute a Histogram to evaluate a ranking algorithm.
@@ -116,8 +116,8 @@ public class ComputeOutlierHistogram implements Evaluator {
    * @return Result
    */
   public HistogramResult evaluateOutlierResult(Database database, OutlierResult or) {
-    if(scaling instanceof OutlierScalingFunction) {
-      OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
+    if(scaling instanceof OutlierScaling) {
+      OutlierScaling oscaling = (OutlierScaling) scaling;
       oscaling.prepare(or);
     }
 
