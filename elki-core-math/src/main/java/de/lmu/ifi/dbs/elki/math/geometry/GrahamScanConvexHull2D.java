@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,16 +34,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Classes to compute the convex hull of a set of points in 2D, using the
  * classic Grahams scan. Also computes a bounding box.
+ * <p>
+ * Reference:
+ * <p>
+ * P. Graham<br>
+ * An Efficient Algorithm for Determining the Convex Hull of a Finite Planar
+ * Set<br>
+ * Information Processing Letters 1
  *
  * @author Erich Schubert
  * @since 0.4.0
  *
  * @apiviz.has Polygon
  */
-@Reference(authors = "Paul Graham", //
+@Reference(authors = "P. Graham", //
     title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
     booktitle = "Information Processing Letters 1", //
-    url = "dx.doi.org/10.1016/0020-0190(72)90045-2")
+    url = "https://doi.org/10.1016/0020-0190(72)90045-2")
 public class GrahamScanConvexHull2D {
   /**
    * The current set of points

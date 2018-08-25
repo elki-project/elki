@@ -36,31 +36,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1]
  * by assuming a Gamma distribution on the values.
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "https://doi.org/10.1137/1.9781611972818.2")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
+    url = "https://doi.org/10.1137/1.9781611972818.2")
 public class OutlierGammaScaling implements OutlierScaling {
-  /**
-   * Normalization flag.
-   * 
-   * <pre>
-   * -gammascale.normalize
-   * </pre>
-   */
-  public static final OptionID NORMALIZE_ID = new OptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
-
   /**
    * Gamma parameter k
    */
@@ -100,7 +90,7 @@ public class OutlierGammaScaling implements OutlierScaling {
   public double getScaled(double value) {
     assert (theta > 0) : "prepare() was not run prior to using the scaling function.";
     value = preScale(value);
-    if (Double.isNaN(value) || Double.isInfinite(value)) {
+    if(Double.isNaN(value) || Double.isInfinite(value)) {
       return 1.0;
     }
     return Math.max(0, (GammaDistribution.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
@@ -111,10 +101,10 @@ public class OutlierGammaScaling implements OutlierScaling {
     meta = or.getOutlierMeta();
     MeanVariance mv = new MeanVariance();
     DoubleRelation scores = or.getScores();
-    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double score = scores.doubleValue(id);
       score = preScale(score);
-      if (!Double.isNaN(score) && !Double.isInfinite(score)) {
+      if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
@@ -123,17 +113,18 @@ public class OutlierGammaScaling implements OutlierScaling {
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
+    // valatmean"+atmean);
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
     MeanVariance mv = new MeanVariance();
     final int size = adapter.size(array);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       double score = adapter.getDouble(array, i);
       score = preScale(score);
-      if (!Double.isNaN(score) && !Double.isInfinite(score)) {
+      if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
@@ -142,19 +133,20 @@ public class OutlierGammaScaling implements OutlierScaling {
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
+    // valatmean"+atmean);
   }
 
   /**
    * Normalize data if necessary.
-   * 
+   * <p>
    * Note: this is overridden by {@link MinusLogGammaScaling}!
    * 
    * @param score Original score
    * @return Normalized score.
    */
   protected double preScale(double score) {
-    if (normalize) {
+    if(normalize) {
       score = meta.normalizeScore(score);
     }
     return score;
@@ -178,13 +170,25 @@ public class OutlierGammaScaling implements OutlierScaling {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Normalization flag.
+     * 
+     * <pre>
+     * -gammascale.normalize
+     * </pre>
+     */
+    public static final OptionID NORMALIZE_ID = new OptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
+
+    /**
+     * Store flag to Normalize data before curve fitting.
+     */
     protected boolean normalize = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag normalizeF = new Flag(NORMALIZE_ID);
-      if (config.grab(normalizeF)) {
+      if(config.grab(normalizeF)) {
         normalize = normalizeF.getValue();
       }
     }

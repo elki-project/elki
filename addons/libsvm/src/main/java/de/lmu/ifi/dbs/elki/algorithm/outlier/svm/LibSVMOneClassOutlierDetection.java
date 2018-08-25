@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.svm;
 
-import libsvm.svm;
-import libsvm.svm_model;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_print_interface;
-import libsvm.svm_problem;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -53,10 +47,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import libsvm.svm;
+import libsvm.svm_model;
+import libsvm.svm_node;
+import libsvm.svm_parameter;
+import libsvm.svm_print_interface;
+import libsvm.svm_problem;
 
 /**
  * Outlier-detection using one-class support vector machines.
- * 
+ * <p>
  * Important note: from literature, the one-class SVM is trained as if 0 was the
  * only counterexample. Outliers will only be detected when they are close to
  * the origin in kernel space! In our experience, results from this method are
@@ -64,14 +64,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * Results may be better if you have a training data set with positive examples
  * only, then apply it only to new data (which is currently not supported in
  * this implementation, it assumes a single-dataset scenario).
- * 
  * <p>
- * Reference:<br />
+ * Reference:
+ * <p>
  * B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C.
- * Williamson<br />
- * Estimating the support of a high-dimensional distribution<br />
+ * Williamson<br>
+ * Estimating the support of a high-dimensional distribution<br>
  * Neural computation 13.7
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -80,7 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  */
 @Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", //
     title = "Estimating the support of a high-dimensional distribution", //
-    booktitle = "Neural computation 13.7")
+    booktitle = "Neural computation 13.7", //
+    url = "https://doi.org/10.1162/089976601750264965")
 public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

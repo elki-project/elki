@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,15 +48,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * Simple distanced based outlier detection algorithm. User has to specify two
  * parameters An object is flagged as an outlier if at least a fraction p of all
- * data objects has a distance above d from c
- *
+ * data objects has a distance above d from c.
+ * <p>
  * Reference:
  * <p>
- * E.M. Knorr, R. T. Ng:<br />
- * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
- * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
- * </p>
- *
+ * E.M. Knorr, R. T. Ng:<br>
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br>
+ * In: Proc. Int. Conf. on Very Large Databases (VLDB'98)
+ * <p>
  * This paper presents several Distance Based Outlier Detection algorithms.
  * Implemented here is a simple index based algorithm as presented in section
  * 3.1.
@@ -66,13 +65,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  *
  * @apiviz.has KNNQuery
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("DBOD: Distance Based Outlier Detection")
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
-@Reference(authors = "E.M. Knorr, R. T. Ng", //
+@Reference(authors = "E. M. Knorr, R. T. Ng", //
     title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
-    booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+    booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
+    url = "http://www.vldb.org/conf/1998/p392.pdf")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection" })
 public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**

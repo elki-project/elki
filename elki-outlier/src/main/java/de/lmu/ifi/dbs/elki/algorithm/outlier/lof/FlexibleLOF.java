@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,39 +63,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * <p>
  * Flexible variant of the "Local Outlier Factor" algorithm.
- * </p>
- *
  * <p>
  * This implementation diverts from the original LOF publication in that it
  * allows the user to use a different distance function for the reachability
  * distance and neighborhood determination (although the default is to use the
  * same value.)
- * </p>
- *
  * <p>
- * The k nearest neighbors are determined using the parameter
- * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
- * , while the reference set used in reachability distance computation is
- * configured using {@link Parameterizer#REACHABILITY_DISTANCE_FUNCTION_ID}.
- * </p>
- *
+ * The k nearest neighbors are determined using the standard distance function,
+ * while the reference set used in reachability distance computation is
+ * configured using a separate reachability distance function.
  * <p>
  * The original LOF parameter was called &quot;minPts&quot;. For consistency
  * with the name "kNN query", we chose to rename the parameter to {@code k}.
  * Flexible LOF allows you to set the two values different, which yields the
- * parameters {@link Parameterizer#KREF_ID} ({@code -lof.krefer}) and
- * {@link Parameterizer#KREACH_ID} ({@code -lof.kreach})
- * </p>
- *
+ * parameters {@code -lof.krefer} and {@code -lof.kreach}.
  * <p>
- * Reference: <br>
- * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander: LOF: Identifying
- * Density-Based Local Outliers. <br>
- * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00),
- * Dallas, TX, 2000.
- * </p>
+ * Reference:<br>
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander<br>
+ * LOF: Identifying Density-Based Local Outliers<br>
+ * Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)
  *
  * @author Peer Kröger
  * @author Erich Schubert
@@ -109,9 +96,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander", //
+@Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "LOF: Identifying Density-Based Local Outliers", //
-    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
+    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)", //
     url = "https://doi.org/10.1145/342009.335388")
 public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

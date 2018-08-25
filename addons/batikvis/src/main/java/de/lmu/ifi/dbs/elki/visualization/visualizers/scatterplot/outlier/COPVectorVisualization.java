@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,6 +50,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 
 /**
  * Visualize error vectors as produced by COP.
+ * <p>
+ * Reference:
+ * <p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
+ * Outlier Detection in Arbitrarily Oriented Subspaces<br />
+ * Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)
  *
  * @author Erich Schubert
  * @since 0.5.5
@@ -61,7 +67,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 @Title("COP: Correlation Outlier Probability")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
-    booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
+    booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21")
 public class COPVectorVisualization implements VisFactory {
   /**

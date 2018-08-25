@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,16 +29,15 @@ import net.jafama.FastMath;
 
 /**
  * Dynamic Time Warping distance (DTW) for numerical vectors.
- * 
+ * <p>
  * Reference:
  * <p>
- * Berndt, D. and Clifford, J.<br />
- * Using dynamic time warping to find patterns in time series<br />
+ * Berndt, D. and Clifford, J.<br>
+ * Using dynamic time warping to find patterns in time series<br>
  * AAAI-94 Workshop on Knowledge Discovery in Databases, 1994
- * </p>
- * 
+ * <p>
  * This implementation uses a buffer storing two rows.
- * 
+ * <p>
  * TODO: allow different one-dimensional distances
  * 
  * @author Thomas Bernecker
@@ -47,9 +46,9 @@ import net.jafama.FastMath;
  */
 @Title("Dynamic Time Warping Distance Function")
 @Reference(authors = "Berndt, D. and Clifford, J.", //
-title = "Using dynamic time warping to find patterns in time series", //
-booktitle = "AAAI-94 Workshop on Knowledge Discovery in Databases, 1994", //
-url = "http://www.aaai.org/Papers/Workshops/1994/WS-94-03/WS94-03-031.pdf")
+    title = "Using dynamic time warping to find patterns in time series", //
+    booktitle = "AAAI-94 Workshop on Knowledge Discovery in Databases, 1994", //
+    url = "http://www.aaai.org/Papers/Workshops/1994/WS-94-03/WS94-03-031.pdf")
 public class DTWDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * Constructor.
@@ -149,7 +148,7 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
 
   /**
    * Compute the delta of two values.
-   * 
+   * <p>
    * TODO: support Euclidean, Manhattan, others?
    * 
    * @param val1 First value

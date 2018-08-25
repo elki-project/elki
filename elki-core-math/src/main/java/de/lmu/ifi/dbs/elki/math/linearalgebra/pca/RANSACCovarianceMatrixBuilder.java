@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.Random;
 
@@ -44,38 +46,37 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * RANSAC based approach to a more robust covariance matrix computation.
- * 
+ * <p>
  * This is an <b>experimental</b> adoption of RANSAC to this problem, not a
  * generic RANSAC implementation!
- * 
+ * <p>
  * While using RANSAC for PCA at first sounds like a good idea, <b>it does not
  * work very well in high-dimensional spaces</b>. The problem is that PCA has
- * O(n^2) degrees of freedom, so we need to sample very many objects, then
- * perform an O(n^3) matrix operation to compute PCA, for each attempt.
- * 
+ * O(n²) degrees of freedom, so we need to sample very many objects, then
+ * perform an O(n³) matrix operation to compute PCA, for each attempt.
+ * <p>
  * References:
- * 
+ * <p>
  * RANSAC for PCA was a side note in:
  * <p>
- * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
- * Outlier Detection in Arbitrarily Oriented Subspaces<br />
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Outlier Detection in Arbitrarily Oriented Subspaces<br>
  * In: Proc. IEEE International Conference on Data Mining (ICDM 2012)
- * </p>
- * 
+ * <p>
  * The basic RANSAC idea was explained in:
  * <p>
  * Random sample consensus: a paradigm for model fitting with applications to
- * image analysis and automated cartography<br />
- * M.A. Fischler, R.C. Bolles<br />
+ * image analysis and automated cartography<br>
+ * M.A. Fischler, R.C. Bolles<br>
  * Communications of the ACM, Vol. 24 Issue 6
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.5.5
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
-    booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+    booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
+    url = "https://doi.org/10.1109/ICDM.2012.21")
 public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Number of iterations to perform

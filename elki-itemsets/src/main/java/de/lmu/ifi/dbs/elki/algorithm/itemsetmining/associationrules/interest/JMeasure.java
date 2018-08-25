@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,17 +27,16 @@ import net.jafama.FastMath;
 
 /**
  * J-Measure interestingness measure.
- *
+ * <p>
  * Reference:
  * <p>
- * R. M Goodman and P. Smyth<br />
- * Rule induction using information theory<br />
+ * R. M. Goodman and P. Smyth<br>
+ * Rule induction using information theory<br>
  * Knowledge Discovery in Databases 1991
- * </p>
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "R. M Goodman and P. Smyth", //
+@Reference(authors = "R. M. Goodman and P. Smyth", //
     title = "Rule induction using information theory", //
     booktitle = "Knowledge Discovery in Databases 1991")
 public class JMeasure implements InterestingnessMeasure {

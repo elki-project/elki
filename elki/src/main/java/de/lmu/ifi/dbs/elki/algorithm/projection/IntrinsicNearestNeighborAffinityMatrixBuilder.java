@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.projection;
 
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -43,26 +48,24 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-
 import net.jafama.FastMath;
 
 /**
  * Build sparse affinity matrix using the nearest neighbors only, adjusting for
  * intrinsic dimensionality. On data sets with high intrinsic dimensionality,
  * this can give better results.
- * 
+ * <p>
  * Furthermore, this approach uses a different rule to combine affinities:
- * rather than taking the arithmetic average of p_ij and p_ji, we use
- * sqrt(p_ij * p_ji), which prevents outliers from attaching closely to nearby
- * clusters.
- * 
+ * rather than taking the arithmetic average of \(p_{ij}\) and \(p_{ji}\), we
+ * use \(\sqrt(p_{ij} \cdot p_{ji})\), which prevents outliers from attaching
+ * closely to nearby clusters.
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert and Michael Gertz<br />
+ * Erich Schubert and Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
- * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Detection: A Remedy Against the Curse of Dimensionality?<br>
  * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
- * </p>
  *
  * @author Erich Schubert
  *
@@ -70,7 +73,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "Erich Schubert and Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+    url = "https://doi.org/10.1007/978-3-319-68474-1_13")
 public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNeighborAffinityMatrixBuilder<O> {
   /**
    * Class logger.

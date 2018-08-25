@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.projection;
 
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -36,27 +41,25 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
 import net.jafama.FastMath;
 
 /**
  * Build sparse affinity matrix using the nearest neighbors only.
- * 
+ * <p>
  * Reference:
  * <p>
- * L. van der Maaten<br />
- * Accelerating t-SNE using Tree-Based Algorithms<br />
+ * L. J. P. van der Maaten<br>
+ * Accelerating t-SNE using Tree-Based Algorithms<br>
  * Journal of Machine Learning Research 15
- * </p>
- *
+ * <p>
  * TODO: this implementation currently differs in one major point: we do not
- * symmetrize the sparse pij matrix.
+ * symmetrize the sparse \(p_{ij}\) matrix.
  *
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
-@Reference(authors = "L. van der Maaten", //
+@Reference(authors = "L. J. P. van der Maaten", //
     title = "Accelerating t-SNE using Tree-Based Algorithms", //
     booktitle = "Journal of Machine Learning Research 15", //
     url = "http://dl.acm.org/citation.cfm?id=2697068")

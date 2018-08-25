@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,25 +49,24 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Off-line change point detection algorithm detecting a change in mean, based
  * on the cumulative sum (CUSUM), same-variance assumption, and using bootstrap
  * sampling for significance estimation.
- * 
+ * <p>
  * References:
  * <p>
- * D. Picard<br />
- * Testing and Estimating Change-Points in Time Series<br />
+ * D. Picard<br>
+ * Testing and Estimating Change-Points in Time Series<br>
  * Advances in Applied Probability Vol. 17
- * </p>
+ * <p>
  * early results along these lines can be found in:
  * <p>
- * E. S. Page<br />
- * On Problems in which a Change in a Parameter Occurs at an Unknown Point<br />
+ * E. S. Page<br>
+ * On Problems in which a Change in a Parameter Occurs at an Unknown Point<br>
  * Biometrika Vol. 44
- * </p>
+ * <p>
  * also discussed in:
  * <p>
- * M. Basseville and I. V. Nikiforov<br />
- * Section 2.6: Off-line Change Detection<br />
- * Detection of Abrupt Changes - Theory and Application<br />
- * </p>
+ * M. Basseville and I. V. Nikiforov<br>
+ * Section 2.6: Off-line Change Detection<br>
+ * Detection of Abrupt Changes - Theory and Application<br>
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
@@ -79,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "D. Picard", //
     title = "Testing and Estimating Change-Points in Time Series ", //
     booktitle = "Advances in Applied Probability Vol. 17", //
-    url = "http://www.jstor.org/stable/1427090")
+    url = "https://doi.org/10.2307/1427090")
 public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger
@@ -92,7 +91,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
   @Reference(authors = "E. S. Page ", //
       title = "On Problems in which a Change in a Parameter Occurs at an Unknown Point", //
       booktitle = "Biometrika Vol. 44", //
-      url = "http://www.jstor.org/stable/2333258")
+      url = "https://doi.org/10.2307/2333258")
   public static final Void ADDITIONAL_REFERENCE = null;
 
   /**

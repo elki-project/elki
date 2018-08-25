@@ -54,21 +54,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Index a 2d data set (consisting of Lat/Lng pairs) by using a projection to 3D
  * coordinates (WGS-86 to ECEF).
- * 
+ * <p>
  * Earth-Centered, Earth-Fixed (ECEF) is a 3D coordinate system, sometimes also
  * referred to as XYZ, that uses 3 cartesian axes. The center is at the earths
  * center of mass, the z axis points to the north pole. X axis is to the prime
  * meridan at the equator (so latitude 0, longitude 0), and the Y axis is
  * orthogonal going to the east (latitude 0, longitude 90°E).
- * 
+ * <p>
  * The Euclidean distance in this coordinate system is a lower bound for the
  * great-circle distance, and Euclidean coordinates are supposedly easier to
  * index.
- * 
+ * <p>
  * Note: this index will <b>only</b> support the distance function
  * {@link LatLngDistanceFunction}, as it uses a projection that will map data
- * according to this great circle distance. If the query hint
- * {@link DatabaseQuery#HINT_EXACT} is set, it will not be used.
+ * according to this great circle distance. If the query hint "exact" is set, it
+ * will not be used.
  * 
  * @author Erich Schubert
  * @since 0.6.0

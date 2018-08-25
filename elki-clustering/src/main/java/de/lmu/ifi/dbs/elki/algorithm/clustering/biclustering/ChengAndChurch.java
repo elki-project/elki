@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,15 +48,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Perform Cheng and Church biclustering.
- *
+ * Cheng and Church biclustering.
+ * <p>
  * Reference:
  * <p>
- * Y. Cheng and G. M. Church.<br />
- * Biclustering of expression data.<br />
- * In Proceedings of the 8th International Conference on Intelligent Systems for
- * Molecular Biology (ISMB), San Diego, CA, 2000.
- * </p>
+ * Y. Cheng and G. M. Church.<br>
+ * Biclustering of expression data.<br>
+ * Proc. 8th Int. Conf. on Intelligent Systems for Molecular Biology (ISMB)
  *
  * @author Erich Schubert
  * @since 0.2
@@ -64,8 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Reference(authors = "Y. Cheng, G. M. Church", //
     title = "Biclustering of expression data", //
-    booktitle = "Proc. 8th International Conference on Intelligent Systems for Molecular Biology (ISMB)", //
-    url = "https://www.ncbi.nlm.nih.gov/pubmed/10977070")
+    booktitle = "Proc. 8th Int. Conf. on Intelligent Systems for Molecular Biology (ISMB)", //
+    url = "http://www.aaai.org/Library/ISMB/2000/ismb00-010.php")
 public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
   /**
    * The logger for this class.
@@ -75,11 +73,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
   /**
    * The minimum number of columns that the database must have so that a removal
    * of columns is performed in {@link #multipleNodeDeletion}.
-   * </p>
    * <p>
    * Just start deleting multiple columns when more than 100 columns are in the
    * data matrix.
-   * </p>
    */
   private static final int MIN_COLUMN_REMOVE_THRESHOLD = 100;
 
@@ -89,11 +85,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    * <p>
    * Just start deleting multiple rows when more than 100 rows are in the data
    * matrix.
-   * </p>
    * <!--
    * <p>
    * The value is set to 100 as this is not really described in the paper.
-   * </p>
    * -->
    */
   private static final int MIN_ROW_REMOVE_THRESHOLD = 100;
@@ -105,11 +99,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * The parameter for multiple node deletion.
-   * </p>
    * <p>
    * It is used to magnify the {@link #delta} value in the
    * {@link #multipleNodeDeletion} method.
-   * </p>
    */
   private double alpha;
 
@@ -573,9 +565,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Algorithm 1 of Cheng and Church:
-   *
+   * <p>
    * Remove single rows or columns.
-   *
+   * <p>
    * Inverted rows are not supported in this method.
    *
    * @param mat Data matrix
@@ -639,9 +631,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
   //
   /**
    * Algorithm 2 of Cheng and Church.
-   *
+   * <p>
    * Remove all rows and columns that reduce the residue by alpha.
-   *
+   * <p>
    * Inverted rows are not supported in this method.
    *
    * @param mat Data matrix
@@ -711,9 +703,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Algorithm 3 of Cheng and Church.
-   *
+   * <p>
    * Try to re-add rows or columns that decrease the overall score.
-   *
+   * <p>
    * Also try adding inverted rows.
    *
    * @param mat Data matrix
@@ -815,29 +807,16 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     /**
      * Threshold value to determine the maximal acceptable score (mean squared
      * residue) of a bicluster.
-     * <p/>
-     * Key: {@code -chengandchurch.delta}
-     * </p>
      */
     public static final OptionID DELTA_ID = new OptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
 
     /**
-     * Parameter for multiple node deletion to accelerate the algorithm. (&gt;=
-     * 1)
-     * <p/>
-     * Key: {@code -chengandchurch.alpha}
-     * </p>
+     * Parameter for multiple node deletion to accelerate the algorithm.
      */
     public static final OptionID ALPHA_ID = new OptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
 
     /**
      * Number of biclusters to be found.
-     * <p/>
-     * Default value: 1
-     * </p>
-     * <p/>
-     * Key: {@code -chengandchurch.n}
-     * </p>
      */
     public static final OptionID N_ID = new OptionID("chengandchurch.n", "The number of biclusters to be found.");
 
@@ -848,11 +827,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * The parameter for multiple node deletion.
-     * </p>
      * <p>
      * It is used to magnify the {@link #delta} value in the
      * {@link ChengAndChurch#multipleNodeDeletion} method.
-     * </p>
      */
     private double alpha;
 

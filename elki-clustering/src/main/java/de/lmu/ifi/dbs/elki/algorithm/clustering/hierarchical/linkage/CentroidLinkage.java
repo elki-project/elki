@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,39 +27,38 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Centroid linkage &mdash; Unweighted Pair-Group Method using Centroids
  * (UPGMC).
- *
+ * <p>
  * This is closely related to {@link GroupAverageLinkage} (UPGMA), but the
  * resulting distance corresponds to the distance of the cluster centroids when
  * used with squared Euclidean distance.
- * 
+ * <p>
  * For Lance-Williams, we can then obtain the following recursive definition:
- * \[d_{\text{UPGMC}}(A\cup B,C)=\frac{|A|}{|A|+|B|} d(A,C) +
- * \frac{|B|}{|A|+|B|} d(B,C) - \frac{|A|\cdot|B|}{(|A|+|B|)^2} d(A,B)\]
- *
+ * \[d_{\text{UPGMC}}(A\cup B,C)=\tfrac{|A|}{|A|+|B|} d(A,C) +
+ * \tfrac{|B|}{|A|+|B|} d(B,C) - \tfrac{|A|\cdot|B|}{(|A|+|B|)^2} d(A,B)\]
+ * <p>
  * With <em>squared</em> Euclidean distance, we then get the cluster distance:
  * \[d_{\text{UPGMC}}(A,B)=||\tfrac{1}{|A|}\sum_{a\in A} a,
  * \tfrac{1}{|B|}\sum_{b\in B} b||^2\]
  * but for other distances, this will not generally be true.
- *
+ * <p>
  * Because the ELKI implementations use Lance-Williams, this linkage should only
  * be used with (squared) Euclidean distance.
- * 
+ * <p>
  * While titled "unweighted", this method does take cluster sizes into account
  * when merging clusters with Lance-Williams.
- *
+ * <p>
  * While the idea of this method &mdash; at least for squared Euclidean &mdash;
  * is compelling (distance of cluster centers), it is not as well behaved as one
  * may think. It can yield so called "inversions", where a later merge has a
  * smaller distance than an early merge, because a cluster center <em>can</em>
  * be closer to a neighboring cluster than any of the individual points. Because
  * of this, the {@link GroupAverageLinkage} (UPGMA) is usually preferable.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. C. Gower<br/>
- * A comparison of some methods of cluster analysis<br/>
+ * J. C. Gower<br>
+ * A comparison of some methods of cluster analysis<br>
  * Biometrics (1967): 623-637.
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -67,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. C. Gower", //
     title = "A comparison of some methods of cluster analysis", //
     booktitle = "Biometrics (1967)", //
-    url = "http://www.jstor.org/stable/10.2307/2528417")
+    url = "https://doi.org/10.2307/2528417")
 @Alias({ "centroid", "upgmc", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod" })
 public class CentroidLinkage implements Linkage {
   /**
@@ -93,7 +92,7 @@ public class CentroidLinkage implements Linkage {
 
   /**
    * Class parameterizer.
-   * 
+   * <p>
    * Returns the static instance.
    * 
    * @author Erich Schubert

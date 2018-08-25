@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -464,7 +464,7 @@ public class NormalDistribution extends AbstractDistribution {
   @Reference(authors = "G. Marsaglia", //
       title = "Evaluating the Normal Distribution", //
       booktitle = "Journal of Statistical Software 11(4)", //
-      url = "https://www.jstatsoft.org/article/view/v011i04/v11i04.pdf")
+      url = "https://doi.org/10.18637/jss.v011.i04")
   public static double cdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
     if(x >= 8.22) {
@@ -501,7 +501,7 @@ public class NormalDistribution extends AbstractDistribution {
   @Reference(authors = "G. Marsaglia", //
       title = "Evaluating the Normal Distribution", //
       booktitle = "Journal of Statistical Software 11(4)", //
-      url = "https://www.jstatsoft.org/article/view/v011i04/v11i04.pdf")
+      url = "https://doi.org/10.18637/jss.v011.i04")
   public static double standardNormalCDF(double x) {
     if(x >= 8.22) {
       return 1.;

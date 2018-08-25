@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,14 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * K-Means++ initialization for k-means.
- *
+ * <p>
  * Reference:
  * <p>
- * D. Arthur, S. Vassilvitskii<br />
- * k-means++: the advantages of careful seeding<br />
- * In: Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms,
- * SODA 2007
- * </p>
+ * D. Arthur, S. Vassilvitskii<br>
+ * k-means++: the advantages of careful seeding<br>
+ * Proc. 18th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2007)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -60,9 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <O> Vector type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", //
-title = "k-means++: the advantages of careful seeding", //
-booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", //
-url = "https://doi.org/10.1145/1283383.1283494")
+    title = "k-means++: the advantages of careful seeding", //
+    booktitle = "Proc. 18th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2007)", //
+    url = "http://dl.acm.org/citation.cfm?id=1283383.1283494")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans")
 public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**

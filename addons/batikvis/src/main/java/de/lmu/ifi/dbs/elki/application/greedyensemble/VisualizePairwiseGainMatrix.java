@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,18 +64,16 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Class to load an outlier detection summary file, as produced by
  * {@link ComputeKNNOutlierScores}, and compute a matrix with the pairwise
  * gains. It will have one column / row obtained for each combination.
- *
+ * <p>
  * The gain is always computed in relation to the better of the two input
  * methods. Green colors indicate the result has improved, red indicate it
  * became worse.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
- * On Evaluation of Outlier Rankings and Outlier Scores<br/>
- * In Proceedings of the 12th SIAM International Conference on Data Mining
- * (SDM), Anaheim, CA, 2012.
- * </p>
+ * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>
+ * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -83,9 +81,9 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.composedOf SimilarityMatrixVisualizer
  */
-@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
-    booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.", //
+    booktitle = "Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)", //
     url = "https://doi.org/10.1137/1.9781611972825.90")
 public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**

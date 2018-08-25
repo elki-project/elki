@@ -49,8 +49,8 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
-        .with(SUBCLU.EPSILON_ID, 0.001) //
-        .with(SUBCLU.MINPTS_ID, 100) //
+        .with(SUBCLU.Parameterizer.EPSILON_ID, 0.001) //
+        .with(SUBCLU.Parameterizer.MINPTS_ID, 100) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9090);
@@ -65,8 +65,8 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
-        .with(SUBCLU.EPSILON_ID, 0.04) //
-        .with(SUBCLU.MINPTS_ID, 70) //
+        .with(SUBCLU.Parameterizer.EPSILON_ID, 0.04) //
+        .with(SUBCLU.Parameterizer.MINPTS_ID, 70) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.49279033);

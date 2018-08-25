@@ -33,20 +33,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the Jaccard coefficient.
- * 
  * <p>
- * P. Jaccard<br />
- * Distribution de la florine alpine dans la Bassin de Dranses et dans quelques
- * regiones voisines<br />
+ * Reference:
+ * <p>
+ * P. Jaccard<br>
+ * Distribution de la florine alpine dans la Bassin de Dranses et dans
+ * quelques regiones voisines<br>
  * Bulletin del la Société Vaudoise des Sciences Naturelles
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "P. Jaccard", //
-title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
-booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
+    title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
+    booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
+    url = "http://data.rero.ch/01-R241574160")
 public class ClusterJaccardSimilarityFunction implements PrimitiveDistanceFunction<Cluster<?>>, PrimitiveSimilarityFunction<Cluster<?>> {
   /**
    * Static instance.

@@ -39,25 +39,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * CDF based outlier score scaling.
- * 
+ * <p>
  * Enhanced version of the scaling proposed in:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
- * 
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
+ * <p>
  * See also:
  * <p>
- * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
- * Outlier Detection in Arbitrarily Oriented Subspaces<br />
- * in: Proc. IEEE International Conference on Data Mining (ICDM 2012)
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Outlier Detection in Arbitrarily Oriented Subspaces<br>
+ * in: Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+    title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+    booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
+    url = "https://doi.org/10.1109/ICDM.2012.21")
 public class COPOutlierScaling implements OutlierScaling {
   /**
    * Phi parameter.
@@ -87,14 +88,17 @@ public class COPOutlierScaling implements OutlierScaling {
   /**
    * Secondary reference.
    */
-  @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+  @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+      title = "Interpreting and Unifying Outlier Scores", //
+      booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
+      url = "https://doi.org/10.1137/1.9781611972818.2")
   public static final void secondReference() {
     // Dummy, reference attachment point only.
   }
 
   @Override
   public double getScaled(double value) {
-    if (dist == null) {
+    if(dist == null) {
       throw new AbortException("Programming error: outlier scaling not initialized.");
     }
     double s = inverted ? (1 - dist.cdf(value)) : dist.cdf(value);
@@ -113,14 +117,11 @@ public class COPOutlierScaling implements OutlierScaling {
 
   @Override
   public void prepare(OutlierResult or) {
-    double[] s;
-    {
-      DoubleRelation scores = or.getScores();
-      s = new double[scores.size()];
-      int i = 0;
-      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance(), i++) {
-        s[i] = scores.doubleValue(id);
-      }
+    DoubleRelation scores = or.getScores();
+    double[] s = new double[scores.size()];
+    int i = 0;
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance(), i++) {
+      s[i] = scores.doubleValue(id);
     }
     Arrays.sort(s);
     dist = BestFitEstimator.STATIC.estimate(s, ArrayLikeUtil.DOUBLEARRAYADAPTER);
@@ -157,7 +158,7 @@ public class COPOutlierScaling implements OutlierScaling {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter phiP = new DoubleParameter(PHI_ID);
-      if (config.grab(phiP)) {
+      if(config.grab(phiP)) {
         phi = phiP.doubleValue();
       }
     }

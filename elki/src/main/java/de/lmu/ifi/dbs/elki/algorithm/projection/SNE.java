@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,13 +54,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Stochastic Neighbor Embedding is a projection technique designed for
  * visualization that tries to preserve the nearest neighbor structure.
- * 
+ * <p>
  * Reference:
  * <p>
- * G. Hinton and S. Roweis<br />
- * Stochastic Neighbor Embedding<br />
+ * G. Hinton and S. Roweis<br>
+ * Stochastic Neighbor Embedding<br>
  * Advances in Neural Information Processing Systems 15
- * </p>
  * 
  * @author Erich Schubert
  *
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "G. Hinton and S. Roweis", //
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
-    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf")
+    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding")
 public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> {
   /**
    * Class logger.

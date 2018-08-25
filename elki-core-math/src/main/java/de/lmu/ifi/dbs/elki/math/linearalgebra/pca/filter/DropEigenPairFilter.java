@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * The "drop" filter looks for the largest drop in normalized relative
  * eigenvalues.
- *
- * Let s_1 .. s_n be the eigenvalues.
- *
- * Let a_k := 1/(n-k) sum_{i=k..n} s_i
- *
- * Then r_k := s_k / a_k is the relative eigenvalue.
- *
- * The drop filter searches for argmax_k r_k / r_{k+1}
+ * <p>
+ * Let \( s_1 \ldots s_n \) be the eigenvalues.
+ * <p>
+ * Let \( a_k := 1/(n-k) \sum_{i=k..n} s_i \)
+ * <p>
+ * Then \( r_k := s_k / a_k \) is the relative eigenvalue.
+ * <p>
+ * The drop filter searches for \(\operatorname{arg\,max}_k r_k / r_{k+1} \)
  *
  * @author Erich Schubert
  * @since 0.2

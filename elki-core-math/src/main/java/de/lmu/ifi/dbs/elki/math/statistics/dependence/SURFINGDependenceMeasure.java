@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,29 +29,26 @@ import net.jafama.FastMath;
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
  * for the k nearest neighbors is currently hard-coded to 10% of the set size.
- *
+ * <p>
  * Note that the complexity is roughly O(n n k), so this is a rather slow
- * method, and with k at 10% of n, is actually cubic: O(0.1 * n^3).
- *
+ * method, and with k at 10% of n, is actually cubic: O(0.1 * n²).
+ * <p>
  * This version cannot use index support, as the API operates without database
  * attachment. However, it should be possible to implement some trivial
  * sorted-list indexes to get a reasonable speedup!
- *
+ * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
- * Proceedings of the 2013 ACM International Conference on Management of Data
- * (SIGMOD), New York City, NY, 2013.
- * </p>
- *
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)
+ * <p>
  * Based on:
  * <p>
  * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and
- * Peer Kröger<br />
- * Subspace Selection for Clustering High-Dimensional Data<br />
- * In IEEE International Conference on Data Mining, 2004.
- * </p>
+ * Peer Kröger<br>
+ * Subspace Selection for Clustering High-Dimensional Data<br>
+ * Proc. IEEE International Conference on Data Mining (ICDM 2004)
  *
  * TODO: make the subspace distance function and k parameterizable.
  *
@@ -60,9 +57,9 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
-booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
-url = "https://doi.org/10.1145/2463676.2463696")
+    title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+    booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+    url = "https://doi.org/10.1145/2463676.2463696")
 public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.
@@ -77,9 +74,9 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
   }
 
   @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
-  title = "Subspace Selection for Clustering High-Dimensional Data", //
-  booktitle = "IEEE International Conference on Data Mining, 2004", //
-  url = "https://doi.org/10.1109/ICDM.2004.10112")
+      title = "Subspace Selection for Clustering High-Dimensional Data", //
+      booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
+      url = "https://doi.org/10.1109/ICDM.2004.10112")
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = size(adapter1, data1, adapter2, data2);
@@ -90,10 +87,12 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
     DoubleMinHeap heap = new DoubleMinHeap(k);
     double kdistmean = 0.;
     for(int i = 0; i < len; ++i) {
-      double ix = adapter1.getDouble(data1, i), iy = adapter2.getDouble(data2, i);
+      double ix = adapter1.getDouble(data1, i),
+          iy = adapter2.getDouble(data2, i);
       heap.clear();
       for(int j = 0; j < len; ++j) {
-        double jx = adapter1.getDouble(data1, j), jy = adapter2.getDouble(data2, j);
+        double jx = adapter1.getDouble(data1, j),
+            jy = adapter2.getDouble(data2, j);
         double dx = ix - jx, dy = iy - jy;
         heap.add(dx * dx + dy * dy); // Squared Euclidean.
       }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,15 +32,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Sort object along the Hilbert Space Filling curve by mapping them to their
  * Hilbert numbers and sorting them.
- * 
+ * <p>
  * Objects are mapped using 31 bits per dimension.
- * 
+ * <p>
  * Reference:
  * <p>
- * D. Hilbert<br />
- * Über die stetige Abbildung einer Linie auf ein Flächenstück<br />
+ * D. Hilbert<br>
+ * Ueber die stetige Abbildung einer Linie auf ein Flächenstück<br>
  * In: Mathematische Annalen, 38(3)
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -48,8 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.composedOf HilbertRef
  */
 @Reference(authors = "D. Hilbert", //
-    title = "Über die stetige Abbildung einer Linie auf ein Flächenstück", //
-    booktitle = "Mathematische Annalen, 38(3)")
+    title = "Ueber die stetige Abbildung einer Linie auf ein Flächenstück", //
+    booktitle = "Mathematische Annalen, 38(3)", //
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002253135")
 public class HilbertSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

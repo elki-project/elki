@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -52,26 +52,24 @@ import net.jafama.FastMath;
 
 /**
  * kNN-based adaption of Stochastic Outlier Selection.
- * 
+ * <p>
  * This is a trivial variation of Stochastic Outlier Selection to benefit from
  * KNN indexes, but not discussed in the original publication. Instead of
  * setting perplexity, we choose the number of neighbors k, and set perplexity
  * simply to k/3. Objects outside of the kNN are not considered anymore.
- * 
+ * <p>
  * Reference of the kNN variant:
  * <p>
- * Erich Schubert and Michael Gertz<br />
+ * Erich Schubert and Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
- * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Detection: A Remedy Against the Curse of Dimensionality?<br>
  * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
- * </p>
- * 
+ * <p>
  * Original reference:
  * <p>
- * J. Janssens, F. Huszár, E. Postma, J. van den Herik<br />
- * Stochastic Outlier Selection<br />
+ * J. Janssens, F. Huszár, E. Postma, J. van den Herik<br>
+ * Stochastic Outlier Selection<br>
  * TiCC TR 2012–001
- * </p>
  * 
  * @author Erich Schubert
  *
@@ -79,7 +77,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "Erich Schubert and Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+    url = "https://doi.org/10.1007/978-3-319-68474-1_13")
 public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

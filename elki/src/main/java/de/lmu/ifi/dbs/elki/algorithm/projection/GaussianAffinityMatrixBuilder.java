@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,13 +47,12 @@ import net.jafama.FastMath;
 /**
  * Compute the affinity matrix for SNE and tSNE using a Gaussian distribution
  * with a constant sigma.
- * 
+ * <p>
  * Reference:
  * <p>
- * G. Hinton and S. Roweis<br />
- * Stochastic Neighbor Embedding<br />
+ * G. Hinton and S. Roweis<br>
+ * Stochastic Neighbor Embedding<br>
  * Advances in Neural Information Processing Systems 15
- * </p>
  * 
  * @author Erich Schubert
  *
@@ -62,7 +61,7 @@ import net.jafama.FastMath;
 @Reference(authors = "G. Hinton and S. Roweis", //
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
-    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf")
+    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding")
 public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O> {
   /**
    * Class logger.

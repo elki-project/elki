@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -51,11 +49,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+
 import net.jafama.FastMath;
 
 /**
- * Outlier have smallest GMOD_PROB: the outlier scores is the <em>probability
- * density</em> of the assumed distribution.
+ * Outlier detection based on the probability density of the single normal
+ * distribution.
  * 
  * @author Lisa Reichert
  * @since 0.3
@@ -69,11 +68,6 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(GaussianModel.class);
-
-  /**
-   * OptionID for inversion flag.
-   */
-  public static final OptionID INVERT_ID = new OptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
 
   /**
    * Invert the result
@@ -157,6 +151,11 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * OptionID for inversion flag.
+     */
+    public static final OptionID INVERT_ID = new OptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
+
     protected boolean invert = false;
 
     @Override

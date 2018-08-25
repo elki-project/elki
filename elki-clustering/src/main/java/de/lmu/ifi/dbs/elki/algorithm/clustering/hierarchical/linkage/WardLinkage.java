@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,55 +24,55 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
  * Ward's method clustering method.
- *
+ * <p>
  * This criterion minimizes the <em>increase</em> of squared errors, and should
  * be used with <em>squared Euclidean</em> distance. Usually, ELKI will try to
  * automatically square distances when you combine this with Euclidean distance.
  * For performance reasons, the direct use of squared distances is preferable!
- *
+ * <p>
  * The distance of two clusters in this method is:
  * \[ d_{\text{Ward}}(A,B):=\text{SSE}(A\cup B)-\text{SSE}(A)-\text{SSE}(B) \]
  * where the sum of squared errors is defined as:
  * \[ \text{SSE}(X):=\sum_{x\in X} (x-\mu_X)^2 \qquad \text{with }
  * \mu_X=\tfrac{1}{|X|}\sum_{x\in X} X \]
  * This objective can be rewritten to
- * \[ d_{\text{Ward}}(A,B):=\frac{|A|\cdot|B|}{|A|+|B|} ||\mu_A-\mu_B||^2
- * = \frac{1}{1/|A|+1/|B|} ||\mu_A-\mu_B||^2 \]
- * 
+ * \[ d_{\text{Ward}}(A,B):=\tfrac{|A|\cdot|B|}{|A|+|B|} ||\mu_A-\mu_B||^2
+ * = \tfrac{1}{1/|A|+1/|B|} ||\mu_A-\mu_B||^2 \]
+ * <p>
  * For Lance-Williams, we can then obtain the following recursive definition:
- * \[d_{\text{Ward}}(A\cup B,C)=\frac{|A|+|C|}{|A|+|B|+|C|} d(A,C) +
- * \frac{|B|+|C|}{|A|+|B|+|C|} d(B,C) - \frac{|C|}{|A|+|B|+|C|} d(A,B)\]
- *
+ * \[d_{\text{Ward}}(A\cup B,C)=\tfrac{|A|+|C|}{|A|+|B|+|C|} d(A,C) +
+ * \tfrac{|B|+|C|}{|A|+|B|+|C|} d(B,C) - \tfrac{|C|}{|A|+|B|+|C|} d(A,B)\]
+ * <p>
  * These transformations rely on properties of the L2-norm, so they cannot be
  * used with arbitrary metrics, unless they are equivalent to the L2-norm in
  * some transformed space.
- *
+ * <p>
  * Because the resulting distances are squared, when used with a non-squared
  * distance, ELKI implementations will apply the square root before returning
  * the final result. This is statistically somewhat questionable, but usually
  * yields more interpretable distances that &mdash; roughly &mdash; correspond
  * to the increase in standard deviation. With ELKI, you can get both behavior:
  * Either choose squared Euclidean distance, or regular Euclidean distance.
- *
+ * <p>
  * This method is also referred to as "minimize increase of sum of squares"
  * (MISSQ) by Podani.
- *
+ * <p>
  * Reference:
  * <p>
- * J. H. Ward Jr<br />
- * Hierarchical grouping to optimize an objective function<br />
+ * J. H. Ward Jr<br>
+ * Hierarchical grouping to optimize an objective function<br>
  * Journal of the American statistical association 58.301 (1963): 236-244.
- * </p>
+ * <p>
  * The formulation using Lance-Williams equations is due to:
  * <p>
- * D. Wishart<br />
- * 256. Note: An Algorithm for Hierarchical Classifications<br />
+ * D. Wishart<br>
+ * 256. Note: An Algorithm for Hierarchical Classifications<br>
  * Biometrics 25(1)
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -125,7 +125,7 @@ public class WardLinkage implements Linkage {
 
   /**
    * Class parameterizer.
-   * 
+   * <p>
    * Returns the static instance.
    * 
    * @author Erich Schubert

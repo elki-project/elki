@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,11 +22,11 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
 
 /**
  * Quadratic weight function, scaled using the standard deviation.
- * 
+ * <p>
  * We needed another scaling here, we chose the cutoff point to be 3*stddev. If
  * you need another value, you have to reimplement this class.
- * 
- * max(0.0, 1.0 - (distance/(3*stddev))^2
+ * <p>
+ * \( \max\{0.0, 1.0 - \frac{\text{dist}^2}{3\sigma^2} \}\)
  * 
  * @author Erich Schubert
  * @since 0.2

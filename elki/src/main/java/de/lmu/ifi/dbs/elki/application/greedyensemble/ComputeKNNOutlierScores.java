@@ -79,32 +79,31 @@ import net.jafama.FastMath;
  * Application that runs a series of kNN-based algorithms on a data set, for
  * building an ensemble in a second step. The output file consists of a label
  * and one score value for each object.
- *
+ * <p>
  * Since some algorithms can be too slow to run on large data sets and for large
  * values of k, they can be disabled. For example
  * <tt>-disable '(LDOF|DWOF|COF|FastABOD)'</tt> disables these two methods
  * completely. Alternatively, you can use the parameter <tt>-ksquaremax</tt>
  * to control the maximum k for these four methods separately.
- *
+ * <p>
  * For methods where k=1 does not make sense, this value will be skipped, and
  * the procedure will commence at 1+stepsize.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
- * On Evaluation of Outlier Rankings and Outlier Scores<br/>
- * In Proceedings of the 12th SIAM International Conference on Data Mining
- * (SDM), Anaheim, CA, 2012.
- * </p>
+ * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>
+ * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
  *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @param <O> Vector type
  */
-@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
-    booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
+    booktitle = "Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)", //
+    url = "https://doi.org/10.1137/1.9781611972825.90")
 public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApplication {
   /**
    * Our logger class.

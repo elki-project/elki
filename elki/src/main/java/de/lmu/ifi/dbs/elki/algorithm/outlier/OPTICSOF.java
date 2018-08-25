@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,11 +62,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Optics-OF outlier detection algorithm, an algorithm to find Local Outliers in
  * a database based on ideas from {@link OPTICSTypeAlgorithm} clustering.
  * <p>
- * Reference:<br>
- * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
- * OPTICS-OF: Identifying Local Outliers<br />
- * In Proc. of the 3rd European Conference on Principles of Knowledge Discovery
- * and Data Mining (PKDD), Prague, Czech Republic
+ * Reference:
+ * <p>
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander<br>
+ * OPTICS-OF: Identifying Local Outliers<br>
+ * Proc. 3rd European Conf. on Principles of Knowledge Discovery and Data Mining
+ * (PKDD'99)
  *
  * @author Ahmed Hettab
  * @since 0.3
@@ -78,10 +79,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", //
-title = "OPTICS-OF: Identifying Local Outliers", //
-booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", //
-url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
+@Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
+    title = "OPTICS-OF: Identifying Local Outliers", //
+    booktitle = "Proc. 3rd European Conf. on Principles of Knowledge Discovery and Data Mining (PKDD'99)", //
+    url = "https://doi.org/10.1007/978-3-540-48247-5_28")
 public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -191,13 +192,16 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Parameter to specify the threshold MinPts.
+     */
     protected int minpts = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         minpts = param.getValue();
       }

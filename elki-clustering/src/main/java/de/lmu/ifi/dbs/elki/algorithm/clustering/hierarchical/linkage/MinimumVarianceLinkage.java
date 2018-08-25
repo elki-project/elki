@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,30 +28,29 @@ import net.jafama.FastMath;
 
 /**
  * Minimum increase in variance (MIVAR) linkage.
- *
+ * <p>
  * This is subtly different from Ward's method ({@link WardLinkage}, MISSQ),
  * because variance is normalized by the cluster size; and Ward minimizes the
  * increase in sum of squares (without normalization).
- * 
+ * <p>
  * \[d_{\text{MIVAR}}(A\cup B,C)=
- * \left(\frac{|A|+|C|}{|A|+|B|+|C|}\right)^2 d(A,C) +
- * \left(\frac{|B|+|C|}{|A|+|B|+|C|}\right)^2 d(B,C)
- * - \frac{|C|\cdot(|A|+|B|)}{(|A|+|B|+|C|)^2} d(A,B)\]
+ * \left(\tfrac{|A|+|C|}{|A|+|B|+|C|}\right)^2 d(A,C) +
+ * \left(\tfrac{|B|+|C|}{|A|+|B|+|C|}\right)^2 d(B,C)
+ * - \tfrac{|C|\cdot(|A|+|B|)}{(|A|+|B|+|C|)^2} d(A,B)\]
  * or equivalently:
- * \[d_{\text{MIVAR}}(A\cup B,C)=\frac{(|A|+|C|)^2 d(A,C)
+ * \[d_{\text{MIVAR}}(A\cup B,C)=\tfrac{(|A|+|C|)^2 d(A,C)
  * + (|B|+|C|)^2 d(B,C) - |C|\cdot(|A|+|B|) d(A,B)}{(|A|+|B|+|C|)^2}\]
- *
+ * <p>
  * Reference:
  * <p>
- * J. Podani<br />
- * New Combinatorial Clustering Methods<br />
+ * J. Podani<br>
+ * New Combinatorial Clustering Methods<br>
  * Vegetatio 81(1/2)
- * </p>
+ * <p>
  * attributes this to (but we did not verify):
  * <p>
- * E. Diday, J. Lemaire, J. Pouget, and F.Testu<br />
+ * E. Diday, J. Lemaire, J. Pouget, F. Testu<br>
  * Elements d'analyse de donnees
- * </p>
  * 
  * @author Erich Schubert
  */
@@ -69,7 +68,7 @@ public class MinimumVarianceLinkage implements Linkage {
   /**
    * Additional reference.
    */
-  @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, and F.Testu", //
+  @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, F. Testu", //
       title = "Elements d'analyse de donnees", //
       booktitle = "Elements d'analyse de donnees")
   private static Void SECOND_REFERENCE = null;
@@ -103,7 +102,7 @@ public class MinimumVarianceLinkage implements Linkage {
 
   /**
    * Class parameterizer.
-   * 
+   * <p>
    * Returns the static instance.
    * 
    * @author Erich Schubert

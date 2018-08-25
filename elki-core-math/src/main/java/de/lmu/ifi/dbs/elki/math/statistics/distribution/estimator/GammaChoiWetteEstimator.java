@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,14 +28,13 @@ import net.jafama.FastMath;
 
 /**
  * Estimate distribution parameters using the method by Choi and Wette.
- * 
+ * <p>
  * Reference:
  * <p>
  * Maximum likelihood estimation of the parameters of the gamma distribution and
- * their bias<br />
- * S. C. Choi, R. Wette<br />
- * in: Technometrics
- * </p>
+ * their bias<br>
+ * S. C. Choi, R. Wette<br>
+ * Technometrics
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -45,7 +44,7 @@ import net.jafama.FastMath;
 @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", //
     authors = "S. C. Choi, R. Wette", //
     booktitle = "Technometrics", //
-    url = "http://www.jstor.org/stable/10.2307/1266892")
+    url = "https://doi.org/10.2307/1266892")
 public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistribution> {
   /**
    * Static estimation, using iterative refinement.

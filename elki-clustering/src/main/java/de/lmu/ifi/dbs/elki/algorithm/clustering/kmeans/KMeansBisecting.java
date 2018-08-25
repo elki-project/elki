@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,13 +50,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * The bisecting k-means algorithm works by starting with an initial
  * partitioning into two clusters, then repeated splitting of the largest
  * cluster to get additional clusters.
- *
- * Reference:<br>
  * <p>
- * M. Steinbach, G. Karypis, V. Kumar:<br />
- * A Comparison of Document Clustering Techniques<br />
+ * Reference:
+ * <p>
+ * M. Steinbach, G. Karypis, V. Kumar:<br>
+ * A Comparison of Document Clustering Techniques<br>
  * KDD workshop on text mining. Vol. 400. No. 1
- * </p>
  *
  * @author Stephan Baier
  * @since 0.6.0
@@ -64,7 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Model type
  */
-@Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", title = "A Comparison of Document Clustering Techniques", booktitle = "KDD workshop on text mining. Vol. 400. No. 1")
+@Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", //
+    title = "A Comparison of Document Clustering Techniques", //
+    booktitle = "KDD workshop on text mining. Vol. 400. No. 1", //
+    url = "http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf")
 public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
@@ -104,14 +106,15 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Bisecting k-means", k - 1, LOG) : null;
 
-    for (int j = 0; j < this.k - 1; j++) {
+    for(int j = 0; j < this.k - 1; j++) {
       // Choose a cluster to split and project database to cluster
-      if (currentClusterList.isEmpty()) {
+      if(currentClusterList.isEmpty()) {
         proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
-      } else {
+      }
+      else {
         Cluster<M> largestCluster = null;
-        for (Cluster<M> cluster : currentClusterList) {
-          if (largestCluster == null || cluster.size() > largestCluster.size()) {
+        for(Cluster<M> cluster : currentClusterList) {
+          if(largestCluster == null || cluster.size() > largestCluster.size()) {
             largestCluster = cluster;
           }
         }
@@ -127,7 +130,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
       currentClusterList.addAll(innerResult.getAllClusters());
 
       LOG.incrementProcessed(prog);
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("Iteration " + j);
       }
     }
@@ -135,7 +138,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
     // add all current clusters to the result
     Clustering<M> result = new Clustering<>("Bisecting k-Means Result", "Bisecting-k-means");
-    for (Cluster<M> cluster : currentClusterList) {
+    for(Cluster<M> cluster : currentClusterList) {
       result.addToplevelCluster(cluster);
     }
     return result;
@@ -204,12 +207,12 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
       IntParameter kP = new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
 
       ObjectParameter<KMeans<V, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class, BestOfMultipleKMeans.class);
-      if (config.grab(kMeansVariantP)) {
+      if(config.grab(kMeansVariantP)) {
         ListParameterization kMeansVariantParameters = new ListParameterization();
 
         // We will always invoke this with k=2!

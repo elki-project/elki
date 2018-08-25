@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,19 +44,18 @@ import net.jafama.FastMath;
 
 /**
  * {@link CovarianceMatrixBuilder} with weights.
- * 
+ * <p>
  * This builder uses a weight function to weight points differently during build
  * a covariance matrix. Covariance can be canonically extended with weights, as
  * shown in the article
- * 
+ * <p>
  * Reference:
  * <p>
  * A General Framework for Increasing the Robustness of PCA-Based Correlation
- * Clustering Algorithms<br />
- * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek<br />
- * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management
+ * Clustering Algorithms<br>
+ * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek<br>
+ * Proc. 20th Int. Conf. on Scientific and Statistical Database Management
  * (SSDBM)
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -69,7 +68,7 @@ import net.jafama.FastMath;
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
-    booktitle = "Proc. 20th Int.l Conf. on Scientific and Statistical Database Management (SSDBM)", //
+    booktitle = "Proc. 20th Intl. Conf. on Scientific and Statistical Database Management (SSDBM)", //
     url = "https://doi.org/10.1007/978-3-540-69497-7_27")
 public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**

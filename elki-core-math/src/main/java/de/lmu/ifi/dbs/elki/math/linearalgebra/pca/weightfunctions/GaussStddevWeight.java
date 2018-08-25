@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,11 +24,8 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import net.jafama.FastMath;
 
 /**
- * Gaussian Weight function, scaled such using standard deviation
- * 
- * factor * exp(-.5 * (distance/stddev)^2)
- * 
- * with factor being 1 / sqrt(2 * PI)
+ * Gaussian weight function, scaled using standard deviation
+ * \( 1/\sqrt(2\pi) \exp(-\frac{\text{dist}^2}{2\sigma^2}) \)
  * 
  * @author Erich Schubert
  * @since 0.2

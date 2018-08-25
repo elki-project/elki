@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,23 +47,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * This is a modification of the classic AGNES algorithm for hierarchical
  * clustering using a nearest-neighbor heuristic for acceleration.
- *
- * Instead of scanning the matrix (with cost O(n^2)) to find the minimum, the
+ * <p>
+ * Instead of scanning the matrix (with cost O(n²)) to find the minimum, the
  * nearest neighbor of each object is remembered. On the downside, we need to
- * check these values at every merge, and it may now cost O(n^2) to perform a
+ * check these values at every merge, and it may now cost O(n²) to perform a
  * merge, so there is no worst-case advantage to this approach. The average case
- * however improves from O(n^3) to O(n^2), which yields a considerable
+ * however improves from O(n³) to O(n²), which yields a considerable
  * improvement in running time.
- *
+ * <p>
  * This optimization is attributed to M. R. Anderberg.
- *
+ * <p>
  * Reference:
  * <p>
- * M. R. Anderberg<br />
- * Hierarchical Clustering Methods<br />
- * Cluster Analysis for Applications<br />
+ * M. R. Anderberg<br>
+ * Hierarchical Clustering Methods<br>
+ * Cluster Analysis for Applications<br>
  * ISBN: 0120576503
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
@@ -57,18 +54,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * <p>
  * Implementation of the SUBCLU algorithm, an algorithm to detect arbitrarily
  * shaped and positioned clusters in subspaces. SUBCLU delivers for each
  * subspace the same clusters DBSCAN would have found, when applied to this
  * subspace separately.
- * </p>
  * <p>
- * Reference: <br>
- * K. Kailing, H.-P. Kriegel, P. Kröger:<br />
- * Density connected Subspace Clustering for High Dimensional Data<br />
- * In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.
- * </p>
+ * Reference:
+ * <p>
+ * Karin Kailing, Hans-Peter Kriegel, Peer Kröger<br>
+ * Density Connected Subspace Clustering for High Dimensional Data<br>
+ * Proc. SIAM Int. Conf. on Data Mining (SDM'04)
  * 
  * @author Elke Achtert
  * @since 0.2
@@ -77,16 +72,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses DimensionSelectingSubspaceDistanceFunction
  * @apiviz.has SubspaceModel
  * 
- * @param <V> the type of FeatureVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this algorithm
  */
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. "//
     + "SUBCLU delivers for each subspace the same clusters DBSCAN would have found, "//
     + "when applied to this subspace seperately.")
-@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", //
-title = "Density connected Subspace Clustering for High Dimensional Data", //
-booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004", //
-url = "http://www.siam.org/meetings/sdm04/proceedings/sdm04_023.pdf")
+@Reference(authors = "Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
+    title = "Density Connected Subspace Clustering for High Dimensional Data", //
+    booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04)", //
+    url = "https://doi.org/10.1137/1.9781611972740.23")
 public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
@@ -94,55 +89,19 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   private static final Logging LOG = Logging.getLogger(SUBCLU.class);
 
   /**
-   * The distance function to determine the distance between database objects.
-   * <p>
-   * Default value: {@link SubspaceEuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -subclu.distancefunction}
-   * </p>
+   * The distance function to determine the distance between objects.
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
+  protected DimensionSelectingSubspaceDistanceFunction<V> distanceFunction;
 
   /**
-   * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to
-   * {@link DimensionSelectingSubspaceDistanceFunction}.
-   * <p>
-   * Key: {@code -subclu.epsilon}
-   * </p>
+   * Maximum radius of the neighborhood to be considered.
    */
-  public static final OptionID EPSILON_ID = new OptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
+  protected double epsilon;
 
   /**
-   * Parameter to specify the threshold for minimum number of points in the
-   * epsilon-neighborhood of a point, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -subclu.minpts}
-   * </p>
+   * Minimum number of points.
    */
-  public static final OptionID MINPTS_ID = new OptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
-
-  /**
-   * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_ID}.
-   */
-  private DimensionSelectingSubspaceDistanceFunction<V> distanceFunction;
-
-  /**
-   * Holds the value of {@link #EPSILON_ID}.
-   */
-  private double epsilon;
-
-  /**
-   * Holds the value of {@link #MINPTS_ID}.
-   */
-  private int minpts;
-
-  /**
-   * Holds the result;
-   */
-  private Clustering<SubspaceModel> result;
+  protected int minpts;
 
   /**
    * Constructor.
@@ -257,7 +216,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
     // build result
     int numClusters = 1;
-    result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
     for(Subspace subspace : clusterMap.descendingKeySet()) {
       List<Cluster<Model>> clusters = clusterMap.get(subspace);
       for(Cluster<Model> cluster : clusters) {
@@ -269,15 +228,6 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     }
 
     LOG.setCompleted(stepprog);
-    return result;
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public Clustering<SubspaceModel> getResult() {
     return result;
   }
 
@@ -332,12 +282,10 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @return the {@code d+1}-dimensional subspace candidates
    */
   private List<Subspace> generateSubspaceCandidates(List<Subspace> subspaces) {
-    List<Subspace> candidates = new ArrayList<>();
-
     if(subspaces.isEmpty()) {
-      return candidates;
+      return Collections.emptyList();
     }
-
+    List<Subspace> candidates = new ArrayList<>();
     // Generate (d+1)-dimensional candidate subspaces
     int d = subspaces.get(0).dimensionality();
 
@@ -466,11 +414,36 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
-    protected int minpts = 0;
+    /**
+     * The distance function to determine the distance between objects.
+     */
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
 
+    /**
+     * Maximum radius of the neighborhood to be considered.
+     */
+    public static final OptionID EPSILON_ID = new OptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
+
+    /**
+     * Parameter to specify the threshold for minimum number of points in the
+     * epsilon-neighborhood of a point, must be an integer greater than 0.
+     */
+    public static final OptionID MINPTS_ID = new OptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+
+    /**
+     * The distance function to determine the distance between objects.
+     */
+    protected DimensionSelectingSubspaceDistanceFunction<V> distance;
+
+    /**
+     * Maximum radius of the neighborhood to be considered.
+     */
     protected double epsilon;
 
-    protected DimensionSelectingSubspaceDistanceFunction<V> distance = null;
+    /**
+     * Minimum number of points.
+     */
+    protected int minpts;
 
     @Override
     protected void makeOptions(Parameterization config) {

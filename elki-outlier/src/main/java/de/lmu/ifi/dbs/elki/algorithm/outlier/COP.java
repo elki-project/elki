@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
@@ -32,22 +29,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.database.relation.*;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -66,21 +51,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
 
 /**
  * Correlation outlier probability: Outlier Detection in Arbitrarily Oriented
  * Subspaces
- *
+ * <p>
+ * Reference:
  * <p>
  * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
  * Outlier Detection in Arbitrarily Oriented Subspaces<br />
- * in: Proc. IEEE International Conference on Data Mining (ICDM 2012)
- * </p>
+ * Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)
  *
  * @author Erich Schubert
  * @since 0.2
@@ -89,10 +70,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("COP: Correlation Outlier Probability")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
-booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
-url = "https://doi.org/10.1109/ICDM.2012.21")
-public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult>implements OutlierAlgorithm {
+    title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+    booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
+    url = "https://doi.org/10.1109/ICDM.2012.21")
+public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -151,9 +132,10 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     /**
      * Use chi^2 for score normalization.
      */
-    CHISQUARED, /**
-                 * Use gamma distributions for score normalization.
-                 */
+    CHISQUARED,
+    /**
+     * Use gamma distributions for score normalization.
+     */
     GAMMA
   }
 

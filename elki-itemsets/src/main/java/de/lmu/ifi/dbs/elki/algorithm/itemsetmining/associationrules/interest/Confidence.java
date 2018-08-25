@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,18 +23,17 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Confidence interestingness measure, support(X \cup Y)/support(X).
- * 
+ * Confidence interestingness measure, support(X u Y)/support(X).
+ * <p>
  * Reference:
  * <p>
- * R. Agrawal, T. Imielinski, and A. Swami
- * Mining association rules between sets of items in large databases<br />
+ * R. Agrawal, T. Imielinski, A. Swami<br>
+ * Mining association rules between sets of items in large databases<br>
  * Proc. ACM SIGMOD International Conference on Management of Data
- * </p>
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "R. Agrawal, T. Imielinski, and A. Swami", //
+@Reference(authors = "R. Agrawal, T. Imielinski, A. Swami", //
     title = "Mining association rules between sets of items in large databases", //
     booktitle = "Proc. ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/170036.170072")

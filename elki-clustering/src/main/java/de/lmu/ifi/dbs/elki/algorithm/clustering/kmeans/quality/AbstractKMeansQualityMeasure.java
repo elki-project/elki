@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,29 +36,27 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
  * Base class for evaluating clusterings by information criteria (such as AIC or
  * BIC). Provides helper functions (e.g. max likelihood calculation) to its
  * subclasses.
- *
+ * <p>
  * The use of information-theoretic criteria for evaluating k-means was
  * popularized by X-means:
  * <p>
- * D. Pelleg, A. Moore:<br />
+ * D. Pelleg, A. Moore:<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
- * Clusters<br />
- * In: Proceedings of the 17th International Conference on Machine Learning
- * (ICML 2000)
- * </p>
- *
+ * Clusters<br>
+ * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)
+ * <p>
  * A different version of logLikelihood is derived in:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti:<br />
- * Knee Point Detection on Bayesian Information Criterion<br />
+ * Q. Zhao, M. Xu, P. Fränti:<br>
+ * Knee Point Detection on Bayesian Information Criterion<br>
  * 20th IEEE International Conference on Tools with Artificial Intelligence
- * </p>
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
@@ -66,7 +64,7 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-    booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
     url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> implements KMeansQualityMeasure<O> {
   /**
@@ -126,8 +124,8 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @return Log Likelihood.
    */
   @Reference(authors = "D. Pelleg, A. Moore", //
-      booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-      title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+      title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+      booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
       url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
   public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
@@ -165,7 +163,8 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Posterior entropy, Rn log Rn
+      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Posterior entropy, Rn
+                                                     // log Rn
           - n_i[i] * .5 * MathUtil.LOGTWOPI // Rn/2 log2pi
           - n_i[i] * dim * .5 * logv // Rn M/2 log sigma^2
           - (d_i[i] - m) * .5; // (Rn-K)/2

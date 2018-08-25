@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -80,13 +80,12 @@ import net.jafama.FastMath;
 /**
  * The CASH algorithm is a subspace clustering algorithm based on the Hough
  * transform.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek:<br />
- * Robust clustering in arbitrarily oriented subspaces. <br>
- * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
- * </p>
+ * Elke Achtert, Christian Böhm, Jörn David, Peer Kröger, Arthur Zimek<br>
+ * Robust clustering in arbitrarily oriented subspaces.<br>
+ * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)
  *
  * @author Elke Achtert
  * @since 0.2
@@ -100,10 +99,10 @@ import net.jafama.FastMath;
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
-@Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Jörn David, Peer Kröger, Arthur Zimek", //
     title = "Robust clustering in arbitraily oriented subspaces", //
-    booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", //
-    url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
+    booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)", //
+    url = "https://doi.org/10.1137/1.9781611972788.69")
 public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -739,48 +738,30 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     /**
      * Parameter to specify the threshold for minimum number of points in a
      * cluster, must be an integer greater than 0.
-     * <p>
-     * Key: {@code -cash.minpts}
-     * </p>
      */
     public static final OptionID MINPTS_ID = new OptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
 
     /**
      * Parameter to specify the maximum level for splitting the hypercube, must
      * be an integer greater than 0.
-     * <p>
-     * Key: {@code -cash.maxlevel}
-     * </p>
      */
     public static final OptionID MAXLEVEL_ID = new OptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
 
     /**
      * Parameter to specify the minimum dimensionality of the subspaces to be
      * found, must be an integer greater than 0.
-     * <p>
-     * Default value: {@code 1}
-     * </p>
-     * <p>
-     * Key: {@code -cash.mindim}
-     * </p>
      */
     public static final OptionID MINDIM_ID = new OptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
 
     /**
      * Parameter to specify the maximum jitter for distance values, must be a
      * double greater than 0.
-     * <p>
-     * Key: {@code -cash.jitter}
-     * </p>
      */
     public static final OptionID JITTER_ID = new OptionID("cash.jitter", "The maximum jitter for distance values.");
 
     /**
      * Flag to indicate that an adjustment of the applied heuristic for choosing
      * an interval is performed after an interval is selected.
-     * <p>
-     * Key: {@code -cash.adjust}
-     * </p>
      */
     public static final OptionID ADJUST_ID = new OptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
 

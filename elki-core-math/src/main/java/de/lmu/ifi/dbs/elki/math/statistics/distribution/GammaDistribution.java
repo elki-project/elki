@@ -879,7 +879,8 @@ public class GammaDistribution extends AbstractDistribution {
    */
   @Reference(authors = "J. M. Bernando", //
       title = "Algorithm AS 103: Psi (Digamma) Function", //
-      booktitle = "Statistical Algorithms")
+      booktitle = "Statistical Algorithms", //
+      url = "https://doi.org/10.2307/2347257")
   public static double digamma(double x) {
     if(!(x > 0)) {
       return Double.NaN;

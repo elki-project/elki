@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
  * the Peano curve.
- *
+ * <p>
  * The basic shape of this space-filling curve looks like this:
  *
  * <pre>
@@ -58,22 +58,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *   | | | | | | | | |
  *   S +-+ +-+ +-+ +-+
  * </pre>
- *
+ * 
  * and so on.
- *
+ * <p>
  * Reference:
  * <p>
- * G. Peano<br />
- * Sur une courbe, qui remplit toute une aire plane<br />
+ * G. Peano<br>
+ * Sur une courbe, qui remplit toute une aire plane<br>
  * Mathematische Annalen, 36(1)
- * </p>
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
 @Reference(authors = "G. Peano", //
     title = "Sur une courbe, qui remplit toute une aire plane", //
-    booktitle = "Mathematische Annalen, 36(1)")
+    booktitle = "Mathematische Annalen, 36(1)", //
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002252376")
 public class PeanoSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

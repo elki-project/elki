@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,12 +48,12 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 /**
  * This tutorial will step you through implementing a well known clustering
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
- *
+ * <p>
  * This is the first step, where we implement it with single linkage only, and
  * extract a fixed number of clusters. The follow up variants will be made more
  * flexible.
- *
- * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
+ * <p>
+ * This is the naive O(n³) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
  *
  * @author Erich Schubert
@@ -139,7 +139,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
           }
         }
       }
-      assert(minx >= 0 && miny >= 0);
+      assert (minx >= 0 && miny >= 0);
       // Avoid allocating memory, by reusing existing iterators:
       ix.seek(minx);
       iy.seek(miny);

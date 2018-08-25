@@ -29,26 +29,25 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
 /**
- * Scaling function to invert values by computing -1 * FastMath.log(x)
- * 
+ * Scaling function to invert values by computing -log(x)
+ * <p>
  * Useful for example for scaling
  * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.ABOD}, but see
  * {@link MinusLogStandardDeviationScaling} and {@link MinusLogGammaScaling} for
  * more advanced scalings for this algorithm.
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
-    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
     url = "https://doi.org/10.1137/1.9781611972818.2")
 public class OutlierMinusLogScaling implements OutlierScaling {
   /**

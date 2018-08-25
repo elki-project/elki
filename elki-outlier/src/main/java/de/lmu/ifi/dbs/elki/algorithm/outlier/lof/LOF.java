@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -60,28 +60,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter {@link Parameterizer#K_ID} ({@code -lof.k}).
- * </p>
- * 
+ * on a specified parameter {@code -lof.k}.
  * <p>
  * The original LOF parameter was called &quot;minPts&quot;, but for consistency
  * within ELKI we have renamed this parameter to &quot;k&quot;.
- * </p>
- * 
  * <p>
  * Compatibility note: as of ELKI 0.7.0, we no longer include the query point,
  * for consistency with other methods.
- * </p>
- * 
+ * <p>
  * Reference:
  * <p>
- * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander:<br />
- * LOF: Identifying Density-Based Local Outliers.<br />
- * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00),
- * Dallas, TX, 2000.
- * </p>
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander<br>
+ * LOF: Identifying Density-Based Local Outliers<br>
+ * Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)
  * 
  * @author Erich Schubert
  * @author Elke Achtert
@@ -93,9 +85,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", //
+@Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "LOF: Identifying Density-Based Local Outliers", //
-    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
+    booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)", //
     url = "https://doi.org/10.1145/342009.335388")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LOF")
 @Priority(Priority.RECOMMENDED)

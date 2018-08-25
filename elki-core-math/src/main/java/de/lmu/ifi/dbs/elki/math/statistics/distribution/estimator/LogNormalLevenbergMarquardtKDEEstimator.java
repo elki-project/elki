@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,10 +35,10 @@ import net.jafama.FastMath;
 /**
  * Distribution parameter estimation using Levenberg-Marquardt iterative
  * optimization and a kernel density estimation.
- * 
+ * <p>
  * Note: this estimator is rather expensive, and needs optimization in the KDE
- * phase, which currently is O(n^2)!
- * 
+ * phase, which currently is O(n²)!
+ * <p>
  * This estimator is primarily attractive when only part of the distribution was
  * observed.
  * 
@@ -67,9 +67,9 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
     MeanVariance mv = new MeanVariance();
     // X positions of samples
     double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
-      if (!(val > 0)) {
+      if(!(val > 0)) {
         throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
       }
       x[i] = FastMath.log(val);

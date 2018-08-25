@@ -24,18 +24,8 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -63,27 +53,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * Algorithm to compute dynamic-window outlier factors in a database based on a
- * specified parameter {@link Parameterizer#K_ID} ({@code -dwof.k}).
- * </p>
- *
+ * specified parameter k, which specifies the number of the neighbors to be
+ * considered during the calculation of the DWOF score.
  * <p>
- * The parameter {@link Parameterizer#K_ID} specifies the number of the
- * neighbors to be considered during the calculation of the DWOF score.
- * </p>
- *
- * <p>
- * All the distance queries -KNN and Range- are determined using the parameter
- * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
- * </p>
- *
  * Reference:
  * <p>
  * Rana Momtaz, Nesma Mohssen and Mohammad A. Gowayyed:<br>
  * DWOF: A Robust Density-Based OutlierDetection Approach.<br>
  * Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)
- * </p>
  *
  * @author Omar Yousry
  * @since 0.6.0

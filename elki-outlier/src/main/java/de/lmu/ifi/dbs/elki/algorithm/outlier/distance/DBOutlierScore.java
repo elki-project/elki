@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,17 +39,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Compute percentage of neighbors in the given neighborhood with size d.
- *
+ * <p>
  * Generalization of the DB Outlier Detection by using the fraction as outlier
  * score thus eliminating this parameter and turning the method into a ranking
  * method instead of a labelling one.
- *
+ * <p>
  * Reference:
  * <p>
- * E.M. Knorr, R. T. Ng:<br />
- * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
- * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
- * </p>
+ * E.M. Knorr, R. T. Ng:<br>
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br>
+ * In: Proc. Int. Conf. on Very Large Databases (VLDB'98)
  *
  * @author Lisa Reichert
  * @since 0.3
@@ -59,12 +58,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <O> Database object type
  */
 @Title("Distance based outlier score")
-@Description("Generalization of the original DB-Outlier approach to a ranking method, "//
-    + "by turning the fraction parameter into the output value.")
+@Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", //
-    authors = "E.M. Knorr, R. T. Ng", //
+    authors = "E. M. Knorr, R. T. Ng", //
     title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
-    booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+    booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
+    url = "http://www.vldb.org/conf/1998/p392.pdf")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore" })
 public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**

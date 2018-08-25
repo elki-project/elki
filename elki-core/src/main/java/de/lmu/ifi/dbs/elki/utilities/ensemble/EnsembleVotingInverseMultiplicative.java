@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Inverse multiplicative voting:
- * 
- * {@code 1-product(1-s_i)}
+ * \( 1-\prod_i(1-s_i) \)
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -51,7 +50,7 @@ public class EnsembleVotingInverseMultiplicative implements EnsembleVoting {
   @Override
   public double combine(double[] scores, int count) {
     double prod = 1.;
-    for (int i = 0; i < count; i++) {
+    for(int i = 0; i < count; i++) {
       prod *= (1 - scores[i]);
     }
     return 1 - prod;

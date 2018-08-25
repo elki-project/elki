@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,20 +28,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Estimator using Medians. More robust to outliers, and just slightly more
  * expensive (needs to copy the data for partial sorting to find the median).
- * 
+ * <p>
  * References:
  * <p>
- * F. R. Hampel<br />
- * The Influence Curve and Its Role in Robust Estimation<br />
- * in: Journal of the American Statistical Association, June 1974, Vol. 69, No.
- * 346
- * </p>
+ * F. R. Hampel<br>
+ * The Influence Curve and Its Role in Robust Estimation<br>
+ * Journal of the American Statistical Association, June 1974, Vol. 69, No. 346
  * <p>
- * P. J. Rousseeuw, C. Croux<br />
- * Alternatives to the Median Absolute Deviation<br />
- * in: Journal of the American Statistical Association, December 1993, Vol. 88,
+ * P. J. Rousseeuw, C. Croux<br>
+ * Alternatives to the Median Absolute Deviation<br>
+ * Journal of the American Statistical Association, December 1993, Vol. 88,
  * No. 424, Theory and Methods
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -51,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "F. R. Hampel", //
     title = "The Influence Curve and Its Role in Robust Estimation", //
     booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", //
-    url = "http://www.jstor.org/stable/10.2307/2285666")
+    url = "https://doi.org/10.2307/2285666")
 public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<LogNormalDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.

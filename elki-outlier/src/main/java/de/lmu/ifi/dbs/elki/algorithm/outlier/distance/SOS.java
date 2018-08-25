@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -49,17 +49,16 @@ import net.jafama.FastMath;
 
 /**
  * Stochastic Outlier Selection.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. Janssens, F. Huszár, E. Postma, J. van den Herik<br />
- * Stochastic Outlier Selection<br />
+ * J. Janssens, F. Huszár, E. Postma, J. van den Herik<br>
+ * Stochastic Outlier Selection<br>
  * TiCC TR 2012–001
- * </p>
  * 
  * @author Erich Schubert
  *
- * @param <O> Object type.
+ * @param <O> Object type
  */
 @Reference(authors = "J. Janssens, F. Huszár, E. Postma, J. van den Herik", //
     title = "Stochastic Outlier Selection", //
@@ -228,7 +227,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
 
   /**
    * Estimate beta from the distances in a row.
-   * 
+   * <p>
    * This lacks a thorough mathematical argument, but is a handcrafted heuristic
    * to avoid numerical problems. The average distance is usually too large, so
    * we scale the average distance by 2*N/perplexity. Then estimate beta as 1/x.
@@ -240,7 +239,8 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    */
   @Reference(authors = "Erich Schubert and Michael Gertz", //
       title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-      booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
+      booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+      url = "https://doi.org/10.1007/978-3-319-68474-1_13")
   protected static double estimateInitialBeta(DBIDRef ignore, DoubleDBIDListIter it, double perplexity) {
     double sum = 0.;
     int size = 0;

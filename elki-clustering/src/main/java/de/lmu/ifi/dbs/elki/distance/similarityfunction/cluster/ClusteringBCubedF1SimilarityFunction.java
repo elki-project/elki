@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,22 +32,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the BCubed F1 Index.
- *
+ * <p>
  * Reference:
  * <p>
- * Bagga, A. and Baldwin, B.<br />
- * Entity-based cross-document coreferencing using the Vector Space Model<br />
- * Proc. COLING '98 Proceedings of the 17th international conference on
- * Computational linguistics
- * </p>
+ * A. Bagga and B. Baldwin<br>
+ * Entity-based cross-document coreferencing using the Vector Space Model<br>
+ * Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "Bagga, A. and Baldwin, B.", //
-title = "Entity-based cross-document coreferencing using the Vector Space Model", //
-booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
-url = "https://doi.org/10.3115/980451.980859")
+@Reference(authors = "A. Bagga and B. Baldwin", //
+    title = "Entity-based cross-document coreferencing using the Vector Space Model", //
+    booktitle = "Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)", //
+    url = "https://doi.org/10.3115/980451.980859")
 public class ClusteringBCubedF1SimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.

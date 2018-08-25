@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -149,38 +149,34 @@ public class PairCounting {
 
   /**
    * Computes the pair-counting Fowlkes-mallows (flat only, non-hierarchical!)
-   *
    * <p>
-   * Fowlkes, E.B. and Mallows, C.L.<br />
-   * A method for comparing two hierarchical clusterings<br />
+   * E. B. Fowlkes and C. L. Mallows<br>
+   * A method for comparing two hierarchical clusterings<br>
    * In: Journal of the American Statistical Association, Vol. 78 Issue 383
-   * </p>
    *
    * @return pair-counting Fowlkes-mallows
    */
-  // TODO: implement for non-flat clusterings!
-  @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", //
+  @Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
       title = "A method for comparing two hierarchical clusterings", //
-      booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
+      booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
+      url = "https://doi.org/10.2307/2288117")
   public double fowlkesMallows() {
     return FastMath.sqrt(precision() * recall());
   }
 
   /**
    * Computes the Rand index (RI).
-   *
    * <p>
-   * Rand, W. M.<br />
-   * Objective Criteria for the Evaluation of Clustering Methods<br />
+   * W. M. Rand<br>
+   * Objective Criteria for the Evaluation of Clustering Methods<br>
    * Journal of the American Statistical Association, Vol. 66 Issue 336
-   * </p>
    *
    * @return The Rand index (RI).
    */
-  @Reference(authors = "Rand, W. M.", //
+  @Reference(authors = "W. M. Rand", //
       title = "Objective Criteria for the Evaluation of Clustering Methods", //
       booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
-      url = "http://www.jstor.org/stable/10.2307/2284239")
+      url = "https://doi.org/10.2307/2284239")
   public double randIndex() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3];
     return (pairconfuse[0] + pairconfuse[3]) / sum;
@@ -188,9 +184,17 @@ public class PairCounting {
 
   /**
    * Computes the adjusted Rand index (ARI).
+   * <p>
+   * L. Hubert and P. Arabie<br>
+   * Comparing partitions.<br>
+   * Journal of Classification 2(193)
    *
    * @return The adjusted Rand index (ARI).
    */
+  @Reference(authors = "L. Hubert and P. Arabie", //
+      title = "Comparing partitions", //
+      booktitle = "Journal of Classification 2(193)", //
+      url = "https://doi.org/10.1007/BF01908075")
   public double adjustedRandIndex() {
     double d = FastMath.sqrt(pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3]);
     // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
@@ -202,19 +206,38 @@ public class PairCounting {
 
   /**
    * Computes the Jaccard index
+   * <p>
+   * P. Jaccard<br>
+   * Distribution de la florine alpine dans la Bassin de Dranses et dans
+   * quelques regiones voisines<br>
+   * Bulletin del la Société Vaudoise des Sciences Naturelles
    *
    * @return The Jaccard index
    */
+  @Reference(authors = "P. Jaccard", //
+      title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
+      booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
+      url = "http://data.rero.ch/01-R241574160")
   public double jaccard() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2];
     return pairconfuse[0] / sum;
   }
 
   /**
-   * Computes the Mirkin index
+   * Computes the Mirkin index, aka Equivalence Mismatch Distance.
+   * <p>
+   * This is a multiple of the Rand index.
+   * <p>
+   * B. Mirkin<br>
+   * Mathematical Classification and Clustering
+   * </p>
    *
    * @return The Mirkin index
    */
+  @Reference(authors = "B. Mirkin", //
+      title = "Mathematical Classification and Clustering", //
+      booktitle = "Mathematical Classification and Clustering", //
+      url = "https://doi.org/10.1007/978-1-4613-0457-9")
   public long mirkin() {
     return 2 * (pairconfuse[1] + pairconfuse[2]);
   }

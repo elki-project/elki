@@ -32,35 +32,34 @@ import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
- * 
- * Transformation is done using the formula max(0, erf(lambda * (x - mean) /
- * (stddev * sqrt(2))))
- * 
+ * <p>
+ * Transformation is done using the formula
+ * \(\max\{0, \mathrm{erf}(\lambda \frac{x-\mu}{\sigma\sqrt{2}})\}\)
+ * <p>
  * Where mean can be fixed to a given value, and stddev is then computed against
  * this mean.
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
-    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
     url = "https://doi.org/10.1137/1.9781611972818.2")
 public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   /**
    * Constructor.
    * 
-   * @param fixedmean
-   * @param lambda
+   * @param fixedmean Fixed mean
+   * @param lambda Scaling factor lambda
    */
-  public MinusLogStandardDeviationScaling(Double fixedmean, Double lambda) {
+  public MinusLogStandardDeviationScaling(double fixedmean, double lambda) {
     super(fixedmean, lambda);
   }
 
@@ -76,7 +75,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(fixedmean == null) {
+    if(Double.isNaN(fixedmean)) {
       MeanVariance mv = new MeanVariance();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
 import net.jafama.FastMath;
 
 /**
- * Gaussian Weight function, scaled such that the result it 0.1 at distance ==
- * max
- * 
- * exp(-2.3025850929940455 * (distance/max)^2)
+ * Gaussian weight function, scaled such that the result it 0.1 at distance ==
+ * max, using \( \exp(-2.3025850929940455 \frac{\text{dist}^2}{\max^2}) \).
  * 
  * @author Erich Schubert
  * @since 0.2

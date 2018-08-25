@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,12 +32,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
@@ -55,14 +50,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * Shared nearest neighbor clustering.
- * </p>
  * <p>
- * Reference: L. Ertöz, M. Steinbach, V. Kumar: Finding Clusters of Different
- * Sizes, Shapes, and Densities in Noisy, High Dimensional Data. <br>
- * In: Proc. of SIAM Data Mining (SDM), 2003.
- * </p>
+ * Reference:
+ * <p>
+ * L. Ertöz, M. Steinbach, V. Kumar<br/>
+ * Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High
+ * Dimensional Data.<br>
+ * Proc. of SIAM Data Mining (SDM'03)
  *
  * @author Arthur Zimek
  * @since 0.2
@@ -73,12 +68,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " //
-+ "parameters 'minPts' and 'epsilon' (specifying a volume). " //
-+ "These two parameters determine a density threshold for clustering.")
+    + "parameters 'minPts' and 'epsilon' (specifying a volume). " //
+    + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", //
-title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", //
-booktitle = "Proc. of SIAM Data Mining (SDM), 2003", //
-url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
+    title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", //
+    booktitle = "Proc. of SIAM Data Mining (SDM'03)", //
+    url = "https://doi.org/10.1137/1.9781611972733.5")
 public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

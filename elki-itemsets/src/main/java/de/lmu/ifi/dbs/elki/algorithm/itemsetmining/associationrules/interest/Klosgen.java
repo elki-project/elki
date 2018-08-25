@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,20 +24,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Klosgen interestingness measure.
- *
+ * <p>
  * Reference:
  * <p>
- * W. Klosgen<br />
- * Explora: A multipattern and multistrategy discovery assistant<br />
- * In Advances in knowledge discovery and data mining, American Association for
- * Artificial Intelligence, 1996
- * </p>
+ * W. Klösgen<br>
+ * Explora: A multipattern and multistrategy discovery assistant<br>
+ * Advances in Knowledge Discovery and Data Mining
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "W. Klosgen", //
+@Reference(authors = "W. Klösgen", //
     title = "Explora: A multipattern and multistrategy discovery assistant", //
-    booktitle = "Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996")
+    booktitle = "Advances in Knowledge Discovery and Data Mining")
 public class Klosgen implements InterestingnessMeasure {
   /**
    * Constructor.

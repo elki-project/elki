@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,26 +52,28 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 /**
  * This tutorial will step you through implementing a well known clustering
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
- *
+ * <p>
  * This is the third step, where we add support for different linkage
  * strategies.
- *
- * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
+ * <p>
+ * This is the naive O(n³) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
- *
+ * <p>
  * Reference (for the update formulas):
  * <p>
- * A Review of Classification<br />
- * R. M. Cormack<br />
+ * R. M. Cormack<br>
+ * A Review of Classification<br>
  * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0
  *
  * @param <O> Object type
  */
-@Reference(title = "A Review of Classification", authors = "R. M. Cormack", booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", url = "http://www.jstor.org/stable/2344237")
+@Reference(authors = "R. M. Cormack", //
+    title = "A Review of Classification", //
+    booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
+    url = "https://doi.org/10.2307/2344237")
 public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger
@@ -80,8 +82,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Different linkage strategies.
-   *
-   * The update formulas here come from:<br />
+   * <p>
+   * The update formulas here come from:<br>
    * R. M. Cormack, A Review of Classification
    *
    * @author Erich Schubert

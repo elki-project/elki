@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,42 +48,38 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * is a classic hierarchical clustering algorithm. Initially, each element is
  * its own cluster; the closest clusters are merged at every step, until all the
  * data has become a single cluster.
- *
- * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
+ * <p>
+ * This is the naive O(n³) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
- *
+ * <p>
  * This implementation uses the pointer-based representation used by SLINK, so
  * that the extraction algorithms we have can be used with either of them.
- *
+ * <p>
  * The algorithm is believed to be first published (for single-linkage) by:
  * <p>
- * P. H. Sneath<br />
- * The application of computers to taxonomy<br />
+ * P. H. Sneath<br>
+ * The application of computers to taxonomy<br>
  * Journal of general microbiology, 17(1).
- * </p>
- *
+ * <p>
  * This algorithm is also known as AGNES (Agglomerative Nesting), where the use
  * of alternative linkage criterions is discussed:
  * <p>
- * L. Kaufman and P. J. Rousseeuw<br />
- * Agglomerative Nesting (Program AGNES),<br />
+ * L. Kaufman and P. J. Rousseeuw<br>
+ * Agglomerative Nesting (Program AGNES),<br>
  * in Finding Groups in Data: An Introduction to Cluster Analysis
- * </p>
- *
+ * <p>
  * Reference for the unified concept:
  * <p>
- * G. N. Lance and W. T. Williams<br />
- * A general theory of classificatory sorting strategies 1. Hierarchical systems
- * <br/>
+ * G. N. Lance and W. T. Williams<br>
+ * A general theory of classificatory sorting strategies 1. Hierarchical
+ * systems<br>
  * The computer journal 9.4 (1967): 373-380.
- * </p>
- *
+ * <p>
  * See also:
  * <p>
- * R. M. Cormack<br />
- * A Review of Classification<br />
+ * R. M. Cormack<br>
+ * A Review of Classification<br>
  * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0

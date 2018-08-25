@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -60,16 +60,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * k-means--: A Unified Approach to Clustering and Outlier Detection.
- *
+ * <p>
  * Similar to Lloyds K-means algorithm, but ignores the farthest points when
  * updating the means, considering them to be outliers.
- *
+ * <p>
  * Reference:
  * <p>
- * S. Chawla and A. Gionis<br />
- * k-means--: A Unified Approach to Clustering and Outlier Detection<br />
- * In Proc. 13th SIAM International Conference on Data Mining
- * </p>
+ * S. Chawla and A. Gionis<br>
+ * k-means--: A Unified Approach to Clustering and Outlier Detection<br>
+ * Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)
  *
  * @author Jonas Steinke
  * @since 0.7.2
@@ -82,8 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Title("K-Means--")
 @Reference(authors = "S. Chawla and A. Gionis", //
     title = "k-means--: A Unified Approach to Clustering and Outlier Detection", //
-    booktitle = "Proc. 13th SIAM International Conference on Data Mining", //
-    url = "")
+    booktitle = "Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)", //
+    url = "https://doi.org/10.1137/1.9781611972832.21")
 public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
@@ -149,7 +148,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".variance-sum");
-    assert(varstat != null); // Otherwise, the vartotal break below will fail!
+    assert (varstat != null); // Otherwise, the vartotal break below will fail!
 
     int iteration = 0;
     double prevvartotal = Double.POSITIVE_INFINITY;

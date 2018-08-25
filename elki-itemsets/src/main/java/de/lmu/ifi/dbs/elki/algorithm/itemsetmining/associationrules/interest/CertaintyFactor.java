@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,20 +25,19 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Certainty factor interestingness measure.
- *
+ * <p>
  * Reference:
  * <p>
- * F. Berzal, I. Blanco, D. Sánchez, M. Vila<br />
- * Measuring the accuracy and interest of association rules: A new
- * framework<br />
+ * F. Berzal, I. Blanco, D. Sánchez, M. Vila<br>
+ * Measuring the accuracy and interest of association rules: A new framework<br>
  * Intelligent Data Analysis, 6(3), 2002
- * </p>
  * 
  * @author Frederic Sautter
  */
 @Reference(authors = "F. Berzal, I. Blanco, D. Sánchez, M. Vila", //
     title = "Measuring the accuracy and interest of association rules: A new framework", //
-    booktitle = "Intelligent Data Analysis, 6(3), 2002")
+    booktitle = "Intelligent Data Analysis, 6(3), 2002", //
+    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00089")
 @Alias({ "Loevinger" })
 public class CertaintyFactor implements InterestingnessMeasure {
   /**

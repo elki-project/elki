@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,21 +54,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * A Trimmed Mean Approach to Finding Spatial Outliers.
- * 
+ * <p>
  * Outliers are defined by their value deviation from a trimmed mean of the
  * neighbors.
- * 
  * <p>
  * Reference: <br>
  * Tianming Hu and Sam Yuan Sung<br>
  * A Trimmed Mean Approach to finding Spatial Outliers<br>
  * in Intelligent Data Analysis, Volume 8, 2004.
- * </p>
- * 
  * <p>
- * the contiguity Matrix is definit as <br>
+ * the contiguity Matrix is definit as<br>
  * wij = 1/k if j is neighbor of i, k is the neighbors size of i.
- * </p>
  * 
  * @author Ahmed Hettab
  * @since 0.4.0
@@ -76,7 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("A local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intelligent Data Analysis, Volume 8, 2004", url = "http://iospress.metapress.com/content/PLVLT6431DVNJXNK")
+@Reference(authors = "Tianming Hu and Sam Yuan Sung", //
+    title = "A trimmed mean approach to finding spatial outliers", //
+    booktitle = "Intelligent Data Analysis, Volume 8, 2004", //
+    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00153")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

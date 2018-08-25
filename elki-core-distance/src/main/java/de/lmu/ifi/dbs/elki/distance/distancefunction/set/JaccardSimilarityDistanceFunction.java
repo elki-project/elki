@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,30 +35,30 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * A flexible extension of Jaccard similarity to non-binary vectors.
- * 
- * Jaccard coefficient is commonly defined as {@code |intersection|/|union|}.
- * 
- * We can extend this definition as follows:
- * 
- * {@code |non-zero and equal attributes|/|non-zero attributes|}.
- * 
+ * <p>
+ * Jaccard coefficient is commonly defined as \(\frac{A\cap B}{A\cup B}\).
+ * </p>
+ * We can extend this definition to non-binary vectors as follows:
+ * <p>
+ * \[\frac{|\{i\mid a_i = b_i\}|}{|\{i\mid a_i = 0 \wedge b_i = 0\}|}\]
+ * <p>
  * For binary vectors, this will obviously be the same quantity. However, this
  * version is more useful for categorical data.
- * 
+ * <p>
  * Reference:
  * <p>
- * P. Jaccard<br />
+ * P. Jaccard<br>
  * Distribution de la florine alpine dans la Bassin de Dranses et dans quelques
- * regiones voisines<br />
+ * regiones voisines<br>
  * Bulletin del la Société Vaudoise des Sciences Naturelles
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
 @Reference(authors = "P. Jaccard", //
     title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
-    booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
+    booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
+    url = "http://data.rero.ch/01-R241574160")
 @Alias("de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction")
 public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFunction<FeatureVector<?>> implements NormalizedPrimitiveSimilarityFunction<FeatureVector<?>>, NumberVectorDistanceFunction<FeatureVector<?>>, PrimitiveDistanceFunction<FeatureVector<?>> {
   /**

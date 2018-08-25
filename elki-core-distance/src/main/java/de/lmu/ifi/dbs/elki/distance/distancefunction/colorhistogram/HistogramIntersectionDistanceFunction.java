@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,9 +32,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Intersection distance for color histograms.
- * 
- * According to: M. J. Swain, D. H. Ballard:<br />
- * Color indexing<br />
+ * <p>
+ * Reference:
+ * <p>
+ * M. J. Swain, D. H. Ballard<br>
+ * Color indexing<br>
  * International Journal of Computer Vision, 7(1), 32, 1991
  * 
  * @author Erich Schubert
@@ -43,8 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", //
-title = "Color Indexing", //
-booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
+    title = "Color Indexing", //
+    booktitle = "International Journal of Computer Vision, 7(1), 32, 1991", //
+    url = "https://doi.org/10.1007/BF00130487")
 public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance
@@ -66,8 +69,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
     final int dim = dimensionality(v1, v2);
     double agg = 0., norm1 = 0., norm2 = 0.;
     for(int i = 0; i < dim; i++) {
-      final double val1 = v1.doubleValue(i);
-      final double val2 = v2.doubleValue(i);
+      final double val1 = v1.doubleValue(i), val2 = v2.doubleValue(i);
       agg += Math.min(val1, val2);
       norm1 += val1;
       norm2 += val2;
@@ -80,10 +82,8 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0., norm1 = 0, norm2 = 0.;
     for(int i = 0; i < dim; i++) {
-      final double min1 = mbr1.getMin(i);
-      final double max1 = mbr1.getMax(i);
-      final double min2 = mbr2.getMin(i);
-      final double max2 = mbr2.getMax(i);
+      final double min1 = mbr1.getMin(i), max1 = mbr1.getMax(i);
+      final double min2 = mbr2.getMin(i), max2 = mbr2.getMax(i);
       agg += Math.min(max1, max2);
       norm1 += min1;
       norm2 += min2;

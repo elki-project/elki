@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
@@ -52,18 +48,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedPara
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Implementation of the HiSC algorithm, an algorithm for detecting hierarchies
  * of subspace clusters.
  * <p>
- * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman,
- * A. Zimek<br />
- * Finding Hierarchies of Subspace Clusters. <br />
- * In: Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery
- * in Databases (PKDD'06), Berlin, Germany, 2006.
- * </p>
+ * Reference:
+ * <p>
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Ina
+ * Müller-Gorman, Arthur Zimek<br>
+ * Finding Hierarchies of Subspace Clusters. <br>
+ * Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in
+ * Databases (PKDD'06).
  * 
  * @author Elke Achtert
  * @since 0.3
@@ -74,10 +72,10 @@ import net.jafama.FastMath;
  */
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Petre Kriegel, Peer Kröger, Ina Müller-Gorman, Arthur Zimek", //
     title = "Finding Hierarchies of Subspace Clusters", //
-    booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", //
-    url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
+    booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06)", //
+    url = "https://doi.org/10.1007/11871637_42")
 public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**
    * The logger for this class.

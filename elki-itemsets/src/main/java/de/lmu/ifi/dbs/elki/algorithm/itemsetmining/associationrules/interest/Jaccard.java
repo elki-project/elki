@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,28 +23,26 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Jaccard interestingness measure: P(A u B)/(P(A)+P(B)-P(A u B))
- *
+ * Jaccard interestingness measure: \(P(A \cup B)/(P(A)+P(B)-P(A \cup B)) \)
+ * <p>
  * Reference:
  * <p>
- * P.-N. Tan, V. Kumar, J. Srivastava<br />
- * Selecting the right objective measure for association analysis<br />
+ * P.-N. Tan, V. Kumar, J. Srivastava<br>
+ * Selecting the right objective measure for association analysis<br>
  * Information Systems 29.4
- * </p>
- *
+ * <p>
  * Tan et al. credit Rijsbergen for the use of Jaccard in Information Retrieval:
  * <p>
- * C.J. van Rijsbergen<br />
- * Information Retrieval, 2nd Edition<br />
+ * C.J. van Rijsbergen<br>
+ * Information Retrieval, 2nd Edition<br>
  * Butterworths, London, 1979
- * </p>
  *
  * @author Frederic Sautter
  */
 @Reference(authors = "P.-N. Tan, V. Kumar, J. Srivastava", // )
     title = "Selecting the right objective measure for association analysis", //
-    booktitle = "Information Systems 29.4", // 9
-    url = "")
+    booktitle = "Information Systems 29.4", //
+    url = "https://doi.org/10.1016/S0306-4379(03)00072-3")
 public class Jaccard implements InterestingnessMeasure {
   /**
    * This reference is credited by Tan et al., but did not use it within

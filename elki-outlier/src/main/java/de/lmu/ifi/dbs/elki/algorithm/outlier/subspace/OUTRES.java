@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,13 +31,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -61,23 +55,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Adaptive outlierness for subspace outlier ranking (OUTRES).
- * 
- * Note: this algorithm seems to have a O(n^3) complexity without appropriate
+ * <p>
+ * Note: this algorithm seems to have a O(n³) complexity without appropriate
  * index structures to accelerate range queries: each object in each tested
  * subspace will need to know the mean and standard deviation of the density of
  * the neighbors, which in turn needs another range query.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Müller, M. Schiffer, T. Seidl<br />
- * Adaptive outlierness for subspace outlier ranking<br />
- * in: Proc. 19th ACM International Conference on Information and knowledge
- * management
- * </p>
+ * E. Müller, M. Schiffer, T. Seidl<br>
+ * Adaptive outlierness for subspace outlier ranking<br>
+ * Proc. 19th ACM Int. Conf. on Information and Knowledge Management
  * 
  * @author Viktoria Pleintinger
  * @author Erich Schubert
@@ -88,8 +81,9 @@ import net.jafama.FastMath;
  * @param <V> vector type
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", //
-title = "Adaptive outlierness for subspace outlier ranking", //
-booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
+    title = "Adaptive outlierness for subspace outlier ranking", //
+    booktitle = "Proc. 19th ACM Int. Conf. on Information and Knowledge Management", //
+    url = "https://doi.org/10.1145/1871437.1871690")
 public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

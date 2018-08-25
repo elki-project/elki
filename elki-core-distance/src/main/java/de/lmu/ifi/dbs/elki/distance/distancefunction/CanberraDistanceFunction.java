@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,27 +30,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Canberra distance function, a variation of Manhattan distance.
- *
+ * <p>
  * Canberra distance is defined as:
  * \[ \text{Canberra}(\vec{x},\vec{y}) :=
  * \sum_i \frac{|x_i-y_i|}{|x_i|+|y_i|} \]
- *
  * <p>
- * Reference:<br />
- * G. N. Lance, W. T. Williams<br />
- * Computer programs for hierarchical polythetic classification ("similarity
- * analyses")<br />
+ * Reference:<br>
+ * G. N. Lance, W. T. Williams<br>
+ * Computer Programs for Hierarchical Polythetic Classification ("Similarity
+ * Analyses")<br>
  * In: Computer Journal, Volume 9, Issue 1
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Priority(Priority.RECOMMENDED)
 @Reference(authors = "G. N. Lance, W. T. Williams", //
-    title = "Computer programs for hierarchical polythetic classification (similarity analyses)", //
+    title = "Computer Programs for Hierarchical Polythetic Classification (Similarity Analyses)", //
     booktitle = "Computer Journal, Volume 9, Issue 1", //
-    url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
+    url = "https://doi.org/10.1093/comjnl/9.1.60")
 @Alias({ "canberra" })
 public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

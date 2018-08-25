@@ -57,31 +57,28 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * In-memory iDistance index, a metric indexing method using a reference point
  * embedding.
- * 
+ * <p>
  * <b>Important note:</b> we are currently using a different query strategy. The
  * original publication discusses queries based on repeated <em>radius</em>
  * queries. We use a strategy based on shrinking spheres, iteratively refined
  * starting with the closes reference point. We also do not use a B+-tree as
  * data structure, but simple in-memory lists. Therefore, we cannot report page
  * accesses needed.
- * 
+ * <p>
  * Feel free to contribute improved query strategies. All the code is
  * essentially here, you only need to query every reference point list, not just
  * the best.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish<br />
- * Indexing the Distance: An Efficient Method to KNN Processing.<br />
+ * C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish<br>
+ * Indexing the Distance: An Efficient Method to KNN Processing.<br>
  * In Proceedings of the 27th International Conference on Very Large Data Bases
- * </p>
- * 
  * <p>
- * H. V. Jagadish, B. C. Ooi, K. L. Tan, C. Yu, R. Zhang<br />
+ * H. V. Jagadish, B. C. Ooi, K. L. Tan, C. Yu, R. Zhang<br>
  * iDistance: An adaptive B+-tree based indexing method for nearest neighbor
- * search.<br />
- * ACM Transactions on Database Systems (TODS), 30(2), 364-397.
- * </p>
+ * search.<br>
+ * ACM Transactions on Database Systems (TODS), 30(2).
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -128,7 +125,8 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    */
   @Reference(authors = "H. V. Jagadish, B. C. Ooi, K. L. Tan, C. Yu, R. Zhang", //
       title = "iDistance: An adaptive B+-tree based indexing method for nearest neighbor search", //
-      booktitle = "ACM Transactions on Database Systems (TODS), 30(2), 364-397")
+      booktitle = "ACM Transactions on Database Systems (TODS), 30(2)", //
+      url = "https://doi.org/10.1145/1071610.1071612")
   public static final Void SECOND_REFERENCE = null;
 
   /**

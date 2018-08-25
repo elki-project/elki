@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,32 +24,30 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Gini-index based interestingness measure.
- *
+ * <p>
  * Reference:
  * <p>
- * P. Tan and V. Kumar<br />
- * Interestingness measures for association patterns: A perspective<br />
+ * P. Tan, V. Kumar<br>
+ * Interestingness measures for association patterns: A perspective<br>
  * In Proc. Workshop on Postprocessing in Machine Learning and Data Mining
- * </p>
- * 
+ * <p>
  * The Gini was originally used in decision trees:
  * <p>
- * L. Breiman, J. Friedman, C. J. Stone, and R. A Olshen<br />
- * Classification and regression trees<br />
+ * L. Breiman, J. Friedman, C. J. Stone, R. A Olshen<br>
+ * Classification and regression trees<br>
  * CRC press, 1984
- * </p>
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "P. Tan and V. Kumar", //
+@Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //
-    booktitle = "Proc. of Workshop on Postprocessing in Machine Learning and Data Mining, 2000", //
+    booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
     url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
 public class GiniIndex implements InterestingnessMeasure {
   /**
    * Additional reference, for Gini.
    */
-  @Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, and R. A Olshen", //
+  @Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, R. A Olshen", //
       title = "Classification and regression trees", //
       booktitle = "CRC press, 1984")
   public static Void ADDITIONAL_REFERENCE = null;

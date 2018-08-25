@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,22 +25,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * BCubed measures.
- *
+ * <p>
  * Reference:
  * <p>
- * A. Bagga and B. Baldwin<br />
- * Entity-based cross-document coreferencing using the Vector Space Model<br />
- * Proc. COLING '98 Proceedings of the 17th international conference on
- * Computational linguistics
- * </p>
+ * A. Bagga and B. Baldwin<br>
+ * Entity-based cross-document coreferencing using the Vector Space Model<br>
+ * Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)
  *
  * @author Sascha Goldhofer
  * @since 0.5.0
  */
 @Reference(authors = "A. Bagga and B. Baldwin", //
-title = "Entity-based cross-document coreferencing using the Vector Space Model", //
-booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
-url = "https://doi.org/10.3115/980451.980859")
+    title = "Entity-based cross-document coreferencing using the Vector Space Model", //
+    booktitle = "Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)", //
+    url = "https://doi.org/10.3115/980451.980859")
 public class BCubed {
   /**
    * Result cache

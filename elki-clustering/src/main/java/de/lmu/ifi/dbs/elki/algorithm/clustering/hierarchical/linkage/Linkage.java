@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,14 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Abstract interface for implementing a new linkage method into hierarchical
  * clustering.
- * 
+ * <p>
  * Reference:
  * <p>
- * G. N. Lance and W. T. Williams<br />
- * A general theory of classificatory sorting strategies 1. Hierarchical systems
- * <br/>
+ * G. N. Lance and W. T. Williams<br>
+ * A general theory of classificatory sorting strategies 1. Hierarchical
+ * systems<br>
  * The computer journal 9.4 (1967): 373-380.
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "G. N. Lance and W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
-    url = "https://doi.org/ 10.1093/comjnl/9.4.373")
+    url = "https://doi.org/10.1093/comjnl/9.4.373")
 public interface Linkage {
   /**
    * Initialization of the distance matrix.

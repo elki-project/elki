@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,19 +24,19 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Lift interestingness measure.
- *
+ * <p>
  * Reference:
  * <p>
- * S. Brin, R. Motwani, and C. Silverstein<br />
- * Beyond market baskets: Generalizing association rules to correlations<br />
- * In ACM SIGMOD Record, volume 26, ACM, 1997
- * </p>
+ * S. Brin, R. Motwani, and C. Silverstein<br>
+ * Beyond market baskets: Generalizing association rules to correlations<br>
+ * In ACM SIGMOD Record, volume 26
  * 
  * @author Frederic Sautter
  */
 @Reference(authors = "S. Brin, R. Motwani, and C. Silverstein", //
     title = "Beyond market baskets: Generalizing association rules to correlations", //
-    booktitle = "ACM SIGMOD Record, volume 26, ACM, 1997")
+    booktitle = "ACM SIGMOD Record, volume 26", //
+    url = "https://doi.org/10.1145/253260.253327")
 public class Lift implements InterestingnessMeasure {
   /**
    * Constructor.

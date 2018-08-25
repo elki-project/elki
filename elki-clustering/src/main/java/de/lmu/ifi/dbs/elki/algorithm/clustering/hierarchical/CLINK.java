@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -35,8 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * CLINK algorithm for complete linkage.
- *
- * This algorithm runs in O(n^2) time, and needs only O(n) memory. The results
+ * <p>
+ * This algorithm runs in O(n²) time, and needs only O(n) memory. The results
  * can differ from the standard algorithm in unfavorable ways, and are
  * order-dependent (Defays: "Modifications of the labeling permit us to obtain
  * different minimal superior ultrametric dissimilarities"). Unfortunately, the
@@ -44,13 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * expensive algorithms for complete linkage clustering. This arises from the
  * fact that this algorithm has to add the new object to the existing tree in
  * every step, instead of being able to always do the globally best merge.
- *
+ * <p>
  * Reference:
  * <p>
- * D. Defays<br />
- * An Efficient Algorithm for the Complete Link Cluster Method<br />
+ * D. Defays<br>
+ * An Efficient Algorithm for the Complete Link Cluster Method<br>
  * In: The Computer Journal 20.4
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -60,9 +55,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
 @Reference(authors = "D. Defays", //
-title = "An Efficient Algorithm for the Complete Link Cluster Method", //
-booktitle = "The Computer Journal 20.4", //
-url = "https://doi.org/10.1093/comjnl/20.4.364")
+    title = "An Efficient Algorithm for the Complete Link Cluster Method", //
+    booktitle = "The Computer Journal 20.4", //
+    url = "https://doi.org/10.1093/comjnl/20.4.364")
 @Alias("Defays")
 public class CLINK<O> extends SLINK<O> {
   /**

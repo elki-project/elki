@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,13 +29,13 @@ import net.jafama.FastMath;
 
 /**
  * Generalized logistic distribution. (Type I, Skew-logistic distribution)
- * 
+ * <p>
  * One of multiple ways of generalizing the logistic distribution.
- * 
- * {@code pdf(x) = shape * FastMath.exp(-x) / (1 + FastMath.exp(-x))**(shape+1)}
- * 
- * {@code cdf(x) = FastMath.pow(1+FastMath.exp(-x), -shape)}
- * 
+ * <br>
+ * {@code pdf(x) = shape * exp(-x) / (1 + exp(-x))**(shape+1)}
+ * <br>
+ * {@code cdf(x) = pow(1+exp(-x), -shape)}
+ * <br>
  * Where {@code shape=1} yields the regular logistic distribution.
  * 
  * @author Erich Schubert

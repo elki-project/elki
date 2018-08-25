@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -65,14 +65,12 @@ import net.jafama.FastMath;
  * are in the set of normal objects and the set of anomalous objects is empty.
  * An iterative procedure then transfers objects from the ordinary set to the
  * anomalous set if the transfer increases the overall likelihood of the data.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Eskin<br />
- * Anomaly detection over noisy data using learned probability distributions.
- * <br />
- * In Proc. of the Seventeenth International Conference on Machine Learning
- * (ICML-2000).
+ * E. Eskin<br>
+ * Anomaly detection over noisy data using learned probability distributions<br>
+ * Proc. 17th Int. Conf. on Machine Learning (ICML-2000)
  * </p>
  *
  * @author Lisa Reichert
@@ -83,9 +81,10 @@ import net.jafama.FastMath;
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
 @Reference(prefix = "Generalization using the likelihood gain as outlier score of", //
-authors = "E. Eskin", //
-title = "Anomaly detection over noisy data using learned probability distributions", //
-booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
+    authors = "E. Eskin", //
+    title = "Anomaly detection over noisy data using learned probability distributions", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML-2000)", //
+    url = "https://doi.org/10.7916/D8C53SKF")
 public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

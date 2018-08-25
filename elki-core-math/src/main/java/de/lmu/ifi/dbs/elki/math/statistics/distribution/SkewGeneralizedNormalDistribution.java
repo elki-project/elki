@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,23 +35,23 @@ import net.jafama.FastMath;
 /**
  * Generalized normal distribution by adding a skew term, similar to lognormal
  * distributions.
- * 
+ * <p>
  * This is one kind of generalized normal distributions. Note that there are
  * multiple that go by the name of a "Generalized Normal Distribution"; this is
  * what is currently called "version 2" in English Wikipedia.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking and J. R. Wallis<br />
+ * J. R. M. Hosking and J. R. Wallis<br>
  * Regional frequency analysis: an approach based on L-moments
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
 @Reference(authors = "J. R. M. Hosking and J. R. Wallis", //
     title = "Regional frequency analysis: an approach based on L-moments", //
-    booktitle = "")
+    booktitle = "Regional frequency analysis: an approach based on L-moments", //
+    url = "https://doi.org/10.1017/CBO9780511529443")
 public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   /**
    * Location.
@@ -180,7 +180,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma, double skew) {
-    if (x != x) {
+    if(x != x) {
       return Double.NaN;
     }
     x = (x - mu) / sigma; // Scale
@@ -203,7 +203,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @return log PDF of the given normal distribution at x.
    */
   public static double logpdf(double x, double mu, double sigma, double skew) {
-    if (x != x) {
+    if(x != x) {
       return Double.NaN;
     }
     x = (x - mu) / sigma;
@@ -267,7 +267,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
      */
     public static final OptionID SKEW_ID = new OptionID("distribution.skewgnormal.skew", "Skew of the distribution.");
 
-    /** Parameters. */
+    /** Parameters */
     double mean, sigma, skew;
 
     @Override

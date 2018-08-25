@@ -75,29 +75,27 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * strategy. Starting with the best candidate only as initial ensemble, the most
  * diverse candidate is investigated at each step. If it improves towards the
  * (estimated) target vector, it is added, otherwise it is discarded.
- *
+ * <p>
  * This approach is naive, and it may be surprising that it can improve results.
  * The reason is probably that diversity will result in a comparable ensemble,
  * while the reduced ensemble size is actually responsible for the improvements,
  * by being more decisive and less noisy due to dropping "unhelpful" members.
- *
+ * <p>
  * This still leaves quite a bit of room for improvement. If you build upon this
  * basic approach, please acknowledge our proof of concept work.
- *
+ * <P>
  * Reference:
  * <p>
- * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
- * On Evaluation of Outlier Rankings and Outlier Scores<br />
- * In Proceedings of the 12th SIAM International Conference on Data Mining
- * (SDM), Anaheim, CA, 2012.
- * </p>
+ * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>
+ * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
-    booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.", //
+    booktitle = "Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)", //
     url = "https://doi.org/10.1137/1.9781611972825.90")
 public class GreedyEnsembleExperiment extends AbstractApplication {
   /**

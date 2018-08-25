@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,23 +29,21 @@ import net.jafama.FastMath;
 
 /**
  * Derivative Dynamic Time Warping distance for numerical vectors.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. J. Keogh and M. J. Pazzani<br />
- * Derivative dynamic time warping<br />
- * In the 1st SIAM International Conference on Data Mining (SDM-2001), Chicago,
- * IL, USA.
- * </p>
+ * E. J. Keogh, M. J. Pazzani<br>
+ * Derivative dynamic time warping<br>
+ * 1st SIAM Int. Conf. on Data Mining (SDM-2001)
  * 
  * @author Lara Hirschbeck, Daniel Kolb
  * @since 0.2
  */
 @Title("Derivative dynamic time warping")
-@Reference(authors = "E. J. Keogh and M. J. Pazzani", //
-title = "Derivative dynamic time warping", //
-booktitle = "1st SIAM International Conference on Data Mining (SDM-2001)", //
-url = "https://siam.org/proceedings/datamining/2001/dm01_01KeoghE.pdf")
+@Reference(authors = "E. J. Keogh, M. J. Pazzani", //
+    title = "Derivative dynamic time warping", //
+    booktitle = "1st SIAM Int. Conf. on Data Mining (SDM-2001)", //
+    url = "https://doi.org/10.1137/1.9781611972719.1")
 public class DerivativeDTWDistanceFunction extends DTWDistanceFunction {
   /**
    * Constructor.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Class to load an outlier detection summary file, as produced by
  * {@link ComputeKNNOutlierScores}, and compute popular evaluation metrics for
  * it.
- *
+ * <p>
  * File format description:
  * <ul>
  * <li>Each column is one object in the data set</li>
@@ -60,10 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * <tt>bylabel</tt>, where <tt>0</tt> indicates an inlier and <tt>1</tt>
  * indicates an outlier</li>
  * </ul>
- *
  * The evaluation assumes that high scores correspond to outliers, unless the
- * method name matches the pattern given using
- * {@link Parameterizer#REVERSED_ID}.
+ * method name matches the pattern given using {@code -reversed}.
  * The default value matches several scores known to use reversed values.
  *
  * @author Erich Schubert

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,12 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -49,17 +44,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Performs a self-tuning local PCA based on the covariance matrices of given
  * objects. At most the closest 'k' points are used in the calculation and a
  * weight function is applied.
- *
+ * <p>
  * The number of points used depends on when the strong eigenvectors exhibit the
  * clearest correlation.
- *
+ * <p>
+ * Reference:
+ * <p>
+ * A General Framework for Increasing the Robustness of PCA-Based Correlation
+ * Clustering Algorithms<br>
+ * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek<br>
+ * Proc. 20th Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM)
+ * 
  * @author Erich Schubert
  * @since 0.5.0
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
-booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", //
-url = "https://doi.org/10.1007/978-3-540-69497-7_27")
+    title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
+    booktitle = "Proc. 20th Intl. Conf. on Scientific and Statistical Database Management (SSDBM)", //
+    url = "https://doi.org/10.1007/978-3-540-69497-7_27")
 public class AutotuningPCA extends PCARunner {
   /**
    * Filter to select eigenvectors.
@@ -219,10 +222,11 @@ public class AutotuningPCA extends PCARunner {
   private double computeExplainedVariance(SortedEigenPairs eigenPairs, int filteredEigenPairs) {
     double strongsum = 0.0;
     double weaksum = 0.0;
-    for (int i = 0; i < eigenPairs.size(); i++) {
-      if (i <= filteredEigenPairs) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
+      if(i <= filteredEigenPairs) {
         strongsum += eigenPairs.eigenValue(i);
-      } else {
+      }
+      else {
         weaksum += eigenPairs.eigenValue(i);
       }
     }
@@ -249,7 +253,7 @@ public class AutotuningPCA extends PCARunner {
       try {
         ModifiableDoubleDBIDList.class.cast(results).sort();
       }
-      catch(ClassCastException|UnsupportedOperationException e) {
+      catch(ClassCastException | UnsupportedOperationException e) {
         LoggingUtil.warning("WARNING: results not sorted by distance!", e);
       }
     }

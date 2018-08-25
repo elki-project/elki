@@ -48,28 +48,27 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * FP-Growth is an algorithm for mining the frequent itemsets by using a
  * compressed representation of the database called {@link FPTree}.
- *
+ * <p>
  * FP-Growth first sorts items by the overall frequency, since having high
  * frequent items appear first in the tree leads to a much smaller tree since
  * frequent subsets will likely share the same path in the tree. FP-Growth is
  * beneficial when you have a lot of (near-) duplicate transactions, and are
  * using a not too high support threshold, as it only prunes single items, not
  * item combinations.
- *
+ * <p>
  * This implementation is in-memory only, and has not yet been carefully
  * optimized.
- *
- * The worst case memory use probably is O(min(n*l,i^l)) where i is the number
- * of items, l the average itemset length, and n the number of items. The worst
- * case scenario is when every item is frequent, and every transaction is
+ * <p>
+ * The worst case memory use probably is \(O(\min(n\cdot l,i^l))\) where i is the
+ * number of items, l the average itemset length, and n the number of items. The
+ * worst case scenario is when every item is frequent, and every transaction is
  * unique. The resulting tree will then be larger than the original data.
- *
+ * <p>
  * Reference:
  * <p>
- * J. Han, J. Pei, Y. Yin<br />
- * Mining frequent patterns without candidate generation<br />
+ * J. Han, J. Pei, Y. Yin<br>
+ * Mining frequent patterns without candidate generation<br>
  * In Proc. ACM SIGMOD Int. Conf. Management of Data (SIGMOD 2000)
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0

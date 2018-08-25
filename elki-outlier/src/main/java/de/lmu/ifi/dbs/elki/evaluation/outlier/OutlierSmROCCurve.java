@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,23 +45,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 /**
  * Smooth ROC curves are a variation of classic ROC curves that takes the scores
  * into account.
- *
+ * <p>
  * Reference:
  * <p>
- * W. Klement, P. A. Flach, N. Japkowicz, S. Matwin<br />
- * Smooth Receiver Operating Characteristics (smROC) Curves.<br />
- * In: European Conference on Machine Learning and Principles and Practice of
- * Knowledge Discovery in Databases (ECML-PKDD'11)
- * </p>
- *
+ * W. Klement, P. A. Flach, N. Japkowicz, S. Matwin<br>
+ * Smooth Receiver Operating Characteristics (smROC) Curves.<br>
+ * European Conf. Machine Learning and Principles and Practice of Knowledge
+ * Discovery in Databases (ECML-PKDD'11)
+ * <p>
  * However, this method has some deficiencies when the mean score is not 0.5, as
  * discussed in:
  * <p>
- * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
- * On Evaluation of Outlier Rankings and Outlier Scores<br />
- * In Proceedings of the 12th SIAM International Conference on Data Mining
- * (SDM), Anaheim, CA, 2012.
- * </p>
+ * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>
+ * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -70,9 +67,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.has SmROCResult oneway - - «create»
  */
 @Reference(authors = "W. Klement, P. A. Flach, N. Japkowicz, S. Matwin", //
-title = "Smooth Receiver Operating Characteristics (smROC) Curves", //
-booktitle = "In: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML-PKDD'11)", //
-url = "https://doi.org/10.1007/978-3-642-23783-6_13")
+    title = "Smooth Receiver Operating Characteristics (smROC) Curves", //
+    booktitle = "European Conf. Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML-PKDD'11)", //
+    url = "https://doi.org/10.1007/978-3-642-23783-6_13")
 public class OutlierSmROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.

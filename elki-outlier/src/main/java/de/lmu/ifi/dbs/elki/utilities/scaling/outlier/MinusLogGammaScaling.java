@@ -28,25 +28,25 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
  * by assuming a Gamma distribution on the data and evaluating the Gamma CDF.
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
-    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
     url = "https://doi.org/10.1137/1.9781611972818.2")
 public class MinusLogGammaScaling extends OutlierGammaScaling {
   /**
@@ -100,8 +100,6 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
-    // valatmean"+atmean);
   }
 
   /**

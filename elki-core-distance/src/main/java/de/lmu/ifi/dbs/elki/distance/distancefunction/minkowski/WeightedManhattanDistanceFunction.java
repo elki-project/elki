@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,11 +27,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Weighted version of the Minkowski L_p metrics distance function for
- * {@link NumberVector}s.
+ * Weighted version of the Manhattan (L<sub>1</sub>) metric.
  * 
  * Weighted Manhattan distance is defined as:
- * \[ \text{Manhattan}_{\vec{w}}(\vec{x},\vec{y}) := \sum_i w_i |x_i-y_i|\right \]
+ * \[ \text{Manhattan}_{\vec{w}}(\vec{x},\vec{y}) := \sum_i w_i |x_i-y_i| \]
  * 
  * @author Erich Schubert
  * @since 0.4.0

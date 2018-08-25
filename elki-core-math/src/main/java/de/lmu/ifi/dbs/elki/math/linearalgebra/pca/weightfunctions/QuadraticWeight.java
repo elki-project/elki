@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
 /**
  * Quadratic weight function, scaled using the maximum to reach 0.1 at that
  * point.
- * 
- * 1.0 - 0.9 * (distance/max)^2
+ * <p>
+ * 1.0 - 0.9 * (distance/max)²
  * 
  * @author Erich Schubert
  * @since 0.2

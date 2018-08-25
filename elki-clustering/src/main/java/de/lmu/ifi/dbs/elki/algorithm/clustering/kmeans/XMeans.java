@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -60,19 +60,17 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * X-means: Extending K-means with Efficient Estimation on the Number of
  * Clusters.
- *
- * Note: this implementation does currently <em>not</em> use a k-d-tree for
- * acceleration. Also note that k_max is not a hard threshold - the algorithm
- * can return up to 2*k_max clusters!
- *
- * Reference:<br>
  * <p>
- * D. Pelleg, A. Moore:<br />
+ * Note: this implementation does currently <em>not</em> use a k-d-tree for
+ * acceleration. Also note that kmax is not a hard threshold - the algorithm
+ * can return up to 2*kmax clusters!
+ * <p>
+ * Reference:
+ * <p>
+ * D. Pelleg, A. Moore:<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
- * Clusters<br />
- * In: Proceedings of the 17th International Conference on Machine Learning
- * (ICML 2000)
- * </p>
+ * Clusters<br>
+ * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
@@ -83,7 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-    booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
     url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public class XMeans<V extends NumberVector, M extends MeanModel> extends AbstractKMeans<V, M> {
   /**

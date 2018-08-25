@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,21 +32,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the Fowlkes-Mallows Index.
- *
+ * <p>
  * Reference:
  * <p>
- * Fowlkes, E.B. and Mallows, C.L.<br />
- * A method for comparing two hierarchical clusterings<br />
+ * E. B. Fowlkes and C. L. Mallows<br>
+ * A method for comparing two hierarchical clusterings<br>
  * In: Journal of the American Statistical Association, Vol. 78 Issue 383
- * </p>
- *
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", //
-title = "A method for comparing two hierarchical clusterings", //
-booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
+@Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
+    title = "A method for comparing two hierarchical clusterings", //
+    booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
+    url = "https://doi.org/10.2307/2288117")
 public class ClusteringFowlkesMallowsSimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.

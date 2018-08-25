@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -53,14 +53,13 @@ import net.jafama.FastMath;
 
 /**
  * Intrinsic stochastic outlier score.
- * 
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert and Michael Gertz<br />
+ * Erich Schubert and Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
- * Detection: A Remedy Against the Curse of Dimensionality?<br />
+ * Detection: A Remedy Against the Curse of Dimensionality?<br>
  * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
- * </p>
  * 
  * @author Erich Schubert
  *
@@ -68,7 +67,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "Erich Schubert and Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017")
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+    url = "https://doi.org/10.1007/978-3-319-68474-1_13")
 public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

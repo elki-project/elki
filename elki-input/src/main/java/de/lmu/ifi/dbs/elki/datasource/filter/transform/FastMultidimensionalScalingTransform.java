@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,11 +50,11 @@ import net.jafama.FastMath;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
- *
+ * <p>
  * This implementation uses power iterations, which is faster when the number of
  * data points is much larger than the desired number of dimensions.
- *
- * This implementation is O(n^2), and uses O(n^2) memory.
+ * <p>
+ * This implementation is O(n²), and uses O(n²) memory.
  *
  * @author Erich Schubert
  * @since 0.6.0

@@ -50,16 +50,15 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * tSNE using Barnes-Hut-Approximation.
- * 
+ * <p>
  * For larger data sets, use an index to make finding the nearest neighbors
  * faster, e.g. cover tree or k-d-tree.
- * 
+ * <p>
  * Reference:
  * <p>
- * L. J. P. van der Maaten<br />
- * Accelerating t-SNE using Tree-Based Algorithms<br />
+ * L. J. P. van der Maaten<br>
+ * Accelerating t-SNE using Tree-Based Algorithms<br>
  * Journal of Machine Learning Research 15
- * </p>
  *
  * @author Erich Schubert
  *
@@ -80,14 +79,14 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
   /**
    * Threshold for optimizing perplexity.
-   * 
+   * <p>
    * We deliberately allow more error than with "slow" tSNE.
    */
   final static protected double PERPLEXITY_ERROR = 1e-4;
 
   /**
    * Maximum number of iterations when optimizing perplexity.
-   * 
+   * <p>
    * We deliberately allow more error than with "slow" tSNE.
    */
   final static protected int PERPLEXITY_MAXITER = 25;
@@ -271,7 +270,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
   /**
    * Quad Tree for use in a Barnes-Hut approximation.
-   * 
+   * <p>
    * This tree stores in every node the number of points contained, the center
    * of mass, and the diagonal of the cell.
    * 
@@ -501,7 +500,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
     /**
      * Compute the square size of a bounding box.
-     * 
+     * <p>
      * Note that van der Maaten writes "diagonal", while his source code uses
      * the maximum edge length. Barnes and Hut used the cell edge size of a
      * square quad tree.

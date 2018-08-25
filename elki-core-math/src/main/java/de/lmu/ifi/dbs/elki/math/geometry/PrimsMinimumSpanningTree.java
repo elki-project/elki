@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,15 +26,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Prim's algorithm for finding the minimum spanning tree.
- * 
+ * <p>
  * Implementation for <em>dense</em> graphs, represented as distance matrix.
- * 
+ * <p>
  * Reference:
  * <p>
- * R. C. Prim<br />
- * Shortest connection networks and some generalizations<br />
+ * R. C. Prim<br>
+ * Shortest connection networks and some generalizations<br>
  * In: Bell System Technical Journal, 36 (1957), pp. 1389–140
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.5.5
@@ -44,7 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "R. C. Prim", //
     title = "Shortest connection networks and some generalizations", //
-    booktitle = "Bell System Technical Journal, 36 (1957)")
+    booktitle = "Bell System Technical Journal, 36 (1957)", //
+    url = "https://doi.org/10.1002/j.1538-7305.1957.tb01515.x")
 public class PrimsMinimumSpanningTree {
   /**
    * Adapter class for double[][] matrixes.

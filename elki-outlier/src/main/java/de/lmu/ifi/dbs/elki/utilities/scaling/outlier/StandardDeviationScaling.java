@@ -33,36 +33,36 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
- * 
- * Transformation is done using the formula max(0, erf(lambda * (x - mean) /
- * (stddev * sqrt(2))))
- * 
+ * <p>
+ * Transformation is done using the formula
+ * \(\max\{0, \mathrm{erf}(\lambda \frac{x-\mu}{\sigma\sqrt{2}})\}\)
+ * <p>
  * Where mean can be fixed to a given value, and stddev is then computed against
  * this mean.
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
-    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
     url = "https://doi.org/10.1137/1.9781611972818.2")
 public class StandardDeviationScaling implements OutlierScaling {
   /**
    * Field storing the fixed mean to use
    */
-  protected Double fixedmean = null;
+  protected double fixedmean = Double.NaN;
 
   /**
    * Field storing the lambda value
@@ -85,7 +85,7 @@ public class StandardDeviationScaling implements OutlierScaling {
    * @param fixedmean Fixed mean
    * @param lambda Scaling factor lambda
    */
-  public StandardDeviationScaling(Double fixedmean, double lambda) {
+  public StandardDeviationScaling(double fixedmean, double lambda) {
     super();
     this.fixedmean = fixedmean;
     this.lambda = lambda;
@@ -95,7 +95,7 @@ public class StandardDeviationScaling implements OutlierScaling {
    * Constructor.
    */
   public StandardDeviationScaling() {
-    this(null, 1.0);
+    this(Double.NaN, 1.0);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class StandardDeviationScaling implements OutlierScaling {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(fixedmean == null) {
+    if(Double.isNaN(fixedmean)) {
       MeanVariance mv = new MeanVariance();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
@@ -143,7 +143,7 @@ public class StandardDeviationScaling implements OutlierScaling {
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if(fixedmean == null) {
+    if(Double.isNaN(fixedmean)) {
       MeanVariance mv = new MeanVariance();
       final int size = adapter.size(array);
       for(int i = 0; i < size; i++) {
@@ -195,22 +195,22 @@ public class StandardDeviationScaling implements OutlierScaling {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify a fixed mean to use.
-     * <p>
-     * Key: {@code -stddevscale.mean}
-     * </p>
      */
     public static final OptionID MEAN_ID = new OptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
 
     /**
      * Parameter to specify the lambda value
-     * <p>
-     * Key: {@code -stddevscale.lambda}
-     * </p>
      */
     public static final OptionID LAMBDA_ID = new OptionID("stddevscale.lambda", "Significance level to use for error function.");
 
-    protected Double fixedmean = null;
+    /**
+     * Field storing the fixed mean to use
+     */
+    protected double fixedmean = Double.NaN;
 
+    /**
+     * Field storing the lambda value
+     */
     protected double lambda;
 
     @Override

@@ -45,12 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Distance matrix, for precomputing similarity for a small data set.
- *
+ * <p>
  * This class uses a linear memory layout (not a ragged array), and assumes
  * symmetry as well as strictness. This way, it only stores the upper triangle
  * matrix with double precision. It has to store (n-1) * (n-2) distance values
  * in memory, requiring 8 * (n-1) * (n-2) bytes. Since Java has a size limit of
- * arrays of 31 bits (signed integer), we can store at most 2^16 objects
+ * arrays of 31 bits (signed integer), we can store at most \(2^16\) objects
  * (precisely, 65536 objects) in a single array, which needs about 16 GB of RAM.
  *
  * @author Erich Schubert

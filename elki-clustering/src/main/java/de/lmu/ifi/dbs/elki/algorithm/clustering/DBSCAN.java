@@ -31,14 +31,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -60,13 +53,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Density-Based Clustering of Applications with Noise (DBSCAN), an algorithm to
  * find density-connected sets in a database.
  * <p>
- * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, X. Xu<br />
+ * Reference:
+ * <p>
+ * Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu<br>
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
- * with Noise<br />
- * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
- * Portland, OR, 1996.
- * </p>
+ * with Noise<br>
+ * Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)
+ * <p>
+ * Further discussion:
+ * <p>
+ * Erich Schubert, Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br>
+ * DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN<br>
+ * ACM Trans. Database Systems (TODS)
  *
  * @author Arthur Zimek
  * @author Erich Schubert
@@ -75,16 +73,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
+@Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
     title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
-    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-    url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
+    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
+    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php")
 @Priority(Priority.RECOMMENDED)
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(DBSCAN.class);
+
+  /**
+   * Additional reference
+   */
+  @Reference(authors = "Erich Schubert, Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
+      title = "DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN", //
+      booktitle = "ACM Trans. Database Systems (TODS)", //
+      url = "https://doi.org/10.1145/3068335")
+  private static final Void SECOND_REFERENCE = null;
 
   /**
    * Holds the epsilon radius threshold.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,8 +47,12 @@ import net.jafama.FastMath;
  * 
  * This process is also known as "Whitening transformation".
  * 
- * If you want to also reduce dimensionality, set the
- * {@link Parameterizer#FILTER_ID} parameter!
+ * If you want to also reduce dimensionality, set the {@code -pca.filter}
+ * parameter! Note that this implementation currently will always perform a full
+ * matrix inversion. For very high dimensional data, this can take an excessive
+ * amount of time O(d³) and memory O(d²). Please contribute a better
+ * implementation to ELKI that only computes the requiried dimensions, yet
+ * allows for the same filtering flexibility.
  * 
  * @author Erich Schubert
  * @since 0.5.0

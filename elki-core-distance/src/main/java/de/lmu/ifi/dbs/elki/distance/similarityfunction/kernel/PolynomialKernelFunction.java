@@ -38,7 +38,7 @@ import net.jafama.FastMath;
 
 /**
  * Polynomial Kernel function that computes a similarity between the two feature
- * vectors V1 and V2 defined by (V1^T*V2)^degree.
+ * vectors x and y defined by \((x^T\cdot y)^{\text{degree}}\).
  * 
  * @author Simon Paradies
  * @since 0.2

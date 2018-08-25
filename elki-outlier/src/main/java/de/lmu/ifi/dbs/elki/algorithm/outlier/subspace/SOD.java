@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -74,14 +69,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Subspace Outlier Degree. Outlier detection method for axis-parallel
  * subspaces.
- * 
+ * <p>
  * Reference:
  * <p>
- * * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek:<br />
- * Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data<br />
- * In: Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery
- * and Data Mining (PAKDD), Bangkok, Thailand, 2009
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:<br>
+ * Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data<br>
+ * Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2009)
  * 
  * @author Arthur Zimek
  * @since 0.2
@@ -93,7 +86,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "https://doi.org/10.1007/978-3-642-01307-2")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+    title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", //
+    booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2009)", //
+    url = "https://doi.org/10.1007/978-3-642-01307-2_86")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.SOD")
 public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

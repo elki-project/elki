@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,14 +57,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * COPAC is an algorithm to partition a database according to the correlation
  * dimension of its objects and to then perform an arbitrary clustering
  * algorithm over the partitions.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek:<br />
- * Robust, Complete, and Efficient Correlation Clustering.<br />
- * In Proc. 7th SIAM International Conference on Data Mining (SDM'07),
- * Minneapolis, MN, 2007
- * </p>
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur
+ * Zimek<br>
+ * Robust, Complete, and Efficient Correlation Clustering<br>
+ * Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)
  * 
  * @author Arthur Zimek
  * @since 0.2
@@ -76,11 +75,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " //
-+ "a clustering algorithm over the partitions.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", //
-title = "Robust, Complete, and Efficient Correlation Clustering", //
-booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", //
-url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+    + "a clustering algorithm over the partitions.")
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
+    title = "Robust, Complete, and Efficient Correlation Clustering", //
+    booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
+    url = "https://doi.org/10.1137/1.9781611972771.37")
 public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<DimensionModel>> implements ClusteringAlgorithm<Clustering<DimensionModel>> {
   /**
    * The logger for this class.
@@ -154,7 +153,7 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
      * Class to compute PCA.
      */
     public PCARunner pca;
-    
+
     /**
      * Eigenpair filter.
      */
@@ -193,7 +192,7 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
     protected void makeOptions(Parameterization config) {
       settings = new Settings();
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         settings.k = kP.intValue();
       }
@@ -206,12 +205,12 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
         settings.filter = filterP.instantiateClass(config);
       }
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         settings.epsilon = epsilonP.doubleValue();
       }
       IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         settings.minpts = minptsP.intValue();
       }

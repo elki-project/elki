@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Drop-in replacement for {@link java.util.Random}, but not using atomic long
  * seeds. This implementation is <em>no longer thread-safe</em> (but faster)!
- * 
+ * <p>
  * It is still the same Linear Congruential Generator (LCG), with a cycle length
- * of 2^48, of which we only use 32 bits at a time. Given the same seed, it is
- * expected to produce the exact same random sequence as Java's
+ * of 2<sup>48</sup>, of which we only use 32 bits at a time. Given the same
+ * seed, it is expected to produce the exact same random sequence as Java's
  * {@link java.util.Random}.
  * 
  * @author Erich Schubert
@@ -102,16 +102,15 @@ public class FastNonThreadsafeRandom extends Random {
    * that one {@code int} value in the specified range is pseudorandomly
    * generated and returned. All {@code n} possible {@code int} values are
    * produced with (approximately) equal probability.
-   * 
+   * <p>
    * In contrast to the Java version, we use an approach that tries to avoid
    * divisions for performance. We will have a slightly worse distribution in
    * this fast version (see the XorShift generators for higher quality with
    * rejection sampling) discussed in:
    * <p>
-   * D. Lemire<br />
-   * Fast random shuffling<br />
+   * D. Lemire<br>
+   * Fast random shuffling<br>
    * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
-   * </p>
    */
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //
@@ -133,16 +132,15 @@ public class FastNonThreadsafeRandom extends Random {
    * that one {@code int} value in the specified range is pseudorandomly
    * generated and returned. All {@code n} possible {@code int} values are
    * produced with (approximately) equal probability.
-   * 
+   * <p>
    * In contrast to the Java version, we use an approach that tries to avoid
    * divisions for performance. In this method, we also employ rejection
    * sampling (for marginal improvement) as discussed in:
    * <p>
-   * D. Lemire<br />
-   * Fast random shuffling<br />
+   * D. Lemire<br>
+   * Fast random shuffling<br>
    * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
-   * </p>
-   * 
+   * <p>
    * In our experiments, the difference was negligible, as the rejections are
    * quite rare events at least for our use case.
    */

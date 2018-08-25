@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,15 +55,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * COPAC neighborhood predicate.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm H.-P. Kriegel, P. Kröger, A. Zimek:<br />
- * Robust, Complete, and Efficient Correlation Clustering.<br />
- * In Proc. 7th SIAM International Conference on Data Mining (SDM'07),
- * Minneapolis, MN, 2007
- * </p>
- * 
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur
+ * Zimek<br>
+ * Robust, Complete, and Efficient Correlation Clustering<br>
+ * Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)
+ * <p>
  * TODO: improve performance by allowing index support for finding neighbors
  * and/or exploiting the data partitioning better.
  * 
@@ -73,10 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", //
-title = "Robust, Complete, and Efficient Correlation Clustering", //
-booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", //
-url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
+    title = "Robust, Complete, and Efficient Correlation Clustering", //
+    booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
+    url = "https://doi.org/10.1137/1.9781611972771.37")
 public class COPACNeighborPredicate<V extends NumberVector> implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
   /**
    * The logger for this class.
@@ -106,7 +105,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
 
   @Override
   public NeighborPredicate.Instance<COPACModel> instantiate(Database database) {
-    return instantiate(database, database.<V>getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return instantiate(database, database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -121,7 +120,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     KNNQuery<V> knnq = database.getKNNQuery(dq, settings.k);
 
     WritableDataStore<COPACModel> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, COPACModel.class);
-    
+
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

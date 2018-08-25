@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,15 +45,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * The default DBSCAN and OPTICS neighbor predicate, using an
  * epsilon-neighborhood.
- *
+ * <p>
  * Reference:
  * <p>
- * M. Ester, H.-P. Kriegel, J. Sander, X. Xu<br />
+ * Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu<br>
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
- * with Noise<br />
- * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
- * Portland, OR, 1996.
- * </p>
+ * with Noise<br>
+ * Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -62,10 +60,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> object type
  */
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
-title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
-booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
+@Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
+    title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
+    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php")
 public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBIDList> {
   /**
    * Range to query with
@@ -187,7 +185,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
       }
       // Get the epsilon parameter
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

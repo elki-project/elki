@@ -27,29 +27,26 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Scaling function to invert values basically by computing 1/x, but in a variation
- * that maps the values to the [0:1] interval and avoiding division by 0.
- * 
+ * Scaling function to invert values by computing 1/x, but in a variation that
+ * maps the values to the [0:1] interval and avoiding division by 0.
+ * <p>
  * The exact formula can be written as
- * 
- * 1 / (value * max_{x!=0}(1 / abs(x))) = min_{x != 0}(abs(x)) / x
- * 
+ * \[ 1 / (v \cdot \max_{x\neq 0}\frac{1}{|x|}) = \min_{x \neq 0}(|x|) / v \]
  * with 1 / 0 := 1
- * 
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
- * Interpreting and Unifying Outlier Scores<br />
- * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
- * </p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Interpreting and Unifying Outlier Scores<br>
+ * Proc. 11th SIAM International Conference on Data Mining (SDM 2011)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "https://doi.org/10.1137/1.9781611972818.2")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
+    url = "https://doi.org/10.1137/1.9781611972818.2")
 public class MultiplicativeInverseScaling implements OutlierScaling {
   /**
    * Constructor.
@@ -92,7 +89,7 @@ public class MultiplicativeInverseScaling implements OutlierScaling {
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
     double max = Double.MIN_VALUE;
     final int size = adapter.size(array);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       double inv = Math.abs(1.0 / adapter.getDouble(array, i));
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
         max = Math.max(max, inv);
@@ -105,7 +102,7 @@ public class MultiplicativeInverseScaling implements OutlierScaling {
   public double getMin() {
     return 0.0;
   }
-  
+
   @Override
   public double getMax() {
     return 1.0;

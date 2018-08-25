@@ -61,6 +61,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
  * an outlierness-score, with its center at the position of the visualized
  * object and its radius depending on the objects score.
+ * <p>
+ * Reference:
+ * <p>
+ * Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius
+ * Wojdanowski, Arthur Zimek<br>
+ * Visual Evaluation of Outlier Detection Models<br>
+ * Proc. 15th Int. Conf. on Database Systems for Advanced Applications (DASFAA
+ * 2010)
  *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
@@ -69,9 +77,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-@Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", //
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek", //
     title = "Visual Evaluation of Outlier Detection Models", //
-    booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", //
+    booktitle = "Proc. 15th Int. Conf. on Database Systems for Advanced Applications (DASFAA 2010)", //
     url = "https://doi.org/10.1007/978-3-642-12098-5_34")
 public class BubbleVisualization implements VisFactory {
   /**
@@ -278,19 +286,11 @@ public class BubbleVisualization implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
-     *
-     * <p>
-     * Key: {@code -bubble.fill}
-     * </p>
      */
     public static final OptionID FILL_ID = new OptionID("bubble.fill", "Half-transparent filling of bubbles.");
 
     /**
      * Parameter for scaling functions
-     *
-     * <p>
-     * Key: {@code -bubble.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("bubble.scaling", "Additional scaling function for bubbles.");
 

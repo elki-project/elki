@@ -28,8 +28,8 @@ import net.jafama.FastMath;
 
 /**
  * Linear Kernel function that computes a similarity between the two feature
- * vectors V1 and V2 defined by V1^T*V2.
- * 
+ * vectors x and y defined by \(x^T\cdot y\).
+ * <p>
  * Note: this is effectively equivalent to using
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
  * 

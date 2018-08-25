@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,9 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
  * per line, points separated by whitespace, numbers separated by colons.
- * Multiple polygons components can be separated using
- * {@link #POLYGON_SEPARATOR}.
- * 
+ * Multiple polygons components can be separated using {@code --}.
+ * <p>
  * Unparseable parts will be treated as labels.
  * 
  * @author Erich Schubert
@@ -211,7 +210,7 @@ public class SimplePolygonParser extends AbstractStreamingParser {
       // FIXME: Avoid unnecessary subSequence call.
       final int len = tokenizer.getEnd() - tokenizer.getStart();
       if(POLYGON_SEPARATOR.length() == len && //
-      reader.getBuffer().subSequence(tokenizer.getStart(), tokenizer.getEnd()).equals(POLYGON_SEPARATOR)) {
+          reader.getBuffer().subSequence(tokenizer.getStart(), tokenizer.getEnd()).equals(POLYGON_SEPARATOR)) {
         if(!coords.isEmpty()) {
           polys.add(new Polygon(new ArrayList<>(coords)));
         }

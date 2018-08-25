@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,22 +41,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Simple distance based outlier detection algorithms.
- * 
+ * <p>
  * Reference:
  * <p>
- * E.M. Knorr, R. T. Ng:<br />
- * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
- * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
- * </p>
+ * E.M. Knorr, R. T. Ng:<br>
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br>
+ * In: Proc. Int. Conf. on Very Large Databases (VLDB'98)
  * 
  * @author Lisa Reichert
  * @since 0.3
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
-@Reference(authors = "E.M. Knorr, R. T. Ng", //
-title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
-booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+@Reference(authors = "E. M. Knorr, R. T. Ng", //
+    title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+    booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
+    url = "http://www.vldb.org/conf/1998/p392.pdf")
 public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Radius parameter d.
@@ -137,7 +137,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      */
     protected void configD(Parameterization config, DistanceFunction<?> distanceFunction) {
       final DoubleParameter param = new DoubleParameter(D_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(param)) {
         d = param.getValue();
       }

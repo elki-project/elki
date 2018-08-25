@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,20 +33,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Measure the similarity of clusters via the Adjusted Rand Index.
  *
- * Reference:
+ * References:
  * <p>
- * Rand, W. M.<br />
- * Objective Criteria for the Evaluation of Clustering Methods<br />
+ * L. Hubert and P. Arabie<br>
+ * Comparing partitions.<br>
+ * Journal of Classification 2(193)
+ * <p>
+ * W. M. Rand<br>
+ * Objective Criteria for the Evaluation of Clustering Methods<br>
  * Journal of the American Statistical Association, Vol. 66 Issue 336
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "Rand, W. M.", //
-title = "Objective Criteria for the Evaluation of Clustering Methods", //
-booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
-url = "http://www.jstor.org/stable/10.2307/2284239")
+@Reference(authors = "L. Hubert and P. Arabie", //
+    title = "Comparing partitions", //
+    booktitle = "Journal of Classification 2(193)", //
+    url = "https://doi.org/10.1007/BF01908075")
 public class ClusteringAdjustedRandIndexSimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
@@ -73,7 +76,7 @@ public class ClusteringAdjustedRandIndexSimilarityFunction implements Clustering
     ct.process(o1, o2);
     return 1. - ct.getPaircount().adjustedRandIndex();
   }
-  
+
   @Override
   public boolean isMetric() {
     return false;

@@ -31,19 +31,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree.
- * The routing objects are chosen according to the M_LB_DIST strategy.
- * 
+ * The routing objects are chosen according to the MLBDIST strategy.
+ * <p>
  * The benefit of this strategy is that it works with precomputed distances from
- * the parent, while most other strategies would require $O(n^2)$ distance
+ * the parent, while most other strategies would require O(n²) distance
  * computations. So if construction time is critical, this is a good choice.
- *
+ * <p>
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br>
  * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
- * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
+ * Spaces<br>
+ * Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  *
  * @author Elke Achtert
  * @since 0.2
@@ -71,7 +70,7 @@ public class MLBDistSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N
    * Selects the second object of the specified node to be promoted and stored
    * into the parent node and partitions the entries according to the M_LB_DIST
    * strategy.
-   *
+   * <p>
    * This strategy considers all possible pairs of objects and chooses the pair
    * of objects for which the distance is maximum.
    * 

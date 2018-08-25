@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Distribution parameter estimation using Levenberg-Marquardt iterative
  * optimization and a kernel density estimation.
- * 
+ * <p>
  * Note: this estimator is rather expensive, and needs optimization in the KDE
- * phase, which currently is O(n^2)!
- * 
+ * phase, which currently is O(n²)!
+ * <p>
  * This estimator is primarily attractive when only part of the distribution was
  * observed.
  * 
@@ -66,7 +66,7 @@ public class NormalLevenbergMarquardtKDEEstimator implements DistributionEstimat
     MeanVariance mv = new MeanVariance();
     // X positions of samples
     double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       x[i] = adapter.getDouble(data, i);
       mv.put(x[i]);
     }

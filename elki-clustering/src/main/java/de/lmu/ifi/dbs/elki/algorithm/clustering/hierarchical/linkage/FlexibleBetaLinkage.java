@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,28 +32,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Flexible-beta linkage as proposed by Lance and Williams.
- * 
+ * <p>
  * Beta values larger than 0 cause chaining, and are thus not recommended.
  * Instead, choose a value between -1 and 0.
- * 
+ * <p>
  * The general form of the recursive definition is:
  * \[d_{\text{Flexible},\beta}(A\cup B, C) := \tfrac{1-\beta}{2} d(A,C)
  * + \tfrac{1-\beta}{2} d(B,C) + \beta d(A,B) \]
- * 
+ * <p>
  * Reference:
  * <p>
- * G. N. Lance and W. T. Williams<br />
- * A general theory of classificatory sorting strategies 1. Hierarchical systems
- * <br/>
+ * G. N. Lance and W. T. Williams<br>
+ * A general theory of classificatory sorting strategies 1. Hierarchical
+ * systems<br>
  * The computer journal 9.4 (1967): 373-380.
- * </p>
  * 
  * @author Erich Schubert
  */
 @Reference(authors = "G. N. Lance and W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
-    url = "https://doi.org/ 10.1093/comjnl/9.4.373")
+    url = "https://doi.org/10.1093/comjnl/9.4.373")
 @Alias({ "flex", "beta", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod" })
 @Priority(Priority.DEFAULT - 2) // Rather uncommon
 public class FlexibleBetaLinkage implements Linkage {

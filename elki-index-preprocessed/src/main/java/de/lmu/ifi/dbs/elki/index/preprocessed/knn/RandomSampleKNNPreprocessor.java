@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,22 +45,23 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Class that computed the kNN only on a random sample.
- *
+ * <p>
  * Used in:
  * <p>
+ * Arthur Zimek, Matthew Gaudet, Ricardo J. G. B. Campello, Jörg Sander<br>
  * Subsampling for Efficient and Effective Unsupervised Outlier Detection
- * Ensembles<br />
- * A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander<br />
- * In: Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and
- * Data Mining, KDD '13
- * </p>
+ * Ensembles<br>
+ * Proc. 19th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining KDD'13
  *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @param <O> Object type
  */
-@Reference(title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", authors = "A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander", booktitle = "Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD '13")
+@Reference(authors = "Arthur Zimek, Matthew Gaudet, Ricardo J. G. B. Campello, Jörg Sander", //
+    title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", //
+    booktitle = "Proc. 19th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining, KDD '13", //
+    url = "https://doi.org/10.1145/2487575.2487676")
 public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger
@@ -189,21 +190,12 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
-       * Parameter to specify how many objects to consider for computing the
-       * kNN.
-       *
-       * <p>
-       * Key: {@code -randomknn.share}
-       * </p>
+       * Share of objects to consider for computing the kNN.
        */
       public static final OptionID SHARE_ID = new OptionID("randomknn.share", "The relative amount of objects to consider for kNN computations.");
 
       /**
        * Random number generator seed.
-       *
-       * <p>
-       * Key: {@code -randomknn.seed}
-       * </p>
        */
       public static final OptionID SEED_ID = new OptionID("randomknn.seed", "The random number seed.");
 
