@@ -63,11 +63,18 @@ public @interface Reference {
    * @return Prefix or empty string
    */
   String prefix() default "";
-  
+ 
   /**
    * Reference URL, e.g. DOI
    * 
    * @return Reference URL or empty string
    */
   String url() default "";
+  
+  /**
+   * BibTeX key
+   * 
+   * @return BibTeX in the bibliography
+   */
+  String bibkey() default "";
 }
