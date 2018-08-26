@@ -61,6 +61,10 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 public class DocumentReferences {
   private static final String DOIPREFIX = "https://doi.org/";
 
+  private static final String DBLPPREFIX = "DBLP:";
+
+  private static final String DBLPURL = "https://dblp.uni-trier.de/rec/bibtex/";
+
   private static final String CSSFILE = "stylesheet.css";
 
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
@@ -204,7 +208,7 @@ public class DocumentReferences {
       {
         Reference ref = pair.first;
         // Prefix
-        if(ref.prefix().length() > 0) {
+        if(!ref.prefix().isEmpty()) {
           Element prediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
           prediv.setTextContent(ref.prefix());
           classdd.appendChild(prediv);
@@ -220,7 +224,7 @@ public class DocumentReferences {
         titlediv.appendChild(titleb);
         classdd.appendChild(titlediv);
         // Booktitle
-        if(ref.booktitle().length() > 0) {
+        if(!ref.booktitle().isEmpty()) {
           Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
           booktitlediv.setTextContent("In: " + ref.booktitle());
           if(ref.booktitle().startsWith("Online:")) {
@@ -229,13 +233,27 @@ public class DocumentReferences {
           classdd.appendChild(booktitlediv);
         }
         // URL
-        if(ref.url().length() > 0) {
+        if(!ref.url().isEmpty()) {
           Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
           Element urla = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
           urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, ref.url());
           urla.setTextContent(ref.url());
           urldiv.appendChild(urla);
           classdd.appendChild(urldiv);
+        }
+        // Bibkey
+        if(!ref.bibkey().isEmpty()) {
+          if(ref.bibkey().startsWith(DBLPPREFIX)) {
+            Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+            Element urla = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+            urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, DBLPURL + ref.bibkey());
+            urla.setTextContent(ref.url());
+            urldiv.appendChild(urla);
+            classdd.appendChild(urldiv);
+          }
+          else {
+            classdd.appendChild((Element) htmldoc.createComment(ref.bibkey()));
+          }
         }
       }
     }
@@ -267,7 +285,7 @@ public class DocumentReferences {
       {
         Reference ref = pair.first;
         // Prefix
-        if(ref.prefix().length() > 0) {
+        if(!ref.prefix().isEmpty()) {
           refstreamW.escaped(ref.prefix()).lf();
         }
         // Authors
@@ -277,17 +295,28 @@ public class DocumentReferences {
             // Title
             .append("**").escaped(ref.title()).append("**").lf();
         // Booktitle
-        if(ref.booktitle().length() > 0 && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
+        if(!ref.booktitle().isEmpty() && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
           refstreamW.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
         }
         // URL
-        if(ref.url().length() > 0) {
+        if(!ref.url().isEmpty()) {
           if(ref.url().startsWith(DOIPREFIX)) {
             refstreamW.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
-                .append("](").append(ref.url()).append(")").lf();
+                .append("](").append(ref.url()).append(')').lf();
           }
           else {
             refstreamW.append("Online: <").append(ref.url()).append('>').lf();
+          }
+        }
+        // Bibkey, if we can link to DBLP:
+        if(!ref.bibkey().isEmpty()) {
+          if(ref.bibkey().startsWith(DBLPPREFIX)) {
+            refstreamW.append("[DBLP:").append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length())//
+                .append("](").append(DBLPURL)//
+                .append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length()).append(')').lf();
+          }
+          else {
+            refstreamW.append("<!-- ").append(ref.bibkey()).append(" -->").lf();
           }
         }
       }
