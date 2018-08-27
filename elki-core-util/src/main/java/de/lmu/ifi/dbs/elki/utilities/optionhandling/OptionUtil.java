@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,15 +23,16 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -51,91 +52,32 @@ public final class OptionUtil {
   }
 
   /**
-   * Returns a string representation of the specified list of options containing
-   * the names of the options.
-   * 
-   * @param <O> Option type
-   * @param options the list of options
-   * @return the names of the options
-   */
-  public static <O extends Parameter<?>> String optionsNamesToString(List<O> options) {
-    StringBuilder buffer = new StringBuilder(1000).append('[');
-    for(int i = 0; i < options.size(); i++) {
-      buffer.append(options.get(i).getOptionID().getName());
-      if(i != options.size() - 1) {
-        buffer.append(',');
-      }
-    }
-    return buffer.append(']').toString();
-  }
-
-  /**
-   * Returns a string representation of the specified list of options containing
-   * the names of the options.
-   * 
-   * @param <O> Option type
-   * @param options the list of options
-   * @return the names of the options
-   */
-  public static <O extends Parameter<?>> String optionsNamesToString(O[] options) {
-    StringBuilder buffer = new StringBuilder(1000).append('[');
-    for(int i = 0; i < options.length; i++) {
-      buffer.append(options[i].getOptionID().getName());
-      if(i != options.length - 1) {
-        buffer.append(',');
-      }
-    }
-    return buffer.append(']').toString();
-  }
-
-  /**
-   * Returns a string representation of the list of number parameters containing
-   * the names and the values of the parameters.
-   * 
-   * @param <N> Parameter type
-   * @param parameters the list of number parameters
-   * @return the names and the values of the parameters
-   */
-  public static <N extends Parameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
-    StringBuilder buffer = new StringBuilder(1000).append('[');
-    for(int i = 0; i < parameters.size(); i++) {
-      buffer.append(parameters.get(i).getOptionID().getName()).append(':') //
-          .append(parameters.get(i).getValueAsString());
-      if(i != parameters.size() - 1) {
-        buffer.append(", ");
-      }
-    }
-    return buffer.append(']').toString();
-  }
-
-  /**
    * Format a list of options (and associated owning objects) for console help
    * output.
    * 
    * @param buf Serialization buffer
    * @param width Screen width
-   * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<TrackedParameter> options) {
+  public static void formatForConsole(StringBuilder buf, int width, Collection<TrackedParameter> options) {
     for(TrackedParameter pair : options) {
+      Parameter<?> par = pair.getParameter();
       println(buf//
-          .append(SerializedParameterization.OPTION_PREFIX).append(pair.getParameter().getOptionID().getName()) //
-          .append(' ').append(pair.getParameter().getSyntax()).append(FormatUtil.NEWLINE), //
-          width, getFullDescription(pair.getParameter()), indent);
+          .append(SerializedParameterization.OPTION_PREFIX).append(par.getOptionID().getName()) //
+          .append(' ').append(par.getSyntax()).append(FormatUtil.NEWLINE), //
+          width, getFullDescription(par));
     }
   }
 
   /**
    * Format a parameter description.
    * 
-   * @param param
+   * @param param Parameter
    * @return Parameter description
    */
-  public static <T> String getFullDescription(Parameter<T> param) {
-    StringBuilder description = new StringBuilder(1000);
-    // description.append(getParameterType()).append(" ");
-    description.append(param.getShortDescription()).append(FormatUtil.NEWLINE);
+  public static String getFullDescription(Parameter<?> param) {
+    StringBuilder description = new StringBuilder(1000) //
+        .append(param.getShortDescription()).append(FormatUtil.NEWLINE);
     param.describeValues(description);
     if(!FormatUtil.endsWith(description, FormatUtil.NEWLINE)) {
       description.append(FormatUtil.NEWLINE);
@@ -143,13 +85,14 @@ public final class OptionUtil {
     if(param.hasDefaultValue()) {
       description.append("Default: ").append(param.getDefaultValueAsString()).append(FormatUtil.NEWLINE);
     }
-    List<ParameterConstraint<? super T>> constraints = param.getConstraints();
+    List<? extends ParameterConstraint<?>> constraints = param.getConstraints();
     if(constraints != null && !constraints.isEmpty()) {
-      description.append((constraints.size() == 1) ? "Constraint: " : "Constraints: ");
-      for(int i = 0; i < constraints.size(); i++) {
-        description.append(i > 0 ? ", " : "").append(constraints.get(i).getDescription(param.getOptionID().getName()));
+      description.append((constraints.size() == 1) ? "Constraint: " : "Constraints: ") //
+          .append(constraints.get(0).getDescription(param.getOptionID().getName()));
+      for(int i = 1; i < constraints.size(); i++) {
+        description.append(", ").append(constraints.get(i).getDescription(param.getOptionID().getName()));
       }
-      description.append('.').append(FormatUtil.NEWLINE);
+      description.append(FormatUtil.NEWLINE);
     }
     return description.toString();
   }
@@ -160,11 +103,10 @@ public final class OptionUtil {
    * @param buf Buffer to write to
    * @param width Width to use for linewraps
    * @param data Data to write.
-   * @param indent Indentation
    */
-  private static void println(StringBuilder buf, int width, String data, String indent) {
-    for(String line : FormatUtil.splitAtLastBlank(data, width - indent.length())) {
-      buf.append(indent).append(line);
+  private static void println(StringBuilder buf, int width, String data) {
+    for(String line : FormatUtil.splitAtLastBlank(data, width)) {
+      buf.append(line);
       if(!line.endsWith(FormatUtil.NEWLINE)) {
         buf.append(FormatUtil.NEWLINE);
       }
@@ -180,46 +122,39 @@ public final class OptionUtil {
    * @param indent Text indent
    * @return Formatted description
    */
-  public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width, String indent) {
-    try {
-      println(buf, width, "Description for class " + pcls.getName(), "");
+  public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width, String indent) throws ClassInstantiationException {
+    println(buf, width, "Description for class " + pcls.getName());
 
-      String title = DocumentationUtil.getTitle(pcls);
-      if(title != null && title.length() > 0) {
-        println(buf, width, title, "");
-      }
-
-      String desc = DocumentationUtil.getDescription(pcls);
-      if(desc != null && desc.length() > 0) {
-        println(buf, width, desc, "  ");
-      }
-
-      Reference ref = DocumentationUtil.getReference(pcls);
-      if(ref != null) {
-        if(ref.prefix().length() > 0) {
-          println(buf, width, ref.prefix(), "");
-        }
-        println(buf, width, ref.authors() + ":", "");
-        println(buf, width, ref.title(), "  ");
-        println(buf, width, "in: " + ref.booktitle(), "");
-        if(ref.url().length() > 0) {
-          println(buf, width, "see also: " + ref.url(), "");
-        }
-      }
-
-      SerializedParameterization config = new SerializedParameterization();
-      TrackParameters track = new TrackParameters(config);
-      @SuppressWarnings("unused")
-      Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
-      Collection<TrackedParameter> options = track.getAllParameters();
-      if(!options.isEmpty()) {
-        OptionUtil.formatForConsole(buf, width, indent, options);
-      }
-      return buf;
+    Title title = pcls.getAnnotation(Title.class);
+    if(title != null && title.value() != null && !title.value().isEmpty()) {
+      println(buf, width, title.value());
     }
-    catch(Exception e) {
-      LoggingUtil.exception("Error instantiating class to describe.", e.getCause());
-      return buf.append("No description available: ").append(e);
+
+    Description desc = pcls.getAnnotation(Description.class);
+    if(desc != null && desc.value() != null && !desc.value().isEmpty()) {
+      println(buf, width, desc.value());
     }
+
+    for(Reference ref : pcls.getAnnotationsByType(Reference.class)) {
+      if(!ref.prefix().isEmpty()) {
+        println(buf, width, ref.prefix());
+      }
+      println(buf, width, ref.authors());
+      println(buf, width, ref.title());
+      println(buf, width, ref.booktitle());
+      if(ref.url().length() > 0) {
+        println(buf, width, ref.url());
+      }
+    }
+
+    SerializedParameterization config = new SerializedParameterization();
+    TrackParameters track = new TrackParameters(config);
+    @SuppressWarnings("unused")
+    Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
+    Collection<TrackedParameter> options = track.getAllParameters();
+    if(!options.isEmpty()) {
+      OptionUtil.formatForConsole(buf, width, options);
+    }
+    return buf;
   }
 }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * AbstractApplication sets the values for flags verbose and help.
- * <p/>
+ * <p>
  * Any Wrapper class that makes use of these flags may extend this class. Beware
  * to make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
@@ -118,7 +118,7 @@ public abstract class AbstractApplication {
 
   /**
    * Generic command line invocation.
-   *
+   * <p>
    * Refactored to have a central place for outermost exception handling.
    *
    * @param cls Application class to run.
@@ -173,8 +173,7 @@ public abstract class AbstractApplication {
         LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose("ERROR: The following configuration errors prevented execution:");
         for(ParameterException e : params.getErrors()) {
-          LOG.verbose(e.getMessage());
-          LOG.verbose("\n");
+          LOG.verbose(e.getMessage() + "\n");
         }
         params.logUnusedParameters();
         LOG.verbose("Stopping execution because of configuration errors above.");
@@ -203,7 +202,7 @@ public abstract class AbstractApplication {
 
     // Collect options
     OptionUtil.formatForConsole(usage.append(NEWLINE).append("Parameters:").append(NEWLINE), //
-        FormatUtil.getConsoleWidth(), "   ", options);
+        FormatUtil.getConsoleWidth(), options);
     return usage.toString();
   }
 
@@ -233,9 +232,15 @@ public abstract class AbstractApplication {
    * Print the description for the given parameter
    */
   private static void printDescription(Class<?> descriptionClass) {
-    if(descriptionClass != null) {
+    if(descriptionClass == null) {
+      return;
+    }
+    try {
       LoggingConfiguration.setVerbose(Level.VERBOSE);
-      LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
+      LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "").toString());
+    }
+    catch(Exception e) {
+      LOG.exception("Error instantiating class to describe.", e.getCause());
     }
   }
 
@@ -254,65 +259,41 @@ public abstract class AbstractApplication {
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the name of the output file.
-     * <p>
-     * Key: {@code -app.out}
-     * </p>
      */
     public static final OptionID OUTPUT_ID = new OptionID("app.out", "");
 
     /**
      * Parameter that specifies the name of the input file.
-     * <p>
-     * Key: {@code -app.in}
-     * </p>
      */
     public static final OptionID INPUT_ID = new OptionID("app.in", "");
 
     /**
      * Option ID to specify the database type
-     * <p>
-     * Key: {@code -db}
-     * </p>
      */
     public static final OptionID DATABASE_ID = new OptionID("db", "Database class.");
 
     /**
      * Flag to obtain help-message.
-     * <p>
-     * Key: {@code -h}
-     * </p>
      */
     public static final OptionID HELP_ID = new OptionID("h", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
     /**
      * Flag to obtain help-message.
-     * <p>
-     * Key: {@code -help}
-     * </p>
      */
     public static final OptionID HELP_LONG_ID = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
     /**
      * Optional Parameter to specify a class to obtain a description for.
-     * <p>
-     * Key: {@code -description}
-     * </p>
      */
     public static final OptionID DESCRIPTION_ID = new OptionID("description", "Class to obtain a description of. " + "Causes immediate stop of the program.");
 
     /**
      * Optional Parameter to specify a class to enable debugging for.
-     * <p>
-     * Key: {@code -enableDebug}
-     * </p>
      */
     public static final OptionID DEBUG_ID = new OptionID("enableDebug", "Parameter to enable debugging for particular packages.");
 
     /**
      * Flag to allow verbose messages while running the application.
-     * <p>
-     * Key: {@code -verbose}
-     * </p>
      */
     public static final OptionID VERBOSE_ID = new OptionID("verbose", "Enable verbose messages.");
 
@@ -372,7 +353,6 @@ public abstract class AbstractApplication {
      * Parse the option string to configure logging.
      *
      * @param param Parameter to process.
-     *
      * @throws WrongParameterValueException On parsing errors
      */
     public static final void parseDebugParameter(StringParameter param) throws WrongParameterValueException {

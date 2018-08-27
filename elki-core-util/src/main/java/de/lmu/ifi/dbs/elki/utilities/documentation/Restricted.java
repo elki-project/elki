@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,10 +25,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
 /**
  * Indicator that the given class has distibution restrictions such as
  * associated patents, and therefore must not be included in the release.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
@@ -38,7 +39,7 @@ import java.lang.annotation.Target;
 public @interface Restricted {
   /**
    * Restriction reason
-   * 
+   *
    * @return reason why this class must not be published
    */
   String value();

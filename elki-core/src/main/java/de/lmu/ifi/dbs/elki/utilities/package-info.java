@@ -32,7 +32,6 @@
  * <li>Specialized:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry}: class and classpath inspection.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil}: documentation extraction from annotations.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil}: reporting page file accesses.</li>
  * </ul></li>
  * </ul>
@@ -41,7 +40,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
