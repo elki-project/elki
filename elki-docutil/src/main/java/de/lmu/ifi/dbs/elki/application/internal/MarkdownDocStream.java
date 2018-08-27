@@ -80,7 +80,7 @@ public class MarkdownDocStream implements AutoCloseable {
     if(newline == Newline.NONE) {
       return this;
     }
-    out.append(newline == Newline.BREAK ? "\\\\\n" : newline == Newline.PAR ? "\n\n" : "\n");
+    out.append(newline == Newline.BREAK ? "\\\n" : newline == Newline.PAR ? "\n\n" : "\n");
     for(int i = indent, j = i; i > 0; i -= j) {
       out.append(WHITESPACES, 0, (j = i > WHITESPACES.length() ? WHITESPACES.length() : i));
     }
@@ -206,23 +206,6 @@ public class MarkdownDocStream implements AutoCloseable {
       newline = newline == Newline.BREAK ? Newline.NEWLINE : Newline.PAR;
     }
     indent = newindent;
-    return this;
-  }
-
-  /**
-   * Generate a JavaDoc link
-   * 
-   * TODO: move to a higher level abstraction.
-   *
-   * @param cls Class
-   * @param base Base class to simplify names
-   * @param wrap Characters to wrap around the link
-   * @return {@code this}
-   */
-  MarkdownDocStream javadocLink(Class<?> cls, Class<?> base, String wrap) {
-    wrap = wrap == null ? "" : wrap;
-    append('[').append(wrap).append(cls.getName()).append(wrap) //
-        .append("](./releases/current/doc/").append(cls.getName().replace('.', '/')).append(".html)");
     return this;
   }
 

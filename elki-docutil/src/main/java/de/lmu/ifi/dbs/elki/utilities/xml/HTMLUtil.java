@@ -203,6 +203,11 @@ public final class HTMLUtil {
   public static final String HTML_CLASS_ATTRIBUTE = "class";
 
   /**
+   * HTML element id attribute
+   */
+  public static final String HTML_ID_ATTRIBUTE = "id";
+
+  /**
    * HTML name attribute (e.g. A tag)
    */
   public static final String HTML_NAME_ATTRIBUTE = "name";
@@ -252,7 +257,6 @@ public final class HTMLUtil {
    */
   public static final String CONTENT_TYPE_HTML_UTF8 = CONTENT_TYPE_HTML + "; charset=UTF-8";
 
-
   /**
    * Write an HTML document to an output stream.
    * 
@@ -285,15 +289,18 @@ public final class HTMLUtil {
    * @param htmldoc Document
    * @param parent Parent node
    * @param text Text to add.
+   * @return parent node
    */
-  public static void appendMultilineText(Document htmldoc, Element parent, String text) {
-    boolean firstline = true;
-    for(String line : text.split("\n")) {
-      if(!firstline) {
-        parent.appendChild(htmldoc.createElement(HTML_BR_TAG));
-      }
-      parent.appendChild(htmldoc.createTextNode(line));
-      firstline = false;
-    }    
+  public static Element appendMultilineText(Document htmldoc, Element parent, String text) {
+    String[] parts = text != null ? text.split("\n") : null;
+    if(parts == null || parts.length == 0) {
+      return parent;
+    }
+    parent.appendChild(htmldoc.createTextNode(parts[0]));
+    for(int i = 1; i < parts.length; i++) {
+      parent.appendChild(htmldoc.createElement(HTML_BR_TAG));
+      parent.appendChild(htmldoc.createTextNode(parts[i]));
+    }
+    return parent;
   }
 }

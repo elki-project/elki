@@ -64,10 +64,6 @@ public class DocumentReferences {
 
   private static final String DBLPURL = "https://dblp.uni-trier.de/rec/bibtex/";
 
-  private static final String CSSFILE = "stylesheet.css";
-
-  private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
-
   /**
    * Logger
    */
@@ -90,8 +86,7 @@ public class DocumentReferences {
     File references = new File(args[0]);
     try (FileOutputStream reffo = new FileOutputStream(references); //
         OutputStream refstream = new BufferedOutputStream(reffo)) {
-      Document refdoc = documentReferences(refs);
-      HTMLUtil.writeXHTML(refdoc, refstream);
+      documentReferences(refs, new HTMLFormat()).writeTo(refstream);
     }
     catch(IOException e) {
       LOG.exception("IO Exception writing HTML output.", e);
@@ -101,7 +96,7 @@ public class DocumentReferences {
       File refwiki = new File(args[1]);
       try (FileOutputStream reffow = new FileOutputStream(refwiki); //
           MarkdownDocStream refstreamW = new MarkdownDocStream(reffow)) {
-        documentReferencesMarkdown(refs, refstreamW);
+        documentReferences(refs, new MarkdownFormat(refstreamW));
       }
       catch(IOException e) {
         LOG.exception("IO Exception writing Wiki output.", e);
@@ -110,101 +105,128 @@ public class DocumentReferences {
     }
   }
 
-  private static Document documentReferences(List<Map.Entry<Reference, TreeSet<Object>>> refs) throws IOException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder;
-    try {
-      builder = factory.newDocumentBuilder();
+  /**
+   * Abstract interface for output formats.
+   *
+   * @author Erich Schubert
+   *
+   * @param <T> Entry type
+   */
+  private interface Format<T> {
+    T newEntry();
+
+    void init(String title);
+
+    void writeClass(T classdt, Class<?> cls);
+
+    void writePackage(T classdt, Package pkg);
+
+    void writeReference(Reference ref);
+
+    default String linkFor(Class<?> cls) {
+      return cls.getName().replace('.', '/') + ".html";
     }
-    catch(ParserConfigurationException e1) {
-      throw new IOException(e1);
+
+    default String linkFor(Package name) {
+      return name.getName().replace('.', '/') + "/package-summary.html";
     }
-    DOMImplementation impl = builder.getDOMImplementation();
-    Document htmldoc = impl.createDocument(HTMLUtil.HTML_NAMESPACE, HTMLUtil.HTML_HTML_TAG, null);
-    // head
-    Element head = htmldoc.createElement(HTMLUtil.HTML_HEAD_TAG);
-    htmldoc.getDocumentElement().appendChild(head);
-    // body
-    Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
-    htmldoc.getDocumentElement().appendChild(body);
-    // modification warnings
-    head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
-    body.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
-    // meta with charset information
-    {
+  }
+
+  /**
+   * HTML output format.
+   *
+   * @author Erich Schubert
+   */
+  private static class HTMLFormat implements Format<Element> {
+    private static final String CSSFILE = "stylesheet.css";
+
+    private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
+
+    Document htmldoc;
+
+    Element maindl;
+
+    HTMLFormat() throws IOException {
+      DocumentBuilder builder;
+      try {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        builder = factory.newDocumentBuilder();
+      }
+      catch(ParserConfigurationException e) {
+        throw new IOException(e);
+      }
+      DOMImplementation impl = builder.getDOMImplementation();
+      htmldoc = impl.createDocument(HTMLUtil.HTML_NAMESPACE, HTMLUtil.HTML_HTML_TAG, null);
+    }
+
+    @Override
+    public void init(String title) {
+      assert !htmldoc.getDocumentElement().hasChildNodes();
+      // head
+      Element head = htmldoc.createElement(HTMLUtil.HTML_HEAD_TAG);
+      head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
+      htmldoc.getDocumentElement().appendChild(head);
+      // meta with charset information
       Element meta = htmldoc.createElement(HTMLUtil.HTML_META_TAG);
       meta.setAttribute(HTMLUtil.HTML_HTTP_EQUIV_ATTRIBUTE, HTMLUtil.HTML_HTTP_EQUIV_CONTENT_TYPE);
       meta.setAttribute(HTMLUtil.HTML_CONTENT_ATTRIBUTE, HTMLUtil.CONTENT_TYPE_HTML_UTF8);
       head.appendChild(meta);
-    }
-    // stylesheet
-    {
+      // stylesheet
       Element css = htmldoc.createElement(HTMLUtil.HTML_LINK_TAG);
       css.setAttribute(HTMLUtil.HTML_REL_ATTRIBUTE, HTMLUtil.HTML_REL_STYLESHEET);
       css.setAttribute(HTMLUtil.HTML_TYPE_ATTRIBUTE, HTMLUtil.CONTENT_TYPE_CSS);
       css.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, CSSFILE);
       head.appendChild(css);
-    }
-    // title
-    {
-      Element title = htmldoc.createElement(HTMLUtil.HTML_TITLE_TAG);
-      title.setTextContent("ELKI references overview.");
-      head.appendChild(title);
-    }
-    // Heading
-    {
-      Element h1 = htmldoc.createElement(HTMLUtil.HTML_H1_TAG);
-      h1.setTextContent("ELKI references overview:");
-      body.appendChild(h1);
+      // title
+      head.appendChild(htmldoc.createElement(HTMLUtil.HTML_TITLE_TAG)).setTextContent(title);
+      // body
+      Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
+      htmldoc.getDocumentElement().appendChild(body)//
+          .appendChild(htmldoc.createComment(MODIFICATION_WARNING));
+      body.appendChild(htmldoc.createElement(HTMLUtil.HTML_H1_TAG)).setTextContent(title + ":");
+      // Main definition list
+      maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
+      body.appendChild(maindl);
     }
 
-    // Main definition list
-    Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
-    body.appendChild(maindl);
-    for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
+    @Override
+    public Element newEntry() {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
-      // Anchor for references
-      {
-        boolean first = true;
-        for(Object o : pair.getValue()) {
-          if(!first) {
-            classdt.appendChild(htmldoc.createTextNode(", "));
-          }
-          if(o instanceof Class<?>) {
-            Class<?> cls = (Class<?>) o;
-            Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, cls.getName());
-            classdt.appendChild(classan);
-
-            // Link back to original class
-            Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(cls));
-            classa.setTextContent(cls.getName());
-            classdt.appendChild(classa);
-          }
-          else if(o instanceof Package) {
-            Package pkg = (Package) o;
-            Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, pkg.getName());
-            classdt.appendChild(classan);
-
-            // Link back to original class
-            Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(pkg));
-            classa.setTextContent(pkg.getName());
-            classdt.appendChild(classa);
-          }
-
-          first = false;
-        }
-      }
       maindl.appendChild(classdt);
+      return classdt;
+    }
+
+    @Override
+    public void writeClass(Element classdt, Class<?> cls) {
+      if(classdt.hasChildNodes()) {
+        classdt.appendChild(htmldoc.createTextNode(", "));
+      }
+      Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+      classa.setAttribute(HTMLUtil.HTML_ID_ATTRIBUTE, cls.getName());
+      classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(cls));
+      classa.setTextContent(cls.getName());
+      classdt.appendChild(classa);
+    }
+
+    @Override
+    public void writePackage(Element classdt, Package pkg) {
+      if(classdt.hasChildNodes()) {
+        classdt.appendChild(htmldoc.createTextNode(", "));
+      }
+      Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+      classa.setAttribute(HTMLUtil.HTML_ID_ATTRIBUTE, pkg.getName());
+      classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(pkg));
+      classa.setTextContent(pkg.getName());
+      classdt.appendChild(classa);
+    }
+
+    @Override
+    public void writeReference(Reference ref) {
       // DD = definition description
       Element classdd = htmldoc.createElement(HTMLUtil.HTML_DD_TAG);
       maindl.appendChild(classdd);
 
-      Reference ref = pair.getKey();
       // Prefix
       if(!ref.prefix().isEmpty()) {
         Element prediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
@@ -250,73 +272,118 @@ public class DocumentReferences {
           classdd.appendChild(urldiv);
         }
         else {
-          classdd.appendChild((Element) htmldoc.createComment(ref.bibkey()));
+          classdd.appendChild(htmldoc.createComment(ref.bibkey()));
         }
       }
     }
-    return htmldoc;
+
+    public void writeTo(OutputStream refstream) throws IOException {
+      HTMLUtil.writeXHTML(htmldoc, refstream);
+    }
   }
 
-  private static void documentReferencesMarkdown(List<Map.Entry<Reference, TreeSet<Object>>> refs, MarkdownDocStream refstreamW) {
-    for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
-      // JavaDoc links for relevant classes and packages.
-      boolean first = true;
-      for(Object o : pair.getValue()) {
-        if(!first) {
-          refstreamW.append(',').lf();
-        }
-        if(o instanceof Class<?>) {
-          Class<?> cls = (Class<?>) o;
-          refstreamW.append('[').append(cls.getName()).append("](./releases/current/doc/") //
-              .append(linkFor(cls)).append(')');
-        }
-        else if(o instanceof Package) {
-          Package pkg = (Package) o;
-          refstreamW.append('[').append(pkg.getName()).append("](./releases/current/doc/") //
-              .append(linkFor(pkg)).append(')');
-        }
-        first = false;
-      }
-      refstreamW.lf();
+  /**
+   * Markdown output format.
+   *
+   * @author Erich Schubert
+   */
+  private static class MarkdownFormat implements Format<Void> {
+    MarkdownDocStream out;
 
-      Reference ref = pair.getKey();
+    boolean firstInEntry = false;
+
+    public MarkdownFormat(MarkdownDocStream out) {
+      this.out = out;
+    }
+
+    @Override
+    public void init(String title) {
+      out.append("# ").append(title).par();
+    }
+
+    @Override
+    public Void newEntry() {
+      firstInEntry = true;
+      return null;
+    }
+
+    @Override
+    public void writeClass(Void classdt, Class<?> cls) {
+      if(!firstInEntry) {
+        out.append(',').lf();
+      }
+      out.append('[').append(cls.getName()).append("](./releases/current/doc/") //
+          .append(linkFor(cls)).append(')');
+      firstInEntry = false;
+    }
+
+    @Override
+    public void writePackage(Void classdt, Package pkg) {
+      if(!firstInEntry) {
+        out.append(',').lf();
+      }
+      out.append('[').append(pkg.getName()).append("](./releases/current/doc/") //
+          .append(linkFor(pkg)).append(')');
+      firstInEntry = false;
+    }
+
+    @Override
+    public void writeReference(Reference ref) {
+      out.lf();
       // Prefix
       if(!ref.prefix().isEmpty()) {
-        refstreamW.escaped(ref.prefix()).lf();
+        out.escaped(ref.prefix()).lf();
       }
       // Authors
-      refstreamW //
+      out //
           // authors
           .append(ref.authors()).lf() //
           // Title
           .append("**").escaped(ref.title()).append("**").lf();
       // Booktitle
       if(!ref.booktitle().isEmpty() && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
-        refstreamW.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
+        out.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
       }
       // URL
       if(!ref.url().isEmpty()) {
         if(ref.url().startsWith(DOIPREFIX)) {
-          refstreamW.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
+          out.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
               .append("](").append(ref.url()).append(')').lf();
         }
         else {
-          refstreamW.append("Online: <").append(ref.url()).append('>').lf();
+          out.append("Online: <").append(ref.url()).append('>').lf();
         }
       }
       // Bibkey, if we can link to DBLP:
       if(!ref.bibkey().isEmpty()) {
         if(ref.bibkey().startsWith(DBLPPREFIX)) {
-          refstreamW.append("[DBLP:").append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length())//
+          out.append("[DBLP:").append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length())//
               .append("](").append(DBLPURL)//
               .append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length()).append(')').lf();
         }
         else {
-          refstreamW.append("<!-- ").append(ref.bibkey()).append(" -->").lf();
+          out.nl().append("<!-- ").append(ref.bibkey()).append(" -->").lf();
         }
       }
-      refstreamW.par();
+      out.par();
     }
+  }
+
+  private static <T, F extends Format<T>> F documentReferences(List<Map.Entry<Reference, TreeSet<Object>>> refs, F format) throws IOException {
+    format.init("ELKI references overview");
+    for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
+      T classdt = format.newEntry();
+      for(Object o : pair.getValue()) {
+        if(o instanceof Class<?>) {
+          format.writeClass(classdt, (Class<?>) o);
+        }
+        else if(o instanceof Package) {
+          format.writePackage(classdt, (Package) o);
+        }
+      }
+      format.writeReference(pair.getKey());
+    }
+    return format;
   }
 
   private static List<Map.Entry<Reference, TreeSet<Object>>> sortedReferences() {
@@ -326,75 +393,31 @@ public class DocumentReferences {
     for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
       inspectClass(cls, map);
       if(packages.add(cls.getPackage())) {
-        inspectPackage(cls.getPackage(), map);
+        Package p = cls.getPackage();
+        addReference(p, p.getAnnotationsByType(Reference.class), map);
       }
     }
     // Sort references by first class.
     List<Map.Entry<Reference, TreeSet<Object>>> refs = new ArrayList<>(map.entrySet());
-    Collections.sort(refs, new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
-      @Override
-      public int compare(Map.Entry<Reference, TreeSet<Object>> p1, Map.Entry<Reference, TreeSet<Object>> p2) {
-        final Object o1 = p1.getValue().first(), o2 = p2.getValue().first();
-        int c = COMPARATOR.compare(o1, o2);
-        if(c == 0) {
-          Reference r1 = p1.getKey(), r2 = p2.getKey();
-          c = compareNull(r1.title(), r2.title());
-          c = (c != 0) ? c : compareNull(r1.authors(), r2.authors());
-          c = (c != 0) ? c : compareNull(r1.booktitle(), r2.booktitle());
-        }
-        return c;
-      }
-
-      /**
-       * Null-tolerant String comparison.
-       * 
-       * @param s1 First string
-       * @param s2 Second string
-       * @return Order
-       */
-      private int compareNull(String s1, String s2) {
-        return (s1 == s2) ? 0 //
-            : (s1 == null) ? -1 //
-                : (s2 == null) ? +1 //
-                    : s1.compareTo(s2);
-      }
-    });
+    Collections.sort(refs, SORT_BY_FIRST_CLASS);
     return refs;
   }
-
-  /**
-   * Comparator for sorting the list of classes for each reference.
-   */
-  private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
-    @Override
-    public int compare(Object o1, Object o2) {
-      String n1 = (o1 instanceof Class) ? ((Class<?>) o1).getName() : ((Package) o1).getName();
-      String n2 = (o2 instanceof Class) ? ((Class<?>) o2).getName() : ((Package) o2).getName();
-      return n1.compareTo(n2);
-    }
-  };
 
   private static void inspectClass(final Class<?> cls, Map<Reference, TreeSet<Object>> map) {
     if(cls.getSimpleName().equals("package-info")) {
       return;
     }
     try {
-      if(cls.isAnnotationPresent(Reference.class)) {
-        addReference(cls, cls.getAnnotationsByType(Reference.class), map);
+      addReference(cls, cls.getAnnotationsByType(Reference.class), map);
+      for(Method m : cls.getDeclaredMethods()) {
+        addReference(cls, m.getAnnotationsByType(Reference.class), map);
+      }
+      for(Field f : cls.getDeclaredFields()) {
+        addReference(cls, f.getAnnotationsByType(Reference.class), map);
       }
       // Inner classes
       for(Class<?> c2 : cls.getDeclaredClasses()) {
         inspectClass(c2, map);
-      }
-      for(Method m : cls.getDeclaredMethods()) {
-        if(m.isAnnotationPresent(Reference.class)) {
-          addReference(cls, m.getAnnotationsByType(Reference.class), map);
-        }
-      }
-      for(Field f : cls.getDeclaredFields()) {
-        if(f.isAnnotationPresent(Reference.class)) {
-          addReference(cls, f.getAnnotationsByType(Reference.class), map);
-        }
       }
     }
     catch(Error e) {
@@ -406,45 +429,51 @@ public class DocumentReferences {
     for(Reference ref : r) {
       TreeSet<Object> list = map.get(ref);
       if(list == null) {
-        map.put(ref, list = new TreeSet<>(COMPARATOR));
+        map.put(ref, list = new TreeSet<>(SORT_PKGS_AND_CLASSES));
       }
       list.add(cls);
     }
   }
 
-  private static void inspectPackage(Package p, Map<Reference, TreeSet<Object>> map) {
-    if(p.isAnnotationPresent(Reference.class)) {
-      addReference(p, p.getAnnotationsByType(Reference.class), map);
-    }
-  }
-
-  private static String linkFor(Class<?> cls) {
-    return cls.getName().replace('.', '/') + ".html";
-  }
-
-  private static String linkFor(Package name) {
-    return name.getName().replace('.', '/') + "/package-summary.html";
-  }
-
   /**
-   * Find all classes that have the reference annotation
-   *
-   * @return All classes with the reference annotation.
+   * Comparator for sorting the list of classes for each reference.
    */
-  public static ArrayList<Class<?>> findAllClassesWithReferences() {
-    ArrayList<Class<?>> references = new ArrayList<>();
-    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
-      if(cls.isAnnotationPresent(Reference.class)) {
-        references.add(cls);
-      }
-      else {
-        for(Method m : cls.getDeclaredMethods()) {
-          if(m.isAnnotationPresent(Reference.class)) {
-            references.add(cls);
-          }
-        }
-      }
+  private static final Comparator<Object> SORT_PKGS_AND_CLASSES = new Comparator<Object>() {
+    @Override
+    public int compare(Object o1, Object o2) {
+      String n1 = (o1 instanceof Class) ? ((Class<?>) o1).getName() : ((Package) o1).getName();
+      String n2 = (o2 instanceof Class) ? ((Class<?>) o2).getName() : ((Package) o2).getName();
+      return n1.compareTo(n2);
     }
-    return references;
-  }
+  };
+
+  private static Comparator<Map.Entry<Reference, TreeSet<Object>>> SORT_BY_FIRST_CLASS = new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
+    @Override
+    public int compare(Map.Entry<Reference, TreeSet<Object>> p1, Map.Entry<Reference, TreeSet<Object>> p2) {
+      final Object o1 = p1.getValue().first(), o2 = p2.getValue().first();
+      int c = SORT_PKGS_AND_CLASSES.compare(o1, o2);
+      if(c == 0) {
+        Reference r1 = p1.getKey(), r2 = p2.getKey();
+        c = compareNull(r1.title(), r2.title());
+        c = (c != 0) ? c : compareNull(r1.authors(), r2.authors());
+        c = (c != 0) ? c : compareNull(r1.booktitle(), r2.booktitle());
+      }
+      return c;
+    }
+
+    /**
+     * Null-tolerant String comparison.
+     * 
+     * @param s1 First string
+     * @param s2 Second string
+     * @return Order
+     */
+    private int compareNull(String s1, String s2) {
+      return (s1 == s2) ? 0 //
+          : (s1 == null) ? -1 //
+              : (s2 == null) ? +1 //
+                  : s1.compareTo(s2);
+    }
+  };
+
 }
