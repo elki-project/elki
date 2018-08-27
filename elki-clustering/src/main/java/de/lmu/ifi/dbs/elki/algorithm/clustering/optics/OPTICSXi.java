@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -58,10 +59,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Class to handle OPTICS Xi extraction.
- *
+ * <p>
  * Note: this implementation includes an additional filter step that prunes
  * elements from a steep up area that don't have the predecessor in the cluster.
  * This removes a popular type of artifacts.
+ * <p>
+ * Reference:
+ * <p>
+ * Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander<br>
+ * OPTICS: Ordering Points to Identify the Clustering Structure<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)
+ * <p>
+ * Filtering technique:
+ * <p>
+ * Erich Schubert, Michael Gertz<br>
+ * Improving the Cluster Structure Extracted from OPTICS Plots<br>
+ * Proc. Lernen, Wissen, Daten, Analysen (LWDA 2018)
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -70,6 +83,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.uses ClusterOrder
  * @apiviz.has SteepAreaResult
  */
+@Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
+    title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+    url = "https://doi.org/10.1145/304181.304187")
+@Reference(authors = "Erich Schubert, Michael Gertz", //
+    title = "Improving the Cluster Structure Extracted from OPTICS Plots", //
+    booktitle = "Proc. Lernen, Wissen, Daten, Analysen (LWDA 2018)", //
+    url = "http://web.informatik.uni-mannheim.de/ponzetto/lwda18/paper37.pdf")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
 @Priority(Priority.RECOMMENDED)
 public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
@@ -268,7 +289,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             }
             // Case a) is the default
           }
-          // This NOT in the original article - please credit ELKI:
+          // MST-based filtering technique of Schubert:
           // ensure that the predecessor is in the current cluster.
           // This filter removes common artifacts from the Xi method
           if(!nocorrect) {

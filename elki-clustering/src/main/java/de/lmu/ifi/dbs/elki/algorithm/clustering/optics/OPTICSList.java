@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,17 +48,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
- *
+ * <p>
  * This version is implemented using a list, always scanning the list for the
  * maximum. While this could be cheaper than the complex heap updates,
  * benchmarks indicate the heap version is usually still preferable.
- *
+ * <p>
  * Reference:
  * <p>
- * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:<br />
- * OPTICS: Ordering Points to Identify the Clustering Structure. <br/>
- * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
- * </p>
+ * Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander<br>
+ * OPTICS: Ordering Points to Identify the Clustering Structure<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)
  *
  * @author Elke Achtert
  * @author Erich Schubert
@@ -70,10 +69,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", //
-title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
-url = "https://doi.org/10.1145/304181.304187")
+@Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
+    title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+    url = "https://doi.org/10.1145/304181.304187")
 public class OPTICSList<O> extends AbstractOPTICS<O> {
   /**
    * The logger for this class.
@@ -232,7 +231,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
      * @param out Output variable
      */
     public void findBest(ArrayModifiableDBIDs candidates, DBIDArrayMIter it, DBIDVar out) {
-      assert(candidates.size() > 0);
+      assert (candidates.size() > 0);
       int best = 0;
       double min = reachability.doubleValue(it.seek(0));
       for(it.advance(); it.valid(); it.advance()) {
