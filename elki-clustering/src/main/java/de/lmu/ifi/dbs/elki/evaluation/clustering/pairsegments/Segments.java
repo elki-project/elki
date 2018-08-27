@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Creates segments of two or more clusterings.
- * 
  * <p>
  * Segments are the equally paired database objects of all given (2+)
  * clusterings. Given a contingency table, an object Segment represents the
@@ -54,31 +53,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * clustering. Here, these pair Segments are referenced as fragmented Segments.
  * Within the visualization they describe (at least two) pair Segments that have
  * a corresponding object Segment.
- * </p>
- * 
+ * <p>
  * Reference:
  * <p>
- * Evaluation of Clusterings – Metrics and Visual Support<br />
- * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
- * Zimek<br />
- * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
- * </p>
- * 
- * <p>
- * Details on the experimental setup can be found at:
- * <a href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation" >wiki/
- * Examples/ClusterEvaluation</a>
- * </p>
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert,
+ * Arthur Zimek<br>
+ * Evaluation of Clusterings – Metrics and Visual Support<br>
+ * Proc. 28th International Conference on Data Engineering (ICDE 2012)
  * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.composedOf Segment
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
-    authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+@Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Evaluation of Clusterings - Metrics and Visual Support", //
+    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.128")
 public class Segments extends BasicResult implements Iterable<Segment> {
   /**

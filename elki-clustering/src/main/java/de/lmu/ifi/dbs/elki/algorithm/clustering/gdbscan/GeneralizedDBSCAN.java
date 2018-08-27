@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,12 +33,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -55,14 +50,13 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * Generalized DBSCAN, density-based clustering with noise.
- *
+ * <p>
  * Reference:
  * <p>
- * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br />
- * Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its
- * Applications<br />
- * In: Data Mining and Knowledge Discovery, 1998.
- * </p>
+ * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br>
+ * Density-Based Clustering in Spatial Databases:
+ * The Algorithm GDBSCAN and Its Applications<br>
+ * Data Mining and Knowledge Discovery, 1998.
  *
  * @author Erich Schubert
  * @author Arthur Zimek
@@ -75,9 +69,9 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
  * @apiviz.composedOf NeighborPredicate
  */
 @Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
-title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
-booktitle = "Data Mining and Knowledge Discovery", //
-url = "https://doi.org/10.1023/A:1009745219419")
+    title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
+    booktitle = "Data Mining and Knowledge Discovery", //
+    url = "https://doi.org/10.1023/A:1009745219419")
 public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
@@ -336,19 +330,19 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * Parameter for neighborhood predicate.
      */
     public static final OptionID NEIGHBORHOODPRED_ID = new OptionID("gdbscan.neighborhood", //
-    "Neighborhood predicate for Generalized DBSCAN");
+        "Neighborhood predicate for Generalized DBSCAN");
 
     /**
      * Parameter for core predicate.
      */
     public static final OptionID COREPRED_ID = new OptionID("gdbscan.core", //
-    "Core point predicate for Generalized DBSCAN");
+        "Core point predicate for Generalized DBSCAN");
 
     /**
      * Flag to keep track of core points.
      */
     public static final OptionID COREMODEL_ID = new OptionID("gdbscan.core-model", //
-    "Use a model that keeps track of core points. Needs more memory.");
+        "Use a model that keeps track of core points. Needs more memory.");
 
     /**
      * Neighborhood predicate.

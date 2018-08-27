@@ -61,24 +61,23 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * on-demand. This usually needs less memory (except for very small neighborhood
  * sizes k) than {@link SpacefillingMaterializeKNNPreprocessor}, but will also
  * be slower.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Schubert, A. Zimek, H.-P. Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Fast and Scalable Outlier Detection with Approximate Nearest Neighbor
- * Ensembles<br />
- * Proc. 20th International Conference on Database Systems for Advanced
- * Applications (DASFAA), Hanoi, Vietnam, 2015.
- * </p>
+ * Ensembles<br>
+ * Proc. 20th Int. Conf. Database Systems for Advanced Applications
+ * (DASFAA 2015)
  *
  * @author Erich Schubert
  * @since 0.7.0
  *
  * @apiviz.has SpaceFillingKNNQuery
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
-    booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+    booktitle = "Proc. 20th Int. Conf. Database Systems for Advanced Applications (DASFAA 2015)", //
     url = "https://doi.org/10.1007/978-3-319-18123-3_2")
 public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNIndex<O> {
   /**

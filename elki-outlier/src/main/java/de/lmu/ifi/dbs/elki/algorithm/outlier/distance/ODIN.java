@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,27 +50,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
- *
+ * <p>
  * This is a curried version: instead of using a threshold T to obtain a binary
  * decision, we use the computed value as outlier score; normalized by k to make
  * the numbers more comparable across different parameterizations.
- *
+ * <p>
  * Reference:
  * <p>
- * V. Hautamäki and I. Kärkkäinen and P. Fränti<br />
- * Outlier detection using k-nearest neighbour graph<br />
- * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004
- * </p>
+ * V. Hautamäki and I. Kärkkäinen and P. Fränti<br>
+ * Outlier detection using k-nearest neighbour graph<br>
+ * Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)
  *
  * @author Erich Schubert
  * @since 0.6.0
  *
  * @param <O> Object type
  */
-@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P. Fränti", //
-title = "Outlier detection using k-nearest neighbour graph", //
-booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
-url = "https://doi.org/10.1109/ICPR.2004.1334558")
+@Reference(authors = "V. Hautamäki, I. Kärkkäinen, P. Fränti", //
+    title = "Outlier detection using k-nearest neighbour graph", //
+    booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //
+    url = "https://doi.org/10.1109/ICPR.2004.1334558")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN" })
 public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -177,7 +176,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       super.makeOptions(config);
 
       IntParameter param = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(param)) {
         k = param.intValue();
       }

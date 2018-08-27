@@ -23,17 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -53,14 +44,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract base class for HDBSCAN variations.
- *
+ * <p>
  * Reference:
  * <p>
- * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
- * Density-Based Clustering Based on Hierarchical Density Estimates<br />
- * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
- * PAKDD
- * </p>
+ * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
+ * Density-Based Clustering Based on Hierarchical Density Estimates<br>
+ * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -73,10 +62,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
-@Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
-title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
-url = "https://doi.org/10.1007/978-3-642-37456-2_14")
+@Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
+    title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
+    booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
+    url = "https://doi.org/10.1007/978-3-642-37456-2_14")
 public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDistanceBasedAlgorithm<O, R> {
   /**
    * MinPts parameter.
@@ -318,7 +307,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
       super.makeOptions(config); // distanceFunction
 
       IntParameter minptsP = new IntParameter(MIN_PTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(minptsP)) {
         minPts = minptsP.getValue();
       }

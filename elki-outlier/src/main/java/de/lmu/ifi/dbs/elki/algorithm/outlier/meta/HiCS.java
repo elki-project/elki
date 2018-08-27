@@ -81,29 +81,26 @@ import net.jafama.FastMath;
 /**
  * Algorithm to compute High Contrast Subspaces for Density-Based Outlier
  * Ranking.
- * 
+ * <p>
  * Reference:
  * <p>
- * F. Keller, E. Müller, K. Böhm:<br />
- * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br />
- * in: Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012), Washington,
- * DC, USA
- * </p>
- * 
+ * F. Keller, E. Müller, K. Böhm<br>
+ * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br>
+ * Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)
+ *
  * @author Jan Brusis
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.composedOf GoodnessOfFitTest
  * @apiviz.composedOf OutlierAlgorithm
- * 
  * @param <V> vector type
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
 @Reference(authors = "F. Keller, E. Müller, K. Böhm", //
     title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
-    booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", //
+    booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.88")
 public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

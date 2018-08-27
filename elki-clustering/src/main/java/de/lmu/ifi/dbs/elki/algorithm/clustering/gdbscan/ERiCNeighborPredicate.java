@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -35,12 +32,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -58,28 +50,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * ERiC neighborhood predicate.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek:<br />
- * On Exploring Complex Relationships of Correlation Clusters.<br />
- * In Proc. 19th International Conference on Scientific and Statistical Database
- * Management (SSDBM 2007), Banff, Canada, 2007.
- * </p>
- * 
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger,
+ * Arthur Zimek<br>
+ * On Exploring Complex Relationships of Correlation Clusters<br>
+ * Proc. 19th Int. Conf. Scientific and Statistical Database Management
+ * (SSDBM 2007)
+ * <p>
  * TODO: improve performance by allowing index support for finding neighbors
  * and/or exploiting the data partitioning better.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", //
-title = "On Exploring Complex Relationships of Correlation Clusters", //
-booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
-url = "https://doi.org/10.1109/SSDBM.2007.21")
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
+    title = "On Exploring Complex Relationships of Correlation Clusters", //
+    booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
+    url = "https://doi.org/10.1109/SSDBM.2007.21")
 public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPredicate<DBIDs> {
   /**
    * The logger for this class.
@@ -109,7 +101,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
 
   @Override
   public Instance instantiate(Database database) {
-    return instantiate(database, database.<V>getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return instantiate(database, database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -216,7 +208,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
       }
 
       return mahalanobisDistance(pca1.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau //
-      && mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
+          && mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
     }
 
     /**

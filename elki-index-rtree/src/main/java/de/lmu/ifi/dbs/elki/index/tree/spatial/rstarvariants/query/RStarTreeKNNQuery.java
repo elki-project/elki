@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,25 +40,24 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Instance of a KNN query for a particular spatial index.
- * 
+ * <p>
  * Reference:
  * <p>
- * G. R. Hjaltason, H. Samet<br />
- * Ranking in spatial databases<br />
- * In: 4th Symposium on Advances in Spatial Databases, SSD'95
- * </p>
- * 
+ * G. R. Hjaltason, H. Samet<br>
+ * Ranking in spatial databases<br>
+ * 4th Symp. Advances in Spatial Databases (SSD'95)
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  * @apiviz.uses DoubleDistanceSearchCandidate
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
-title = "Ranking in spatial databases", //
-booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
-url = "https://doi.org/10.1007/3-540-60159-7_6")
+    title = "Ranking in spatial databases", //
+    booktitle = "4th Symp. Advances in Spatial Databases (SSD'95)", //
+    url = "https://doi.org/10.1007/3-540-60159-7_6")
 public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<O> {
   /**
    * The index to use

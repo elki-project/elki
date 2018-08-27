@@ -1,22 +1,20 @@
 /**
  * <p>Generalized DBSCAN.</p>
- * 
  * Generalized DBSCAN is an abstraction of the original DBSCAN idea,
  * that allows the use of arbitrary "neighborhood" and "core point" predicates.
- * 
+ * <p>
  * For each object, the neighborhood as defined by the "neighborhood" predicate
  * is retrieved - in original DBSCAN, this is the objects within an epsilon sphere
  * around the query object. Then the core point predicate is evaluated to decide if
  * the object is considered dense. If so, a cluster is started (or extended) to
  * include the neighbors as well.
- * 
  * <p>
- * Reference:<br />
- * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu:<br />
- * Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its
- * Applications<br />
- * In: Data Mining and Knowledge Discovery, 1998.
- * </p>
+ * Reference:
+ * <p>
+ * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br>
+ * Density-Based Clustering in Spatial Databases:
+ * The Algorithm GDBSCAN and Its Applications<br>
+ * Data Mining and Knowledge Discovery, 1998.
  * 
  * @apiviz.exclude .*\.Instance$
  */
@@ -24,7 +22,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

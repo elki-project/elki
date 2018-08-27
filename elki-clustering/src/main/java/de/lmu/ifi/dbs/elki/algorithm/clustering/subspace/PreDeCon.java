@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,30 +40,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * PreDeCon computes clusters of subspace preference weighted connected points.
  * The algorithm searches for local subgroups of a set of feature vectors having
  * a low variance along one or more (but not all) attributes.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
- * Density Connected Clustering with Local Subspace Preferences.<br />
- * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
- * </p>
- * 
+ * Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger<br>
+ * Density Connected Clustering with Local Subspace Preferences.<br>
+ * Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)
+ *
  * @author Peer Kröger
  * @since 0.2
- * 
+ *
  * @apiviz.has PreDeCon.Settings
  * @apiviz.composedOf PreDeConNeighborPredicate
  * @apiviz.composedOf PreDeConCorePredicate
- * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. "//
     + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", //
-title = "Density Connected Clustering with Local Subspace Preferences", //
-booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", //
-url = "https://doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
+    title = "Density Connected Clustering with Local Subspace Preferences", //
+    booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
+    url = "https://doi.org/10.1109/ICDM.2004.10087")
 public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
@@ -167,7 +165,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configEpsilon(Parameterization config) {
         DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(config.grab(epsilonP)) {
           settings.epsilon = epsilonP.doubleValue();
         }
@@ -180,7 +178,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configMinPts(Parameterization config) {
         IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           settings.minpts = minptsP.intValue();
         }
@@ -193,7 +191,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configDelta(Parameterization config) {
         DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
-        .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if(config.grab(deltaP)) {
           settings.delta = deltaP.doubleValue();
         }
@@ -206,8 +204,8 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configKappa(Parameterization config) {
         DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
-        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-        .setDefaultValue(KAPPA_DEFAULT);
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+            .setDefaultValue(KAPPA_DEFAULT);
         if(config.grab(kappaP)) {
           settings.kappa = kappaP.doubleValue();
         }
@@ -220,8 +218,8 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configLambda(Parameterization config) {
         IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-        .setOptional(true);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .setOptional(true);
         if(config.grab(lambdaP)) {
           settings.lambda = lambdaP.intValue();
         }

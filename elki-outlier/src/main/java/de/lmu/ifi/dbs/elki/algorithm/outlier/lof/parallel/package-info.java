@@ -1,16 +1,15 @@
 /**
  * Parallelized variants of LOF.
- * 
+ * <p>
  * This parallelization is based on the generalization of outlier detection
  * published in:
- * 
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Local Outlier Detection Reconsidered: a Generalized View on Locality with
- * Applications to Spatial, Video, and Network Outlier Detection<br />
- * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
- * </p>
+ * Applications to Spatial, Video, and Network Outlier Detection<br>
+ * Data Mining and Knowledge Discovery 28(1)
  */
 /*
  * This file is part of ELKI:
@@ -32,9 +31,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
-    booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
+    booktitle = "Data Mining and Knowledge Discovery 28(1)", //
     url = "https://doi.org/10.1007/s10618-012-0300-z")
 package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 

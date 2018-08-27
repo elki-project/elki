@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,7 @@ import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -63,16 +59,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Outlier Detection with Kernel Density Functions.
- *
+ * <p>
  * A variation of LOF which uses kernel density estimation, but in contrast to
  * {@link SimpleKernelDensityLOF} also uses the reachability concept of LOF.
- *
+ * <p>
  * Reference:
  * <p>
- * Outlier Detection with Kernel Density Functions.<br/>
- * L. J. Latecki, A. Lazarevic, D. Pokrajac<br />
- * Machine Learning and Data Mining in Pattern Recognition 2007
- * </p>
+ * Outlier Detection with Kernel Density Functions.<br>
+ * L. J. Latecki, A. Lazarevic, D. Pokrajac<br>
+ * Machine Learning and Data Mining in Pattern Recognition
  *
  * @author Erich Schubert
  * @since 0.5.5
@@ -83,9 +78,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of objects handled by this Algorithm
  */
 @Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", //
-title = "Outlier Detection with Kernel Density Functions", //
-booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
-url = "https://doi.org/10.1007/978-3-540-73499-4_6")
+    title = "Outlier Detection with Kernel Density Functions", //
+    booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
+    url = "https://doi.org/10.1007/978-3-540-73499-4_6")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LDF")
 public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

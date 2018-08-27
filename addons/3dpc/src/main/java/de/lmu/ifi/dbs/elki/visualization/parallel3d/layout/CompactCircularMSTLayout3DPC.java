@@ -25,26 +25,23 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-
 import net.jafama.FastMath;
 
 /**
  * Simple circular layout based on the minimum spanning tree.
- * 
+ * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
- * Proceedings of the 2013 ACM International Conference on Management of Data
- * (SIGMOD), New York City, NY, 2013.
- * </p>
- * 
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
-    booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+    booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
     url = "https://doi.org/10.1145/2463676.2463696")
 public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCircularMSTLayout3DPC.Node> {
   /**

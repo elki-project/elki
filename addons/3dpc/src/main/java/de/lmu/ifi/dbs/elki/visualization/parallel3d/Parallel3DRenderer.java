@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import net.jafama.FastMath;
 
 /**
  * Renderer for 3D parallel plots.
- * 
+ * <p>
  * The tricky part here is the vertex buffer layout. We are drawing lines, so we
  * need two vertices for each macro edge (edge between axes in the plot). We
  * furthermore need the following properties: we need to draw edges sorted by
@@ -60,27 +60,27 @@ import net.jafama.FastMath;
  * different colors for clusters. An efficient batch therefore will consist of
  * one edge-color combination. The input data comes in color-object ordering, so
  * we need to seek through the edges when writing the buffer.
- * 
+ * <p>
  * In total, we have 2 * obj.size * edges.size vertices.
- * 
+ * <p>
  * Where obj.size = sum(col.sizes)
- * 
+ * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
- * Proceedings of the 2013 ACM International Conference on Management of Data
- * (SIGMOD), New York City, NY, 2013.
- * </p>
- * 
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
+ * <p>
  * TODO: generalize to non-numeric features and scales.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
  * @param <O> Object type
  */
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "https://doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+    booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
+    url = "https://doi.org/10.1145/2463676.2463696")
 public class Parallel3DRenderer<O extends NumberVector> {
   /**
    * Logging class.
@@ -137,25 +137,26 @@ public class Parallel3DRenderer<O extends NumberVector> {
     this.shared = shared;
     this.dindex = new int[shared.dim];
     axes = new DoubleIntPair[shared.dim];
-    for (int i = 0; i < shared.dim; i++) {
+    for(int i = 0; i < shared.dim; i++) {
       axes[i] = new DoubleIntPair(0.0, 0);
     }
   }
 
   protected int prepare(GL2 gl) {
-    if (completedTextures < 0) {
-      if (textures != null) {
+    if(completedTextures < 0) {
+      if(textures != null) {
         gl.glDeleteTextures(textures.length, textures, 0);
         textures = null;
       }
       completedTextures = 0;
     }
-    if (completedTextures >= shared.layout.edges.size()) {
+    if(completedTextures >= shared.layout.edges.size()) {
       return 0;
     }
-    if (!LOG.isDebugging()) {
+    if(!LOG.isDebugging()) {
       renderTexture(gl, completedTextures);
-    } else {
+    }
+    else {
       long start = System.nanoTime();
       renderTexture(gl, completedTextures);
       long end = System.nanoTime();
@@ -170,35 +171,36 @@ public class Parallel3DRenderer<O extends NumberVector> {
     // Sort edges by the maximum (foreground) index.
     IntIntPair[] edgesort = sortEdges(dindex);
 
-    if (textures != null) {
+    if(textures != null) {
       gl.glShadeModel(GL2.GL_FLAT);
       // Render spider web:
       gl.glLineWidth(shared.settings.linewidth); // outside glBegin!
       gl.glBegin(GL.GL_LINES);
       gl.glColor4f(0f, 0f, 0f, 1f);
-      for (Layout.Edge edge : shared.layout.edges) {
-        Node n1 = shared.layout.getNode(edge.dim1), n2 = shared.layout.getNode(edge.dim2);
+      for(Layout.Edge edge : shared.layout.edges) {
+        Node n1 = shared.layout.getNode(edge.dim1),
+            n2 = shared.layout.getNode(edge.dim2);
         gl.glVertex3d(n1.getX(), n1.getY(), 0f);
         gl.glVertex3d(n2.getX(), n2.getY(), 0f);
       }
       gl.glEnd();
       // Draw axes and 3DPC:
-      for (int i = 0; i < shared.dim; i++) {
+      for(int i = 0; i < shared.dim; i++) {
         final int d = axes[i].second;
         final Node node1 = shared.layout.getNode(d);
         // Draw edge textures
-        for (IntIntPair pair : edgesort) {
+        for(IntIntPair pair : edgesort) {
           // Not yet available?
-          if (pair.second >= completedTextures) {
+          if(pair.second >= completedTextures) {
             continue;
           }
           // Other axis must have a smaller index.
-          if (pair.first >= i) {
+          if(pair.first >= i) {
             continue;
           }
           Layout.Edge edge = shared.layout.edges.get(pair.second);
           // Must involve the current axis.
-          if (edge.dim1 != d && edge.dim2 != d) {
+          if(edge.dim1 != d && edge.dim2 != d) {
             continue;
           }
           int od = axes[pair.first].second;
@@ -231,7 +233,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
         LinearScale scale = shared.proj.getAxisScale(d);
         gl.glPointSize(shared.settings.linewidth * 2f);
         gl.glBegin(GL.GL_POINTS);
-        for (double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
+        for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
           gl.glVertex3d(node1.getX(), node1.getY(), scale.getScaled(tick));
         }
         gl.glEnd();
@@ -247,7 +249,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
     prepareColors(shared.stylepol);
 
     // Setup buffer IDs:
-    if (vbi[0] < 0) {
+    if(vbi[0] < 0) {
       gl.glGenBuffers(1, vbi, 0);
       // Buffer for coordinates.
       gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
@@ -255,18 +257,19 @@ public class Parallel3DRenderer<O extends NumberVector> {
           * 2 // 2 Points *
           * 5 // 2 coordinates + 3 color
           * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
-    } else {
+    }
+    else {
       gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
     }
 
     // Generate textures:
-    if (textures == null) {
+    if(textures == null) {
       textures = new int[shared.layout.edges.size()];
       gl.glGenTextures(textures.length, textures, 0);
     }
 
     // Get a framebuffer:
-    if (frameBufferID[0] < 0) {
+    if(frameBufferID[0] < 0) {
       gl.glGenFramebuffers(1, frameBufferID, 0);
     }
 
@@ -294,7 +297,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
       gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, //
           GL.GL_TEXTURE_2D, textures[edge], 0);
 
-      if (gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
+      if(gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
         LOG.warning("glCheckFramebufferStatus: " + gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER));
       }
 
@@ -317,13 +320,13 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
       gl.glLineWidth(shared.settings.linewidth);
 
-      if (shared.stylepol instanceof ClassStylingPolicy) {
+      if(shared.stylepol instanceof ClassStylingPolicy) {
         ClassStylingPolicy csp = (ClassStylingPolicy) shared.stylepol;
         final int mincolor = csp.getMinStyle();
         ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
-        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
+        for(DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
           final O vec = shared.rel.get(it);
           final int c = (csp.getStyleForDBID(it) - mincolor) * 3;
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
@@ -352,11 +355,12 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-      } else {
+      }
+      else {
         ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
-        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
+        for(DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
           final O vec = shared.rel.get(it);
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
           final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim2), e.dim2);
@@ -378,7 +382,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
       }
 
-      if (shared.settings.mipmaps > 0) {
+      if(shared.settings.mipmaps > 0) {
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, shared.settings.mipmaps);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
@@ -388,7 +392,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
       }
       gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-      if (!gl.glIsTexture(textures[0])) {
+      if(!gl.glIsTexture(textures[0])) {
         LOG.warning("Generating texture failed!");
       }
     }
@@ -398,7 +402,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
     gl.glPopAttrib();
 
     ++completedTextures;
-    if (completedTextures == shared.layout.edges.size()) {
+    if(completedTextures == shared.layout.edges.size()) {
       // Free vertex buffer
       gl.glDeleteBuffers(vbi.length, vbi, 0);
       vbi[0] = -1;
@@ -409,19 +413,20 @@ public class Parallel3DRenderer<O extends NumberVector> {
   }
 
   private void prepareColors(final StylingPolicy sp) {
-    if (colors == null) {
+    if(colors == null) {
       final ColorLibrary cols = shared.stylelib.getColorSet(StyleLibrary.PLOT);
-      if (sp instanceof ClassStylingPolicy) {
+      if(sp instanceof ClassStylingPolicy) {
         ClassStylingPolicy csp = (ClassStylingPolicy) sp;
         final int maxStyle = csp.getMaxStyle();
         colors = new float[maxStyle * 3];
-        for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
+        for(int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
           Color col = SVGUtil.stringToColor(cols.getColor(s));
           colors[c + 0] = col.getRed() / 255.f;
           colors[c + 1] = col.getGreen() / 255.f;
           colors[c + 2] = col.getBlue() / 255.f;
         }
-      } else {
+      }
+      else {
         // Render in black.
         colors = new float[] { 0f, 0f, 0f };
       }
@@ -429,10 +434,11 @@ public class Parallel3DRenderer<O extends NumberVector> {
   }
 
   protected void forgetTextures(GL gl) {
-    if (gl == null) {
+    if(gl == null) {
       completedTextures = -1;
-    } else {
-      if (textures != null) {
+    }
+    else {
+      if(textures != null) {
         gl.glDeleteTextures(textures.length, textures, 0);
         textures = null;
       }
@@ -446,13 +452,13 @@ public class Parallel3DRenderer<O extends NumberVector> {
    * @param axes Sorted list of (depth, axis)
    */
   private void sortAxes() {
-    for (int d = 0; d < shared.dim; d++) {
+    for(int d = 0; d < shared.dim; d++) {
       double dist = shared.camera.squaredDistanceFromCamera(shared.layout.getNode(d).getX(), shared.layout.getNode(d).getY());
       axes[d].first = -dist;
       axes[d].second = d;
     }
     Arrays.sort(axes);
-    for (int i = 0; i < shared.dim; i++) {
+    for(int i = 0; i < shared.dim; i++) {
       dindex[axes[i].second] = i;
     }
   }
@@ -468,7 +474,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
   private IntIntPair[] sortEdges(int[] dindex) {
     IntIntPair[] edgesort = new IntIntPair[shared.layout.edges.size()];
     int e = 0;
-    for (Layout.Edge edge : shared.layout.edges) {
+    for(Layout.Edge edge : shared.layout.edges) {
       int i1 = dindex[edge.dim1], i2 = dindex[edge.dim2];
       edgesort[e] = new IntIntPair(Math.min(i1, i2), e);
       e++;
@@ -485,17 +491,18 @@ public class Parallel3DRenderer<O extends NumberVector> {
     // While the text will be visible from +Z and +Y is baseline.
     gl.glRotatef(90.f, 1.f, 0.f, 0.f);
     // HalfPI: 180 degree extra rotation, for text orientation.
-    double cos = FastMath.cos(shared.camera.getRotationZ()), sin = FastMath.sin(shared.camera.getRotationZ());
+    double cos = FastMath.cos(shared.camera.getRotationZ()),
+        sin = FastMath.sin(shared.camera.getRotationZ());
 
     shared.textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
     float defaultscale = .01f / (float) FastMath.sqrt(shared.dim);
     final float targetwidth = .2f; // TODO: div depth?
     final float minratio = 8.f; // Assume all text is at least this width
-    for (int i = 0; i < shared.dim; i++) {
-      if (shared.labels[i] != null) {
+    for(int i = 0; i < shared.dim; i++) {
+      if(shared.labels[i] != null) {
         Rectangle2D b = shared.textrenderer.getBounds(shared.labels[i]);
         float scale = defaultscale;
-        if (Math.max(b.getWidth(), b.getHeight() * minratio) * scale > targetwidth) {
+        if(Math.max(b.getWidth(), b.getHeight() * minratio) * scale > targetwidth) {
           scale = targetwidth / (float) Math.max(b.getWidth(), b.getHeight() * minratio);
         }
         float w = (float) b.getWidth() * scale;
@@ -507,9 +514,9 @@ public class Parallel3DRenderer<O extends NumberVector> {
     }
 
     // Show depth indexes on debug:
-    if (OpenGL3DParallelCoordinates.Instance.DEBUG) {
+    if(OpenGL3DParallelCoordinates.Instance.DEBUG) {
       shared.textrenderer.setColor(1f, 0f, 0f, 1f);
-      for (IntIntPair pair : edgesort) {
+      for(IntIntPair pair : edgesort) {
         Layout.Edge edge = shared.layout.edges.get(pair.second);
         final Node node1 = shared.layout.getNode(edge.dim1);
         final Node node2 = shared.layout.getNode(edge.dim2);

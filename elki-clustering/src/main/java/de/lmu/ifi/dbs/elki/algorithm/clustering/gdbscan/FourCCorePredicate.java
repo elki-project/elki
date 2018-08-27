@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,26 +30,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * The PreDeCon core point predicate -- having at least minpts. neighbors, and a
- * maximum preference dimensionality of lambda.
- * 
+ * The 4C core point predicate.
  * <p>
  * Reference:
  * <p>
- * C. Böhm, K. Kailing, P. Kröger, A. Zimek:<br />
- * Computing Clusters of Correlation Connected Objects. <br>
- * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
- * </p>
- * 
+ * Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek<br>
+ * Computing Clusters of Correlation Connected Objects<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.has Instance
  */
-@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", //
-title = "Computing Clusters of Correlation Connected Objects", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
-url = "https://doi.org/10.1145/1007568.1007620")
+@Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
+    title = "Computing Clusters of Correlation Connected Objects", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
+    url = "https://doi.org/10.1145/1007568.1007620")
 public class FourCCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.

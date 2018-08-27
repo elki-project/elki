@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,14 +31,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Evaluate clustering results by building segments for their pairs: shared
  * pairs and differences.
- * 
+ * <p>
  * Reference:
  * <p>
- * Evaluation of Clusterings – Metrics and Visual Support<br />
- * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
- * Zimek<br />
- * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
- * </p>
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert,
+ * Arthur Zimek<br>
+ * Evaluation of Clusterings – Metrics and Visual Support<br>
+ * Proc. 28th International Conference on Data Engineering (ICDE 2012)
  *
  * @author Sascha Goldhofer
  * @author Erich Schubert
@@ -47,10 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses Clustering
  * @apiviz.uses Segments
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
-authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
-url = "https://doi.org/10.1109/ICDE.2012.128")
+@Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Evaluation of Clusterings - Metrics and Visual Support", //
+    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE 2012)", //
+    url = "https://doi.org/10.1109/ICDE.2012.128")
 public class ClusterPairSegmentAnalysis implements Evaluator {
   /**
    * Constructor.

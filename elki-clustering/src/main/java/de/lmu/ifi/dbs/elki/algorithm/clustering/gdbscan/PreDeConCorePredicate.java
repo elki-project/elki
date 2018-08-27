@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,23 +32,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * The PreDeCon core point predicate -- having at least minpts. neighbors, and a
  * maximum preference dimensionality of lambda.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
- * Density Connected Clustering with Local Subspace Preferences.<br />
- * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
- * </p>
- * 
+ * Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger<br>
+ * Density Connected Clustering with Local Subspace Preferences.<br>
+ * Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.has Instance
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", //
-title = "Density Connected Clustering with Local Subspace Preferences", //
-booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", //
-url = "https://doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
+    title = "Density Connected Clustering with Local Subspace Preferences", //
+    booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
+    url = "https://doi.org/10.1109/ICDM.2004.10087")
 public class PreDeConCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.

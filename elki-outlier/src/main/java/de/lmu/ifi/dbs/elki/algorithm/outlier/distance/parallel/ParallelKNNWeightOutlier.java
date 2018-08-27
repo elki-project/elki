@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,35 +54,32 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Parallel implementation of KNN Weight Outlier detection.
- * 
+ * <p>
  * Reference:
  * <p>
- * F. Angiulli, C. Pizzuti:<br />
- * Fast Outlier Detection in High Dimensional Spaces.<br />
- * In: Proc. European Conference on Principles of Knowledge Discovery and Data
- * Mining (PKDD'02), Helsinki, Finland, 2002.
- * </p>
- *
+ * F. Angiulli, C. Pizzuti<br>
+ * Fast Outlier Detection in High Dimensional Spaces<br>
+ * Proc. European Conf. Principles of Knowledge Discovery and Data Mining
+ * (PKDD'02)
+ * <p>
  * This parallelized implementation is based on the easy-to-parallelize
  * generalized pattern discussed in
  * <p>
- * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Local Outlier Detection Reconsidered: a Generalized View on Locality with
- * Applications to Spatial, Video, and Network Outlier Detection<br />
- * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
- * </p>
- * 
+ * Applications to Spatial, Video, and Network Outlier Detection<br>
+ * Data Mining and Knowledge Discovery 28(1)
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.composedOf KNNWeightProcessor
- * 
  * @param <O> Object type
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
-title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
-booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
-url = "https://doi.org/10.1007/s10618-012-0300-z")
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
+    title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
+    booktitle = "Data Mining and Knowledge Discovery 28(1)", //
+    url = "https://doi.org/10.1007/s10618-012-0300-z")
 public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k

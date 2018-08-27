@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,22 +26,21 @@ import net.jafama.FastMath;
 
 /**
  * Cosine interestingness measure, P(A,B)/sqrt(P(A)*P(B)).
- * 
+ * <p>
  * The interestingness measure called IS by Tan and Kumar.
- * 
+ * <p>
  * Reference:
  * <p>
- * P. Tan and V. Kumar<br />
- * Interestingness measures for association patterns: A perspective<br />
+ * P. Tan, V. Kumar<br>
+ * Interestingness measures for association patterns: A perspective<br>
  * In Proc. Workshop on Postprocessing in Machine Learning and Data Mining
- * </p>
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "P. Tan and V. Kumar", //
+@Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //
     booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
-    url="https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
+    url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
 public class Cosine implements InterestingnessMeasure {
   /**
    * Constructor.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,11 +37,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -66,31 +58,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
  * ORCLUS: Arbitrarily ORiented projected CLUSter generation.
- *
+ * <p>
  * Reference:
  * <p>
- * C. C. Aggarwal, P. S. Yu:<br />
- * Finding Generalized Projected Clusters in High Dimensional Spaces. <br/>
- * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
- * </p>
- * 
+ * C. C. Aggarwal, P. S. Yu<br>
+ * Finding Generalized Projected Clusters in High Dimensional Spaces<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
+ *
  * @author Elke Achtert
  * @since 0.2
- * 
+ *
  * @apiviz.has PCARunner
- * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggarwal, P. S. Yu", //
-title = "Finding Generalized Projected Clusters in High Dimensional Spaces", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", //
-url = "https://doi.org/10.1145/342009.335383")
+    title = "Finding Generalized Projected Clusters in High Dimensional Spaces", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", //
+    url = "https://doi.org/10.1145/342009.335383")
 public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<Model>, V> {
   /**
    * The logger for this class.
@@ -530,23 +521,23 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
       IntParameter k_iP = new IntParameter(K_I_ID, 30) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(k_iP)) {
         k_i = k_iP.getValue();
       }
       IntParameter lP = new IntParameter(L_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         l = lP.getValue();
       }
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

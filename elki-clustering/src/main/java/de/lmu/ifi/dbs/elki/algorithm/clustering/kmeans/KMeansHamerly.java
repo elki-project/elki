@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,17 +53,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+
 import net.jafama.FastMath;
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
- *
  * <p>
- * Reference:<br />
- * G. Hamerly<br/>
- * Making k-means even faster<br/>
+ * Reference:
+ * <p>
+ * G. Hamerly<br>
+ * Making k-means even faster<br>
  * Proc. 2010 SIAM International Conference on Data Mining
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -73,9 +73,9 @@ import net.jafama.FastMath;
  * @param <V> vector datatype
  */
 @Reference(authors = "G. Hamerly", //
-title = "Making k-means even faster", //
-booktitle = "Proc. 2010 SIAM International Conference on Data Mining", //
-url = "https://doi.org/10.1137/1.9781611972801.12")
+    title = "Making k-means even faster", //
+    booktitle = "Proc. 2010 SIAM International Conference on Data Mining", //
+    url = "https://doi.org/10.1137/1.9781611972801.12")
 public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

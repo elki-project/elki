@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,11 +34,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -67,36 +63,35 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Fast Outlier Detection in High Dimensional Spaces
- * 
+ * <p>
  * Outlier Detection using Hilbert space filling curves
- * 
+ * <p>
  * Reference:
  * <p>
- * F. Angiulli, C. Pizzuti:<br />
- * Fast Outlier Detection in High Dimensional Spaces.<br />
- * In: Proc. European Conference on Principles of Knowledge Discovery and Data
- * Mining (PKDD'02), Helsinki, Finland, 2002.
- * </p>
- * 
+ * F. Angiulli, C. Pizzuti<br>
+ * Fast Outlier Detection in High Dimensional Spaces<br>
+ * Proc. European Conf. Principles of Knowledge Discovery and Data Mining
+ * (PKDD'02)
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.composedOf HilbertFeatures
  * @apiviz.uses HilFeature
- * 
  * @param <O> Object type
  */
 @Title("Fast Outlier Detection in High Dimensional Spaces")
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
 @Reference(authors = "F. Angiulli, C. Pizzuti", //
-title = "Fast Outlier Detection in High Dimensional Spaces", //
-booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
-url = "https://doi.org/10.1007/3-540-45681-3_2")
+    title = "Fast Outlier Detection in High Dimensional Spaces", //
+    booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
+    url = "https://doi.org/10.1007/3-540-45681-3_2")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut" })
 public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

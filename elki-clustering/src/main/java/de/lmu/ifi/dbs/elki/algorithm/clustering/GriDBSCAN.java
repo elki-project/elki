@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,32 +68,30 @@ import net.jafama.FastMath;
 
 /**
  * Using Grid for Accelerating Density-Based Clustering.
- *
+ * <p>
  * An accelerated DBSCAN version for numerical data and Lp-norms only, by
  * partitioning the data set into overlapping grid cells. For best efficiency,
  * the overlap of the grid cells must be chosen well. The authors suggest a grid
  * width of 10 times epsilon.
- *
+ * <p>
  * Because of partitioning the data, this version does not make use of indexes.
- *
+ * <p>
  * Reference:
  * <p>
- * S. Mahran and K. Mahar: <br />
- * Using grid for accelerating density-based clustering.<br />
+ * S. Mahran, K. Mahar:<br>
+ * Using grid for accelerating density-based clustering.<br>
  * In 8th IEEE Int. Conf. on Computer and Information Technology, 2008.
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.1
  *
  * @apiviz.composedOf Instance
- *
  * @param <V> the type of vector the algorithm is applied to
  */
-@Reference(authors = "S. Mahran and K. Mahar", //
-title = "Using grid for accelerating density-based clustering", //
-booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
-url = "https://doi.org/10.1109/CIT.2008.4594646")
+@Reference(authors = "S. Mahran, K. Mahar", //
+    title = "Using grid for accelerating density-based clustering", //
+    booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
+    url = "https://doi.org/10.1109/CIT.2008.4594646")
 public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -494,7 +492,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         final int s = cell.size();
         if(s >= size >> 1) {
           LOG.warning("A single cell contains half of the database (" + s//
-          + " objects). This will not scale very well.");
+              + " objects). This will not scale very well.");
         }
         tcount += s;
         sqcount += s * (long) s;
@@ -506,9 +504,10 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       if(savings >= 1) {
         LOG.warning("Pairwise distances within each cells are more expensive than a full DBSCAN run due to overlap!");
       }
-      if (overflown) {
+      if(overflown) {
         LOG.statistics(new StringStatistic(GriDBSCAN.class.getName() + ".all-cells", "overflow"));
-      } else {
+      }
+      else {
         LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".all-cells", numcell));
       }
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".used-cells", grid.size()));
@@ -703,13 +702,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       }
 
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
 
       IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
         if(minpts <= 2) {
@@ -718,7 +717,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       }
 
       DoubleParameter gridP = new DoubleParameter(GRID_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(epsilon > 0.) {
         gridP.setDefaultValue(10. * epsilon) //
             .addConstraint(new GreaterEqualConstraint(1. * epsilon));

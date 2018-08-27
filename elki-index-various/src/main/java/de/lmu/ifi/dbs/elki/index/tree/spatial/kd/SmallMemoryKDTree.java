@@ -23,14 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.kd;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.QuickSelectDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -61,18 +54,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * dynamic updates or anything, but also is very simple and memory efficient:
  * all it uses is one {@link ModifiableDoubleDBIDList} to sort the data in a
  * serialized tree and store the current attribute value.
- *
+ * <p>
  * It needs about 3 times as much memory as {@link MinimalisticMemoryKDTree} but
  * it is also considerably faster because it does not need to lookup this value
  * from the vectors.
- *
+ * <p>
  * Reference:
  * <p>
- * J. L. Bentley<br/>
- * Multidimensional binary search trees used for associative searching<br />
- * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
- * </p>
- *
+ * J. L. Bentley<br>
+ * Multidimensional binary search trees used for associative searching<br>
+ * Communications of the ACM 18(9)
+ * <p>
  * TODO: add support for weighted Minkowski distances.
  *
  * @author Erich Schubert
@@ -80,14 +72,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @apiviz.has KDTreeKNNQuery
  * @apiviz.has KDTreeRangeQuery
- *
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", //
-title = "Multidimensional binary search trees used for associative searching", //
-booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
-url = "https://doi.org/10.1145/361002.361007")
-public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>implements KNNIndex<O>, RangeIndex<O> {
+    title = "Multidimensional binary search trees used for associative searching", //
+    booktitle = "Communications of the ACM 18(9)", //
+    url = "https://doi.org/10.1145/361002.361007")
+public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
    */
@@ -127,7 +118,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
   public SmallMemoryKDTree(Relation<O> relation, int leafsize) {
     super(relation);
     this.leafsize = leafsize;
-    assert(leafsize >= 1);
+    assert (leafsize >= 1);
     if(LOG.isStatistics()) {
       String prefix = this.getClass().getName();
       this.objaccess = LOG.newCounter(prefix + ".objaccess");
@@ -160,7 +151,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
    * @param iter Iterator
    */
   private void buildTree(int left, int right, int axis, DoubleDBIDListMIter iter) {
-    assert(left < right);
+    assert (left < right);
     for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
       iter.setDouble(relation.get(iter).doubleValue(axis));
       countObjectAccess();
@@ -310,7 +301,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
 
       // Distance to axis:
       final double delta = iter.seek(middle).doubleValue() - query.doubleValue(axis);
-      assert(iter.doubleValue() == relation.get(iter).doubleValue(axis)) : "Tree inconsistent " + left + " < " + middle + " < " + right + ": " + iter.doubleValue() + " != " + relation.get(iter).doubleValue(axis) + " " + relation.get(iter);
+      assert (iter.doubleValue() == relation.get(iter).doubleValue(axis)) : "Tree inconsistent " + left + " < " + middle + " < " + right + ": " + iter.doubleValue() + " != " + relation.get(iter).doubleValue(axis) + " " + relation.get(iter);
       final boolean onleft = (delta >= 0);
       final boolean onright = (delta <= 0);
 
@@ -325,7 +316,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= maxdist) {
-          assert(iter.getOffset() == middle);
+          assert (iter.getOffset() == middle);
           knns.insert(dist, iter /* .seek(middle) */);
           maxdist = knns.getKNNDistance();
         }
@@ -348,7 +339,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
             double dist = norm.distance(query, split);
             countDistanceComputation();
             if(dist <= maxdist) {
-              assert(iter.getOffset() == middle);
+              assert (iter.getOffset() == middle);
               knns.insert(dist, iter /* .seek(middle) */);
               maxdist = knns.getKNNDistance();
             }
@@ -451,7 +442,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= radius) {
-          assert(iter.getOffset() == middle);
+          assert (iter.getOffset() == middle);
           res.add(dist, iter /* .seek(middle) */);
         }
       }
@@ -525,7 +516,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         IntParameter leafP = new IntParameter(MinimalisticMemoryKDTree.Factory.Parameterizer.LEAFSIZE_P, 1) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(leafP)) {
           leafsize = leafP.intValue();
         }

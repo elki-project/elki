@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,29 +44,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 4C identifies local subgroups of data objects sharing a uniform correlation.
  * The algorithm is based on a combination of PCA and density-based clustering
  * (DBSCAN).
- *
+ * <p>
  * Reference:
  * <p>
- * C. Böhm, K. Kailing, P. Kröger, A. Zimek:<br />
- * Computing Clusters of Correlation Connected Objects. <br>
- * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
- * </p>
+ * Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek<br>
+ * Computing Clusters of Correlation Connected Objects<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
  *
  * @author Arthur Zimek
  * @since 0.2
  *
  * @apiviz.composedOf FourCNeighborPredicate
  * @apiviz.composedOf FourCCorePredicate
- *
  * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " //
     + "The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).")
-@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", //
-title = "Computing Clusters of Correlation Connected Objects", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
-url = "https://doi.org/10.1145/1007568.1007620")
+@Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
+    title = "Computing Clusters of Correlation Connected Objects", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
+    url = "https://doi.org/10.1145/1007568.1007620")
 public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
@@ -181,7 +179,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configEpsilon(Parameterization config) {
         DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(config.grab(epsilonP)) {
           settings.epsilon = epsilonP.doubleValue();
         }
@@ -194,7 +192,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configMinPts(Parameterization config) {
         IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           settings.minpts = minptsP.intValue();
         }
@@ -214,7 +212,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
         // Parameter delta
         DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(!settings.absolute) {
           deltaP.setDefaultValue(DEFAULT_DELTA);
         }
@@ -233,8 +231,8 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configKappa(Parameterization config) {
         DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
-        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-        .setDefaultValue(KAPPA_DEFAULT);
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+            .setDefaultValue(KAPPA_DEFAULT);
         if(config.grab(kappaP)) {
           settings.kappa = kappaP.doubleValue();
         }
@@ -247,8 +245,8 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
        */
       protected void configLambda(Parameterization config) {
         IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-        .setOptional(true);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .setOptional(true);
         if(config.grab(lambdaP)) {
           settings.lambda = lambdaP.intValue();
         }

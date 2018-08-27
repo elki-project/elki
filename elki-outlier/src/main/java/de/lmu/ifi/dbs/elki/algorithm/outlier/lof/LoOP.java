@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,18 +68,16 @@ import net.jafama.FastMath;
 
 /**
  * LoOP: Local Outlier Probabilities
- *
+ * <p>
  * Distance/density based algorithm similar to LOF to detect outliers, but with
  * statistical methods to achieve better result stability.
- *
+ * <p>
  * Reference:
  * <p>
- * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:<br />
- * LoOP: Local Outlier Probabilities< br /> In Proceedings of the 18th
- * International Conference on Information and Knowledge Management (CIKM), Hong
- * Kong, China, 2009
- * </p>
- *
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:<br>
+ * LoOP: Local Outlier Probabilities<br>
+ * Proc. 18th Int. Conf. Information and Knowledge Management (CIKM 2009)
+ * <p>
  * Implementation notes:
  * <ul>
  * <li>The lambda parameter was removed from the pdist term, because it cancels
@@ -92,14 +90,13 @@ import net.jafama.FastMath;
  * @since 0.3
  *
  * @apiviz.has KNNQuery
- *
  * @param <O> type of objects handled by this algorithm
  */
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "LoOP: Local Outlier Probabilities", //
-    booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", //
+    booktitle = "Proc. 18th Int. Conf. Information and Knowledge Management (CIKM 2009)", //
     url = "https://doi.org/10.1145/1645953.1646195")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP")
 @Priority(Priority.RECOMMENDED)

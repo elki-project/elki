@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,17 +29,16 @@ import net.jafama.FastMath;
 
 /**
  * Distance correlation.
- * 
+ * <p>
  * The value returned is the square root of the dCor² value. This matches the R
  * implementation by the original authors.
- * 
+ * <p>
  * Reference:
  * <p>
- * Székely, G. J., Rizzo, M. L., & Bakirov, N. K.<br />
- * Measuring and testing dependence by correlation of distances<br />
+ * G. J. Székely, M. L. Rizzo, N. K. Bakirov<br>
+ * Measuring and testing dependence by correlation of distances<br>
  * The Annals of Statistics, 35(6), 2769-2794
- * </p>
- * 
+ * <p>
  * Implementation notice: we exploit symmetry, and thus use diagonal matrixes.
  * While initially the diagonal is zero, after double-centering the matrix these
  * values can become non-zero!
@@ -48,10 +47,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "Székely, G. J., Rizzo, M. L., & Bakirov, N. K.", //
-title = "Measuring and testing dependence by correlation of distances", //
-booktitle = "The Annals of Statistics, 35(6), 2769-2794", //
-url = "https://doi.org/10.1214/009053607000000505")
+@Reference(authors = "G. J. Székely, M. L. Rizzo, N. K. Bakirov", //
+    title = "Measuring and testing dependence by correlation of distances", //
+    booktitle = "The Annals of Statistics, 35(6), 2769-2794", //
+    url = "https://doi.org/10.1214/009053607000000505")
 public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.

@@ -44,43 +44,40 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Linear memory implementation of HDBSCAN clustering.
- *
+ * <p>
  * By not building a distance matrix, we can reduce memory usage to linear
  * memory only; but at the cost of roughly double the runtime (unless using
  * indexes) as we first need to compute all kNN distances (for core sizes), then
  * recompute distances when building the spanning tree.
- *
+ * <p>
  * This implementation follows the HDBSCAN publication more closely than
  * {@link SLINKHDBSCANLinearMemory}, by computing the minimum spanning tree
  * using Prim's algorithm (instead of SLINK; although the two are remarkably
  * similar). In order to produce the preferred internal format of hierarchical
  * clusterings (the compact pointer representation introduced in {@link SLINK})
  * we have to perform a postprocessing conversion.
- *
+ * <p>
  * This implementation does <em>not</em> include the cluster extraction
  * discussed as Step 4, which is provided in a separate step. For this reason,
  * we also do <em>not include self-edges</em>.
- *
+ * <p>
  * Reference:
  * <p>
- * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
- * Density-Based Clustering Based on Hierarchical Density Estimates<br />
- * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
- * PAKDD
- * </p>
+ * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
+ * Density-Based Clustering Based on Hierarchical Density Estimates<br>
+ * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
  *
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @param <O> Object type
- *
  * @apiviz.has PointerDensityHierarchyRepresentationResult
+ * @param <O> Object type
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
-@Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
+@Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-    booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
+    booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14")
 public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**

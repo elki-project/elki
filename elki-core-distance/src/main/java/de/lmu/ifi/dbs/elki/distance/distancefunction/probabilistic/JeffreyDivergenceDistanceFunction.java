@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,26 +27,24 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-
 import net.jafama.FastMath;
 
 /**
  * Jeffrey Divergence Distance for {@link NumberVector}s.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
- * Empirical evaluation of dissimilarity measures for color and texture<br />
+ * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br>
+ * Empirical evaluation of dissimilarity measures for color and texture<br>
  * Proc. 7th IEEE International Conference on Computer Vision
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
-title = "Empirical evaluation of dissimilarity measures for color and texture", //
-booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
-url = "https://doi.org/10.1109/ICCV.1999.790412")
+    title = "Empirical evaluation of dissimilarity measures for color and texture", //
+    booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
+    url = "https://doi.org/10.1109/ICCV.1999.790412")
 public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,21 +30,20 @@ import net.jafama.FastMath;
 /**
  * Estimate the parameters of a Generalized Extreme Value Distribution, using
  * the methods of L-Moments (LMM).
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking, J. R. Wallis, and E. F. Wood<br />
+ * J. R. M. Hosking, J. R. Wallis, E. F. Wood<br>
  * Estimation of the generalized extreme-value distribution by the method of
- * probability-weighted moments.<br />
+ * probability-weighted moments.<br>
  * Technometrics 27.3
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has GeneralizedExtremeValueDistribution
  */
-@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
+@Reference(authors = "J. R. M. Hosking, J. R. Wallis, E. F. Wood", //
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
     booktitle = "Technometrics 27.3", //
     url = "https://doi.org/10.1080/00401706.1985.10488049")

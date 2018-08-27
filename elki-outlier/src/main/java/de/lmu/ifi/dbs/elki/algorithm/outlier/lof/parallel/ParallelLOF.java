@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,11 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
-import de.lmu.ifi.dbs.elki.parallel.processor.DoubleMinMaxProcessor;
-import de.lmu.ifi.dbs.elki.parallel.processor.KDistanceProcessor;
-import de.lmu.ifi.dbs.elki.parallel.processor.KNNProcessor;
-import de.lmu.ifi.dbs.elki.parallel.processor.WriteDataStoreProcessor;
-import de.lmu.ifi.dbs.elki.parallel.processor.WriteDoubleDataStoreProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.*;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -57,28 +53,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Parallel implementation of Local Outlier Factor using processors.
- *
+ * <p>
  * This parallelized implementation is based on the easy-to-parallelize
  * generalized pattern discussed in
  * <p>
- * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Local Outlier Detection Reconsidered: a Generalized View on Locality with
- * Applications to Spatial, Video, and Network Outlier Detection<br />
- * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
- * </p>
+ * Applications to Spatial, Video, and Network Outlier Detection<br>
+ * Data Mining and Knowledge Discovery 28(1)
  * 
  * @author Erich Schubert
  * @since 0.7.0
  * 
  * @apiviz.has LRDProcessor
  * @apiviz.has LOFProcessor
- * 
  * @param <O> Object type
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
-title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
-booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
-url = "https://doi.org/10.1007/s10618-012-0300-z")
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
+    title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
+    booktitle = "Data Mining and Knowledge Discovery 28(1)", //
+    url = "https://doi.org/10.1007/s10618-012-0300-z")
 public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k

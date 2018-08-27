@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,28 +47,29 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Hash function family to use with Cosine distance, using simplified hash
  * functions where the projection is only drawn from +-1, instead of Gaussian
  * distributions.
- *
+ * <p>
  * References:
  * <p>
- * M.S. Charikar<br />
- * Similarity estimation techniques from rounding algorithms<br />
- * Proc. 34th ACM Symposium on Theory of computing, STOC'02
- * </p>
+ * M. S. Charikar<br>
+ * Similarity estimation techniques from rounding algorithms<br>
+ * Proc. 34th ACM Symposium on Theory of Computing, STOC'02
  * <p>
- * M. Henzinger<br />
- * Finding near-duplicate web pages: a large-scale evaluation of algorithms
- * <br />
- * Proc. 29th ACM Conference on Research and Development in Information
- * Retrieval. ACM SIGIR, 2006
- * </p>
+ * M. Henzinger<br>
+ * Finding near-duplicate web pages: a large-scale evaluation of algorithms<br>
+ * Proc. 29th ACM Conf. Research and Development in Information Retrieval
+ * (SIGIR 2006)
  *
  * @author Evgeniy Faerman
  * @since 0.6.0
  */
-@Reference(authors = "M.S. Charikar", //
-title = "Similarity estimation techniques from rounding algorithms", //
-booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
-url = "https://doi.org/10.1145/509907.509965")
+@Reference(authors = "M. S. Charikar", //
+    title = "Similarity estimation techniques from rounding algorithms", //
+    booktitle = "Proc. 34th ACM Symposium on Theory of Computing, STOC'02", //
+    url = "https://doi.org/10.1145/509907.509965")
+@Reference(authors = "M. Henzinger", //
+    title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
+    booktitle = "Proc. 29th ACM Conf. Research and Development in Information Retrieval (SIGIR 2006)", //
+    url = "https://doi.org/10.1145/1148170.1148222")
 public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Projection family to use.
@@ -150,8 +151,8 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
       }
 
       IntParameter lP = new IntParameter(NUMPROJ_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-      .addConstraint(new LessEqualConstraint(32)); // Integer precision
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .addConstraint(new LessEqualConstraint(32)); // Integer precision
       if(config.grab(lP)) {
         k = lP.intValue();
       }

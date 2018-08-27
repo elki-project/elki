@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,15 +57,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Computes the LDOF (Local Distance-Based Outlier Factor) for all objects of a
  * Database.
- *
+ * <p>
  * Reference:
  * <p>
- * K. Zhang, M. Hutter, H. Jin<br />
+ * K. Zhang, M. Hutter, H. Jin<br>
  * A New Local Distance-Based Outlier Detection Approach for Scattered
- * Real-World Data.<br />
- * In: Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and
- * Data Mining (PAKDD 2009), Bangkok, Thailand, 2009.
- * </p>
+ * Real-World Data.<br>
+ * Proc. 13th Pacific-Asia Conf. Adv. Knowledge Discovery and Data Mining
+ * (PAKDD 2009)
  *
  * @author Arthur Zimek
  * @since 0.3
@@ -77,9 +76,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", //
-title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", //
-booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009)", //
-url = "https://doi.org/10.1007/978-3-642-01307-2_84")
+    title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", //
+    booktitle = "Proc. 13th Pacific-Asia Conf. Adv. Knowledge Discovery and Data Mining (PAKDD 2009)", //
+    url = "https://doi.org/10.1007/978-3-642-01307-2_84")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF" })
 public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

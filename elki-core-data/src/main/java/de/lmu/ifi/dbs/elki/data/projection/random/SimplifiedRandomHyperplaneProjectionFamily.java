@@ -30,18 +30,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Random hyperplane projection family.
- *
+ * <p>
  * Reference:
  * <p>
- * M. Henzinger<br />
- * Finding near-duplicate web pages: a large-scale evaluation of algorithms
- * <br />
- * Proc. 29th ACM Conference on Research and Development in Information
- * Retrieval. ACM SIGIR, 2006
- * </p>
- *
- * TODO: Benchmark if boolean[][] and "if" is faster, or multiplication (does
- * Java emit SIMD code then?)
+ * M. Henzinger<br>
+ * Finding near-duplicate web pages: a large-scale evaluation of algorithms<br>
+ * Proc. 29th ACM Conf. Research and Development in Information Retrieval
+ * (SIGIR 2006)
+ * <p>
+ * TODO: Benchmark if {@code boolean[][]} and "if" is faster, or multiplication
+ * (does Java emit SIMD code then?)
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
@@ -49,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Reference(authors = "M. Henzinger", //
     title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
-    booktitle = "Proc. 29th ACM Conference on Research and Development in Information Retrieval. ACM SIGIR, 2006", //
+    booktitle = "Proc. 29th ACM Conf. Research and Development in Information Retrieval (SIGIR 2006)", //
     url = "https://doi.org/10.1145/1148170.1148222")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.SimplifiedRandomHyperplaneProjectionFamily")
 public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProjectionFamily {

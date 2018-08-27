@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,36 +26,34 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
  * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
  * SBIC) for the use with evaluating k-means results.
- *
+ * <p>
  * Reference:
  * <p>
- * G. Schwarz<br />
- * Estimating the dimension of a model<br />
+ * G. Schwarz<br>
+ * Estimating the dimension of a model<br>
  * The annals of statistics 6.2.
- * </p>
- *
+ * <p>
  * The use for k-means was popularized by:
  * <p>
- * D. Pelleg, A. Moore:<br />
+ * D. Pelleg, A. Moore:<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
- * Clusters<br />
- * In: Proceedings of the 17th International Conference on Machine Learning
- * (ICML 2000)
- * </p>
+ * Clusters<br>
+ * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
  * @since 0.6.0
  */
 @Reference(authors = "G. Schwarz", //
-title = "Estimating the dimension of a model", //
-booktitle = "The annals of statistics 6.2", //
-url = "https://doi.org/10.1214/aos/1176344136")
+    title = "Estimating the dimension of a model", //
+    booktitle = "The annals of statistics 6.2", //
+    url = "https://doi.org/10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -59,10 +54,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * The algorithm is based on a combination of PCA and density-based clustering
  * (DBSCAN).
  * <p>
- * Reference: Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek:
- * Computing Clusters of Correlation Connected Objects. <br>
- * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
- * </p>
+ * Reference:
+ * <p>
+ * Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek<br>
+ * Computing Clusters of Correlation Connected Objects<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
+ * 
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
@@ -70,9 +67,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", //
+@Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
     title = "Computing Clusters of Correlation Connected Objects", //
-    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
     url = "https://doi.org/10.1145/1007568.1007620")
 public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConModel, PreDeConModel> {
   /**

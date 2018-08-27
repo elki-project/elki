@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,26 +50,24 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Cluster analysis by affinity propagation.
- *
+ * <p>
  * Reference:
  * <p>
- * Clustering by Passing Messages Between Data Points<br />
- * B. J. Frey and D. Dueck<br />
+ * B. J. Frey, D. Dueck<br>
+ * Clustering by Passing Messages Between Data Points<br>
  * Science Vol 315
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0
  *
  * @apiviz.composedOf AffinityPropagationInitialization
- *
  * @param <O> object type
  */
 @Title("Affinity Propagation: Clustering by Passing Messages Between Data Points")
 @Reference(title = "Clustering by Passing Messages Between Data Points", //
-authors = "B. J. Frey and D. Dueck", //
-booktitle = "Science Vol 315", //
-url = "https://doi.org/10.1126/science.1136800")
+    authors = "B. J. Frey, D. Dueck", //
+    booktitle = "Science Vol 315", //
+    url = "https://doi.org/10.1126/science.1136800")
 public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger

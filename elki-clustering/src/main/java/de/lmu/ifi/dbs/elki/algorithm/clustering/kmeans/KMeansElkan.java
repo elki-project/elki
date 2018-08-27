@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,18 +58,17 @@ import net.jafama.FastMath;
 
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
- *
+ * <p>
  * This variant needs O(n*k) additional memory to store bounds.
- *
+ * <p>
  * See {@link KMeansHamerly} for a close variant that only uses O(n*2)
  * additional memory for bounds.
- *
  * <p>
- * Reference:<br />
- * C. Elkan<br/>
- * Using the triangle inequality to accelerate k-means<br/>
+ * Reference:
+ * <p>
+ * C. Elkan<br>
+ * Using the triangle inequality to accelerate k-means<br>
  * Proc. 20th International Conference on Machine Learning, ICML 2003
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -79,9 +78,9 @@ import net.jafama.FastMath;
  * @param <V> vector datatype
  */
 @Reference(authors = "C. Elkan", //
-title = "Using the triangle inequality to accelerate k-means", //
-booktitle = "Proc. 20th International Conference on Machine Learning, ICML 2003", //
-url = "http://www.aaai.org/Library/ICML/2003/icml03-022.php")
+    title = "Using the triangle inequality to accelerate k-means", //
+    booktitle = "Proc. 20th International Conference on Machine Learning, ICML 2003", //
+    url = "http://www.aaai.org/Library/ICML/2003/icml03-022.php")
 public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

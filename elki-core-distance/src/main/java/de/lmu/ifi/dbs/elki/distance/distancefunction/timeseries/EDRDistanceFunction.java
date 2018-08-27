@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,22 +32,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Edit Distance on Real Sequence distance for numerical vectors.
- * 
+ * <p>
  * Reference:
  * <p>
- * L. Chen and M. T. Özsu and V. Oria<br />
- * Robust and fast similarity search for moving object trajectories<br />
- * SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on
- * Management of data
- * </p>
- * 
+ * L. Chen, M. T. Özsu, V. Oria<br>
+ * Robust and fast similarity search for moving object trajectories<br>
+ * Proc. 2005 ACM SIGMOD Int. Conf. Management of Data
+ *
  * @author Thomas Bernecker
  * @since 0.2
  */
 @Title("Edit Distance on Real Sequence")
-@Reference(authors = "L. Chen and M. T. Özsu and V. Oria", //
+@Reference(authors = "L. Chen, M. T. Özsu, V. Oria", //
     title = "Robust and fast similarity search for moving object trajectories", //
-    booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", //
+    booktitle = "Proc. 2005 ACM SIGMOD Int. Conf. Management of Data", //
     url = "https://doi.org/10.1145/1066157.1066213")
 public class EDRDistanceFunction extends DTWDistanceFunction {
   /**

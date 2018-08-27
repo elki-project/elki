@@ -1,17 +1,19 @@
 /**
- * <p>Greedy ensembles for outlier detection.</p>
- * 
- * <p>This package contains code that was used for the greedy ensemble experiment in
- * <blockquote> E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
- * On Evaluation of Outlier Rankings and Outlier Scores<br/>
- * In Proceedings of the 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.</blockquote>
+ * <p>
+ * Greedy ensembles for outlier detection.
  * </p>
+ * This package contains code used for the greedy ensemble experiment in
+ * <blockquote>
+ * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>
+ * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
+ * </blockquote>
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

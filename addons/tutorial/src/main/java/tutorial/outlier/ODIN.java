@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,26 +50,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
- *
+ * <p>
  * This is a curried version: instead of using a threshold T to obtain a binary
  * decision, we use the computed value as outlier score.
- *
+ * <p>
  * Reference:
  * <p>
- * V. Hautamäki and I. Kärkkäinen and P. Fränti<br />
- * Outlier detection using k-nearest neighbour graph<br />
- * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004
- * </p>
+ * V. Hautamäki and I. Kärkkäinen and P. Fränti<br>
+ * Outlier detection using k-nearest neighbour graph<br>
+ * Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)
  *
  * @author Erich Schubert
  * @since 0.6.0
  *
  * @param <O> Object type
  */
-@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P. Fränti", //
-title = "Outlier detection using k-nearest neighbour graph", //
-booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
-url = "https://doi.org/10.1109/ICPR.2004.1334558")
+@Reference(authors = "V. Hautamäki, I. Kärkkäinen, P. Fränti", //
+    title = "Outlier detection using k-nearest neighbour graph", //
+    booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //
+    url = "https://doi.org/10.1109/ICPR.2004.1334558")
 public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -114,12 +113,12 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB, 0.);
 
     // Process all objects
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
       KNNList neighbors = knnq.getKNNForDBID(iter, k);
       // For each neighbor, except ourselves, increase the in-degree:
-      for (DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
-        if (DBIDUtil.equal(iter, nei)) {
+      for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
+        if(DBIDUtil.equal(iter, nei)) {
           continue;
         }
         scores.put(nei, scores.doubleValue(nei) + 1);
@@ -128,7 +127,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     // Compute maximum
     double min = Double.POSITIVE_INFINITY, max = 0.0;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       min = Math.min(min, scores.doubleValue(iter));
       max = Math.max(max, scores.doubleValue(iter));
     }
@@ -183,7 +182,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       // will usually be the query object itself, we require
       // this value to be at least 2.
       param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(param)) {
+      if(config.grab(param)) {
         k = param.intValue();
       }
     }

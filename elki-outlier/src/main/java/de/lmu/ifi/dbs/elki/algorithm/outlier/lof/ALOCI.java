@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,15 +67,14 @@ import net.jafama.FastMath;
 
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
- *
+ * <p>
  * Outlier detection using multiple epsilon neighborhoods.
- *
+ * <p>
  * Reference:
  * <p>
- * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos: <br />
- * LOCI: Fast Outlier Detection Using the Local Correlation Integral. <br />
+ * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos:<br>
+ * LOCI: Fast Outlier Detection Using the Local Correlation Integral.<br>
  * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)
- * </p>
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
@@ -88,9 +87,9 @@ import net.jafama.FastMath;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
-title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
-booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
-url = "https://doi.org/10.1109/ICDE.2003.1260802")
+    title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
+    booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
+    url = "https://doi.org/10.1109/ICDE.2003.1260802")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.ALOCI")
 public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

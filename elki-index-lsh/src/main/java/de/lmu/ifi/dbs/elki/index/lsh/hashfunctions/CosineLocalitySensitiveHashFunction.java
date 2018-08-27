@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,21 +27,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Random projection family to use with sparse vectors.
- *
+ * <p>
  * Reference:
  * <p>
- * M.S. Charikar<br />
- * Similarity estimation techniques from rounding algorithms<br />
- * Proc. 34th ACM Symposium on Theory of computing, STOC'02
- * </p>
+ * M. S. Charikar<br>
+ * Similarity estimation techniques from rounding algorithms<br>
+ * Proc. 34th ACM Symposium on Theory of Computing, STOC'02
  *
  * @author Evgeniy Faerman
  * @since 0.3
  */
-@Reference(authors = "M.S. Charikar", //
-title = "Similarity estimation techniques from rounding algorithms", //
-booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
-url = "https://doi.org/10.1145/509907.509965")
+@Reference(authors = "M. S. Charikar", //
+    title = "Similarity estimation techniques from rounding algorithms", //
+    booktitle = "Proc. 34th ACM Symposium on Theory of Computing, STOC'02", //
+    url = "https://doi.org/10.1145/509907.509965")
 public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
   /**
    * Projection function.

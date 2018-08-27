@@ -79,26 +79,25 @@ import net.jafama.FastMath;
 
 /**
  * Class to handle KML output.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek:<br />
- * Spatial Outlier Detection: Data, Algorithms, Visualizations.<br />
- * in Proc. 12th International Symposium on Spatial and Temporal Databases
- * (SSTD), Minneapolis, MN, 2011
- * </p>
- * 
+ * Erich Achtert, Ahmed Hettab, Hans-Peter Kriegel, Erich Schubert, Arthur
+ * Zimek<br>
+ * Spatial Outlier Detection: Data, Algorithms, Visualizations<br>
+ * Proc. 12th Int. Symp. Spatial and Temporal Databases (SSTD 2011)
+ * <p>
  * Note: This class - currently - is an ugly hack. This code needs to be
  * modularized to make it more reusable, to support multiple results and
  * different result types.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 // TODO: make configurable color scheme
-@Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", //
-    booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", //
+@Reference(authors = "Erich Achtert, Ahmed Hettab, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Spatial Outlier Detection: Data, Algorithms, Visualizations", //
+    booktitle = "Proc. 12th Int. Symp. Spatial and Temporal Databases (SSTD 2011)", //
     url = "https://doi.org/10.1007/978-3-642-22922-0_41")
 public class KMLOutputHandler implements ResultHandler {
   /**

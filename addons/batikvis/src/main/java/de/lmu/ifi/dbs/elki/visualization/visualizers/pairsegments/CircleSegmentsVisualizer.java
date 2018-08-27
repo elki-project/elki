@@ -65,33 +65,25 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualizer to draw circle segments of clusterings and enable interactive
  * selection of segments. For "empty" segments, all related segments are
  * selected instead, to visualize the differences.
- *
  * <p>
- * Reference:<br />
- * Evaluation of Clusterings – Metrics and Visual Support<br />
- * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
- * Zimek<br />
- * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
- * </p>
- *
+ * Reference:
  * <p>
- * Details on the experimental setup can be found at:
- * <a href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation" >wiki/
- * Examples/ClusterEvaluation</a>
- * </p>
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert,
+ * Arthur Zimek<br>
+ * Evaluation of Clusterings – Metrics and Visual Support<br>
+ * Proc. 28th International Conference on Data Engineering (ICDE 2012)
  *
  * @author Sascha Goldhofer
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @apiviz.landmark
- *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
-    authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+@Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Evaluation of Clusterings - Metrics and Visual Support", //
+    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.128")
 public class CircleSegmentsVisualizer implements VisFactory {
   /**

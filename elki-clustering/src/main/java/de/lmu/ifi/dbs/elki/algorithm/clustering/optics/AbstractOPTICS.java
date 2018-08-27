@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,15 +38,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
- * 
+ * <p>
  * This is the abstract base class, providing the shared parameters only.
- * 
+ * <p>
  * Reference:
  * <p>
- * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:<br />
- * OPTICS: Ordering Points to Identify the Clustering Structure. <br/>
- * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
- * </p>
+ * Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander<br>
+ * OPTICS: Ordering Points to Identify the Clustering Structure<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)
  * 
  * @author Elke Achtert
  * @author Erich Schubert
@@ -56,10 +55,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", //
-title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
-url = "https://doi.org/10.1145/304181.304187")
+@Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
+    title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+    url = "https://doi.org/10.1145/304181.304187")
 @Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
 public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
@@ -140,13 +139,13 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
 
       IntParameter minptsP = new IntParameter(MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }

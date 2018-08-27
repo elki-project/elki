@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,19 +35,8 @@ import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.data.model.PrototypeDendrogramModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
@@ -61,27 +50,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
- *
+ * <p>
  * In contrast to the authors top-down approach, we use a bottom-up approach
  * based on the more efficient pointer representation introduced in SLINK.
- *
+ * <p>
  * Reference:
  * <p>
- * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
- * Density-Based Clustering Based on Hierarchical Density Estimates<br />
- * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
- * PAKDD
- * </p>
- *
+ * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
+ * Density-Based Clustering Based on Hierarchical Density Estimates<br>
+ * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
+ * F
+ * 
  * @author Erich Schubert
  * @since 0.7.0
  *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
-@Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
+@Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-    booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
+    booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14")
 @Priority(Priority.RECOMMENDED + 5) // Extraction should come before clustering
 public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
@@ -344,7 +332,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
       final String name;
       if(members == null || members.size() == 1 && members.contains(lead)) {
         name = "obj_" + DBIDUtil.toString(lead);
-        if (members == null) {
+        if(members == null) {
           ArrayModifiableDBIDs m = DBIDUtil.newArray(1);
           m.add(lead);
           members = m;

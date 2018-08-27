@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Outlier Detection based on the accumulated distances of a point to its k
  * nearest neighbors.
- *
+ * <p>
  * As in the original publication (as far as we could tell from the pseudocode
  * included), the current point is not included in the nearest neighbors (see
  * figures in the publication). This matches the intuition common in nearest
@@ -64,32 +64,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * training set; but it contrasts to the pseudocode of the kNN outlier method
  * and the database interpretation (which returns all objects stored in the
  * database).
- *
+ * <p>
  * Furthermore, we report the sum of the k distances (called "weight" in the
  * original publication). Other implementations may return the average distance
  * instead, and therefore yield different results.
- *
+ * <p>
  * Reference:
  * <p>
- * F. Angiulli, C. Pizzuti:<br />
- * Fast Outlier Detection in High Dimensional Spaces.<br />
- * In: Proc. European Conference on Principles of Knowledge Discovery and Data
- * Mining (PKDD'02), Helsinki, Finland, 2002.
- * </p>
+ * F. Angiulli, C. Pizzuti<br>
+ * Fast Outlier Detection in High Dimensional Spaces<br>
+ * Proc. European Conf. Principles of Knowledge Discovery and Data Mining
+ * (PKDD'02)
  *
  * @author Lisa Reichert
  * @since 0.3
  *
  * @apiviz.has KNNQuery
- *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("KNNWeight outlier detection")
 @Description("Outlier detection based on the sum of distances of an object to its k nearest neighbors.")
 @Reference(authors = "F. Angiulli, C. Pizzuti", //
-title = "Fast Outlier Detection in High Dimensional Spaces", //
-booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", //
-url = "https://doi.org/10.1007/3-540-45681-3_2")
+    title = "Fast Outlier Detection in High Dimensional Spaces", //
+    booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
+    url = "https://doi.org/10.1007/3-540-45681-3_2")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier", "knnw" })
 public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -121,14 +119,17 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // + query point
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // +
+                                                                       // query
+                                                                       // point
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query point
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query
+                                                                 // point
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
@@ -177,8 +178,8 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
      * Parameter to specify the k nearest neighbor.
      */
     public static final OptionID K_ID = new OptionID("knnwod.k", //
-    "The k nearest neighbor, excluding the query point "//
-        + "(i.e. query point is the 0-nearest-neighbor)");
+        "The k nearest neighbor, excluding the query point "//
+            + "(i.e. query point is the 0-nearest-neighbor)");
 
     /**
      * k parameter
@@ -189,7 +190,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -69,33 +69,33 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Performs correlation clustering on the data partitioned according to local
  * correlation dimensionality and builds a hierarchy of correlation clusters
  * that allows multiple inheritance from the clustering result.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek:<br />
- * On Exploring Complex Relationships of Correlation Clusters.<br />
- * In Proc. 19th International Conference on Scientific and Statistical Database
- * Management (SSDBM 2007), Banff, Canada, 2007.
- * </p>
- * 
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger,
+ * Arthur Zimek<br>
+ * On Exploring Complex Relationships of Correlation Clusters<br>
+ * Proc. 19th Int. Conf. Scientific and Statistical Database Management
+ * (SSDBM 2007)
+ *
  * @author Elke Achtert
  * @since 0.2
- * 
+ *
  * @apiviz.composedOf COPAC
  * @apiviz.composedOf DBSCAN
  * @apiviz.composedOf FirstNEigenPairFilter
  * @apiviz.composedOf PCAFilteredRunner
  * @apiviz.composedOf ERiCNeighborPredicate
  * @apiviz.has CorrelationModel
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " //
     + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "On Exploring Complex Relationships of Correlation Clusters", //
-    booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
+    booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
     url = "https://doi.org/10.1109/SSDBM.2007.21")
 public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel>> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**

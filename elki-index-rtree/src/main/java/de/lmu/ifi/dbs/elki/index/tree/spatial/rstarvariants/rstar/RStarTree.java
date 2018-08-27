@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -34,6 +34,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * RStarTree is a spatial index structure based on the concepts of the R*-Tree.
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure and ensures persistence.
+ * <p>
+ * Reference:
+ * <p>
+ * Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger<br>
+ * The R*-tree: an efficient and robust access method for points and
+ * rectangles<br>
+ * Proc. 1990 ACM SIGMOD Int. Conf. Management of Data
  *
  * @author Elke Achtert
  * @since 0.2
@@ -42,7 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("R*-Tree")
 @Description("Balanced index structure based on bounding rectangles.")
-@Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "https://doi.org/10.1145/93597.98741")
+@Reference(authors = "Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger", //
+    title = "The R*-tree: an efficient and robust access method for points and rectangles", //
+    booktitle = "Proc. 1990 ACM SIGMOD Int. Conf. Management of Data", //
+    url = "https://doi.org/10.1145/93597.98741")
 public abstract class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, RTreeSettings> {
   /**
    * The logger for this class.

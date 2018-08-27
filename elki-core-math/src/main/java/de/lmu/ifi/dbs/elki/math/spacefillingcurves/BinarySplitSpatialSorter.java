@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,24 +33,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * through the dimensions. This is essentially the bulk-loading proposed for the
  * k-d-tree, as it will produce a perfectly balanced k-d-tree. The resulting
  * order is the sequence in which objects would then be stored in the k-d-tree.
- * 
+ * <p>
  * Note that when using this for bulk-loading an R-tree, the result will
  * <em>not</em> be a k-d-tree, not even remotely similar, as the splits are not
  * preserved.
- * 
+ * <p>
  * Reference (for the bulk-loading):
  * <p>
- * J. L. Bentley<br/>
- * Multidimensional binary search trees used for associative searching<br/>
- * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
- * </p>
- * 
+ * J. L. Bentley<br>
+ * Multidimensional binary search trees used for associative searching<br>
+ * Communications of the ACM 18(9)
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
 @Reference(authors = "J. L. Bentley", //
     title = "Multidimensional binary search trees used for associative searching", //
-    booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
+    booktitle = "Communications of the ACM 18(9)", //
     url = "https://doi.org/10.1145/361002.361007")
 public class BinarySplitSpatialSorter implements SpatialSorter {
   /**

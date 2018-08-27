@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -46,24 +40,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Neighborhood predicate used by PreDeCon.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
- * Density Connected Clustering with Local Subspace Preferences.<br />
- * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
- * </p>
- * 
+ * Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger<br>
+ * Density Connected Clustering with Local Subspace Preferences.<br>
+ * Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)
+ *
  * @author Peer Kröger
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger",//
-title = "Density Connected Clustering with Local Subspace Preferences",//
-booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004",//
-url = "https://doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
+    title = "Density Connected Clustering with Local Subspace Preferences", //
+    booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
+    url = "https://doi.org/10.1109/ICDM.2004.10087")
 public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.

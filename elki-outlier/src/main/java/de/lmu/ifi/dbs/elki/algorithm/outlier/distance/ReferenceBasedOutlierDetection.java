@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,17 +64,17 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 /**
  * Reference-Based Outlier Detection algorithm, an algorithm that computes kNN
  * distances approximately, using reference points.
- *
+ * <p>
  * kNN distances are approximated by the difference in distance from a reference
  * point. For this approximation to be of high quality, triangle inequality is
  * required; but the algorithm can also process non-metric distances.
- *
+ * <p>
  * Reference:
  * <p>
- * Y. Pei, O. R. Zaiane, Y. Gao<br />
- * An Efficient Reference-Based Approach to Outlier Detection in Large Datasets<br />
- * In: Proc. IEEE Int. Conf. on Data Mining (ICDM'06), Hong Kong, China, 2006
- * </p>
+ * Y. Pei, O. R. Zaiane, Y. Gao<br>
+ * An Efficient Reference-Based Approach to Outlier Detection in Large
+ * Datasets<br>
+ * Proc. IEEE Int. Conf. on Data Mining (ICDM'06)
  *
  * @author Lisa Reichert
  * @author Erich Schubert
@@ -84,10 +84,10 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
-@Reference(authors = "Y. Pei, O.R. Zaiane, Y. Gao", //
-title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", //
-booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
-url = "https://doi.org/10.1109/ICDM.2006.17")
+@Reference(authors = "Y. Pei, O. R. Zaiane, Y. Gao", //
+    title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", //
+    booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
+    url = "https://doi.org/10.1109/ICDM.2006.17")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
 public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -305,7 +305,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter pK = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }

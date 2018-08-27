@@ -57,23 +57,22 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Compute the approximate k nearest neighbors using 1 dimensional projections.
- *
+ * <p>
  * This serves as a comparison method in:
  * <p>
- * E. Schubert, A. Zimek, H.-P. Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Fast and Scalable Outlier Detection with Approximate Nearest Neighbor
- * Ensembles<br />
- * Proc. 20th International Conference on Database Systems for Advanced
- * Applications (DASFAA), Hanoi, Vietnam, 2015.
- * </p>
+ * Ensembles<br>
+ * Proc. 20th Int. Conf. Database Systems for Advanced Applications
+ * (DASFAA 2015)
  *
  * @author Erich Schubert
  * @since 0.7.0
  * @apiviz.has NaiveProjectedKNNQuery
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
-    booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+    booktitle = "Proc. 20th Int. Conf. Database Systems for Advanced Applications (DASFAA 2015)", //
     url = "https://doi.org/10.1007/978-3-319-18123-3_2")
 public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KNNIndex<O> {
   /**

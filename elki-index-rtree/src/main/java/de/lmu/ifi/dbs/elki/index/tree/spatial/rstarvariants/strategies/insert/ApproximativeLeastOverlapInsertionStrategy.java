@@ -38,20 +38,21 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * The choose subtree method proposed by the R*-Tree with slightly better
  * performance for large leaf sizes (linear approximation).
- * 
  * <p>
- * N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger:<br />
- * The R*-tree: an efficient and robust access method for points and rectangles<br />
- * in: Proceedings of the 1990 ACM SIGMOD International Conference on Management
- * of Data, Atlantic City, NJ, May 23-25, 1990
- * </p>
- * 
+ * Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger<br>
+ * The R*-tree: an efficient and robust access method for points and
+ * rectangles<br>
+ * Proc. 1990 ACM SIGMOD Int. Conf. Management of Data
+ *
  * @author Erich Schubert
  * @author Franz Graf
  * @author Marisa Thoma
  * @since 0.5.0
  */
-@Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "https://doi.org/10.1145/93597.98741")
+@Reference(authors = "Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger", //
+    title = "The R*-tree: an efficient and robust access method for points and rectangles", //
+    booktitle = "Proc. 1990 ACM SIGMOD Int. Conf. Management of Data", //
+    url = "https://doi.org/10.1145/93597.98741")
 public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInsertionStrategy {
   /**
    * Number of candidates to consider

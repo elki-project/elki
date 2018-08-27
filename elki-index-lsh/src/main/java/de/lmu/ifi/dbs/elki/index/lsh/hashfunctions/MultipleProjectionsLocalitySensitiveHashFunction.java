@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,21 +29,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * LSH hash function for vector space data. Depending on the choice of random
  * vectors, it can be appropriate for Manhattan and Euclidean distances.
- *
+ * <p>
  * Reference:
  * <p>
- * M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni<br />
- * Locality-sensitive hashing scheme based on p-stable distributions<br />
- * Proc. 20th annual symposium on Computational geometry<br />
- * </p>
+ * M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni<br>
+ * Locality-sensitive hashing scheme based on p-stable distributions<br>
+ * Proc. 20th Annual Symposium on Computational Geometry<br>
  *
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
-title = "Locality-sensitive hashing scheme based on p-stable distributions", //
-booktitle = "Proc. 20th annual symposium on Computational geometry", //
-url = "https://doi.org/10.1145/997817.997857")
+@Reference(authors = "M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni", //
+    title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+    booktitle = "Proc. 20th Annual Symposium on Computational Geometry", //
+    url = "https://doi.org/10.1145/997817.997857")
 public class MultipleProjectionsLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
   /**
    * Projection matrix.

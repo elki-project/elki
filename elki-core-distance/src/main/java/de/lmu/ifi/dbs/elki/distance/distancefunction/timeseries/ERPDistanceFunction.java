@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,23 +32,21 @@ import net.jafama.FastMath;
 
 /**
  * Edit Distance With Real Penalty distance for numerical vectors.
- * 
+ * <p>
  * Reference:
  * <p>
- * L. Chen and R. Ng<br />
- * On the marriage of Lp-norms and edit distance<br />
- * VLDB '04: Proceedings of the Thirtieth international conference on Very large
- * data bases
- * </p>
- * 
+ * L. Chen and R. Ng<br>
+ * On the marriage of Lp-norms and edit distance<br>
+ * Proc. 13th Int. Conf. on Very Large Data Bases (VLDB '04)
+ *
  * @author Thomas Bernecker
  * @since 0.2
  */
 @Title("Edit Distance with Real Penalty")
-@Reference(authors = "L. Chen and R. Ng", //
-title = "On the marriage of Lp-norms and edit distance", //
-booktitle = "VLDB '04: Proceedings of the Thirtieth international conference on Very large data bases", //
-url = "http://www.vldb.org/conf/2004/RS21P2.PDF")
+@Reference(authors = "L. Chen, R. Ng", //
+    title = "On the marriage of Lp-norms and edit distance", //
+    booktitle = "Proc. 13th Int. Conf. on Very Large Data Bases (VLDB '04)", //
+    url = "http://www.vldb.org/conf/2004/RS21P2.PDF")
 public class ERPDistanceFunction extends DTWDistanceFunction {
   /**
    * Gap value.
@@ -148,7 +146,7 @@ public class ERPDistanceFunction extends DTWDistanceFunction {
   public boolean equals(Object obj) {
     return super.equals(obj) && this.g == ((ERPDistanceFunction) obj).g;
   }
-  
+
   @Override
   public int hashCode() {
     return super.hashCode() * 31 + Double.hashCode(g);

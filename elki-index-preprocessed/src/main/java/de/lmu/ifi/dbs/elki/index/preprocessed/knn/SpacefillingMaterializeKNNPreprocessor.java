@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -62,23 +57,22 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * This version does the bulk kNN-join operation, i.e. precomputes the k nearest
  * neighbors for every object, then discards the curves. This is usually more
  * memory intensive but faster than {@link SpacefillingKNNPreprocessor}.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Schubert, A. Zimek, H.-P. Kriegel<br />
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
  * Fast and Scalable Outlier Detection with Approximate Nearest Neighbor
- * Ensembles<br />
- * Proc. 20th International Conference on Database Systems for Advanced
- * Applications (DASFAA), Hanoi, Vietnam, 2015.
- * </p>
+ * Ensembles<br>
+ * Proc. 20th Int. Conf. Database Systems for Advanced Applications
+ * (DASFAA 2015)
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
-title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
-booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
-url = "https://doi.org/10.1007/978-3-319-18123-3_2")
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
+    title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
+    booktitle = "Proc. 20th Int. Conf. Database Systems for Advanced Applications (DASFAA 2015)", //
+    url = "https://doi.org/10.1007/978-3-319-18123-3_2")
 public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Class logger

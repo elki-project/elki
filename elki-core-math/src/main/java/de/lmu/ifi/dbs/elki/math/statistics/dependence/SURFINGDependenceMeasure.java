@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
  * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
- * Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)
+ * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
  * <p>
  * Based on:
  * <p>
@@ -58,7 +58,7 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
-    booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+    booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
     url = "https://doi.org/10.1145/2463676.2463696")
 @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
     title = "Subspace Selection for Clustering High-Dimensional Data", //

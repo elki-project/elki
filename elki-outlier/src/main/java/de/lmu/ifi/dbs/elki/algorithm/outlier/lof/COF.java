@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,11 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
@@ -56,13 +52,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Connectivity-based outlier factor (COF).
- *
+ * <p>
  * Reference:
  * <p>
- * J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung<br />
- * Enhancing effectiveness of outlier detections for low density patterns.<br />
- * In Advances in Knowledge Discovery and Data Mining.
- * </p>
+ * J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung<br>
+ * Enhancing effectiveness of outlier detections for low density patterns.<br>
+ * Advances in Knowledge Discovery and Data Mining.
  *
  * @author Erich Schubert
  * @since 0.2
@@ -70,9 +65,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  */
 @Reference(authors = "J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung", //
-title = "Enhancing effectiveness of outlier detections for low density patterns", //
-booktitle = "In Advances in Knowledge Discovery and Data Mining", //
-url = "https://doi.org/10.1007/3-540-47887-6_53")
+    title = "Enhancing effectiveness of outlier detections for low density patterns", //
+    booktitle = "In Advances in Knowledge Discovery and Data Mining", //
+    url = "https://doi.org/10.1007/3-540-47887-6_53")
 public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -261,7 +256,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.intValue();
       }

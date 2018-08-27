@@ -25,14 +25,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.QuickSelectDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -64,19 +57,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * dynamic updates or anything, but also is very simple and memory efficient:
  * all it uses is one {@link ArrayModifiableDBIDs} to sort the data in a
  * serialized tree.
- *
+ * <p>
  * Reference:
  * <p>
- * J. L. Bentley<br/>
- * Multidimensional binary search trees used for associative searching<br />
- * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
- * </p>
- *
+ * J. L. Bentley<br>
+ * Multidimensional binary search trees used for associative searching<br>
+ * Communications of the ACM 18(9)
+ * <p>
  * The version {@link SmallMemoryKDTree} uses 3x more memory, but is
  * considerably faster because it keeps a local copy of the attribute values,
  * thus reducing the number of accesses to the relation substantially. In
  * particular, this reduces construction time.
- *
+ * <p>
  * TODO: add support for weighted Minkowski distances.
  *
  * @author Erich Schubert
@@ -84,14 +76,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @apiviz.has KDTreeKNNQuery
  * @apiviz.has KDTreeRangeQuery
- *
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", //
-title = "Multidimensional binary search trees used for associative searching", //
-booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
-url = "https://doi.org/10.1145/361002.361007")
-public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>implements KNNIndex<O>, RangeIndex<O> {
+    title = "Multidimensional binary search trees used for associative searching", //
+    booktitle = "Communications of the ACM 18(9)", //
+    url = "https://doi.org/10.1145/361002.361007")
+public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
    */
@@ -131,7 +122,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   public MinimalisticMemoryKDTree(Relation<O> relation, int leafsize) {
     super(relation);
     this.leafsize = leafsize;
-    assert(leafsize >= 1);
+    assert (leafsize >= 1);
     if(LOG.isStatistics()) {
       String prefix = this.getClass().getName();
       this.objaccess = LOG.newCounter(prefix + ".objaccess");
@@ -356,7 +347,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= maxdist) {
-          assert(iter.getOffset() == middle);
+          assert (iter.getOffset() == middle);
           knns.insert(dist, iter /* .seek(middle) */);
           maxdist = knns.getKNNDistance();
         }
@@ -476,7 +467,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= radius) {
-          assert(iter.getOffset() == middle);
+          assert (iter.getOffset() == middle);
           res.add(dist, iter /* .seek(middle) */);
         }
       }
@@ -555,7 +546,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         IntParameter leafP = new IntParameter(LEAFSIZE_P, 1) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(leafP)) {
           leafsize = leafP.intValue();
         }

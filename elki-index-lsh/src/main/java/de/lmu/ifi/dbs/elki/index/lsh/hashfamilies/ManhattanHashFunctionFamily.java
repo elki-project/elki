@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,23 +28,22 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * 2-stable hash function family for Euclidean distances.
- * 
+ * <p>
  * Reference:
  * <p>
- * Locality-sensitive hashing scheme based on p-stable distributions<br />
- * M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni<br />
- * Proc. 20th annual symposium on Computational geometry<br />
- * </p>
- * 
+ * M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni<br>
+ * Locality-sensitive hashing scheme based on p-stable distributions<br>
+ * Proc. 20th Annual Symposium on Computational Geometry<br>
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.uses CauchyRandomProjectionFamily
  */
-@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
-title = "Locality-sensitive hashing scheme based on p-stable distributions", //
-booktitle = "Proc. 20th annual symposium on Computational geometry", //
-url = "https://doi.org/10.1145/997817.997857")
+@Reference(authors = "M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni", //
+    title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+    booktitle = "Proc. 20th Annual Symposium on Computational Geometry", //
+    url = "https://doi.org/10.1145/997817.997857")
 public class ManhattanHashFunctionFamily extends AbstractProjectedHashFunctionFamily {
   /**
    * Constructor.

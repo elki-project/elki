@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
 import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.format;
 import static de.lmu.ifi.dbs.elki.utilities.io.FormatUtil.formatTo;
 
@@ -62,24 +66,24 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Dependency derivator computes quantitatively linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek:<br>
- * Deriving Quantitative Dependencies for Correlation Clusters. <br>
- * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
- * Philadelphia, PA 2006.
- * </p>
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger,
+ * Arthur Zimek<br>
+ * Deriving Quantitative Dependencies for Correlation Clusters<br>
+ * Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06)
  *
  * @author Arthur Zimek
  * @since 0.2
+ *
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "Deriving Quantitative Dependencies for Correlation Clusters", //
-    booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", //
+    booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06)", //
     url = "https://doi.org/10.1145/1150402.1150408")
 @Priority(Priority.DEFAULT - 5) // Mostly used inside others, not standalone
 public class DependencyDerivator<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {

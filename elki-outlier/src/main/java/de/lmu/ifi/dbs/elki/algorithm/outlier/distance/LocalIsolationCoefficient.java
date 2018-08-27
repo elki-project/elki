@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,28 +53,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * The Local Isolation Coefficient is the sum of the kNN distance and the
  * average distance to its k nearest neighbors.
- *
+ * <p>
  * The algorithm originally used a normalized Manhattan distance on numerical
  * attributes, and Hamming distance on categorial attributes.
- *
+ * <p>
  * Reference:
  * <p>
- * B. Yu, and M. Song, and L. Wang<br />
- * Local Isolation Coefficient-Based Outlier Mining Algorithm<br />
+ * B. Yu, M. Song, L. Wang<br>
+ * Local Isolation Coefficient-Based Outlier Mining Algorithm<br>
  * Int. Conf. on Information Technology and Computer Science (ITCS) 2009
- * </p>
  *
  * @author Erich Schubert
  * @since 0.3
  *
  * @apiviz.has KNNQuery
- *
  * @param <O> the type of objects handled by this Algorithm
  */
-@Reference(authors = "B. Yu, and M. Song, and L. Wang", //
-title = "Local Isolation Coefficient-Based Outlier Mining Algorithm", //
-booktitle = "Int. Conf. on Information Technology and Computer Science (ITCS) 2009", //
-url = "https://doi.org/10.1109/ITCS.2009.230")
+@Reference(authors = "B. Yu, M. Song, L. Wang", //
+    title = "Local Isolation Coefficient-Based Outlier Mining Algorithm", //
+    booktitle = "Int. Conf. on Information Technology and Computer Science (ITCS) 2009", //
+    url = "https://doi.org/10.1109/ITCS.2009.230")
 public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -105,14 +103,17 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // + query point
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // +
+                                                                       // query
+                                                                       // point
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute Local Isolation Coefficients", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore lic_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query point
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query
+                                                                 // point
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
@@ -157,8 +158,8 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
      * Parameter to specify the k nearest neighbor.
      */
     public static final OptionID K_ID = new OptionID("lic.k", //
-    "The k nearest neighbor, excluding the query point "//
-    + "(i.e. query point is the 0-nearest-neighbor)");
+        "The k nearest neighbor, excluding the query point "//
+            + "(i.e. query point is the 0-nearest-neighbor)");
 
     /**
      * k parameter
@@ -169,7 +170,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

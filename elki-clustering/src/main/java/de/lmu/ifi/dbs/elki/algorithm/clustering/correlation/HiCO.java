@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,17 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Comparator;
 
@@ -44,11 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
@@ -70,30 +56,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Implementation of the HiCO algorithm, an algorithm for detecting hierarchies
  * of correlation clusters.
  * <p>
- * Reference: E. Achtert, C. Böhm, P. Kröger, A. Zimek:<br />
- * Mining Hierarchies of Correlation Clusters. <br>
- * In: Proc. Int. Conf. on Scientific and Statistical Database Management
- * (SSDBM'06), Vienna, Austria, 2006.
- * </p>
+ * Reference:
+ * <p>
+ * Elke Achtert, Christian Böhm, Peer Kröger, Arthur Zimek<br>
+ * Mining Hierarchies of Correlation Clusters.<br>
+ * Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06)
  *
  * @author Elke Achtert
  * @since 0.3
  *
  * @apiviz.composedOf HiCO.Instance
- *
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
-@Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Peer Kröger, Arthur Zimek", //
     title = "Mining Hierarchies of Correlation Clusters", //
-    booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", //
+    booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06)", //
     url = "https://doi.org/10.1109/SSDBM.2006.35")
 public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**

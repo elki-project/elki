@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,28 +84,26 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
- *
+ * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
- * Proceedings of the 2013 ACM International Conference on Management of Data
- * (SIGMOD), New York City, NY, 2013.
- * </p>
- *
- * TODO: Improve generics of Layout3DPC.
- *
- * TODO: Generalize to multiple relations and non-numeric feature vectors.
- *
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
+ * <p>
+ * TODO: Improve generics of Layout3DPC.<br>
+ * TODO: Generalize to multiple relations and non-numeric feature vectors.<br>
  * FIXME: proper depth-sorting of edges. It's not that simple, unfortunately.
  *
  * @author Erich Schubert
  * @since 0.6.0
- *
  * @param <O> Object type
  */
 @Alias({ "3dpc", "3DPC" })
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "https://doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+    booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
+    url = "https://doi.org/10.1145/2463676.2463696")
 public class OpenGL3DParallelCoordinates<O extends NumberVector> implements ResultHandler {
   /**
    * Logging class.
