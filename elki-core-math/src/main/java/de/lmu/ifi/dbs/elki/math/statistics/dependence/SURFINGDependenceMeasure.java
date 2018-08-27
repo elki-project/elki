@@ -60,6 +60,10 @@ import net.jafama.FastMath;
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
     booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
     url = "https://doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
+    title = "Subspace Selection for Clustering High-Dimensional Data", //
+    booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
+    url = "https://doi.org/10.1109/ICDM.2004.10112")
 public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.
@@ -73,10 +77,6 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
     super();
   }
 
-  @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
-      title = "Subspace Selection for Clustering High-Dimensional Data", //
-      booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
-      url = "https://doi.org/10.1109/ICDM.2004.10112")
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = size(adapter1, data1, adapter2, data2);

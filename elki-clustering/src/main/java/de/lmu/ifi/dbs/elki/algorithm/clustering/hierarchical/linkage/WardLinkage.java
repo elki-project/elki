@@ -81,6 +81,10 @@ import net.jafama.FastMath;
     title = "Hierarchical grouping to optimize an objective function", //
     booktitle = "Journal of the American statistical association 58.301", //
     url = "https://doi.org/10.1080/01621459.1963.10500845")
+@Reference(authors = "D. Wishart", //
+    title = "256. Note: An Algorithm for Hierarchical Classifications", //
+    booktitle = "BBiometrics 25(1)", //
+    url = "https://doi.org/10.2307/2528688")
 @Alias({ "ward", "MISSQ", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod" })
 @Priority(Priority.IMPORTANT + 1)
 public class WardLinkage implements Linkage {
@@ -88,15 +92,6 @@ public class WardLinkage implements Linkage {
    * Static instance of class.
    */
   public static final WardLinkage STATIC = new WardLinkage();
-
-  /**
-   * Additional reference.
-   */
-  @Reference(authors = "D. Wishart", //
-      title = "256. Note: An Algorithm for Hierarchical Classifications", //
-      booktitle = "BBiometrics 25(1)", //
-      url = "https://doi.org/10.2307/2528688")
-  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * Constructor.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,49 +28,53 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Bray-Curtis distance function / Sørensen–Dice coefficient for continuous
- * spaces.
- * 
+ * vector spaces (not only binary data).
+ * <p>
  * Reference:
  * <p>
- * J. R. Bray and J. T. Curtis<br />
- * An ordination of the upland forest communities of southern Wisconsin<br />
+ * J. R. Bray, J. T. Curtis<br>
+ * An ordination of the upland forest communities of southern Wisconsin<br>
  * Ecological monographs 27.4
- * </p>
+ * <p>
  * Also:
  * <p>
- * T. Sørensen<br />
+ * T. Sørensen<br>
  * A method of establishing groups of equal amplitude in plant sociology based
  * on similarity of species and its application to analyses of the vegetation on
- * Danish commons<br />
+ * Danish commons<br>
  * Kongelige Danske Videnskabernes Selskab 5 (4)
- * </p>
+ * <p>
  * and:
  * <p>
- * L. R. Dice<br />
- * Measures of the Amount of Ecologic Association Between Species<br />
+ * L. R. Dice<br>
+ * Measures of the Amount of Ecologic Association Between Species<br>
  * Ecology 26 (3)
- * </p>
- * 
- * 
+ * <p>
  * Note: we modified the usual definition of Bray-Curtis for use with negative
  * values. In essence, this function is defined as:
- * 
+ * <p>
  * ManhattanDistance(v1, v2) / (ManhattanNorm(v1) + ManhattanNorm(v2))
- * 
+ * <p>
  * This obviously limits the usefulness of this distance function for cases
  * where this kind of normalization is desired. In particular in low dimensional
  * data it should be used with care.
- * 
- * TODO: add a version optimized for sparse vectors / binary data.
+ * <p>
+ * TODO: add a version <i>optimized</i> for sparse vectors / binary data.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
-@Reference(authors = "J. R. Bray and J. T. Curtis", //
+@Reference(authors = "J. R. Bray, J. T. Curtis", //
     title = "An ordination of the upland forest communities of southern Wisconsin", //
     booktitle = "Ecological monographs 27.4", //
     url = "https://doi.org/10.2307/1942268")
+@Reference(authors = "T. Sørensen", //
+    title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
+    booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
+@Reference(authors = "L. R. Dice", //
+    title = "Measures of the Amount of Ecologic Association Between Species", //
+    booktitle = "Ecology 26 (3)")
+@Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.
@@ -86,22 +90,6 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
   public BrayCurtisDistanceFunction() {
     super();
   }
-
-  /**
-   * Additional reference.
-   */
-  @Reference(authors = "T. Sørensen", //
-      title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
-      booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
-  private static Void SECOND_REFERENCE = null;
-
-  /**
-   * Additional referene.
-   */
-  @Reference(authors = "L. R. Dice", //
-      title = "Measures of the Amount of Ecologic Association Between Species", //
-      booktitle = "Ecology 26 (3)")
-  private static Void THIRD_REFERENCE = null;
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {

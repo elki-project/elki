@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Selecting the right objective measure for association analysis<br>
  * Information Systems 29.4
  * <p>
- * Tan et al. credit Rijsbergen for the use of Jaccard in Information Retrieval:
+ * Tan et al. credit Rijsbergen for the use of Jaccard in Information Retrieval
+ * (it was not used for association rule mining here):
  * <p>
  * C.J. van Rijsbergen<br>
  * Information Retrieval, 2nd Edition<br>
@@ -43,17 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "Selecting the right objective measure for association analysis", //
     booktitle = "Information Systems 29.4", //
     url = "https://doi.org/10.1016/S0306-4379(03)00072-3")
+@Reference(authors = "C.J. van Rijsbergen", //
+    title = "Information Retrieval, 2nd Edition", //
+    booktitle = "Butterworths, London, 1979", //
+    bibkey = "DBLP:books/bu/Rijsbergen79")
 public class Jaccard implements InterestingnessMeasure {
-  /**
-   * This reference is credited by Tan et al., but did not use it within
-   * association rule mining.
-   */
-  @Reference(authors = "C.J. van Rijsbergen", //
-      title = "Information Retrieval, 2nd Edition", //
-      booktitle = "Butterworths, London, 1979", //
-      bibkey = "DBLP:books/bu/Rijsbergen79")
-  public static Void ADDITIONAL_REFERENCE = null;
-
   /**
    * Constructor.
    */

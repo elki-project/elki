@@ -77,6 +77,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21")
+@Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
+    authors = "M.A. Fischler, R.C. Bolles", //
+    booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
+    url = "https://doi.org/10.1145/358669.358692")
 public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Number of iterations to perform
@@ -100,10 +104,6 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
     this.rnd = rnd;
   }
 
-  @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
-      authors = "M.A. Fischler, R.C. Bolles", //
-      booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
-      url = "https://doi.org/10.1145/358669.358692")
   @Override
   public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);

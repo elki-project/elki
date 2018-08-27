@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Inner function of a kernel density estimator.
- * 
- * Note: as of now, this API does not support asymmetric kernels.
+ * <p>
+ * Note: as of now, this API does not support asymmetric kernels, which would be
+ * difficult in the multivariate case.
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -34,10 +35,10 @@ public interface KernelDensityFunction {
   /**
    * Density contribution of a point at the given relative distance
    * {@code delta >= 0}.
-   * 
+   * <p>
    * Note that for {@code delta < 0}, in particular for {@code delta < 1}, the
    * results may become invalid. So usually, you will want to invoke this as:
-   * 
+   * <p>
    * {@code kernel.density(Math.abs(delta))}
    * 
    * @param delta Relative distance
@@ -47,7 +48,7 @@ public interface KernelDensityFunction {
 
   /**
    * Get the canonical bandwidth for this kernel.
-   * 
+   * <p>
    * Note: R uses a different definition of "canonical bandwidth", and also uses
    * differently scaled kernels.
    * 
@@ -68,7 +69,7 @@ public interface KernelDensityFunction {
 
   /**
    * Get the R integral of the kernel, \int K^2(x) dx
-   * 
+   * <p>
    * TODO: any better name for this?
    * 
    * @return R value

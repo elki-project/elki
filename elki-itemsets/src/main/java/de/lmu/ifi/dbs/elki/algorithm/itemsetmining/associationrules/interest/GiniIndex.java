@@ -43,15 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "Interestingness measures for association patterns: A perspective", //
     booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
     url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
+@Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, R. A Olshen", //
+    title = "Classification and regression trees", //
+    booktitle = "CRC press, 1984")
 public class GiniIndex implements InterestingnessMeasure {
-  /**
-   * Additional reference, for Gini.
-   */
-  @Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, R. A Olshen", //
-      title = "Classification and regression trees", //
-      booktitle = "CRC press, 1984")
-  public static Void ADDITIONAL_REFERENCE = null;
-
   /**
    * Constructor.
    */

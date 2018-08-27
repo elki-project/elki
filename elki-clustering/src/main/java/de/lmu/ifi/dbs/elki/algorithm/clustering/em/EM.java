@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -65,22 +65,20 @@ import net.jafama.FastMath;
 
 /**
  * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
- * Mixture Modeling (GMM).
- * 
+ * Mixture Modeling (GMM), with optional MAP regularization.
+ * <p>
  * Reference:
  * <p>
- * A. P. Dempster, N. M. Laird, D. B. Rubin:<br />
- * Maximum Likelihood from Incomplete Data via the EM algorithm.<br />
- * In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
- * </p>
- * 
+ * A. P. Dempster, N. M. Laird, D. B. Rubin:<br>
+ * Maximum Likelihood from Incomplete Data via the EM algorithm.<br>
+ * Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
+ * <p>
  * The MAP estimation is derived from
  * <p>
- * C. Fraley and A. E. Raftery<br />
+ * C. Fraley and A. E. Raftery<br>
  * Bayesian Regularization for Normal Mixture Estimation and Model-Based
- * Clustering<br />
+ * Clustering<br>
  * J. Classification 24(2)
- * </p>
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
@@ -95,8 +93,12 @@ import net.jafama.FastMath;
 @Description("Cluster data via Gaussian mixture modeling and the EM algorithm")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", //
     title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
-    booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
+    booktitle = "Journal of the Royal Statistical Society, Series B, 39(1)", //
     url = "http://www.jstor.org/stable/2984875")
+@Reference(title = "Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering", //
+    authors = "C. Fraley and A. E. Raftery", //
+    booktitle = "J. Classification 24(2)", //
+    url = "https://doi.org/10.1007/s00357-007-0004-5")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
 @Priority(Priority.RECOMMENDED)
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
@@ -133,10 +135,6 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
   /**
    * Prior to enable MAP estimation (use 0 for MLE)
    */
-  @Reference(title = "Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering", //
-      authors = "C. Fraley and A. E. Raftery", //
-      booktitle = "J. Classification 24(2)", //
-      url = "https://doi.org/10.1007/s00357-007-0004-5")
   private double prior = 0.;
 
   /**
@@ -287,7 +285,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       needsTwoPass |= m.needsTwoPass();
     }
     // First pass, only for two-pass models.
-    if (needsTwoPass) {
+    if(needsTwoPass) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double[] clusterProbabilities = probClusterIGivenX.get(iditer);
         NumberVector instance = relation.get(iditer);
@@ -315,10 +313,9 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       }
     }
     for(int i = 0; i < models.size(); i++) {
-      EMClusterModel<?> m = models.get(i);
       // MLE / MAP
       final double weight = prior <= 0. ? wsum[i] / relation.size() : (wsum[i] + prior - 1) / (relation.size() + prior * k - k);
-      m.finalizeEStep(weight, prior);
+      models.get(i).finalizeEStep(weight, prior);
     }
   }
 

@@ -59,6 +59,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
+    url = "https://doi.org/10.1137/1.9781611972818.2")
 public class COPOutlierScaling implements OutlierScaling {
   /**
    * Phi parameter.
@@ -83,17 +87,6 @@ public class COPOutlierScaling implements OutlierScaling {
   public COPOutlierScaling(double phi) {
     super();
     this.phi = phi;
-  }
-
-  /**
-   * Secondary reference.
-   */
-  @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-      title = "Interpreting and Unifying Outlier Scores", //
-      booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
-      url = "https://doi.org/10.1137/1.9781611972818.2")
-  public static final void secondReference() {
-    // Dummy, reference attachment point only.
   }
 
   @Override

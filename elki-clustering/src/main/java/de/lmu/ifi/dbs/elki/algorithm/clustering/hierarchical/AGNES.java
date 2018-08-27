@@ -93,6 +93,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "Agglomerative Nesting (Program AGNES)", //
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch5")
+@Reference(authors = "P. H. Sneath", //
+    title = "The application of computers to taxonomy", //
+    booktitle = "Journal of general microbiology, 17(1)", //
+    url = "https://doi.org/10.1099/00221287-17-1-201")
 @Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
 public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
@@ -116,15 +120,6 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     super(distanceFunction);
     this.linkage = linkage;
   }
-
-  /**
-   * Additional historical reference for single-linkage.
-   */
-  @Reference(authors = "P. H. Sneath", //
-      title = "The application of computers to taxonomy", //
-      booktitle = "Journal of general microbiology, 17(1)", //
-      url = "https://doi.org/10.1099/00221287-17-1-201")
-  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * Run the algorithm

@@ -43,32 +43,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Partial implementation of the CFTree as used by BIRCH.
- *
+ * <p>
  * Important differences:
  * <ol>
  * <li>Leaf nodes an directory nodes have the same capacity</li>
  * <li>Condensing and memory limits are not implemented</li>
  * <li>Merging refinement (merge-resplit) is not implemented</li>
  * </ol>
- *
  * Because we want to be able to track the cluster assignments of all data
  * points easily, we need to store the point IDs, and it is not possible to
  * implement the originally proposed page size management at the same time.
- *
+ * <p>
  * Condensing and merging refinement are possible, and improvements to this code
  * are welcome - please send a pull request!
- *
+ * <p>
  * References:
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
+ * T. Zhang and R. Ramakrishnan and M. Livny<br>
  * BIRCH: An Efficient Data Clustering Method for Very Large Databases
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
- * </p>
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
- * BIRCH: A New Data Clustering Algorithm and Its Applications<br />
+ * T. Zhang and R. Ramakrishnan and M. Livny<br>
+ * BIRCH: A New Data Clustering Algorithm and Its Applications<br>
  * Data Min. Knowl. Discovery
- * </p>
  *
  * @author Erich Schubert
  *
@@ -79,16 +76,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324")
+@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+    title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
+    booktitle = "Data Min. Knowl. Discovery", //
+    url = "https://doi.org/10.1023/A:1009783824328")
 public class CFTree {
-  /**
-   * Additional reference
-   */
-  @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
-      title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
-      booktitle = "Data Min. Knowl. Discovery", //
-      url = "https://doi.org/10.1023/A:1009783824328")
-  public static final Void ADDITIONAL_REFERENCE = null;
-
   /**
    * Class logger.
    */

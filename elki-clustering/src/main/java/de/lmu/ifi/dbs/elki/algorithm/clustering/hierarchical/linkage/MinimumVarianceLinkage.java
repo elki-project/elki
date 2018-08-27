@@ -58,20 +58,15 @@ import net.jafama.FastMath;
     title = "New Combinatorial Clustering Methods", //
     booktitle = "Vegetatio 81(1/2)", //
     url = "https://doi.org/10.1007/978-94-009-2432-1_5")
+@Reference(authors = "E. Diday, J. Lemaire, J. Pouget, F. Testu", //
+    title = "Elements d'analyse de donnees", //
+    booktitle = "Elements d'analyse de donnees")
 @Alias({ "variance", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MinimumVarianceLinkageMethod" })
 public class MinimumVarianceLinkage implements Linkage {
   /**
    * Static instance of class.
    */
   public static final MinimumVarianceLinkage STATIC = new MinimumVarianceLinkage();
-
-  /**
-   * Additional reference.
-   */
-  @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, F. Testu", //
-      title = "Elements d'analyse de donnees", //
-      booktitle = "Elements d'analyse de donnees")
-  private static Void SECOND_REFERENCE = null;
 
   /**
    * Constructor.

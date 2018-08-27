@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,10 @@ public final class UniformKernelDensityFunction implements KernelDensityFunction
   /**
    * Canonical bandwidth: (9/2)^(1/5)
    */
-  @Reference(authors = "J.S. Marron, D. Nolan", title = "Canonical kernels for density estimation", booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", url = "https://doi.org/10.1016/0167-7152(88)90050-8")
+  @Reference(authors = "J.S. Marron, D. Nolan", //
+      title = "Canonical kernels for density estimation", //
+      booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", //
+      url = "https://doi.org/10.1016/0167-7152(88)90050-8")
   public static final double CANONICAL_BANDWIDTH = Math.pow(4.5, .2);
 
   /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,18 +35,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * NNchain clustering algorithm.
- * 
+ * <p>
  * Reference:
  * <p>
- * F. Murtagh<br />
- * A survey of recent advances in hierarchical clustering algorithms<br />
+ * F. Murtagh<br>
+ * A survey of recent advances in hierarchical clustering algorithms<br>
  * The Computer Journal 26(4)
- * </p>
  * <p>
- * D. Müllner<br />
- * Modern hierarchical, agglomerative clustering algorithms<br />
+ * D. Müllner<br>
+ * Modern hierarchical, agglomerative clustering algorithms<br>
  * arXiv preprint arXiv:1109.2378
- * </p>
  *
  * @author Erich Schubert
  *
@@ -56,20 +54,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "A survey of recent advances in hierarchical clustering algorithms", //
     booktitle = "The Computer Journal 26(4)", //
     url = "https://doi.org/10.1093/comjnl/26.4.354")
+@Reference(authors = "D. Müllner", //
+    title = "Modern hierarchical, agglomerative clustering algorithms", //
+    booktitle = "arXiv preprint arXiv:1109.2378", //
+    url = "https://arxiv.org/abs/1109.2378")
 public class NNChain<O> extends AGNES<O> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(NNChain.class);
-
-  /**
-   * Additional literature:
-   */
-  @Reference(authors = "D. Müllner", //
-      title = "Modern hierarchical, agglomerative clustering algorithms", //
-      booktitle = "arXiv preprint arXiv:1109.2378", //
-      url = "https://arxiv.org/abs/1109.2378")
-  public static final Void ADDITIONAL_REFERNCE = null;
 
   /**
    * Constructor.

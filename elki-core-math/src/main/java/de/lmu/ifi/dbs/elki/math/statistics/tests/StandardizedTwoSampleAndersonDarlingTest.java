@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,57 +28,51 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Perform a two-sample Anderson-Darling rank test, and standardize the
  * statistic according to Scholz and Stephens. Ties are handled as discussed in
  * Equation 7 of Scholz and Stephens.
- *
+ * <p>
  * To access the non-standardized A2 scores, use the function
  * {@link #unstandardized}.
- *
+ * <p>
  * Compared to the Cramer-van Mises test, the Anderson-Darling test puts more
  * weight on the tail of the distribution. This variant only uses the ranks.
- *
- *
+ * <p>
  * References:
  * <p>
- * D. A. Darling<br />
- * The Kolmogorov-Smirnov, Cramer-von Mises tests.<br />
+ * Darling's note on this equation
+ * <p>
+ * D. A. Darling<br>
+ * The Kolmogorov-Smirnov, Cramer-von Mises tests.<br>
  * Annals of Mathematical Statistics 28(4)
- * </p>
  * <p>
- * A. N. Pettitt<br />
- * A two-sample Anderson-Darling rank statistic<br />
+ * More detailed discussion by Pettitt
+ * <p>
+ * A. N. Pettitt<br>
+ * A two-sample Anderson-Darling rank statistic<br>
  * Biometrika 63 (1)
- * </p>
  * <p>
- * F. W. Scholz, and M. A. Stephens<br />
- * K-sample Anderson–Darling tests<br />
+ * F. W. Scholz, and M. A. Stephens<br>
+ * K-sample Anderson–Darling tests<br>
  * Journal of the American Statistical Association, 82(399)
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "F. W. Scholz, and M. A. Stephens", //
-title = "K-sample Anderson–Darling tests", //
-booktitle = "Journal of the American Statistical Association, 82(399)", //
-url = "https://doi.org/10.1080/01621459.1987.10478517")
+    title = "K-sample Anderson–Darling tests", //
+    booktitle = "Journal of the American Statistical Association, 82(399)", //
+    url = "https://doi.org/10.1080/01621459.1987.10478517")
+@Reference(authors = "D. A. Darling", //
+    title = "The Kolmogorov-Smirnov, Cramer-von Mises tests", //
+    booktitle = "Annals of mathematical statistics 28(4)", //
+    url = "https://doi.org/10.1214/aoms/1177706788")
+@Reference(authors = "A. N. Pettitt", //
+    title = "A two-sample Anderson-Darling rank statistic", //
+    booktitle = "Biometrika 63 (1)", //
+    url = "https://doi.org/10.1093/biomet/63.1.161")
 public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTest {
   /**
    * Static instance.
    */
   public static final StandardizedTwoSampleAndersonDarlingTest STATIC = new StandardizedTwoSampleAndersonDarlingTest();
-
-  /** Additional reference -- Darling's note on this equation */
-  @Reference(authors = "D. A. Darling", //
-  title = "The Kolmogorov-Smirnov, Cramer-von Mises tests", //
-  booktitle = "Annals of mathematical statistics 28(4)", //
-  url = "https://doi.org/10.1214/aoms/1177706788")
-  public static final Void ADDITIONAL_REFERENCE_1 = null;
-
-  /** More detailed discussion by Pettitt */
-  @Reference(authors = "A. N. Pettitt", //
-  title = "A two-sample Anderson-Darling rank statistic",//
-  booktitle = "Biometrika 63 (1)", //
-  url = "https://doi.org/10.1093/biomet/63.1.161")
-  public static final Void ADDITIONAL_REFERENCE_2 = null;
 
   @Override
   public double deviation(double[] sample1, double[] sample2) {
@@ -144,7 +138,7 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Compute the non-standardized A2 test statistic for the k-samples test.
-   *
+   * <p>
    * This is based on Scholz and Stephens, Equation 7.
    *
    * @param samples Samples
@@ -207,7 +201,7 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Compute the non-standardized A2 test statistic for the k-samples test.
-   *
+   * <p>
    * This is based on Scholz and Stephens, Equation 7.
    *
    * @param sample1 First sample

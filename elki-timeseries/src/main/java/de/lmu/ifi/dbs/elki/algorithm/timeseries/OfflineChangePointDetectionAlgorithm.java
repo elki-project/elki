@@ -79,29 +79,19 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Testing and Estimating Change-Points in Time Series ", //
     booktitle = "Advances in Applied Probability Vol. 17", //
     url = "https://doi.org/10.2307/1427090")
+@Reference(authors = "E. S. Page", //
+    title = "On Problems in which a Change in a Parameter Occurs at an Unknown Point", //
+    booktitle = "Biometrika Vol. 44", //
+    url = "https://doi.org/10.2307/2333258")
+@Reference(authors = "M. Basseville, I. V. Nikiforov", //
+    title = "Section 2.6: Off-line Change Detection", //
+    booktitle = "Detection of Abrupt Changes - Theory and Application", //
+    url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf")
 public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(OfflineChangePointDetectionAlgorithm.class);
-
-  /**
-   * Additional reference (early literature).
-   */
-  @Reference(authors = "E. S. Page ", //
-      title = "On Problems in which a Change in a Parameter Occurs at an Unknown Point", //
-      booktitle = "Biometrika Vol. 44", //
-      url = "https://doi.org/10.2307/2333258")
-  public static final Void ADDITIONAL_REFERENCE = null;
-
-  /**
-   * Additional reference (textbook).
-   */
-  @Reference(authors = "M. Basseville and I. V. Nikiforov", //
-      title = "Section 2.6: Off-line Change Detection", //
-      booktitle = "Detection of Abrupt Changes - Theory and Application", //
-      url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf")
-  public static final Void ADDITIONAL_REFERENCE2 = null;
 
   /**
    * Number of samples for bootstrap significance.

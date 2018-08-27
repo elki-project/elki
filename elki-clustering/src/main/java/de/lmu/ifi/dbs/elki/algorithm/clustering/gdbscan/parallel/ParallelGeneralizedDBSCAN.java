@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,11 +42,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.parallel.Executor;
@@ -63,33 +59,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Parallel version of DBSCAN clustering.
- *
+ * <p>
  * This is the archetype of a non-linear shared-memory DBSCAN that does not
  * sequentially expand a cluster, but processes points in arbitrary order and
  * merges clusters when neighboring core points occur.
- * 
+ * <p>
  * Because of synchronization when labeling points, the speedup will only be
  * sublinear in the number of cores. But in particular without an index and on
  * large data, the majority of the work is finding the neighbors; not in
  * labeling the points.
- *
+ * <p>
  * Reference:
  * <p>
  * Please cite the latest ELKI version.
- * </p>
- *
+ * <p>
  * Related is the following publication, whose "disjoint set data structure"
  * appears to be a similar union-find approach to ours, and whose DSDBSCAN
  * appears rather similar. The main benefit of our approach is that we avoid
  * using the union-find data structure for every object, but only use it for
  * merging clusters.
  * <p>
- * M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary<br />
+ * M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary<br>
  * A new scalable parallel DBSCAN algorithm using the disjoint-set data
- * structure<br />
+ * structure<br>
  * In IEEE Int. Conf. for High Performance Computing, Networking, Storage and
  * Analysis (SC)
- * </p>
  *
  * @author Erich Schubert
  *
@@ -99,21 +93,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf CorePredicate
  * @apiviz.composedOf NeighborPredicate
  */
+@Reference(prefix = "closely related", //
+    authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
+    title = "A new scalable parallel DBSCAN algorithm using the disjoint-set data structure", //
+    booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
+    url = "https://doi.org/10.1109/SC.2012.9")
 public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
   private static final Logging LOG = Logging.getLogger(ParallelGeneralizedDBSCAN.class);
-
-  /**
-   * Additional reference for documentation.
-   */
-  @Reference(//
-      authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
-      title = "A new scalable parallel DBSCAN algorithm using the disjoint-set data structure", //
-      booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
-      url = "https://doi.org/10.1109/SC.2012.9")
-  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * The neighborhood predicate factory.
@@ -257,7 +246,7 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      */
     public Clustering<Model> run() {
       DBIDs ids = npred.getIDs();
-      
+
       progress = LOG.isVerbose() ? new FiniteProgress("DBSCAN clustering", ids.size(), LOG) : null;
       // Do the majority of the work in parallel:
       // (This will call "instantiate".)

@@ -27,64 +27,59 @@ import net.jafama.FastMath;
 /**
  * Do some simple statistics (mean, variance) using a numerically stable online
  * algorithm.
- * 
+ * <p>
  * This class can repeatedly be fed with data using the add() methods, the
  * resulting values for mean and average can be queried at any time using
- * getMean() and getSampleVariance().
- * 
- * Make sure you have understood variance correctly when using
- * getNaiveVariance() - since this class is fed with samples and estimates the
- * mean from the samples, getSampleVariance() is the proper formula.
- * 
- * Trivial code, but replicated a lot. The class is final so it should come at
- * low cost.
- * 
- * The current approach is based on:
+ * {@link #getMean()} and {@link #getSampleVariance()}.
  * <p>
- * E. A. Youngs and E. M. Cramer<br />
- * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br />
+ * Make sure you have understood variance correctly when using
+ * {@link #getNaiveVariance()} - since this class is fed with samples and
+ * estimates the mean from the samples, {@link #getSampleVariance()} is often
+ * the more appropriate version.
+ * <p>
+ * As experimentally studied in
+ * <p>
+ * Erich Schubert, Michael Gertz<br>
+ * Numerically Stable Parallel Computation of (Co-)Variance<br>
+ * Proc. 30th Int. Conf. Scientific and Statistical Database Management
+ * (SSDBM 2018)
+ * <p>
+ * the current approach is based on:
+ * <p>
+ * E. A. Youngs and E. M. Cramer<br>
+ * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br>
  * Technometrics 13(3), 1971
- * </p>
- *
+ * <p>
  * We have originally experimented with:
  * <p>
- * B. P. Welford<br />
- * Note on a method for calculating corrected sums of squares and products<br />
- * in: Technometrics 4(3), 1962
- * </p>
- * 
+ * B. P. Welford<br>
+ * Note on a method for calculating corrected sums of squares and products<br>
+ * Technometrics 4(3), 1962
  * <p>
- * D. H. D. West<br />
- * Updating Mean and Variance Estimates: An Improved Method<br />
- * In: Communications of the ACM 22(9)
- * </p>
+ * D. H. D. West<br>
+ * Updating Mean and Variance Estimates: An Improved Method<br>
+ * Communications of the ACM 22(9)
  * 
  * @author Erich Schubert
  * @since 0.2
  */
-@Reference(authors = "E. A. Youngs  and  E. M. Cramer", //
+@Reference(authors = "Erich Schubert, Michael Gertz", //
+    title = "Numerically Stable Parallel Computation of (Co-)Variance", //
+    booktitle = "Proc. 30th Int. Conf. Scientific and Statistical Database Management (SSDBM 2018)", //
+    url = "https://doi.org/10.1145/3221269.3223036")
+@Reference(authors = "E. A. Youngs, E. M. Cramer", //
     title = "Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms", //
     booktitle = "Technometrics 13(3)", //
     url = "https://doi.org/10.1080/00401706.1971.10488826")
+@Reference(authors = "B. P. Welford", //
+    title = "Note on a method for calculating corrected sums of squares and products", //
+    booktitle = "Technometrics 4(3)", //
+    url = "https://doi.org/10.2307/1266577")
+@Reference(authors = "D. H. D. West", //
+    title = "Updating Mean and Variance Estimates: An Improved Method", //
+    booktitle = "Communications of the ACM 22(9)", //
+    url = "https://doi.org/10.1145/359146.359153")
 public class MeanVariance extends Mean {
-  /**
-   * Additional reference.
-   */
-  @Reference(authors = "B. P. Welford", //
-      title = "Note on a method for calculating corrected sums of squares and products", //
-      booktitle = "Technometrics 4(3)", //
-      url = "https://doi.org/10.2307/1266577")
-  public static Void SECOND_REFERENCE = null;
-
-  /**
-   * Additional reference.
-   */
-  @Reference(authors = "D.H.D. West", //
-      title = "Updating Mean and Variance Estimates: An Improved Method", //
-      booktitle = "Communications of the ACM 22(9)", //
-      url = "https://doi.org/10.1145/359146.359153")
-  public static Void THIRD_REFERENCE = null;
-
   /**
    * n times Variance
    */

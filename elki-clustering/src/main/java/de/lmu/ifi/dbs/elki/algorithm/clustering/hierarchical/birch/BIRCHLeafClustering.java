@@ -44,19 +44,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * BIRCH-based clustering algorithm that simply treats the leafs of the CFTree
  * as clusters.
- *
+ * <p>
  * References:
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
+ * T. Zhang and R. Ramakrishnan and M. Livny<br>
  * BIRCH: An Efficient Data Clustering Method for Very Large Databases
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
- * </p>
- *
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
+ * T. Zhang and R. Ramakrishnan and M. Livny<br>
  * BIRCH: A New Data Clustering Algorithm and Its Applications
  * Data. Min. Knowl. Discovery
- * </p>
  *
  * @author Erich Schubert
  *
@@ -66,20 +63,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324")
+@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+    title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
+    booktitle = "Data Min. Knowl. Discovery", //
+    url = "https://doi.org/10.1023/A:1009783824328")
 public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(BIRCHLeafClustering.class);
-
-  /**
-   * Additional reference
-   */
-  @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
-      title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
-      booktitle = "Data Min. Knowl. Discovery", //
-      url = "https://doi.org/10.1023/A:1009783824328")
-  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * CFTree factory.

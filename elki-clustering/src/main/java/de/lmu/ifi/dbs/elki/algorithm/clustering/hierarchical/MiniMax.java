@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,44 +37,35 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Minimax Linkage clustering.
- * 
+ * <p>
  * Reference:
  * <p>
- * S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado and P. C.
- * Sham<br />
- * CLUSTAG: hierarchical clustering and graph methods for selecting tag
- * SNPs<br />
+ * S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado, P. C. Sham<br>
+ * CLUSTAG: hierarchical clustering and graph methods for selecting tag SNPs<br>
  * Bioinformatics, 21 (8)
- * </p>
  * <p>
- * J. Bien and R. Tibshirani<br >
- * Hierarchical Clustering with Prototypes via Minimax Linkage<br />
+ * J. Bien and R. Tibshirani<br>
+ * Hierarchical Clustering with Prototypes via Minimax Linkage<br>
  * Journal of the American Statistical Association 106(495)
- * </p>
  * 
  * @author Julian Erhard
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
-@Reference(authors = "S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado and P. C. Sham", //
+@Reference(authors = "S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado, P. C. Sham", //
     title = "CLUSTAG: hierarchical clustering and graph methods for selecting tag SNPs", //
     booktitle = "Bioinformatics, 21 (8)", //
     url = "https://doi.org/10.1093/bioinformatics/bti201")
+@Reference(authors = "J. Bien, R. Tibshirani", //
+    title = "Hierarchical Clustering with Prototypes via Minimax Linkage", //
+    booktitle = "Journal of the American Statistical Association 106(495)", //
+    url = "https://doi.org/10.1198/jasa.2011.tm10183")
 public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class Logger.
    */
   private static final Logging LOG = Logging.getLogger(MiniMax.class);
-
-  /**
-   * Additional reference with detailed discussion.
-   */
-  @Reference(authors = "J. Bien and R. Tibshirani", //
-      title = "Hierarchical Clustering with Prototypes via Minimax Linkage", //
-      booktitle = "Journal of the American Statistical Association 106(495)", //
-      url = "https://doi.org/10.1198/jasa.2011.tm10183")
-  public static final Void ADDITIONAL_REFERNECE = null;
 
   /**
    * Constructor.
