@@ -26,61 +26,23 @@ import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to specify a reference.
- * 
+ * Container annotation to store multiple {@link Reference} annotations.
+ *
  * @author Erich Schubert
- * @since 0.3
  */
 @Documented
-@Repeatable(References.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ TYPE, FIELD, METHOD, PACKAGE })
-public @interface Reference {
+public @interface References {
   /**
-   * Publication title.
-   * 
-   * @return publication title
+   * References of the class / field / method.
+   *
+   * @return References
    */
-  String title();
-
-  /**
-   * Publication Authors
-   * 
-   * @return authors
-   */
-  String authors();
-
-  /**
-   * Book title or Journal title etc.
-   * 
-   * @return book title
-   */
-  String booktitle();
-
-  /**
-   * Prefix to the reference, e.g. "Generalization of a method proposed in"
-   * 
-   * @return Prefix or empty string
-   */
-  String prefix() default "";
-
-  /**
-   * Reference URL, e.g. DOI
-   * 
-   * @return Reference URL or empty string
-   */
-  String url() default "";
-
-  /**
-   * BibTeX key
-   * 
-   * @return BibTeX in the bibliography
-   */
-  String bibkey() default "";
+  Reference[] value();
 }

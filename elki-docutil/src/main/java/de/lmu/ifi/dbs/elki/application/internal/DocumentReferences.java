@@ -47,7 +47,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
 /**
@@ -87,7 +86,7 @@ public class DocumentReferences {
       System.exit(1);
     }
 
-    List<Pair<Reference, TreeSet<Object>>> refs = sortedReferences();
+    List<Map.Entry<Reference, TreeSet<Object>>> refs = sortedReferences();
     File references = new File(args[0]);
     try (FileOutputStream reffo = new FileOutputStream(references); //
         OutputStream refstream = new BufferedOutputStream(reffo)) {
@@ -111,7 +110,7 @@ public class DocumentReferences {
     }
   }
 
-  private static Document documentReferences(List<Pair<Reference, TreeSet<Object>>> refs) throws IOException {
+  private static Document documentReferences(List<Map.Entry<Reference, TreeSet<Object>>> refs) throws IOException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -162,13 +161,13 @@ public class DocumentReferences {
     // Main definition list
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
-    for(Pair<Reference, TreeSet<Object>> pair : refs) {
+    for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
       {
         boolean first = true;
-        for(Object o : pair.second) {
+        for(Object o : pair.getValue()) {
           if(!first) {
             classdt.appendChild(htmldoc.createTextNode(", "));
           }
@@ -205,66 +204,64 @@ public class DocumentReferences {
       Element classdd = htmldoc.createElement(HTMLUtil.HTML_DD_TAG);
       maindl.appendChild(classdd);
 
-      {
-        Reference ref = pair.first;
-        // Prefix
-        if(!ref.prefix().isEmpty()) {
-          Element prediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-          prediv.setTextContent(ref.prefix());
-          classdd.appendChild(prediv);
+      Reference ref = pair.getKey();
+      // Prefix
+      if(!ref.prefix().isEmpty()) {
+        Element prediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+        prediv.setTextContent(ref.prefix());
+        classdd.appendChild(prediv);
+      }
+      // Authors
+      Element authorsdiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+      authorsdiv.setTextContent(ref.authors());
+      classdd.appendChild(authorsdiv);
+      // Title
+      Element titlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+      Element titleb = htmldoc.createElement(HTMLUtil.HTML_B_TAG);
+      titleb.setTextContent(ref.title());
+      titlediv.appendChild(titleb);
+      classdd.appendChild(titlediv);
+      // Booktitle
+      if(!ref.booktitle().isEmpty()) {
+        Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+        booktitlediv.setTextContent("In: " + ref.booktitle());
+        if(ref.booktitle().startsWith("Online:")) {
+          booktitlediv.setTextContent(ref.booktitle());
         }
-        // Authors
-        Element authorsdiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-        authorsdiv.setTextContent(ref.authors());
-        classdd.appendChild(authorsdiv);
-        // Title
-        Element titlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-        Element titleb = htmldoc.createElement(HTMLUtil.HTML_B_TAG);
-        titleb.setTextContent(ref.title());
-        titlediv.appendChild(titleb);
-        classdd.appendChild(titlediv);
-        // Booktitle
-        if(!ref.booktitle().isEmpty()) {
-          Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-          booktitlediv.setTextContent("In: " + ref.booktitle());
-          if(ref.booktitle().startsWith("Online:")) {
-            booktitlediv.setTextContent(ref.booktitle());
-          }
-          classdd.appendChild(booktitlediv);
-        }
-        // URL
-        if(!ref.url().isEmpty()) {
+        classdd.appendChild(booktitlediv);
+      }
+      // URL
+      if(!ref.url().isEmpty()) {
+        Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+        Element urla = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+        urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, ref.url());
+        urla.setTextContent(ref.url());
+        urldiv.appendChild(urla);
+        classdd.appendChild(urldiv);
+      }
+      // Bibkey
+      if(!ref.bibkey().isEmpty()) {
+        if(ref.bibkey().startsWith(DBLPPREFIX)) {
           Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
           Element urla = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-          urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, ref.url());
+          urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, DBLPURL + ref.bibkey());
           urla.setTextContent(ref.url());
           urldiv.appendChild(urla);
           classdd.appendChild(urldiv);
         }
-        // Bibkey
-        if(!ref.bibkey().isEmpty()) {
-          if(ref.bibkey().startsWith(DBLPPREFIX)) {
-            Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-            Element urla = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-            urla.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, DBLPURL + ref.bibkey());
-            urla.setTextContent(ref.url());
-            urldiv.appendChild(urla);
-            classdd.appendChild(urldiv);
-          }
-          else {
-            classdd.appendChild((Element) htmldoc.createComment(ref.bibkey()));
-          }
+        else {
+          classdd.appendChild((Element) htmldoc.createComment(ref.bibkey()));
         }
       }
     }
     return htmldoc;
   }
 
-  private static void documentReferencesMarkdown(List<Pair<Reference, TreeSet<Object>>> refs, MarkdownDocStream refstreamW) {
-    for(Pair<Reference, TreeSet<Object>> pair : refs) {
+  private static void documentReferencesMarkdown(List<Map.Entry<Reference, TreeSet<Object>>> refs, MarkdownDocStream refstreamW) {
+    for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
       // JavaDoc links for relevant classes and packages.
       boolean first = true;
-      for(Object o : pair.second) {
+      for(Object o : pair.getValue()) {
         if(!first) {
           refstreamW.append(',').lf();
         }
@@ -282,67 +279,65 @@ public class DocumentReferences {
       }
       refstreamW.lf();
 
-      {
-        Reference ref = pair.first;
-        // Prefix
-        if(!ref.prefix().isEmpty()) {
-          refstreamW.escaped(ref.prefix()).lf();
+      Reference ref = pair.getKey();
+      // Prefix
+      if(!ref.prefix().isEmpty()) {
+        refstreamW.escaped(ref.prefix()).lf();
+      }
+      // Authors
+      refstreamW //
+          // authors
+          .append(ref.authors()).lf() //
+          // Title
+          .append("**").escaped(ref.title()).append("**").lf();
+      // Booktitle
+      if(!ref.booktitle().isEmpty() && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
+        refstreamW.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
+      }
+      // URL
+      if(!ref.url().isEmpty()) {
+        if(ref.url().startsWith(DOIPREFIX)) {
+          refstreamW.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
+              .append("](").append(ref.url()).append(')').lf();
         }
-        // Authors
-        refstreamW //
-            // authors
-            .append(ref.authors()).lf() //
-            // Title
-            .append("**").escaped(ref.title()).append("**").lf();
-        // Booktitle
-        if(!ref.booktitle().isEmpty() && !ref.booktitle().equals(ref.url()) && !ref.booktitle().equals("Online")) {
-          refstreamW.append(ref.booktitle().startsWith("Online:") ? "" : "In: ").escaped(ref.booktitle()).lf();
+        else {
+          refstreamW.append("Online: <").append(ref.url()).append('>').lf();
         }
-        // URL
-        if(!ref.url().isEmpty()) {
-          if(ref.url().startsWith(DOIPREFIX)) {
-            refstreamW.append("[DOI:").append(ref.url(), DOIPREFIX.length(), ref.url().length())//
-                .append("](").append(ref.url()).append(')').lf();
-          }
-          else {
-            refstreamW.append("Online: <").append(ref.url()).append('>').lf();
-          }
+      }
+      // Bibkey, if we can link to DBLP:
+      if(!ref.bibkey().isEmpty()) {
+        if(ref.bibkey().startsWith(DBLPPREFIX)) {
+          refstreamW.append("[DBLP:").append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length())//
+              .append("](").append(DBLPURL)//
+              .append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length()).append(')').lf();
         }
-        // Bibkey, if we can link to DBLP:
-        if(!ref.bibkey().isEmpty()) {
-          if(ref.bibkey().startsWith(DBLPPREFIX)) {
-            refstreamW.append("[DBLP:").append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length())//
-                .append("](").append(DBLPURL)//
-                .append(ref.bibkey(), DBLPPREFIX.length(), ref.bibkey().length()).append(')').lf();
-          }
-          else {
-            refstreamW.append("<!-- ").append(ref.bibkey()).append(" -->").lf();
-          }
+        else {
+          refstreamW.append("<!-- ").append(ref.bibkey()).append(" -->").lf();
         }
       }
       refstreamW.par();
     }
   }
 
-  private static List<Pair<Reference, TreeSet<Object>>> sortedReferences() {
-    List<Pair<Reference, TreeSet<Object>>> refs = new ArrayList<>();
+  private static List<Map.Entry<Reference, TreeSet<Object>>> sortedReferences() {
     Map<Reference, TreeSet<Object>> map = new HashMap<>();
 
     HashSet<Package> packages = new HashSet<>();
     for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
-      inspectClass(cls, refs, map);
+      inspectClass(cls, map);
       if(packages.add(cls.getPackage())) {
-        inspectPackage(cls.getPackage(), refs, map);
+        inspectPackage(cls.getPackage(), map);
       }
     }
     // Sort references by first class.
-    Collections.sort(refs, new Comparator<Pair<Reference, TreeSet<Object>>>() {
+    List<Map.Entry<Reference, TreeSet<Object>>> refs = new ArrayList<>(map.entrySet());
+    Collections.sort(refs, new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
       @Override
-      public int compare(Pair<Reference, TreeSet<Object>> p1, Pair<Reference, TreeSet<Object>> p2) {
-        final Object o1 = p1.second.first(), o2 = p2.second.first();
+      public int compare(Map.Entry<Reference, TreeSet<Object>> p1, Map.Entry<Reference, TreeSet<Object>> p2) {
+        final Object o1 = p1.getValue().first(), o2 = p2.getValue().first();
         int c = COMPARATOR.compare(o1, o2);
         if(c == 0) {
-          Reference r1 = p1.first, r2 = p2.first;
+          Reference r1 = p1.getKey(), r2 = p2.getKey();
           c = compareNull(r1.title(), r2.title());
           c = (c != 0) ? c : compareNull(r1.authors(), r2.authors());
           c = (c != 0) ? c : compareNull(r1.booktitle(), r2.booktitle());
@@ -379,27 +374,26 @@ public class DocumentReferences {
     }
   };
 
-  private static void inspectClass(final Class<?> cls, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
+  private static void inspectClass(final Class<?> cls, Map<Reference, TreeSet<Object>> map) {
     if(cls.getSimpleName().equals("package-info")) {
       return;
     }
     try {
       if(cls.isAnnotationPresent(Reference.class)) {
-        Reference ref = cls.getAnnotation(Reference.class);
-        addReference(cls, ref, refs, map);
+        addReference(cls, cls.getAnnotationsByType(Reference.class), map);
       }
       // Inner classes
       for(Class<?> c2 : cls.getDeclaredClasses()) {
-        inspectClass(c2, refs, map);
+        inspectClass(c2, map);
       }
       for(Method m : cls.getDeclaredMethods()) {
         if(m.isAnnotationPresent(Reference.class)) {
-          addReference(cls, m.getAnnotation(Reference.class), refs, map);
+          addReference(cls, m.getAnnotationsByType(Reference.class), map);
         }
       }
       for(Field f : cls.getDeclaredFields()) {
         if(f.isAnnotationPresent(Reference.class)) {
-          addReference(cls, f.getAnnotation(Reference.class), refs, map);
+          addReference(cls, f.getAnnotationsByType(Reference.class), map);
         }
       }
     }
@@ -408,18 +402,19 @@ public class DocumentReferences {
     }
   }
 
-  private static void addReference(Object cls, Reference ref, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
-    TreeSet<Object> list = map.get(ref);
-    if(list == null) {
-      map.put(ref, list = new TreeSet<>(COMPARATOR));
-      refs.add(new Pair<>(ref, list));
+  private static void addReference(Object cls, Reference[] r, Map<Reference, TreeSet<Object>> map) {
+    for(Reference ref : r) {
+      TreeSet<Object> list = map.get(ref);
+      if(list == null) {
+        map.put(ref, list = new TreeSet<>(COMPARATOR));
+      }
+      list.add(cls);
     }
-    list.add(cls);
   }
 
-  private static void inspectPackage(Package p, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
+  private static void inspectPackage(Package p, Map<Reference, TreeSet<Object>> map) {
     if(p.isAnnotationPresent(Reference.class)) {
-      addReference(p, p.getAnnotation(Reference.class), refs, map);
+      addReference(p, p.getAnnotationsByType(Reference.class), map);
     }
   }
 
