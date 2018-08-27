@@ -57,7 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //
     booktitle = "4th Symp. Advances in Spatial Databases (SSD'95)", //
-    url = "https://doi.org/10.1007/3-540-60159-7_6")
+    url = "https://doi.org/10.1007/3-540-60159-7_6", //
+    bibkey = "DBLP:conf/ssd/HjaltasonS95")
 public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<O> {
   /**
    * The index to use

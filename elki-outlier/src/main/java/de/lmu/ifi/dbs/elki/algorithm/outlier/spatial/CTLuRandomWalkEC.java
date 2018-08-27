@@ -78,7 +78,8 @@ import net.jafama.FastMath;
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", //
     title = "Spatial outlier detection: random walk based approaches", //
     booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
-    url = "https://doi.org/10.1145/1869790.1869841")
+    url = "https://doi.org/10.1145/1869790.1869841", //
+    bibkey = "DBLP:conf/gis/LiuLC10")
 public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.

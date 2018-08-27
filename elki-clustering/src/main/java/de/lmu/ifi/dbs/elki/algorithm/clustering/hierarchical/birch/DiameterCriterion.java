@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/233269.233324")
+    url = "https://doi.org/10.1145/233269.233324", //
+    bibkey = "DBLP:conf/sigmod/ZhangRL96")
 public class DiameterCriterion implements BIRCHAbsorptionCriterion {
   /**
    * Static instance.

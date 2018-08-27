@@ -81,7 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "B. Hopkins and J. G. Skellam", //
     title = "A new method for determining the type of distribution of plant individuals", //
     booktitle = "Annals of Botany, 18(2), 213-227", //
-    url = "https://doi.org/10.1093/oxfordjournals.aob.a083391")
+    url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
+    bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
 public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, Result> {
   /**
    * The logger for this class.

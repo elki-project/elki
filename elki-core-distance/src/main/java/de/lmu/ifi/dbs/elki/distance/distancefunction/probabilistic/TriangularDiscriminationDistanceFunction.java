@@ -50,7 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "F. Topsoe", //
     title = "Some inequalities for information divergence and related measures of discrimination", //
     booktitle = "IEEE Transactions on information theory, 46(4)", //
-    url = "https://doi.org/10.1109/18.850703")
+    url = "https://doi.org/10.1109/18.850703", //
+    bibkey = "DBLP:journals/tit/Topsoe00")
 public class TriangularDiscriminationDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!

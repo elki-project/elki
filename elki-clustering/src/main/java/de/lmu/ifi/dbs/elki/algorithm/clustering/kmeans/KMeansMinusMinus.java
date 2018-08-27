@@ -82,7 +82,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Reference(authors = "S. Chawla and A. Gionis", //
     title = "k-means--: A Unified Approach to Clustering and Outlier Detection", //
     booktitle = "Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)", //
-    url = "https://doi.org/10.1137/1.9781611972832.21")
+    url = "https://doi.org/10.1137/1.9781611972832.21", //
+    bibkey = "DBLP:conf/sdm/ChawlaG13")
 public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

@@ -87,7 +87,8 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 @Reference(authors = "Y. Pei, O. R. Zaiane, Y. Gao", //
     title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", //
     booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
-    url = "https://doi.org/10.1109/ICDM.2006.17")
+    url = "https://doi.org/10.1109/ICDM.2006.17", //
+    bibkey = "DBLP:conf/icdm/PeiZG06")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
 public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
   /**

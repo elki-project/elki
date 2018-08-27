@@ -75,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "L. J. Hubert and J. R. Levin", //
     title = "A general statistical framework for assessing categorical clustering in free recall.", //
     booktitle = "Psychological Bulletin, Vol. 83(6)", //
-    url = "https://doi.org/10.1037/0033-2909.83.6.1072")
+    url = "https://doi.org/10.1037/0033-2909.83.6.1072", //
+    bibkey = "doi:10.1037/0033-2909.83.6.1072")
 public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Logger for debug output.

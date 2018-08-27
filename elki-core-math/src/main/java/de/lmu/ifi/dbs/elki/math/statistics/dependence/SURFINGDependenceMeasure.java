@@ -59,11 +59,13 @@ import net.jafama.FastMath;
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
-    url = "https://doi.org/10.1145/2463676.2463696")
+    url = "https://doi.org/10.1145/2463676.2463696", //
+    bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
     title = "Subspace Selection for Clustering High-Dimensional Data", //
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
-    url = "https://doi.org/10.1109/ICDM.2004.10112")
+    url = "https://doi.org/10.1109/ICDM.2004.10112", //
+    bibkey = "DBLP:conf/icdm/BaumgartnerPKKK04")
 public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.

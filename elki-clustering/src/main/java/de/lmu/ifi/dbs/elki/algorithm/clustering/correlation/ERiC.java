@@ -96,7 +96,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "On Exploring Complex Relationships of Correlation Clusters", //
     booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
-    url = "https://doi.org/10.1109/SSDBM.2007.21")
+    url = "https://doi.org/10.1109/SSDBM.2007.21", //
+    bibkey = "DBLP:conf/ssdbm/AchtertBKKZ07")
 public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel>> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * The logger for this class.

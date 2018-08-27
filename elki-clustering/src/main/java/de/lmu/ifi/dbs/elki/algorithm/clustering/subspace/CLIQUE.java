@@ -94,7 +94,8 @@ import net.jafama.FastMath;
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", //
     title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", //
     booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", //
-    url = "https://doi.org/10.1145/276304.276314")
+    url = "https://doi.org/10.1145/276304.276314", //
+    bibkey = "DBLP:conf/sigmod/AgrawalGGR98")
 public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

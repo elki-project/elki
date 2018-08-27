@@ -44,7 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 @Reference(authors = "Norbert Beckmann, Hans-Peter Kriegel, Ralf Schneider, Bernhard Seeger", //
     title = "The R*-tree: an efficient and robust access method for points and rectangles", //
     booktitle = "Proc. 1990 ACM SIGMOD Int. Conf. Management of Data", //
-    url = "https://doi.org/10.1145/93597.98741")
+    url = "https://doi.org/10.1145/93597.98741", //
+    bibkey = "DBLP:conf/sigmod/BeckmannKSS90")
 public class CombinedInsertionStrategy implements InsertionStrategy {
   /**
    * Strategy when inserting into directory nodes

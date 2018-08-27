@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P.-N. Tan, V. Kumar, J. Srivastava", // )
     title = "Selecting the right objective measure for association analysis", //
     booktitle = "Information Systems 29.4", //
-    url = "https://doi.org/10.1016/S0306-4379(03)00072-3")
+    url = "https://doi.org/10.1016/S0306-4379(03)00072-3", //
+    bibkey = "DBLP:journals/is/TanKS04")
 @Reference(authors = "C.J. van Rijsbergen", //
     title = "Information Retrieval, 2nd Edition", //
     booktitle = "Butterworths, London, 1979", //

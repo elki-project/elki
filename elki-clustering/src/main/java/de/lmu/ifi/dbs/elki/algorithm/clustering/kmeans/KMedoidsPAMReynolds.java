@@ -59,7 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
     authors = "A. P. Reynolds and G. Richards and B. de la Iglesia and V. J. Rayward-Smith", //
     booktitle = "J. Math. Model. Algorithms 5(4)", //
-    url = "https://doi.org/10.1007/s10852-005-9022-1")
+    url = "https://doi.org/10.1007/s10852-005-9022-1", //
+    bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
 public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
   /**
    * The logger for this class.

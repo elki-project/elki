@@ -200,7 +200,8 @@ public class Mean {
   @Reference(authors = "P. M. Neely", //
       title = "Comparison of Several Algorithms for Computation of Means, Standard Deviations and Correlation Coefficients", //
       booktitle = "Communications of the ACM 9(7), 1966", //
-      url = "https://doi.org/10.1145/365719.365958")
+      url = "https://doi.org/10.1145/365719.365958", //
+      bibkey = "doi:10.1145/365719.365958")
   public static double highPrecision(double... data) {
     double sum = 0.;
     for(double v : data) {

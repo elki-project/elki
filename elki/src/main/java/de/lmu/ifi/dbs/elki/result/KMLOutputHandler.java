@@ -98,7 +98,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Erich Achtert, Ahmed Hettab, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Spatial Outlier Detection: Data, Algorithms, Visualizations", //
     booktitle = "Proc. 12th Int. Symp. Spatial and Temporal Databases (SSTD 2011)", //
-    url = "https://doi.org/10.1007/978-3-642-22922-0_41")
+    url = "https://doi.org/10.1007/978-3-642-22922-0_41", //
+    bibkey = "DBLP:conf/ssd/AchtertHKSZ11")
 public class KMLOutputHandler implements ResultHandler {
   /**
    * Logger class to use.

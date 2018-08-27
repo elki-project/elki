@@ -52,7 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "G. N. Lance and W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
-    url = "https://doi.org/10.1093/comjnl/9.4.373")
+    url = "https://doi.org/10.1093/comjnl/9.4.373", //
+    bibkey = "doi:10.1093/comjnl/9.4.373")
 @Alias({ "flex", "beta", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod" })
 @Priority(Priority.DEFAULT - 2) // Rather uncommon
 public class FlexibleBetaLinkage implements Linkage {

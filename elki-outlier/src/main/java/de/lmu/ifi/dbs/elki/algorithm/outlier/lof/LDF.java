@@ -80,7 +80,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", //
     title = "Outlier Detection with Kernel Density Functions", //
     booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
-    url = "https://doi.org/10.1007/978-3-540-73499-4_6")
+    url = "https://doi.org/10.1007/978-3-540-73499-4_6", //
+    bibkey = "DBLP:conf/mldm/LateckiLP07")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LDF")
 public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

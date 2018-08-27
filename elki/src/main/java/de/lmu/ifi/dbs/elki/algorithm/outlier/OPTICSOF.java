@@ -82,7 +82,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "OPTICS-OF: Identifying Local Outliers", //
     booktitle = "Proc. 3rd European Conf. on Principles of Knowledge Discovery and Data Mining (PKDD'99)", //
-    url = "https://doi.org/10.1007/978-3-540-48247-5_28")
+    url = "https://doi.org/10.1007/978-3-540-48247-5_28", //
+    bibkey = "DBLP:conf/pkdd/BreunigKNS99")
 public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

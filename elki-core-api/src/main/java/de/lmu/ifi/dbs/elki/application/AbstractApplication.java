@@ -102,7 +102,8 @@ public abstract class AbstractApplication {
   @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
       title = "A Framework for Clustering Uncertain Data", //
       booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
-      url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
+      url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf", //
+      bibkey = "DBLP:journals/pvldb/SchubertKEZSZ15")
   public static final String REFERENCE = "ELKI Release 0.7.0 (2015, August) published in:" + NEWLINE + NEWLINE //
       + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
       + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //

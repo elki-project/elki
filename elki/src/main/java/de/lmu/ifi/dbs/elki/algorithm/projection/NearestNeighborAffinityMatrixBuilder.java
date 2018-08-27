@@ -62,7 +62,8 @@ import net.jafama.FastMath;
 @Reference(authors = "L. J. P. van der Maaten", //
     title = "Accelerating t-SNE using Tree-Based Algorithms", //
     booktitle = "Journal of Machine Learning Research 15", //
-    url = "http://dl.acm.org/citation.cfm?id=2697068")
+    url = "http://dl.acm.org/citation.cfm?id=2697068", //
+    bibkey = "DBLP:journals/jmlr/Maaten14")
 public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityMatrixBuilder<O> {
   /**
    * Class logger.

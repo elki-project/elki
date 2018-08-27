@@ -91,7 +91,8 @@ import net.jafama.FastMath;
 @Reference(authors = "F. Angiulli, C. Pizzuti", //
     title = "Fast Outlier Detection in High Dimensional Spaces", //
     booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
-    url = "https://doi.org/10.1007/3-540-45681-3_2")
+    url = "https://doi.org/10.1007/3-540-45681-3_2", //
+    bibkey = "DBLP:conf/pkdd/AngiulliP02")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut" })
 public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

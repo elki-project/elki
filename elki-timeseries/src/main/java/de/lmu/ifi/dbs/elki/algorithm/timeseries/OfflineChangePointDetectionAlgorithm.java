@@ -78,11 +78,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "D. Picard", //
     title = "Testing and Estimating Change-Points in Time Series ", //
     booktitle = "Advances in Applied Probability Vol. 17", //
-    url = "https://doi.org/10.2307/1427090")
+    url = "https://doi.org/10.2307/1427090", //
+    bibkey = "doi:10.2307/1427090")
 @Reference(authors = "E. S. Page", //
     title = "On Problems in which a Change in a Parameter Occurs at an Unknown Point", //
     booktitle = "Biometrika Vol. 44", //
-    url = "https://doi.org/10.2307/2333258")
+    url = "https://doi.org/10.2307/2333258", //
+    bibkey = "doi:10.2307/2333258")
 @Reference(authors = "M. Basseville, I. V. Nikiforov", //
     title = "Section 2.6: Off-line Change Detection", //
     booktitle = "Detection of Abrupt Changes - Theory and Application", //

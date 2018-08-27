@@ -44,7 +44,8 @@ import net.jafama.FastMath;
 @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", //
     authors = "S. C. Choi, R. Wette", //
     booktitle = "Technometrics", //
-    url = "https://doi.org/10.2307/1266892")
+    url = "https://doi.org/10.2307/1266892", //
+    bibkey = "doi:10.2307/1266892")
 public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistribution> {
   /**
    * Static estimation, using iterative refinement.

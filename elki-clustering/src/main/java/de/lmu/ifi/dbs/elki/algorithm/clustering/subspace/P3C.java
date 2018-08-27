@@ -103,7 +103,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", //
     title = "P3C: A Robust Projected Clustering Algorithm", //
     booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", //
-    url = "https://doi.org/10.1109/ICDM.2006.123")
+    url = "https://doi.org/10.1109/ICDM.2006.123", //
+    bibkey = "DBLP:conf/icdm/MoiseSE06")
 @Priority(Priority.RECOMMENDED - 10) // More specialized
 public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**

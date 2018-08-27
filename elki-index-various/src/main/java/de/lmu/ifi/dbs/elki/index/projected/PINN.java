@@ -57,7 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(title = "Finding local anomalies in very high dimensional space", //
     authors = "T. de Vries, S. Chawla, M. E. Houle", //
     booktitle = "Proc. IEEE 10th International Conference on Data Mining (ICDM)", //
-    url = "https://doi.org/10.1109/ICDM.2010.151")
+    url = "https://doi.org/10.1109/ICDM.2010.151", //
+    bibkey = "DBLP:conf/icdm/VriesCH10")
 public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
   /**
    * Constructor.

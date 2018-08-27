@@ -57,7 +57,8 @@ import net.jafama.FastMath;
 @Reference(authors = "M. Kratz and S. I. Resnick", //
     title = "On Least Squares Estimates of an Exponential Tail Coefficient", //
     booktitle = "Statistics & Risk Modeling. Band 14, Heft 4", //
-    url = "https://doi.org/10.1524/strm.1996.14.4.353")
+    url = "https://doi.org/10.1524/strm.1996.14.4.353", //
+    bibkey = "doi:10.1524/strm.1996.14.4.353")
 public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

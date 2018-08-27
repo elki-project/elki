@@ -76,11 +76,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
-    url = "https://doi.org/10.1109/ICDM.2012.21")
+    url = "https://doi.org/10.1109/ICDM.2012.21", //
+    bibkey = "DBLP:conf/icdm/KriegelKSZ12")
 @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
     authors = "M.A. Fischler, R.C. Bolles", //
     booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
-    url = "https://doi.org/10.1145/358669.358692")
+    url = "https://doi.org/10.1145/358669.358692", //
+    bibkey = "DBLP:journals/cacm/FischlerB81")
 public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   /**
    * Number of iterations to perform

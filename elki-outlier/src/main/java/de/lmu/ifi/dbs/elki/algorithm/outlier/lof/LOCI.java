@@ -85,7 +85,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
     title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
     booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
-    url = "https://doi.org/10.1109/ICDE.2003.1260802")
+    url = "https://doi.org/10.1109/ICDE.2003.1260802", //
+    bibkey = "DBLP:conf/icde/PapadimitriouKGF03")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI" })
 public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

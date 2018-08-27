@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
     title = "Locality-sensitive hashing scheme based on p-stable distributions", //
     booktitle = "Proc. 20th Symposium on Computational Geometry", //
-    url = "https://doi.org/10.1145/997817.997857")
+    url = "https://doi.org/10.1145/997817.997857", //
+    bibkey = "DBLP:conf/compgeom/DatarIIM04")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily")
 public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**

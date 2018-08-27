@@ -84,7 +84,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "Deriving Quantitative Dependencies for Correlation Clusters", //
     booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06)", //
-    url = "https://doi.org/10.1145/1150402.1150408")
+    url = "https://doi.org/10.1145/1150402.1150408", //
+    bibkey = "DBLP:conf/kdd/AchtertBKKZ06")
 @Priority(Priority.DEFAULT - 5) // Mostly used inside others, not standalone
 public class DependencyDerivator<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
   /**

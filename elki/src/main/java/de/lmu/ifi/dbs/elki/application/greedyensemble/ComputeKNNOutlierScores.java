@@ -103,7 +103,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel", //
     title = "On Evaluation of Outlier Rankings and Outlier Scores", //
     booktitle = "Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)", //
-    url = "https://doi.org/10.1137/1.9781611972825.90")
+    url = "https://doi.org/10.1137/1.9781611972825.90", //
+    bibkey = "DBLP:conf/sdm/SchubertWZK12")
 public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApplication {
   /**
    * Our logger class.

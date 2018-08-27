@@ -67,7 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. R. Bray, J. T. Curtis", //
     title = "An ordination of the upland forest communities of southern Wisconsin", //
     booktitle = "Ecological monographs 27.4", //
-    url = "https://doi.org/10.2307/1942268")
+    url = "https://doi.org/10.2307/1942268", //
+    bibkey = "doi:10.2307/1942268")
 @Reference(authors = "T. Sørensen", //
     title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
     booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")

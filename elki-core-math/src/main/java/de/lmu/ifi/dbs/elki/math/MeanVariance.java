@@ -66,19 +66,23 @@ import net.jafama.FastMath;
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Numerically Stable Parallel Computation of (Co-)Variance", //
     booktitle = "Proc. 30th Int. Conf. Scientific and Statistical Database Management (SSDBM 2018)", //
-    url = "https://doi.org/10.1145/3221269.3223036")
+    url = "https://doi.org/10.1145/3221269.3223036", //
+    bibkey = "DBLP:conf/ssdbm/SchubertG18")
 @Reference(authors = "E. A. Youngs, E. M. Cramer", //
     title = "Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms", //
     booktitle = "Technometrics 13(3)", //
-    url = "https://doi.org/10.1080/00401706.1971.10488826")
+    url = "https://doi.org/10.1080/00401706.1971.10488826", //
+    bibkey = "doi:10.1080/00401706.1971.10488826")
 @Reference(authors = "B. P. Welford", //
     title = "Note on a method for calculating corrected sums of squares and products", //
     booktitle = "Technometrics 4(3)", //
-    url = "https://doi.org/10.2307/1266577")
+    url = "https://doi.org/10.2307/1266577", //
+    bibkey = "doi:10.2307/1266577")
 @Reference(authors = "D. H. D. West", //
     title = "Updating Mean and Variance Estimates: An Improved Method", //
     booktitle = "Communications of the ACM 22(9)", //
-    url = "https://doi.org/10.1145/359146.359153")
+    url = "https://doi.org/10.1145/359146.359153", //
+    bibkey = "DBLP:journals/cacm/West79")
 public class MeanVariance extends Mean {
   /**
    * n times Variance

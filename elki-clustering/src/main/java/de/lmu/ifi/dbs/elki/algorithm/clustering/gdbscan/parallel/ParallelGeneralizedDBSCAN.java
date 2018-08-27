@@ -97,7 +97,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
     title = "A new scalable parallel DBSCAN algorithm using the disjoint-set data structure", //
     booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
-    url = "https://doi.org/10.1109/SC.2012.9")
+    url = "https://doi.org/10.1109/SC.2012.9", //
+    bibkey = "DBLP:conf/sc/PatwaryPALMC12")
 public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm

@@ -72,7 +72,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
-    url = "https://doi.org/10.1109/ICDM.2012.21")
+    url = "https://doi.org/10.1109/ICDM.2012.21", //
+    bibkey = "DBLP:conf/icdm/KriegelKSZ12")
 public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

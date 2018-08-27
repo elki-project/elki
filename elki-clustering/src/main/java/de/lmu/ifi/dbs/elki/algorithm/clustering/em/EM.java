@@ -98,7 +98,8 @@ import net.jafama.FastMath;
 @Reference(title = "Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering", //
     authors = "C. Fraley and A. E. Raftery", //
     booktitle = "J. Classification 24(2)", //
-    url = "https://doi.org/10.1007/s00357-007-0004-5")
+    url = "https://doi.org/10.1007/s00357-007-0004-5", //
+    bibkey = "DBLP:journals/classification/FraleyR07")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
 @Priority(Priority.RECOMMENDED)
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {

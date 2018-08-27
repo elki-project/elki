@@ -39,7 +39,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Meilă, M.", //
     title = "Comparing clusterings by the variation of information", //
     booktitle = "Learning theory and kernel machines", //
-    url = "https://doi.org/10.1007/978-3-540-45167-9_14")
+    url = "https://doi.org/10.1007/978-3-540-45167-9_14", //
+    bibkey = "DBLP:conf/colt/Meila03")
 public class Entropy {
   /**
    * Entropy in first
@@ -241,7 +242,8 @@ public class Entropy {
   @Reference(authors = "Nguyen, X. V. and Epps, J. and Bailey, J.", //
       title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
       booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", //
-      url = "https://doi.org/10.1145/1553374.1553511")
+      url = "https://doi.org/10.1145/1553374.1553511", //
+      bibkey = "DBLP:conf/icml/NguyenEB09")
   public double normalizedVariationOfInformation() {
     return (1.0 - (entropyMutualInformation() / entropyJoint()));
   }

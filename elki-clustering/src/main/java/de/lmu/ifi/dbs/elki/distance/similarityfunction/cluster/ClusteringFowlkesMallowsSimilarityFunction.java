@@ -45,7 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
     title = "A method for comparing two hierarchical clusterings", //
     booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
-    url = "https://doi.org/10.2307/2288117")
+    url = "https://doi.org/10.2307/2288117", //
+    bibkey = "doi:10.2307/2288117")
 public class ClusteringFowlkesMallowsSimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.

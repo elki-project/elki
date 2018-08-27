@@ -79,7 +79,8 @@ import net.jafama.FastMath;
 @Reference(authors = "F. B. Baker, and L. J. Hubert", //
     title = "Measuring the Power of Hierarchical Cluster Analysis", //
     booktitle = "Journal of the American Statistical Association, 70(349)", //
-    url = "https://doi.org/10.1080/01621459.1975.10480256")
+    url = "https://doi.org/10.1080/01621459.1975.10480256", //
+    bibkey = "doi:10.1080/01621459.1975.10480256")
 public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Logger for debug output.
@@ -279,7 +280,8 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    */
   @Reference(authors = "F. J. Rohlf", title = "Methods of comparing classifications", //
       booktitle = "Annual Review of Ecology and Systematics", //
-      url = "https://doi.org/10.1146/annurev.es.05.110174.000533")
+      url = "https://doi.org/10.1146/annurev.es.05.110174.000533", //
+      bibkey = "doi:10.1146/annurev.es.05.110174.000533")
   public double computeTau(long c, long d, double m, long wd, long bd) {
     double tie = (wd * (wd - 1) + bd * (bd - 1)) >>> 1;
     return (c - d) / FastMath.sqrt((m - tie) * m);

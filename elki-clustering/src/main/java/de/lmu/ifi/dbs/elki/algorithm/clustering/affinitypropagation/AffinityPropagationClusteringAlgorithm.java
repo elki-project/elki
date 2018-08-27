@@ -67,7 +67,8 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Reference(title = "Clustering by Passing Messages Between Data Points", //
     authors = "B. J. Frey, D. Dueck", //
     booktitle = "Science Vol 315", //
-    url = "https://doi.org/10.1126/science.1136800")
+    url = "https://doi.org/10.1126/science.1136800", //
+    bibkey = "doi:10.1126/science.1136800")
 public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger

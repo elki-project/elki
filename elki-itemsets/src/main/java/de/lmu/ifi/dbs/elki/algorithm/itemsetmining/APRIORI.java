@@ -82,7 +82,8 @@ import net.jafama.FastMath;
 @Reference(authors = "R. Agrawal, R. Srikant", //
     title = "Fast Algorithms for Mining Association Rules", //
     booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
-    url = "http://www.vldb.org/conf/1994/P487.PDF")
+    url = "http://www.vldb.org/conf/1994/P487.PDF", //
+    bibkey = "DBLP:conf/vldb/AgrawalS94")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.APRIORI")
 public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**

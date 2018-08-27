@@ -75,7 +75,8 @@ import net.jafama.FastMath;
 @Reference(authors = "G. Hamerly", //
     title = "Making k-means even faster", //
     booktitle = "Proc. 2010 SIAM International Conference on Data Mining", //
-    url = "https://doi.org/10.1137/1.9781611972801.12")
+    url = "https://doi.org/10.1137/1.9781611972801.12", //
+    bibkey = "DBLP:conf/sdm/Hamerly10")
 public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

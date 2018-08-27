@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "L. Hubert and P. Arabie", //
     title = "Comparing partitions", //
     booktitle = "Journal of Classification 2(193)", //
-    url = "https://doi.org/10.1007/BF01908075")
+    url = "https://doi.org/10.1007/BF01908075", //
+    bibkey = "doi:10.1007/BF01908075")
 public class ClusteringAdjustedRandIndexSimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.

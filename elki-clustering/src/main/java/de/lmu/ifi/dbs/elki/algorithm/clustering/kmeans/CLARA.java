@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
     title = "Clustering Large Applications (Program CLARA)", //
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
-    url = "https://doi.org/10.1002/9780470316801.ch3")
+    url = "https://doi.org/10.1002/9780470316801.ch3", //
+    bibkey = "doi:10.1002/9780470316801.ch3")
 public class CLARA<V> extends KMedoidsPAM<V> {
   /**
    * Class logger.

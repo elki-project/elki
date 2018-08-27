@@ -67,7 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "D. L. Davies and D. W. Bouldin", //
     title = "A Cluster Separation Measure", //
     booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)", //
-    url = "https://doi.org/10.1109/TPAMI.1979.4766909")
+    url = "https://doi.org/10.1109/TPAMI.1979.4766909", //
+    bibkey = "DBLP:journals/pami/DaviesB79")
 public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Logger for debug output.

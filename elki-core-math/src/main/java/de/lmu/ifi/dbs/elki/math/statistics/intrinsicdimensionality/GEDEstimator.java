@@ -45,7 +45,8 @@ import net.jafama.FastMath;
 @Reference(authors = "M. E. Houle, H. Kashima, M. Nett", //
     title = "Generalized expansion dimension", //
     booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
-    url = "https://doi.org/10.1109/ICDMW.2012.94")
+    url = "https://doi.org/10.1109/ICDMW.2012.94", //
+    bibkey = "DBLP:conf/icdm/HouleKN12")
 public class GEDEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

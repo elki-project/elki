@@ -48,7 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "G. N. Lance, W. T. Williams", //
     title = "Computer Programs for Hierarchical Polythetic Classification (Similarity Analyses)", //
     booktitle = "Computer Journal, Volume 9, Issue 1", //
-    url = "https://doi.org/10.1093/comjnl/9.1.60")
+    url = "https://doi.org/10.1093/comjnl/9.1.60", //
+    bibkey = "doi:10.1093/comjnl/9.1.60")
 @Alias({ "canberra" })
 public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

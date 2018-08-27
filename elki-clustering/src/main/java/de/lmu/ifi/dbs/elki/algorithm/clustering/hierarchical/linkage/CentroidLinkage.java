@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "J. C. Gower", //
     title = "A comparison of some methods of cluster analysis", //
     booktitle = "Biometrics (1967)", //
-    url = "https://doi.org/10.2307/2528417")
+    url = "https://doi.org/10.2307/2528417", //
+    bibkey = "doi:10.2307/2528417")
 @Alias({ "centroid", "upgmc", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod" })
 public class CentroidLinkage implements Linkage {
   /**

@@ -88,7 +88,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "LOF: Identifying Density-Based Local Outliers", //
     booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)", //
-    url = "https://doi.org/10.1145/342009.335388")
+    url = "https://doi.org/10.1145/342009.335388", //
+    bibkey = "DBLP:conf/sigmod/BreunigKNS00")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LOF")
 @Priority(Priority.RECOMMENDED)
 public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

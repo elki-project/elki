@@ -81,7 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "P. J. Rousseeuw", //
     title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
     booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
-    url = "https://doi.org/10.1016/0377-0427(87)90125-7")
+    url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
+    bibkey = "doi:10.1016/0377-04278790125-7")
 public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

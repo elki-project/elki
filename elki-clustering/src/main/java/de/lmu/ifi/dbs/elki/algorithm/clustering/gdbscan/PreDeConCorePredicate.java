@@ -47,7 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
     title = "Density Connected Clustering with Local Subspace Preferences", //
     booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
-    url = "https://doi.org/10.1109/ICDM.2004.10087")
+    url = "https://doi.org/10.1109/ICDM.2004.10087", //
+    bibkey = "DBLP:conf/icdm/BohmKKK04")
 public class PreDeConCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.

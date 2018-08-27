@@ -74,7 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Erich Schubert and Michael Gertz", //
     title = "Semantic Word Clouds with Background Corpus Normalization and t-distributed Stochastic Neighbor Embedding", //
     booktitle = "ArXiV preprint, 1708.03569", //
-    url = "http://arxiv.org/abs/1708.03569")
+    url = "http://arxiv.org/abs/1708.03569", //
+    bibkey = "DBLP:journals/corr/abs-1708-03569")
 @Priority(Priority.RECOMMENDED + 6) // Extraction should come before clustering
 public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clustering<Model>> {
   /**

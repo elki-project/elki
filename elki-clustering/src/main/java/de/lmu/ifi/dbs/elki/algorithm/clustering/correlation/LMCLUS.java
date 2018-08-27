@@ -91,7 +91,8 @@ import net.jafama.FastMath;
 @Reference(authors = "R. Haralick, R. Harpaz", //
     title = "Linear manifold clustering in high dimensional spaces by stochastic search", //
     booktitle = "Pattern Recognition volume 40, Issue 10", //
-    url = "https://doi.org/10.1016/j.patcog.2007.01.020")
+    url = "https://doi.org/10.1016/j.patcog.2007.01.020", //
+    bibkey = "DBLP:journals/pr/HaralickH07")
 public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

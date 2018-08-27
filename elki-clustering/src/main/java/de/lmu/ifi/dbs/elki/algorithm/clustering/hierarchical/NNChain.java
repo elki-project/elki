@@ -53,7 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "F. Murtagh", //
     title = "A survey of recent advances in hierarchical clustering algorithms", //
     booktitle = "The Computer Journal 26(4)", //
-    url = "https://doi.org/10.1093/comjnl/26.4.354")
+    url = "https://doi.org/10.1093/comjnl/26.4.354", //
+    bibkey = "DBLP:journals/cj/Murtagh83")
 @Reference(authors = "D. Müllner", //
     title = "Modern hierarchical, agglomerative clustering algorithms", //
     booktitle = "arXiv preprint arXiv:1109.2378", //

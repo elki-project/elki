@@ -65,7 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Petre Kriegel, Peer Kröger, Ina Müller-Gorman, Arthur Zimek", //
     title = "Finding Hierarchies of Subspace Clusters", //
     booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06)", //
-    url = "https://doi.org/10.1007/11871637_42")
+    url = "https://doi.org/10.1007/11871637_42", //
+    bibkey = "DBLP:conf/pkdd/AchtertBKKMZ06")
 public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
   /**
    * Logger to use.

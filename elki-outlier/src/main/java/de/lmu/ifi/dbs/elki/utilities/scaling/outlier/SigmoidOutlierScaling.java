@@ -52,7 +52,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Gao, P.-N. Tan", //
     title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
     booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
-    url = "https://doi.org/10.1109/ICDM.2006.43")
+    url = "https://doi.org/10.1109/ICDM.2006.43", //
+    bibkey = "DBLP:conf/icdm/GaoT06")
 @Alias("de.lmu.ifi.dbs.elki.utilities.scaling.outlier.SigmoidOutlierScalingFunction")
 public class SigmoidOutlierScaling implements OutlierScaling {
   /**

@@ -63,7 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
     authors = "E. M. Knorr, R. T. Ng", //
     title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
     booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
-    url = "http://www.vldb.org/conf/1998/p392.pdf")
+    url = "http://www.vldb.org/conf/1998/p392.pdf", //
+    bibkey = "DBLP:conf/vldb/KnorrN98")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore" })
 public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**

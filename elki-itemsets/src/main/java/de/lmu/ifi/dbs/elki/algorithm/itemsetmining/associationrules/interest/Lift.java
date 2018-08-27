@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "S. Brin, R. Motwani, and C. Silverstein", //
     title = "Beyond market baskets: Generalizing association rules to correlations", //
     booktitle = "ACM SIGMOD Record, volume 26", //
-    url = "https://doi.org/10.1145/253260.253327")
+    url = "https://doi.org/10.1145/253260.253327", //
+    bibkey = "DBLP:conf/sigmod/BrinMS97")
 public class Lift implements InterestingnessMeasure {
   /**
    * Constructor.

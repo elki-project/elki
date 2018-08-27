@@ -81,7 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
     title = "Density Connected Subspace Clustering for High Dimensional Data", //
     booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04)", //
-    url = "https://doi.org/10.1137/1.9781611972740.23")
+    url = "https://doi.org/10.1137/1.9781611972740.23", //
+    bibkey = "DBLP:conf/sdm/KroegerKK04")
 public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

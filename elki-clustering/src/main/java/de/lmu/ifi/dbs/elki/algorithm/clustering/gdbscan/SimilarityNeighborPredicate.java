@@ -61,7 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
     title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
     booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
-    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php")
+    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php", //
+    bibkey = "DBLP:conf/kdd/EsterKSX96")
 public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleDBIDList> {
   /**
    * Range to query with

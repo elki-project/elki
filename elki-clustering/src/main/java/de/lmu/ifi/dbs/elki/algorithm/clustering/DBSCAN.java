@@ -76,11 +76,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
     title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
     booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
-    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php")
+    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php", //
+    bibkey = "DBLP:conf/kdd/EsterKSX96")
 @Reference(authors = "Erich Schubert, Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
     title = "DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN", //
     booktitle = "ACM Trans. Database Systems (TODS)", //
-    url = "https://doi.org/10.1145/3068335")
+    url = "https://doi.org/10.1145/3068335", //
+    bibkey = "DBLP:journals/tods/SchubertSEKX17")
 @Priority(Priority.RECOMMENDED)
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**

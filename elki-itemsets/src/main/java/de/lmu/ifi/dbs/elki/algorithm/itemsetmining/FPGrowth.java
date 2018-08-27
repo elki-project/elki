@@ -78,7 +78,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
     title = "Mining frequent patterns without candidate generation", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. Management of Data (SIGMOD 2000)", //
-    url = "https://doi.org/10.1145/342009.335372")
+    url = "https://doi.org/10.1145/342009.335372", //
+    bibkey = "DBLP:conf/sigmod/HanPY00")
 @Priority(Priority.RECOMMENDED)
 public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
   /**

@@ -159,7 +159,8 @@ public class PairCounting {
   @Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
       title = "A method for comparing two hierarchical clusterings", //
       booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
-      url = "https://doi.org/10.2307/2288117")
+      url = "https://doi.org/10.2307/2288117", //
+      bibkey = "doi:10.2307/2288117")
   public double fowlkesMallows() {
     return FastMath.sqrt(precision() * recall());
   }
@@ -176,7 +177,8 @@ public class PairCounting {
   @Reference(authors = "W. M. Rand", //
       title = "Objective Criteria for the Evaluation of Clustering Methods", //
       booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
-      url = "https://doi.org/10.2307/2284239")
+      url = "https://doi.org/10.2307/2284239", //
+      bibkey = "doi:10.2307/2284239")
   public double randIndex() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3];
     return (pairconfuse[0] + pairconfuse[3]) / sum;
@@ -194,7 +196,8 @@ public class PairCounting {
   @Reference(authors = "L. Hubert and P. Arabie", //
       title = "Comparing partitions", //
       booktitle = "Journal of Classification 2(193)", //
-      url = "https://doi.org/10.1007/BF01908075")
+      url = "https://doi.org/10.1007/BF01908075", //
+      bibkey = "doi:10.1007/BF01908075")
   public double adjustedRandIndex() {
     double d = FastMath.sqrt(pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3]);
     // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
@@ -237,7 +240,8 @@ public class PairCounting {
   @Reference(authors = "B. Mirkin", //
       title = "Mathematical Classification and Clustering", //
       booktitle = "Mathematical Classification and Clustering", //
-      url = "https://doi.org/10.1007/978-1-4613-0457-9")
+      url = "https://doi.org/10.1007/978-1-4613-0457-9", //
+      bibkey = "doi:10.1007/978-1-4613-0457-9")
   public long mirkin() {
     return 2 * (pairconfuse[1] + pairconfuse[2]);
   }

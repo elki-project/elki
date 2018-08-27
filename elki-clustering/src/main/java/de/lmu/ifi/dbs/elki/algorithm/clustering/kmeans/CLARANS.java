@@ -81,7 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "R. T. Ng and J. Han", //
     title = "CLARANS: a method for clustering objects for spatial data mining", //
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
-    url = "https://doi.org/10.1109/TKDE.2002.1033770")
+    url = "https://doi.org/10.1109/TKDE.2002.1033770", //
+    bibkey = "DBLP:journals/tkde/NgH02")
 public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger.

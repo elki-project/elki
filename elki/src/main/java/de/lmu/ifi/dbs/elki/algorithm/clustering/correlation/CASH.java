@@ -102,7 +102,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Elke Achtert, Christian Böhm, Jörn David, Peer Kröger, Arthur Zimek", //
     title = "Robust clustering in arbitraily oriented subspaces", //
     booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)", //
-    url = "https://doi.org/10.1137/1.9781611972788.69")
+    url = "https://doi.org/10.1137/1.9781611972788.69", //
+    bibkey = "DBLP:conf/sdm/AchtertBDKZ08")
 public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

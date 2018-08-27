@@ -47,7 +47,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Interpreting and Unifying Outlier Scores", //
     booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM 2011)", //
-    url = "https://doi.org/10.1137/1.9781611972818.2")
+    url = "https://doi.org/10.1137/1.9781611972818.2", //
+    bibkey = "DBLP:conf/sdm/KriegelKSZ11")
 public class MinusLogGammaScaling extends OutlierGammaScaling {
   /**
    * Maximum value seen

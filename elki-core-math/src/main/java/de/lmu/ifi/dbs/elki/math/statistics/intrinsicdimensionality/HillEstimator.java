@@ -43,7 +43,8 @@ import net.jafama.FastMath;
 @Reference(authors = "B. M. Hill", //
     title = "A simple general approach to inference about the tail of a distribution", //
     booktitle = "The annals of statistics 3(5)", //
-    url = "https://doi.org/10.1214/aos/1176343247")
+    url = "https://doi.org/10.1214/aos/1176343247", //
+    bibkey = "doi:10.1214/aos/1176343247")
 public class HillEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

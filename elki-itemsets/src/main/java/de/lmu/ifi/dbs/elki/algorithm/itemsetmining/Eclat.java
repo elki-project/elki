@@ -73,7 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(title = "New Algorithms for Fast Discovery of Association Rules", //
     authors = "M. J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li", //
     booktitle = "Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining", //
-    url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php")
+    url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php", //
+    bibkey = "DBLP:conf/kdd/ZakiPOL97")
 public class Eclat extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.

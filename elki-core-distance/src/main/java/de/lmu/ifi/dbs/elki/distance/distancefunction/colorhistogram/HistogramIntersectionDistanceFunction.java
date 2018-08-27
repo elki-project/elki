@@ -47,7 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "M. J. Swain, D. H. Ballard", //
     title = "Color Indexing", //
     booktitle = "International Journal of Computer Vision, 7(1), 32, 1991", //
-    url = "https://doi.org/10.1007/BF00130487")
+    url = "https://doi.org/10.1007/BF00130487", //
+    bibkey = "DBLP:journals/ijcv/SwainB91")
 public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance

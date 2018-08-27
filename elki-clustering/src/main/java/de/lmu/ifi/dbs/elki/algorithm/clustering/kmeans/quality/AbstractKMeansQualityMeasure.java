@@ -189,7 +189,8 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
   @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
       title = "Knee Point Detection on Bayesian Information Criterion", //
       booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-      url = "https://doi.org/10.1109/ICTAI.2008.154")
+      url = "https://doi.org/10.1109/ICTAI.2008.154", //
+      bibkey = "DBLP:conf/ictai/ZhaoXF08")
   public static <V extends NumberVector> double logLikelihoodAlternate(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points

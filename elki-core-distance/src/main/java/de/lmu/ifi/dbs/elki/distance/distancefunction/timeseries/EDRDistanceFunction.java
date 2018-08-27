@@ -46,7 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "L. Chen, M. T. Özsu, V. Oria", //
     title = "Robust and fast similarity search for moving object trajectories", //
     booktitle = "Proc. 2005 ACM SIGMOD Int. Conf. Management of Data", //
-    url = "https://doi.org/10.1145/1066157.1066213")
+    url = "https://doi.org/10.1145/1066157.1066213", //
+    bibkey = "DBLP:conf/sigmod/ChenOO05")
 public class EDRDistanceFunction extends DTWDistanceFunction {
   /**
    * Delta parameter, similarity threshold for attributes.

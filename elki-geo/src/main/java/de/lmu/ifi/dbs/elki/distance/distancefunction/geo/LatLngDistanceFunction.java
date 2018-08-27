@@ -55,7 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
     booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
-    url = "https://doi.org/10.1007/978-3-642-40235-7_9")
+    url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
+    bibkey = "DBLP:conf/ssd/SchubertZK13")
 public class LatLngDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Earth model to use.

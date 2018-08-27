@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
-    url = "http://www.vldb.org/conf/1997/P426.PDF")
+    url = "http://www.vldb.org/conf/1997/P426.PDF", //
+    bibkey = "DBLP:conf/vldb/CiacciaPZ97")
 public class MinimumEnlargementInsert<N extends AbstractMTreeNode<?, N, E>, E extends MTreeEntry> implements MTreeInsert<E, N> {
   @Override
   public IndexTreePath<E> choosePath(AbstractMTree<?, N, E, ?> tree, E object) {

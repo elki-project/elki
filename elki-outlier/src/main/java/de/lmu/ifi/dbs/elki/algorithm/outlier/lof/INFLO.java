@@ -88,7 +88,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "W. Jin, A. Tung, J. Han, and W. Wang", //
     title = "Ranking outliers using symmetric neighborhood relationship", //
     booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
-    url = "https://doi.org/10.1007/11731139_68")
+    url = "https://doi.org/10.1007/11731139_68", //
+    bibkey = "DBLP:conf/pakdd/JinTHW06")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.INFLO")
 public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

@@ -97,7 +97,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "LoOP: Local Outlier Probabilities", //
     booktitle = "Proc. 18th Int. Conf. Information and Knowledge Management (CIKM 2009)", //
-    url = "https://doi.org/10.1145/1645953.1646195")
+    url = "https://doi.org/10.1145/1645953.1646195", //
+    bibkey = "DBLP:conf/cikm/KriegelKSZ09")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP")
 @Priority(Priority.RECOMMENDED)
 public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {

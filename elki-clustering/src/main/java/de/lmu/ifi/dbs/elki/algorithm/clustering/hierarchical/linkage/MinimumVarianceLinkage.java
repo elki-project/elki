@@ -57,7 +57,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Podani", //
     title = "New Combinatorial Clustering Methods", //
     booktitle = "Vegetatio 81(1/2)", //
-    url = "https://doi.org/10.1007/978-94-009-2432-1_5")
+    url = "https://doi.org/10.1007/978-94-009-2432-1_5", //
+    bibkey = "doi:10.1007/978-94-009-2432-1_5")
 @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, F. Testu", //
     title = "Elements d'analyse de donnees", //
     booktitle = "Elements d'analyse de donnees")

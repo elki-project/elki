@@ -65,11 +65,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. S. Charikar", //
     title = "Similarity estimation techniques from rounding algorithms", //
     booktitle = "Proc. 34th ACM Symposium on Theory of Computing, STOC'02", //
-    url = "https://doi.org/10.1145/509907.509965")
+    url = "https://doi.org/10.1145/509907.509965", //
+    bibkey = "DBLP:conf/stoc/Charikar02")
 @Reference(authors = "M. Henzinger", //
     title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
     booktitle = "Proc. 29th ACM Conf. Research and Development in Information Retrieval (SIGIR 2006)", //
-    url = "https://doi.org/10.1145/1148170.1148222")
+    url = "https://doi.org/10.1145/1148170.1148222", //
+    bibkey = "DBLP:conf/sigir/Henzinger06")
 public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Projection family to use.

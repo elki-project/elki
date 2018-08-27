@@ -60,7 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "C. Hastings, F. Mosteller, J. W. Tukey, C. P. Winsor", //
     title = "Low moments for small samples: a comparative study of order statistics", //
     booktitle = "The Annals of Mathematical Statistics, 18(3)", //
-    url = "https://doi.org/10.1214/aoms/1177730388")
+    url = "https://doi.org/10.1214/aoms/1177730388", //
+    bibkey = "doi:10.1214/aoms/1177730388")
 @Alias({ "de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.WinsorisingEstimator" })
 public class WinsorizingEstimator<D extends Distribution> implements DistributionEstimator<D> {
   /**

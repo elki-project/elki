@@ -60,7 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "D. Arthur, S. Vassilvitskii", //
     title = "k-means++: the advantages of careful seeding", //
     booktitle = "Proc. 18th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2007)", //
-    url = "http://dl.acm.org/citation.cfm?id=1283383.1283494")
+    url = "http://dl.acm.org/citation.cfm?id=1283383.1283494", //
+    bibkey = "DBLP:conf/soda/ArthurV07")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans")
 public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**

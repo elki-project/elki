@@ -43,7 +43,8 @@ import net.jafama.FastMath;
 @Reference(authors = "E. J. Keogh, M. J. Pazzani", //
     title = "Derivative dynamic time warping", //
     booktitle = "1st SIAM Int. Conf. on Data Mining (SDM-2001)", //
-    url = "https://doi.org/10.1137/1.9781611972719.1")
+    url = "https://doi.org/10.1137/1.9781611972719.1", //
+    bibkey = "DBLP:conf/sdm/KeoghP01")
 public class DerivativeDTWDistanceFunction extends DTWDistanceFunction {
   /**
    * Constructor.

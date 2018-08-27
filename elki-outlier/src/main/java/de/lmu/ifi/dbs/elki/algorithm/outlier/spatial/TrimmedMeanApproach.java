@@ -75,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "Tianming Hu and Sam Yuan Sung", //
     title = "A trimmed mean approach to finding spatial outliers", //
     booktitle = "Intelligent Data Analysis, Volume 8, 2004", //
-    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00153")
+    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00153", //
+    bibkey = "DBLP:journals/ida/HuS04")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

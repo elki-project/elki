@@ -71,7 +71,8 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 @Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
     title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
     booktitle = "Data Mining and Knowledge Discovery", //
-    url = "https://doi.org/10.1023/A:1009745219419")
+    url = "https://doi.org/10.1023/A:1009745219419", //
+    bibkey = "DBLP:journals/datamine/SanderEKX98")
 public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm

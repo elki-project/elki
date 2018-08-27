@@ -73,7 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "R. Momtaz, N. Mohssen, M. A. Gowayyed", //
     title = "DWOF: A Robust Density-Based Outlier Detection Approach", //
     booktitle = "Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)", //
-    url = "https://doi.org/10.1007/978-3-642-38628-2_61")
+    url = "https://doi.org/10.1007/978-3-642-38628-2_61", //
+    bibkey = "DBLP:conf/ibpria/MomtazMG13")
 public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

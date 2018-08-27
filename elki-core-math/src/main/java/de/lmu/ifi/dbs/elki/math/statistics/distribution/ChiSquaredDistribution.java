@@ -133,7 +133,8 @@ public class ChiSquaredDistribution extends GammaDistribution {
   @Reference(authors = "D.J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
-      url = "https://doi.org/10.2307/2347113")
+      url = "https://doi.org/10.2307/2347113", //
+      bibkey = "doi:10.2307/2347113")
   public static double quantile(double x, double dof) {
     return GammaDistribution.quantile(x, .5 * dof, .5);
   }

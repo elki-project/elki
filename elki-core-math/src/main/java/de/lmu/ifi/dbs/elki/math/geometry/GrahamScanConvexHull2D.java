@@ -50,7 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P. Graham", //
     title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
     booktitle = "Information Processing Letters 1", //
-    url = "https://doi.org/10.1016/0020-0190(72)90045-2")
+    url = "https://doi.org/10.1016/0020-0190(72)90045-2", //
+    bibkey = "DBLP:journals/ipl/Graham72")
 public class GrahamScanConvexHull2D {
   /**
    * The current set of points

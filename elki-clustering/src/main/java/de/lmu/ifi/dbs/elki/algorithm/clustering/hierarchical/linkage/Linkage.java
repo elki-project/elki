@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "G. N. Lance and W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
     booktitle = "The computer journal 9.4", //
-    url = "https://doi.org/10.1093/comjnl/9.4.373")
+    url = "https://doi.org/10.1093/comjnl/9.4.373", //
+    bibkey = "doi:10.1093/comjnl/9.4.373")
 public interface Linkage {
   /**
    * Initialization of the distance matrix.

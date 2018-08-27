@@ -89,7 +89,8 @@ import net.jafama.FastMath;
 @Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
     title = "Angle-Based Outlier Detection in High-dimensional Data", //
     booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
-    url = "https://doi.org/10.1145/1401890.1401946")
+    url = "https://doi.org/10.1145/1401890.1401946", //
+    bibkey = "DBLP:conf/kdd/KriegelSZ08")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD", "lb-abod" })
 public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   /**

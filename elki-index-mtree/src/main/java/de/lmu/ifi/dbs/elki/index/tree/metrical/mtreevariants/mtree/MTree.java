@@ -56,7 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
-    url = "http://www.vldb.org/conf/1997/P426.PDF")
+    url = "http://www.vldb.org/conf/1997/P426.PDF", //
+    bibkey = "DBLP:conf/vldb/CiacciaPZ97")
 abstract public class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * The logger for this class.

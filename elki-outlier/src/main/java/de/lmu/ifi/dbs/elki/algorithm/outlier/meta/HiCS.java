@@ -101,7 +101,8 @@ import net.jafama.FastMath;
 @Reference(authors = "F. Keller, E. Müller, K. Böhm", //
     title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
     booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
-    url = "https://doi.org/10.1109/ICDE.2012.88")
+    url = "https://doi.org/10.1109/ICDE.2012.88", //
+    bibkey = "DBLP:conf/icde/KellerMB12")
 public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class.

@@ -51,7 +51,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. R. M. Hosking and J. R. Wallis", //
     title = "Regional frequency analysis: an approach based on L-moments", //
     booktitle = "Regional frequency analysis: an approach based on L-moments", //
-    url = "https://doi.org/10.1017/CBO9780511529443")
+    url = "https://doi.org/10.1017/CBO9780511529443", //
+    bibkey = "doi:10.1017/CBO9780511529443")
 public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   /**
    * Location.

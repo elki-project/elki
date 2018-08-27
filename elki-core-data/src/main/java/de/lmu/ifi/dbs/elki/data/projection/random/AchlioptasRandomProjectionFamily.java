@@ -48,7 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(title = "Database-friendly random projections: Johnson-Lindenstrauss with binary coins", //
     authors = "D. Achlioptas", //
     booktitle = "Proc. 20th ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems", //
-    url = "https://doi.org/10.1145/375551.375608")
+    url = "https://doi.org/10.1145/375551.375608", //
+    bibkey = "DBLP:conf/pods/Achlioptas01")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily")
 public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**

@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "S. Brin, R. Motwani, J. D Ullman, and S Tsur", //
     title = "Dynamic itemset counting and implication rules for market basket data", //
     booktitle = "Proc. 1997 ACM SIGMOD international conference on management of data", //
-    url = "https://doi.org/10.1145/253260.253325")
+    url = "https://doi.org/10.1145/253260.253325", //
+    bibkey = "DBLP:conf/sigmod/BrinMUT97")
 public class Conviction implements InterestingnessMeasure {
   /**
    * Constructor.

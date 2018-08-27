@@ -71,7 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 @Reference(authors = "A. Zimek, R. J. G. B. Campello, J. Sander", //
     title = "Data Perturbation for Outlier Detection Ensembles", //
     booktitle = "Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014", //
-    url = "https://doi.org/10.1145/2618243.2618257")
+    url = "https://doi.org/10.1145/2618243.2618257", //
+    bibkey = "DBLP:conf/ssdbm/ZimekCS14")
 public class PerturbationFilter<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> {
   /**
    * Class logger

@@ -76,7 +76,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Schneider and M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
     booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
-    url = "https://doi.org/10.1145/2505515.2505590")
+    url = "https://doi.org/10.1145/2505515.2505590", //
+    bibkey = "DBLP:conf/cikm/SchneiderV13")
 public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
   /**
    * Class logger.

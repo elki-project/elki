@@ -48,7 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Henzinger", //
     title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //
     booktitle = "Proc. 29th ACM Conf. Research and Development in Information Retrieval (SIGIR 2006)", //
-    url = "https://doi.org/10.1145/1148170.1148222")
+    url = "https://doi.org/10.1145/1148170.1148222", //
+    bibkey = "DBLP:conf/sigir/Henzinger06")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.SimplifiedRandomHyperplaneProjectionFamily")
 public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProjectionFamily {
   /**

@@ -62,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "W. Dong and C. Moses and K. Li", //
     title = "Efficient k-nearest neighbor graph construction for generic similarity measures", //
     booktitle = "Proc. 20th Int. Conf. on World Wide Web (WWW'11)", //
-    url = "https://doi.org/10.1145/1963405.1963487")
+    url = "https://doi.org/10.1145/1963405.1963487", //
+    bibkey = "DBLP:conf/www/DongCL11")
 public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger

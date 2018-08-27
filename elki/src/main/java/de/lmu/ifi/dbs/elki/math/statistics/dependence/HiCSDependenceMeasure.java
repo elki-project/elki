@@ -61,11 +61,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
-    url = "https://doi.org/10.1145/2463676.2463696")
+    url = "https://doi.org/10.1145/2463676.2463696", //
+    bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 @Reference(authors = "F. Keller, E. Müller, K. Böhm", //
     title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
     booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
-    url = "https://doi.org/10.1109/ICDE.2012.88")
+    url = "https://doi.org/10.1109/ICDE.2012.88", //
+    bibkey = "DBLP:conf/icde/KellerMB12")
 public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Monte-Carlo iterations

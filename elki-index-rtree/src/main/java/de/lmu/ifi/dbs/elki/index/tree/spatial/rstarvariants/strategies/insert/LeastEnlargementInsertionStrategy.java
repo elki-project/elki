@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "A. Guttman", //
     title = "R-Trees: A Dynamic Index Structure For Spatial Searching", //
     booktitle = "Proc. 1984 ACM SIGMOD Int. Conf. on Management of Data", //
-    url = "https://doi.org/10.1145/971697.602266")
+    url = "https://doi.org/10.1145/971697.602266", //
+    bibkey = "doi:10.1145/971697.602266")
 public class LeastEnlargementInsertionStrategy implements InsertionStrategy {
   /**
    * Static instance.

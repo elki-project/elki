@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", //
     title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
     booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", //
-    url = "https://doi.org/10.1145/347090.347123")
+    url = "https://doi.org/10.1145/347090.347123", //
+    bibkey = "DBLP:conf/kdd/McCallumNU00")
 public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.

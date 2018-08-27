@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni", //
     title = "Locality-sensitive hashing scheme based on p-stable distributions", //
     booktitle = "Proc. 20th Annual Symposium on Computational Geometry", //
-    url = "https://doi.org/10.1145/997817.997857")
+    url = "https://doi.org/10.1145/997817.997857", //
+    bibkey = "DBLP:conf/compgeom/DatarIIM04")
 public class ManhattanHashFunctionFamily extends AbstractProjectedHashFunctionFamily {
   /**
    * Constructor.

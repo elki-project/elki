@@ -56,7 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "C. Traina Jr., A. J. M. Traina, B. Seeger, C. Faloutsos", //
     title = "Slim-Trees: High Performance Metric Trees Minimizing Overlap Between Nodes", //
     booktitle = "Int. Conf. Extending Database Technology (EDBT'2000)", //
-    url = "https://doi.org/10.1007/3-540-46439-5_4")
+    url = "https://doi.org/10.1007/3-540-46439-5_4", //
+    bibkey = "DBLP:conf/edbt/TrainaTSF00")
 public class MSTSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> implements MTreeSplit<E, N> {
   @Override
   public Assignments<E> split(AbstractMTree<?, N, E, ?> tree, N node) {

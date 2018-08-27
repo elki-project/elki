@@ -78,7 +78,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", //
     title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", //
     booktitle = "Proc. 13th Pacific-Asia Conf. Adv. Knowledge Discovery and Data Mining (PAKDD 2009)", //
-    url = "https://doi.org/10.1007/978-3-642-01307-2_84")
+    url = "https://doi.org/10.1007/978-3-642-01307-2_84", //
+    bibkey = "DBLP:conf/pakdd/ZhangHJ09")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF" })
 public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**

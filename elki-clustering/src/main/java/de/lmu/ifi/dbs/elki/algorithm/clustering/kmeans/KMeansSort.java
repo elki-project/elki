@@ -75,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "S. J. Phillips", //
     title = "Acceleration of k-means and related clustering algorithms", //
     booktitle = "Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX 2002)", //
-    url = "https://doi.org/10.1007/3-540-45643-0_13")
+    url = "https://doi.org/10.1007/3-540-45643-0_13", //
+    bibkey = "DBLP:conf/alenex/Phillips02")
 @Priority(Priority.RECOMMENDED)
 public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**

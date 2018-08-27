@@ -81,7 +81,8 @@ import net.jafama.FastMath;
 @Reference(authors = "C. C. Aggarwal, P. S. Yu", //
     title = "Finding Generalized Projected Clusters in High Dimensional Spaces", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", //
-    url = "https://doi.org/10.1145/342009.335383")
+    url = "https://doi.org/10.1145/342009.335383", //
+    bibkey = "DBLP:conf/sigmod/AggarwalY00")
 public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<Model>, V> {
   /**
    * The logger for this class.

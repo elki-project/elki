@@ -72,7 +72,8 @@ import net.jafama.FastMath;
 @Reference(authors = "M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik", //
     title = "Validity index for crisp and fuzzy clusters", //
     booktitle = "Pattern recognition, 37(3)", //
-    url = "https://doi.org/10.1016/j.patcog.2003.06.005")
+    url = "https://doi.org/10.1016/j.patcog.2003.06.005", //
+    bibkey = "DBLP:journals/pr/PakhiraBM04")
 public class EvaluatePBMIndex implements Evaluator {
   /**
    * Logger for debug output.

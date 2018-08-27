@@ -75,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "Robust, Complete, and Efficient Correlation Clustering", //
     booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
-    url = "https://doi.org/10.1137/1.9781611972771.37")
+    url = "https://doi.org/10.1137/1.9781611972771.37", //
+    bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
 public class COPACNeighborPredicate<V extends NumberVector> implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
   /**
    * The logger for this class.

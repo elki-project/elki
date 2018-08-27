@@ -59,7 +59,8 @@ import net.jafama.FastMath;
 @Reference(authors = "G. Hinton and S. Roweis", //
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
-    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding")
+    url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding", //
+    bibkey = "DBLP:conf/nips/HintonR02")
 public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBuilder<O> {
   /**
    * Class logger.

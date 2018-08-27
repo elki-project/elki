@@ -61,7 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "Arthur Zimek, Matthew Gaudet, Ricardo J. G. B. Campello, Jörg Sander", //
     title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", //
     booktitle = "Proc. 19th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining, KDD '13", //
-    url = "https://doi.org/10.1145/2487575.2487676")
+    url = "https://doi.org/10.1145/2487575.2487676", //
+    bibkey = "DBLP:conf/kdd/ZimekGCS13")
 public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger

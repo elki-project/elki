@@ -80,7 +80,8 @@ import net.jafama.FastMath;
 @Reference(authors = "C. Elkan", //
     title = "Using the triangle inequality to accelerate k-means", //
     booktitle = "Proc. 20th International Conference on Machine Learning, ICML 2003", //
-    url = "http://www.aaai.org/Library/ICML/2003/icml03-022.php")
+    url = "http://www.aaai.org/Library/ICML/2003/icml03-022.php", //
+    bibkey = "DBLP:conf/icml/Elkan03")
 public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

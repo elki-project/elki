@@ -74,7 +74,8 @@ import net.jafama.FastMath;
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", //
     title = "A Monte Carlo algorithm for fast projective clustering", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
-    url = "https://doi.org/10.1145/564691.564739")
+    url = "https://doi.org/10.1145/564691.564739", //
+    bibkey = "DBLP:conf/sigmod/ProcopiucJAM02")
 public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

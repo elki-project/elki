@@ -49,7 +49,8 @@ import net.jafama.FastMath;
 @Reference(authors = "D. Guo", //
     title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", //
     booktitle = "Information Visualization, 2(4)", //
-    url = "https://doi.org/10.1057/palgrave.ivs.9500053")
+    url = "https://doi.org/10.1057/palgrave.ivs.9500053", //
+    bibkey = "DBLP:journals/ivs/Guo03")
 public class MCEDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.

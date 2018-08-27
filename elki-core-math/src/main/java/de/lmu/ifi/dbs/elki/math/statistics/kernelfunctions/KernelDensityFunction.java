@@ -57,7 +57,8 @@ public interface KernelDensityFunction {
   @Reference(authors = "J.S. Marron, D. Nolan", //
       title = "Canonical kernels for density estimation", //
       booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", //
-      url = "https://doi.org/10.1016/0167-7152(88)90050-8")
+      url = "https://doi.org/10.1016/0167-7152(88)90050-8", //
+      bibkey = "doi:10.1016/0167-71528890050-8")
   double canonicalBandwidth();
 
   /**

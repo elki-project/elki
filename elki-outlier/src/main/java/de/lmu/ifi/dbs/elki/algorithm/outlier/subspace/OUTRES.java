@@ -83,7 +83,8 @@ import net.jafama.FastMath;
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", //
     title = "Adaptive outlierness for subspace outlier ranking", //
     booktitle = "Proc. 19th ACM Int. Conf. on Information and Knowledge Management", //
-    url = "https://doi.org/10.1145/1871437.1871690")
+    url = "https://doi.org/10.1145/1871437.1871690", //
+    bibkey = "DBLP:conf/cikm/MullerSS10")
 public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

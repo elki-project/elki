@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "R. Agrawal, T. Imielinski, A. Swami", //
     title = "Mining association rules between sets of items in large databases", //
     booktitle = "Proc. ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/170036.170072")
+    url = "https://doi.org/10.1145/170036.170072", //
+    bibkey = "doi:10.1145/170036.170072")
 public class Confidence implements InterestingnessMeasure {
   /**
    * Constructor.

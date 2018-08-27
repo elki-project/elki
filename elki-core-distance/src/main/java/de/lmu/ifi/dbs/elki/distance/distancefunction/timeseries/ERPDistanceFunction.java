@@ -46,7 +46,8 @@ import net.jafama.FastMath;
 @Reference(authors = "L. Chen, R. Ng", //
     title = "On the marriage of Lp-norms and edit distance", //
     booktitle = "Proc. 13th Int. Conf. on Very Large Data Bases (VLDB '04)", //
-    url = "http://www.vldb.org/conf/2004/RS21P2.PDF")
+    url = "http://www.vldb.org/conf/2004/RS21P2.PDF", //
+    bibkey = "DBLP:conf/vldb/ChenN04")
 public class ERPDistanceFunction extends DTWDistanceFunction {
   /**
    * Gap value.

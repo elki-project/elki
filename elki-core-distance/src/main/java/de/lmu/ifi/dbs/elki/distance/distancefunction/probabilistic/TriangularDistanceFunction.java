@@ -50,7 +50,8 @@ import net.jafama.FastMath;
 @Reference(authors = "R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti", //
     title = "Hilbert Exclusion: Improved Metric Search through Finite Isometric Embeddings", //
     booktitle = "arXiv preprint arXiv:1604.08640", //
-    url = "http://arxiv.org/abs/1604.08640")
+    url = "http://arxiv.org/abs/1604.08640", //
+    bibkey = "DBLP:journals/corr/ConnorCVR16")
 public class TriangularDistanceFunction extends TriangularDiscriminationDistanceFunction {
   /**
    * Static instance. Use this!

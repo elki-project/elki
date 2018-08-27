@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Evaluation of Clusterings - Metrics and Visual Support", //
     booktitle = "Proc. 28th International Conference on Data Engineering (ICDE 2012)", //
-    url = "https://doi.org/10.1109/ICDE.2012.128")
+    url = "https://doi.org/10.1109/ICDE.2012.128", //
+    bibkey = "DBLP:conf/icde/AchtertGKSZ12")
 public class ClusterPairSegmentAnalysis implements Evaluator {
   /**
    * Constructor.

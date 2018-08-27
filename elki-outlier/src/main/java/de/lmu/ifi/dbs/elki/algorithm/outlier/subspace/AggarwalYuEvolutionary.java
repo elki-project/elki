@@ -82,7 +82,8 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", //
     title = "Outlier detection for high dimensional data", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
-    url = "https://doi.org/10.1145/375663.375668")
+    url = "https://doi.org/10.1145/375663.375668", //
+    bibkey = "DBLP:conf/sigmod/AggarwalY01")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary")
 public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAggarwalYuOutlier<V> {
   /**

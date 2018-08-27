@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
-    url = "http://www.vldb.org/conf/1997/P426.PDF")
+    url = "http://www.vldb.org/conf/1997/P426.PDF", //
+    bibkey = "DBLP:conf/vldb/CiacciaPZ97")
 public class BalancedDistribution implements DistributionStrategy {
   @Override
   public <E extends MTreeEntry> Assignments<E> distribute(AbstractNode<E> node, int routing1, double[] dis1, int routing2, double[] dis2) {

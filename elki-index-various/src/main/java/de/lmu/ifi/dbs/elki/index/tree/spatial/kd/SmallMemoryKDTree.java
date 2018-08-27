@@ -77,7 +77,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "J. L. Bentley", //
     title = "Multidimensional binary search trees used for associative searching", //
     booktitle = "Communications of the ACM 18(9)", //
-    url = "https://doi.org/10.1145/361002.361007")
+    url = "https://doi.org/10.1145/361002.361007", //
+    bibkey = "DBLP:journals/cacm/Bentley75")
 public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger

@@ -80,7 +80,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Elke Achtert, Christian Böhm, Peer Kröger, Arthur Zimek", //
     title = "Mining Hierarchies of Correlation Clusters", //
     booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06)", //
-    url = "https://doi.org/10.1109/SSDBM.2006.35")
+    url = "https://doi.org/10.1109/SSDBM.2006.35", //
+    bibkey = "DBLP:conf/ssdbm/AchtertBKZ06")
 public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**
    * The logger for this class.

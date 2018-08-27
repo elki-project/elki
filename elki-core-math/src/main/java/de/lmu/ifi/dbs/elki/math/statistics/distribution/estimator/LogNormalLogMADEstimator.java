@@ -48,7 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "F. R. Hampel", //
     title = "The Influence Curve and Its Role in Robust Estimation", //
     booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", //
-    url = "https://doi.org/10.2307/2285666")
+    url = "https://doi.org/10.2307/2285666", //
+    bibkey = "doi:10.2307/2285666")
 public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<LogNormalDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.

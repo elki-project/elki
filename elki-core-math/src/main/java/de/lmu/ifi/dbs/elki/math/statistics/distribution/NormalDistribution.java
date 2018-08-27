@@ -464,7 +464,8 @@ public class NormalDistribution extends AbstractDistribution {
   @Reference(authors = "G. Marsaglia", //
       title = "Evaluating the Normal Distribution", //
       booktitle = "Journal of Statistical Software 11(4)", //
-      url = "https://doi.org/10.18637/jss.v011.i04")
+      url = "https://doi.org/10.18637/jss.v011.i04", //
+      bibkey = "doi:10.18637/jss.v011.i04")
   public static double cdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
     if(x >= 8.22) {
@@ -501,7 +502,8 @@ public class NormalDistribution extends AbstractDistribution {
   @Reference(authors = "G. Marsaglia", //
       title = "Evaluating the Normal Distribution", //
       booktitle = "Journal of Statistical Software 11(4)", //
-      url = "https://doi.org/10.18637/jss.v011.i04")
+      url = "https://doi.org/10.18637/jss.v011.i04", //
+      bibkey = "doi:10.18637/jss.v011.i04")
   public static double standardNormalCDF(double x) {
     if(x >= 8.22) {
       return 1.;

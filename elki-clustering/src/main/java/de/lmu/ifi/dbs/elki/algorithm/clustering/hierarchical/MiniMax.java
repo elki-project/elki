@@ -56,11 +56,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 @Reference(authors = "S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado, P. C. Sham", //
     title = "CLUSTAG: hierarchical clustering and graph methods for selecting tag SNPs", //
     booktitle = "Bioinformatics, 21 (8)", //
-    url = "https://doi.org/10.1093/bioinformatics/bti201")
+    url = "https://doi.org/10.1093/bioinformatics/bti201", //
+    bibkey = "DBLP:journals/bioinformatics/AoYNCFMS05")
 @Reference(authors = "J. Bien, R. Tibshirani", //
     title = "Hierarchical Clustering with Prototypes via Minimax Linkage", //
     booktitle = "Journal of the American Statistical Association 106(495)", //
-    url = "https://doi.org/10.1198/jasa.2011.tm10183")
+    url = "https://doi.org/10.1198/jasa.2011.tm10183", //
+    bibkey = "doi:10.1198/jasa.2011.tm10183")
 public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class Logger.

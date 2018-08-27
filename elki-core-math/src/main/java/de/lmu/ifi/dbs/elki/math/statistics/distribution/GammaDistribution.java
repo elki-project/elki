@@ -630,7 +630,8 @@ public class GammaDistribution extends AbstractDistribution {
   @Reference(authors = "D.J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
-      url = "https://doi.org/10.2307/2347113")
+      url = "https://doi.org/10.2307/2347113", //
+      bibkey = "doi:10.2307/2347113")
   protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
     final double EPS1 = 1e-14; // Approximation quality
     // Sanity checks
@@ -713,7 +714,8 @@ public class GammaDistribution extends AbstractDistribution {
   @Reference(authors = "D.J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
-      url = "https://doi.org/10.2307/2347113")
+      url = "https://doi.org/10.2307/2347113", //
+      bibkey = "doi:10.2307/2347113")
   public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;
@@ -880,7 +882,8 @@ public class GammaDistribution extends AbstractDistribution {
   @Reference(authors = "J. M. Bernando", //
       title = "Algorithm AS 103: Psi (Digamma) Function", //
       booktitle = "Statistical Algorithms", //
-      url = "https://doi.org/10.2307/2347257")
+      url = "https://doi.org/10.2307/2347257", //
+      bibkey = "doi:10.2307/2347257")
   public static double digamma(double x) {
     if(!(x > 0)) {
       return Double.NaN;

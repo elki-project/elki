@@ -89,7 +89,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
     title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", //
     booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2009)", //
-    url = "https://doi.org/10.1007/978-3-642-01307-2_86")
+    url = "https://doi.org/10.1007/978-3-642-01307-2_86", //
+    bibkey = "DBLP:conf/pakdd/KriegelKSZ09")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.SOD")
 public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

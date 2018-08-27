@@ -106,7 +106,8 @@ import net.jafama.FastMath;
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", //
     title = "Detection and Visualization of Subspace Cluster Hierarchies", //
     booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", //
-    url = "https://doi.org/10.1007/978-3-540-71703-4_15")
+    url = "https://doi.org/10.1007/978-3-540-71703-4_15", //
+    bibkey = "DBLP:conf/dasfaa/AchtertBKKMZ07")
 public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

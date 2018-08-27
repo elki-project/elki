@@ -44,7 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "W. M. Rand", //
     title = "Objective Criteria for the Evaluation of Clustering Methods", //
     booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
-    url = "https://doi.org/10.2307/2284239")
+    url = "https://doi.org/10.2307/2284239", //
+    bibkey = "doi:10.2307/2284239")
 public class ClusteringRandIndexSimilarityFunction implements ClusteringDistanceSimilarityFunction {
   /**
    * Static instance.

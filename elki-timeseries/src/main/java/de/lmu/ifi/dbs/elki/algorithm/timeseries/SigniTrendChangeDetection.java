@@ -82,7 +82,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Erich Schubert, Michael Weiler, Hans-Peter Kriegel", //
     title = "Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds", //
     booktitle = "Proc. 20th ACM SIGKDD international conference on Knowledge discovery and data mining", //
-    url = "https://doi.org/10.1145/2623330.2623740")
+    url = "https://doi.org/10.1145/2623330.2623740", //
+    bibkey = "DBLP:conf/kdd/SchubertWK14")
 @Priority(Priority.RECOMMENDED)
 public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
   /**

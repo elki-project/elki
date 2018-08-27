@@ -73,7 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", //
     title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", //
     booktitle = "Proc. of SIAM Data Mining (SDM'03)", //
-    url = "https://doi.org/10.1137/1.9781611972733.5")
+    url = "https://doi.org/10.1137/1.9781611972733.5", //
+    bibkey = "DBLP:conf/sdm/ErtozSK03")
 public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

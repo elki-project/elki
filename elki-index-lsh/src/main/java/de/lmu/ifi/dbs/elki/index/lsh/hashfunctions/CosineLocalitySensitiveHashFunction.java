@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "M. S. Charikar", //
     title = "Similarity estimation techniques from rounding algorithms", //
     booktitle = "Proc. 34th ACM Symposium on Theory of Computing, STOC'02", //
-    url = "https://doi.org/10.1145/509907.509965")
+    url = "https://doi.org/10.1145/509907.509965", //
+    bibkey = "DBLP:conf/stoc/Charikar02")
 public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
   /**
    * Projection function.

@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "F. Berzal, I. Blanco, D. Sánchez, M. Vila", //
     title = "Measuring the accuracy and interest of association rules: A new framework", //
     booktitle = "Intelligent Data Analysis, 6(3), 2002", //
-    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00089")
+    url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00089", //
+    bibkey = "DBLP:journals/ida/GalianoBSM02")
 @Alias({ "Loevinger" })
 public class CertaintyFactor implements InterestingnessMeasure {
   /**

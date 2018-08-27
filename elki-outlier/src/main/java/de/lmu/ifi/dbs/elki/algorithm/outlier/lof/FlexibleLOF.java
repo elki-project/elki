@@ -99,7 +99,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "LOF: Identifying Density-Based Local Outliers", //
     booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)", //
-    url = "https://doi.org/10.1145/342009.335388")
+    url = "https://doi.org/10.1145/342009.335388", //
+    bibkey = "DBLP:conf/sigmod/BreunigKNS00")
 public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

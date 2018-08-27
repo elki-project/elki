@@ -669,7 +669,8 @@ public final class SphereUtil {
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
       booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
-      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
+      bibkey = "DBLP:conf/ssd/SchubertZK13")
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     return latlngMinDistRad(deg2rad(plat), deg2rad(plng), deg2rad(rminlat), deg2rad(rminlng), deg2rad(rmaxlat), deg2rad(rmaxlng));
   }
@@ -705,7 +706,8 @@ public final class SphereUtil {
   @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
       booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
-      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
+      bibkey = "DBLP:conf/ssd/SchubertZK13")
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: add support for rectangles crossing the +-180 deg boundary!
 
@@ -778,7 +780,8 @@ public final class SphereUtil {
   @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
       booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
-      url = "https://doi.org/10.1007/978-3-642-40235-7_9")
+      url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
+      bibkey = "DBLP:conf/ssd/SchubertZK13")
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: add support for rectangles crossing the +-180 deg boundary!
 

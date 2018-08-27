@@ -63,7 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Y. Cheng, G. M. Church", //
     title = "Biclustering of expression data", //
     booktitle = "Proc. 8th Int. Conf. on Intelligent Systems for Molecular Biology (ISMB)", //
-    url = "http://www.aaai.org/Library/ISMB/2000/ismb00-010.php")
+    url = "http://www.aaai.org/Library/ISMB/2000/ismb00-010.php", //
+    bibkey = "DBLP:conf/ismb/ChengC00")
 public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
   /**
    * The logger for this class.

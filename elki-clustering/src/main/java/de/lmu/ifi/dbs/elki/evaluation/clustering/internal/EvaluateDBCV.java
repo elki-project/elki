@@ -70,7 +70,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Davoud Moulavi, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur Zimek, Jörg Sander", //
     title = "Density-Based Clustering Validation", //
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM)", //
-    url = "https://doi.org/10.1137/1.9781611973440.96")
+    url = "https://doi.org/10.1137/1.9781611973440.96", //
+    bibkey = "DBLP:conf/sdm/MoulaviJCZS14")
 public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Distance function to use.

@@ -46,7 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
     title = "Computing Clusters of Correlation Connected Objects", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
-    url = "https://doi.org/10.1145/1007568.1007620")
+    url = "https://doi.org/10.1145/1007568.1007620", //
+    bibkey = "DBLP:conf/sigmod/BohmKKZ04")
 public class FourCCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.

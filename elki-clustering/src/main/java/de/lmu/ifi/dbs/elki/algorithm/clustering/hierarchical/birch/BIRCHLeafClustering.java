@@ -62,11 +62,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/233269.233324")
+    url = "https://doi.org/10.1145/233269.233324", //
+    bibkey = "DBLP:conf/sigmod/ZhangRL96")
 @Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
     title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
     booktitle = "Data Min. Knowl. Discovery", //
-    url = "https://doi.org/10.1023/A:1009783824328")
+    url = "https://doi.org/10.1023/A:1009783824328", //
+    bibkey = "DBLP:journals/datamine/ZhangRL97")
 public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
