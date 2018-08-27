@@ -84,7 +84,8 @@ import net.jafama.FastMath;
     authors = "E. Eskin", //
     title = "Anomaly detection over noisy data using learned probability distributions", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML-2000)", //
-    url = "https://doi.org/10.7916/D8C53SKF")
+    url = "https://doi.org/10.7916/D8C53SKF", //
+    bibkey = "DBLP:conf/icml/Eskin00")
 public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

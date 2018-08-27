@@ -38,7 +38,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "R. M. Goodman and P. Smyth", //
     title = "Rule induction using information theory", //
-    booktitle = "Knowledge Discovery in Databases 1991")
+    booktitle = "Knowledge Discovery in Databases 1991", //
+    bibkey = "DBLP:books/mit/PF91/SmythG91")
 public class JMeasure implements InterestingnessMeasure {
   /**
    * Constructor.

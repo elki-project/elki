@@ -50,7 +50,8 @@ public class Jaccard implements InterestingnessMeasure {
    */
   @Reference(authors = "C.J. van Rijsbergen", //
       title = "Information Retrieval, 2nd Edition", //
-      booktitle = "Butterworths, London, 1979")
+      booktitle = "Butterworths, London, 1979", //
+      bibkey = "DBLP:books/bu/Rijsbergen79")
   public static Void ADDITIONAL_REFERENCE = null;
 
   /**

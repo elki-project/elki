@@ -82,7 +82,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
-    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+    bibkey = "DBLP:conf/icml/PellegM00")
 public class XMeans<V extends NumberVector, M extends MeanModel> extends AbstractKMeans<V, M> {
   /**
    * The logger for this class.

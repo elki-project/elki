@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,13 +47,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * k-medians clustering algorithm, but using Lloyd-style bulk iterations instead
  * of the more complicated approach suggested by Kaufman and Rousseeuw (see
  * {@link KMedoidsPAM} instead).
- *
+ * <p>
  * Reference:
  * <p>
- * Clustering via Concave Minimization<br />
- * P. S. Bradley, O. L. Mangasarian, W. N. Street<br />
- * in: Advances in Neural Information Processing Systems (NIPS)
- * </p>
+ * Clustering via Concave Minimization<br>
+ * P. S. Bradley, O. L. Mangasarian, W. N. Street<br>
+ * Advances in Neural Information Processing Systems (NIPS'96)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -64,9 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", //
-authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", //
-booktitle = "Advances in Neural Information Processing Systems", //
-url = "https://papers.nips.cc/paper/1260-clustering-via-concave-minimization.pdf")
+    authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", //
+    booktitle = "Advances in Neural Information Processing Systems", //
+    url = "https://papers.nips.cc/paper/1260-clustering-via-concave-minimization", //
+    bibkey = "DBLP:conf/nips/BradleyMS96")
 public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * The logger for this class.

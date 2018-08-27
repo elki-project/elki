@@ -65,7 +65,8 @@ import net.jafama.FastMath;
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
-    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+    bibkey = "DBLP:conf/icml/PellegM00")
 public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> implements KMeansQualityMeasure<O> {
   /**
    * Compute the number of points in a given set of clusters (which may be

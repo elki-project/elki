@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "W. Klösgen", //
     title = "Explora: A multipattern and multistrategy discovery assistant", //
-    booktitle = "Advances in Knowledge Discovery and Data Mining")
+    booktitle = "Advances in Knowledge Discovery and Data Mining", //
+    bibkey = "DBLP:books/mit/fayyadPSU96/Klosgen96")
 public class Klosgen implements InterestingnessMeasure {
   /**
    * Constructor.

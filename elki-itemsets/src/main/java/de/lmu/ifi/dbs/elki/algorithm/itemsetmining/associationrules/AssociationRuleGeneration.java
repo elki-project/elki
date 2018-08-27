@@ -48,19 +48,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This algorithm calls a specified frequent itemset algorithm
  * and calculates all association rules, having a interest value between
  * then the specified boundaries form the obtained frequent itemsets
- *
+ * <p>
  * Reference:
  * <p>
- * M. J. Zaki and W. Meira Jr.</br>
- * Data mining and analysis: fundamental concepts and algorithms</br>
- * Cambridge University Press, 2014</br>
- * </p>
+ * M. J. Zaki and W. Meira Jr<br>
+ * Data mining and analysis: fundamental concepts and algorithms<br>
+ * Cambridge University Press, 2014
  * 
  * @author Erich Schubert
  */
 @Reference(authors = "M. J. Zaki and W. Meira Jr.", //
     title = "Data mining and analysis: fundamental concepts and algorithms", //
-    booktitle = "Cambridge University Press, 2014")
+    booktitle = "Cambridge University Press, 2014", //
+    bibkey = "DBLP:books/cu/ZM2014")
 public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRuleResult> {
   /**
    * Class logger.

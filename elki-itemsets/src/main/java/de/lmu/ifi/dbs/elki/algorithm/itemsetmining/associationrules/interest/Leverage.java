@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "G. Piatetsky-Shapiro", //
     title = "Discovery, analysis, and presentation of strong rules", //
-    booktitle = "Knowledge Discovery in Databases 1991")
+    booktitle = "Knowledge Discovery in Databases 1991", //
+    bibkey = "DBLP:books/mit/PF91/Piatetsky91")
 public class Leverage implements InterestingnessMeasure {
   /**
    * Constructor.
