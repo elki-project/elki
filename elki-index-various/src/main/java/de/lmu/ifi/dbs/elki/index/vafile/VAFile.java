@@ -27,13 +27,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -55,17 +49,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Vector-approximation file (VAFile)
- * 
+ * <p>
  * Reference:
  * <p>
- * Weber, R. and Blott, S.<br>
- * An approximation based data structure for similarity search<br />
- * in: Report TR1997b, ETH Zentrum, Zurich, Switzerland
- * </p>
+ * R. Weber, S. Blott<br>
+ * An approximation based data structure for similarity search<br>
+ * Report TR1997b, ETH Zentrum, Zurich, Switzerland
  * 
  * @author Thomas Bernecker
  * @author Erich Schubert
@@ -81,10 +75,11 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  */
 @Title("An approximation based data structure for similarity search")
-@Reference(authors = "Weber, R. and Blott, S.", //
-title = "An approximation based data structure for similarity search", //
-booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", //
-url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
+@Reference(authors = "R. Weber, S. Blott", //
+    title = "An approximation based data structure for similarity search", //
+    booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", //
+    url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf", //
+    bibkey = "tr/ethz/WeberS97")
 public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class.

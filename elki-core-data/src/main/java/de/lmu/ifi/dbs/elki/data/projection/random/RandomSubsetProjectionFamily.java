@@ -30,17 +30,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Random projection family based on selecting random features.
- *
+ * <p>
  * The basic idea of using this for data mining should probably be attributed to
  * L. Breiman, who used it to improve the performance of predictors in an
  * ensemble.
- *
+ * <p>
  * Reference:
  * <p>
- * L. Breiman<br />
- * Bagging predictors<br />
+ * L. Breiman<br>
+ * Bagging predictors<br>
  * Machine learning 24.2
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0
@@ -48,7 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "L. Breiman", //
     title = "Bagging predictors", //
     booktitle = "Machine learning 24.2", //
-    url = "https://doi.org/10.1007/BF00058655")
+    url = "https://doi.org/10.1007/BF00058655", //
+    bibkey = "DBLP:journals/ml/Breiman96b")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomSubsetProjectionFamily")
 public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily {
   /**
@@ -105,7 +105,7 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
 
   /**
    * Generate the integer sequence 0 .. e-1
-   *
+   * <p>
    * TODO: move to shared code.
    *
    * @param e End (exclusive)

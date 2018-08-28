@@ -65,15 +65,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * G. Peano<br>
  * Sur une courbe, qui remplit toute une aire plane<br>
- * Mathematische Annalen, 36(1)
+ * Mathematische Annalen 36(1)
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
 @Reference(authors = "G. Peano", //
     title = "Sur une courbe, qui remplit toute une aire plane", //
-    booktitle = "Mathematische Annalen, 36(1)", //
-    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002252376")
+    booktitle = "Mathematische Annalen 36(1)", //
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002252376", //
+    bibkey = "journals/mathann/Peano1890")
 public class PeanoSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

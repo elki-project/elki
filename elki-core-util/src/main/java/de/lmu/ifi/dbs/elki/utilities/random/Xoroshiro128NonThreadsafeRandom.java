@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,24 +28,25 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Replacement for Java's {@link java.util.Random} class, using a different
  * random number generation strategy. Java's random generator is optimized for
  * speed, but may lack the randomness needed for more complex experiments.
- * 
+ * <p>
  * This approach is based on the work on Xoroshiro128+ by Sebastiano Vigna,
  * with the original copyright statement:
  * <p>
  * Written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org)
- * 
+ * <p>
  * To the extent possible under law, the author has dedicated all copyright and
  * related and neighboring rights to this software to the public domain
  * worldwide. This software is distributed without any warranty.
- * 
+ * <p>
  * See http://creativecommons.org/publicdomain/zero/1.0/
- * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "D. Blackman, S. Vigna", //
     title = "xoroshiro+ / xorshift* / xorshift+ generators and the PRNG shootout", //
-    booktitle = "", url = "http://xoroshiro.di.unimi.it/")
+    booktitle = "Online", //
+    url = "http://xoroshiro.di.unimi.it/", //
+    bibkey = "web/BlackmanV16")
 public class Xoroshiro128NonThreadsafeRandom extends Random {
   /**
    * Serial version number.
@@ -91,7 +92,6 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
   public long nextLong() {
     long t0 = s0, t1 = s1;
     final long result = t0 + t1;
-
     t1 ^= t0;
     s0 = Long.rotateLeft(t0, 55) ^ t1 ^ (t1 << 14); // a, b
     s1 = Long.rotateLeft(t1, 36); // c
@@ -122,15 +122,19 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
    * that one {@code int} value in the specified range is pseudorandomly
    * generated and returned. All {@code n} possible {@code int} values are
    * produced with (approximately) equal probability.
-   * 
+   * <p>
    * In contrast to the Java version, we use an approach that tries to avoid
    * divisions for performance discussed in:
    * <p>
-   * D. Lemire<br />
-   * Fast random shuffling<br />
+   * D. Lemire<br>
+   * Fast random shuffling<br>
    * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
-   * </p>
    */
+  @Reference(authors = "D. Lemire", //
+      title = "Fast random shuffling", //
+      booktitle = "Daniel Lemire's blog", //
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
+      bibkey = "blog/Lemire16")
   @Override
   public int nextInt(int n) {
     if(n <= 0) {

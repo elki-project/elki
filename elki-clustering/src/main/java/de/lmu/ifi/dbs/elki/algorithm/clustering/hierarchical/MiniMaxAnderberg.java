@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,25 +41,25 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 /**
  * This is a modification of the classic MiniMax algorithm for hierarchical
  * clustering using a nearest-neighbor heuristic for acceleration.
- *
+ * <p>
  * This optimization is attributed to M. R. Anderberg.
- * 
+ * <p>
  * This particular implementation is based on AnderbergHierarchicalClustering
- *
+ * <p>
  * Reference:
  * <p>
- * M. R. Anderberg<br />
- * Hierarchical Clustering Methods<br />
- * Cluster Analysis for Applications<br />
+ * M. R. Anderberg<br>
+ * Hierarchical Clustering Methods<br>
+ * Cluster Analysis for Applications<br>
  * ISBN: 0120576503
- * </p>
- * 
+ *
  * @author Julian Erhard
  * @author Erich Schubert
  */
 @Reference(authors = "M. R. Anderberg", //
     title = "Hierarchical Clustering Methods", //
-    booktitle = "Cluster Analysis for Applications")
+    booktitle = "Cluster Analysis for Applications", //
+    bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED - 5)
 public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**

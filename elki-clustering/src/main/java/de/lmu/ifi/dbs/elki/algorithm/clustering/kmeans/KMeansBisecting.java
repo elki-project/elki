@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Reference:
  * <p>
- * M. Steinbach, G. Karypis, V. Kumar:<br>
+ * M. Steinbach, G. Karypis, V. Kumar<br>
  * A Comparison of Document Clustering Techniques<br>
  * KDD workshop on text mining. Vol. 400. No. 1
  *
@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", //
     title = "A Comparison of Document Clustering Techniques", //
     booktitle = "KDD workshop on text mining. Vol. 400. No. 1", //
-    url = "http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf")
+    url = "http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf", //
+    bibkey = "conf/kdd/SteinbachKK00")
 public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.

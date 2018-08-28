@@ -47,14 +47,14 @@ import net.jafama.FastMath;
  * The use of information-theoretic criteria for evaluating k-means was
  * popularized by X-means:
  * <p>
- * D. Pelleg, A. Moore:<br>
+ * D. Pelleg, A. Moore<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
  * Clusters<br>
  * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)
  * <p>
  * A different version of logLikelihood is derived in:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti:<br>
+ * Q. Zhao, M. Xu, P. Fränti<br>
  * Knee Point Detection on Bayesian Information Criterion<br>
  * 20th IEEE International Conference on Tools with Artificial Intelligence
  *
@@ -127,7 +127,8 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
   @Reference(authors = "D. Pelleg, A. Moore", //
       title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
       booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
-      url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+      url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+      bibkey = "DBLP:conf/icml/PellegM00")
   public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points

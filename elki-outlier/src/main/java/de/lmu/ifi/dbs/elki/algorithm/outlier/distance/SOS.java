@@ -63,7 +63,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Janssens, F. Huszár, E. Postma, J. van den Herik", //
     title = "Stochastic Outlier Selection", //
     booktitle = "TiCC TR 2012–001", //
-    url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf")
+    url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
+    bibkey = "tr/tilburg/JanssensHPv12")
 public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

@@ -25,38 +25,34 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Set matching purity measures.
- * 
+ * <p>
  * References:
  * <p>
- * Zhao, Y. and Karypis, G.<br />
- * Criterion functions for document clustering: Experiments and analysis<br />
- * University of Minnesota, Department of Computer Science, Technical Report
- * 01-40, 2001
- * </p>
+ * M. Meilă<br>
+ * Comparing clusterings<br>
+ * University of Washington, Seattle, Technical Report 418
  * <p>
- * Meilă, M<br />
- * Comparing clusterings<br />
- * University of Washington, Seattle, Technical Report 418, 2002
- * </p>
+ * Y. Zhao, G. Karypis<br>
+ * Criterion functions for document clustering: Experiments and analysis<br>
+ * University of Minnesota, Dep. Computer Science, Technical Report 01-40
  * <p>
- * Steinbach, M. and Karypis, G. and Kumar, V.<br />
- * A comparison of document clustering techniques<br />
- * KDD workshop on text mining, 2000
- * </p>
+ * M. Steinbach, G. Karypis, V. Kumar<br>
+ * A Comparison of Document Clustering Techniques<br>
+ * KDD workshop on text mining. Vol. 400. No. 1
  * <p>
- * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+ * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo<br>
  * A comparison of extrinsic clustering evaluation metrics based on formal
- * constraints<br />
- * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
- * </p>
- * 
+ * constraints<br>
+ * Inf. Retrieval 12(5)
+ *
  * @author Sascha Goldhofer
  * @since 0.5.0
  */
-@Reference(authors = "Meilă, M", //
+@Reference(authors = "M. Meilă", //
     title = "Comparing clusterings", //
-    booktitle = "University of Washington, Seattle, Technical Report 418, 2002", //
-    url = "http://www.stat.washington.edu/mmp/Papers/compare-colt.pdf")
+    booktitle = "University of Washington, Seattle, Technical Report 418", //
+    url = "http://www.stat.washington.edu/mmp/Papers/compare-colt.pdf", //
+    bibkey = "tr/washington/Meila02")
 public class SetMatchingPurity {
   /**
    * Result cache
@@ -109,15 +105,20 @@ public class SetMatchingPurity {
   }
 
   /**
-   * Get the set matchings purity (first:second clustering) (normalized, 1 =
-   * equal)
-   * 
+   * Get the set matchings purity (first:second clustering)
+   * (normalized, 1 = equal)
+   * <p>
+   * Y. Zhao, G. Karypis<br>
+   * Criterion functions for document clustering: Experiments and analysis<br>
+   * University of Minnesota, Dep. Computer Science, Technical Report 01-40
+   *
    * @return purity
    */
-  @Reference(authors = "Zhao, Y. and Karypis, G.", //
+  @Reference(authors = "Y. Zhao, G. Karypis", //
       title = "Criterion functions for document clustering: Experiments and analysis", //
-      booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", //
-      url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
+      booktitle = "University of Minnesota, Dep. Computer Science, Technical Report 01-40", //
+      url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf", //
+      bibkey = "tr/umn/ZhaoK01")
   public double purity() {
     return smPurity;
   }
@@ -134,59 +135,56 @@ public class SetMatchingPurity {
 
   /**
    * Get the set matching F1-Measure
-   * 
    * <p>
-   * Steinbach, M. and Karypis, G. and Kumar, V.<br />
-   * A comparison of document clustering techniques<br />
-   * KDD workshop on text mining, 2000
-   * </p>
-   * 
+   * M. Steinbach, G. Karypis, V. Kumar<br>
+   * A Comparison of Document Clustering Techniques<br>
+   * KDD workshop on text mining. Vol. 400. No. 1
+   *
    * @return Set Matching F1-Measure
    */
-  @Reference(authors = "Steinbach, M. and Karypis, G. and Kumar, V.", //
-      title = "A comparison of document clustering techniques", //
-      booktitle = "KDD workshop on text mining, 2000", //
-      url = "http://www-users.itlabs.umn.edu/~karypis/publications/Papers/PDF/doccluster.pdf")
+  @Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", //
+      title = "A Comparison of Document Clustering Techniques", //
+      booktitle = "KDD workshop on text mining. Vol. 400. No. 1", //
+      url = "http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf", //
+      bibkey = "conf/kdd/SteinbachKK00")
   public double f1Measure() {
     return Util.f1Measure(purity(), inversePurity());
   }
 
   /**
    * Get the Van Rijsbergen’s F measure (asymmetric) for first clustering
-   * 
    * <p>
-   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo<br>
    * A comparison of extrinsic clustering evaluation metrics based on formal
-   * constraints<br />
-   * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
-   * </p>
-   * 
+   * constraints<br>
+   * Information Retrieval 12(5)
+   *
    * @return Set Matching F-Measure of first clustering
    */
-  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
+  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, F. Verdejo", //
       title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
-      booktitle = "Inf. Retrieval, vol. 12, no. 5", //
-      url = "https://doi.org/10.1007/s10791-009-9106-z")
+      booktitle = "Information Retrieval 12(5)", //
+      url = "https://doi.org/10.1007/s10791-009-9106-z", //
+      bibkey = "DBLP:journals/ir/AmigoGAV09a")
   public double fMeasureFirst() {
     return smFFirst;
   }
 
   /**
    * Get the Van Rijsbergen’s F measure (asymmetric) for second clustering
-   * 
    * <p>
-   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo<br>
    * A comparison of extrinsic clustering evaluation metrics based on formal
-   * constraints<br />
-   * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
-   * </p>
-   * 
+   * constraints<br>
+   * Information Retrieval 12(5)
+   *
    * @return Set Matching F-Measure of second clustering
    */
-  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
+  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, F. Verdejo", //
       title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
-      booktitle = "Inf. Retrieval, vol. 12, no. 5", //
-      url = "https://doi.org/10.1007/s10791-009-9106-z")
+      booktitle = "Information Retrieval 12(5)", //
+      url = "https://doi.org/10.1007/s10791-009-9106-z", //
+      bibkey = "DBLP:journals/ir/AmigoGAV09a")
   public double fMeasureSecond() {
     return smFSecond;
   }

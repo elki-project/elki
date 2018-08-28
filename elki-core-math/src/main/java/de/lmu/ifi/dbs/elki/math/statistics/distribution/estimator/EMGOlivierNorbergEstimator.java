@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,11 +24,16 @@ import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-
 import net.jafama.FastMath;
 
 /**
  * Naive distribution estimation using mean and sample variance.
+ * <p>
+ * Reference:
+ * <p>
+ * J. Olivier, M. M. Norberg<br>
+ * Positively skewed data: Revisiting the Box-Cox power transformation<br>
+ * International Journal of Psychological Research 3(1)
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -37,7 +42,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "J. Olivier, M. M. Norberg", //
     title = "Positively skewed data: Revisiting the Box-Cox power transformation", //
-    booktitle = "International Journal of Psychological Research Vol. 3 No. 1")
+    booktitle = "International Journal of Psychological Research 3(1)", //
+    bibkey = "journals/misc/OliviertN10")
 public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<ExponentiallyModifiedGaussianDistribution> {
   /**
    * Static estimator class.

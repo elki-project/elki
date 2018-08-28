@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,33 +27,32 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Single-linkage ("minimum") clustering method.
- *
+ * <p>
  * The distance of two clusters is simply the minimum of all pairwise distances
  * between the two clusters.
- *
+ * <p>
  * The distance of two clusters is defined as:
  * \[d_{\min}(A,B):=\min_{a\in A}\min_{b\in B} d(a,b)\]
- * 
+ * <p>
  * This can be computed recursively using:
  * \[d_{\min}(A\cup B,C) = \min(d(A,C), d(B,C))\]
- *
+ * <p>
  * Note that with similarity functions, one would need to use the maximum
  * instead to get the same effect.
- *
+ * <p>
  * Reference:
  * <p>
- * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S.
- * Zubrzycki<br/>
- * Sur la liaison et la division des points d'un ensemble fini<br />
- * In Colloquium Mathematicae (Vol. 2, No. 3-4)
- * </p>
+ * K. Florek, J. Łukaszewicz, J. Perkal, H. Steinhaus, S. Zubrzycki<br>
+ * Sur la liaison et la division des points d'un ensemble fini<br>
+ * Colloquium Mathematicae 2(3-4)
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", //
+@Reference(authors = "K. Florek, J. Łukaszewicz, J. Perkal, H. Steinhaus, S. Zubrzycki", //
     title = "Sur la liaison et la division des points d'un ensemble fini", //
-    booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
+    booktitle = "Colloquium Mathematicae 2(3-4)", //
+    bibkey = "journals/misc/FlorekLPSZ51")
 @Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SingleLinkageMethod" })
 @Priority(Priority.IMPORTANT)
 public class SingleLinkage implements Linkage {

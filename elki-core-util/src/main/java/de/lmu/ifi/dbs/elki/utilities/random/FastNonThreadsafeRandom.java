@@ -115,7 +115,8 @@ public class FastNonThreadsafeRandom extends Random {
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //
       booktitle = "Daniel Lemire's blog", //
-      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
+      bibkey = "blog/Lemire16")
   @Override
   public int nextInt(int n) {
     if(n <= 0) {
@@ -147,7 +148,8 @@ public class FastNonThreadsafeRandom extends Random {
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //
       booktitle = "Daniel Lemire's blog", //
-      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
+      bibkey = "Lemire")
   public int nextIntRefined(int n) {
     if(n <= 0) {
       throw new IllegalArgumentException(BADBOUND);

@@ -47,7 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "P. Jaccard", //
     title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
     booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
-    url = "http://data.rero.ch/01-R241574160")
+    url = "http://data.rero.ch/01-R241574160", //
+    bibkey = "Jaccard1902")
 public class ClusterJaccardSimilarityFunction implements PrimitiveDistanceFunction<Cluster<?>>, PrimitiveSimilarityFunction<Cluster<?>> {
   /**
    * Static instance.

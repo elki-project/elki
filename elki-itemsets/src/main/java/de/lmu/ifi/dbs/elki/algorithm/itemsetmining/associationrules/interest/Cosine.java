@@ -40,7 +40,8 @@ import net.jafama.FastMath;
 @Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //
     booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
-    url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
+    url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf", //
+    bibkey = "tr/umn/TanK00")
 public class Cosine implements InterestingnessMeasure {
   /**
    * Constructor.

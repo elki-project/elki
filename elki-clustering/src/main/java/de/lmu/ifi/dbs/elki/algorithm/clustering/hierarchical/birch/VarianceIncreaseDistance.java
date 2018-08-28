@@ -27,21 +27,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Variance increase distance.
- * 
+ * <p>
  * Reference:
  * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br />
- * T. Zhang<br />
+ * Data Clustering for Very Large Datasets Plus Applications<br>
+ * T. Zhang<br>
  * Doctoral Dissertation, 1997.
- * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Alias({ "D4" })
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf")
+    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
+    bibkey = "tr/wisc/Zhang97")
 public class VarianceIncreaseDistance implements BIRCHDistance {
   /**
    * Static instance.

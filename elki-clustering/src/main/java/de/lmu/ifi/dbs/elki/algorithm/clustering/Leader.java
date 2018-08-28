@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,16 +44,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Leader clustering algorithm.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. A. Hartigan<br />
+ * J. A. Hartigan<br>
  * Clustering algorithms, Chapter 3, Quick Partition Algorithms
- * </p>
- * 
+ * <p>
  * This implementation does not use the linear process described, but uses index
  * structures. This may or may not be faster.
- * 
+ * <p>
  * TODO: when no index is available, fall back to the original approach.
  * 
  * @author Erich Schubert
@@ -63,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "J. A. Hartigan", //
     title = "Chapter 3: Quick Partition Algorithms, 3.2 Leader Algorithm", //
     booktitle = "Clustering algorithms", // )
-    url = "http://dl.acm.org/citation.cfm?id=540298")
+    url = "http://dl.acm.org/citation.cfm?id=540298", //
+    bibkey = "book/wiley/Hartigan75/C3")
 public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Maximum distance from leading object,

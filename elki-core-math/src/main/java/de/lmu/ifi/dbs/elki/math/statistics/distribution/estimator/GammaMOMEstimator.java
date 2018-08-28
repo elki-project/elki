@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,24 +27,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Simple parameter estimation for the Gamma distribution.
- * 
+ * <p>
  * This is a very naive estimation, based on the mean and variance only,
  * sometimes referred to as the "Method of Moments" (MOM).
- * 
+ * <p>
  * Reference:
  * <p>
- * G. Casella, R. L. Berger<br />
+ * G. Casella, R. L. Berger<br>
+ * Point Estimation (Chapter 7)<br>
  * Statistical inference. Vol. 70
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  * 
  * @apiviz.has GammaDistribution - - estimates
  */
 @Reference(authors = "G. Casella, R. L. Berger", //
-    title = "Statistical inference. Vol. 70", //
-    booktitle = "Statistical inference. Vol. 70")
+    title = "Point Estimation (Chapter 7)", //
+    booktitle = "Statistical inference. Vol. 70", //
+    bibkey = "books/duxbury/CasellaB90/Ch7")
 public class GammaMOMEstimator implements MeanVarianceDistributionEstimator<GammaDistribution> {
   /**
    * Static estimation using just the mean and variance.

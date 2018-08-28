@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,27 +29,27 @@ import net.jafama.FastMath;
 /**
  * Alternate estimate the parameters of a log Gamma Distribution, using the
  * methods of L-Moments (LMM) for the Generalized Normal Distribution.
- * 
+ * <p>
  * Reference:
  * <p>
- * D. Bílková<br />
+ * D. Bílková<br>
  * Lognormal distribution and using L-moment method for estimating its
- * parameters<br />
+ * parameters<br>
  * Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)
- * </p>
- * 
+ * <p>
  * See also {@link LogNormalLMMEstimator} for a similar estimator, based on the
  * generalized normal distribution, as used by Hosking.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has LogNormalDistribution
  */
 @Reference(authors = "D. Bílková", //
     title = "Lognormal distribution and using L-moment method for estimating its parameters", //
     booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", //
-    url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf")
+    url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf", //
+    bibkey = "journal/naun/Bilkova12")
 public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<LogNormalDistribution> {
   /**
    * Static instance.
@@ -78,8 +78,8 @@ public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<Lo
     if(!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.)) {
       throw new ArithmeticException("L-Moments invalid");
     }
-    final double z = SQRT8_3 * NormalDistribution.standardNormalQuantile(.5 * (1. + xmom[2])),
-        z2 = z * z;
+    final double z = SQRT8_3 * NormalDistribution.standardNormalQuantile(.5 * (1. + xmom[2]));
+    final double z2 = z * z;
     final double sigma = 0.999281 * z - 0.006118 * z * z2 + 0.000127 * z * z2 * z2;
     final double sigmasqhalf = sigma * sigma * .5;
     final double logmu = FastMath.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;

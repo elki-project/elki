@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <p>
  * Reference:
  * <p>
- * D. Pelleg, A. Moore:<br>
+ * D. Pelleg, A. Moore<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
  * Clusters<br>
  * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)

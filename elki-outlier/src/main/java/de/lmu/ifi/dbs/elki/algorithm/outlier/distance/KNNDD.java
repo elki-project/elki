@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,31 +53,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Nearest Neighbor Data Description.
- *
+ * <p>
  * A variation inbetween of KNN outlier and LOF, comparing the nearest neighbor
  * distance of a point to the nearest neighbor distance of the nearest neighbor.
- * 
+ * <p>
  * The initial description used k=1, where this equation makes most sense.
  * For k > 1, one may want to use averaging similar to LOF.
- * 
+ * <p>
  * Reference ("1-Nearest-Neighbor method"):
  * <p>
- * D. de Ridder, D. M. J. Tax, R. P. W. Duin<br />
- * An experimental comparison of one-class classification methods<br />
- * Proc. 4th Annual Conference of the Advanced School for Computing and Imaging
- * (ASCI'98)
- * </p>
+ * D. de Ridder, D. M. J. Tax, R. P. W. Duin<br>
+ * An experimental comparison of one-class classification methods<br>
+ * Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)
  *
  * @author Erich Schubert
  *
  * @apiviz.has KNNQuery
- *
  * @param <O> the type of objects processed by this algorithm
  */
 @Reference(authors = "D. de Ridder, D. M. J. Tax, R. P. W. Duin", //
     title = "An experimental comparison of one-class classification methods", //
-    booktitle = "Proc. 4th Annual Conference of the Advanced School for Computing and Imaging (ASCI'98)", //
-    url = "http://prlab.tudelft.nl/sites/default/files/asci_98.pdf")
+    booktitle = "Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)", //
+    url = "http://prlab.tudelft.nl/sites/default/files/asci_98.pdf", //
+    bibkey = "conf/asci/deRidderTD98")
 public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

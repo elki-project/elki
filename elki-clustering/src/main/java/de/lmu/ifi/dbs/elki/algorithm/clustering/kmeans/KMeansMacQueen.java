@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,18 +49,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * The original k-means algorithm, using MacQueen style incremental updates;
  * making this effectively an "online" (streaming) algorithm.
- *
+ * <p>
  * This implementation will by default iterate over the data set until
  * convergence, although MacQueen likely only meant to do a single pass over the
- * data.
- *
+ * data, but the result quality improves with multiple passes.
+ * <p>
  * Reference:
  * <p>
- * J. MacQueen:<br />
- * Some Methods for Classification and Analysis of Multivariate Observations.
- * <br />
- * In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
- * </p>
+ * J. MacQueen:<br>
+ * Some Methods for Classification and Analysis of Multivariate Observations<br>
+ * 5th Berkeley Symp. Math. Statist. Prob.
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -71,9 +69,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("K-Means")
 @Description("Finds a least-squares partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", //
-title = "Some Methods for Classification and Analysis of Multivariate Observations", //
-booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", //
-url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
+    title = "Some Methods for Classification and Analysis of Multivariate Observations", //
+    booktitle = "5th Berkeley Symp. Math. Statist. Prob.", //
+    url = "http://projecteuclid.org/euclid.bsmsp/1200512992", //
+    bibkey = "conf/bsmsp/MacQueen67")
 public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

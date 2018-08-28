@@ -20,12 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -35,12 +30,7 @@ import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -91,7 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Improving the Cluster Structure Extracted from OPTICS Plots", //
     booktitle = "Proc. Lernen, Wissen, Daten, Analysen (LWDA 2018)", //
-    url = "http://web.informatik.uni-mannheim.de/ponzetto/lwda18/paper37.pdf")
+    url = "http://web.informatik.uni-mannheim.de/ponzetto/lwda18/paper37.pdf", //
+    bibkey = "DBLP:conf/lwa/SchubertG18")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
 @Priority(Priority.RECOMMENDED)
 public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {

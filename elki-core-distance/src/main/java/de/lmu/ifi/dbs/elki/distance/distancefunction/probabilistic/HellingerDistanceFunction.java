@@ -36,28 +36,28 @@ import net.jafama.FastMath;
 /**
  * Hellinger kernel / Hellinger distance are used with SIFT vectors, and also
  * known as Bhattacharyya distance / coefficient.
- * 
+ * <p>
  * This distance is appropriate for histograms, and is equal to A) L1
  * normalizing the vectors and then B) using Euclidean distance. As this is
  * usually much faster, this is the recommended way of handling such data.
- * 
+ * <p>
  * Reference:
  * <p>
- * E. Hellinger<br />
+ * E. Hellinger<br>
  * Neue Begründung der Theorie quadratischer Formen von unendlichvielen
- * Veränderlichen<br />
+ * Veränderlichen<br>
  * Journal für die reine und angewandte Mathematik
- * </p>
- * 
+ * <p>
  * TODO: support acceleration for sparse vectors
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "E. Hellinger", //
     title = "Neue Begründung der Theorie quadratischer Formen von unendlichvielen Veränderlichen", //
     booktitle = "Journal für die reine und angewandte Mathematik", //
-    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002166941")
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002166941", //
+    bibkey = "journals/mathematik/Hellinger1909")
 @Alias({ "hellinger", "bhattacharyya" })
 public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunction implements PrimitiveSimilarityFunction<NumberVector> {
   /**

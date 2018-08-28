@@ -74,7 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Reference(authors = "M. R. Anderberg", //
     title = "Hierarchical Clustering Methods", //
-    booktitle = "Cluster Analysis for Applications")
+    booktitle = "Cluster Analysis for Applications", //
+    bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED)
 public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**

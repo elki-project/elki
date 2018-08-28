@@ -71,10 +71,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     bibkey = "doi:10.2307/1942268")
 @Reference(authors = "T. Sørensen", //
     title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
-    booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
+    booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)", //
+    bibkey = "journals/misc/Sorensen48")
 @Reference(authors = "L. R. Dice", //
     title = "Measures of the Amount of Ecologic Association Between Species", //
-    booktitle = "Ecology 26 (3)")
+    booktitle = "Ecology 26 (3)", //
+    url = "https://doi.org/10.2307/1932409", //
+    bibkey = "doi:10.2307/1932409")
 @Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

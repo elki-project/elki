@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,13 +59,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Intrinsic Dimensional Outlier Detection in High-Dimensional Data.
- *
+ * <p>
  * Reference:
  * <p>
- * Jonathan von Brünken, Michael E. Houle, Arthur Zimek<br />
- * Intrinsic Dimensional Outlier Detection in High-Dimensional Data<br />
+ * Jonathan von Brünken, Michael E. Houle, Arthur Zimek<br>
+ * Intrinsic Dimensional Outlier Detection in High-Dimensional Data<br>
  * NII Technical Report (NII-2015-003E)
- * </p>
  *
  * @author Jonathan von Brünken
  * @since 0.7.0
@@ -76,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Jonathan von Brünken, Michael E. Houle, Arthur Zimek", //
     title = "Intrinsic Dimensional Outlier Detection in High-Dimensional Data", //
     booktitle = "NII Technical Report (NII-2015-003E)", //
-    url = "http://www.nii.ac.jp/TechReports/15-003E.html")
+    url = "http://www.nii.ac.jp/TechReports/15-003E.html", //
+    bibkey = "tr/nii/BrunkenHZ15")
 public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

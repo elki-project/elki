@@ -88,7 +88,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Basseville, I. V. Nikiforov", //
     title = "Section 2.6: Off-line Change Detection", //
     booktitle = "Detection of Abrupt Changes - Theory and Application", //
-    url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf")
+    url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf", //
+    bibkey = "books/prentice/BassevilleN93/C2")
 public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger

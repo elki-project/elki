@@ -33,19 +33,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * <p>
  * The Gini was originally used in decision trees:
  * <p>
- * L. Breiman, J. Friedman, C. J. Stone, R. A Olshen<br>
- * Classification and regression trees<br>
- * CRC press, 1984
- * 
+ * L. Breiman, J. H. Friedman, R. A. Olshen, C. J. Stone<br>
+ * Classification and regression trees
+ *
  * @author Frederic Sautter
  */
 @Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //
     booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
-    url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
-@Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, R. A Olshen", //
+    url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf", //
+    bibkey = "tr/umn/TanK00")
+@Reference(authors = "L. Breiman, J. H. Friedman, R. A. Olshen, C. J. Stone", //
     title = "Classification and regression trees", //
-    booktitle = "CRC press, 1984")
+    booktitle = "Classification and Regression Trees", //
+    bibkey = "books/wa/BreimanFOS84")
 public class GiniIndex implements InterestingnessMeasure {
   /**
    * Constructor.

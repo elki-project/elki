@@ -27,14 +27,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Average intracluster distance.
- *
+ * <p>
  * Reference:
  * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br />
- * T. Zhang<br />
+ * Data Clustering for Very Large Datasets Plus Applications<br>
+ * T. Zhang<br>
  * Doctoral Dissertation, 1997.
- * </p>
- *
+ * <p>
  * Note: this distance did not work well in the original work, apparently.
  *
  * @author Erich Schubert
@@ -43,7 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf")
+    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
+    bibkey = "tr/wisc/Zhang97")
 public class AverageIntraclusterDistance implements BIRCHDistance {
   /**
    * Static instance.

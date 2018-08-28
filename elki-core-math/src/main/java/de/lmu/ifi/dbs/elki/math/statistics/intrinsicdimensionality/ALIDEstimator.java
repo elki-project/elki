@@ -34,14 +34,13 @@ import net.jafama.FastMath;
 /**
  * ALID estimator of the intrinsic dimensionality (maximum likelihood estimator
  * for ID using auxiliary distances).
- *
+ * <p>
  * Reference:
  * <p>
- * Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi<br />
+ * Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi<br>
  * Enhanced Estimation of Local Intrinsic Dimensionality Using Auxiliary
- * Distances<br />
+ * Distances<br>
  * Contributed to ELKI
- * </p>
  *
  * @author Jonathan von Brünken
  * @since 0.7.2
@@ -49,7 +48,8 @@ import net.jafama.FastMath;
 @Reference(authors = "Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi", //
     title = "Enhanced Estimation of Local Intrinsic Dimensionality Using Auxiliary Distances", //
     booktitle = "Contributed to ELKI", //
-    url = "http://elki.dbs.ifi.lmu.de/")
+    url = "http://elki.dbs.ifi.lmu.de/", //
+    bibkey = "tr/nii/ChellyHK16")
 public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

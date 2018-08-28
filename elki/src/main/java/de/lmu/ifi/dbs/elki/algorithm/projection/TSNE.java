@@ -54,14 +54,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * t-Stochastic Neighbor Embedding is a projection technique designed for
  * visualization that tries to preserve the nearest neighbor structure.
- * 
+ * <p>
  * Reference:
  * <p>
- * L. J. P. van der Maaten, G. E. Hinton<br />
- * Visualizing High-Dimensional Data Using t-SNE<br />
- * Journal of Machine Learning Research 9 2008
- * </p>
- * 
+ * L. J. P. van der Maaten, G. E. Hinton<br>
+ * Visualizing High-Dimensional Data Using t-SNE<br>
+ * Journal of Machine Learning Research 9
+ *
  * @author Erich Schubert
  * @author Dominik Acker
  *
@@ -69,8 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Reference(authors = "L. J. P. van der Maaten, G. E. Hinton", //
     title = "Visualizing High-Dimensional Data Using t-SNE", //
-    booktitle = "Journal of Machine Learning Research 9 2008", //
-    url = "http://www.jmlr.org/papers/v9/vandermaaten08a.html")
+    booktitle = "Journal of Machine Learning Research 9", //
+    url = "http://www.jmlr.org/papers/v9/vandermaaten08a.html", //
+    bibkey = "journals/jmlr/MaatenH08")
 public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> {
   /**
    * Class logger.
@@ -84,7 +84,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
 
   /**
    * Early exaggeration factor.
-   * 
+   * <p>
    * Barnes-Hut tSNE implementation used 12.
    */
   protected static final double EARLY_EXAGGERATION = 4.;

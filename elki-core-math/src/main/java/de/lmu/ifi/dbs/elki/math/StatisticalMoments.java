@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,36 +27,58 @@ import net.jafama.FastMath;
 /**
  * Track various statistical moments, including mean, variance, skewness and
  * kurtosis.
- * 
+ * <p>
  * References:
  * <p>
- * T. B. Terriberry<br />
- * Computing Higher-Order Moments Online<br/>
+ * An exhaustive performance study:
+ * <p>
+ * Erich Schubert, Michael Gertz<br>
+ * Numerically Stable Parallel Computation of (Co-)Variance<br>
+ * Proc. 30th Int. Conf. Scientific and Statistical Database Management
+ * (SSDBM 2018)
+ * <p>
+ * Details on higher order moments:
+ * <p>
+ * T. B. Terriberry<br>
+ * Computing Higher-Order Moments Online<br>
  * http://people.xiph.org/~tterribe/notes/homs.html
- * </p>
- * 
+ * <p>
  * General recurrence, for higher order moments, can be found in:
  * <p>
- * Philippe Pébay<br />
+ * P. Pébay<br>
  * Formulas for Robust, One-Pass Parallel Computation of Covariances and
- * Arbitrary-Order Statistical Moments<br />
+ * Arbitrary-Order Statistical Moments<br>
  * Sandia Report SAND2008-6212, Sandia National Laboratories
- * </p>
- * 
+ * <p>
  * But our approach also uses parts of
  * <p>
- * E. A. Youngs and E. M. Cramer<br />
- * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br />
+ * E. A. Youngs and E. M. Cramer<br>
+ * Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms<br>
  * Technometrics 13(3), 1971
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
+@Reference(authors = "Erich Schubert, Michael Gertz", //
+    title = "Numerically Stable Parallel Computation of (Co-)Variance", //
+    booktitle = "Proc. 30th Int. Conf. Scientific and Statistical Database Management (SSDBM 2018)", //
+    url = "https://doi.org/10.1145/3221269.3223036", //
+    bibkey = "DBLP:conf/ssdbm/SchubertG18")
 @Reference(authors = "T. B. Terriberry", //
     title = "Computing Higher-Order Moments Online", //
     booktitle = "Online - Technical Note", //
-    url = "http://people.xiph.org/~tterribe/notes/homs.html")
+    url = "http://people.xiph.org/~tterribe/notes/homs.html", //
+    bibkey = "web/Terriberry07")
+@Reference(authors = "P. Pébay", //
+    title = "Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments", //
+    booktitle = "Sandia Report SAND2008-6212, Sandia National Laboratories", //
+    url = "https://prod.sandia.gov/techlib-noauth/access-control.cgi/2008/086212.pdf", //
+    bibkey = "tr/sandia/Pebay08")
+@Reference(authors = "E. A. Youngs, E. M. Cramer", //
+    title = "Some Results Relevant to Choice of Sum and Sum-of-Product Algorithms", //
+    booktitle = "Technometrics 13(3)", //
+    url = "https://doi.org/10.1080/00401706.1971.10488826", //
+    bibkey = "doi:10.1080/00401706.1971.10488826")
 public class StatisticalMoments extends MeanVarianceMinMax {
   /**
    * Third moment.

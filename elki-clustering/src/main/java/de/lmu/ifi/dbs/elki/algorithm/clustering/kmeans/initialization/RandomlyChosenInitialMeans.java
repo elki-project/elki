@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Initialize K-means by randomly choosing k existing elements as cluster
  * centers.
- *
+ * <p>
  * This initialization is attributed to:
  * <p>
- * E. W. Forgy<br />
+ * E. W. Forgy<br>
  * Cluster analysis of multivariate data : efficiency versus interpretability of
- * classifications<br />
+ * classifications<br>
  * Abstract published in Biometrics 21(3)
- * </p>
+ * <p>
  * but we were unable to verify this so far (apparently, only an abstract is
  * available in Biometrics).
  *
@@ -53,8 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <O> Vector type
  */
 @Reference(authors = "E. W. Forgy", //
-title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
-booktitle = "Biometrics 21(3)")
+    title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
+    booktitle = "Biometrics 21(3)", //
+    bibkey = "journals/biometrics/Forgy65")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans")
 public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**

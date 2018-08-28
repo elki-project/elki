@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * <p>
  * R. C. Prim<br>
  * Shortest connection networks and some generalizations<br>
- * In: Bell System Technical Journal, 36 (1957), pp. 1389–140
+ * Bell System Technical Journal 36
  * 
  * @author Erich Schubert
  * @since 0.5.5
@@ -44,7 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "R. C. Prim", //
     title = "Shortest connection networks and some generalizations", //
     booktitle = "Bell System Technical Journal, 36 (1957)", //
-    url = "https://doi.org/10.1002/j.1538-7305.1957.tb01515.x")
+    url = "https://doi.org/10.1002/j.1538-7305.1957.tb01515.x", //
+    bibkey = "doi:10.1002/j.1538-7305.1957.tb01515.x")
 public class PrimsMinimumSpanningTree {
   /**
    * Adapter class for double[][] matrixes.

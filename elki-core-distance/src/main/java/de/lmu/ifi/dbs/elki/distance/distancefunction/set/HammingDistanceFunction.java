@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,23 +31,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Computes the Hamming distance of arbitrary vectors - i.e. counting, on how
  * many places they differ.
- * 
+ * <p>
  * Reference:
  * <p>
- * R. W. Hamming<br />
- * Error detecting and error correcting codes<br />
+ * R. W. Hamming<br>
+ * Error detecting and error correcting codes<br>
  * Bell System technical journal, 29(2)
- * </p>
- * 
+ * <p>
  * TODO: add a sparse (but not binary) optimized version?
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "R. W. Hamming", //
     title = "Error detecting and error correcting codes", //
     booktitle = "Bell System technical journal, 29(2)", //
-    url = "https://doi.org/10.1002/j.1538-7305.1950.tb00463.x")
+    url = "https://doi.org/10.1002/j.1538-7305.1950.tb00463.x", //
+    bibkey = "doi:10.1002/j.1538-7305.1950.tb00463.x")
 public class HammingDistanceFunction extends AbstractSetDistanceFunction<FeatureVector<?>> implements NumberVectorDistanceFunction<FeatureVector<?>> {
   /**
    * Static instance.

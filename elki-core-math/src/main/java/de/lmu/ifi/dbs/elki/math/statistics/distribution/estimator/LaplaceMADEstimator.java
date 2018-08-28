@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,23 +26,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Estimate Laplace distribution parameters using Median and MAD.
- * 
+ * <p>
  * Reference:
  * <p>
- * D. J. Olive<br />
- * Applied Robust Statistics<br />
- * Preprint of an upcoming book, University of Minnesota
- * </p>
- * 
+ * D. J. Olive<br>
+ * Applied Robust Statistics<br>
+ * Preprint, University of Minnesota
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has LaplaceDistribution
  */
 @Reference(title = "Applied Robust Statistics", //
     authors = "D. J. Olive", //
     booktitle = "Applied Robust Statistics", //
-    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm", //
+    bibkey = "books/Olive08")
 public class LaplaceMADEstimator implements MADDistributionEstimator<LaplaceDistribution> {
   /**
    * Static instance.

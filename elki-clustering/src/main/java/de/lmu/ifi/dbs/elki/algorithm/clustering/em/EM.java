@@ -94,9 +94,10 @@ import net.jafama.FastMath;
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", //
     title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
     booktitle = "Journal of the Royal Statistical Society, Series B, 39(1)", //
-    url = "http://www.jstor.org/stable/2984875")
+    url = "http://www.jstor.org/stable/2984875", //
+    bibkey = "journals/jroyastatsocise2/DempsterLR77")
 @Reference(title = "Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering", //
-    authors = "C. Fraley and A. E. Raftery", //
+    authors = "C. Fraley, A. E. Raftery", //
     booktitle = "J. Classification 24(2)", //
     url = "https://doi.org/10.1007/s00357-007-0004-5", //
     bibkey = "DBLP:journals/classification/FraleyR07")

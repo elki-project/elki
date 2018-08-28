@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,30 +29,35 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Akaike Information Criterion (AIC).
- *
+ * <p>
  * Reference:
  * <p>
- * H. Akaike<br />
- * On entropy maximization principle<br />
+ * H. Akaike<br>
+ * On entropy maximization principle<br>
  * Application of statistics, 1977, North-Holland
- * </p>
- *
- * The use for k-means was popularized by:
  * <p>
- * D. Pelleg, A. Moore:<br />
+ * The use for k-means was briefly mentioned in:
+ * <p>
+ * D. Pelleg, A. Moore<br>
  * X-means: Extending K-means with Efficient Estimation on the Number of
- * Clusters<br />
+ * Clusters<br>
  * In: Proceedings of the 17th International Conference on Machine Learning
  * (ICML 2000)
- * </p>
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
  * @since 0.2
  */
 @Reference(authors = "H. Akaike", //
-title = "On entropy maximization principle", //
-booktitle = "Application of statistics, 1977, North-Holland")
+    title = "Information Theory and an Extension of the Maximum Likelihood Principle", //
+    booktitle = "Second International Symposium on Information Theory", //
+    url = "https://doi.org/10.1007/978-1-4612-1694-0_15", // reprint
+    bibkey = "conf/isit/Aka73")
+@Reference(authors = "D. Pelleg, A. Moore", //
+    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+    bibkey = "DBLP:conf/icml/PellegM00")
 public class AkaikeInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {

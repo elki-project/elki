@@ -28,24 +28,24 @@ import net.jafama.FastMath;
 
 /**
  * Calculate Hoeffding's D as a measure of dependence.
- * 
+ * <p>
  * References:
  * <p>
- * W. Hoeffding:<br />
- * A non-parametric test of independence<br />
+ * W. Hoeffding:<br>
+ * A non-parametric test of independence<br>
  * The Annals of Mathematical Statistics 19:546–57
- * </p>
- * 
+ * <p>
  * The resulting value is scaled by 30, so it is in the range {@code [-.5;1]}.
- * 
+ *
  * @author Yinchong Yang
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "W. Hoeffding", //
-title = "A non-parametric test of independence", //
-booktitle = "The Annals of Mathematical Statistics 19", //
-url = "http://www.jstor.org/stable/2236021")
+    title = "A non-parametric test of independence", //
+    booktitle = "The Annals of Mathematical Statistics 19", //
+    url = "http://www.jstor.org/stable/2236021", //
+    bibkey = "journals/mathstat/Hoeffding48")
 public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.
@@ -87,7 +87,7 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
 
   /**
    * Compute bivariate ranks.
-   *
+   * <p>
    * q[i] is the number of objects such that x[j] < x[i] and y[j] < y[i]
    *
    * @param adapter1 First adapter
@@ -101,8 +101,10 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
     double[] ret = new double[len];
     for(int i = 0; i < len; i++) {
       for(int j = i + 1; j < len; j++) {
-        double xi = adapter1.getDouble(data1, i), xj = adapter1.getDouble(data1, j);
-        double yi = adapter2.getDouble(data2, i), yj = adapter2.getDouble(data2, j);
+        double xi = adapter1.getDouble(data1, i),
+            xj = adapter1.getDouble(data1, j);
+        double yi = adapter2.getDouble(data2, i),
+            yj = adapter2.getDouble(data2, j);
         if(xi < xj) {
           ret[j] += (yi < yj) ? 1 : (yi == yj) ? .5 : 0;
         }
@@ -128,39 +130,39 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
 
   // Tabular approximation
   private final static double[] TABVAL = { //
-  0.5297, 0.4918, 0.4565, 0.4236, 0.393, //
-  0.3648, 0.3387, 0.3146, 0.2924, 0.2719, // 10
-  0.253, 0.2355, 0.2194, 0.2045, 0.1908, //
-  0.1781, 0.1663, 0.1554, 0.1453, 0.1359, // 20
-  0.1273, 0.1192, 0.1117, 0.1047, 0.0982, //
-  0.0921, 0.0864, 0.0812, 0.0762, 0.0716, // 30
-  0.0673, 0.0633, 0.0595, 0.056, 0.0527, //
-  0.0496, 0.0467, 0.044, 0.0414, 0.039, // 40
-  0.0368, 0.0347, 0.0327, 0.0308, 0.0291, //
-  0.0274, 0.0259, 0.0244, 0.023, 0.0217, // 50
-  0.0205, 0.0194, 0.0183, 0.0173, 0.0163, //
-  0.0154, 0.0145, 0.0137, 0.013, 0.0123, // 60
-  0.0116, 0.011, 0.0104, 0.0098, 0.0093, //
-  0.0087, 0.0083, 0.0078, 0.0074, 0.007, // 70
-  0.0066, 0.0063, 0.0059, 0.0056, 0.0053, //
-  0.005, 0.0047, 0.0045, 0.0042, 0.0025, // 80
-  0.0014, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001 };
+      0.5297, 0.4918, 0.4565, 0.4236, 0.393, //
+      0.3648, 0.3387, 0.3146, 0.2924, 0.2719, // 10
+      0.253, 0.2355, 0.2194, 0.2045, 0.1908, //
+      0.1781, 0.1663, 0.1554, 0.1453, 0.1359, // 20
+      0.1273, 0.1192, 0.1117, 0.1047, 0.0982, //
+      0.0921, 0.0864, 0.0812, 0.0762, 0.0716, // 30
+      0.0673, 0.0633, 0.0595, 0.056, 0.0527, //
+      0.0496, 0.0467, 0.044, 0.0414, 0.039, // 40
+      0.0368, 0.0347, 0.0327, 0.0308, 0.0291, //
+      0.0274, 0.0259, 0.0244, 0.023, 0.0217, // 50
+      0.0205, 0.0194, 0.0183, 0.0173, 0.0163, //
+      0.0154, 0.0145, 0.0137, 0.013, 0.0123, // 60
+      0.0116, 0.011, 0.0104, 0.0098, 0.0093, //
+      0.0087, 0.0083, 0.0078, 0.0074, 0.007, // 70
+      0.0066, 0.0063, 0.0059, 0.0056, 0.0053, //
+      0.005, 0.0047, 0.0045, 0.0042, 0.0025, // 80
+      0.0014, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001 };
 
   // Table positions
   private final static double[] TABPOS = new double[] { //
-  1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.55, //
-  1.60, 1.65, 1.70, 1.75, 1.80, 1.85, 1.90, 1.95, 2.00, 2.05, //
-  2.10, 2.15, 2.20, 2.25, 2.30, 2.35, 2.40, 2.45, 2.50, 2.55, //
-  2.60, 2.65, 2.70, 2.75, 2.80, 2.85, 2.90, 2.95, 3.00, 3.05, //
-  3.10, 3.15, 3.20, 3.25, 3.30, 3.35, 3.40, 3.45, 3.50, 3.55, //
-  3.60, 3.65, 3.70, 3.75, 3.80, 3.85, 3.90, 3.95, 4.00, 4.05, //
-  4.10, 4.15, 4.20, 4.25, 4.30, 4.35, 4.40, 4.45, 4.50, 4.55, //
-  4.60, 4.65, 4.70, 4.75, 4.80, 4.85, 4.90, 4.95, 5.00, //
-  5.50, 6.00, 6.50, 7.00, 7.50, 8.00, 8.50 };
+      1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.55, //
+      1.60, 1.65, 1.70, 1.75, 1.80, 1.85, 1.90, 1.95, 2.00, 2.05, //
+      2.10, 2.15, 2.20, 2.25, 2.30, 2.35, 2.40, 2.45, 2.50, 2.55, //
+      2.60, 2.65, 2.70, 2.75, 2.80, 2.85, 2.90, 2.95, 3.00, 3.05, //
+      3.10, 3.15, 3.20, 3.25, 3.30, 3.35, 3.40, 3.45, 3.50, 3.55, //
+      3.60, 3.65, 3.70, 3.75, 3.80, 3.85, 3.90, 3.95, 4.00, 4.05, //
+      4.10, 4.15, 4.20, 4.25, 4.30, 4.35, 4.40, 4.45, 4.50, 4.55, //
+      4.60, 4.65, 4.70, 4.75, 4.80, 4.85, 4.90, 4.95, 5.00, //
+      5.50, 6.00, 6.50, 7.00, 7.50, 8.00, 8.50 };
 
   /**
    * Convert Hoeffding D value to a p-value.
-   * 
+   *
    * @param d D value
    * @param n Data set size
    * @return p-value

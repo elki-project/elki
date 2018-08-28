@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,11 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * Compute the Convex Hull and/or Delaunay Triangulation, using the sweep-hull
  * approach of David Sinclair.
- *
+ * <p>
  * Note: This implementation does not check or handle duplicate points!
- *
+ * <p>
  * TODO: Handle duplicates.
- *
+ * <p>
  * TODO: optimize data structures for memory usage
  *
  * @author Erich Schubert
@@ -52,9 +52,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  *
  * @apiviz.has Polygon
  */
-@Reference(authors = "David Sinclair", //
+@Reference(authors = "D. Sinclair", //
     title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", //
-    booktitle = "Online: http://s-hull.org/")
+    booktitle = "Online", //
+    url = "http://s-hull.org/", //
+    bibkey = "web/Sinclair16")
 public class SweepHullDelaunay2D {
   /**
    * Class logger
@@ -209,8 +211,7 @@ public class SweepHullDelaunay2D {
           // Not yet visible:
           if(hend < 0) {
             if(leftOf(prevV, nextV, newpoint)) {
-              hstart = pos;
-              hend = pos;
+              hstart = hend = pos;
               if(!hullonly) {
                 // Clockwise, A is new point!
                 Triangle tri = new Triangle(pointId, next.first, prev.first);
@@ -278,8 +279,7 @@ public class SweepHullDelaunay2D {
       // Update hull, remove points
       final int firsttri, lasttri;
       if(hullonly) {
-        firsttri = -1;
-        lasttri = -1;
+        firsttri = lasttri = -1;
       }
       else {
         final int tristart = tris.size();
@@ -306,12 +306,7 @@ public class SweepHullDelaunay2D {
         iter.add(new IntIntPair(pointId, lasttri));
         iter.previous();
         if(!hullonly) {
-          if(iter.hasPrevious()) {
-            iter.previous().second = firsttri;
-          }
-          else {
-            hull.getLast().second = firsttri;
-          }
+          (iter.hasPrevious() ? iter.previous() : hull.getLast()).second = firsttri;
         }
       }
       else {
@@ -350,18 +345,8 @@ public class SweepHullDelaunay2D {
         for(int o = 0; iter.hasNext(); o++) {
           // This triangle has num tristart + o.
           Triangle cur = iter.next();
-          if(o > 0) {
-            cur.ca = tristart + o - 1; // previously added triangle
-          }
-          else {
-            cur.ca = -1; // outside
-          }
-          if(iter.hasNext()) {
-            cur.ab = tristart + o + 1; // next triangle
-          }
-          else {
-            cur.ab = -1; // outside
-          }
+          cur.ca = o > 0 ? tristart + o - 1 : -1; // previously added triangle
+          cur.ab = iter.hasNext() ? tristart + o + 1 : -1; // next triangle
           // cur.bc was set upon creation
           assert (cur.bc >= 0);
           Triangle other = tris.get(cur.bc);

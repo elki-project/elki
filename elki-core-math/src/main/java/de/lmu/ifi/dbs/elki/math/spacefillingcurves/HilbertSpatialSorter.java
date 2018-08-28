@@ -40,16 +40,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * D. Hilbert<br>
  * Ueber die stetige Abbildung einer Linie auf ein Flächenstück<br>
  * In: Mathematische Annalen, 38(3)
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.composedOf HilbertRef
  */
 @Reference(authors = "D. Hilbert", //
     title = "Ueber die stetige Abbildung einer Linie auf ein Flächenstück", //
     booktitle = "Mathematische Annalen, 38(3)", //
-    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002253135")
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002253135", //
+    bibkey = "journal/mathann/Hilbert1891")
 public class HilbertSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

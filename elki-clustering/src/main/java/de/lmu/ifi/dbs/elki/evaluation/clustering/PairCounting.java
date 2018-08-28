@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -220,7 +221,8 @@ public class PairCounting {
   @Reference(authors = "P. Jaccard", //
       title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
       booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
-      url = "http://data.rero.ch/01-R241574160")
+      url = "http://data.rero.ch/01-R241574160", //
+      bibkey = "Jaccard1902")
   public double jaccard() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2];
     return pairconfuse[0] / sum;

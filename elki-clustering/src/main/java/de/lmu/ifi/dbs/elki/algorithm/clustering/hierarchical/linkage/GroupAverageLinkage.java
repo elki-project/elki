@@ -64,7 +64,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "R. R. Sokal, C. D. Michener", //
     title = "A statistical method for evaluating systematic relationship", //
     booktitle = "University of Kansas science bulletin 28", //
-    url = "https://archive.org/details/cbarchive_33927_astatisticalmethodforevaluatin1902")
+    url = "https://archive.org/details/cbarchive_33927_astatisticalmethodforevaluatin1902", //
+    bibkey = "tr/kansas/SokalM1902")
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod" })
 @Priority(Priority.RECOMMENDED + 1)
 public class GroupAverageLinkage implements Linkage {

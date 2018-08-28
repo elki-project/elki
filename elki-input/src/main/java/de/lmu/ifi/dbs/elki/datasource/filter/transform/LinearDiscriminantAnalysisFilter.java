@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,13 +45,12 @@ import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * Linear Discriminant Analysis (LDA) / Fisher's linear discriminant.
- *
+ * <p>
  * Reference:
  * <p>
- * R. A. Fisher<br />
- * The use of multiple measurements in taxonomic problems<br />
- * Annals of Eugenics 7.2 (1936): 179-188.
- * </p>
+ * R. A. Fisher<br>
+ * The use of multiple measurements in taxonomic problems<br>
+ * Annals of Eugenics 7.2
  *
  * @author Angela Peng
  * @author Erich Schubert
@@ -62,8 +61,9 @@ import it.unimi.dsi.fastutil.ints.IntList;
 @Alias("lda")
 @Reference(authors = "R. A. Fisher", //
     title = "The use of multiple measurements in taxonomic problems", //
-    booktitle = "Annals of eugenics 7.2 (1936)", //
-    url = "https://doi.org/10.1111/j.1469-1809.1936.tb02137.x")
+    booktitle = "Annals of Eugenics 7.2", //
+    url = "https://doi.org/10.1111/j.1469-1809.1936.tb02137.x", //
+    bibkey = "doi:10.1111/j.1469-1809.1936.tb02137.x")
 public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter<V> {
   /**
    * Class logger.

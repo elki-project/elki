@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,15 +68,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Algorithm to compute local correlation outlier probability.
- * 
+ * <p>
  * This is the simpler, original version of COP, as published in
- * 
+ * <p>
  * Reference:
  * <p>
- * Arthur Zimek<br />
- * Correlation Clustering.<br />
- * PhD thesis, Chapter 18
- * </p>
+ * Arthur Zimek<br>
+ * Application 2: Outlier Detection (Chapter 18)<br>
+ * Correlation Clustering
+ * <p>
  * which has then been refined to the method published as {@link COP}
  * 
  * @author Erich Schubert
@@ -85,8 +85,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Simple COP: Correlation Outlier Probability")
 @Reference(authors = "Arthur Zimek", //
-title = "Correlation Clustering", //
-booktitle = "PhD thesis, Chapter 18")
+    title = "Application 2: Outlier Detection (Chapter 18)", //
+    booktitle = "Correlation Clustering", //
+    bibkey = "phd/dnb/Zimek08/Ch18")
 public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

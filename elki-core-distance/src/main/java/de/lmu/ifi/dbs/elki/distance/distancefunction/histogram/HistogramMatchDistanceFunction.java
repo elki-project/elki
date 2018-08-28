@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,30 +31,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Distance function based on histogram matching, i.e. Manhattan distance on the
  * cumulative density function.
- * 
+ * <p>
  * This distance function assumes there exist a natural order in the vectors,
  * i.e. they should be some 1-dimensional histogram.
- * 
+ * <p>
  * This is also known as Earth Movers Distance (EMD), 1st Mallows distance or
  * 1st Wasserstein metric (also Vasershtein metric), for the special case of a
  * one-dimensional histogram, where the cost is linear in the number of bins to
  * transport.
- * 
+ * <p>
  * Reference:
  * <p>
- * L.N. Vaserstein<br />
+ * L.N. Vaserstein<br>
  * Markov processes over denumerable products of spaces describing large systems
- * of automata <br />
+ * of automata<br>
  * Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission 5:3
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Reference(authors = "L.N. Vaserstein", //
     title = "Markov processes over denumerable products of spaces describing large systems of automata", //
     booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
-    url = "http://mi.mathnet.ru/eng/ppi1811")
+    url = "http://mi.mathnet.ru/eng/ppi1811", //
+    bibkey = "journals/misc/Vaserstein1969")
 public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!
