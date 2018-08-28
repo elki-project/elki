@@ -73,7 +73,8 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 @Reference(authors = "R. M. Cormack", //
     title = "A Review of Classification", //
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
-    url = "https://doi.org/10.2307/2344237")
+    url = "https://doi.org/10.2307/2344237", //
+    bibkey = "doi:10.2307/2344237")
 public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger

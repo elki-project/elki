@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,18 +55,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Density-based Clustering of Applications with Noise and Fuzzy objects
  * (FDBSCAN) is an Algorithm to find sets in a fuzzy database that are
  * density-connected with minimum probability.
- *
+ * <p>
  * Reference:
  * <p>
- * Hans-Peter Kriegel and Martin Pfeifle:<br />
- * Density-based clustering of uncertain data<br />
- * In Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD),
- * Chicago, IL, 2005.
- * </p>
- *
+ * Hans-Peter Kriegel, Martin Pfeifle<br>
+ * Density-based clustering of uncertain data<br>
+ * Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)
+ * <p>
  * This class is a NeighborPredicate presenting this Algorithm in use with
  * <code>{@link GeneralizedDBSCAN}</code>.
- *
+ * <p>
  * Only Euclidean distance is supported, because of the pruning strategy
  * described in the original article which needs minimum and maximum distances
  * of bounding rectangles. Index support is not yet available.
@@ -79,11 +77,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
 @Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the" //
-+ " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
-@Reference(authors = "Hans-Peter Kriegel and Martin Pfeifle", //
-title = "Density-based clustering of uncertain data", //
-booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (KDD'05)", //
-url = "https://doi.org/10.1145/1081870.1081955")
+    + " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
+@Reference(authors = "Hans-Peter Kriegel, Martin Pfeifle", //
+    title = "Density-based clustering of uncertain data", //
+    booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)", //
+    url = "https://doi.org/10.1145/1081870.1081955", //
+    bibkey = "DBLP:conf/kdd/KriegelP05")
 public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
   /**
    * Epsilon radius
@@ -102,7 +101,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
   protected double threshold;
 
   /**
-   * The <code>Random</code> object to draw the samples with.
+   * The random generator to draw the samples with.
    */
   protected RandomFactory rand;
 
@@ -308,19 +307,19 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
      * Number of samples per uncertain object.
      */
     public final static OptionID SAMPLE_SIZE_ID = new OptionID("fdbscan.samplesize", //
-    "The number of samples to draw from each uncertain object to determine the epsilon-neighborhood.");
+        "The number of samples to draw from each uncertain object to determine the epsilon-neighborhood.");
 
     /**
      * Threshold for epsilon-neighborhood, defaults to 0.5.
      */
     public final static OptionID THRESHOLD_ID = new OptionID("fdbscan.threshold", //
-    "The amount of samples that have to be epsilon-close for two objects to be neighbors.");
+        "The amount of samples that have to be epsilon-close for two objects to be neighbors.");
 
     /**
      * Seed for random sample draw.
      */
     public final static OptionID SEED_ID = new OptionID("fdbscan.seed", //
-    "Random generator used to draw samples.");
+        "Random generator used to draw samples.");
 
     /**
      * Epsilon radius
@@ -347,18 +346,18 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
       IntParameter sampleSizep = new IntParameter(SAMPLE_SIZE_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleSizep)) {
         sampleSize = sampleSizep.intValue();
       }
       DoubleParameter thresholdp = new DoubleParameter(THRESHOLD_ID, 0.5) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(thresholdp)) {
         threshold = thresholdp.doubleValue();
       }

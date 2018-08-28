@@ -80,7 +80,8 @@ import libsvm.svm_problem;
 @Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", //
     title = "Estimating the support of a high-dimensional distribution", //
     booktitle = "Neural computation 13.7", //
-    url = "https://doi.org/10.1162/089976601750264965")
+    url = "https://doi.org/10.1162/089976601750264965", //
+    bibkey = "DBLP:journals/neco/ScholkopfPSSW01")
 public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

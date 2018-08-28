@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,18 +37,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Run k-means on the centers of each uncertain object.
- *
+ * <p>
  * This is a baseline reference method, that computes the center of mass
  * (centroid) of each object, then runs k-means on this.
- *
+ * <p>
  * This algorithm was introduces as CK-Means in:
  * <p>
- * S. D. Lee, B. Kao, R. Cheng<br />
- * Reducing UK-means to K-means<br />
+ * S. D. Lee, B. Kao, R. Cheng<br>
+ * Reducing UK-means to K-means<br>
  * ICDM Data Mining Workshops, 2007
  * </p>
  * and was shown to be equivalent to UK-Means.
- *
+ * <p>
  * In summary, the expected distance used by UK-Means can be decomposed using
  * Steiner/König-Huygens into the sum of squares between the centroids, and the
  * sum of squared deviations within the uncertain object itself. This last term,
@@ -58,9 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.0
  */
 @Reference(authors = "S. D. Lee, B. Kao, R. Cheng", //
-title = "Reducing UK-means to K-means", //
-booktitle = "ICDM Data Mining Workshops, 2007", //
-url = "https://doi.org/10.1109/ICDMW.2007.40")
+    title = "Reducing UK-means to K-means", //
+    booktitle = "ICDM Data Mining Workshops, 2007", //
+    url = "https://doi.org/10.1109/ICDMW.2007.40", //
+    bibkey = "DBLP:conf/icdm/LeeKC07")
 public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>> {
   /**
    * CLass logger.

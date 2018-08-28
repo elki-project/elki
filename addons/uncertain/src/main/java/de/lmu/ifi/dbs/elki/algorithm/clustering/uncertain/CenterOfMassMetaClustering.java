@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,14 +52,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Center-of-mass meta clustering reduces uncertain objects to their center of
  * mass, then runs a vector-oriented clustering algorithm on this data set.
- *
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur
- * Schmid, Arthur Zimek<br />
- * A Framework for Clustering Uncertain Data<br />
+ * Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle,
+ * Klaus Arthur Schmid, Arthur Zimek<br>
+ * A Framework for Clustering Uncertain Data<br>
  * In Proceedings of the VLDB Endowment, 8(12), 2015.
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -67,10 +66,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <C> Clustering result type (inherited from inner algorithm)
  */
 @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
-title = "A Framework for Clustering Uncertain Data", //
-booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
-url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
-public class CenterOfMassMetaClustering<C extends Clustering<?>> extends AbstractAlgorithm<C>implements ClusteringAlgorithm<C> {
+    title = "A Framework for Clustering Uncertain Data", //
+    booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
+    url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf", //
+    bibkey = "DBLP:journals/pvldb/SchubertKEZSZ15")
+public class CenterOfMassMetaClustering<C extends Clustering<?>> extends AbstractAlgorithm<C> implements ClusteringAlgorithm<C> {
   /**
    * Initialize a Logger.
    */
@@ -92,7 +92,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
 
   /**
    * This run method will do the wrapping.
-   *
+   * <p>
    * Its called from {@link AbstractAlgorithm#run(Database)} and performs the
    * call to the algorithms particular run method as well as the storing and
    * comparison of the resulting Clusterings.
@@ -164,7 +164,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
       if(config.grab(palgorithm)) {
         inner = palgorithm.instantiateClass(config);
         if(inner != null && inner.getInputTypeRestriction().length > 0 && //
-        !inner.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+            !inner.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + inner.getInputTypeRestriction()[0]));
         }
       }

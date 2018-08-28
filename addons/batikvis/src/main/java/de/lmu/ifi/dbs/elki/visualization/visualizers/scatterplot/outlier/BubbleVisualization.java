@@ -80,7 +80,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek", //
     title = "Visual Evaluation of Outlier Detection Models", //
     booktitle = "Proc. 15th Int. Conf. on Database Systems for Advanced Applications (DASFAA 2010)", //
-    url = "https://doi.org/10.1007/978-3-642-12098-5_34")
+    url = "https://doi.org/10.1007/978-3-642-12098-5_34", //
+    bibkey = "DBLP:conf/dasfaa/AchtertKRSWZ10")
 public class BubbleVisualization implements VisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.

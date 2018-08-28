@@ -83,7 +83,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
     title = "Uncertain data mining: An example in clustering location data", //
     booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006)", //
-    url = "https://doi.org/10.1007/11731139_24")
+    url = "https://doi.org/10.1007/11731139_24", //
+    bibkey = "DBLP:conf/pakdd/ChauCKN06")
 public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
    * CLass logger.

@@ -148,7 +148,8 @@ public class DensityEstimationOverlay implements VisFactory {
 
     @Reference(authors = "D. W. Scott", title = "Multivariate density estimation: Theory, Practice, and Visualization", //
         booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", //
-        url = "https://doi.org/10.1002/9780470316849")
+        url = "https://doi.org/10.1002/9780470316849", //
+        bibkey = "doi:10.1002/9780470316849")
     private double[] initializeBandwidth(double[][] data) {
       MeanVariance mv0 = new MeanVariance();
       MeanVariance mv1 = new MeanVariance();

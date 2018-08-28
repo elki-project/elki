@@ -71,7 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 @Reference(authors = "R. M. Cormack", //
     title = "A Review of Classification", //
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
-    url = "https://doi.org/10.2307/2344237")
+    url = "https://doi.org/10.2307/2344237", //
+    bibkey = "doi:10.2307/2344237")
 public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger

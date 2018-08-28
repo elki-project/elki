@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -31,35 +32,33 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Unweighted implementation of discrete uncertain objects.
- *
+ * <p>
  * <ul>
  * <li>Every object is represented by a finite number of discrete samples.</li>
  * <li>Every sample has the same weight.</li>
  * <li>Every sample is equally likely to be returned by {@link #drawSample}.
  * </ul>
- *
  * This is called the block independent-disjoint (BID model) in:
  * <p>
- * N. Dalvi, C. Ré, D. Suciu<br />
- * Probabilistic databases: diamonds in the dirt<br />
+ * N. Dalvi, C. Ré, D. Suciu<br>
+ * Probabilistic databases: diamonds in the dirt<br>
  * Communications of the ACM 52, 7
- * </p>
- *
+ * <p>
  * This is also known as the X-Tuple model in:
  * <p>
- * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br />
- * ULDBs: Databases with uncertainty and lineage<br />
- * In Proc. of the 32nd international conference on Very Large Data Bases (VLDB)
- * </p>
+ * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br>
+ * ULDBs: Databases with uncertainty and lineage<br>
+ * In Proc. of the 32nd Int. Conf. on Very Large Data Bases (VLDB)
  *
  * @author Alexander Koos
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "N. Dalvi, C. Ré, D. Suciu", //
-title = "Probabilistic databases: diamonds in the dirt", //
-booktitle = "Communications of the ACM 52, 7", //
-url = "https://doi.org/10.1145/1538788.1538810")
+    title = "Probabilistic databases: diamonds in the dirt", //
+    booktitle = "Communications of the ACM 52, 7", //
+    url = "https://doi.org/10.1145/1538788.1538810", //
+    bibkey = "DBLP:journals/cacm/DalviRS09")
 public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.
@@ -102,10 +101,7 @@ public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject i
       }
     }
 
-    for(int d = 0; d < dim; d++) {
-      meanVals[d] /= samples.length;
-    }
-    return DoubleVector.wrap(meanVals);
+    return DoubleVector.wrap(VMath.timesEquals(meanVals, 1. / samples.length));
   }
 
   @Override
@@ -127,7 +123,7 @@ public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject i
    * Factory class for this data type. Not for public use, use
    * {@link de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier} to
    * derive uncertain objects from certain vectors.
-   *
+   * <p>
    * TODO: provide serialization functionality.
    *
    * @author Erich Schubert

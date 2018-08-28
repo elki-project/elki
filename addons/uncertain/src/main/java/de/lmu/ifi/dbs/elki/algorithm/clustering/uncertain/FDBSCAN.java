@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,18 +36,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * FDBSCAN is an adaption of DBSCAN for fuzzy (uncertain) objects.
- *
+ * <p>
  * This implementation is based on GeneralizedDBSCAN. All implementation of
  * FDBSCAN functionality is located in the neighbor predicate
  * {@link FDBSCANNeighborPredicate}.
- *
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel and M. Pfeifle:<br />
- * Density-based clustering of uncertain data<br />
- * In Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD),
- * Chicago, IL, 2005.
- * </p>
+ * Hans-Peter Kriegel, Martin Pfeifle<br>
+ * Density-based clustering of uncertain data<br>
+ * Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -56,11 +54,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
 @Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the" //
-+ " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
-@Reference(authors = "H.-P. Kriegel and M. Pfeifle", //
-title = "Density-based clustering of uncertain data", //
-booktitle = "KDD05", //
-url = "https://doi.org/10.1145/1081870.1081955")
+    + " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
+@Reference(authors = "Hans-Peter Kriegel, Martin Pfeifle", //
+    title = "Density-based clustering of uncertain data", //
+    booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)", //
+    url = "https://doi.org/10.1145/1081870.1081955", //
+    bibkey = "DBLP:conf/kdd/KriegelP05")
 public class FDBSCAN extends GeneralizedDBSCAN {
   /**
    * Constructor that initialized GeneralizedDBSCAN.
@@ -116,23 +115,23 @@ public class FDBSCAN extends GeneralizedDBSCAN {
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
       IntParameter minPtsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minPtsP)) {
         minPts = minPtsP.intValue();
       }
       IntParameter sampleSizep = new IntParameter(FDBSCANNeighborPredicate.Parameterizer.SAMPLE_SIZE_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleSizep)) {
         sampleSize = sampleSizep.getValue();
       }
       DoubleParameter thresholdp = new DoubleParameter(FDBSCANNeighborPredicate.Parameterizer.THRESHOLD_ID, 0.5) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(thresholdp)) {
         threshold = thresholdp.getValue();
       }
