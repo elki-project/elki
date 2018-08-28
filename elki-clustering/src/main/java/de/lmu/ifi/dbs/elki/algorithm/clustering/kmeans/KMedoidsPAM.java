@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,13 +59,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * The original Partitioning Around Medoids (PAM) algorithm or k-medoids
  * clustering, as proposed by Kaufman and Rousseeuw in "Clustering by means of
  * Medoids".
- *
+ * <p>
  * Reference:
  * <p>
- * Clustering by means of Medoids<br />
- * L. Kaufman and P. J. Rousseeuw<br />
- * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
- * </p>
+ * L. Kaufman, P. J. Rousseeuw<br>
+ * Clustering by means of Medoids<br>
+ * Statistical Data Analysis Based on the L1-Norm and Related Methods
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -77,9 +76,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Partioning Around Medoids")
 @Priority(Priority.IMPORTANT)
-@Reference(title = "Clustering by means of Medoids", //
-    authors = "L. Kaufman and P. J. Rousseeuw", //
-    booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
+    title = "Clustering by means of Medoids", //
+    booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods", //
+    bibkey = "books/misc/KauRou87")
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
+    title = "Partitioning Around Medoids (Program PAM)", //
+    booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
+    url = "https://doi.org/10.1002/9780470316801.ch2", //
+    bibkey = "doi:10.1002/9780470316801.ch2")
 public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,25 +30,23 @@ import net.jafama.FastMath;
 /**
  * Kullback-Leibler (asymmetric!) Distance, also known as relative entropy,
  * information deviation or just KL-distance
- * 
+ * <p>
  * For a version with the arguments reversed, see
  * {@link KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction}.
- * 
+ * <p>
  * For a symmetric version, see {@link JeffreyDivergenceDistanceFunction}.
- * 
+ * <p>
  * Reference:
  * <p>
- * S. Kullback<br />
- * Information theory and statistics<br />
- * Courier Dover Publications, 1997.
- * </p>
+ * S. Kullback<br>
+ * Information theory and statistics
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Reference(authors = "S. Kullback", //
-    title = "Information theory and statistics", //
-    booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
+    title = "Information theory and statistics", booktitle = "", //
+    bibkey = "books/dover/Kullback59")
 @Alias("kl")
 public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

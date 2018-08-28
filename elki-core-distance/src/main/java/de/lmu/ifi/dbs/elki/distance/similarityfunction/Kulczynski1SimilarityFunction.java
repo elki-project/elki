@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,17 +27,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Kulczynski similarity 1.
- * 
+ * <p>
  * Reference:
  * <p>
- * M.-M. Deza and E. Deza<br />
+ * M.-M. Deza and E. Deza<br>
  * Dictionary of distances
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
+@Reference(authors = "M.-M. Deza, E. Deza", //
+    title = "Dictionary of distances", //
+    booktitle = "Dictionary of distances", //
+    url = "https://doi.org/10.1007/978-3-642-00234-2", //
+    bibkey = "doi:10.1007/978-3-642-00234-2")
 public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunction {
   /**
    * Static instance.
@@ -58,7 +61,7 @@ public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunct
   public double similarity(NumberVector v1, NumberVector v2) {
     final int dim = AbstractNumberVectorDistanceFunction.dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       double xi = v1.doubleValue(i), yi = v2.doubleValue(i);
       sumdiff += Math.abs(xi - yi);
       summin += Math.min(xi, yi);

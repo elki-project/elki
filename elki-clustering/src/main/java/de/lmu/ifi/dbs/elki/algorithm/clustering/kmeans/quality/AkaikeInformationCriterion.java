@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Reference:
  * <p>
  * H. Akaike<br>
- * On entropy maximization principle<br>
- * Application of statistics, 1977, North-Holland
+ * Information Theory and an Extension of the Maximum Likelihood Principle<br>
+ * Second International Symposium on Information Theory
  * <p>
  * The use for k-means was briefly mentioned in:
  * <p>
@@ -51,8 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "H. Akaike", //
     title = "Information Theory and an Extension of the Maximum Likelihood Principle", //
     booktitle = "Second International Symposium on Information Theory", //
-    url = "https://doi.org/10.1007/978-1-4612-1694-0_15", // reprint
-    bibkey = "conf/isit/Aka73")
+    bibkey = "conf/isit/Akaike73")
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //

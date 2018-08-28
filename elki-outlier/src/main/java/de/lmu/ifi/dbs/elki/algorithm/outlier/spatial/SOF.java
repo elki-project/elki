@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,28 +45,31 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * The Spatial Outlier Factor (SOF) is a spatial
  * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF LOF} variation.
- * 
+ * <p>
  * Since the "reachability distance" of LOF cannot be used canonically in the
  * bichromatic case, this part of LOF is dropped and the exact distance is used
  * instead.
- * 
  * <p>
- * Huang, T., Qin, X.<br>
- * Detecting outliers in spatial database.<br>
- * In: Proc. 3rd International Conference on Image and Graphics,
- * Hong Kong, China.
- * </p>
- * 
+ * Reference:
+ * <p>
+ * T. Huang, X. Qin<br>
+ * Detecting outliers in spatial database<br>
+ * Proc. 3rd International Conference on Image and Graphics
+ * <p>
  * A LOF variation simplified with reachDist(o,p) == dist(o,p).
- * 
+ *
  * @author Ahmed Hettab
  * @since 0.4.0
- * 
+ *
  * @param <N> Neighborhood object type
  * @param <O> Attribute object type
  */
 @Title("Spatial Outlier Factor")
-@Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proc. 3rd International Conference on Image and Graphics", url = "https://doi.org/10.1109/ICIG.2004.53")
+@Reference(authors = "T. Huang, X. Qin", //
+    title = "Detecting outliers in spatial database", //
+    booktitle = "Proc. 3rd International Conference on Image and Graphics", //
+    url = "https://doi.org/10.1109/ICIG.2004.53", //
+    bibkey = "DBLP:conf/icig/HuangQ04")
 public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
    * The logger for this class.
@@ -113,7 +116,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
         avg += distFunc.distance(iditer, iter);
       }
       double lrd = 1 / (avg / neighbors.size());
-      if (Double.isNaN(lrd)) {
+      if(Double.isNaN(lrd)) {
         lrd = 0;
       }
       lrds.putDouble(iditer, lrd);
@@ -127,10 +130,11 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
         avg += lrds.doubleValue(iter);
       }
       final double lrd = (avg / neighbors.size()) / lrds.doubleValue(iditer);
-      if (!Double.isNaN(lrd)) {
+      if(!Double.isNaN(lrd)) {
         lofs.putDouble(iditer, lrd);
         lofminmax.put(lrd);
-      } else {
+      }
+      else {
         lofs.putDouble(iditer, 0.0);
       }
     }

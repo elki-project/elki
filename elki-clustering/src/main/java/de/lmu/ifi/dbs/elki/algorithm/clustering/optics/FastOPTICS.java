@@ -6,7 +6,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -55,17 +55,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * FastOPTICS algorithm (Fast approximation of OPTICS)
- *
+ * <p>
  * Note that this is <em>not</em> FOPTICS as in "Fuzzy OPTICS"!
- *
+ * <p>
  * Reference:
  * <p>
- * J. Schneider and M. Vlachos<br />
- * Fast parameterless density-based clustering via random projections<br />
- * Proc. 22nd ACM international conference on Conference on Information &
- * Knowledge Management (CIKM)
- * </p>
- *
+ * J. Schneider, M. Vlachos<br>
+ * Fast parameterless density-based clustering via random projections<br>
+ * Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)
+ * <p>
  * This is based on the original code provided by Johannes Schneider, with
  * ELKIfications and optimizations by Erich Schubert.
  *
@@ -75,9 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @apiviz.composedOf RandomProjectedNeighborsAndDensities
  */
-@Reference(authors = "J. Schneider and M. Vlachos", //
+@Reference(authors = "J. Schneider, M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
-    booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
+    booktitle = "Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)", //
     url = "https://doi.org/10.1145/2505515.2505590", //
     bibkey = "DBLP:conf/cikm/SchneiderV13")
 public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {

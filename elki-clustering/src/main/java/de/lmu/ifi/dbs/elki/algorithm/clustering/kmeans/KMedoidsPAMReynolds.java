@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,18 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * The Partitioning Around Medoids (PAM) algorithm with some additional
  * optimizations proposed by Reynolds et al.
- *
+ * <p>
  * In our implementation, we could not observe a substantial improvement over
  * the original PAM algorithm. This may be because of modern CPU architectures,
  * where saving an addition may be neglibile compared to caching and pipelining.
- *
  * <p>
  * Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering
- * Algorithms<br />
- * A. P. Reynolds and G. Richards and B. de la Iglesia and V. J.
- * Rayward-Smith<br />
+ * Algorithms<br>
+ * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>
  * J. Math. Model. Algorithms 5(4)
- * </p>
  *
  * @author Erich Schubert
  *
@@ -57,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <V> vector datatype
  */
 @Reference(title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
-    authors = "A. P. Reynolds and G. Richards and B. de la Iglesia and V. J. Rayward-Smith", //
+    authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
     booktitle = "J. Math. Model. Algorithms 5(4)", //
     url = "https://doi.org/10.1007/s10852-005-9022-1", //
     bibkey = "DBLP:journals/jmma/ReynoldsRIR06")

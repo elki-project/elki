@@ -42,13 +42,13 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking and J. R. Wallis<br>
+ * J. R. M. Hosking, J. R. Wallis<br>
  * Regional frequency analysis: an approach based on L-moments
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "J. R. M. Hosking and J. R. Wallis", //
+@Reference(authors = "J. R. M. Hosking, J. R. Wallis", //
     title = "Regional frequency analysis: an approach based on L-moments", //
     booktitle = "Regional frequency analysis: an approach based on L-moments", //
     url = "https://doi.org/10.1017/CBO9780511529443", //

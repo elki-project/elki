@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,17 +28,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Levenshtein distance on strings, normalized by string length.
- * 
- * Note: this is no longer a metric, the triange inequality is violated.
+ * <p>
+ * Note: this is no longer a metric, the triangle inequality is violated.
  * Example: d("ab","bc")=1, d("ab", "abc")+d("abc","bc")=0.4+0.4=0.8
- * 
+ * <p>
  * Reference:
  * <p>
  * V. I. Levenshtein<br>
  * Binary codes capable of correcting deletions, insertions and reversals.<br>
  * Soviet physics doklady. Vol. 10. 1966.
- * </p>
- * 
+ * <p>
  * TODO: add case insensitive flag.
  * 
  * @author Felix Stahlberg
@@ -49,8 +48,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Description("Levenshtein distance, normalized by average string length.")
 @Reference(authors = "V. I. Levenshtein", //
-    title = "Binary codes capable of correcting deletions, insertions and reversals.", //
-    booktitle = "Soviet physics doklady. Vol. 10. 1966.")
+    title = "Binary codes capable of correcting deletions, insertions and reversals", //
+    booktitle = "Soviet physics doklady 10", //
+    bibkey = "journals/misc/Levenshtein66")
 public class NormalizedLevenshteinDistanceFunction implements PrimitiveDistanceFunction<String> {
   /**
    * Static instance, case sensitive.

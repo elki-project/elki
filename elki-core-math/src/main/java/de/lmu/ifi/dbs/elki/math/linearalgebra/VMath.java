@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,10 +30,10 @@ import net.jafama.FastMath;
  * Class providing basic vector mathematics, for low-level vectors stored as
  * {@code double[]}. While this is less nice syntactically, it reduces memory
  * usage and VM overhead.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.landmark
  */
 public final class VMath {
@@ -96,7 +96,7 @@ public final class VMath {
 
   /**
    * Returns the ith unit vector of the specified dimensionality.
-   * 
+   *
    * @param dimensionality the dimensionality of the vector
    * @param i the index
    * @return the ith unit vector of the specified dimensionality
@@ -109,7 +109,7 @@ public final class VMath {
 
   /**
    * Returns a copy of this vector.
-   * 
+   *
    * @param v original vector
    * @return a copy of this vector
    */
@@ -119,7 +119,7 @@ public final class VMath {
 
   /**
    * Transpose vector to a matrix <em>without copying</em>.
-   * 
+   *
    * @param v Vector
    * @return Matrix
    */
@@ -129,7 +129,7 @@ public final class VMath {
 
   /**
    * Computes v1 + v2 for vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return the sum v1 + v2
@@ -145,7 +145,7 @@ public final class VMath {
 
   /**
    * Computes v1 + v2 * s2
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @param s2 the scalar
@@ -162,7 +162,7 @@ public final class VMath {
 
   /**
    * Computes v1 * s1 + v2
-   * 
+   *
    * @param v1 first vector
    * @param s1 the scalar for v1
    * @param v2 second vector
@@ -179,7 +179,7 @@ public final class VMath {
 
   /**
    * Computes v1 * s1 + v2 * s2
-   * 
+   *
    * @param v1 first vector
    * @param s1 the scalar for v1
    * @param v2 second vector
@@ -197,7 +197,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 + v2, overwriting v1
-   * 
+   *
    * @param v1 first vector (overwritten)
    * @param v2 second vector
    * @return v1 = v1 + v2
@@ -212,7 +212,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 + v2 * s2, overwriting v1
-   * 
+   *
    * @param v1 first vector
    * @param v2 another vector
    * @param s2 scalar factor for v2
@@ -228,7 +228,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 * s1 + v2, overwriting v1
-   * 
+   *
    * @param v1 first vector
    * @param s1 scalar factor for v1
    * @param v2 another vector
@@ -244,7 +244,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 * s1 + v2 * s2, overwriting v1
-   * 
+   *
    * @param v1 first vector
    * @param s1 scalar for v1
    * @param v2 another vector
@@ -261,7 +261,7 @@ public final class VMath {
 
   /**
    * Computes v1 + d
-   * 
+   *
    * @param v1 vector to add to
    * @param d value to add
    * @return v1 + d
@@ -276,7 +276,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 + d, overwriting v1
-   * 
+   *
    * @param v1 vector to add to
    * @param d value to add
    * @return Modified vector
@@ -290,7 +290,7 @@ public final class VMath {
 
   /**
    * Computes v1 - v2
-   * 
+   *
    * @param v1 first vector
    * @param v2 the vector to be subtracted from this vector
    * @return v1 - v2
@@ -306,7 +306,7 @@ public final class VMath {
 
   /**
    * Computes v1 - v2 * s2
-   * 
+   *
    * @param v1 first vector
    * @param v2 the vector to be subtracted from this vector
    * @param s2 the scaling factor for v2
@@ -323,7 +323,7 @@ public final class VMath {
 
   /**
    * Computes v1 * s1 - v2
-   * 
+   *
    * @param v1 first vector
    * @param s1 the scaling factor for v1
    * @param v2 the vector to be subtracted from this vector
@@ -340,7 +340,7 @@ public final class VMath {
 
   /**
    * Computes v1 * s1 - v2 * s2
-   * 
+   *
    * @param v1 first vector
    * @param s1 the scaling factor for v1
    * @param v2 the vector to be subtracted from this vector
@@ -358,7 +358,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 - v2, overwriting v1
-   * 
+   *
    * @param v1 vector
    * @param v2 another vector
    * @return v1 = v1 - v2
@@ -373,7 +373,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 - v2 * s2, overwriting v1
-   * 
+   *
    * @param v1 vector
    * @param v2 another vector
    * @param s2 scalar for v2
@@ -389,7 +389,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 * s1 - v2, overwriting v1
-   * 
+   *
    * @param v1 vector
    * @param s1 scalar for v1
    * @param v2 another vector
@@ -405,7 +405,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 * s1 - v2 * s2, overwriting v1
-   * 
+   *
    * @param v1 vector
    * @param s1 scalar for v1
    * @param v2 another vector
@@ -422,7 +422,7 @@ public final class VMath {
 
   /**
    * Compute v1 - d
-   * 
+   *
    * @param v1 original vector
    * @param d Value to subtract
    * @return v1 - d
@@ -437,7 +437,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 - d, overwriting v1
-   * 
+   *
    * @param v1 original vector
    * @param d Value to subtract
    * @return v1 = v1 - d
@@ -451,7 +451,7 @@ public final class VMath {
 
   /**
    * Computes v1 * s1
-   * 
+   *
    * @param v1 original vector
    * @param s1 the scalar to be multiplied
    * @return v1 * s1
@@ -466,7 +466,7 @@ public final class VMath {
 
   /**
    * Computes v1 = v1 * s1, overwriting v1
-   * 
+   *
    * @param v1 original vector
    * @param s scalar
    * @return v1 = v1 * s1
@@ -503,7 +503,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
-   * 
+   *
    * @param v1 vector
    * @param m2 other matrix
    * @return Matrix product, v1<sup>T</sup> * m2
@@ -524,7 +524,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, v1<sup>T</sup> * v2
-   * 
+   *
    * @param v1 vector
    * @param v2 other vector
    * @return scalar result of matrix product, v1<sup>T</sup> * v2
@@ -563,7 +563,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, v1 * v2^T
-   * 
+   *
    * @param v1 vector
    * @param v2 other vector
    * @return Matrix product, v1 * v2^T
@@ -581,9 +581,9 @@ public final class VMath {
   /**
    * Returns the scalar product (dot product) of this vector and the specified
    * vector v.
-   * 
+   * <p>
    * This is the same as {@link #transposeTimes(double[], double[])}.
-   * 
+   *
    * @param v1 vector
    * @param v2 other vector
    * @return double the scalar product of vectors v1 and v2
@@ -594,7 +594,7 @@ public final class VMath {
 
   /**
    * Sum of the vector
-   * 
+   *
    * @param v1 vector
    * @return sum of this vector
    */
@@ -608,7 +608,7 @@ public final class VMath {
 
   /**
    * Squared Euclidean length of the vector
-   * 
+   *
    * @param v1 vector
    * @return squared Euclidean length of this vector
    */
@@ -623,7 +623,7 @@ public final class VMath {
 
   /**
    * Euclidean length of the vector
-   * 
+   *
    * @param v1 vector
    * @return Euclidean length of this vector
    */
@@ -653,7 +653,7 @@ public final class VMath {
 
   /**
    * Normalizes v1 to the length of 1.0.
-   * 
+   *
    * @param v1 vector
    * @return normalized copy of v1
    */
@@ -670,7 +670,7 @@ public final class VMath {
 
   /**
    * Normalizes v1 to the length of 1.0.
-   * 
+   *
    * @param v1 vector
    * @return normalized v1
    */
@@ -687,7 +687,7 @@ public final class VMath {
   /**
    * Projects this row vector into the subspace formed by the specified matrix
    * v.
-   * 
+   *
    * @param m2 the subspace matrix
    * @return the projection of p into the subspace formed by v
    */
@@ -706,7 +706,7 @@ public final class VMath {
 
   /**
    * Compute the hash code for the vector
-   * 
+   *
    * @param v1 elements
    * @return hash code
    */
@@ -716,7 +716,7 @@ public final class VMath {
 
   /**
    * Compare for equality.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return comparison result
@@ -727,7 +727,7 @@ public final class VMath {
 
   /**
    * Reset the Vector to 0.
-   * 
+   *
    * @param v1 vector
    */
   public static void clear(final double[] v1) {
@@ -736,7 +736,7 @@ public final class VMath {
 
   /**
    * Reset the Matrix to 0.
-   * 
+   *
    * @param m Matrix
    */
   public static void clear(final double[][] m) {
@@ -747,7 +747,7 @@ public final class VMath {
 
   /**
    * Rotate vector by 90 degrees.
-   * 
+   *
    * @param v1 first vector
    * @return modified v1, rotated by 90 degrees
    */
@@ -763,7 +763,7 @@ public final class VMath {
 
   /**
    * Returns the unit matrix of the specified dimension.
-   * 
+   *
    * @param dim the dimensionality of the unit matrix
    * @return the unit matrix of the specified dimension
    */
@@ -777,7 +777,7 @@ public final class VMath {
 
   /**
    * Returns the zero matrix of the specified dimension.
-   * 
+   *
    * @param dim the dimensionality of the unit matrix
    * @return the zero matrix of the specified dimension
    */
@@ -787,7 +787,7 @@ public final class VMath {
 
   /**
    * Generate identity matrix
-   * 
+   *
    * @param m Number of rows.
    * @param n Number of columns.
    * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
@@ -804,7 +804,7 @@ public final class VMath {
   /**
    * Returns a quadratic Matrix consisting of zeros and of the given values on
    * the diagonal.
-   * 
+   *
    * @param v1 the values on the diagonal
    * @return the resulting matrix
    */
@@ -819,7 +819,7 @@ public final class VMath {
 
   /**
    * Make a deep copy of a matrix.
-   * 
+   *
    * @param m1 Input matrix
    * @return a new matrix containing the same values as this matrix
    */
@@ -834,7 +834,7 @@ public final class VMath {
 
   /**
    * Make a one-dimensional row packed copy of the internal array.
-   * 
+   *
    * @param m1 Input matrix
    * @return Matrix elements packed in a one-dimensional array by rows.
    */
@@ -850,7 +850,7 @@ public final class VMath {
 
   /**
    * Make a one-dimensional column packed copy of the internal array.
-   * 
+   *
    * @param m1 Input matrix
    * @return Matrix elements packed in a one-dimensional array by columns.
    */
@@ -869,7 +869,7 @@ public final class VMath {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r0 Initial row index
    * @param r1 Final row index (exclusive)
@@ -890,7 +890,7 @@ public final class VMath {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c Array of column indices.
@@ -910,7 +910,7 @@ public final class VMath {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
@@ -930,7 +930,7 @@ public final class VMath {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r0 Initial row index
    * @param r1 Final row index (exclusive)
@@ -954,7 +954,7 @@ public final class VMath {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param m1 Original matrix
    * @param r0 Initial row index
    * @param r1 Final row index (exclusive)
@@ -973,7 +973,7 @@ public final class VMath {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param m1 Original matrix
    * @param r Array of row indices.
    * @param c Array of column indices.
@@ -990,7 +990,7 @@ public final class VMath {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r Array of row indices.
    * @param c0 Initial column index
@@ -1007,7 +1007,7 @@ public final class VMath {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param m1 Input matrix
    * @param r0 Initial row index
    * @param r1 Final row index
@@ -1027,7 +1027,7 @@ public final class VMath {
 
   /**
    * Returns the <code>r</code>th row of this matrix as vector.
-   * 
+   *
    * @param m1 Input matrix
    * @param r the index of the row to be returned
    * @return the <code>r</code>th row of this matrix
@@ -1038,7 +1038,7 @@ public final class VMath {
 
   /**
    * Sets the <code>r</code>th row of this matrix to the specified vector.
-   * 
+   *
    * @param m1 Original matrix
    * @param r the index of the column to be set
    * @param row the value of the column to be set
@@ -1051,7 +1051,7 @@ public final class VMath {
 
   /**
    * Get a column from a matrix as vector.
-   * 
+   *
    * @param m1 Matrix to extract the column from
    * @param col Column number
    * @return Column
@@ -1066,7 +1066,7 @@ public final class VMath {
 
   /**
    * Sets the <code>c</code>th column of this matrix to the specified column.
-   * 
+   *
    * @param m1 Input matrix
    * @param c the index of the column to be set
    * @param column the value of the column to be set
@@ -1080,7 +1080,7 @@ public final class VMath {
 
   /**
    * Matrix transpose
-   * 
+   *
    * @param m1 Input matrix
    * @return m1<sup>T</sup> as copy
    */
@@ -1098,7 +1098,7 @@ public final class VMath {
 
   /**
    * m3 = m1 + m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return m1 + m1 in a new Matrix
@@ -1109,7 +1109,7 @@ public final class VMath {
 
   /**
    * m3 = m1 + s2 * m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @param s2 scalar
@@ -1121,7 +1121,7 @@ public final class VMath {
 
   /**
    * m1 = m1 + m2, overwriting m1
-   * 
+   *
    * @param m1 input matrix
    * @param m2 another matrix
    * @return m1 = m1 + m2
@@ -1140,7 +1140,7 @@ public final class VMath {
 
   /**
    * m1 = m1 + s2 * m2, overwriting m1
-   * 
+   *
    * @param m1 input matrix
    * @param m2 another matrix
    * @param s2 scalar for s2
@@ -1160,7 +1160,7 @@ public final class VMath {
 
   /**
    * m3 = m1 - m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return m1 - m2 in a new matrix
@@ -1171,7 +1171,7 @@ public final class VMath {
 
   /**
    * m3 = m1 - s2 * m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @param s2 Scalar
@@ -1183,7 +1183,7 @@ public final class VMath {
 
   /**
    * m1 = m1 - m2, overwriting m1
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return m1 - m2, overwriting m1
@@ -1201,7 +1201,7 @@ public final class VMath {
 
   /**
    * m1 = m1 - s2 * m2, overwriting m1
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @param s2 Scalar
@@ -1220,7 +1220,7 @@ public final class VMath {
 
   /**
    * Multiply a matrix by a scalar, m3 = s1*m1
-   * 
+   *
    * @param m1 Input matrix
    * @param s1 scalar
    * @return s1*m1, in a new matrix
@@ -1231,7 +1231,7 @@ public final class VMath {
 
   /**
    * Multiply a matrix by a scalar in place, m1 = s1 * m1
-   * 
+   *
    * @param m1 Input matrix
    * @param s1 scalar
    * @return m1 = s1 * m1, overwriting m1
@@ -1249,7 +1249,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1 * m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return Matrix product, m1 * m2
@@ -1282,7 +1282,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1 * v2
-   * 
+   *
    * @param m1 Input matrix
    * @param v2 a vector
    * @return Matrix product, m1 * v2
@@ -1306,7 +1306,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
-   * 
+   *
    * @param m1 Input matrix
    * @param v2 another matrix
    * @return Matrix product, m1<sup>T</sup> * v2
@@ -1328,7 +1328,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1<sup>T</sup> * m2
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return Matrix product, m1<sup>T</sup> * m2
@@ -1358,7 +1358,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
-   * 
+   *
    * @param a vector on the left
    * @param B matrix
    * @param c vector on the right
@@ -1382,7 +1382,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1 * m2^T
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return Matrix product, m1 * m2^T
@@ -1411,7 +1411,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, m1^T * m2^T. Computed as (m2*m1)^T
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @return Matrix product, m1^T * m2^T
@@ -1443,7 +1443,7 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
-   * 
+   *
    * @param B matrix
    * @param a First vector
    * @param c Center vector
@@ -1451,7 +1451,8 @@ public final class VMath {
    */
   @Reference(authors = "P. C. Mahalanobis", //
       title = "On the generalized distance in statistics", //
-      booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)")
+      booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)", //
+      bibkey = "journals/misc/Mahalanobis36")
   public static double mahalanobisDistance(final double[][] B, final double[] a, final double[] c) {
     final int rowdim = B.length, coldim = B[0].length;
     assert rowdim == a.length && rowdim == c.length : ERR_MATRIX_INNERDIM;
@@ -1469,7 +1470,7 @@ public final class VMath {
 
   /**
    * getDiagonal returns array of diagonal-elements.
-   * 
+   *
    * @param m1 Input matrix
    * @return values on the diagonal of the Matrix
    */
@@ -1508,7 +1509,7 @@ public final class VMath {
 
   /**
    * Returns a matrix which consists of this matrix and the specified columns.
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 the columns to be appended
    * @return the new matrix with the appended columns
@@ -1534,7 +1535,7 @@ public final class VMath {
 
   /**
    * Returns an orthonormalization of this matrix.
-   * 
+   *
    * @param m1 Input matrix
    * @return the orthonormalized matrix
    */
@@ -1619,7 +1620,7 @@ public final class VMath {
 
   /**
    * Compute hash code
-   * 
+   *
    * @param m1 Input matrix
    * @return Hash code
    */
@@ -1629,7 +1630,7 @@ public final class VMath {
 
   /**
    * Test for equality
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 Other matrix
    * @return Equality
@@ -1641,7 +1642,7 @@ public final class VMath {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 other matrix to compare with
    * @param maxdelta maximum delta allowed
@@ -1671,7 +1672,7 @@ public final class VMath {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 other matrix to compare with
    * @return almost equals with delta {@link #DELTA}
@@ -1683,7 +1684,7 @@ public final class VMath {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 other matrix to compare with
    * @param maxdelta maximum delta allowed
@@ -1711,7 +1712,7 @@ public final class VMath {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param m1 Input matrix
    * @param m2 other matrix to compare with
    * @return almost equals with delta {@link #DELTA}
@@ -1722,7 +1723,7 @@ public final class VMath {
 
   /**
    * Returns the dimensionality of the rows of this matrix.
-   * 
+   *
    * @param m1 Input matrix
    * @return the number of rows.
    */
@@ -1732,7 +1733,7 @@ public final class VMath {
 
   /**
    * Returns the dimensionality of the columns of this matrix.
-   * 
+   *
    * @param m1 Input matrix
    * @return the number of columns.
    */
@@ -1743,7 +1744,7 @@ public final class VMath {
   /**
    * Compute the cosine of the angle between two vectors,
    * where the smaller angle between those vectors is viewed.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return cosine of the smaller angle

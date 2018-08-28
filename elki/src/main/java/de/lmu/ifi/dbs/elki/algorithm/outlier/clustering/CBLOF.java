@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -65,14 +65,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Cluster-based local outlier factor (CBLOF).
- *
+ * <p>
  * Reference:
  * <p>
- * Z. He, X. Xu, S. Deng:<br />
- * Discovering cluster-based local outliers.<br />
- * In: Pattern Recognition Letters, 2003.
- * </p>
- *
+ * Z. He, X. Xu, S. Deng<br>
+ * Discovering cluster-based local outliers<br>
+ * Pattern Recognition Letters 24(9-10)
+ * <p>
  * Implementation note: this algorithm is hard to implement in a generic
  * fashion, as to support arbitrary clustering algorithms and distances, because
  * it is not trivial to ensure both the clustering algorithm and the outlier
@@ -83,7 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of data objects handled by this algorithm
  */
 @Title("Discovering cluster-based local outliers")
-@Reference(authors = "Z. He, X. Xu, and S. Deng", //
+@Reference(authors = "Z. He, X. Xu, S. Deng", //
     title = "Discovering cluster-based local outliers", //
     booktitle = "Pattern Recognition Letters 24(9-10)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00003-5", //
@@ -217,7 +216,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param distance The distance function
    * @param cblofs CBLOF scores
    * @param cblofMinMax Minimum/maximum score tracker
-   * @param largeClusters Large clusters output 
+   * @param largeClusters Large clusters output
    * @param smallClusters Small clusters output
    */
   private void computeCBLOFs(Relation<O> relation, NumberVectorDistanceFunction<? super O> distance, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {

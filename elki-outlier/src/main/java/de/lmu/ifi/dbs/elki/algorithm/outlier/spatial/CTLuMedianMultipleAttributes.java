@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -51,29 +49,29 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Median Approach is used to discover spatial outliers with multiple
  * attributes.
- * 
  * <p>
- * Reference:<br>
- * Chang-Tien Lu and Dechang Chen and Yufeng Kou:<br>
+ * Reference:
+ * <p>
+ * C.-T. Lu, D. Chen, Y. Kou<br>
  * Detecting Spatial Outliers with Multiple Attributes<br>
- * in 15th IEEE International Conference on Tools with Artificial Intelligence,
- * 2003
- * </p>
- * 
+ * Proc. 15th IEEE Int. Conf. Tools with Artificial Intelligence (TAI 2003)
  * <p>
  * Implementation note: attribute standardization is not used; this is
  * equivalent to using the
  * {@link de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseVarianceNormalization
  * AttributeWiseVarianceNormalization} filter.
- * </p>
- * 
+ *
  * @author Ahmed Hettab
  * @since 0.4.0
- * 
+ *
  * @param <N> Spatial Vector
  * @param <O> Non Spatial Vector
  */
-@Reference(authors = "Chang-Tien Lu and Dechang Chen and Yufeng Kou", title = "Detecting Spatial Outliers with Multiple Attributes", booktitle = "Proc. 15th IEEE International Conference on Tools with Artificial Intelligence, 2003", url = "https://doi.org/10.1109/TAI.2003.1250179")
+@Reference(authors = "C.-T. Lu, D. Chen, Y. Kou", //
+    title = "Detecting Spatial Outliers with Multiple Attributes", //
+    booktitle = "Proc. 15th IEEE Int. Conf. Tools with Artificial Intelligence (TAI 2003)", //
+    url = "https://doi.org/10.1109/TAI.2003.1250179", //
+    bibkey = "DBLP:conf/ictai/LuCK03")
 public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends AbstractNeighborhoodOutlier<N> {
   /**
    * logger

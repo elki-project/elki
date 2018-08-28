@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,21 +53,19 @@ import net.jafama.FastMath;
 
 /**
  * Compute the Gamma Criterion of a data set.
- *
+ * <p>
  * References:
  * <p>
- * F. B. Baker, and L. J. Hubert<br />
- * Measuring the Power of Hierarchical Cluster Analysis<br />
+ * F. B. Baker, L. J. Hubert<br>
+ * Measuring the Power of Hierarchical Cluster Analysis<br>
  * Journal of the American Statistical Association, 70(349)
- * </p>
- *
+ * <p>
  * Tau measures:
  * <p>
- * F. J. Rohlf<br />
- * Methods of comparing classifications<br />
+ * F. J. Rohlf<br>
+ * Methods of comparing classifications<br>
  * Annual Review of Ecology and Systematics
- * </p>
- *
+ * <p>
  * The runtime complexity of this measure is O(n*n*log(n)).
  *
  * @author Stephan Baier
@@ -76,7 +74,7 @@ import net.jafama.FastMath;
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "F. B. Baker, and L. J. Hubert", //
+@Reference(authors = "F. B. Baker, L. J. Hubert", //
     title = "Measuring the Power of Hierarchical Cluster Analysis", //
     booktitle = "Journal of the American Statistical Association, 70(349)", //
     url = "https://doi.org/10.1080/01621459.1975.10480256", //
@@ -192,7 +190,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
     double gamma = (concordantPairs - discordantPairs) / (double) (concordantPairs + discordantPairs);
     double tau = computeTau(concordantPairs, discordantPairs, tt, withinDistances.length, betweenPairs);
-    
+
     // Avoid NaN when everything is in a single cluster:
     gamma = gamma > 0. ? gamma : 0.;
     tau = tau > 0. ? tau : 0.;

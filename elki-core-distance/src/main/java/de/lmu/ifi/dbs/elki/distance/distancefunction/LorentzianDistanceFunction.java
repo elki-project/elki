@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,24 +24,24 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-
 import net.jafama.FastMath;
 
 /**
  * Lorentzian distance function for vector spaces.
- * 
+ * <p>
  * Reference:
  * <p>
- * M.-M. Deza and E. Deza<br />
+ * M.-M. Deza, E. Deza<br>
  * Dictionary of distances
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "M.-M. Deza and E. Deza", //
-title = "Dictionary of distances", //
-booktitle = "Dictionary of distances")
+@Reference(authors = "M.-M. Deza, E. Deza", //
+    title = "Dictionary of distances", //
+    booktitle = "Dictionary of distances", //
+    url = "https://doi.org/10.1007/978-3-642-00234-2", //
+    bibkey = "doi:10.1007/978-3-642-00234-2")
 public class LorentzianDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * Static instance.

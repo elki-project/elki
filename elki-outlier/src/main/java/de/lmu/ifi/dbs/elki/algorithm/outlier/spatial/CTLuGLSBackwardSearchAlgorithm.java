@@ -62,15 +62,12 @@ import net.jafama.FastMath;
 
 /**
  * GLS-Backward Search is a statistical approach to detecting spatial outliers.
- *
  * <p>
- * F. Chen and C.-T. Lu and A. P. Boedihardjo: <br>
+ * F. Chen, C.-T. Lu, A. P. Boedihardjo<br>
  * GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier
- * Detection <br>
- * In Proc. 16th ACM SIGKDD international conference on Knowledge discovery and
- * data mining, 2010
- * </p>
- *
+ * Detection<br>
+ * Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining
+ * <p>
  * Implementation note: this is just the most basic version of this algorithm.
  * The spatial relation must be two dimensional, the set of spatial basis
  * functions is hard-coded (but trivial to enhance) to {1,x,y,x*x,y*y,x*y}, and
@@ -83,7 +80,11 @@ import net.jafama.FastMath;
  * @param <V> Vector type to use for distances
  */
 @Title("GLS-Backward Search")
-@Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining", url = "https://doi.org/10.1145/1835804.1835939")
+@Reference(authors = "F. Chen, C.-T. Lu, A. P. Boedihardjo", //
+    title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", //
+    booktitle = "Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining", //
+    url = "https://doi.org/10.1145/1835804.1835939", //
+    bibkey = "DBLP:conf/kdd/ChenLB10")
 public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -130,7 +131,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
       ProxyView<V> proxy = new ProxyView<>(idview, relationx);
 
-      double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha *.5);
+      double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha * .5);
       // Detect outliers while significant.
       while(true) {
         Pair<DBIDVar, Double> candidate = singleIteration(proxy, relationy);

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,23 +59,22 @@ import net.jafama.FastMath;
 
 /**
  * Locally scaled Density Based Clustering.
- *
+ * <p>
  * This is a variant of DBSCAN which starts with the most dense point first,
  * then expands clusters until density has dropped below a threshold.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Biçici and D. Yuret<br />
- * Locally Scaled Density Based Clustering<br />
+ * E. Biçici, D. Yuret<br>
+ * Locally Scaled Density Based Clustering<br>
  * Adaptive and Natural Computing Algorithms
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
  *
  * @param <O> Object type
  */
-@Reference(authors = "E. Biçici and D. Yuret", //
+@Reference(authors = "E. Biçici, D. Yuret", //
     title = "Locally Scaled Density Based Clustering", //
     booktitle = "Adaptive and Natural Computing Algorithms", //
     url = "https://doi.org/10.1007/978-3-540-71618-1_82", //

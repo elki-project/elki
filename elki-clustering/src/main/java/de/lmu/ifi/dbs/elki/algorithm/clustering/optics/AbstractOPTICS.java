@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
     title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
     url = "https://doi.org/10.1145/304181.304187", //
-    bibkey = "doi:10.1145/304181.304187")
+    bibkey = "DBLP:conf/sigmod/AnkerstBKS99")
 @Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
 public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**

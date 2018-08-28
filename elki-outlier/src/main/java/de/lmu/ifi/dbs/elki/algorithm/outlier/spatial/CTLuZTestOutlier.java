@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,31 +48,34 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * Detect outliers by comparing their attribute value to the mean and standard
  * deviation of their neighborhood.
- * 
  * <p>
- * Reference: <br>
- * S. Shekhar and C.-T. Lu and P. Zhang <br>
+ * Reference:
+ * <p>
+ * S. Shekhar, C.-T. Lu, P. Zhang<br>
  * A Unified Approach to Detecting Spatial Outliers<br>
- * in in GeoInformatica 7-2, 2003.
- * </p>
+ * GeoInformatica 7-2, 2003
  * <p>
- * Description: <br>
+ * Description:
+ * <p>
  * Z-Test Algorithm uses mean to represent the average non-spatial attribute
- * value of neighbors. <br>
+ * value of neighbors.<br>
  * The Difference e = non-spatial-attribute-value - mean (Neighborhood) is
  * computed.<br>
  * The Spatial Objects with the highest standardized e value are Spatial
  * Outliers.
- * </p>
- * 
+ *
  * @author Ahmed Hettab
  * @since 0.4.0
- * 
+ *
  * @param <N> Neighborhood type
  */
 @Title("Z-Test Outlier Detection")
 @Description("Outliers are detected by their z-deviation from the local mean.")
-@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003", url="https://doi.org/10.1023/A:1023455925009")
+@Reference(authors = "S. Shekhar, C.-T. Lu, P. Zhang", //
+    title = "A Unified Approach to Detecting Spatial Outliers", //
+    booktitle = "GeoInformatica 7-2, 2003", //
+    url = "https://doi.org/10.1023/A:1023455925009", //
+    bibkey = "DBLP:journals/geoinformatica/ShekharLZ03")
 public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,14 +35,13 @@ import net.jafama.FastMath;
 
 /**
  * INCOMPLETE implementation of the poisson distribution.
- *
+ * <p>
  * TODO: continue implementing, CDF, invcdf and nextRandom are missing
- *
+ * <p>
  * References:
  * <p>
- * Catherine Loader<br />
+ * Catherine Loader<br>
  * Fast and Accurate Computation of Binomial Probabilities.
- * </p>
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -75,7 +74,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Exact table values for n <= 15 in steps of 0.5
-   *
+   * <p>
    * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
    */
   private static final double[] STIRLING_EXACT_ERROR = { //
@@ -177,7 +176,8 @@ public class PoissonDistribution extends AbstractDistribution {
    */
   @Reference(title = "Fast and accurate computation of binomial probabilities", //
       authors = "C. Loader", booktitle = "", //
-      url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+      url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf", //
+      bibkey = "web/Loader00")
   public static double pmf(double x, int n, double p) {
     // Invalid values
     if(x < 0 || x > n) {
@@ -278,7 +278,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Compute the poisson distribution PDF with an offset of + 1
-   *
+   * <p>
    * pdf(x_plus_1 - 1, lambda)
    *
    * @param x_plus_1 x+1
@@ -302,7 +302,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Compute the poisson distribution PDF with an offset of + 1
-   *
+   * <p>
    * log pdf(x_plus_1 - 1, lambda)
    *
    * @param x_plus_1 x+1
@@ -325,14 +325,17 @@ public class PoissonDistribution extends AbstractDistribution {
   }
 
   /**
-   * Calculates the Striling Error
-   *
+   * Calculates the Stirling Error
+   * <p>
    * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
    *
    * @param n Parameter n
    * @return Stirling error
    */
-  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  @Reference(title = "Fast and accurate computation of binomial probabilities", //
+      authors = "C. Loader", booktitle = "", //
+      url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf", //
+      bibkey = "web/Loader00")
   private static double stirlingError(int n) {
     // Try to use a table value:
     if(n < 16) {
@@ -353,14 +356,17 @@ public class PoissonDistribution extends AbstractDistribution {
   }
 
   /**
-   * Calculates the Striling Error
-   *
+   * Calculates the Stirling Error
+   * <p>
    * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
    *
    * @param n Parameter n
    * @return Stirling error
    */
-  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  @Reference(title = "Fast and accurate computation of binomial probabilities", //
+      authors = "C. Loader", booktitle = "", //
+      url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf", //
+      bibkey = "web/Loader00")
   private static double stirlingError(double n) {
     if(n < 16.0) {
       // Our table has a step size of 0.5
@@ -387,14 +393,17 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Evaluate the deviance term of the saddle point approximation.
-   *
+   * <p>
    * bd0(x,np) = x*ln(x/np)+np-x
    *
    * @param x probability density function position
    * @param np product of trials and success probability: n*p
    * @return Deviance term
    */
-  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  @Reference(title = "Fast and accurate computation of binomial probabilities", //
+      authors = "C. Loader", booktitle = "", //
+      url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf", //
+      bibkey = "web/Loader00")
   private static double devianceTerm(double x, double np) {
     if(Math.abs(x - np) < 0.1 * (x + np)) {
       final double v = (x - np) / (x + np);
@@ -415,7 +424,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson distribution probability, but also for non-integer arguments.
-   *
+   * <p>
    * lb^x exp(-lb) / x!
    *
    * @param x X
@@ -445,7 +454,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson distribution probability, but also for non-integer arguments.
-   *
+   * <p>
    * lb^x exp(-lb) / x!
    *
    * @param x X
@@ -510,14 +519,14 @@ public class PoissonDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       IntParameter nP = new IntParameter(N_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(nP)) {
         n = nP.intValue();
       }
 
       DoubleParameter probP = new DoubleParameter(PROB_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(probP)) {
         p = probP.doubleValue();
       }

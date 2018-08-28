@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,21 +33,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Bulk loading by spatially sorting the objects, then partitioning the sorted
  * list appropriately.
- * 
+ * <p>
  * Based conceptually on:
  * <p>
- * On packing R-trees<br/>
- * Kamel, I. and Faloutsos, C.<br/>
- * Proc. of the second international conference on Information and knowledge
- * management
- * </p>
+ * On packing R-trees<br>
+ * I. Kamel, C. Faloutsos<br>
+ * Proc. 2nd Int. Conf. on Information and Knowledge Management (CIKM)
  * 
- * @apiviz.composedOf SpatialSorter 
+ * @apiviz.composedOf SpatialSorter
  * 
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(title = "On packing R-trees", authors = "Kamel, I. and Faloutsos, C.", booktitle = "Proc. of the second international conference on Information and knowledge management", url = "https://doi.org/10.1145/170088.170403")
+@Reference(authors = "I. Kamel, C. Faloutsos", //
+    title = "On packing R-trees", //
+    booktitle = "Proc. 2nd Int. Conf. on Information and Knowledge Management", //
+    url = "https://doi.org/10.1145/170088.170403", //
+    bibkey = "DBLP:conf/cikm/KamelF93")
 public class SpatialSortBulkSplit extends AbstractBulkSplit {
   /**
    * Sorting class

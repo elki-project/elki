@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Outlier Detection based on the distance of an object to its k nearest
  * neighbor.
- *
+ * <p>
  * This implementation differs from the original pseudocode: the k nearest
  * neighbors do not exclude the point that is currently evaluated. I.e. for k=1
  * the resulting score is the distance to the 1-nearest neighbor that is not the
@@ -62,13 +62,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * of k=1 in the original code does not make sense, as the 1NN distance will be
  * 0 for every point in the database. If you for any reason want to use the
  * original algorithm, subtract 1 from the k parameter.
- *
+ * <p>
  * Reference:
  * <p>
- * S. Ramaswamy, and R. Rastogi, and K. Shim<br />
- * Efficient Algorithms for Mining Outliers from Large Data Sets.<br />
- * In: Proc. Int. Conf. on Management of Data, 2000.
- * </p>
+ * S. Ramaswamy, R. Rastogi, K. Shim<br>
+ * Efficient Algorithms for Mining Outliers from Large Data Sets.<br>
+ * In: Proc. Int. Conf. on Management of Data (SIGMOD 2000)
  *
  * @author Lisa Reichert
  * @since 0.3
@@ -79,9 +78,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
-@Reference(authors = "S. Ramaswamy, and R. Rastogi, and K. Shim", //
+@Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", //
     title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
-    booktitle = "Proc. Int. Conf. on Management of Data, 2000", //
+    booktitle = "Proc. Int. Conf. on Management of Data (SIGMOD 2000)", //
     url = "https://doi.org/10.1145/342009.335437", //
     bibkey = "DBLP:conf/sigmod/RamaswamyRS00")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier", "knno" })

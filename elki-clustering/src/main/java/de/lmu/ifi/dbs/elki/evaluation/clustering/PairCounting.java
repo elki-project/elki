@@ -151,13 +151,13 @@ public class PairCounting {
   /**
    * Computes the pair-counting Fowlkes-mallows (flat only, non-hierarchical!)
    * <p>
-   * E. B. Fowlkes and C. L. Mallows<br>
+   * E. B. Fowlkes, C. L. Mallows<br>
    * A method for comparing two hierarchical clusterings<br>
    * In: Journal of the American Statistical Association, Vol. 78 Issue 383
    *
    * @return pair-counting Fowlkes-mallows
    */
-  @Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
+  @Reference(authors = "E. B. Fowlkes, C. L. Mallows", //
       title = "A method for comparing two hierarchical clusterings", //
       booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
       url = "https://doi.org/10.2307/2288117", //
@@ -188,13 +188,13 @@ public class PairCounting {
   /**
    * Computes the adjusted Rand index (ARI).
    * <p>
-   * L. Hubert and P. Arabie<br>
+   * L. Hubert, P. Arabie<br>
    * Comparing partitions.<br>
    * Journal of Classification 2(193)
    *
    * @return The adjusted Rand index (ARI).
    */
-  @Reference(authors = "L. Hubert and P. Arabie", //
+  @Reference(authors = "L. Hubert, P. Arabie", //
       title = "Comparing partitions", //
       booktitle = "Journal of Classification 2(193)", //
       url = "https://doi.org/10.1007/BF01908075", //
@@ -222,7 +222,7 @@ public class PairCounting {
       title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
       booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
       url = "http://data.rero.ch/01-R241574160", //
-      bibkey = "Jaccard1902")
+      bibkey = "journals/misc/Jaccard1902")
   public double jaccard() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2];
     return pairconfuse[0] / sum;
@@ -234,14 +234,15 @@ public class PairCounting {
    * This is a multiple of the Rand index.
    * <p>
    * B. Mirkin<br>
-   * Mathematical Classification and Clustering
+   * Mathematical Classification and Clustering<br>
+   * Nonconvex Optimization and Its Applications
    * </p>
    *
    * @return The Mirkin index
    */
   @Reference(authors = "B. Mirkin", //
       title = "Mathematical Classification and Clustering", //
-      booktitle = "Mathematical Classification and Clustering", //
+      booktitle = "Nonconvex Optimization and Its Applications", //
       url = "https://doi.org/10.1007/978-1-4613-0457-9", //
       bibkey = "doi:10.1007/978-1-4613-0457-9")
   public long mirkin() {

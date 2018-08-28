@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,23 +28,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Estimate the parameters of a Gumbel Distribution, using the methods of
  * L-Moments (LMM).
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking<br />
- * Fortran routines for use with the method of L-moments Version 3.03<br />
- * IBM Research.
- * </p>
- * 
+ * J. R. M. Hosking<br>
+ * Fortran routines for use with the method of L-moments Version 3.03<br>
+ * IBM Research
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
  * @apiviz.has GumbelDistribution
  */
-@Reference(authors = "J.R.M. Hosking", //
+@Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
-    booktitle = "IBM Research Technical Report")
+    booktitle = "IBM Research Technical Report", //
+    bibkey = "tr/ibm/Hosking00")
 public class GumbelLMMEstimator implements LMMDistributionEstimator<GumbelDistribution> {
   /**
    * Static instance.

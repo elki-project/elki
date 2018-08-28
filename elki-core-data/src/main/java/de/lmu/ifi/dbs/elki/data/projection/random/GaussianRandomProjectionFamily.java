@@ -26,20 +26,19 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Random projections using Cauchy distributions (1-stable).
- *
+ * <p>
  * Reference:
  * <p>
- * M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni<br />
- * Locality-sensitive hashing scheme based on p-stable distributions.<br />
- * In Proc. 20th Symposium on Computational Geometry
- * </p>
+ * M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni<br>
+ * Locality-sensitive hashing scheme based on p-stable distributions.<br>
+ * Proc. 20th Annual Symposium on Computational Geometry
  *
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
+@Reference(authors = "M. Datar, N. Immorlica, P. Indyk, V. S. Mirrokni", //
     title = "Locality-sensitive hashing scheme based on p-stable distributions", //
-    booktitle = "Proc. 20th Symposium on Computational Geometry", //
+    booktitle = "Proc. 20th Annual Symposium on Computational Geometry", //
     url = "https://doi.org/10.1145/997817.997857", //
     bibkey = "DBLP:conf/compgeom/DatarIIM04")
 @Alias("de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily")

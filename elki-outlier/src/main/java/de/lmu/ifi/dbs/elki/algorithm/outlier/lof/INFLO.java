@@ -54,20 +54,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Influence Outliers using Symmetric Relationship (INFLO) using two-way search,
  * is an outlier detection method based on LOF; but also using the reverse kNN.
- *
- * Reference: <br>
  * <p>
- * W. Jin, A. Tung, J. Han, and W. Wang<br />
- * Ranking outliers using symmetric neighborhood relationship<br />
+ * Reference:
+ * <p>
+ * W. Jin, A. Tung, J. Han, W. Wang<br>
+ * Ranking outliers using symmetric neighborhood relationship<br>
  * Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and
  * Data Mining, 2006.
- * </p>
- *
+ * <p>
  * There is an error in the two-way search algorithm proposed in the article
  * above. It does not correctly compute the RNN, but it will find only those RNN
  * that are in the kNN, making the entire RNN computation redundant, as it uses
  * the kNN + RNN later anyway.
- * 
+ * <p>
  * Given the errors in the INFLO paper, as of ELKI 0.8, we do:
  * <ul>
  * <li>Assume \( IS_k(p) := kNN(p) \cup RkNN(p) \)</li>
@@ -85,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
-@Reference(authors = "W. Jin, A. Tung, J. Han, and W. Wang", //
+@Reference(authors = "W. Jin, A. Tung, J. Han, W. Wang", //
     title = "Ranking outliers using symmetric neighborhood relationship", //
     booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1007/11731139_68", //

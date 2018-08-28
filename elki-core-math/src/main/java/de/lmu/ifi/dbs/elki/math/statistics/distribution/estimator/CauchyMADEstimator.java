@@ -38,11 +38,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @apiviz.has CauchyDistribution
  */
-@Reference(title = "Applied Robust Statistics", //
-    authors = "D. J. Olive", //
-    booktitle = "Applied Robust Statistics", //
-    url = "http://lagrange.math.siu.edu/Olive/run.pdf", //
-    bibkey = "Olive08")
+@Reference(authors = "D. J. Olive", //
+    title = "Applied Robust Statistics", booktitle = "", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm", //
+    bibkey = "books/Olive08")
 public class CauchyMADEstimator implements MADDistributionEstimator<CauchyDistribution> {
   /**
    * Static instance.

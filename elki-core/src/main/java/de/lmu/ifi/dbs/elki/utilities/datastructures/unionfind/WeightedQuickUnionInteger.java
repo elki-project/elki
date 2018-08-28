@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,28 +23,29 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.unionfind;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * Union-find algorithm for primitive integers, with optimizations.
- *
+ * <p>
  * This is the weighted quick union approach, weighted by count and using
  * path-halving for optimization.
- *
+ * <p>
  * Reference:
  * <p>
- * R. Sedgewick<br />
- * 1.3 Union-Find Algorithms<br />
+ * R. Sedgewick<br>
+ * 1.3 Union-Find Algorithms<br>
  * Algorithms in C, Parts 1-4
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "R. Sedgewick", //
-title = "1.3 Union-Find Algorithms", //
-booktitle = "Algorithms in C, Parts 1-4")
+    title = "Algorithms in C, Parts 1-4", //
+    booktitle = "", //
+    bibkey = "DBLP:books/daglib/0004943")
 public class WeightedQuickUnionInteger {
   /**
    * Number of used indexes.

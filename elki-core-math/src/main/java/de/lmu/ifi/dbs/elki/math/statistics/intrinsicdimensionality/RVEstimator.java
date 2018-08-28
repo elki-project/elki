@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,20 +27,18 @@ import net.jafama.FastMath;
 
 /**
  * Regularly Varying Functions estimator of the intrinsic dimensionality
- *
+ * <p>
  * Reference:
  * <p>
- * L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K.
- * Kawarabayashi and M. Nett<br />
- * Estimating Local Intrinsic Dimensionality<br />
- * Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining
- * 2015
- * </p>
+ * L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi,
+ * M. Nett<br>
+ * Estimating Local Intrinsic Dimensionality<br>
+ * Proc. SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
  *
  * @author Oussama Chelly
  * @since 0.7.0
  */
-@Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
+@Reference(authors = "L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi, M. Nett", //
     title = "Estimating Local Intrinsic Dimensionality", //
     booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
     url = "https://doi.org/10.1145/2783258.2783405", //

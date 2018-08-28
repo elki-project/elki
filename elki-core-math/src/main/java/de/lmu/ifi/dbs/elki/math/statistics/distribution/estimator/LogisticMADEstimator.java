@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,20 +27,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Estimate Logistic distribution parameters using Median and MAD.
- * 
+ * <p>
  * Reference:
  * <p>
- * Robust Estimators for Transformed Location Scale Families<br />
+ * Robust Estimators for Transformed Location Scale Families<br>
  * D. J. Olive
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has LogisticDistribution
  */
 @Reference(title = "Robust Estimators for Transformed Location Scale Families", //
-    authors = "D. J. Olive", booktitle = "")
+    authors = "D. J. Olive", booktitle = "", //
+    bibkey = "preprints/Olive06")
 public class LogisticMADEstimator implements MADDistributionEstimator<LogisticDistribution> {
   /**
    * Static instance.

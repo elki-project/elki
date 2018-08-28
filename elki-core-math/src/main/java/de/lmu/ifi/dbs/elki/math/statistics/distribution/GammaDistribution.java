@@ -47,10 +47,10 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * LANCZOS-Coefficients for Gamma approximation.
-   * 
+   * <p>
    * These are said to have higher precision than those in "Numerical Recipes".
    * They probably come from
-   * 
+   * <p>
    * Paul Godfrey: http://my.fit.edu/~gabdo/gamma.txt
    */
   static final double[] LANCZOS = { 0.99999999999999709182, 57.156235665862923517, -59.597960355475491248, 14.136097974741747174, -0.49191381609762019978, .33994649984811888699e-4, .46523628927048575665e-4, -.98374475304879564677e-4, .15808870322491248884e-3, -.21026444172410488319e-3, .21743961811521264320e-3, -.16431810653676389022e-3, .84418223983852743293e-4, -.26190838401581408670e-4, .36899182659531622704e-5, };
@@ -254,12 +254,12 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Compute logGamma.
-   * 
+   * <p>
    * Based loosely on "Numerical Recpies" and the work of Paul Godfrey at
    * http://my.fit.edu/~gabdo/gamma.txt
-   * 
+   * <p>
    * TODO: find out which approximation really is the best...
-   * 
+   *
    * @param x Parameter x
    * @return log(&#915;(x))
    */
@@ -279,13 +279,13 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Compute the regular Gamma function.
-   * 
+   * <p>
    * Note: for numerical reasons, it is preferable to use {@link #logGamma} when
    * possible! In particular, this method just computes
    * {@code FastMath.exp(logGamma(x))} anyway.
-   * 
+   * <p>
    * Try to postpone the {@code FastMath.exp} call to preserve numeric range!
-   * 
+   *
    * @param x Position
    * @return Gamma at this position
    */
@@ -295,12 +295,12 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Returns the regularized gamma function P(a, x).
-   * 
+   * <p>
    * Includes the quadrature way of computing.
-   * 
+   * <p>
    * TODO: find "the" most accurate version of this. We seem to agree with
    * others for the first 10+ digits, but diverge a bit later than that.
-   * 
+   *
    * @param a Parameter a
    * @param x Parameter x
    * @return Gamma value
@@ -336,12 +336,12 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Returns the regularized gamma function log P(a, x).
-   * 
+   * <p>
    * Includes the quadrature way of computing.
-   * 
+   * <p>
    * TODO: find "the" most accurate version of this. We seem to agree with
    * others for the first 10+ digits, but diverge a bit later than that.
-   * 
+   *
    * @param a Parameter a
    * @param x Parameter x
    * @return Gamma value
@@ -379,14 +379,14 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Returns the regularized gamma function Q(a, x) = 1 - P(a, x).
-   * 
+   * <p>
    * Includes the continued fraction way of computing, based loosely on the book
    * "Numerical Recipes"; but probably not with the exactly same precision,
    * since we reimplemented this in our coding style, not literally.
-   * 
+   * <p>
    * TODO: find "the" most accurate version of this. We seem to agree with
    * others for the first 10+ digits, but diverge a bit later than that.
-   * 
+   *
    * @param a parameter a
    * @param x parameter x
    * @return Result
@@ -431,19 +431,30 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Generate a random value with the generators parameters.
-   * 
+   * <p>
    * Along the lines of
-   * 
-   * - J.H. Ahrens, U. Dieter (1974): Computer methods for sampling from gamma,
-   * beta, Poisson and binomial distributions, Computing 12, 223-246.
-   * 
-   * - J.H. Ahrens, U. Dieter (1982): Generating gamma variates by a modified
-   * rejection technique, Communications of the ACM 25, 47-54.
-   * 
+   * <p>
+   * J. H. Ahrens, U. Dieter<br>
+   * Computer methods for sampling from gamma, beta, Poisson and binomial
+   * distributions<br>
+   * Computing 12
+   * <p>
+   * J. H. Ahrens, U. Dieter<br>
+   * Generating gamma variates by a modified rejection technique<br>
+   * Communications of the ACM 25
+   *
    * @param k K parameter
    * @param theta Theta parameter
    * @param random Random generator
    */
+  @Reference(authors = "J. H. Ahrens, U. Dieter", //
+      title = "Computer methods for sampling from gamma, beta, Poisson and binomial distributions", //
+      booktitle = "Computing 12", //
+      url = "https://doi.org/10.1007/BF02293108")
+  @Reference(authors = "J. H. Ahrens, U. Dieter", //
+      title = "Generating gamma variates by a modified rejection technique", //
+      booktitle = "Communications of the ACM 25", //
+      url = "https://doi.org/10.1145/358315.358390")
   public static double nextRandom(double k, double theta, Random random) {
     /* Constants */
     final double q1 = 0.0416666664, q2 = 0.0208333723, q3 = 0.0079849875;
@@ -612,22 +623,21 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Approximate probit for chi squared distribution
-   * 
+   * <p>
    * Based on first half of algorithm AS 91
-   * 
+   * <p>
    * Reference:
    * <p>
-   * D.J. Best, D. E. Roberts<br />
-   * Algorithm AS 91: The percentage points of the χ² distribution<br />
+   * D. J. Best, D. E. Roberts<br>
+   * Algorithm AS 91: The percentage points of the χ² distribution<br>
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
-   * </p>
-   * 
+   *
    * @param p Probit value
    * @param nu Shape parameter for Chi, nu = 2 * k
    * @param g log(nu)
    * @return Probit for chi squared
    */
-  @Reference(authors = "D.J. Best, D. E. Roberts", //
+  @Reference(authors = "D. J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
       url = "https://doi.org/10.2307/2347113", //
@@ -696,22 +706,21 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Compute probit (inverse cdf) for Gamma distributions.
-   * 
+   * <p>
    * Based on algorithm AS 91:
-   * 
+   * <p>
    * Reference:
    * <p>
-   * D.J. Best, D. E. Roberts<br />
-   * Algorithm AS 91: The percentage points of the χ² distribution<br />
+   * D. J. Best, D. E. Roberts<br>
+   * Algorithm AS 91: The percentage points of the χ² distribution<br>
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
-   * </p>
-   * 
+   *
    * @param p Probability
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
-  @Reference(authors = "D.J. Best, D. E. Roberts", //
+  @Reference(authors = "D. J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
       url = "https://doi.org/10.2307/2347113", //
@@ -866,16 +875,15 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Compute the Psi / Digamma function
-   * 
+   * <p>
    * Reference:
    * <p>
-   * J. M. Bernando<br />
-   * Algorithm AS 103: Psi (Digamma) Function<br />
+   * J. M. Bernando<br>
+   * Algorithm AS 103: Psi (Digamma) Function<br>
    * Statistical Algorithms
-   * </p>
-   * 
+   * <p>
    * TODO: is there a more accurate version maybe in R?
-   * 
+   *
    * @param x Position
    * @return digamma value
    */
@@ -907,9 +915,9 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Compute the Trigamma function. Based on digamma.
-   * 
+   * <p>
    * TODO: is there a more accurate version maybe in R?
-   * 
+   *
    * @param x Position
    * @return trigamma value
    */
@@ -936,11 +944,11 @@ public class GammaDistribution extends AbstractDistribution {
 
   /**
    * Parameterization class
-   * 
+   * <p>
    * TODO: allow alternate parameterization, with alpha+beta?
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

@@ -152,19 +152,19 @@ public class NormalDistribution extends AbstractDistribution {
   /**
    * Complementary error function for Gaussian distributions = Normal
    * distributions.
-   * 
-   * Based on:<br />
-   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br />
-   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br />
+   * <p>
+   * Based on:<br>
+   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br>
+   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br>
    * "You may use, copy, modify this code for any purpose and without fee."
    * 
    * @param x parameter value
    * @return erfc(x)
    */
   @Reference(authors = "T. Ooura", //
-      title = "Gamma / Error Functions", //
-      booktitle = "Online", //
-      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html")
+      title = "Gamma / Error Functions", booktitle = "", //
+      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html", //
+      bibkey = "web/Ooura96")
   public static double erfc(double x) {
     if(Double.isNaN(x)) {
       return Double.NaN;
@@ -204,7 +204,7 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   /**
-   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
+   * T. Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
    */
   private static final double[] ERF_COEFF1 = { //
       5.958930743e-11, -1.13739022964e-9, //
@@ -244,7 +244,7 @@ public class NormalDistribution extends AbstractDistribution {
       0.49766113250947636708 };
 
   /**
-   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
+   * T. Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
    */
   private static final double[] ERF_COEFF2 = { //
       -2.9734388465e-10, 2.69776334046e-9, //
@@ -328,19 +328,19 @@ public class NormalDistribution extends AbstractDistribution {
 
   /**
    * Inverse error function.
-   * 
-   * Based on:<br />
-   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br />
-   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br />
+   * <p>
+   * Based on:<br>
+   * T. Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br>
+   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br>
    * "You may use, copy, modify this code for any purpose and without fee."
    * 
    * @param y parameter value
    * @return erfcinv(y)
    */
   @Reference(authors = "T. Ooura", //
-      title = "Gamma / Error Functions", //
-      booktitle = "Online", //
-      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html")
+      title = "Gamma / Error Functions", booktitle = "", //
+      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html", //
+      bibkey = "web/Ooura96")
   public static double erfcinv(double y) {
     final double z = (y > 1) ? 2 - y : y;
     final double w = 0.916461398268964 - FastMath.log(z);
@@ -386,10 +386,8 @@ public class NormalDistribution extends AbstractDistribution {
 
   /**
    * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
-   * </pre>
+   * <p>
+   * \[ \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{(x-\mu)^2}{2\sigma^2}) \]
    * 
    * @param x The value.
    * @param mu The mean.
@@ -402,11 +400,9 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   /**
-   * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
-   * </pre>
+   * Log probability density function of the normal distribution.
+   * <p>
+   * \[\log\frac{1}{\sqrt{2\pi}} - \log\sigma - \tfrac{(x-\mu)^2}{2\sigma^2}\]
    * 
    * @param x The value.
    * @param mu The mean.
@@ -419,11 +415,9 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   /**
-   * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
-   * </pre>
+   * Log probability density function of the standard normal distribution.
+   * <p>
+   * \[ \log\frac{1}{\sqrt{2\pi}} -\frac{x^2}{2}) \]
    * 
    * @param x The value.
    * @return PDF of the given normal distribution at x.
@@ -433,11 +427,9 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   /**
-   * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
-   * </pre>
+   * Probability density function of the standard normal distribution.
+   * <p>
+   * \[ \frac{1}{\sqrt{2\pi}} \exp(-\frac{x^2}{2}) \]
    * 
    * @param x The value.
    * @return PDF of the given normal distribution at x.
@@ -448,13 +440,12 @@ public class NormalDistribution extends AbstractDistribution {
 
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * G. Marsaglia<br />
-   * Evaluating the Normal Distribution<br />
+   * G. Marsaglia<br>
+   * Evaluating the Normal Distribution<br>
    * Journal of Statistical Software 11(4)
-   * </p>
    *
    * @param x value to evaluate CDF at
    * @param mu Mean value
@@ -488,14 +479,13 @@ public class NormalDistribution extends AbstractDistribution {
 
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * G. Marsaglia<br />
-   * Evaluating the Normal Distribution<br />
+   * G. Marsaglia<br>
+   * Evaluating the Normal Distribution<br>
    * Journal of Statistical Software 11(4)
-   * </p>
-   * 
+   *
    * @param x value to evaluate CDF at
    * @return The CDF of the given normal distribution at x.
    */

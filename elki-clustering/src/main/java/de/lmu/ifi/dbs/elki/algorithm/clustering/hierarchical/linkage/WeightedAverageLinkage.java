@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "A statistical method for evaluating systematic relationship", //
     booktitle = "University of Kansas science bulletin 28", //
     url = "https://archive.org/details/cbarchive_33927_astatisticalmethodforevaluatin1902", //
-    bibkey = "tr/kansas/SokalM1902")
+    bibkey = "journals/kansas/SokalM1902")
 @Alias({ "wpgma", "WPGMA", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMethod" })
 @Priority(Priority.DEFAULT - 1)
 public class WeightedAverageLinkage implements Linkage {

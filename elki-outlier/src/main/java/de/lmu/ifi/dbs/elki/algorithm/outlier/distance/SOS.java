@@ -238,7 +238,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param perplexity Desired perplexity
    * @return Estimated beta.
    */
-  @Reference(authors = "Erich Schubert and Michael Gertz", //
+  @Reference(authors = "Erich Schubert, Michael Gertz", //
       title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
       booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
       url = "https://doi.org/10.1007/978-3-319-68474-1_13", //

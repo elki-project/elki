@@ -43,35 +43,34 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Eclat is a depth-first discovery algorithm for mining frequent itemsets.
- * 
+ * <p>
  * Eclat discovers frequent itemsets by first transforming the data into a
  * (sparse) column-oriented form, then performing a depth-first traversal of the
  * prefix lattice, stopping traversal when the minimum support is no longer
  * satisfied.
- *
+ * <p>
  * This implementation is the basic algorithm only, and does not use diffsets.
  * Columns are represented using a sparse representation, which theoretically is
  * beneficial when the density is less than 1/31. This corresponds roughly to a
  * minimum support of 3% for 1-itemsets. When searching for itemsets with a
  * larger minimum support, it may be desirable to use a dense bitset
  * representation instead and/or implement an automatic switching technique!
- *
+ * <p>
  * Performance of this implementation is probably surpassed with a low-level C
  * implementation based on SIMD bitset operations as long as support of an
  * itemset is high, which are not easily accessible in Java.
- *
+ * <p>
  * Reference:
  * <p>
- * New Algorithms for Fast Discovery of Association Rules<br />
- * M. J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li<br />
+ * New Algorithms for Fast Discovery of Association Rules<br>
+ * M. J. Zaki, S. Parthasarathy, M. Ogihara, W. Li<br>
  * Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(title = "New Algorithms for Fast Discovery of Association Rules", //
-    authors = "M. J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li", //
+@Reference(authors = "M. J. Zaki, S. Parthasarathy, M. Ogihara, W. Li", //
+    title = "New Algorithms for Fast Discovery of Association Rules", //
     booktitle = "Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php", //
     bibkey = "DBLP:conf/kdd/ZakiPOL97")

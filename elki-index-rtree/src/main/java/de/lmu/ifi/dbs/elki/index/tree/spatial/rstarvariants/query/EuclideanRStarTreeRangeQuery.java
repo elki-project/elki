@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,18 +36,16 @@ import net.jafama.FastMath;
 
 /**
  * Instance of a range query for a particular spatial index.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. Kuan, P. Lewis<br />
- * Fast k nearest neighbour search for R-tree family<br />
- * In Proc. Int. Conf Information, Communications and Signal Processing, ICICS
- * 1997
- * </p>
- * 
+ * J. Kuan, P. Lewis<br>
+ * Fast k nearest neighbour search for R-tree family<br>
+ * Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses EuclideanDistanceFunction
  * @apiviz.uses SquaredEuclideanDistanceFunction
  */

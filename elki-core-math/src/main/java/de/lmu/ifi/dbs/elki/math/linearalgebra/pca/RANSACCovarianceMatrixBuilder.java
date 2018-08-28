@@ -67,8 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <p>
  * Random sample consensus: a paradigm for model fitting with applications to
  * image analysis and automated cartography<br>
- * M.A. Fischler, R.C. Bolles<br>
- * Communications of the ACM, Vol. 24 Issue 6
+ * M. A. Fischler, R. C. Bolles<br>
+ * Communications of the ACM 24(6)
  * 
  * @author Erich Schubert
  * @since 0.5.5
@@ -79,8 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     url = "https://doi.org/10.1109/ICDM.2012.21", //
     bibkey = "DBLP:conf/icdm/KriegelKSZ12")
 @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
-    authors = "M.A. Fischler, R.C. Bolles", //
-    booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
+    authors = "M. A. Fischler, R. C. Bolles", //
+    booktitle = "Communications of the ACM 24(6)", //
     url = "https://doi.org/10.1145/358669.358692", //
     bibkey = "DBLP:journals/cacm/FischlerB81")
 public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {

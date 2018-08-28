@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,13 +39,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Instance of a KNN query for a particular spatial index.
- *
+ * <p>
  * Reference:
  * <p>
- * G. R. Hjaltason, H. Samet<br />
- * Ranking in spatial databases<br />
- * In: 4th Symposium on Advances in Spatial Databases, SSD'95
- * </p>
+ * G. R. Hjaltason, H. Samet<br>
+ * Ranking in spatial databases<br>
+ * 4th Symp. Advances in Spatial Databases (SSD'95)
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -55,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //
-    booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
+    booktitle = "4th Symp. Advances in Spatial Databases (SSD'95)", //
     url = "https://doi.org/10.1007/3-540-60159-7_6", //
     bibkey = "DBLP:conf/ssd/HjaltasonS95")
 public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNQuery<O> {

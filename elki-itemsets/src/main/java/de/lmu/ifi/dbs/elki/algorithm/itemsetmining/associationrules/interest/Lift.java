@@ -27,15 +27,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * <p>
  * Reference:
  * <p>
- * S. Brin, R. Motwani, and C. Silverstein<br>
+ * S. Brin, R. Motwani, C. Silverstein<br>
  * Beyond market baskets: Generalizing association rules to correlations<br>
- * In ACM SIGMOD Record, volume 26
+ * In ACM SIGMOD Record 26
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "S. Brin, R. Motwani, and C. Silverstein", //
+@Reference(authors = "S. Brin, R. Motwani, C. Silverstein", //
     title = "Beyond market baskets: Generalizing association rules to correlations", //
-    booktitle = "ACM SIGMOD Record, volume 26", //
+    booktitle = "ACM SIGMOD Record 26", //
     url = "https://doi.org/10.1145/253260.253327", //
     bibkey = "DBLP:conf/sigmod/BrinMS97")
 public class Lift implements InterestingnessMeasure {

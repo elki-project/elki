@@ -59,11 +59,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * References:
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br>
+ * T. Zhang, R. Ramakrishnan, M. Livny<br>
  * BIRCH: An Efficient Data Clustering Method for Very Large Databases
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br>
+ * T. Zhang, R. Ramakrishnan, M. Livny<br>
  * BIRCH: A New Data Clustering Algorithm and Its Applications<br>
  * Data Min. Knowl. Discovery
  *
@@ -72,12 +72,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf ClusteringFeature
  * @apiviz.has LeafIterator
  */
-@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324", //
     bibkey = "DBLP:conf/sigmod/ZhangRL96")
-@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
     booktitle = "Data Min. Knowl. Discovery", //
     url = "https://doi.org/10.1023/A:1009783824328", //

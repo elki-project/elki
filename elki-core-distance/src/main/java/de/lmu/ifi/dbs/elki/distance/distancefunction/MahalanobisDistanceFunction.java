@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -27,23 +27,22 @@ import net.jafama.FastMath;
 
 /**
  * Mahalanobis quadratic form distance for feature vectors.
- *
+ * <p>
  * For a weight matrix M, this distance is defined as
  * \[ \text{Mahalanobis}_M(\vec{x},\vec{y}) := \sqrt{(\vec{x}-\vec{y})^T * M *
  * (\vec{x}-\vec{y})} \]
- * 
+ * <p>
  * Reference:
  * <p>
- * P. C. Mahalanobis<br />
- * On the generalized distance in statistics<br />
+ * P. C. Mahalanobis<br>
+ * On the generalized distance in statistics<br>
  * Proceedings of the National Institute of Sciences of India. 2 (1)
- * </p>
- * 
+ * <p>
  * This is the implementation as quadratic form distance function. In many cases
  * it will be more convenient to use the static function
  * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.VMath#mahalanobisDistance}
  * instead.
- * 
+ * <p>
  * TODO: Add a factory with parameterizable weight matrix! Right now, this can
  * only be used from Java and from subclasses, not from command line or MiniGUI.
  *
@@ -51,7 +50,8 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "P. C. Mahalanobis", //
     title = "On the generalized distance in statistics", //
-    booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)")
+    booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)", //
+    bibkey = "journals/misc/Mahalanobis36")
 public class MahalanobisDistanceFunction extends MatrixWeightedQuadraticDistanceFunction {
   /**
    * Constructor.
@@ -66,7 +66,7 @@ public class MahalanobisDistanceFunction extends MatrixWeightedQuadraticDistance
   public double distance(NumberVector o1, NumberVector o2) {
     return FastMath.sqrt(super.distance(o1, o2));
   }
-  
+
   @Override
   public double norm(NumberVector obj) {
     return Math.sqrt(super.norm(obj));

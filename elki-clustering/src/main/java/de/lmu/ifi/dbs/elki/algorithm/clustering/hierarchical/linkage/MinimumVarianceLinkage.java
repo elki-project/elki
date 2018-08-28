@@ -60,9 +60,8 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-94-009-2432-1_5", //
     bibkey = "doi:10.1007/978-94-009-2432-1_5")
 @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, F. Testu", //
-    title = "Elements d'analyse de donnees", //
-    booktitle = "Elements d'analyse de donnees", //
-    bibkey = "book/misc/DidayLPT85")
+    title = "Elements d'analyse de donnees", booktitle = "", //
+    bibkey = "books/misc/DidayLPT85")
 @Alias({ "variance", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MinimumVarianceLinkageMethod" })
 public class MinimumVarianceLinkage implements Linkage {
   /**

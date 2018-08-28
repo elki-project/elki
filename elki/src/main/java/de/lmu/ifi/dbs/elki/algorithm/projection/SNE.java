@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <p>
  * Reference:
  * <p>
- * G. Hinton and S. Roweis<br>
+ * G. Hinton, S. Roweis<br>
  * Stochastic Neighbor Embedding<br>
  * Advances in Neural Information Processing Systems 15
  * 
@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-@Reference(authors = "G. Hinton and S. Roweis", //
+@Reference(authors = "G. Hinton, S. Roweis", //
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
     url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding", //

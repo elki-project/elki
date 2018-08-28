@@ -25,13 +25,12 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * Class to sort an int array, using a modified quicksort.
- * 
+ * <p>
  * The implementation is closely based on:
  * <p>
- * Dual-Pivot Quicksort<br />
- * Vladimir Yaroslavskiy
- * </p>
- *
+ * Vladimir Yaroslavskiy<br>
+ * Dual-Pivot Quicksort
+ * <p>
  * and differs mostly in that we sort different kinds of arrays, and allow the
  * use of comparators - useful in particular when the array references external
  * objects.
@@ -41,10 +40,10 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
  * 
  * @apiviz.uses IntegerComparator
  */
-@Reference(authors = "Vladimir Yaroslavskiy", //
-    title = "Dual-Pivot Quicksort", //
-    booktitle = "http://iaroslavski.narod.ru/quicksort/", //
-    url = "http://iaroslavski.narod.ru/quicksort/")
+@Reference(authors = "V. Yaroslavskiy", //
+    title = "Dual-Pivot Quicksort", booktitle = "", //
+    url = "http://iaroslavski.narod.ru/quicksort/", //
+    bibkey = "web/Yaroslavskiy09")
 public class IntegerArrayQuickSort {
   /**
    * Private constructor. Static methods only.
@@ -208,7 +207,7 @@ public class IntegerArrayQuickSort {
 
   /**
    * An explicit sort, for the five pivot candidates.
-   *
+   * <p>
    * Note that this <em>must</em> only be used with
    * {@code m1 < m2 < m3 < m4 < m5}.
    *

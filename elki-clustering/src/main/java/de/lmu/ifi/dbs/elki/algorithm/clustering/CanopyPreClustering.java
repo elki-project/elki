@@ -48,24 +48,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Canopy pre-clustering is a simple preprocessing step for clustering.
- * 
+ * <p>
  * Reference:
  * <p>
- * A. McCallum, K. Nigam, L.H. Ungar<br />
+ * A. McCallum, K. Nigam, L. H. Ungar<br>
  * Efficient Clustering of High Dimensional Data Sets with Application to
- * Reference Matching<br />
- * Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data
- * mining
- * </p>
- * 
+ * Reference Matching<br>
+ * Proc. 6th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <O> Object type
  */
-@Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", //
+@Reference(authors = "A. McCallum, K. Nigam, L. H. Ungar", //
     title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
-    booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", //
+    booktitle = "Proc. 6th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/347090.347123", //
     bibkey = "DBLP:conf/kdd/McCallumNU00")
 public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {

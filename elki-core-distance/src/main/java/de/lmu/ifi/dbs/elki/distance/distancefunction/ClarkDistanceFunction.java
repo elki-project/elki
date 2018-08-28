@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,24 +30,25 @@ import net.jafama.FastMath;
 
 /**
  * Clark distance function for vector spaces.
- *
+ * <p>
  * Clark distance is defined as:
  * \[ \text{Clark}(\vec{x},\vec{y}) :=
  * \sqrt{\frac{1}{d}\sum_i \left(\frac{|x_i-y_i|}{|x_i|+|y_i|}\right)^2} \]
- *
+ * <p>
  * Reference:
  * <p>
- * M.-M. Deza and E. Deza<br />
+ * M.-M. Deza, E. Deza<br>
  * Dictionary of distances
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Priority(Priority.RECOMMENDED)
-@Reference(authors = "M.-M. Deza and E. Deza", //
+@Reference(authors = "M.-M. Deza, E. Deza", //
     title = "Dictionary of distances", //
-    booktitle = "Dictionary of distances")
+    booktitle = "Dictionary of distances", //
+    url = "https://doi.org/10.1007/978-3-642-00234-2", //
+    bibkey = "doi:10.1007/978-3-642-00234-2")
 public class ClarkDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.

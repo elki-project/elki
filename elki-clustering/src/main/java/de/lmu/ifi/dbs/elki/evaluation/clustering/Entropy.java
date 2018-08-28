@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,18 +25,17 @@ import net.jafama.FastMath;
 
 /**
  * Entropy based measures.
- * 
+ * <p>
  * References:
  * <p>
- * Meilă, M.<br />
- * Comparing clusterings by the variation of information<br />
+ * M. Meilă<br>
+ * Comparing clusterings by the variation of information<br>
  * Learning theory and kernel machines
- * </p>
- * 
+ *
  * @author Sascha Goldhofer
  * @since 0.5.0
  */
-@Reference(authors = "Meilă, M.", //
+@Reference(authors = "M. Meilă", //
     title = "Comparing clusterings by the variation of information", //
     booktitle = "Learning theory and kernel machines", //
     url = "https://doi.org/10.1007/978-3-540-45167-9_14", //
@@ -228,20 +227,17 @@ public class Entropy {
   /**
    * Get the normalized variation of information (normalized, 0 = equal) NVI = 1
    * - NMI_Joint
-   * 
    * <p>
-   * Nguyen, X. V. and Epps, J. and Bailey, J.<br />
+   * X. V. Nguyen, J. Epps, J. Bailey<br>
    * Information theoretic measures for clusterings comparison: is a correction
-   * for chance necessary?<br />
-   * In: Proc. ICML '09 Proceedings of the 26th Annual International Conference
-   * on Machine Learning
-   * </p>
-   * 
+   * for chance necessary?<br>
+   * Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)
+   *
    * @return Normalized Variation of information
    */
-  @Reference(authors = "Nguyen, X. V. and Epps, J. and Bailey, J.", //
+  @Reference(authors = "X. V. Nguyen, J. Epps, J. Bailey", //
       title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
-      booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", //
+      booktitle = "Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)", //
       url = "https://doi.org/10.1145/1553374.1553511", //
       bibkey = "DBLP:conf/icml/NguyenEB09")
   public double normalizedVariationOfInformation() {

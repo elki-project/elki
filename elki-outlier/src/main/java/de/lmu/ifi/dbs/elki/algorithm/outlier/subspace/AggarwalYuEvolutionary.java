@@ -59,13 +59,12 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 /**
  * Evolutionary variant (EAFOD) of the high-dimensional outlier detection
  * algorithm by Aggarwal and Yu.
- *
+ * <p>
  * Reference:
  * <p>
  * Outlier detection for high dimensional data<br />
- * C.C. Aggarwal, P. S. Yu <br />
+ * C. C. Aggarwal, P. S. Yu <br />
  * Proc. 2001 ACM SIGMOD international conference on Management of data
- * </p>
  *
  * @author Ahmed Hettab
  * @author Erich Schubert
@@ -79,7 +78,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 // TODO: progress logging!
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", //
+@Reference(authors = "C. C. Aggarwal, P. S. Yu", //
     title = "Outlier detection for high dimensional data", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //

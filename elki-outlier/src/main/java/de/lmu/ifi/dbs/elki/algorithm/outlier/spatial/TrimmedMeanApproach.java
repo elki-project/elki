@@ -58,10 +58,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Outliers are defined by their value deviation from a trimmed mean of the
  * neighbors.
  * <p>
- * Reference: <br>
- * Tianming Hu and Sam Yuan Sung<br>
+ * Reference:
+ * <p>
+ * T. Hu, S. Y. Sung<br>
  * A Trimmed Mean Approach to finding Spatial Outliers<br>
- * in Intelligent Data Analysis, Volume 8, 2004.
+ * Intelligent Data Analysis 8
  * <p>
  * the contiguity Matrix is definit as<br>
  * wij = 1/k if j is neighbor of i, k is the neighbors size of i.
@@ -72,9 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("A local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-@Reference(authors = "Tianming Hu and Sam Yuan Sung", //
+@Reference(authors = "T. Hu, S. Y. Sung", //
     title = "A trimmed mean approach to finding spatial outliers", //
-    booktitle = "Intelligent Data Analysis, Volume 8, 2004", //
+    booktitle = "Intelligent Data Analysis 8", //
     url = "http://content.iospress.com/articles/intelligent-data-analysis/ida00153", //
     bibkey = "DBLP:journals/ida/HuS04")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {

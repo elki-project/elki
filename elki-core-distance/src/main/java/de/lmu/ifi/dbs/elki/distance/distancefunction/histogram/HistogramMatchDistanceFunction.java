@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * Reference:
  * <p>
- * L.N. Vaserstein<br>
+ * L. N. Vaserstein<br>
  * Markov processes over denumerable products of spaces describing large systems
  * of automata<br>
  * Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission 5:3
@@ -50,11 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "L.N. Vaserstein", //
+@Reference(authors = "L. N. Vaserstein", //
     title = "Markov processes over denumerable products of spaces describing large systems of automata", //
     booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
     url = "http://mi.mathnet.ru/eng/ppi1811", //
-    bibkey = "journals/misc/Vaserstein1969")
+    bibkey = "journals/misc/Vaserstein69")
 public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!

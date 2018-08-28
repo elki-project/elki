@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,22 +30,22 @@ import net.jafama.FastMath;
 /**
  * Estimate the parameters of a skew Normal Distribution (Hoskin's Generalized
  * Normal Distribution), using the methods of L-Moments (LMM).
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking<br />
- * Fortran routines for use with the method of L-moments Version 3.03<br />
+ * J. R. M. Hosking<br>
+ * Fortran routines for use with the method of L-moments Version 3.03<br>
  * IBM Research.
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
  * @apiviz.has SkewGeneralizedNormalDistribution
  */
-@Reference(authors = "J.R.M. Hosking", //
+@Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
-    booktitle = "IBM Research Technical Report")
+    booktitle = "IBM Research Technical Report", //
+    bibkey = "tr/ibm/Hosking00")
 public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGeneralizedNormalDistribution> {
   /**
    * Static instance.

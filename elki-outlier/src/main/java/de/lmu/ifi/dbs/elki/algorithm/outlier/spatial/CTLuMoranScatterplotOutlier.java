@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,29 +48,34 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * Moran scatterplot outliers, based on the standardized deviation from the
  * local and global means. In contrast to the definition given in the reference,
- * we use this as a ranking outlier detection by not applying the signedness test,
- * but by using the score (- localZ) * (Average localZ of Neighborhood) directly.
+ * we use this as a ranking outlier detection by not applying the signedness
+ * test,
+ * but by using the score (- localZ) * (Average localZ of Neighborhood)
+ * directly.
  * This allows us to differentiate a bit between stronger and weaker outliers.
- * 
  * <p>
- * Reference: <br>
- * S. Shekhar and C.-T. Lu and P. Zhang <br>
- * A Unified Approach to Detecting Spatial Outliers <br>
- * in GeoInformatica 7-2, 2003
- * 
+ * Reference:
+ * <p>
+ * S. Shekhar, C.-T. Lu, P. Zhang<br>
+ * A Unified Approach to Detecting Spatial Outliers<br>
+ * GeoInformatica 7-2, 2003
  * <p>
  * Moran scatterplot is a plot of normalized attribute values against the
  * neighborhood average of normalized attribute values. Spatial Objects on the
  * upper left or lower right are Spatial Outliers.
- * 
+ *
  * @author Ahmed Hettab
  * @since 0.4.0
- * 
+ *
  * @param <N> Neighborhood type
  */
 @Title("Moran Scatterplot Outlier")
 @Description("Spatial Outlier detection based on the standardized deviation from the local means.")
-@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003", url="https://doi.org/10.1023/A:1023455925009")
+@Reference(authors = "S. Shekhar, C.-T. Lu, P. Zhang", //
+    title = "A Unified Approach to Detecting Spatial Outliers", //
+    booktitle = "GeoInformatica 7-2, 2003", //
+    url = "https://doi.org/10.1023/A:1023455925009", //
+    bibkey = "DBLP:journals/geoinformatica/ShekharLZ03")
 public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -130,7 +135,8 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       }
 
       // compute score
-      // Note: in the original moran scatterplot, any object with a score < 0 would be an outlier.
+      // Note: in the original moran scatterplot, any object with a score < 0
+      // would be an outlier.
       final double score = Math.max(-globalZ * localZ, 0);
       minmax.put(score);
       scores.putDouble(iditer, score);

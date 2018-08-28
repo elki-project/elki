@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,15 +53,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- *
- * Compute the PBM of a data set
- *
+ * Compute the PBM index of a clustering
+ * <p>
  * Reference:
  * <p>
- * M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik<br />
- * Validity index for crisp and fuzzy clusters<br />
+ * M. K. Pakhira, S. Bandyopadhyay, U. Maulik<br>
+ * Validity index for crisp and fuzzy clusters<br>
  * Pattern recognition, 37(3)
- * </p>
  *
  * @author Stephan Baier
  * @author Erich Schubert
@@ -69,7 +67,7 @@ import net.jafama.FastMath;
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik", //
+@Reference(authors = "M. K. Pakhira, S. Bandyopadhyay, U. Maulik", //
     title = "Validity index for crisp and fuzzy clusters", //
     booktitle = "Pattern recognition, 37(3)", //
     url = "https://doi.org/10.1016/j.patcog.2003.06.005", //

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,18 +30,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Simple bulk loading strategy by sorting the data along the first dimension.
- * 
+ * <p>
  * This is also known as Nearest-X, and attributed to:
  * <p>
- * Roussopoulos, N. and Leifker, D.:<br />
- * Direct spatial search on pictorial databases using packed R-trees<br />
- * In: ACM SIGMOD Record 14-4
- * </p>
- * 
+ * N. Roussopoulos, D. Leifker<br>
+ * Direct spatial search on pictorial databases using packed R-trees<br>
+ * ACM SIGMOD Record 14-4
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Roussopoulos, N. and Leifker, D.", title = "Direct spatial search on pictorial databases using packed R-trees", booktitle = "ACM SIGMOD Record 14-4", url = "https://doi.org/10.1145/971699.318900")
+@Reference(authors = "N. Roussopoulos, D. Leifker", //
+    title = "Direct spatial search on pictorial databases using packed R-trees", //
+    booktitle = "ACM SIGMOD Record 14-4", //
+    url = "https://doi.org/10.1145/971699.318900", //
+    bibkey = "doi:10.1145/971699.318900")
 public class OneDimSortBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,30 +25,32 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Estimate the L-Moments of a sample.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking, J. R. Wallis, and E. F. Wood<br />
+ * J. R. M. Hosking, J. R. Wallis, E. F. Wood<br>
  * Estimation of the generalized extreme-value distribution by the method of
- * probability-weighted moments.<br />
+ * probability-weighted moments.<br>
  * Technometrics 27.3
- * </p>
- * 
+ * <p>
  * Also based on:
  * <p>
- * J. R. M. Hosking<br />
- * Fortran routines for use with the method of L-moments Version 3.03<br />
+ * J. R. M. Hosking<br>
+ * Fortran routines for use with the method of L-moments Version 3.03<br>
  * IBM Research.
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
+@Reference(authors = "J. R. M. Hosking, J. R. Wallis, E. F. Wood", //
     title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
     booktitle = "Technometrics 27.3", //
     url = "https://doi.org/10.1080/00401706.1985.10488049", //
     bibkey = "doi:10.1080/00401706.1985.10488049")
+@Reference(authors = "J. R. M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report", //
+    bibkey = "tr/ibm/Hosking00")
 public final class ProbabilityWeightedMoments {
   /**
    * Private constructor, use static methods!

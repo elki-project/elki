@@ -34,14 +34,14 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br>
+ * J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi<br>
  * Empirical evaluation of dissimilarity measures for color and texture<br>
  * Proc. 7th IEEE International Conference on Computer Vision
  *
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
+@Reference(authors = "J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi", //
     title = "Empirical evaluation of dissimilarity measures for color and texture", //
     booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
     url = "https://doi.org/10.1109/ICCV.1999.790412", //

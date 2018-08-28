@@ -49,7 +49,7 @@ import net.jafama.FastMath;
     title = "Lognormal distribution and using L-moment method for estimating its parameters", //
     booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", //
     url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf", //
-    bibkey = "journal/naun/Bilkova12")
+    bibkey = "journals/naun/Bilkova12")
 public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<LogNormalDistribution> {
   /**
    * Static instance.

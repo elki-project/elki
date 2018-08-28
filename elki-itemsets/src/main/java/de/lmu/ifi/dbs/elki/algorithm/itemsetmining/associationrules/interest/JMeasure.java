@@ -30,13 +30,13 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * R. M. Goodman and P. Smyth<br>
+ * R. M. Goodman, P. Smyth<br>
  * Rule induction using information theory<br>
  * Knowledge Discovery in Databases 1991
  * 
  * @author Frederic Sautter
  */
-@Reference(authors = "R. M. Goodman and P. Smyth", //
+@Reference(authors = "R. M. Goodman, P. Smyth", //
     title = "Rule induction using information theory", //
     booktitle = "Knowledge Discovery in Databases 1991", //
     bibkey = "DBLP:books/mit/PF91/SmythG91")

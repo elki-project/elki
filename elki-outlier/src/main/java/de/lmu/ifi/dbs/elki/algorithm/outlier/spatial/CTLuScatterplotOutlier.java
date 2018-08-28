@@ -49,29 +49,30 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * Scatterplot-outlier is a spatial outlier detection method that performs a
  * linear regression of object attributes and their neighbors average value.
- * 
  * <p>
- * Reference: <br>
- * S. Shekhar and C.-T. Lu and P. Zhang <br>
+ * Reference:
+ * <p>
+ * S. Shekhar, C.-T. Lu, P. Zhang<br>
  * A Unified Approach to Detecting Spatial Outliers<br>
- * in in GeoInformatica 7-2, 2003.
- * </p>
- * 
+ * GeoInformatica 7-2, 2003
  * <p>
  * Scatterplot shows attribute values on the X-axis and the average of the
  * attribute values in the neighborhood on the Y-axis. Best fit regression line
  * is used to identify spatial outliers. Vertical difference of a data point
  * tells about outlierness.
- * </p>
- * 
+ *
  * @author Ahmed Hettab
  * @since 0.4.0
- * 
+ *
  * @param <N> Neighborhood object type
  */
 @Title("Scatterplot Spatial Outlier")
 @Description("Spatial Outlier Detection Algorithm using linear regression of attributes and the mean of their neighbors.")
-@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003", url="https://doi.org/10.1023/A:1023455925009")
+@Reference(authors = "S. Shekhar, C.-T. Lu, P. Zhang", //
+    title = "A Unified Approach to Detecting Spatial Outliers", //
+    booktitle = "GeoInformatica 7-2, 2003", //
+    url = "https://doi.org/10.1023/A:1023455925009", //
+    bibkey = "DBLP:journals/geoinformatica/ShekharLZ03")
 public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

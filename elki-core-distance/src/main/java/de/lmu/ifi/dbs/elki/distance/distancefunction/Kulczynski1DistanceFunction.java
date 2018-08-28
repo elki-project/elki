@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,19 +27,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Kulczynski similarity 1, in distance form.
- * 
+ * <p>
  * Reference:
  * <p>
- * M.-M. Deza and E. Deza<br />
+ * M.-M. Deza, E. Deza<br>
  * Dictionary of distances
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "M.-M. Deza and E. Deza", //
+@Reference(authors = "M.-M. Deza, E. Deza", //
     title = "Dictionary of distances", //
-    booktitle = "Dictionary of distances")
+    booktitle = "Dictionary of distances", //
+    url = "https://doi.org/10.1007/978-3-642-00234-2", //
+    bibkey = "doi:10.1007/978-3-642-00234-2")
 public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.

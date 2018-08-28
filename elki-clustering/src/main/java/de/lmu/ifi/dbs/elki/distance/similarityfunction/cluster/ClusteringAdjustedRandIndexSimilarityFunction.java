@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * References:
  * <p>
- * L. Hubert and P. Arabie<br>
+ * L. Hubert, P. Arabie<br>
  * Comparing partitions.<br>
  * Journal of Classification 2(193)
  * <p>
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "L. Hubert and P. Arabie", //
+@Reference(authors = "L. Hubert, P. Arabie", //
     title = "Comparing partitions", //
     booktitle = "Journal of Classification 2(193)", //
     url = "https://doi.org/10.1007/BF01908075", //

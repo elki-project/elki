@@ -64,13 +64,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This algorithm is also known as AGNES (Agglomerative Nesting), where the use
  * of alternative linkage criterions is discussed:
  * <p>
- * L. Kaufman and P. J. Rousseeuw<br>
+ * L. Kaufman, P. J. Rousseeuw<br>
  * Agglomerative Nesting (Program AGNES),<br>
  * in Finding Groups in Data: An Introduction to Cluster Analysis
  * <p>
  * Reference for the unified concept:
  * <p>
- * G. N. Lance and W. T. Williams<br>
+ * G. N. Lance, W. T. Williams<br>
  * A general theory of classificatory sorting strategies 1. Hierarchical
  * systems<br>
  * The computer journal 9.4 (1967): 373-380.
@@ -89,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-@Reference(authors = "L. Kaufman and P. J. Rousseeuw", //
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
     title = "Agglomerative Nesting (Program AGNES)", //
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch5", //
@@ -99,6 +99,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of general microbiology, 17(1)", //
     url = "https://doi.org/10.1099/00221287-17-1-201", //
     bibkey = "doi:10.1099/00221287-17-1-201")
+@Reference(authors = "R. M. Cormack", //
+    title = "A Review of Classification", //
+    booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
+    url = "https://doi.org/10.2307/2344237", //
+    bibkey = "doi:10.2307/2344237")
 @Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
 public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {

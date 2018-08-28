@@ -47,23 +47,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Extraction of a given number of clusters with a minimum size, and noise.
- *
+ * <p>
  * This will execute the highest-most cut where we retain k clusters, each with
  * a minimum size, plus noise (single points that would only merge afterwards).
  * If no such cut can be found, it returns a result with a relaxed k.
- * 
+ * <p>
  * You need to specify: A) the minimum size of a cluster (it does not make much
  * sense to use 1 - then it will simply execute all but the last k merges) and
  * B) the desired number of clusters with at least minSize elements each.
- *
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert and Michael Gertz<br />
+ * Erich Schubert, Michael Gertz<br>
  * Semantic Word Clouds with Background Corpus Normalization and t-distributed
- * Stochastic Neighbor Embedding<br />
+ * Stochastic Neighbor Embedding<br>
  * ArXiV preprint, 1708.03569
- * </p>
- * 
+ * <p>
  * TODO: Also provide representatives and last merge height for clusters.
  *
  * @author Erich Schubert
@@ -71,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
-@Reference(authors = "Erich Schubert and Michael Gertz", //
+@Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Semantic Word Clouds with Background Corpus Normalization and t-distributed Stochastic Neighbor Embedding", //
     booktitle = "ArXiV preprint, 1708.03569", //
     url = "http://arxiv.org/abs/1708.03569", //

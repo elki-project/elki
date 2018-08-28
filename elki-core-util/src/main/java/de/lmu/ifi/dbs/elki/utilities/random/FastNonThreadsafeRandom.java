@@ -149,7 +149,7 @@ public class FastNonThreadsafeRandom extends Random {
       title = "Fast random shuffling", //
       booktitle = "Daniel Lemire's blog", //
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
-      bibkey = "Lemire")
+      bibkey = "blog/Lemire16")
   public int nextIntRefined(int n) {
     if(n <= 0) {
       throw new IllegalArgumentException(BADBOUND);

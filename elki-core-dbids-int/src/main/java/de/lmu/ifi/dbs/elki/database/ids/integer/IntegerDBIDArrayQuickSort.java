@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,25 +27,24 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Class to sort an integer DBID array, using a modified quicksort.
- * 
+ * <p>
  * Two array iterators will be used to seek to the elements to compare, while
  * the backing storage is a plain integer array.
- * 
+ * <p>
  * The implementation is closely based on:
  * <p>
- * Dual-Pivot Quicksort<br />
- * Vladimir Yaroslavskiy
- * </p>
- * 
+ * V. Yaroslavskiy<br>
+ * Dual-Pivot Quicksort
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @apiviz.uses IntegerArrayDBIDs
  */
-@Reference(authors = "Vladimir Yaroslavskiy", //
-    title = "Dual-Pivot Quicksort", //
-    booktitle = "http://iaroslavski.narod.ru/quicksort/", //
-    url = "http://iaroslavski.narod.ru/quicksort/")
+@Reference(authors = "V. Yaroslavskiy", //
+    title = "Dual-Pivot Quicksort", booktitle = "", //
+    url = "http://iaroslavski.narod.ru/quicksort/", //
+    bibkey = "web/Yaroslavskiy09")
 final class IntegerDBIDArrayQuickSort {
   /**
    * Private constructor. Static methods only.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,19 +27,18 @@ import net.jafama.FastMath;
 
 /**
  * Estimator using the weighted average of multiple hill estimators.
- *
+ * <p>
  * Reference:
  * <p>
- * R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm<br />
- * Tail-Index Estimates in Small Samples<br />
+ * R. Huisman, K. G. Koedijk, C. J. M. Kool, F. Palm<br>
+ * Tail-Index Estimates in Small Samples<br>
  * Journal of Business & Economic Statistics
- * </p>
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm", //
+@Reference(authors = "R. Huisman, K. G. Koedijk, C. J. M. Kool, F. Palm", //
     title = "Tail-Index Estimates in Small Samples", //
     booktitle = "Journal of Business & Economic Statistics", //
     url = "https://doi.org/10.1198/073500101316970421", //

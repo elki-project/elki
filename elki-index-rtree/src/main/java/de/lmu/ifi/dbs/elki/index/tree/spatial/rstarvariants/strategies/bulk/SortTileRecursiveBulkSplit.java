@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,19 +34,22 @@ import net.jafama.FastMath;
 /**
  * Sort-Tile-Recursive aims at tiling the data space with a grid-like structure
  * for partitioning the dataset into the required number of buckets.
- * 
+ * <p>
  * Reference:
  * <p>
- * Leutenegger, S.T. and Lopez, M.A. and Edgington, J.:<br />
- * STR: A simple and efficient algorithm for R-tree packing<br />
- * In: Proc. 13th International Conference on Data Engineering, 1997
- * </p>
- * 
+ * S. T. Leutenegger, M. A. Lopez, J. Edgington<br>
+ * STR: A simple and efficient algorithm for R-tree packing<br>
+ * Proc. 13th International Conference on Data Engineering (ICDE 1997)
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Leutenegger, S.T. and Lopez, M.A. and Edgington, J.", title = "STR: A simple and efficient algorithm for R-tree packing", booktitle = "Proc. 13th International Conference on Data Engineering, 1997", url = "https://doi.org/10.1109/ICDE.1997.582015")
-@Alias({"str", "STR"})
+@Reference(authors = "S. T. Leutenegger, M. A. Lopez, J. Edgington", //
+    title = "STR: A simple and efficient algorithm for R-tree packing", //
+    booktitle = "Proc. 13th International Conference on Data Engineering (ICDE 1997)", //
+    url = "https://doi.org/10.1109/ICDE.1997.582015", //
+    bibkey = "DBLP:conf/icde/LeuteneggerEL97")
+@Alias({ "str", "STR" })
 public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance.
@@ -80,18 +83,19 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
     final int s = (int) FastMath.ceil(FastMath.pow(p, 1.0 / (dims - depth)));
 
     final double len = end - start; // double intentional!
-    for (int i = 0; i < s; i++) {
+    for(int i = 0; i < s; i++) {
       // We don't completely sort, but only ensure the quantile is invariant.
       int s2 = start + (int) ((i * len) / s);
       int e2 = start + (int) (((i + 1) * len) / s);
       // LoggingUtil.warning("STR " + dim + " s2:" + s2 + " e2:" + e2);
-      if (e2 < end) {
+      if(e2 < end) {
         c.setDimension(depth);
         QuickSelect.quickSelect(objs, c, s2, end, e2);
       }
-      if (depth + 1 == dims) {
+      if(depth + 1 == dims) {
         ret.add(objs.subList(s2, e2));
-      } else {
+      }
+      else {
         // Descend
         strPartition(objs, s2, e2, depth + 1, dims, maxEntries, c, ret);
       }

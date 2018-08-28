@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,38 +27,42 @@ import net.jafama.FastMath;
 
 /**
  * Zipf estimator (qq-estimator) of the intrinsic dimensionality.
- *
+ * <p>
  * Unfortunately, this estimator appears to have a bias. We have empirically
  * modified the plot position such that bias is reduced, but could not find the
  * proper way of removing this bias for small samples.
- *
+ * <p>
  * References:
  * <p>
- * M. Kratz and S. I. Resnick<br />
- * The QQ-estimator and heavy tails.<br />
- * Stochastic Models, 12(4), 699-724.
- * </p>
- *
+ * M. Kratz, S. I. Resnick<br>
+ * The QQ-estimator and heavy tails<br>
+ * Communications in Statistics. Stochastic Models 12(4)
  * <p>
- * J. Schultze and J. Steinebach<br />
- * On Least Squares Estimates of an Exponential Tail Coefficient<br />
- * Statistics & Risk Modeling. Band 14, Heft 4
- * </p>
- *
+ * J. Schultze, J. Steinebach<br>
+ * On Least Squares Estimates of an Exponential Tail Coefficient<br>
+ * Statistics & Risk Modeling 14(4)
  * <p>
- * J. Beirlant and G. Dierckx and A. Guillou<br />
- * Estimation of the extreme-value index and generalized quantile plots.<br />
- * Bernoulli, 11(6), 949-970.
- * </p>
+ * J. Beirlant, G. Dierckx, A. Guillou<br>
+ * Estimation of the extreme-value index and generalized quantile plots<br>
+ * Bernoulli 11(6)
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "M. Kratz and S. I. Resnick", //
+@Reference(authors = "M. Kratz, S. I. Resnick", //
+    title = "The QQ-estimator and heavy tails", //
+    booktitle = "Communications in Statistics. Stochastic Models 12(4)", //
+    url = "https://doi.org/10.1080/15326349608807407", //
+    bibkey = "doi:10.1080/15326349608807407")
+@Reference(authors = "J. Schultze, J. Steinebach", //
     title = "On Least Squares Estimates of an Exponential Tail Coefficient", //
-    booktitle = "Statistics & Risk Modeling. Band 14, Heft 4", //
+    booktitle = "Statistics & Risk Modeling 14(4)", //
     url = "https://doi.org/10.1524/strm.1996.14.4.353", //
     bibkey = "doi:10.1524/strm.1996.14.4.353")
+@Reference(authors = "J. Beirlant, G. Dierckx, A. Guillou", //
+    title = "Estimation of the extreme-value index and generalized quantile plots", //
+    booktitle = "Bernoulli 11(6)", //
+    url = "https://doi.org/10.3150/bj/1137421635")
 public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

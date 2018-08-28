@@ -39,26 +39,23 @@ import net.jafama.DoubleWrapper;
 
 /**
  * Class with utility functions for distance computations on the sphere.
- * 
+ * <p>
  * Note: the formulas are usually implemented for the unit sphere.
- * 
+ * <p>
  * The majority of formulas are adapted from:
  * <p>
- * E. Williams<br />
- * Aviation Formulary<br />
- * Online: http://williams.best.vwh.net/avform.htm
- * </p>
- * 
- * TODO: add ellipsoid version of Vinentry formula.
+ * E. Williams<br>
+ * Aviation Formulary<br>
+ * Online: http://www.edwilliams.org/avform.htm
  * 
  * @author Erich Schubert
  * @author Niels Dörre
  * @since 0.5.5
  */
 @Reference(authors = "E. Williams", //
-    title = "Aviation Formulary", //
-    booktitle = "", //
-    url = "http://williams.best.vwh.net/avform.htm")
+    title = "Aviation Formulary", booktitle = "", //
+    url = "http://www.edwilliams.org/avform.htm", //
+    bibkey = "web/Williams11")
 public final class SphereUtil {
   /**
    * Maximum number of iterations.
@@ -85,15 +82,14 @@ public final class SphereUtil {
   /**
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
-   * 
+   * <p>
    * Complexity: 6 trigonometric functions.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * R. W. Sinnott,<br/>
-   * Virtues of the Haversine<br />
-   * Sky and telescope, 68-2, 1984
-   * </p>
+   * R. W. Sinnott,<br>
+   * Virtues of the Haversine<br>
+   * Sky and Telescope 68(2)
    * 
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -108,16 +104,15 @@ public final class SphereUtil {
   /**
    * Compute the approximate great-circle distance of two points using the
    * Spherical law of cosines.
-   * 
+   * <p>
    * Complexity: 6 trigonometric functions. Note that acos
    * is rather expensive apparently - roughly atan + sqrt.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * R. W. Sinnott,<br/>
-   * Virtues of the Haversine<br />
-   * Sky and telescope, 68-2, 1984
-   * </p>
+   * R. W. Sinnott,<br>
+   * Virtues of the Haversine<br>
+   * Sky and Telescope 68(2)
    * 
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -139,15 +134,14 @@ public final class SphereUtil {
   /**
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
-   * 
+   * <p>
    * Complexity: 5 trigonometric functions, 1 sqrt.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * R. W. Sinnott,<br/>
-   * Virtues of the Haversine<br />
-   * Sky and telescope, 68-2, 1984
-   * </p>
+   * R. W. Sinnott,<br>
+   * Virtues of the Haversine<br>
+   * Sky and Telescope 68(2)
    * 
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -155,9 +149,6 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance on unit sphere
    */
-  @Reference(authors = "R. W. Sinnott", //
-      title = "Virtues of the Haversine", //
-      booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
     return haversineFormulaRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
@@ -165,15 +156,14 @@ public final class SphereUtil {
   /**
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
-   *
+   * <p>
    * Complexity: 5 trigonometric functions, 1-2 sqrt.
-   *
+   * <p>
    * Reference:
    * <p>
-   * R. W. Sinnott,<br/>
-   * Virtues of the Haversine<br />
-   * Sky and telescope, 68-2, 1984
-   * </p>
+   * R. W. Sinnott,<br>
+   * Virtues of the Haversine<br>
+   * Sky and Telescope 68(2)
    *
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -183,7 +173,8 @@ public final class SphereUtil {
    */
   @Reference(authors = "R. W. Sinnott", //
       title = "Virtues of the Haversine", //
-      booktitle = "Sky and telescope, 68-2, 1984")
+      booktitle = "Sky and Telescope 68(2)", //
+      bibkey = "journals/skytelesc/Sinnott84")
   public static double haversineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
     if(lat1 == lat2 && lon1 == lon2) {
       return 0.;
@@ -212,7 +203,7 @@ public final class SphereUtil {
 
   /**
    * Use cosine or haversine dynamically.
-   *
+   * <p>
    * Complexity: 4-5 trigonometric functions, 1 sqrt.
    *
    * @param lat1 Latitude of first point in degree
@@ -244,16 +235,15 @@ public final class SphereUtil {
    * 
    * Uses Vincenty's Formula for the spherical case, which does not require
    * iterations.
-   * 
+   * <p>
    * Complexity: 7 trigonometric functions, 1 sqrt.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * T. Vincenty<br />
+   * T. Vincenty<br>
    * Direct and inverse solutions of geodesics on the ellipsoid with application
-   * of nested equations<br />
-   * Survey review 23 176, 1975
-   * </p>
+   * of nested equations<br>
+   * Survey Review 23:176, 1975
    * 
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -261,10 +251,6 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance in radians / on unit sphere.
    */
-  @Reference(authors = "T. Vincenty", //
-      title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", //
-      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
     return sphericalVincentyFormulaRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
@@ -274,16 +260,15 @@ public final class SphereUtil {
    * 
    * Uses Vincenty's Formula for the spherical case, which does not require
    * iterations.
-   * 
+   * <p>
    * Complexity: 7 trigonometric functions, 1 sqrt.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * T. Vincenty<br />
+   * T. Vincenty<br>
    * Direct and inverse solutions of geodesics on the ellipsoid with application
-   * of nested equations<br />
+   * of nested equations<br>
    * Survey review 23 176, 1975
-   * </p>
    * 
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
@@ -293,8 +278,9 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", //
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", //
-      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+      booktitle = "Survey Review 23:176", //
+      url = "https://doi.org/10.1179/sre.1975.23.176.88", //
+      bibkey = "doi:10.1179/sre.1975.23.176.88")
   public static double sphericalVincentyFormulaRad(double lat1, double lon1, double lat2, double lon2) {
     // Half delta longitude.
     final double dlnh = (lon1 > lon2) ? (lon1 - lon2) : (lon2 - lon1);
@@ -311,14 +297,13 @@ public final class SphereUtil {
 
   /**
    * Compute the approximate great-circle distance of two points.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * T. Vincenty<br />
+   * T. Vincenty<br>
    * Direct and inverse solutions of geodesics on the ellipsoid with application
-   * of nested equations<br />
+   * of nested equations<br>
    * Survey review 23 176, 1975
-   * </p>
    * 
    * @param f Ellipsoid flattening
    * @param lat1 Latitude of first point in degree
@@ -327,24 +312,19 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance for a minor axis of 1.
    */
-  @Reference(authors = "T. Vincenty", //
-      title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", //
-      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double ellipsoidVincentyFormulaDeg(double f, double lat1, double lon1, double lat2, double lon2) {
     return ellipsoidVincentyFormulaRad(f, deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
 
   /**
    * Compute the approximate great-circle distance of two points.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * T. Vincenty<br />
+   * T. Vincenty<br>
    * Direct and inverse solutions of geodesics on the ellipsoid with application
-   * of nested equations<br />
+   * of nested equations<br>
    * Survey review 23 176, 1975
-   * </p>
    * 
    * @param f Ellipsoid flattening
    * @param lat1 Latitude of first point in degree
@@ -355,7 +335,9 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", //
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+      booktitle = "Survey Review 23:176", //
+      url = "https://doi.org/10.1179/sre.1975.23.176.88", //
+      bibkey = "doi:10.1179/sre.1975.23.176.88")
   public static double ellipsoidVincentyFormulaRad(double f, double lat1, double lon1, double lat2, double lon2) {
     final double dlon = (lon2 >= lon1) ? (lon2 - lon1) : (lon1 - lon2);
     final double onemf = 1 - f; // = 1 - (a-b)/a = b/a
@@ -423,7 +405,7 @@ public final class SphereUtil {
 
   /**
    * Compute the cross-track distance.
-   * 
+   * <p>
    * XTD = asin(sin(dist_1Q)*sin(crs_1Q-crs_12))
    * 
    * @param lat1 Latitude of starting point.
@@ -499,7 +481,7 @@ public final class SphereUtil {
 
   /**
    * Compute the cross-track distance.
-   * 
+   * <p>
    * XTD = asin(sin(dist_SQ)*sin(crs_SQ-crs_SE))
    * 
    * @param lat1 Latitude of starting point.
@@ -549,12 +531,10 @@ public final class SphereUtil {
   }
 
   /**
-   * The along track distance, is the distance from S to Q along the track S to
-   * E.
-   * 
+   * The along track distance is the distance from S to Q along the track from
+   * S to E.
+   * <p>
    * ATD=acos(cos(dist_1Q)/cos(XTD))
-   * 
-   * TODO: optimize.
    * 
    * @param lat1 Latitude of starting point.
    * @param lon1 Longitude of starting point.
@@ -570,11 +550,11 @@ public final class SphereUtil {
   }
 
   /**
-   * The along track distance, is the distance from S to Q along the track S to
-   * E.
-   * 
+   * The along track distance is the distance from S to Q along the track from
+   * S to E.
+   * <p>
    * ATD=acos(cos(dist_1Q)/cos(XTD))
-   * 
+   * <p>
    * TODO: optimize.
    * 
    * @param lat1 Latitude of starting point in radians.
@@ -594,9 +574,9 @@ public final class SphereUtil {
   }
 
   /**
-   * The along track distance, is the distance from S to Q along the track S to
-   * E.
-   * 
+   * The along track distance is the distance from S to Q along the track from
+   * S to E.
+   * <p>
    * ATD=acos(cos(dist_SQ)/cos(XTD))
    * 
    * @param lat1 Latitude of starting point.
@@ -643,20 +623,19 @@ public final class SphereUtil {
 
   /**
    * Point to rectangle minimum distance.
-   * 
+   * <p>
    * Complexity:
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
    * <li>Cross-track case: 10+2 trig</li>
    * <li>Corner case: 10+3 trig, 1 sqrt</li>
    * </ul>
-   * 
+   * <p>
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
-   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br>
    * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
-   * </p>
    * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.
@@ -666,7 +645,7 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians.
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
       title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
       booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
       url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
@@ -677,23 +656,22 @@ public final class SphereUtil {
 
   /**
    * Point to rectangle minimum distance.
-   * 
+   * <p>
    * Complexity:
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
    * <li>Corner case: 3/4 trig + 4-5 trig, 1 sqrt</li>
    * <li>Cross-track case: 4+2 trig</li>
    * </ul>
-   * 
+   * <p>
    * <b>Important:</b> Rectangles must be in -pi:+pi, and must have min &lt;
    * max, so they cannot cross the date line.
-   * 
+   * <p>
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
-   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br>
    * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
-   * </p>
    * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.
@@ -752,22 +730,21 @@ public final class SphereUtil {
 
   /**
    * Point to rectangle minimum distance.
-   * 
+   * <p>
    * Previous version, only around for reference.
-   * 
+   * <p>
    * Complexity:
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
    * <li>Cross-track case: 10+2 trig</li>
    * <li>Corner case: 10+3 trig, 1 sqrt</li>
    * </ul>
-   * 
+   * <p>
    * Reference:
    * <p>
-   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
-   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br>
    * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
-   * </p>
    * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.

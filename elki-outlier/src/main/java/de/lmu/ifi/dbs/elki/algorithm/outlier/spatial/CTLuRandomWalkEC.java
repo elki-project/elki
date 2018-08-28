@@ -56,17 +56,16 @@ import net.jafama.FastMath;
 
 /**
  * Spatial outlier detection based on random walks.
- *
+ * <p>
  * Note: this method can only handle one-dimensional data, but could probably be
  * easily extended to higher dimensional data by using an distance function
  * instead of the absolute difference.
- *
+ * <p>
  * Reference:
  * <p>
- * X. Liu and C.-T. Lu and F. Chen:<br>
- * Spatial outlier detection: random walk based approaches,<br>
- * in Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems
- * </p>
+ * X. Liu, C.-T. Lu, F. Chen<br>
+ * Spatial outlier detection: random walk based approaches<br>
+ * Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems
  *
  * @author Ahmed Hettab
  * @since 0.4.0
@@ -75,7 +74,7 @@ import net.jafama.FastMath;
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
-@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", //
+@Reference(authors = "X. Liu, C.-T. Lu, F. Chen", //
     title = "Spatial outlier detection: random walk based approaches", //
     booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
     url = "https://doi.org/10.1145/1869790.1869841", //

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,13 +54,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 /**
  * Compute the Variance Ratio Criteria of a data set, also known as
  * Calinski-Harabasz index.
- *
+ * <p>
  * Reference:
  * <p>
- * R. B. Calinski and J. Harabasz<br />
- * A dendrite method for cluster analysis<br />
- * Communications in Statistics-theory and Methods, 3(1)
- * </p>
+ * R. B. Calinski, J. Harabasz<br>
+ * A dendrite method for cluster analysis<br>
+ * Communications in Statistics - Theory and Methods 3(1)
  *
  * @author Stephan Baier
  * @author Erich Schubert
@@ -68,14 +67,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "R. B. Calinski and J. Harabasz", //
+@Reference(authors = "R. B. Calinski, J. Harabasz", //
     title = "A dendrite method for cluster analysis", //
-    booktitle = "Communications in Statistics-theory and Methods, 3(1)", //
+    booktitle = "Communications in Statistics - Theory and Methods 3(1)", //
     url = "https://doi.org/10.1080/03610927408827101", //
     bibkey = "doi:10.1080/03610927408827101")
 @Alias({ "calinski-harabasz" })
 public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
-  /**F
+  /**
    * Logger for debug output.
    */
   private static final Logging LOG = Logging.getLogger(EvaluateVarianceRatioCriteria.class);

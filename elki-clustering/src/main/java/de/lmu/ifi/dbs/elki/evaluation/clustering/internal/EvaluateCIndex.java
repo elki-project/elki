@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,17 +54,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the C-index of a data set.
- * 
+ * <p>
  * Note: This requires pairwise distance computations, so it is not recommended
  * to use this on larger data sets.
- *
+ * <p>
  * Reference:
  * <p>
- * L. J. Hubert and J. R. Levin <br />
+ * L. J. Hubert, J. R. Levin<br>
  * A general statistical framework for assessing categorical clustering in free
- * recall<br />
+ * recall<br>
  * Psychological Bulletin, Vol. 83(6)
- * </p>
  *
  * @author Stephan Baier
  * @author Erich Schubert
@@ -72,8 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "L. J. Hubert and J. R. Levin", //
-    title = "A general statistical framework for assessing categorical clustering in free recall.", //
+@Reference(authors = "L. J. Hubert, J. R. Levin", //
+    title = "A general statistical framework for assessing categorical clustering in free recall", //
     booktitle = "Psychological Bulletin, Vol. 83(6)", //
     url = "https://doi.org/10.1037/0033-2909.83.6.1072", //
     bibkey = "doi:10.1037/0033-2909.83.6.1072")

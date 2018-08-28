@@ -58,32 +58,30 @@ import net.jafama.FastMath;
 
 /**
  * PartialVAFile. In-memory only implementation.
- * 
+ * <p>
  * Reference:
  * <p>
- * Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu:<br />
- * Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations
- * <br />
- * in Proc. 18th Int. Conf. on Scientific and Statistical Database Management
- * (SSDBM 06), Wien, Austria, 2006.
- * </p>
- * 
+ * Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu<br>
+ * Efficient Query Processing in Arbitrary Subspaces Using Vector
+ * Approximations<br>
+ * Proc. 18th Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM 06)
+ *
  * @author Thomas Bernecker
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.landmark
- * 
  * @apiviz.composedOf DAFile
  * @apiviz.has PartialVACandidate
  * @apiviz.has PartialVAFileRangeQuery
  * @apiviz.has PartialVAFileKNNQuery
- * 
+ *
  * @param <V> Vector type
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", //
     title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", //
-    booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", //
+    booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06)", //
     url = "https://doi.org/10.1109/SSDBM.2006.23", //
     bibkey = "DBLP:conf/ssdbm/KriegelKSZ06")
 public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {

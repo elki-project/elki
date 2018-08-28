@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,14 +27,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Estimate the parameters of a Gamma Distribution, using the methods of
  * L-Moments (LMM).
- * 
+ * <p>
  * Reference:
  * <p>
- * J. R. M. Hosking<br />
- * Fortran routines for use with the method of L-moments Version 3.03<br />
+ * J. R. M. Hosking<br>
+ * Fortran routines for use with the method of L-moments Version 3.03<br>
  * IBM Research.
- * </p>
- * 
+ * <p>
  * FIXME: Improve estimation of location parameter? Allow disabling?
  * 
  * @author Erich Schubert
@@ -42,9 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has ExponentialDistribution
  */
-@Reference(authors = "J.R.M. Hosking", //
+@Reference(authors = "J. R. M. Hosking", //
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
-    booktitle = "IBM Research Technical Report")
+    booktitle = "IBM Research Technical Report", //
+    bibkey = "tr/ibm/Hosking00")
 public class ExponentialLMMEstimator implements LMMDistributionEstimator<ExponentialDistribution> {
   /**
    * Static instance.

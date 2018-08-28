@@ -55,30 +55,29 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * CLARANS: a method for clustering objects for spatial data mining
  * is inspired by PAM (partitioning around medoids, {@link KMedoidsPAM})
  * and CLARA and also based on sampling.
- *
+ * <p>
  * This implementation tries to balance memory and computation time.
  * By caching the distances to the two nearest medoids, we usually only need
  * O(n) instead of O(nk) distance computations for one iteration, at
  * the cost of needing O(2n) memory to store them.
- *
+ * <p>
  * The implementation is fairly ugly, because we have three solutions (the best
  * found so far, the current solution, and a neighbor candidate); and for each
  * point in each solution we need the best and second best assignments. But with
  * Java 11, we may be able to switch to value types that would clean this code
  * significantly, without the overhead of O(n) objects.
- *
+ * <p>
  * Reference:
  * <p>
- * R. T. Ng and J. Han<br />
- * CLARANS: a method for clustering objects for spatial data mining<br />
+ * R. T. Ng, J. Han<br>
+ * CLARANS: a method for clustering objects for spatial data mining<br>
  * IEEE Transactions on Knowledge and Data Engineering 14(5)
- * </p>
  *
  * @author Erich Schubert
  *
  * @param <V> Vector type
  */
-@Reference(authors = "R. T. Ng and J. Han", //
+@Reference(authors = "R. T. Ng, J. Han", //
     title = "CLARANS: a method for clustering objects for spatial data mining", //
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
     url = "https://doi.org/10.1109/TKDE.2002.1033770", //

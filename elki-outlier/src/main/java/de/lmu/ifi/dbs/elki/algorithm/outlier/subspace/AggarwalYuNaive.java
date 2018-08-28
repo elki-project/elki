@@ -46,16 +46,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * BruteForce variant of the high-dimensional outlier detection algorithm by
  * Aggarwal and Yu.
- * 
+ * <p>
  * The evolutionary approach is implemented as
  * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuEvolutionary}
- * 
+ * <p>
  * Reference:
  * <p>
- * Outlier detection for high dimensional data<br />
- * C.C. Aggarwal, P. S. Yu <br />
+ * Outlier detection for high dimensional data<br>
+ * C. C. Aggarwal, P. S. Yu <br>
  * Proc. 2001 ACM SIGMOD international conference on Management of data
- * </p>
  * 
  * @author Ahmed Hettab
  * @author Erich Schubert
@@ -66,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 // TODO: progress logging!
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", //
+@Reference(authors = "C. C. Aggarwal, P. S. Yu", //
     title = "Outlier detection for high dimensional data", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //

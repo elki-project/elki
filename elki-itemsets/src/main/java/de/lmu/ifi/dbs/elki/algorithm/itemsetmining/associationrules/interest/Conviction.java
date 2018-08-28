@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,18 +23,17 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Conviction interestingness measure: P(X) P(notY) / P(X, notY)
- * 
+ * Conviction interestingness measure: \(\frac{P(X) P(\neg Y)}{P(X, \neg Y)}\)
+ * <p>
  * Reference:
  * <p>
- * S. Brin, R. Motwani, J. D Ullman, and S Tsur<br />
- * Dynamic itemset counting and implication rules for market basket data<br />
+ * S. Brin, R. Motwani, J. D Ullman, S Tsur<br>
+ * Dynamic itemset counting and implication rules for market basket data<br>
  * In Proc. 1997 ACM SIGMOD international conference on management of data
- * </p>
- * 
+ *
  * @author Frederic Sautter
  */
-@Reference(authors = "S. Brin, R. Motwani, J. D Ullman, and S Tsur", //
+@Reference(authors = "S. Brin, R. Motwani, J. D Ullman, S Tsur", //
     title = "Dynamic itemset counting and implication rules for market basket data", //
     booktitle = "Proc. 1997 ACM SIGMOD international conference on management of data", //
     url = "https://doi.org/10.1145/253260.253325", //

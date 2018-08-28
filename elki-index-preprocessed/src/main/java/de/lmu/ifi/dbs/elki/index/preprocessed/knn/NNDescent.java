@@ -46,20 +46,19 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * NN-desent (also known as KNNGraph) is an approximate nearest neighbor search
  * algorithm beginning with a random sample, then iteratively refining this
  * sample until.
- * 
+ * <p>
  * Reference:
  * <p>
- * W. Dong and C. Moses and K. Li<br />
+ * W. Dong and C. Moses and K. Li<br>
  * Efficient k-nearest neighbor graph construction for generic similarity
- * measures<br />
- * In Proc. 20th Int. Conf. on World Wide Web (WWW'11)
- * </p>
+ * measures<br>
+ * Proc. 20th Int. Conf. on World Wide Web (WWW'11)
  *
  * @author Evelyn Kirner
  *
  * @param <O> Object type
  */
-@Reference(authors = "W. Dong and C. Moses and K. Li", //
+@Reference(authors = "W. Dong, C. Moses, K. Li", //
     title = "Efficient k-nearest neighbor graph construction for generic similarity measures", //
     booktitle = "Proc. 20th Int. Conf. on World Wide Web (WWW'11)", //
     url = "https://doi.org/10.1145/1963405.1963487", //

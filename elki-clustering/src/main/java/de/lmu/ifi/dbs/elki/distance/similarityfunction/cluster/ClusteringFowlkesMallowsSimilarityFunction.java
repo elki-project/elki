@@ -35,14 +35,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * Reference:
  * <p>
- * E. B. Fowlkes and C. L. Mallows<br>
+ * E. B. Fowlkes, C. L. Mallows<br>
  * A method for comparing two hierarchical clusterings<br>
  * In: Journal of the American Statistical Association, Vol. 78 Issue 383
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "E. B. Fowlkes and C. L. Mallows", //
+@Reference(authors = "E. B. Fowlkes, C. L. Mallows", //
     title = "A method for comparing two hierarchical clusterings", //
     booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383", //
     url = "https://doi.org/10.2307/2288117", //

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     title = "Mining association rules between sets of items in large databases", //
     booktitle = "Proc. ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/170036.170072", //
-    bibkey = "doi:10.1145/170036.170072")
+    bibkey = "DBLP:conf/sigmod/AgrawalIS93")
 public class Confidence implements InterestingnessMeasure {
   /**
    * Constructor.

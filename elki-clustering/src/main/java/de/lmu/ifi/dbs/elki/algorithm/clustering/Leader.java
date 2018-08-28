@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
     title = "Chapter 3: Quick Partition Algorithms, 3.2 Leader Algorithm", //
     booktitle = "Clustering algorithms", // )
     url = "http://dl.acm.org/citation.cfm?id=540298", //
-    bibkey = "book/wiley/Hartigan75/C3")
+    bibkey = "books/wiley/Hartigan75/C3")
 public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Maximum distance from leading object,

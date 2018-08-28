@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,23 +30,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Distance function for RGB color histograms based on a quadratic form and
  * color similarity.
- * 
+ * <p>
  * This is (unverified) attributed to
  * <p>
- * James Hafner, Harpreet S.Sawhney, Will Equits, Myron Flickner and Wayne
- * Niblack<br />
- * Efficient Color Histogram Indexing for Quadratic Form Distance
- * Functions<br />
- * IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7,
- * July 1995
- * </p>
- * 
+ * J. Hafner, H. S. Sawhney, W. Equits, M. Flickner and W. Niblack<br>
+ * Efficient Color Histogram Indexing for Quadratic Form Distance Functions<br>
+ * IEEE Trans. on Pattern Analysis and Machine Intelligence 17(7)
+ *
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "J. Hafner, H. S.Sawhney, W. Equits, M. Flickner, W. Niblack", //
+@Reference(authors = "J. Hafner, H. S. Sawhney, W. Equits, M. Flickner, W. Niblack", //
     title = "Efficient Color Histogram Indexing for Quadratic Form Distance Functions", //
-    booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995", //
+    booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence 17(7)", //
     url = "https://doi.org/10.1109/34.391417", //
     bibkey = "DBLP:journals/pami/HafnerSEFN95")
 public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadraticDistanceFunction {
@@ -103,6 +99,7 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadrat
      * Parameter for the kernel dimensionality.
      */
     public static final OptionID BPP_ID = new OptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
+
     int bpp = 0;
 
     @Override

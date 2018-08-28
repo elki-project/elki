@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Tan et al. credit Rijsbergen for the use of Jaccard in Information Retrieval
  * (it was not used for association rule mining here):
  * <p>
- * C.J. van Rijsbergen<br>
+ * C. J. van Rijsbergen<br>
  * Information Retrieval, 2nd Edition<br>
  * Butterworths, London, 1979
  *
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     booktitle = "Information Systems 29.4", //
     url = "https://doi.org/10.1016/S0306-4379(03)00072-3", //
     bibkey = "DBLP:journals/is/TanKS04")
-@Reference(authors = "C.J. van Rijsbergen", //
+@Reference(authors = "C. J. van Rijsbergen", //
     title = "Information Retrieval, 2nd Edition", //
     booktitle = "Butterworths, London, 1979", //
     bibkey = "DBLP:books/bu/Rijsbergen79")

@@ -41,9 +41,8 @@ import net.jafama.FastMath;
  *
  * @apiviz.has WeibullDistribution - - estimates
  */
-@Reference(title = "Applied Robust Statistics", //
-    authors = "D. J. Olive", //
-    booktitle = "Applied Robust Statistics", //
+@Reference(authors = "D. J. Olive", //
+    title = "Applied Robust Statistics", booktitle = "", //
     url = "http://lagrange.math.siu.edu/Olive/preprints.htm", //
     bibkey = "books/Olive08")
 public class WeibullLogMADEstimator implements LogMADDistributionEstimator<WeibullDistribution> {

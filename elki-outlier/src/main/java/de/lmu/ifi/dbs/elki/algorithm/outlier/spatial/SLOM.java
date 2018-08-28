@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,14 +46,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * SLOM: a new measure for local spatial outliers
- * 
  * <p>
- * Reference:<br>
- * Sanjay Chawla and Pei Sun<br>
+ * Reference:
+ * <p>
+ * S. Chawla, P. Sun<br>
  * SLOM: a new measure for local spatial outliers<br>
- * in Knowledge and Information Systems 9(4), 412-429, 2006
- * </p>
- * 
+ * Knowledge and Information Systems 9(4)
+ * <p>
  * This implementation works around some corner cases in SLOM, in particular
  * when an object has none or a single neighbor only (albeit the results will
  * still not be too useful then), which will result in divisions by zero.
@@ -66,7 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
-@Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 9(4), 412-429, 2006", url = "https://doi.org/10.1007/s10115-005-0200-2")
+@Reference(authors = "S. Chawla, P. Sun", //
+    title = "SLOM: a new measure for local spatial outliers", //
+    booktitle = "Knowledge and Information Systems 9(4)", //
+    url = "https://doi.org/10.1007/s10115-005-0200-2", //
+    bibkey = "DBLP:journals/kais/ChawlaS06")
 public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
    * The logger for this class.

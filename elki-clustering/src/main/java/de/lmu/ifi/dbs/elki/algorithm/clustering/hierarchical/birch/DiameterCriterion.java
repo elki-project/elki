@@ -27,18 +27,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Average Radius (R) criterion.
- * 
+ * <p>
  * References:
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
- * BIRCH: An Efficient Data Clustering Method for Very Large Databases
+ * T. Zhang, R. Ramakrishnan, M. Livny<br>
+ * BIRCH: An Efficient Data Clustering Method for Very Large Databases<br>
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
- * </p>
  *
  * @author Erich Schubert
  */
 @Alias("D")
-@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324", //
@@ -71,8 +70,7 @@ public class DiameterCriterion implements BIRCHAbsorptionCriterion {
     if(n12 <= 0) {
       return 0.;
     }
-    double sum1 = f1.ss + f2.ss;
-    double sum2 = 0.;
+    double sum1 = f1.ss + f2.ss, sum2 = 0.;
     for(int i = 0; i < f1.ls.length; i++) {
       double v = f1.ls[i] + f2.ls[i];
       sum2 += v * v;

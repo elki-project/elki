@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Ueber die stetige Abbildung einer Linie auf ein Flächenstück", //
     booktitle = "Mathematische Annalen, 38(3)", //
     url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002253135", //
-    bibkey = "journal/mathann/Hilbert1891")
+    bibkey = "journals/mathann/Hilbert1891")
 public class HilbertSpatialSorter implements SpatialSorter {
   /**
    * Static instance.

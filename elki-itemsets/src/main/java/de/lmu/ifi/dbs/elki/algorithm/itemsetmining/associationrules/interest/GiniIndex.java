@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * The Gini was originally used in decision trees:
  * <p>
  * L. Breiman, J. H. Friedman, R. A. Olshen, C. J. Stone<br>
- * Classification and regression trees
+ * Classification and Regression Trees
  *
  * @author Frederic Sautter
  */
@@ -44,8 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     url = "https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf", //
     bibkey = "tr/umn/TanK00")
 @Reference(authors = "L. Breiman, J. H. Friedman, R. A. Olshen, C. J. Stone", //
-    title = "Classification and regression trees", //
-    booktitle = "Classification and Regression Trees", //
+    title = "Classification and Regression Trees", booktitle = "", //
     bibkey = "books/wa/BreimanFOS84")
 public class GiniIndex implements InterestingnessMeasure {
   /**

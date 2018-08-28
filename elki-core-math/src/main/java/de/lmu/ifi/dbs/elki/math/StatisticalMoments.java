@@ -65,8 +65,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/3221269.3223036", //
     bibkey = "DBLP:conf/ssdbm/SchubertG18")
 @Reference(authors = "T. B. Terriberry", //
-    title = "Computing Higher-Order Moments Online", //
-    booktitle = "Online - Technical Note", //
+    title = "Computing Higher-Order Moments Online", booktitle = "", //
     url = "http://people.xiph.org/~tterribe/notes/homs.html", //
     bibkey = "web/Terriberry07")
 @Reference(authors = "P. Pébay", //

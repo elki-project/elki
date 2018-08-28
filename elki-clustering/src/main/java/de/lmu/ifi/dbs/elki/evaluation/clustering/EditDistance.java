@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,18 +25,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Edit distance measures.
- * 
  * <p>
- * Pantel, P. and Lin, D.<br />
- * Document clustering with committees<br/>
- * Proc. 25th ACM SIGIR conference on Research and development in information
- * retrieval
- * </p>
- * 
+ * P. Pantel, D. Lin<br>
+ * Document clustering with committees<br>
+ * Proc. 25th ACM SIGIR Conf. on Research and Development in Information
+ * Retrieval
+ *
  * @author Sascha Goldhofer
  * @since 0.5.0
  */
-@Reference(authors = "Pantel, P. and Lin, D.", title = "Document clustering with committees", booktitle = "Proc. 25th ACM SIGIR conference on Research and development in information retrieval", url = "https://doi.org/10.1145/564376.564412")
+@Reference(authors = "P. Pantel, D. Lin", //
+    title = "Document clustering with committees", //
+    booktitle = "Proc. 25th ACM SIGIR Conf. on Research and Development in Information Retrieval", //
+    url = "https://doi.org/10.1145/564376.564412", //
+    bibkey = "DBLP:conf/sigir/PantelL02")
 public class EditDistance {
   /**
    * Edit operations for first clustering to second clustering.

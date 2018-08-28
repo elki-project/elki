@@ -61,22 +61,21 @@ import net.jafama.FastMath;
 
 /**
  * Variance of Volume for outlier detection.
- *
+ * <p>
  * The volume is estimated by the distance to the k-nearest neighbor, then the
  * variance of volume is computed.
- *
+ * <p>
  * Unfortunately, this approach needs an enormous numerical precision, and may
  * not work for high-dimensional, non-normalized data. We therefore divide each
  * volume by the average across the data set. This means values are even less
  * comparable across data sets, but this avoids some of the numerical problems
  * of this method.
- *
+ * <p>
  * Reference:
  * <p>
- * T. Hu, and S. Y. Sung<br />
- * Detecting pattern-based outliers<br />
+ * T. Hu, S. Y. Sung<br>
+ * Detecting pattern-based outliers<br>
  * Pattern Recognition Letters 24(16)
- * </p>
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -85,7 +84,7 @@ import net.jafama.FastMath;
  *
  * @param <O> the type of data objects handled by this algorithm
  */
-@Reference(authors = "T. Hu, and S. Y. Sung", //
+@Reference(authors = "T. Hu, S. Y. Sung", //
     title = "Detecting pattern-based outliers", //
     booktitle = "Pattern Recognition Letters 24(16)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00165-X", //

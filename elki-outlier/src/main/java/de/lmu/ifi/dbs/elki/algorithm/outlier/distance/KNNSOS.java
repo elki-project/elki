@@ -60,7 +60,7 @@ import net.jafama.FastMath;
  * <p>
  * Reference of the kNN variant:
  * <p>
- * Erich Schubert and Michael Gertz<br>
+ * Erich Schubert, Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
  * Detection: A Remedy Against the Curse of Dimensionality?<br>
  * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
@@ -75,7 +75,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type.
  */
-@Reference(authors = "Erich Schubert and Michael Gertz", //
+@Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //

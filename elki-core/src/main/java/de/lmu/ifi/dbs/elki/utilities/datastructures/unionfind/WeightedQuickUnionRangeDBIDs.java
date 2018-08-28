@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,37 +21,33 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.unionfind;
 
 import java.util.Arrays;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Union-find algorithm for {@link DBIDRange} only, with optimizations.
- *
+ * <p>
  * To instantiate, use {@link UnionFindUtil#make}. This version is optimized for
  * {@link DBIDRange}s.
- *
+ * <p>
  * This is the weighted quick union approach, weighted by count and using
  * path-halving for optimization.
- *
+ * <p>
  * Reference:
  * <p>
- * R. Sedgewick<br />
- * 1.3 Union-Find Algorithms<br />
+ * R. Sedgewick<br>
+ * 1.3 Union-Find Algorithms<br>
  * Algorithms in C, Parts 1-4
- * </p>
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "R. Sedgewick", //
-title = "1.3 Union-Find Algorithms", //
-booktitle = "Algorithms in C, Parts 1-4")
+    title = "Algorithms in C, Parts 1-4", //
+    booktitle = "", //
+    bibkey = "DBLP:books/daglib/0004943")
 public class WeightedQuickUnionRangeDBIDs implements UnionFind {
   /**
    * Object ID range.

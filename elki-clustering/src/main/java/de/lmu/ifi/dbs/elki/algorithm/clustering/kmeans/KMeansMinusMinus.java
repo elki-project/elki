@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * <p>
  * Reference:
  * <p>
- * S. Chawla and A. Gionis<br>
+ * S. Chawla, A. Gionis<br>
  * k-means--: A Unified Approach to Clustering and Outlier Detection<br>
  * Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)
  *
@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <V> vector datatype
  */
 @Title("K-Means--")
-@Reference(authors = "S. Chawla and A. Gionis", //
+@Reference(authors = "S. Chawla, A. Gionis", //
     title = "k-means--: A Unified Approach to Clustering and Outlier Detection", //
     booktitle = "Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)", //
     url = "https://doi.org/10.1137/1.9781611972832.21", //

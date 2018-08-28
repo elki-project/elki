@@ -27,18 +27,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Average Radius (R) criterion.
- * 
+ * <p>
  * References:
  * <p>
- * T. Zhang and R. Ramakrishnan and M. Livny<br />
- * BIRCH: An Efficient Data Clustering Method for Very Large Databases
+ * T. Zhang, R. Ramakrishnan, M. Livny<br>
+ * BIRCH: An Efficient Data Clustering Method for Very Large Databases<br>
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
- * </p>
  *
  * @author Erich Schubert
  */
 @Alias("R")
-@Reference(authors = "T. Zhang and R. Ramakrishnan and M. Livny", //
+@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324", //

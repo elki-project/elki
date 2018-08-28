@@ -42,16 +42,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * <p>
  * Reference:
  * <p>
- * G. N. Lance and W. T. Williams<br>
+ * G. N. Lance, W. T. Williams<br>
  * A general theory of classificatory sorting strategies 1. Hierarchical
  * systems<br>
- * The computer journal 9.4 (1967): 373-380.
+ * The Computer Journal 9.4 (1967): 373-380.
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "G. N. Lance and W. T. Williams", //
+@Reference(authors = "G. N. Lance, W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
-    booktitle = "The computer journal 9.4", //
+    booktitle = "The Computer Journal 9.4", //
     url = "https://doi.org/10.1093/comjnl/9.4.373", //
     bibkey = "doi:10.1093/comjnl/9.4.373")
 @Alias({ "flex", "beta", "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod" })

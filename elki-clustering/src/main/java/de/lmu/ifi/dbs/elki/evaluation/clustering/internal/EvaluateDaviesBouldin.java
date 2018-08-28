@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,22 +51,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the Davies-Bouldin index of a data set.
- *
+ * <p>
  * Reference:
  * <p>
- * D. L. Davies and D. W. Bouldin<br />
- * A Cluster Separation Measure<br />
- * In: IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)
- * </p>
+ * D. L. Davies, D. W. Bouldin<br>
+ * A Cluster Separation Measure<br>
+ * IEEE Transactions Pattern Analysis and Machine Intelligence 1(2)
  *
  * @author Stephan Baier
  * @since 0.7.0
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "D. L. Davies and D. W. Bouldin", //
+@Reference(authors = "D. L. Davies, D. W. Bouldin", //
     title = "A Cluster Separation Measure", //
-    booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)", //
+    booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence 1(2)", //
     url = "https://doi.org/10.1109/TPAMI.1979.4766909", //
     bibkey = "DBLP:journals/pami/DaviesB79")
 public class EvaluateDaviesBouldin implements Evaluator {

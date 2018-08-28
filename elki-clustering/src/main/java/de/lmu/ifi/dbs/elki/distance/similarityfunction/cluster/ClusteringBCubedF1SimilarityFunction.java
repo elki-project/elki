@@ -35,14 +35,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * Reference:
  * <p>
- * A. Bagga and B. Baldwin<br>
+ * A. Bagga, B. Baldwin<br>
  * Entity-based cross-document coreferencing using the Vector Space Model<br>
  * Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "A. Bagga and B. Baldwin", //
+@Reference(authors = "A. Bagga, B. Baldwin", //
     title = "Entity-based cross-document coreferencing using the Vector Space Model", //
     booktitle = "Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)", //
     url = "https://doi.org/10.3115/980451.980859", //

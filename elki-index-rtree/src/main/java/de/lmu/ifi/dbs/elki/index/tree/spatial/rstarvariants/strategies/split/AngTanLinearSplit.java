@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,21 +34,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Line-time complexity split proposed by Ang and Tan.
- * 
+ * <p>
  * This split strategy tries to minimize overlap only, which can however
  * degenerate to "slices".
- * 
  * <p>
- * C. H. Ang and T. C. Tan:<br />
- * New linear node splitting algorithm for R-trees<br />
- * In: Proceedings of the 5th International Symposium on Advances in Spatial
- * Databases
- * </p>
- * 
+ * Reference:
+ * <p>
+ * C. H. Ang, T. C. Tan:<br>
+ * New linear node splitting algorithm for R-trees<br>
+ * Proc. 5th Int. Symp. on Advances in Spatial Databases
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "C. H. Ang and T. C. Tan", title = "New linear node splitting algorithm for R-trees", booktitle = "Proceedings of the 5th International Symposium on Advances in Spatial Databases", url = "https://doi.org/10.1007/3-540-63238-7_38")
+@Reference(authors = "C. H. Ang, T. C. Tan", //
+    title = "New linear node splitting algorithm for R-trees", //
+    booktitle = "Proc. 5th Int. Sym. on Advances in Spatial Databases", //
+    url = "https://doi.org/10.1007/3-540-63238-7_38", //
+    bibkey = "DBLP:conf/ssd/AngT97")
 public class AngTanLinearSplit implements SplitStrategy {
   /**
    * Logger class

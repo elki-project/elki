@@ -43,7 +43,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Olivier, M. M. Norberg", //
     title = "Positively skewed data: Revisiting the Box-Cox power transformation", //
     booktitle = "International Journal of Psychological Research 3(1)", //
-    bibkey = "journals/misc/OliviertN10")
+    url = "https://doi.org/10.21500/20112084.846", //
+    bibkey = "doi:10.21500/20112084.846")
 public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<ExponentiallyModifiedGaussianDistribution> {
   /**
    * Static estimator class.

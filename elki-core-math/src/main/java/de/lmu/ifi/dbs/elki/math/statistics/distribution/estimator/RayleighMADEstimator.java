@@ -38,9 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @apiviz.has RayleighDistribution - - estimates
  */
-@Reference(title = "Applied Robust Statistics", //
-    authors = "D. J. Olive", //
-    booktitle = "Applied Robust Statistics", //
+@Reference(authors = "D. J. Olive", //
+    title = "Applied Robust Statistics", booktitle = "", //
     url = "http://lagrange.math.siu.edu/Olive/preprints.htm", //
     bibkey = "books/Olive08")
 public class RayleighMADEstimator implements MADDistributionEstimator<RayleighDistribution> {

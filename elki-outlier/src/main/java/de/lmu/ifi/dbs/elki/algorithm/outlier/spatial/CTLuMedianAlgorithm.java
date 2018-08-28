@@ -46,16 +46,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Median Algorithm of C.-T. Lu
- * 
  * <p>
- * Reference: <br>
- * C.-T. Lu and D. Chen and Y. Kou<br>
+ * Reference:
+ * <p>
+ * C.-T. Lu, D. Chen, Y. Kou<br>
  * Algorithms for Spatial Outlier Detection <br>
- * in Proc. 3rd IEEE International Conference on Data Mining <br>
- * </p>
- * 
+ * Proc. 3rd IEEE International Conference on Data Mining (ICDM)
+ * <p>
  * Median Algorithm uses Median to represent the average non-spatial attribute
- * value of neighbors. <br>
+ * value of neighbors.<br>
  * The Difference e = non-spatial-Attribute-Value - Median (Neighborhood) is
  * computed.<br>
  * The Spatial Objects with the highest standardized e value are Spatial
@@ -67,7 +66,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <N> Neighborhood type
  */
 @Title("Median Algorithm for Spatial Outlier Detection")
-@Reference(authors = "C.-T. Lu and D. Chen and Y. Kou", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proc. 3rd IEEE International Conference on Data Mining", url = "https://doi.org/10.1109/ICDM.2003.1250986")
+@Reference(authors = "C.-T. Lu, D. Chen, Y. Kou", //
+    title = "Algorithms for Spatial Outlier Detection", //
+    booktitle = "Proc. 3rd IEEE International Conference on Data Mining", //
+    url = "https://doi.org/10.1109/ICDM.2003.1250986", //
+    bibkey = "DBLP:conf/icdm/LuCK03")
 public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -96,24 +99,25 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     MeanVariance mv = new MeanVariance();
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       final double median;
       {
         double[] fi = new double[neighbors.size()];
         // calculate and store Median of neighborhood
         int c = 0;
-        for (DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-          if (DBIDUtil.equal(iditer, iter)) {
+        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+          if(DBIDUtil.equal(iditer, iter)) {
             continue;
           }
           fi[c] = relation.get(iter).doubleValue(0);
           c++;
         }
 
-        if (c > 0) {
+        if(c > 0) {
           median = QuickSelect.median(fi, 0, c);
-        } else {
+        }
+        else {
           median = relation.get(iditer).doubleValue(0);
         }
       }
@@ -126,7 +130,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     final double mean = mv.getMean();
     final double stddev = mv.getNaiveStddev();
     DoubleMinMax minmax = new DoubleMinMax();
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = Math.abs((scores.doubleValue(iditer) - mean) / stddev);
       minmax.put(score);
       scores.putDouble(iditer, score);

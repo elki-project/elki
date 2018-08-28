@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * The default R-Tree insertion strategy: find rectangle with least volume
  * enlargement.
  * <p>
+ * Reference:
+ * <p>
  * A. Guttman<br>
  * R-Trees: A Dynamic Index Structure For Spatial Searching<br>
  * Proc. 1984 ACM SIGMOD Int. Conf. Management of Data

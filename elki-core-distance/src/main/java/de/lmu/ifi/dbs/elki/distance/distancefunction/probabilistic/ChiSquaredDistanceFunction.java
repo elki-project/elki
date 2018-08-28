@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,23 +33,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Chi-Squared distance function, symmetric version.
- *
+ * <p>
  * This implementation assumes that \( \sum_i \vec{x} = 1 \), and is defined as:
  * \[ \chi^2(\vec{x},\vec{y}):= 2 \sum_i \frac{(x_i-x_i)^2}{x_i+y_i} \]
- *
+ * <p>
  * Reference:
  * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
- * Empirical evaluation of dissimilarity measures for color and texture<br />
+ * J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi<br>
+ * Empirical evaluation of dissimilarity measures for color and texture<br>
  * Proc. 7th IEEE International Conference on Computer Vision
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 @Alias("chisq")
 @Priority(Priority.IMPORTANT)
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
+@Reference(authors = "J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi", //
     title = "Empirical evaluation of dissimilarity measures for color and texture", //
     booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
     url = "https://doi.org/10.1109/ICCV.1999.790412", //

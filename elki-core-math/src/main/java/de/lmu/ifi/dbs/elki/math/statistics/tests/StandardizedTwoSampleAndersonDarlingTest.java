@@ -49,14 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * A two-sample Anderson-Darling rank statistic<br>
  * Biometrika 63 (1)
  * <p>
- * F. W. Scholz, and M. A. Stephens<br>
+ * F. W. Scholz, M. A. Stephens<br>
  * K-sample Anderson–Darling tests<br>
  * Journal of the American Statistical Association, 82(399)
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "F. W. Scholz, and M. A. Stephens", //
+@Reference(authors = "F. W. Scholz, M. A. Stephens", //
     title = "K-sample Anderson–Darling tests", //
     booktitle = "Journal of the American Statistical Association, 82(399)", //
     url = "https://doi.org/10.1080/01621459.1987.10478517", //

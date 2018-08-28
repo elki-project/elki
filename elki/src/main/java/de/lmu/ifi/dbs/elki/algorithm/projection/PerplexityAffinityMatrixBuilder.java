@@ -48,7 +48,7 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * G. Hinton and S. Roweis<br>
+ * G. Hinton, S. Roweis<br>
  * Stochastic Neighbor Embedding<br>
  * Advances in Neural Information Processing Systems 15
  * 
@@ -56,7 +56,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Vector type
  */
-@Reference(authors = "G. Hinton and S. Roweis", //
+@Reference(authors = "G. Hinton, S. Roweis", //
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
     url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding", //

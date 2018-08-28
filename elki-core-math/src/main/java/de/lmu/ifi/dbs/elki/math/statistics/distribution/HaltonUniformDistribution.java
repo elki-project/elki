@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,38 +34,37 @@ import net.jafama.FastMath;
  * Halton sequences are a pseudo-uniform distribution. The data is actually too
  * regular for a true uniform distribution, but as such will of course often
  * appear to be uniform.
- * 
+ * <p>
  * Technically, they are based on Van der Corput sequence and the Von Neumann
  * Katutani transformation. These produce a series of integers which then are
  * converted to floating point values.
- * 
+ * <p>
  * To randomize, we just choose a random starting position, as indicated by
- * 
+ * <p>
  * Reference:
  * <p>
+ * X. Wang, F. J. Hickernell<br>
  * Randomized halton sequences<br>
- * X. Wang and F. J. Hickernell<br />
  * Mathematical and Computer Modelling Vol. 32 (7)
- * </p>
- * 
+ * <p>
  * <b>Important note: this code hasn't been double checked yet. While it
  * probably works for some simple cases such as example data set generation, do
  * <em>not</em> rely on it for e.g. quasi monte carlo methods without
  * double-checking the quality, and looking at more advanced methods!</b>
- * 
+ * <p>
  * Let me repeat this: this code was written <b>to generate toy datasets</b>. It
  * <b>may have deficits</b> for other uses! <b>There is a high chance it will
  * produce correlated data when used for more than one dimension.</b> - for toy
  * data sets, try different random seeds until you find one that works for you.
- * 
+ * <p>
  * TODO: find an improved algorithm that takes care of a better randomization,
  * for example by adding scrambling.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
  */
 @Reference(title = "Randomized halton sequences", //
-    authors = "X. Wang and F. J. Hickernell", //
+    authors = "X. Wang, F. J. Hickernell", //
     booktitle = "Mathematical and Computer Modelling Vol. 32 (7)", //
     url = "https://doi.org/10.1016/S0895-7177(00)00178-3", //
     bibkey = "doi:10.1016/S0895-71770000178-3")

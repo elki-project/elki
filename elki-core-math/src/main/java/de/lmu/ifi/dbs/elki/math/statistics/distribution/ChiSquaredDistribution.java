@@ -118,19 +118,18 @@ public class ChiSquaredDistribution extends GammaDistribution {
 
   /**
    * Return the quantile function for this distribution
-   * 
+   * <p>
    * Reference:
    * <p>
-   * D.J. Best, D. E. Roberts<br />
-   * Algorithm AS 91: The percentage points of the χ² distribution<br />
+   * D. J. Best, D. E. Roberts<br>
+   * Algorithm AS 91: The percentage points of the χ² distribution<br>
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
-   * </p>
-   * 
+   *
    * @param x Quantile
    * @param dof Degrees of freedom
    * @return quantile position
    */
-  @Reference(authors = "D.J. Best, D. E. Roberts", //
+  @Reference(authors = "D. J. Best, D. E. Roberts", //
       title = "Algorithm AS 91: The percentage points of the χ² distribution", //
       booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)", //
       url = "https://doi.org/10.2307/2347113", //

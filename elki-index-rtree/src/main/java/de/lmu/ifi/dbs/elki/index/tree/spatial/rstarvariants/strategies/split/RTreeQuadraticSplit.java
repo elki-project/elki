@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,18 +30,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Quadratic-time complexity greedy split as used by the original R-Tree.
- * 
  * <p>
- * Antonin Guttman:<br/>
- * R-Trees: A Dynamic Index Structure For Spatial Searching<br />
- * in Proceedings of the 1984 ACM SIGMOD international conference on Management
- * of data.
- * </p>
+ * Reference:
+ * <p>
+ * A. Guttman<br>
+ * R-Trees: A Dynamic Index Structure For Spatial Searching<br>
+ * Proc. 1984 ACM SIGMOD Int. Conf. Management of Data
  * 
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Antonin Guttman", title = "R-Trees: A Dynamic Index Structure For Spatial Searching", booktitle = "Proceedings of the 1984 ACM SIGMOD international conference on Management of data", url = "https://doi.org/10.1145/971697.602266")
+@Reference(authors = "A. Guttman", //
+    title = "R-Trees: A Dynamic Index Structure For Spatial Searching", //
+    booktitle = "Proc. 1984 ACM SIGMOD Int. Conf. on Management of Data", //
+    url = "https://doi.org/10.1145/971697.602266", //
+    bibkey = "doi:10.1145/971697.602266")
 public class RTreeQuadraticSplit implements SplitStrategy {
   /**
    * Static instance.
@@ -84,10 +87,10 @@ public class RTreeQuadraticSplit implements SplitStrategy {
       }
       // Data to keep
       // Mark both as used
-      BitsUtil.setI(assigned,w1);
-      BitsUtil.setI(assigned,w2);
+      BitsUtil.setI(assigned, w1);
+      BitsUtil.setI(assigned, w2);
       // Assign second to second set
-      BitsUtil.setI(assignment,w2);
+      BitsUtil.setI(assignment, w2);
       // Initial mbrs and areas
       area1 = areas[w1];
       area2 = areas[w2];

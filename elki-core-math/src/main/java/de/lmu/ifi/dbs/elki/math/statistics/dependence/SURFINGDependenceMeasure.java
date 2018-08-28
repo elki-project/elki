@@ -45,11 +45,11 @@ import net.jafama.FastMath;
  * <p>
  * Based on:
  * <p>
- * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and
+ * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel,
  * Peer Kröger<br>
  * Subspace Selection for Clustering High-Dimensional Data<br>
  * Proc. IEEE International Conference on Data Mining (ICDM 2004)
- *
+ * <p>
  * TODO: make the subspace distance function and k parameterizable.
  *
  * @author Robert Rödler
@@ -61,7 +61,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
     url = "https://doi.org/10.1145/2463676.2463696", //
     bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
-@Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
+@Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
     title = "Subspace Selection for Clustering High-Dimensional Data", //
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
     url = "https://doi.org/10.1109/ICDM.2004.10112", //

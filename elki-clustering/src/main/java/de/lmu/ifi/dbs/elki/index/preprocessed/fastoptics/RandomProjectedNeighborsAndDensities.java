@@ -6,7 +6,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -52,30 +52,28 @@ import net.jafama.FastMath;
 
 /**
  * Random Projections used for computing neighbors and density estimates.
- *
+ * <p>
  * This index is specialized for the algorithm
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.optics.FastOPTICS}
- *
+ * <p>
  * Reference:
  * <p>
- * J. Schneider and M. Vlachos<br />
- * Fast parameterless density-based clustering via random projections<br />
- * Proc. 22nd ACM international conference on Conference on Information &
- * Knowledge Management (CIKM)
- * </p>
- *
+ * J. Schneider, M. Vlachos<br>
+ * Fast parameterless density-based clustering via random projections<br>
+ * Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)
+ * <p>
  * This is based on the original code provided by Johannes Schneider, with
  * ELKIfications and optimizations by Erich Schubert.
- *
+ * <p>
  * TODO: implement one of the Index APIs?
  *
  * @author Johannes Schneider
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "J. Schneider and M. Vlachos", //
+@Reference(authors = "J. Schneider, M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
-    booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
+    booktitle = "Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)", //
     url = "https://doi.org/10.1145/2505515.2505590", //
     bibkey = "DBLP:conf/cikm/SchneiderV13")
 public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
