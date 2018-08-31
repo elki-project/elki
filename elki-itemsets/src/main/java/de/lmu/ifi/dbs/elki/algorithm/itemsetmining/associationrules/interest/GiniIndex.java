@@ -23,7 +23,12 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Gini-index based interestingness measure.
+ * Gini-index based interestingness measure, using the weighted squared
+ * conditional probabilities compared to the non-conditional priors.
+ * <p>
+ * \[ P(X)\left(P(Y|X)^2+P(\neg Y|X)^2\right)
+ * + P(\neg X)\left(P(Y|\neg X)^2+P(\neg Y|\neg X)^2\right)
+ * - P(Y)^2 - P(\neg Y)^2 \]
  * <p>
  * Reference:
  * <p>

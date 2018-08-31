@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,17 +39,17 @@ import net.jafama.FastMath;
 /**
  * L<sub>p</sub>-Norm (Minkowski norms) are a family of distances for
  * {@link NumberVector}s.
- * 
+ * <p>
  * The L<sub>p</sub> distance is defined as:
- * \[ L_p(\vec{x},\vec{y}) := \left(\sum_i (x_i-y_i)\right)^{1/p} \]
- * 
+ * \[ L_p(\vec{x},\vec{y}) := \left(\sum\nolimits_i (x_i-y_i)\right)^{1/p} \]
+ * <p>
  * For p >= 1 this is a metric. For p=1, this yields the well known
  * {@link ManhattanDistanceFunction}, for p = 2 the standard
  * {@link EuclideanDistanceFunction}.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.landmark
  */
 @Priority(Priority.RECOMMENDED)

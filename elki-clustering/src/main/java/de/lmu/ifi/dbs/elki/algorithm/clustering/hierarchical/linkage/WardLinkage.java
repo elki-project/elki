@@ -38,8 +38,8 @@ import net.jafama.FastMath;
  * The distance of two clusters in this method is:
  * \[ d_{\text{Ward}}(A,B):=\text{SSE}(A\cup B)-\text{SSE}(A)-\text{SSE}(B) \]
  * where the sum of squared errors is defined as:
- * \[ \text{SSE}(X):=\sum_{x\in X} (x-\mu_X)^2 \qquad \text{with }
- * \mu_X=\tfrac{1}{|X|}\sum_{x\in X} X \]
+ * \[ \text{SSE}(X):=\sum\nolimits_{x\in X} (x-\mu_X)^2 \qquad \text{with }
+ * \mu_X=\tfrac{1}{|X|}\sum\nolimits_{x\in X} X \]
  * This objective can be rewritten to
  * \[ d_{\text{Ward}}(A,B):=\tfrac{|A|\cdot|B|}{|A|+|B|} ||\mu_A-\mu_B||^2
  * = \tfrac{1}{1/|A|+1/|B|} ||\mu_A-\mu_B||^2 \]
@@ -64,9 +64,9 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * J. H. Ward Jr<br>
+ * J. H. Ward Jr.<br>
  * Hierarchical grouping to optimize an objective function<br>
- * Journal of the American statistical association 58.301 (1963): 236-244.
+ * Journal of the American statistical association 58.301
  * <p>
  * The formulation using Lance-Williams equations is due to:
  * <p>
@@ -77,7 +77,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "J. H. Ward Jr", //
+@Reference(authors = "J. H. Ward Jr.", //
     title = "Hierarchical grouping to optimize an objective function", //
     booktitle = "Journal of the American statistical association 58.301", //
     url = "https://doi.org/10.1080/01621459.1963.10500845", //

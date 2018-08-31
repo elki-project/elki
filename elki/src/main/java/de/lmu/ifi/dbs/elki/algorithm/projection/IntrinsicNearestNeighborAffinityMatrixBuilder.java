@@ -57,7 +57,7 @@ import net.jafama.FastMath;
  * <p>
  * Furthermore, this approach uses a different rule to combine affinities:
  * rather than taking the arithmetic average of \(p_{ij}\) and \(p_{ji}\), we
- * use \(\sqrt(p_{ij} \cdot p_{ji})\), which prevents outliers from attaching
+ * use \(\sqrt{p_{ij} \cdot p_{ji}}\), which prevents outliers from attaching
  * closely to nearby clusters.
  * <p>
  * Reference:
@@ -65,7 +65,7 @@ import net.jafama.FastMath;
  * Erich Schubert, Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
  * Detection: A Remedy Against the Curse of Dimensionality?<br>
- * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
+ * Proc. Int. Conf. Similarity Search and Applications, SISAP 2017
  *
  * @author Erich Schubert
  *
@@ -73,7 +73,7 @@ import net.jafama.FastMath;
  */
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP 2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //
     bibkey = "DBLP:conf/sisap/SchubertG17")
 public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNeighborAffinityMatrixBuilder<O> {

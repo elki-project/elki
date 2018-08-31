@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,14 +34,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import net.jafama.FastMath;
 
 /**
- * Normalize the data set by applying log(1+|x|*b)/log(b+1) to any value. If the
- * input data was in [0;1], then the resulting values will be in the same range.
- * 
- * By default b=1, and thus the transformation is log2(1+|x|).
- * 
+ * Normalize the data set by applying \( \frac{\log(1+|x|b)}{\log 1+b} \) to any
+ * value. If the input data was in [0;1], then the resulting values will be in
+ * [0;1], too.
+ * <p>
+ * By default b=1, and thus the transformation is \(\log_2(1+|x|)\).
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @param <V> vector type
  */
 public class Log1PlusNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
@@ -70,8 +71,8 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractVecto
   protected V filterSingleObject(V featureVector) {
     double[] data = new double[featureVector.getDimensionality()];
     for(int d = 0; d < data.length; ++d) {
-      data[d] = featureVector.doubleValue(d);
-      data[d] = FastMath.log1p((data[d] > 0 ? data[d] : -data[d]) * boost) * scale;
+      final double v = featureVector.doubleValue(d);
+      data[d] = FastMath.log1p((v > 0 ? v : -v) * boost) * scale;
     }
     return factory.newNumberVector(data);
   }

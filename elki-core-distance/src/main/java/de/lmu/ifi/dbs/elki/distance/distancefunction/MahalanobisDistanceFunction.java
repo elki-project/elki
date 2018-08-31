@@ -29,8 +29,8 @@ import net.jafama.FastMath;
  * Mahalanobis quadratic form distance for feature vectors.
  * <p>
  * For a weight matrix M, this distance is defined as
- * \[ \text{Mahalanobis}_M(\vec{x},\vec{y}) := \sqrt{(\vec{x}-\vec{y})^T * M *
- * (\vec{x}-\vec{y})} \]
+ * \[ \text{Mahalanobis}_M(\vec{x},\vec{y}) :=
+ * \sqrt{(\vec{x}-\vec{y})^T \cdot M \cdot (\vec{x}-\vec{y})} \]
  * <p>
  * Reference:
  * <p>

@@ -1,15 +1,15 @@
 /**
  * Database object identification and ID group handling <em>API</em>.
- * 
+ * <p>
  * Database IDs (short: DBID) in ELKI are based on the factory pattern, to allow replacing
  * the simple Integer-based DBIDs with more complex implementations, e.g. for use with external
  * databases or to add tracking for debugging purposes. This also allows adding of more efficient
  * implementations later on in a single place.
- * 
+ * <p>
  * <h2>DBID interface:</h2>
- * 
+ * <p>
  * The {@link de.lmu.ifi.dbs.elki.database.ids.DBID DBID} object identifies a single object.
- * 
+ * <p>
  * The {@link de.lmu.ifi.dbs.elki.database.ids.DBIDs DBIDs} hierarchy contains classes for handling groups (sets, arrays) of IDs, that can
  * be seen as a two-dimensional matrix consisting 
  * <table style="border: 1px">
@@ -29,16 +29,16 @@
  * <td>n/a</td>
  * </tr>
  * </table>
- * 
+ * <p>
  * {@link de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs StaticDBIDs} are structures that cannot support
  * modifications, but thus can be implemented more efficiently, for example as Interval. They are
  * mostly used by the data sources.
- * 
+ * <p>
  * These interfaces cannot be instantiated, obviously. Instead, use the static
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory#FACTORY DBIDFactory.FACTORY}, which is also wrapped in the {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil} class.
- * 
+ * <p>
  * <h2>Examples:</h2>
- * <pre>{@code
+ * {@code
  * DBIDs allids = database.getIDs();
  * // preallocate an array of initial capacity 123 
  * ArrayModifiableDBIDs array = DBIDUtil.newArraySet(123);
@@ -48,19 +48,19 @@
  * // add all DBIDs from the hash
  * tree.addDBIDs(hash)
  * }</pre>
- * 
+ * <p>
  * <h2>Utility functions:</h2>
  * <ul>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#ensureArray DBIDUtil.ensureArray} to ensure {@link de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs ArrayDBIDs}</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#ensureModifiable DBIDUtil.ensureModifiable} to ensure {@link de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs ModifiableDBIDS}</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#makeUnmodifiable DBIDUtil.makeUnmodifiable} to wrap DBIDs unmodifiable ({@link de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs UnmodifiableDBIDs}</li>
  * </ul>
- * 
+ * <p>
  * <h2>Generic utility classes:</h2>
- * 
- * <p>{@link de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs MaskedDBIDs}
- * allows masking an ArrayDBIDs with a BitSet.</p>
- * 
+ * <p>
+ * {@link de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs MaskedDBIDs}
+ * allows masking an ArrayDBIDs with a BitSet.
+ *
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.*
@@ -77,7 +77,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

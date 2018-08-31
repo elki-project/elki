@@ -33,43 +33,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Longest Common Subsequence distance for numerical vectors.
- * 
- * Adapted for Java, based on Matlab Code by Michalis Vlachos. Original
- * Copyright Notice:
- * 
- * BEGIN COPYRIGHT NOTICE
- * 
- * lcsMatching code -- (c) 2002 Michalis Vlachos
- * (http://www.cs.ucr.edu/~mvlachos)
- * 
- * This code is provided as is, with no guarantees except that bugs are almost
- * surely present. Published reports of research using this code (or a modified
- * version) should cite the article that describes the algorithm:
- * 
  * <p>
- * M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh:<br />
+ * Originally this was based on the Matlab Code by Michalis Vlachos, but we have
+ * since switched to a version that uses less memory.
+ * <p>
+ * Reference:
+ * <p>
+ * M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh<br>
  * Indexing Multi-Dimensional Time-Series with Support for Multiple Distance
- * Measures<br />
- * In Proc. of 9th SIGKDD, Washington, DC, 2003
- * </p>
- * 
- * Comments and bug reports are welcome. Email to mvlachos@cs.ucr.edu I would
- * also appreciate hearing about how you used this code, improvements that you
- * have made to it.
- * 
- * You are free to modify, extend or distribute this code, as long as this
- * copyright notice is included whole and unchanged.
- * 
- * END COPYRIGHT NOTICE
- * 
- * 
+ * Measures<br>
+ * Proc. 9th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
+ *
  * @author Thomas Bernecker
  * @since 0.2
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", //
     title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", //
-    booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", //
+    booktitle = "Proc. 9th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/956750.956777", //
     bibkey = "DBLP:conf/kdd/VlachosHGK03")
 public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
@@ -106,8 +87,7 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
     // Compute value range, for scaling epsilon:
     final double epsilon = getRange(v1, dim1, v2, dim2) * pEpsilon;
 
-    double[] curr = new double[dim2 + 1];
-    double[] next = new double[dim2 + 1];
+    double[] curr = new double[dim2 + 1], next = new double[dim2 + 1];
 
     for(int i = 0; i < dim1; i++) {
       final double ai = v1.doubleValue(i);

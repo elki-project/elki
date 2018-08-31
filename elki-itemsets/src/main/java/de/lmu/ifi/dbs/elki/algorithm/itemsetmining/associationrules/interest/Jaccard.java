@@ -23,7 +23,11 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Jaccard interestingness measure: \(P(A \cup B)/(P(A)+P(B)-P(A \cup B)) \)
+ * Jaccard interestingness measure:
+ * <p>
+ * \[\tfrac{\text{support}(A \cup B)}{\text{support}(A \cap B)}
+ * =\tfrac{P(A \cap B)}{P(A)+P(B)-P(A \cap B)}
+ * =\tfrac{P(A \cap B)}{P(A \cup B)}\]
  * <p>
  * Reference:
  * <p>

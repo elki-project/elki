@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,51 +31,59 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Weighted version of discrete uncertain objects.
- *
  * <ul>
  * <li>Every object is represented by a finite number of discrete samples.</li>
  * <li>Every sample has a weight associated with it.</li>
  * <li>Samples with higher weight are more likely to be returned by
  * {@link #drawSample}.
  * </ul>
- *
+ * References:
+ * <p>
  * This is called the block independent-disjoint (BID model) in:
  * <p>
- * N. Dalvi, C. Ré, D. Suciu<br />
- * Probabilistic databases: diamonds in the dirt<br />
+ * N. Dalvi, C. Ré, D. Suciu<br>
+ * Probabilistic databases: diamonds in the dirt<br>
  * Communications of the ACM 52, 7
- * </p>
- *
+ * <p>
  * This is also known as the X-Tuple model in:
  * <p>
- * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br />
- * ULDBs: Databases with uncertainty and lineage<br />
- * In Proc. of the 32nd international conference on Very Large Data Bases (VLDB)
- * </p>
- *
+ * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br>
+ * ULDBs: Databases with uncertainty and lineage<br>
+ * In Proc. of the 32nd Int. Conf. on Very Large Data Bases (VLDB)
+ * <p>
  * If only a single sample is provided, this can be used to model existential
  * uncertainty as in:
  * <p>
- * N. Dalvi, D. Suciu<br />
- * Efficient query evaluation on probabilistic databases.<br />
+ * N. Dalvi, D. Suciu<br>
+ * Efficient query evaluation on probabilistic databases.<br>
  * The VLDB Journal, 16(4)
- * </p>
+ * <p>
  * and:
  * <p>
- * T. Bernecker, H.-P. Kriegel, M. Renz, F. Verhein, A. Züfle<br />
- * Probabilistic frequent itemset mining in uncertain databases.<br />
- * In Proc. 15th ACM SIGKDD International Conference on Knowledge Discovery and
- * Data Mining.
- * </p>
+ * Thomas Bernecker, Hans-Peter Kriegel, Matthias Renz, Florian Verhein,
+ * Andreas Züfle<br>
+ * Probabilistic frequent itemset mining in uncertain databases.<br>
+ * In Proc. 15th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining.
  *
  * @author Alexander Koos
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Reference(authors = "N. Dalvi, C. Ré, D. Suciu", //
+    title = "Probabilistic databases: diamonds in the dirt", //
+    booktitle = "Communications of the ACM 52, 7", //
+    url = "https://doi.org/10.1145/1538788.1538810", //
+    bibkey = "DBLP:journals/cacm/DalviRS09")
 @Reference(authors = "O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom", //
-title = "ULDBs: Databases with uncertainty and lineage", //
-booktitle = "Proc. of the 32nd international conference on Very Large Data Bases (VLDB)", //
-url = "http://www.vldb.org/conf/2006/p953-benjelloun.pdf")
+    title = "ULDBs: Databases with uncertainty and lineage", //
+    booktitle = "Proc. of the 32nd Int. Conf. on Very Large Data Bases (VLDB)", //
+    url = "http://www.vldb.org/conf/2006/p953-benjelloun.pdf", //
+    bibkey = "DBLP:conf/vldb/BenjellounSHW06")
+@Reference(authors = "Thomas Bernecker, Hans-Peter Kriegel, Matthias Renz, Florian Verhein, Andreas Züfle", //
+    title = "Probabilistic frequent itemset mining in uncertain databases", //
+    booktitle = "Proc. 15th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
+    url = "https://doi.org/10.1145/1557019.1557039", //
+    bibkey = "DBLP:conf/kdd/BerneckerKRVZ09")
 public class WeightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.
@@ -106,12 +114,12 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject imp
     double check = 0;
     for(double weight : weights) {
       if(!(weight > 0 && weight < 1.)) {
-        throw new IllegalArgumentException("Probabilities must be in ]0:1], but is "+weight);
+        throw new IllegalArgumentException("Probabilities must be in ]0:1], but is " + weight);
       }
       check += weight;
     }
     if(!(check > 0 && check <= 1.0000001)) {
-      throw new IllegalArgumentException("Probability totals must be in ]0:1], but total is "+check);
+      throw new IllegalArgumentException("Probability totals must be in ]0:1], but total is " + check);
     }
     this.samples = samples;
     this.bounds = computeBounds(samples);
@@ -178,7 +186,7 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject imp
    * Factory class for this data type. Not for public use, use
    * {@link de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier} to
    * derive uncertain objects from certain vectors.
-   *
+   * <p>
    * TODO: provide serialization functionality.
    *
    * @author Erich Schubert

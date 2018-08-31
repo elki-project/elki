@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Distance function for RGB color histograms based on a quadratic form and
  * color similarity.
  * <p>
- * This is (unverified) attributed to
+ * Reference:
  * <p>
- * J. Hafner, H. S. Sawhney, W. Equits, M. Flickner and W. Niblack<br>
+ * J. Hafner, H. S. Sawhney, W. Equits, M. Flickner, W. Niblack<br>
  * Efficient Color Histogram Indexing for Quadratic Form Distance Functions<br>
  * IEEE Trans. on Pattern Analysis and Machine Intelligence 17(7)
  *

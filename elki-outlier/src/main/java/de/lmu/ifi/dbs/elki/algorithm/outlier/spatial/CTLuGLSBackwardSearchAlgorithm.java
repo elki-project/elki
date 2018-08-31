@@ -63,16 +63,18 @@ import net.jafama.FastMath;
 /**
  * GLS-Backward Search is a statistical approach to detecting spatial outliers.
  * <p>
+ * Implementation note: this is just the most basic version of this algorithm.
+ * The spatial relation must be two dimensional, the set of spatial basis
+ * functions is hard-coded (but trivial to enhance) to \(\{1,x,y,x^2,y^2,xy\}\),
+ * and we assume the neighborhood is large enough for the simpler formulas to
+ * work that make the optimization problem convex.
+ * <p>
+ * Reference:
+ * <p>
  * F. Chen, C.-T. Lu, A. P. Boedihardjo<br>
  * GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier
  * Detection<br>
  * Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining
- * <p>
- * Implementation note: this is just the most basic version of this algorithm.
- * The spatial relation must be two dimensional, the set of spatial basis
- * functions is hard-coded (but trivial to enhance) to {1,x,y,x*x,y*y,x*y}, and
- * we assume the neighborhood is large enough for the simpler formulas to work
- * that make the optimization problem convex.
  *
  * @author Ahmed Hettab
  * @since 0.4.0

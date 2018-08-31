@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * The distance of two clusters in this method is:
  * \[d_{\text{UPGMA}}(A,B)=\tfrac{1}{|A|\cdot|B|}
- * \sum_{a\in A}\sum_{b\in B} d(a,b)\]
+ * \sum\nolimits_{a\in A}\sum\nolimits_{b\in B} d(a,b)\]
  * <p>
  * For Lance-Williams, we can then obtain the following recursive definition:
  * \[d_{\text{UPGMA}}(A\cup B,C)=\tfrac{|A|}{|A|+|B|} d(A,C) +

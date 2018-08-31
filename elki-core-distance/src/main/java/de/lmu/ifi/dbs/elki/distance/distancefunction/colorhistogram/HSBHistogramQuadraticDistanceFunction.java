@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,20 +36,19 @@ import net.jafama.FastMath;
 /**
  * Distance function for HSB color histograms based on a quadratic form and
  * color similarity.
- *
+ * <p>
  * The matrix is filled according to:
  * <p>
- * VisualSEEk: a fully automated content-based image query system<br />
- * Smith, J.R. and Chang, S.F.<br />
- * Proceedings of the fourth ACM international conference on Multimedia 1997
- * </p>
+ * VisualSEEk: a fully automated content-based image query system<br>
+ * J. R. Smith, S. F. Chang<br>
+ * Proc. 4th ACM Int. Conf. on Multimedia 1997
  *
  * @author Erich Schubert
  * @since 0.3
  */
 @Reference(authors = "J. R. Smith, S. F. Chang", //
     title = "VisualSEEk: a fully automated content-based image query system", //
-    booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", //
+    booktitle = "Proc. 4th ACM Int. Conf. on Multimedia 1997", //
     url = "https://doi.org/10.1145/244130.244151", //
     bibkey = "DBLP:conf/mm/SmithC96")
 public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedQuadraticDistanceFunction {

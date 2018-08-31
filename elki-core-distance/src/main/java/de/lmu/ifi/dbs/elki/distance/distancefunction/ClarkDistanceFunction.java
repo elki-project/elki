@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * <p>
  * Clark distance is defined as:
  * \[ \text{Clark}(\vec{x},\vec{y}) :=
- * \sqrt{\frac{1}{d}\sum_i \left(\frac{|x_i-y_i|}{|x_i|+|y_i|}\right)^2} \]
+ * \sqrt{\tfrac{1}{d}\sum\nolimits_i \left(\tfrac{|x_i-y_i|}{|x_i|+|y_i|}\right)^2} \]
  * <p>
  * Reference:
  * <p>

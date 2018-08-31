@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,9 +27,11 @@ import net.jafama.FastMath;
 
 /**
  * Euclidean distance function, optimized for {@link SparseNumberVector}s.
- * 
+ * <p>
  * Euclidean distance is defined as:
- * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum_i (x_i-y_i)^2} \]
+ * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum\nolimits_i (x_i-y_i)^2} \]
+ * <p>
+ * For sparse vectors, we can skip those i where both vectors are 0.
  *
  * @author Erich Schubert
  * @since 0.5.0

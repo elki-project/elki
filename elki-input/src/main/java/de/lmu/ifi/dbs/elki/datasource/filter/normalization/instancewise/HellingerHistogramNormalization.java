@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,8 +32,12 @@ import net.jafama.FastMath;
 
 /**
  * Normalize histograms by scaling them to unit absolute sum, then taking the
- * square root of the absolute value in each attribute, times 1/sqrt(2).
- * 
+ * square root of the absolute value in each attribute, times the normalization
+ * constant \(1/\sqrt{2}\).
+ * <p>
+ * \[ H(x_i)=\tfrac{\sqrt{|x_i|/\Sigma}}{\sqrt{2}}
+ * \quad\text{ with } \Sigma=\sum\nolimits_i |x_i| \]
+ * <p>
  * Using Euclidean distance (linear kernel) and this transformation is the same
  * as using Hellinger distance:
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction}
@@ -61,14 +65,14 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
     double[] data = new double[featureVector.getDimensionality()];
     double sum = 0.;
     for(int d = 0; d < data.length; ++d) {
-      data[d] = featureVector.doubleValue(d);
-      data[d] = data[d] > 0 ? data[d] : -data[d];
-      sum += data[d];
+      double v = featureVector.doubleValue(d);
+      sum += (data[d] = v > 0 ? v : -v);
     }
     // Normalize and sqrt:
     if(sum > 0.) {
       for(int d = 0; d < data.length; ++d) {
-        data[d] = data[d] > 0 ? FastMath.sqrt(data[d] / sum) * MathUtil.SQRTHALF : 0.;
+        double v = data[d];
+        data[d] = v > 0 ? FastMath.sqrt(v / sum) * MathUtil.SQRTHALF : 0.;
       }
     }
     return factory.newNumberVector(data);

@@ -25,12 +25,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Lift interestingness measure.
  * <p>
+ * \[ \tfrac{\text{confidence}(X\rightarrow Y)}{\text{support}(Y)}
+ * = \tfrac{\text{confidence}(Y\rightarrow X)}{\text{support}(X)}
+ * = \tfrac{P(X\cap Y)}{P(X)P(Y)} \]
+ * <p>
  * Reference:
  * <p>
  * S. Brin, R. Motwani, C. Silverstein<br>
  * Beyond market baskets: Generalizing association rules to correlations<br>
  * In ACM SIGMOD Record 26
- * 
+ *
  * @author Frederic Sautter
  */
 @Reference(authors = "S. Brin, R. Motwani, C. Silverstein", //

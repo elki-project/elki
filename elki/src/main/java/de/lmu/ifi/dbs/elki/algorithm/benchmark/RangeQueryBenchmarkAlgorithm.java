@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * database. In the latter case, the database is expected to have an additional,
  * 1-dimensional vector field. For the separate data source, the last dimension
  * will be cut off and used as query radius.
- *
+ * <p>
  * The simplest data setup clearly is to have an input file:
  *
  * <pre>
@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * </pre>
  *
  * and a query file:
- *
+ * 
  * <pre>
  * x y z radius
  * 1 2 3 1.2
@@ -79,12 +79,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * </pre>
  *
  * where the additional column is the radius.
- *
+ * <p>
  * Alternatively, if you work with a single file, you need to use the filter
  * command <tt>-dbc.filter SplitNumberVectorFilter -split.dims 1,2,3</tt> to
  * split the relation into a 3-dimensional data vector, and 1 dimensional radius
  * vector.
- *
+ * <p>
  * TODO: alternatively, allow using a fixed radius?
  *
  * @author Erich Schubert

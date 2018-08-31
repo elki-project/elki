@@ -23,14 +23,18 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Klosgen interestingness measure.
+ * Klösgen interestingness measure.
+ * <p>
+ * \[ \sqrt{\text{support}(X\cup Y)}
+ * \left(\text{confidence}(X \rightarrow Y) - \text{support}(Y)\right)
+ * = \sqrt{P(X\cap Y)}\left(P(Y|X)-P(Y)\right) \]
  * <p>
  * Reference:
  * <p>
  * W. Klösgen<br>
  * Explora: A multipattern and multistrategy discovery assistant<br>
  * Advances in Knowledge Discovery and Data Mining
- * 
+ *
  * @author Frederic Sautter
  */
 @Reference(authors = "W. Klösgen", //

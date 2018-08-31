@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,15 +23,15 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Added value interestingness measure: confidence(X => Y) - support(X)
- * 
+ * Added value (AV) interestingness measure:
+ * \( \text{confidence}(X \rightarrow Y) - \text{support}(Y) = P(Y|X)-P(Y) \).
+ * <p>
  * Reference:
  * <p>
- * S. Sahar, Sigal, Y. Mansour<br />
- * Empirical evaluation of interest-level criteria<br />
+ * S. Sahar, Sigal, Y. Mansour<br>
+ * Empirical evaluation of interest-level criteria<br>
  * Proc. SPIE 3695, Data Mining and Knowledge Discovery: Theory, Tools, and
  * Technology
- * </p>
  * 
  * @author Frederic Sautter
  */

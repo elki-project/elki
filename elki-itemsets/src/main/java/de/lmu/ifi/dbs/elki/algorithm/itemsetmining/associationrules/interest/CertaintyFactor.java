@@ -24,7 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Certainty factor interestingness measure.
+ * Certainty factor (CF; Loevinger) interestingness measure.
+ * \( \tfrac{\text{confidence}(X \rightarrow Y) -
+ * \text{support}(Y)}{\text{support}(\neg Y)} \).
  * <p>
  * Reference:
  * <p>

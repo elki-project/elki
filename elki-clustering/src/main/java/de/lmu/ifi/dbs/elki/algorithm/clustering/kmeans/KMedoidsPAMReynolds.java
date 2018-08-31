@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * the original PAM algorithm. This may be because of modern CPU architectures,
  * where saving an addition may be neglibile compared to caching and pipelining.
  * <p>
+ * Reference:
+ * </p>
  * Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering
  * Algorithms<br>
  * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>

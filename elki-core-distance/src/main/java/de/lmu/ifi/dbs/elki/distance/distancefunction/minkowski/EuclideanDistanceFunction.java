@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,9 +29,9 @@ import net.jafama.FastMath;
 
 /**
  * Euclidean distance for {@link NumberVector}s.
- * 
+ * <p>
  * Euclidean distance is defined as:
- * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum_i (x_i-y_i)^2} \]
+ * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum\nolimits_i (x_i-y_i)^2} \]
  *
  * @author Arthur Zimek
  * @since 0.2

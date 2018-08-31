@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Conviction interestingness measure: \(\frac{P(X) P(\neg Y)}{P(X, \neg Y)}\)
+ * Conviction interestingness measure:
+ * \(\frac{P(X) P(\neg Y)}{P(X\cap\neg Y)}\).
  * <p>
  * Reference:
  * <p>

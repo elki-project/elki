@@ -26,6 +26,8 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
 /**
  * Class to sort an int array, using a modified quicksort.
  * <p>
+ * Reference:
+ * <p>
  * The implementation is closely based on:
  * <p>
  * Vladimir Yaroslavskiy<br>

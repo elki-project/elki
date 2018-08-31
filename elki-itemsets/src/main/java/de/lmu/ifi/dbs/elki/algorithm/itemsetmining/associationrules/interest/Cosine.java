@@ -25,7 +25,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
 /**
- * Cosine interestingness measure, P(A,B)/sqrt(P(A)*P(B)).
+ * Cosine interestingness measure,
+ * \(\tfrac{\text{support}(A\cup B)}{\sqrt{\text{support}(A)\text{support}(B)}}
+ * =\tfrac{P(A\cap B)}{\sqrt{P(A)P(B)}}\).
  * <p>
  * The interestingness measure called IS by Tan and Kumar.
  * <p>

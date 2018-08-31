@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,12 +49,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * distribution of values along each dimension independently, then rescaling
  * objects to the cumulative density function (CDF) value at the original
  * coordinate.
- *
- * This process is for example also discussed in section 3.4 of
  * <p>
- * Effects of Feature Normalization on Image Retrieval <br/>
+ * This process is for example also mentioned in section 3.4 of
+ * <p>
+ * Effects of Feature Normalization on Image Retrieval<br>
  * S. Aksoy, R. M. Haralick
- * </p>
+ * <p>
  * but they do not detail how to obtain an appropriate function `F`.
  *
  * @author Erich Schubert

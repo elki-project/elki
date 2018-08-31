@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,9 +30,10 @@ import net.jafama.FastMath;
 
 /**
  * Weighted Euclidean distance for {@link NumberVector}s.
- * 
+ * <p>
  * Weighted Euclidean distance is defined as:
- * \[ \text{Euclidean}_{\vec{w}}(\vec{x},\vec{y}) := \sqrt{\sum_i w_i (x_i-y_i)^2} \]
+ * \[ \text{Euclidean}_{\vec{w}}(\vec{x},\vec{y}) :=
+ * \sqrt{\sum\nolimits_i w_i (x_i-y_i)^2} \]
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -62,7 +63,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      delta = (delta >= 0) ? delta :  value - mbr.getMax(d);
+      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }
@@ -74,7 +75,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      delta = (delta >= 0) ? delta :  mbr1.getMin(d) - mbr2.getMax(d);
+      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }
@@ -95,7 +96,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      delta = (delta >= 0) ? delta :  -mbr.getMax(d);
+      delta = (delta >= 0) ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }

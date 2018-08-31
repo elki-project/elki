@@ -25,12 +25,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Leverage interestingness measure.
  * <p>
+ * \[ \text{support}(X\Rightarrow Y)-\text{support}(X)\text{support}(Y)
+ * =P(X\cap Y)-P(X)P(Y) \]
+ * <p>
  * Reference:
  * <p>
  * G. Piatetsky-Shapiro<br>
  * Discovery, analysis, and presentation of strong rules<br>
  * In Knowledge Discovery in Databases 1991
- * 
+ *
  * @author Frederic Sautter
  */
 @Reference(authors = "G. Piatetsky-Shapiro", //
@@ -47,6 +50,6 @@ public class Leverage implements InterestingnessMeasure {
 
   @Override
   public double measure(int t, int sX, int sY, int sXY) {
-    return (sXY / (double) t) - (sX / (double) t) * (sY / (double) t);
+    return (sXY - sX * (long) sY / (double) t) / t;
   }
 }

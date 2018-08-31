@@ -44,6 +44,8 @@ import net.jafama.FastMath;
  * BIC). Provides helper functions (e.g. max likelihood calculation) to its
  * subclasses.
  * <p>
+ * References:
+ * <p>
  * The use of information-theoretic criteria for evaluating k-means was
  * popularized by X-means:
  * <p>
@@ -62,11 +64,6 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-@Reference(authors = "D. Pelleg, A. Moore", //
-    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
-    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
-    bibkey = "DBLP:conf/icml/PellegM00")
 public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> implements KMeansQualityMeasure<O> {
   /**
    * Compute the number of points in a given set of clusters (which may be

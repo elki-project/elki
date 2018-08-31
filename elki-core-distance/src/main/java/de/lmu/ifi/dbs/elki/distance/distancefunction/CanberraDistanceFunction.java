@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * Canberra distance is defined as:
  * \[ \text{Canberra}(\vec{x},\vec{y}) :=
- * \sum_i \frac{|x_i-y_i|}{|x_i|+|y_i|} \]
+ * \sum\nolimits_i \tfrac{|x_i-y_i|}{|x_i|+|y_i|} \]
  * <p>
  * Reference:<br>
  * G. N. Lance, W. T. Williams<br>

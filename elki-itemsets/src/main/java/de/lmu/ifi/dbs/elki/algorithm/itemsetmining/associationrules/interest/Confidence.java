@@ -23,7 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Confidence interestingness measure, support(X u Y)/support(X).
+ * Confidence interestingness measure,
+ * \( \tfrac{\text{support}(X \cup Y)}{\text{support}(X)}
+ * = \tfrac{P(X \cap Y)}{P(X)}=P(Y|X) \).
  * <p>
  * Reference:
  * <p>

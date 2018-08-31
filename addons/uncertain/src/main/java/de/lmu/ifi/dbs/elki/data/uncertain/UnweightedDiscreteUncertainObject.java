@@ -32,12 +32,13 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Unweighted implementation of discrete uncertain objects.
- * <p>
  * <ul>
  * <li>Every object is represented by a finite number of discrete samples.</li>
  * <li>Every sample has the same weight.</li>
  * <li>Every sample is equally likely to be returned by {@link #drawSample}.
  * </ul>
+ * References:
+ * <p>
  * This is called the block independent-disjoint (BID model) in:
  * <p>
  * N. Dalvi, C. Ré, D. Suciu<br>
@@ -59,6 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
     booktitle = "Communications of the ACM 52, 7", //
     url = "https://doi.org/10.1145/1538788.1538810", //
     bibkey = "DBLP:journals/cacm/DalviRS09")
+@Reference(authors = "O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom", //
+    title = "ULDBs: Databases with uncertainty and lineage", //
+    booktitle = "Proc. of the 32nd Int. Conf. on Very Large Data Bases (VLDB)", //
+    url = "http://www.vldb.org/conf/2006/p953-benjelloun.pdf", //
+    bibkey = "DBLP:conf/vldb/BenjellounSHW06")
 public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,19 +48,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * outlier detection algorithm using EM Clustering. If an object does not belong
- * to any cluster it is supposed to be an outlier. If the probability for an
- * object to belong to the most probable cluster is still relatively low this
- * object is an outlier.
+ * Outlier detection algorithm using EM Clustering.
+ * <p>
+ * If an object does not belong to any cluster it is supposed to be an outlier.
+ * If the probability for an object to belong to the most probable cluster is
+ * still relatively low this object is an outlier.
  * 
  * @author Lisa Reichert
  * @since 0.3
- * 
+ *
  * @apiviz.has EM
- * 
+ *
  * @param <V> Vector type
  */
-// TODO: re-use an existing EM when present?
+// TODO: Allow using an existing EM result
 @Title("EM Outlier: Outlier Detection based on the generic EM clustering")
 @Description("The outlier score assigned is based on the highest cluster probability obtained from EM clustering.")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.EMOutlier")

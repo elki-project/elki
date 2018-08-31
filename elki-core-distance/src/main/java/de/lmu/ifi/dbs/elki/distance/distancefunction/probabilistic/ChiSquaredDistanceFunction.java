@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Chi-Squared distance function, symmetric version.
  * <p>
  * This implementation assumes that \( \sum_i \vec{x} = 1 \), and is defined as:
- * \[ \chi^2(\vec{x},\vec{y}):= 2 \sum_i \frac{(x_i-x_i)^2}{x_i+y_i} \]
+ * \[ \chi^2(\vec{x},\vec{y}):= 2 \sum\nolimits_i \tfrac{(x_i-x_i)^2}{x_i+y_i} \]
  * <p>
  * Reference:
  * <p>

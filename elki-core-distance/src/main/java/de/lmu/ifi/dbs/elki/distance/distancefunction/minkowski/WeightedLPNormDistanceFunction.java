@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,11 +33,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 import net.jafama.FastMath;
 
 /**
- * Weighted version of the Minkowski L<sub>p</sub> norm distance for {@link NumberVector}.
- * 
+ * Weighted version of the Minkowski L<sub>p</sub> norm distance for
+ * {@link NumberVector}.
+ * <p>
  * Weighted L<sub>p</sub> Norms are defined as:
- * \[ L_{p,\vec{w}}(\vec{x},\vec{y}) := \left(\sum_i w_i
- * |x_i-y_i|^p\right)^{1/p} \]
+ * \[ L_{p,\vec{w}}(\vec{x},\vec{y}) := \left(\sum\nolimits_i
+ * w_i |x_i-y_i|^p\right)^{1/p} \]
  *
  * @author Erich Schubert
  * @since 0.4.0

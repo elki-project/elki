@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Important differences:
  * <ol>
- * <li>Leaf nodes an directory nodes have the same capacity</li>
+ * <li>Leaf nodes and directory nodes have the same capacity</li>
  * <li>Condensing and memory limits are not implemented</li>
  * <li>Merging refinement (merge-resplit) is not implemented</li>
  * </ol>

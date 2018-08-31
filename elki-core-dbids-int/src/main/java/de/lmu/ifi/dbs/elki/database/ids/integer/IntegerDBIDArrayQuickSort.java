@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Two array iterators will be used to seek to the elements to compare, while
  * the backing storage is a plain integer array.
  * <p>
- * The implementation is closely based on:
+ * Reference:
  * <p>
  * V. Yaroslavskiy<br>
  * Dual-Pivot Quicksort

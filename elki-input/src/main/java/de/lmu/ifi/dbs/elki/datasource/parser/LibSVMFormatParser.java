@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Parser to read libSVM format files.
- * 
- * 
+ * <p>
  * The format of libSVM is roughly specified in the README given:
  * 
  * <pre>
@@ -43,15 +42,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * sparse vector representation of the data. indexes are integers, starting at 1
  * (Note that ELKI uses 0-based indexing, so we will map these to index-1) to
  * not always have a constant-0 dimension 0.
- * 
+ * <p>
  * The FAQ states that you can also put comments into the file, separated by a
- * dash: <tt>#</tt>, but they must not contain colons and are not officially
+ * hash: <tt>#</tt>, but they must not contain colons and are not officially
  * supported. ELKI will simply stop parsing a line when encountering a
  * <tt>#</tt>.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @param <V> Vector type
  */
 public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumberVectorLabelParser<V> {

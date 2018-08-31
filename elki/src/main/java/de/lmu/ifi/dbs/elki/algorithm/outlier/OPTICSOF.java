@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Optics-OF outlier detection algorithm, an algorithm to find Local Outliers in
+ * OPTICS-OF outlier detection algorithm, an algorithm to find Local Outliers in
  * a database based on ideas from {@link OPTICSTypeAlgorithm} clustering.
  * <p>
  * Reference:

@@ -41,7 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This is a baseline reference method, that computes the center of mass
  * (centroid) of each object, then runs k-means on this.
  * <p>
- * This algorithm was introduces as CK-Means in:
+ * References:
+ * <p>
+ * This algorithm was introduced as CK-Means in:
  * <p>
  * S. D. Lee, B. Kao, R. Cheng<br>
  * Reducing UK-means to K-means<br>

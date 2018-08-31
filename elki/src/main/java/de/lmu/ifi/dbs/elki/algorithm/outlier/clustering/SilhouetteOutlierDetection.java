@@ -57,25 +57,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Outlier detection by using the Silhouette Coefficients.
- * 
- * Silhouette values are computed as in:
  * <p>
- * P. J. Rousseeuw<br />
- * Silhouettes: A graphical aid to the interpretation and validation of cluster
- * analysis<br />
- * In: Journal of Computational and Applied Mathematics Volume 20, November 1987
- * </p>
- * 
- * but then used as outlier scores. To cite this outlier detection approach,
+ * Silhouette values are computed as by Rousseeuw and then used as outlier
+ * scores. To cite this outlier detection approach,
  * please cite the ELKI version you used (use the <a
  * href="http://elki.dbs.ifi.lmu.de/wiki/Publications">ELKI publication list</a>
  * for citation information and BibTeX templates).
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.has ClusteringAlgorithm
- * 
+ *
  * @param <O> Object type
  */
 @Reference(authors = "P. J. Rousseeuw", //

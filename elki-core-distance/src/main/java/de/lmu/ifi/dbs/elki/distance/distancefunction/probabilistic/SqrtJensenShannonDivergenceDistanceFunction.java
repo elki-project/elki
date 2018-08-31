@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,14 +29,13 @@ import net.jafama.FastMath;
 
 /**
  * The square root of Jensen-Shannon divergence is metric.
- * 
- * Reference (proof of triangle inequality, distance called D_PQ):
  * <p>
- * D. M. Endres, J. E. Schindelin<br />
- * A new metric for probability distributions<br />
- * IEEE Transactions on Information Theory, 49(7).
- * </p>
- * 
+ * Reference (proof of triangle inequality, distance called \(D_{PQ}\)):
+ * <p>
+ * D. M. Endres, J. E. Schindelin<br>
+ * A new metric for probability distributions<br>
+ * IEEE Transactions on Information Theory, 49(7)
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */

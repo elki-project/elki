@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * \tfrac{|B|}{|A|+|B|} d(B,C) - \tfrac{|A|\cdot|B|}{(|A|+|B|)^2} d(A,B)\]
  * <p>
  * With <em>squared</em> Euclidean distance, we then get the cluster distance:
- * \[d_{\text{UPGMC}}(A,B)=||\tfrac{1}{|A|}\sum_{a\in A} a,
- * \tfrac{1}{|B|}\sum_{b\in B} b||^2\]
+ * \[d_{\text{UPGMC}}(A,B)=||\tfrac{1}{|A|}\sum\nolimits_{a\in A} a,
+ * \tfrac{1}{|B|}\sum\nolimits_{b\in B} b||^2\]
  * but for other distances, this will not generally be true.
  * <p>
  * Because the ELKI implementations use Lance-Williams, this linkage should only

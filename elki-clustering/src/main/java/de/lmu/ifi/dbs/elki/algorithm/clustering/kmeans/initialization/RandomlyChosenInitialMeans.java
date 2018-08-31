@@ -37,15 +37,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Initialize K-means by randomly choosing k existing elements as cluster
  * centers.
  * <p>
- * This initialization is attributed to:
+ * Reference:
  * <p>
  * E. W. Forgy<br>
- * Cluster analysis of multivariate data : efficiency versus interpretability of
+ * Cluster analysis of multivariate data: efficiency versus interpretability of
  * classifications<br>
  * Abstract published in Biometrics 21(3)
  * <p>
- * but we were unable to verify this so far (apparently, only an abstract is
- * available in Biometrics).
+ * This initialization is attributed to above source, but we were unable to
+ * verify this so far (apparently, only an abstract is available in print,
+ * so we mostly can rely on indirect references).
  *
  * @author Erich Schubert
  * @since 0.4.0

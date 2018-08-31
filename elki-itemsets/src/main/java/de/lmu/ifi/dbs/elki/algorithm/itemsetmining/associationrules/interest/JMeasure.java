@@ -27,6 +27,8 @@ import net.jafama.FastMath;
 
 /**
  * J-Measure interestingness measure.
+ * \(P(X\cap Y)\log\tfrac{P(Y|X)}{P(Y)}
+ * + P(X\cap \neg Y)\log\tfrac{P(\neg Y|X)}{P(\neg Y)}\).
  * <p>
  * Reference:
  * <p>

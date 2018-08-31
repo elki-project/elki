@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,18 +30,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Cosine distance function for feature vectors.
- * 
+ * <p>
  * The cosine distance is computed from the cosine similarity by
  * <code>1-(cosine similarity)</code>.
- * 
+ * <p>
  * Cosine similarity is defined as
- * \[ \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \]
+ * \[ \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \]
  * Cosine distance then is defined as
- * \[ 1 - \frac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
- * 
+ * \[ 1 - \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
+ * <p>
  * {@link ArcCosineDistanceFunction} may sometimes be more appropriate, but also
  * more computationally expensive.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
  */
