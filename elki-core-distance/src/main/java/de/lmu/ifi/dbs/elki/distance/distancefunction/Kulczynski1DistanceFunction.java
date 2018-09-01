@@ -28,6 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Kulczynski similarity 1, in distance form.
  * <p>
+ * \[ d_\text{Kulczynski-1}(\vec{x},\vec{y}):=
+ * \tfrac{\sum\nolimits_i |x_i-y_i|}{\sum\nolimits_i\min\{x_i,y_i\}} \]
+ * <p>
  * Reference:
  * <p>
  * M.-M. Deza, E. Deza<br>
@@ -66,7 +69,7 @@ public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFun
       sumdiff += Math.abs(xd - yd);
       summin += Math.min(xd, yd);
     }
-    return sumdiff / summin;
+    return summin > 0 ? sumdiff / summin : 0.;
   }
 
   @Override
@@ -79,7 +82,7 @@ public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFun
       sumdiff += (max1 < min2) ? min2 - max1 : (min1 > max2) ? min1 - max2 : 0.;
       summin += Math.min(min1, min2);
     }
-    return sumdiff / summin;
+    return summin > 0 ? sumdiff / summin : 0;
   }
 
   @Override

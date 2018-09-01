@@ -28,6 +28,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Kulczynski similarity 2.
  * <p>
+ * \[ s_\text{Kulczynski-2}(\vec{x},\vec{y} :=
+ * \tfrac{n}{2}\left(\tfrac{1}{\bar{x}}+\tfrac{1}{\bar{y}}\right)
+ * \sum\nolimits_i\min\{x_i,y_i\} \]
+ * <p>
  * Reference:
  * <p>
  * M.-M. Deza and E. Deza<br>

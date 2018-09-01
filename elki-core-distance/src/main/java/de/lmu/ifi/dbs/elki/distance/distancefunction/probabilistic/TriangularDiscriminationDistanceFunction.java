@@ -31,20 +31,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Triangular Discrimination has relatively tight upper and lower bounds to the
  * Jensen-Shannon divergence, but is much less expensive.
- * 
+ * <p>
  * This distance function is meant for distribution vectors that sum to 1, and
  * does not work on negative values.
- * 
+ * <p>
  * See also {@link TriangularDistanceFunction} for a metric version.
- * 
+ * <p>
  * Reference:
  * <p>
- * F. Topsoe<br />
+ * F. Topsoe<br>
  * Some inequalities for information divergence and related measures of
- * discrimination<br />
+ * discrimination<br>
  * IEEE Transactions on information theory, 46(4).
- * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "F. Topsoe", //
@@ -103,6 +102,11 @@ public class TriangularDiscriminationDistanceFunction extends AbstractNumberVect
       }
     }
     return agg;
+  }
+
+  @Override
+  public boolean isSquared() {
+    return true;
   }
 
   @Override

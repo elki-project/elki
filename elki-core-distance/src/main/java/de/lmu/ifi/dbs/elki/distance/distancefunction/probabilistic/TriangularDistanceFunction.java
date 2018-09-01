@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,22 +29,21 @@ import net.jafama.FastMath;
 /**
  * Triangular Distance has relatively tight upper and lower bounds to the
  * (square root of the) Jensen-Shannon divergence, but is much less expensive.
- * 
+ * <p>
  * This distance function is meant for distribution vectors that sum to 1, and
  * does not work on negative values.
- * 
+ * <p>
  * This differs from {@link TriangularDistanceFunction} simply by the square
  * root, which makes it a proper metric and a good approximation for the much
  * more expensive {@link SqrtJensenShannonDivergenceDistanceFunction}.
- * 
+ * <p>
  * Reference:
  * <p>
- * R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti<br />
+ * R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti<br>
  * Hilbert Exclusion: Improved Metric Search through Finite Isometric
- * Embeddings<br />
+ * Embeddings<br>
  * arXiv preprint arXiv:1604.08640
- * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti", //
