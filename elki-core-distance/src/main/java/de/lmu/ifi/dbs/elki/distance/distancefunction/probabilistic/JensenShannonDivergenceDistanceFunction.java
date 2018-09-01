@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,15 +22,58 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Jensen-Shannon Divergence is essentially the same as Jeffrey divergence, only
- * scaled by half.
- * 
+ * Jensen-Shannon Divergence for {@link NumberVector}s is a symmetric,
+ * smoothened version of the
+ * {@link KullbackLeiblerDivergenceAsymmetricDistanceFunction}.
+ * <p>
+ * It essentially is the same as {@link JeffreyDivergenceDistanceFunction}, only
+ * scaled by half. For completeness, we include both.
+ * <p>
+ * \[JS(\vec{x},\vec{y}):=\tfrac12\sum\nolimits_i
+ * x_i\log\tfrac{x_i}{\tfrac12(x_i+y_i)} +
+ * y_i\log\tfrac{y_i}{\tfrac12(x_i+y_i)}
+ * = \frac12 KL(\vec{x},\frac12(\vec{x}+\vec{y}))
+ * + \frac12 KL(\vec{y},\frac12(\vec{x}+\vec{y}))\]
+ * <p>
+ * There exists a variable definition where the two vectors are weighted with
+ * \(\beta\) and \(\beta\), which for the common choice of \(\beta=\tfrac12\)
+ * yields this version.
+ * <p>
+ * Reference:
+ * <p>
+ * J. Lin<br>
+ * Divergence measures based on the Shannon entropy<br>
+ * IEEE Transactions on Information Theory 37(1)
+ * <p>
+ * D. M. Endres, J. E. Schindelin<br>
+ * A new metric for probability distributions<br>
+ * IEEE Transactions on Information Theory 49(7)
+ * <p>
+ * M.-M. Deza, E. Deza<br>
+ * Dictionary of distances
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
+@Reference(authors = "J. Lin", //
+    title = "Divergence measures based on the Shannon entropy", //
+    booktitle = "IEEE Transactions on Information Theory 37(1)", //
+    url = "https://doi.org/10.1109/18.61115", //
+    bibkey = "DBLP:journals/tit/Lin91")
+@Reference(authors = "D. M. Endres, J. E. Schindelin", //
+    title = "A new metric for probability distributions", //
+    booktitle = "IEEE Transactions on Information Theory 49(7)", //
+    url = "https://doi.org/10.1109/TIT.2003.813506", //
+    bibkey = "DBLP:journals/tit/EndresS03")
+@Reference(authors = "M.-M. Deza, E. Deza", //
+    title = "Dictionary of distances", //
+    booktitle = "Dictionary of distances", //
+    url = "https://doi.org/10.1007/978-3-642-00234-2", //
+    bibkey = "doi:10.1007/978-3-642-00234-2")
 public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDistanceFunction {
   /**
    * Static instance. Use this!
@@ -47,11 +90,6 @@ public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDi
     super();
   }
 
-  @Override
-  public boolean isSquared() {
-    return true;
-  }
-  
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     return .5 * super.distance(v1, v2);

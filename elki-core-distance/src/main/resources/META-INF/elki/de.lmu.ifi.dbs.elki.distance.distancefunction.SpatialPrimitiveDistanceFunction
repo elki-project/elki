@@ -22,7 +22,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclidean
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction chisq
-de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction j-divergence
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.TriangularDiscriminationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.TriangularDistanceFunction

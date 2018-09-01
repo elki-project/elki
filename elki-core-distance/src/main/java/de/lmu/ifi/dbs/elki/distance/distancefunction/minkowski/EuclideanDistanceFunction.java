@@ -113,7 +113,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
       agg += preNorm(v1, mindim, dim1);
@@ -132,7 +132,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
 
     final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
@@ -159,7 +159,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
    */
   public double maxDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
 
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {

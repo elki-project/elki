@@ -30,7 +30,9 @@ import net.jafama.FastMath;
 /**
  * The square root of Jensen-Shannon divergence is metric.
  * <p>
- * Reference (proof of triangle inequality, distance called \(D_{PQ}\)):
+ * References:
+ * <p>
+ * A proof of triangle inequality (for\(D_{PQ}\)) can be found in:
  * <p>
  * D. M. Endres, J. E. Schindelin<br>
  * A new metric for probability distributions<br>

@@ -65,7 +65,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double delta = (xd >= yd) ? xd - yd : yd - xd;
+      final double delta = xd >= yd ? xd - yd : yd - xd;
       agg += FastMath.pow(delta, p) * weights[d];
     }
     return agg;
@@ -76,7 +76,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
+      delta = delta >= 0 ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -88,7 +88,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
+      delta = delta >= 0 ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -110,7 +110,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      delta = (delta >= 0) ? delta : -mbr.getMax(d);
+      delta = delta >= 0 ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -121,7 +121,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
       agg += preNorm(v1, mindim, dim1);
@@ -140,7 +140,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
 
     final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
@@ -205,16 +205,10 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
 
     @Override
     protected WeightedLPNormDistanceFunction makeInstance() {
-      if(p == 1.) {
-        return new WeightedManhattanDistanceFunction(weights);
-      }
-      if(p == 2.) {
-        return new WeightedEuclideanDistanceFunction(weights);
-      }
-      if(p == Double.POSITIVE_INFINITY) {
-        return new WeightedMaximumDistanceFunction(weights);
-      }
-      return new WeightedLPNormDistanceFunction(p, weights);
+      return p == 1. ? new WeightedManhattanDistanceFunction(weights) //
+          : p == 2. ? new WeightedEuclideanDistanceFunction(weights) //
+              : p == Double.POSITIVE_INFINITY ? new WeightedMaximumDistanceFunction(weights) //
+                  : new WeightedLPNormDistanceFunction(p, weights);
     }
   }
 }

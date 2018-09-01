@@ -25,27 +25,66 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
- * Jeffrey Divergence Distance for {@link NumberVector}s.
+ * Jeffrey Divergence for {@link NumberVector}s is a symmetric, smoothened
+ * version of the {@link KullbackLeiblerDivergenceAsymmetricDistanceFunction}.
+ * Topsøe called this "capacitory discrimination".
+ * <p>
+ * \[JD(\vec{x},\vec{y}):= \sum\nolimits_i
+ * x_i\log\tfrac{x_i}{\tfrac12(x_i+y_i)} +
+ * y_i\log\tfrac{y_i}{\tfrac12(x_i+y_i)}
+ * = KL(\vec{x},\frac12(\vec{x}+\vec{y}))
+ * + KL(\vec{y},\frac12(\vec{x}+\vec{y}))\]
  * <p>
  * Reference:
+ * <p>
+ * H. Jeffreys<br>
+ * An invariant form for the prior probability in estimation problems<br>
+ * Proc. Royal Society A: Mathematical, Physical and Engineering Sciences
+ * 186(1007)
  * <p>
  * J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi<br>
  * Empirical evaluation of dissimilarity measures for color and texture<br>
  * Proc. 7th IEEE International Conference on Computer Vision
+ * <p>
+ * F. Topsøe<br>
+ * Some inequalities for information divergence and related measures of
+ * discrimination<br>
+ * IEEE Transactions on information theory, 46(4).
+ * <p>
+ * D. M. Endres, J. E. Schindelin<br>
+ * A new metric for probability distributions<br>
+ * IEEE Transactions on Information Theory 49(7)
  *
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Reference(authors = "H. Jeffreys", //
+    title = "An invariant form for the prior probability in estimation problems", //
+    booktitle = "Proc. Royal Society A: Mathematical, Physical and Engineering Sciences 186(1007)", //
+    url = "https://doi.org/10.1098/rspa.1946.0056", //
+    bibkey = "doi:10.1098/rspa.1946.0056")
 @Reference(authors = "J. Puzicha, J. M. Buhmann, Y. Rubner, C. Tomasi", //
     title = "Empirical evaluation of dissimilarity measures for color and texture", //
     booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
     url = "https://doi.org/10.1109/ICCV.1999.790412", //
     bibkey = "DBLP:conf/iccv/PuzichaRTB99")
+@Reference(authors = "F. Topsøe", //
+    title = "Some inequalities for information divergence and related measures of discrimination", //
+    booktitle = "IEEE Transactions on information theory, 46(4)", //
+    url = "https://doi.org/10.1109/18.850703", //
+    bibkey = "DBLP:journals/tit/Topsoe00")
+@Reference(authors = "D. M. Endres, J. E. Schindelin", //
+    title = "A new metric for probability distributions", //
+    booktitle = "IEEE Transactions on Information Theory 49(7)", //
+    url = "https://doi.org/10.1109/TIT.2003.813506", //
+    bibkey = "DBLP:journals/tit/EndresS03")
+@Alias({ "j-divergence" })
 public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!
@@ -104,6 +143,11 @@ public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDista
       }
     }
     return agg;
+  }
+
+  @Override
+  public boolean isSquared() {
+    return true;
   }
 
   @Override

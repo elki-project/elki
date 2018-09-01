@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance for {@link NumberVector}s.
- *
+ * <p>
  * The maximum distance is defined as:
  * \[ \text{Maximum}(\vec{x},\vec{y}) := \max_i |x_i-y_i| \]
- *
  * and can be seen as limiting case of the {@link LPNormDistanceFunction}
  * for \( p \rightarrow \infty \).
  *
@@ -58,8 +57,8 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double delta = (xd >= yd) ? xd - yd : yd - xd;
-      agg = (delta < agg) ? agg : delta;
+      final double delta = xd >= yd ? xd - yd : yd - xd;
+      agg = delta >= agg ? delta : agg;
     }
     return agg;
   }
@@ -69,8 +68,8 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
-      agg = (delta < agg) ? agg : delta;
+      delta = delta >= 0 ? delta : value - mbr.getMax(d);
+      agg = delta >= agg ? delta : agg;
     }
     return agg;
   }
@@ -79,8 +78,8 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
-      agg = (delta < agg) ? agg : delta;
+      delta = delta >= 0 ? delta : mbr1.getMin(d) - mbr2.getMax(d);
+      agg = delta >= agg ? delta : agg;
     }
     return agg;
   }
@@ -89,8 +88,8 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
-      final double delta = (xd >= 0.) ? xd : -xd;
-      agg = (delta < agg) ? agg : delta;
+      final double delta = xd >= 0. ? xd : -xd;
+      agg = delta >= agg ? delta : agg;
     }
     return agg;
   }
@@ -99,8 +98,8 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      delta = (delta >= 0) ? delta : -mbr.getMax(d);
-      agg = (delta < agg) ? agg : delta;
+      delta = delta >= 0 ? delta : -mbr.getMax(d);
+      agg = delta >= agg ? delta : agg;
     }
     return agg;
   }
@@ -108,7 +107,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
       double b = preNorm(v1, mindim, dim1);
@@ -129,7 +128,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
 
     final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;

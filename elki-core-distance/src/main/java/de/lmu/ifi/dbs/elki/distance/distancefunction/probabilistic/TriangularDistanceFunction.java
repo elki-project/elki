@@ -76,6 +76,11 @@ public class TriangularDistanceFunction extends TriangularDiscriminationDistance
   }
 
   @Override
+  public boolean isSquared() {
+    return false;
+  }
+
+  @Override
   public boolean isMetric() {
     return true;
   }

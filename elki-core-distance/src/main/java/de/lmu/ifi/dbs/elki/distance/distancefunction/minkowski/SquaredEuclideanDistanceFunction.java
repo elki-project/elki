@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Squared Euclidean distance, optimized for {@link SparseNumberVector}s. This
  * results in the same rankings as regular Euclidean distance, but saves
  * computing the square root.
- *
+ * <p>
  * Squared Euclidean is defined as:
  * \[ \text{Euclidean}^2(\vec{x},\vec{y}) := \sum_i (x_i-y_i)^2 \]
  *
@@ -132,7 +132,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
       agg += preNorm(v1, mindim, dim1);
@@ -148,7 +148,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
    */
   public double distance(double[] v1, double[] v2) {
     final int dim1 = v1.length, dim2 = v2.length;
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
       agg += preNorm(v1, mindim, dim1);
@@ -167,7 +167,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistan
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    final int mindim = dim1 < dim2 ? dim1 : dim2;
 
     final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Minimum distance for {@link NumberVector}s.
- *
+ * <p>
  * Minimum distance is defined as:
  * \[ \text{Minimum}_p(\vec{x},\vec{y}) := \min_i |x_i-y_i| \]
- *
+ * <p>
  * This is not a metric, but can sometimes be useful as a lower bound.
  *
  * @author Erich Schubert
@@ -62,8 +62,8 @@ public class MinimumDistanceFunction extends AbstractNumberVectorDistanceFunctio
     double agg = Double.POSITIVE_INFINITY;
     for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double val = (xd >= yd) ? xd - yd : yd - xd;
-      agg = val > agg ? agg : val;
+      final double val = xd >= yd ? xd - yd : yd - xd;
+      agg = val < agg ? val : agg;
     }
     return agg;
   }
@@ -74,8 +74,8 @@ public class MinimumDistanceFunction extends AbstractNumberVectorDistanceFunctio
     double agg = Double.POSITIVE_INFINITY;
     for(int d = 0; d < dim; d++) {
       final double xd = v.doubleValue(d);
-      final double val = (xd >= 0.) ? xd : -xd;
-      agg = val > agg ? agg : val;
+      final double val = xd >= 0. ? xd : -xd;
+      agg = val < agg ? val : agg;
     }
     return agg;
   }
@@ -90,17 +90,10 @@ public class MinimumDistanceFunction extends AbstractNumberVectorDistanceFunctio
     final int dim = dimensionality(mbr1, mbr2);
     double agg = Double.POSITIVE_INFINITY;
     for(int d = 0; d < dim; d++) {
-      final double diff;
-      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
-      if(d1 > 0.) {
-        diff = d1;
-      }
-      else {
-        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
-        if(d2 > 0.) {
-          diff = d2;
-        }
-        else {
+      double diff = mbr2.getMin(d) - mbr1.getMax(d);
+      if(diff <= 0.) {
+        diff = mbr1.getMin(d) - mbr2.getMax(d);
+        if(diff <= 0.) {
           // The objects overlap in this dimension.
           return 0.;
         }

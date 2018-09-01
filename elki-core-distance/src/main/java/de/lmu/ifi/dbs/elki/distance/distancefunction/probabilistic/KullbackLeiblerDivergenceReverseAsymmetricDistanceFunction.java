@@ -28,8 +28,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
- * Kullback-Leibler (asymmetric!) Distance, also known as relative entropy,
- * information deviation or just KL-distance.
+ * Kullback-Leibler divergence, also known as relative entropy, information
+ * deviation or just KL-distance (albeit asymmetric).
+ * <p>
+ * \[KL_R(\vec{x},\vec{y}):=\sum\nolimits_i y_i\log\tfrac{y_i}{x_i}
+ * = KL(\vec{y},\vec{x})\]
  * <p>
  * This version has the arguments reversed, see
  * {@link KullbackLeiblerDivergenceAsymmetricDistanceFunction} for the "forward"

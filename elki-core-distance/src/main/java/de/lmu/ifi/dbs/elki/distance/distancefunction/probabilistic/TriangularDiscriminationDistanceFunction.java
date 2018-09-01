@@ -39,14 +39,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * Reference:
  * <p>
- * F. Topsoe<br>
+ * F. Topsøe<br>
  * Some inequalities for information divergence and related measures of
  * discrimination<br>
  * IEEE Transactions on information theory, 46(4).
  *
  * @author Erich Schubert
  */
-@Reference(authors = "F. Topsoe", //
+@Reference(authors = "F. Topsøe", //
     title = "Some inequalities for information divergence and related measures of discrimination", //
     booktitle = "IEEE Transactions on information theory, 46(4)", //
     url = "https://doi.org/10.1109/18.850703", //

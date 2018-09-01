@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 /**
  * Weighted squared Euclidean distance for {@link NumberVector}s. This results in the
  * same rankings as weighted Euclidean distance, but saves computing the square root.
- *
+ * <p>
  * Weighted squared Euclidean is defined as:
  * \[ \text{Euclidean}^2_{\vec{w}}(\vec{x},\vec{y}) := \sum_i w_i (x_i-y_i)^2 \]
  *
