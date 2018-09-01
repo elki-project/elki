@@ -14,7 +14,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction canberra
 de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.MahalanobisDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedQuadraticDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
