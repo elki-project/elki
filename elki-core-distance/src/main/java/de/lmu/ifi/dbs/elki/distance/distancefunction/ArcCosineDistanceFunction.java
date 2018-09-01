@@ -76,13 +76,18 @@ public class ArcCosineDistanceFunction implements SpatialPrimitiveDistanceFuncti
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = Math.acos(VectorUtil.cosAngle(v1, v2));
-    return (d > 0) ? d : 0;
+    return d > 0 ? d : 0; // Avoid NaN
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = Math.acos(VectorUtil.minCosAngle(mbr1, mbr2));
-    return (d > 0) ? d : 0;
+    return d > 0 ? d : 0; // Avoid NaN
+  }
+
+  @Override
+  public boolean isMetric() {
+    return true; // on the non-negative unit sphere.
   }
 
   @Override
