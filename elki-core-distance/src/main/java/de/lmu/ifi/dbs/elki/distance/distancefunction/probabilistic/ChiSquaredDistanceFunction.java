@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Chi<sup>2</sup> distance function, symmetric version.
+ * χ² distance function, symmetric version.
  * <p>
- * This implementation assumes that \( \sum_i \vec{x} = 1 \), and is defined as:
- * \[ \chi^2(\vec{x},\vec{y}):= 2 \sum\nolimits_i \tfrac{(x_i-x_i)^2}{x_i+y_i} \]
+ * This implementation assumes \(\sum_i x_i=\sum_i y_i\), and is defined as:
+ * \[\chi^2(\vec{x},\vec{y}):=2\sum\nolimits_i \tfrac{(x_i-x_i)^2}{x_i+y_i}\]
  * <p>
  * Reference:
  * <p>
@@ -77,25 +77,21 @@ public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunc
     for(int d = 0; d < mindim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double di = xd - yd;
-      final double si = xd + yd;
-      if(!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
-        continue;
+      if(di > 0 || di < 0) {
+        final double si = xd + yd;
+        if(!(si > 0)) {
+          continue;
+        }
+        agg += di * di / si;
       }
-      agg += di * di / si;
     }
     for(int d = mindim; d < dim1; d++) {
       final double xd = v1.doubleValue(d);
-      if(xd != xd) { /* avoid NaNs */
-        continue;
-      }
-      agg += xd;
+      agg += xd == xd ? xd : 0; // NaN safe
     }
     for(int d = mindim; d < dim2; d++) {
-      final double xd = v2.doubleValue(d);
-      if(xd != xd) { /* avoid NaNs */
-        continue;
-      }
-      agg += xd;
+      final double yd = v2.doubleValue(d);
+      agg += yd == yd ? yd : 0; // NaN safe
     }
     return 2. * agg;
   }
@@ -108,21 +104,14 @@ public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunc
     for(int d = 0; d < mindim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      final double diff; // Minimum difference
-      if(max1 < min2) {
-        diff = min2 - max1;
+      final double diff = min2 > max1 ? min2 - max1 : min1 > max2 ? min1 - max2 : 0;
+      if(diff > 0) {
+        final double si = max1 + max2; // Maximum sum
+        if(!(si > 0)) {
+          continue;
+        }
+        agg += diff * diff / si;
       }
-      else if(max2 < min1) {
-        diff = max2 - min1;
-      }
-      else {
-        continue; // 0.
-      }
-      final double si = max1 + max2; // Maximum sum
-      if(!(si > 0. || si < 0.) || !(diff > 0. || diff < 0.)) {
-        continue;
-      }
-      agg += diff * diff / si;
     }
     for(int d = mindim; d < dim1; d++) {
       final double min1 = mbr1.getMin(d);
