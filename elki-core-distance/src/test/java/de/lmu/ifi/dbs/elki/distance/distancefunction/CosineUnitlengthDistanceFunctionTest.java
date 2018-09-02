@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,13 +32,21 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for unit-length cosine distance.
  *
  * @author Erich Schubert
  */
-public class CosineUnitlengthDistanceFunctionTest {
+public class CosineUnitlengthDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+  @Test
+  public void testSpatialConsistency() {
+    // Also test the builder - we could have just used .STATIC
+    CosineUnitlengthDistanceFunction dis = new ELKIBuilder<>(CosineUnitlengthDistanceFunction.class).build();
+    nonnegativeSpatialConsistency(dis);
+  }
+
   @Test
   public void compareOnUnitSphere() {
     Random r = new Random(0L);
@@ -133,7 +141,9 @@ public class CosineUnitlengthDistanceFunctionTest {
   public void testNotCosine() {
     DoubleVector d1 = DoubleVector.wrap(new double[] { 1, 0 });
     DoubleVector d2 = DoubleVector.wrap(new double[] { .5, 0 });
-    assertEquals("Cosine not ok", 0, CosineDistanceFunction.STATIC.distance(d1, d2), 0);
-    assertEquals("Length not ignored", 0.5, CosineUnitlengthDistanceFunction.STATIC.distance(d1, d2), 0);
+    CosineUnitlengthDistanceFunction cosnorm = new ELKIBuilder<>(CosineUnitlengthDistanceFunction.class).build();
+    CosineDistanceFunction cosfull = new ELKIBuilder<>(CosineDistanceFunction.class).build();
+    assertEquals("Cosine not ok", 0, cosfull.distance(d1, d2), 0);
+    assertEquals("Length not ignored", 0.5, cosnorm.distance(d1, d2), 0);
   }
 }

@@ -21,8 +21,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -60,7 +62,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-3-642-00234-2", //
     bibkey = "doi:10.1007/978-3-642-00234-2")
 @Alias({ "rao", "fisher-rao", "fisher" })
-public class FisherRaoDistanceFunction extends AbstractNumberVectorDistanceFunction {
+public class FisherRaoDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector> {
   /**
    * Static instance.
    */
@@ -81,6 +83,21 @@ public class FisherRaoDistanceFunction extends AbstractNumberVectorDistanceFunct
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
       final double v12 = fv1.doubleValue(d) * fv2.doubleValue(d);
+      assert (v12 >= 0) : "This distance is not defined on negative values.";
+      if(v12 > 0) {
+        agg += FastMath.sqrt(v12);
+      }
+    }
+    return agg >= 1 ? 0 : agg <= -1 ? -Math.PI : 2 * FastMath.acos(agg);
+  }
+
+  @Override
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = 0.;
+    for(int d = 0; d < mindim; d++) {
+      final double v12 = mbr1.getMin(d) * mbr2.getMin(d);
       assert (v12 >= 0) : "This distance is not defined on negative values.";
       if(v12 > 0) {
         agg += FastMath.sqrt(v12);

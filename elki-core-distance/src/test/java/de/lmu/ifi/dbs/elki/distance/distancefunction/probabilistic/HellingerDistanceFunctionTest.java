@@ -27,22 +27,31 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for Hellinger distance.
  * 
  * @author Erich Schubert
  */
-public class HellingerDistanceFunctionTest {
+public class HellingerDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+  @Test
+  public void testSpatialConsistency() {
+    // Also test the builder - we could have just used .STATIC
+    HellingerDistanceFunction df = new ELKIBuilder<>(HellingerDistanceFunction.class).build();
+    nonnegativeSpatialConsistency(df);
+  }
+
   @Test
   public void testHellingerDistance() {
-    DoubleVector v0 = DoubleVector.wrap(new double[] { 0.8, 0.1, 0.1 });
-    DoubleVector v1 = DoubleVector.wrap(new double[] { 0.1, 0.8, 0.1 });
-    DoubleVector v2 = DoubleVector.wrap(new double[] { 0.1, 0.1, 0.8 });
-    DoubleVector v3 = DoubleVector.wrap(new double[] { 1. / 3, 1. / 3, 1. / 3 });
-    DoubleVector v4 = DoubleVector.wrap(new double[] { 0.6, 0.2, 0.2 });
-
-    DoubleVector[] vecs = { v0, v1, v2, v3, v4 };
+    double[][] vecs = new double[][] { //
+        { 0.8, 0.1, 0.1 }, //
+        { 0.1, 0.8, 0.1 }, //
+        { 0.1, 0.1, 0.8 }, //
+        { 1. / 3, 1. / 3, 1. / 3 }, //
+        { 0.6, 0.2, 0.2 } };
 
     // Manual computation of correct distances:
     double d0102sq = pow(sqrt(0.1) - sqrt(0.2), 2);
@@ -80,13 +89,17 @@ public class HellingerDistanceFunctionTest {
         { s04, s14, s14, s34, 1. }, //
     };
 
-    HellingerDistanceFunction df = HellingerDistanceFunction.STATIC;
+    HellingerDistanceFunction df = new ELKIBuilder<>(HellingerDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {
+      DoubleVector vi = DoubleVector.wrap(vecs[i]);
+      HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
-        assertEquals("Distance " + i + "," + j + " incorrect.", distances[i][j], df.distance(vecs[i], vecs[j]), 1e-15);
-        assertEquals("Similarity " + i + "," + j + " incorrect.", 1 - pow(distances[i][j], 2), df.similarity(vecs[i], vecs[j]), 1e-15);
-        assertEquals("Distance " + i + "," + j + " incorrect.", sqrt(1 - similarities[i][j]), df.distance(vecs[i], vecs[j]), 1e-15);
-        assertEquals("Similarity " + i + "," + j + " incorrect.", similarities[i][j], df.similarity(vecs[i], vecs[j]), 1e-15);
+        DoubleVector vj = DoubleVector.wrap(vecs[j]);
+        assertEquals("Distance " + i + "," + j + " incorrect.", distances[i][j], df.distance(vi, vj), 1e-15);
+        assertEquals("Similarity " + i + "," + j + " incorrect.", 1 - pow(distances[i][j], 2), df.similarity(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j + " incorrect.", sqrt(1 - similarities[i][j]), df.distance(vi, vj), 1e-15);
+        assertEquals("Similarity " + i + "," + j + " incorrect.", similarities[i][j], df.similarity(vi, vj), 1e-15);
+        compareDistances(vj, vi, mbri, df);
       }
     }
   }

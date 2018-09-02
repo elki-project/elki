@@ -21,11 +21,12 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedPrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -106,7 +107,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-3-642-00234-2", //
     bibkey = "doi:10.1007/978-3-642-00234-2")
 @Alias({ "hellinger", "bhattacharyya" })
-public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunction implements NormalizedPrimitiveSimilarityFunction<NumberVector> {
+public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NormalizedPrimitiveSimilarityFunction<NumberVector> {
   /**
    * Static instance.
    */
@@ -127,16 +128,52 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
       final double v1 = fv1.doubleValue(d), v2 = fv2.doubleValue(d);
+      assert (v1 >= 0 && v2 >= 0) : "Hellinger distance requires non-negative values.";
       if(v1 != v2) {
         final double v = FastMath.sqrt(v1) - FastMath.sqrt(v2);
         agg += v * v;
       }
     }
     for(int d = mindim; d < dim1; d++) {
-      agg += Math.abs(fv1.doubleValue(d));
+      final double v1 = fv1.doubleValue(d);
+      assert (v1 >= 0) : "Hellinger distance requires non-negative values.";
+      agg += v1;
     }
     for(int d = mindim; d < dim2; d++) {
-      agg += Math.abs(fv2.doubleValue(d));
+      final double v2 = fv2.doubleValue(d);
+      assert (v2 >= 0) : "Hellinger distance requires non-negative values.";
+      agg += v2;
+    }
+    return MathUtil.SQRTHALF * FastMath.sqrt(agg);
+  }
+
+  @Override
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = 0.;
+    for(int d = 0; d < mindim; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
+      assert (min1 >= 0 && min2 >= 0) : "Hellinger distance requires non-negative values.";
+      if(max1 < min2) {
+        final double v = FastMath.sqrt(max1) - FastMath.sqrt(min2);
+        agg += v * v;
+      }
+      else if(max2 < min1) {
+        final double v = FastMath.sqrt(max2) - FastMath.sqrt(min1);
+        agg += v * v;
+      }
+    }
+    for(int d = mindim; d < dim1; d++) {
+      final double min1 = mbr1.getMin(d);
+      assert (min1 >= 0) : "Hellinger distance requires non-negative values.";
+      agg += min1;
+    }
+    for(int d = mindim; d < dim2; d++) {
+      final double min2 = mbr2.getMin(d);
+      assert (min2 >= 0) : "Hellinger distance requires non-negative values.";
+      agg += min2;
     }
     return MathUtil.SQRTHALF * FastMath.sqrt(agg);
   }
@@ -165,8 +202,8 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
   }
 
   @Override
-  public <T extends NumberVector> DistanceSimilarityQuery<T> instantiate(Relation<T> database) {
-    return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
+  public <T extends NumberVector> SpatialPrimitiveDistanceSimilarityQuery<T> instantiate(Relation<T> database) {
+    return new SpatialPrimitiveDistanceSimilarityQuery<>(database, this, this);
   }
 
   @Override

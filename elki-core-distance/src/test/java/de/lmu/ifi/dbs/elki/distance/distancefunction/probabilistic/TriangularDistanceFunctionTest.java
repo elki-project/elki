@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,24 +25,31 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for triangular distance.
- * 
+ *
  * @author Erich Schubert
  */
-public class TriangularDistanceFunctionTest {
+public class TriangularDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+  @Test
+  public void testSpatialConsistency() {
+    // Also test the builder - we could have just used .STATIC
+    TriangularDistanceFunction df = new ELKIBuilder<>(TriangularDistanceFunction.class).build();
+    nonnegativeSpatialConsistency(df);
+  }
+
   @Test
   public void testTriganular() {
-    DoubleVector v0 = DoubleVector.wrap(new double[] { 0.8, 0.1, 0.1 });
-    DoubleVector v1 = DoubleVector.wrap(new double[] { 0.1, 0.8, 0.1 });
-    DoubleVector v2 = DoubleVector.wrap(new double[] { 0.1, 0.1, 0.8 });
-    DoubleVector v3 = DoubleVector.wrap(new double[] { 1. / 3, 1. / 3, 1. / 3 });
-    DoubleVector v4 = DoubleVector.wrap(new double[] { 0.6, 0.2, 0.2 });
-
-    DoubleVector[] vecs = { v0, v1, v2, v3, v4 };
+    double[][] vecs = new double[][] { //
+        { 0.8, 0.1, 0.1 }, //
+        { 0.1, 0.8, 0.1 }, //
+        { 0.1, 0.1, 0.8 }, //
+        { 1. / 3, 1. / 3, 1. / 3 }, //
+        { 0.6, 0.2, 0.2 } };
 
     // Manual computation of correct distances:
     double d10 = .49 / .9 + .49 / .9 + 0.;
@@ -60,10 +67,14 @@ public class TriangularDistanceFunctionTest {
         { d40, d41, d41, d43, 0. }, //
     };
 
-    PrimitiveDistanceFunction<NumberVector> df = TriangularDistanceFunction.STATIC;
+    TriangularDistanceFunction df = new ELKIBuilder<>(TriangularDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {
+      DoubleVector vi = DoubleVector.wrap(vecs[i]);
+      HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
-        assertEquals("Distance " + i + "," + j + " incorrect.", Math.sqrt(distances[i][j]), df.distance(vecs[i], vecs[j]), 1e-15);
+        DoubleVector vj = DoubleVector.wrap(vecs[j]);
+        assertEquals("Distance " + i + "," + j + " incorrect.", Math.sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
+        compareDistances(vj, vi, mbri, df);
       }
     }
   }

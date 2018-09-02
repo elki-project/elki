@@ -22,8 +22,11 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersecti
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiDistanceFunction chi
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction chisq
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.FisherRaoDistanceFunction rao fisher-rao fisher
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction hellinger bhattacharyya
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction j-divergence
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.SqrtJensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.TriangularDiscriminationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.TriangularDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction

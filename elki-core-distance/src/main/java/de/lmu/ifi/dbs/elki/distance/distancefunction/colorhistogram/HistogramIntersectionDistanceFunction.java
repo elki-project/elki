@@ -86,10 +86,10 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
       final double min1 = mbr1.getMin(i), max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i), max2 = mbr2.getMax(i);
       agg += Math.min(max1, max2);
-      norm1 += min1;
-      norm2 += min2;
+      norm1 += Math.max(0, min1);
+      norm2 += Math.max(0, min2);
     }
-    return 1 - agg / Math.min(norm1, norm2);
+    return Math.max(0, 1 - agg / Math.min(norm1, norm2));
   }
 
   @Override
