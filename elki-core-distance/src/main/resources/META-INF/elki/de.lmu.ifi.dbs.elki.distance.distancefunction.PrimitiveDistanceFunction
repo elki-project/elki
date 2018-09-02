@@ -39,6 +39,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedSquaredPearson
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.KolmogorovSmirnovDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction j-divergence
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiDistanceFunction chi
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction chisq
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction hellinger bhattacharyya
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.FisherRaoDistanceFunction rao fisher-rao fisher
