@@ -21,7 +21,13 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -30,6 +36,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * \[ s_\text{Kulczynski-1}(\vec{x},\vec{y}):=
  * \tfrac{\sum\nolimits_i\min\{x_i,y_i\}}{\sum\nolimits_i |x_i-y_i|} \]
+ * or in distance form:
+ * \[ d_\text{Kulczynski-1}(\vec{x},\vec{y}):=
+ * \tfrac{\sum\nolimits_i |x_i-y_i|}{\sum\nolimits_i\min\{x_i,y_i\}} \]
  * <p>
  * Reference:
  * <p>
@@ -44,7 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     booktitle = "Dictionary of distances", //
     url = "https://doi.org/10.1007/978-3-642-00234-2", //
     bibkey = "doi:10.1007/978-3-642-00234-2")
-public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunction {
+@Alias({ "de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction" })
+public class Kulczynski1SimilarityFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, PrimitiveSimilarityFunction<NumberVector> {
   /**
    * Static instance.
    */
@@ -61,6 +71,37 @@ public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunct
   }
 
   @Override
+  public double distance(NumberVector v1, NumberVector v2) {
+    final int dim = dimensionality(v1, v2);
+    double sumdiff = 0., summin = 0.;
+    for(int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      if(xd >= yd) {
+        sumdiff += xd - yd;
+        summin += yd;
+      }
+      else {
+        sumdiff += yd - xd;
+        summin += xd;
+      }
+    }
+    return summin > 0 ? sumdiff / summin : 0.;
+  }
+
+  @Override
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double sumdiff = 0., summin = 0.;
+    for(int d = 0; d < dim; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
+      sumdiff += max1 < min2 ? min2 - max1 : min1 > max2 ? min1 - max2 : 0.;
+      summin += min1 < min2 ? min1 : min2;
+    }
+    return summin > 0 ? sumdiff / summin : 0;
+  }
+
+  @Override
   public double similarity(NumberVector v1, NumberVector v2) {
     final int dim = AbstractNumberVectorDistanceFunction.dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
@@ -70,6 +111,16 @@ public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunct
       summin += Math.min(xi, yi);
     }
     return summin / sumdiff;
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
+
+  @Override
+  public <T extends NumberVector> SpatialPrimitiveDistanceSimilarityQuery<T> instantiate(Relation<T> database) {
+    return new SpatialPrimitiveDistanceSimilarityQuery<>(database, this, this);
   }
 
   /**

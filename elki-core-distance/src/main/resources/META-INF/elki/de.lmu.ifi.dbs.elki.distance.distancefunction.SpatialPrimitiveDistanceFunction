@@ -12,7 +12,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction bray-cu
 de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction canberra
 de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction squaredeuclidean de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
@@ -32,3 +31,4 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFun
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction

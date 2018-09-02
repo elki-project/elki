@@ -1,4 +1,4 @@
-de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski2SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
