@@ -51,7 +51,7 @@ public class MarkdownDocStream implements AutoCloseable {
    *
    * @apiviz.exclude
    */
-  private static enum Newline {
+  private enum Newline {
     NONE, BREAK, NEWLINE, PAR
   }
 

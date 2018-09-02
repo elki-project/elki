@@ -63,15 +63,9 @@ public class CosineUnitlengthDistanceFunctionTest extends AbstractSpatialPrimiti
     CosineDistanceFunction cosfull = CosineDistanceFunction.STATIC;
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j < data.length; j++) {
-        double actual = cosnorm.distance(DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]));
-        double expected = cosfull.distance(DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]));
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.minDist(DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]));
-        expected = cosfull.minDist(DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]));
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.minDist(new HyperBoundingBox(data[i], data[i]), new HyperBoundingBox(data[j], data[j]));
-        expected = cosfull.minDist(new HyperBoundingBox(data[i], data[i]), new HyperBoundingBox(data[j], data[j]));
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
+        assertSameDistance(cosfull, cosnorm, DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]), 1e-15);
+        assertSameMinDist(cosfull, cosnorm, DoubleVector.wrap(data[i]), DoubleVector.wrap(data[j]), 1e-15);
+        assertSameMinDist(cosfull, cosnorm, new HyperBoundingBox(data[i], data[i]), new HyperBoundingBox(data[j], data[j]), 1e-15);
       }
     }
   }
@@ -113,26 +107,14 @@ public class CosineUnitlengthDistanceFunctionTest extends AbstractSpatialPrimiti
     CosineDistanceFunction cosfull = CosineDistanceFunction.STATIC;
     for(int i = 0; i < sparse.length; i++) {
       for(int j = 0; j < sparse.length; j++) {
-        double actual = cosnorm.distance(sparse[i], sparse[j]);
-        double expected = cosfull.distance(sparse[i], sparse[j]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.minDist(sparse[i], sparse[j]);
-        expected = cosfull.minDist(sparse[i], sparse[j]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
+        assertSameDistance(cosfull, cosnorm, sparse[i], sparse[j], 1e-15);
+        assertSameMinDist(cosfull, cosnorm, sparse[i], sparse[j], 1e-15);
       }
       for(int j = 0; j < dense.length; j++) {
-        double actual = cosnorm.distance(sparse[i], dense[j]);
-        double expected = cosfull.distance(sparse[i], dense[j]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.minDist(sparse[i], dense[j]);
-        expected = cosfull.minDist(sparse[i], dense[j]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.distance(dense[j], sparse[i]);
-        expected = cosfull.distance(dense[j], sparse[i]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
-        actual = cosnorm.minDist(dense[j], sparse[i]);
-        expected = cosfull.minDist(dense[j], sparse[i]);
-        assertEquals("Distances do not agree.", expected, actual, 1e-15);
+        assertSameDistance(cosfull, cosnorm, sparse[i], dense[j], 1e-15);
+        assertSameMinDist(cosfull, cosnorm, sparse[i], dense[j], 1e-15);
+        assertSameDistance(cosfull, cosnorm, dense[j], sparse[i], 1e-15);
+        assertSameMinDist(cosfull, cosnorm, dense[j], sparse[i], 1e-15);
       }
     }
   }

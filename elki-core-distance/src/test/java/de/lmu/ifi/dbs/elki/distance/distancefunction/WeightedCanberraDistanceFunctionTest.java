@@ -24,7 +24,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
@@ -38,7 +37,7 @@ public class WeightedCanberraDistanceFunctionTest extends AbstractSpatialPrimiti
   public void testSpatialConsistency() {
     // Also test the builder
     WeightedCanberraDistanceFunction dis = new ELKIBuilder<>(WeightedCanberraDistanceFunction.class) //
-        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(7, new Random(0L))) //
+        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     spatialConsistency(dis);
     nonnegativeSpatialConsistency(dis);

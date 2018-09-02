@@ -46,12 +46,7 @@ public class HellingerDistanceFunctionTest extends AbstractSpatialPrimitiveDista
 
   @Test
   public void testHellingerDistance() {
-    double[][] vecs = new double[][] { //
-        { 0.8, 0.1, 0.1 }, //
-        { 0.1, 0.8, 0.1 }, //
-        { 0.1, 0.1, 0.8 }, //
-        { 1. / 3, 1. / 3, 1. / 3 }, //
-        { 0.6, 0.2, 0.2 } };
+    double[][] vecs = TOY_VECTORS;
 
     // Manual computation of correct distances:
     double d0102sq = pow(sqrt(0.1) - sqrt(0.2), 2);
@@ -95,10 +90,10 @@ public class HellingerDistanceFunctionTest extends AbstractSpatialPrimitiveDista
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j + " incorrect.", distances[i][j], df.distance(vi, vj), 1e-15);
-        assertEquals("Similarity " + i + "," + j + " incorrect.", 1 - pow(distances[i][j], 2), df.similarity(vi, vj), 1e-15);
-        assertEquals("Distance " + i + "," + j + " incorrect.", sqrt(1 - similarities[i][j]), df.distance(vi, vj), 1e-15);
-        assertEquals("Similarity " + i + "," + j + " incorrect.", similarities[i][j], df.similarity(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, distances[i][j], df.distance(vi, vj), 1e-15);
+        assertEquals("Similarity " + i + "," + j, 1 - pow(distances[i][j], 2), df.similarity(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, sqrt(1 - similarities[i][j]), df.distance(vi, vj), 1e-15);
+        assertEquals("Similarity " + i + "," + j, similarities[i][j], df.similarity(vi, vj), 1e-15);
         compareDistances(vj, vi, mbri, df);
       }
     }

@@ -23,15 +23,12 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
 
 /**
@@ -43,30 +40,66 @@ import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
  */
 public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
   /**
+   * Toy vectors, used for unit testing distribution distances.
+   */
+  public static final double[][] TOY_VECTORS = new double[][] { //
+      { 0.8, 0.1, 0.1 }, //
+      { 0.1, 0.8, 0.1 }, //
+      { 0.1, 0.1, 0.8 }, //
+      { 1. / 3, 1. / 3, 1. / 3 }, //
+      { 0.6, 0.2, 0.2 } };
+
+  /**
+   * Number of dimensions to use in basic test.
+   */
+  public static final int TEST_DIM = 5;
+
+  /**
+   * Compare two distances.
+   *
+   * @param ref Reference measure
+   * @param test Test measure
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @param tol Tolerance
+   * @param <V> vector type
+   */
+  public static <V> void assertSameDistance(PrimitiveDistanceFunction<? super V> ref, PrimitiveDistanceFunction<? super V> test, V v1, V v2, double tol) {
+    assertEquals("Distances not same", ref.distance(v1, v2), test.distance(v1, v2), tol);
+  }
+
+  /**
+   * Compare two distances.
+   *
+   * @param ref Reference measure
+   * @param test Test measure
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @param tol Tolerance
+   */
+  public static void assertSameMinDist(SpatialPrimitiveDistanceFunction<?> ref, SpatialPrimitiveDistanceFunction<?> test, SpatialComparable v1, SpatialComparable v2, double tol) {
+    assertEquals("Distances not same", ref.minDist(v1, v2), test.minDist(v1, v2), tol);
+  }
+
+  /**
    * MBR consistency check, around 0.
    *
    * @param dis Distance function to check
    */
   public static void spatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dis) {
     final Random rnd = new FastNonThreadsafeRandom(0);
-    final int dim = 7, iters = 10000;
+    final int dim = TEST_DIM, iters = 1000;
 
-    double[] d1 = new double[dim], d2 = new double[dim];
-    double[] d3 = new double[dim], d4 = new double[dim];
-    DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d4);
-    HyperBoundingBox mbr = new HyperBoundingBox(d2, d3);
+    double[] d1 = new double[dim], d2 = new double[dim], d3 = new double[dim],
+        d4 = new double[dim];
+    DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
+    HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
-        d2[d] = (rnd.nextDouble() - .5) * 2E4;
-        d3[d] = (rnd.nextDouble() - .5) * 2E4;
-        if(d2[d] > d3[d]) {
-          double t = d2[d];
-          d2[d] = d3[d];
-          d3[d] = t;
-        }
-        double m = rnd.nextDouble();
-        d4[d] = m * d2[d] + (1 - m) * d3[d];
+        double m = d2[d] = (rnd.nextDouble() - .5) * 2E4;
+        d3[d] = m - rnd.nextDouble() * 1E4;
+        d4[d] = m + rnd.nextDouble() * 1E4;
       }
       compareDistances(v1, v2, mbr, dis);
     }
@@ -78,27 +111,22 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
    * @param dis Distance function to test
    */
   public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dis) {
-    List<SpatialPrimitiveDistanceFunction<? super NumberVector>> dists = new ArrayList<>();
-    dists.add(new ELKIBuilder<>(HistogramIntersectionDistanceFunction.class).build());
+    // These should probably go into a more generic function.
+    assertTrue("Inconsistent equals", dis.equals(dis));
+    // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
 
     final Random rnd = new FastNonThreadsafeRandom(1);
-    final int dim = 7, iters = 10000;
-    double[] d1 = new double[dim], d2 = new double[dim];
-    double[] d3 = new double[dim], d4 = new double[dim];
-    DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d4);
-    HyperBoundingBox mbr = new HyperBoundingBox(d2, d3);
+    final int dim = TEST_DIM, iters = 10000;
+    double[] d1 = new double[dim], d2 = new double[dim], d3 = new double[dim],
+        d4 = new double[dim];
+    DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
+    HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;
-        d2[d] = rnd.nextDouble() * 2E4;
-        d3[d] = rnd.nextDouble() * 2E4;
-        if(d2[d] > d3[d]) {
-          double t = d2[d];
-          d2[d] = d3[d];
-          d3[d] = t;
-        }
-        double m = rnd.nextDouble();
-        d4[d] = m * d2[d] + (1 - m) * d3[d];
+        double v = d2[d] = rnd.nextDouble() * 2E4;
+        d3[d] = rnd.nextDouble() * v;
+        d4[d] = rnd.nextDouble() * (2E4 - v) + v;
       }
       compareDistances(v1, v2, mbr, dis);
     }

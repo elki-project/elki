@@ -45,12 +45,7 @@ public class ChiDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFun
 
   @Test
   public void testChiSquaredDistance() {
-    double[][] vecs = new double[][] { //
-        { 0.8, 0.1, 0.1 }, //
-        { 0.1, 0.8, 0.1 }, //
-        { 0.1, 0.1, 0.8 }, //
-        { 1. / 3, 1. / 3, 1. / 3 }, //
-        { 0.6, 0.2, 0.2 } };
+    double[][] vecs = TOY_VECTORS;
 
     // Manual computation of correct distances:
     double d01 = 2 * (49. / 90 * 2);
@@ -72,8 +67,8 @@ public class ChiDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFun
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j + " incorrect.", sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
-        assertEquals("Distance " + i + "," + j + " incorrect.", distances[i][j], df2.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, distances[i][j], df2.distance(vi, vj), 1e-15);
         compareDistances(vj, vi, mbri, df);
       }
     }

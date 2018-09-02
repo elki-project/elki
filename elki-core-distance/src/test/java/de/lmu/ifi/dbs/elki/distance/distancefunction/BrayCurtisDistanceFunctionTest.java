@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**

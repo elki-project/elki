@@ -43,14 +43,14 @@ public class WeightedLPNormDistanceFunctionTest extends AbstractSpatialPrimitive
     // Also test the builder
     WeightedLPNormDistanceFunction dis = new ELKIBuilder<>(WeightedLPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, .5)//
-        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(7, new Random(0L))) //
+        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertFalse("Not metric", dis.isMetric());
     spatialConsistency(dis);
     nonnegativeSpatialConsistency(dis);
     dis = new ELKIBuilder<>(WeightedLPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, 3)//
-        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(7, new Random(0L))) //
+        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertTrue("Not metric", dis.isMetric());
     spatialConsistency(dis);

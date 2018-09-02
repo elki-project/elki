@@ -39,7 +39,7 @@ public class WeightedMaximumDistanceFunctionTest extends AbstractSpatialPrimitiv
   public void testSpatialConsistency() {
     // Also test the builder
     WeightedMaximumDistanceFunction dis = new ELKIBuilder<>(WeightedMaximumDistanceFunction.class) //
-        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(7, new Random(0L))) //
+        .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     spatialConsistency(dis);
     nonnegativeSpatialConsistency(dis);

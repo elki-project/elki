@@ -114,6 +114,11 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
   public static final HellingerDistanceFunction STATIC = new HellingerDistanceFunction();
 
   /**
+   * Assertion error message.
+   */
+  private static final String NON_NEGATIVE = "Hellinger distance requires non-negative values.";
+
+  /**
    * Hellinger kernel. Use static instance {@link #STATIC}!
    */
   @Deprecated
@@ -128,7 +133,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
       final double v1 = fv1.doubleValue(d), v2 = fv2.doubleValue(d);
-      assert (v1 >= 0 && v2 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (v1 >= 0 && v2 >= 0) : NON_NEGATIVE;
       if(v1 != v2) {
         final double v = FastMath.sqrt(v1) - FastMath.sqrt(v2);
         agg += v * v;
@@ -136,12 +141,12 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     }
     for(int d = mindim; d < dim1; d++) {
       final double v1 = fv1.doubleValue(d);
-      assert (v1 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (v1 >= 0) : NON_NEGATIVE;
       agg += v1;
     }
     for(int d = mindim; d < dim2; d++) {
       final double v2 = fv2.doubleValue(d);
-      assert (v2 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (v2 >= 0) : NON_NEGATIVE;
       agg += v2;
     }
     return MathUtil.SQRTHALF * FastMath.sqrt(agg);
@@ -155,7 +160,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     for(int d = 0; d < mindim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      assert (min1 >= 0 && min2 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (min1 >= 0 && min2 >= 0) : NON_NEGATIVE;
       if(max1 < min2) {
         final double v = FastMath.sqrt(max1) - FastMath.sqrt(min2);
         agg += v * v;
@@ -167,12 +172,12 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     }
     for(int d = mindim; d < dim1; d++) {
       final double min1 = mbr1.getMin(d);
-      assert (min1 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (min1 >= 0) : NON_NEGATIVE;
       agg += min1;
     }
     for(int d = mindim; d < dim2; d++) {
       final double min2 = mbr2.getMin(d);
-      assert (min2 >= 0) : "Hellinger distance requires non-negative values.";
+      assert (min2 >= 0) : NON_NEGATIVE;
       agg += min2;
     }
     return MathUtil.SQRTHALF * FastMath.sqrt(agg);
