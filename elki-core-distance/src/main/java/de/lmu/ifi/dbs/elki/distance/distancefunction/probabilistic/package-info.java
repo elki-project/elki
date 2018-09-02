@@ -1,5 +1,6 @@
 /**
- * Distance from probability theory, mostly divergences such as K-L-divergence, J-divergence.
+ * Distance from probability theory, mostly divergences such as K-L-divergence,
+ * J-divergence, F-divergence, χ²-divergence, etc.
  * 
  * @author Erich Schubert
  */
@@ -7,7 +8,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

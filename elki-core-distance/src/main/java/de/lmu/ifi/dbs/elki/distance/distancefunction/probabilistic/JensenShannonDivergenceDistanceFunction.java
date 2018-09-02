@@ -34,13 +34,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * scaled by half. For completeness, we include both.
  * <p>
  * \[JS(\vec{x},\vec{y}):=\tfrac12\sum\nolimits_i
- * x_i\log\tfrac{x_i}{\tfrac12(x_i+y_i)} +
- * y_i\log\tfrac{y_i}{\tfrac12(x_i+y_i)}
- * = \frac12 KL(\vec{x},\frac12(\vec{x}+\vec{y}))
- * + \frac12 KL(\vec{y},\frac12(\vec{x}+\vec{y}))\]
+ * x_i\log\tfrac{2x_i}{x_i+y_i}+y_i\log\tfrac{2y_i}{x_i+y_i}
+ * = \tfrac12 KL(\vec{x},\tfrac12(\vec{x}+\vec{y}))
+ * + \tfrac12 KL(\vec{y},\tfrac12(\vec{x}+\vec{y}))\]
  * <p>
  * There exists a variable definition where the two vectors are weighted with
- * \(\beta\) and \(\beta\), which for the common choice of \(\beta=\tfrac12\)
+ * \(\beta\) and \(1-\beta\), which for the common choice of \(\beta=\tfrac12\)
  * yields this version.
  * <p>
  * Reference:

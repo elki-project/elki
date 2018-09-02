@@ -28,11 +28,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
- * The square root of Jensen-Shannon divergence is metric.
+ * The square root of Jensen-Shannon divergence is a metric.
+ * <p>
+ * \[\sqrt{JS}(\vec{x},\vec{y}):=\sqrt{\tfrac12\sum\nolimits_i
+ * x_i\log\tfrac{2x_i}{x_i+y_i}+y_i\log\tfrac{2y_i}{x_i+y_i}}
+ * = \sqrt{JS(\vec{x},\vec{y})}\]
+ * <p>
+ * A proof of triangle inequality (for "\(D_{PQ}\)") can be found in Endres and
+ * Schindelin.
  * <p>
  * References:
- * <p>
- * A proof of triangle inequality (for\(D_{PQ}\)) can be found in:
  * <p>
  * D. M. Endres, J. E. Schindelin<br>
  * A new metric for probability distributions<br>

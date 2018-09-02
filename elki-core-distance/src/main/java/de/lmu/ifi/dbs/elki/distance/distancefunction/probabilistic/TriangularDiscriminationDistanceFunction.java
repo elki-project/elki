@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Triangular Discrimination has relatively tight upper and lower bounds to the
  * Jensen-Shannon divergence, but is much less expensive.
  * <p>
+ * \[\text{Triangular-Discrimination}(\vec{x},\vec{y}):=
+ * \sum\nolimits_i \tfrac{|x_i-y_i|^2}{x_i+y_i}\]
+ * <p>
  * This distance function is meant for distribution vectors that sum to 1, and
  * does not work on negative values.
  * <p>

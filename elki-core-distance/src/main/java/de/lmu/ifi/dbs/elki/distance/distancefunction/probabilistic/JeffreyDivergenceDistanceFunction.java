@@ -36,10 +36,9 @@ import net.jafama.FastMath;
  * Topsøe called this "capacitory discrimination".
  * <p>
  * \[JD(\vec{x},\vec{y}):= \sum\nolimits_i
- * x_i\log\tfrac{x_i}{\tfrac12(x_i+y_i)} +
- * y_i\log\tfrac{y_i}{\tfrac12(x_i+y_i)}
- * = KL(\vec{x},\frac12(\vec{x}+\vec{y}))
- * + KL(\vec{y},\frac12(\vec{x}+\vec{y}))\]
+ * x_i\log\tfrac{2x_i}{x_i+y_i}+y_i\log\tfrac{2y_i}{x_i+y_i}
+ * = KL(\vec{x},\tfrac12(\vec{x}+\vec{y}))
+ * + KL(\vec{y},\tfrac12(\vec{x}+\vec{y}))\]
  * <p>
  * Reference:
  * <p>
