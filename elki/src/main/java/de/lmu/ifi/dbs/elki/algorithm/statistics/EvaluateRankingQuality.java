@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,8 +142,8 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
       double[][] covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        double d = mahalanobisDistance(covm, relation.get(iter).toArray(), av);
-        cmem.add(d, iter);
+        double[] v = minusEquals(relation.get(iter).toArray(), av);
+        cmem.add(transposeTimesTimes(v, covm, v), iter);
       }
       cmem.sort();
 

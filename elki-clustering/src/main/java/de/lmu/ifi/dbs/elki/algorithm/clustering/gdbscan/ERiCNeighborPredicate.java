@@ -208,8 +208,9 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      return mahalanobisDistance(pca1.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau //
-          && mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
+      double[] v = minusEquals(v1.toArray(), v2.toArray());
+      return transposeTimesTimes(v, pca1.similarityMatrix(), v) <= settings.tau //
+          && transposeTimesTimes(v, pca2.similarityMatrix(), v) <= settings.tau;
     }
 
     /**
@@ -224,24 +225,16 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
      * @return {@code true} when the two vectors are close enough.
      */
     public boolean weakNeighbors(double[] v1, double[] v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
-      if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
+      if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension() //
+          || !approximatelyLinearDependent(pca1, pca2) //
+          || (pca1.getCorrelationDimension() == pca2.getCorrelationDimension() && !approximatelyLinearDependent(pca2, pca1))) {
         return false;
       }
 
-      if(!approximatelyLinearDependent(pca1, pca2)) {
-        return false;
-      }
-      if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension() && !approximatelyLinearDependent(pca2, pca1)) {
-        return false;
-      }
-
-      if(mahalanobisDistance(pca1.similarityMatrix(), v1, v2) > settings.tau) {
-        return false;
-      }
-      if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        return mahalanobisDistance(pca2.similarityMatrix(), v1, v2) <= settings.tau;
-      }
-      return true;
+      double[] v = minus(v1, v2);
+      return transposeTimesTimes(v, pca1.similarityMatrix(), v) <= settings.tau && //
+          (pca1.getCorrelationDimension() != pca2.getCorrelationDimension() //
+              || transposeTimesTimes(v, pca2.similarityMatrix(), v) <= settings.tau);
     }
 
     /**

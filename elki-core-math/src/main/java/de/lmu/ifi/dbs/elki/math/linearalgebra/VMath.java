@@ -128,7 +128,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 + v2 for vectors.
+   * Computes component-wise v1 + v2 for vectors.
    *
    * @param v1 first vector
    * @param v2 second vector
@@ -144,7 +144,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 + v2 * s2
+   * Computes component-wise v1 + v2 * s2.
    *
    * @param v1 first vector
    * @param v2 second vector
@@ -161,7 +161,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 * s1 + v2
+   * Computes component-wise v1 * s1 + v2.
    *
    * @param v1 first vector
    * @param s1 the scalar for v1
@@ -178,7 +178,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 * s1 + v2 * s2
+   * Computes component-wise v1 * s1 + v2 * s2.
    *
    * @param v1 first vector
    * @param s1 the scalar for v1
@@ -196,7 +196,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 + v2, overwriting v1
+   * Computes component-wise v1 = v1 + v2,
+   * overwriting the vector v1.
    *
    * @param v1 first vector (overwritten)
    * @param v2 second vector
@@ -211,9 +212,10 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 + v2 * s2, overwriting v1
+   * Computes component-wise v1 = v1 + v2 * s2,
+   * overwriting the vector v1.
    *
-   * @param v1 first vector
+   * @param v1 first vector (overwritten)
    * @param v2 another vector
    * @param s2 scalar factor for v2
    * @return v1 = v1 + v2 * s2
@@ -227,9 +229,10 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1 + v2, overwriting v1
+   * Computes component-wise v1 = v1 * s1 + v2,
+   * overwriting the vector v1.
    *
-   * @param v1 first vector
+   * @param v1 first vector (overwritten)
    * @param s1 scalar factor for v1
    * @param v2 another vector
    * @return v1 = v1 * s1 + v2
@@ -243,9 +246,10 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1 + v2 * s2, overwriting v1
+   * Computes component-wise v1 = v1 * s1 + v2 * s2,
+   * overwriting the vector v1.
    *
-   * @param v1 first vector
+   * @param v1 first vector (overwritten)
    * @param s1 scalar for v1
    * @param v2 another vector
    * @param s2 scalar for v2
@@ -260,36 +264,37 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 + d
+   * Computes component-wise v1 + s1.
    *
    * @param v1 vector to add to
-   * @param d value to add
-   * @return v1 + d
+   * @param s1 constant value to add
+   * @return v1 + s1
    */
-  public static double[] plus(final double[] v1, final double d) {
+  public static double[] plus(final double[] v1, final double s1) {
     final double[] result = new double[v1.length];
     for(int i = 0; i < result.length; i++) {
-      result[i] = v1[i] + d;
+      result[i] = v1[i] + s1;
     }
     return result;
   }
 
   /**
-   * Computes v1 = v1 + d, overwriting v1
+   * Computes component-wise v1 = v1 + s1,
+   * overwriting the vector v1.
    *
-   * @param v1 vector to add to
-   * @param d value to add
+   * @param v1 vector to add to (overwritten)
+   * @param s1 constant value to add
    * @return Modified vector
    */
-  public static double[] plusEquals(final double[] v1, final double d) {
+  public static double[] plusEquals(final double[] v1, final double s1) {
     for(int i = 0; i < v1.length; i++) {
-      v1[i] += d;
+      v1[i] += s1;
     }
     return v1;
   }
 
   /**
-   * Computes v1 - v2
+   * Computes component-wise v1 - v2.
    *
    * @param v1 first vector
    * @param v2 the vector to be subtracted from this vector
@@ -305,7 +310,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 - v2 * s2
+   * Computes component-wise v1 - v2 * s2.
    *
    * @param v1 first vector
    * @param v2 the vector to be subtracted from this vector
@@ -322,7 +327,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 * s1 - v2
+   * Computes component-wise v1 * s1 - v2.
    *
    * @param v1 first vector
    * @param s1 the scaling factor for v1
@@ -339,7 +344,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 * s1 - v2 * s2
+   * Computes component-wise v1 * s1 - v2 * s2.
    *
    * @param v1 first vector
    * @param s1 the scaling factor for v1
@@ -357,7 +362,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 - v2, overwriting v1
+   * Computes component-wise v1 = v1 - v2,
+   * overwriting the vector v1.
    *
    * @param v1 vector
    * @param v2 another vector
@@ -372,7 +378,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 - v2 * s2, overwriting v1
+   * Computes component-wise v1 = v1 - v2 * s2,
+   * overwriting the vector v1.
    *
    * @param v1 vector
    * @param v2 another vector
@@ -388,7 +395,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1 - v2, overwriting v1
+   * Computes component-wise v1 = v1 * s1 - v2,
+   * overwriting the vector v1.
    *
    * @param v1 vector
    * @param s1 scalar for v1
@@ -404,7 +412,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1 - v2 * s2, overwriting v1
+   * Computes component-wise v1 = v1 * s1 - v2 * s2,
+   * overwriting the vector v1.
    *
    * @param v1 vector
    * @param s1 scalar for v1
@@ -421,36 +430,37 @@ public final class VMath {
   }
 
   /**
-   * Compute v1 - d
+   * Subtract component-wise v1 - s1.
    *
    * @param v1 original vector
-   * @param d Value to subtract
-   * @return v1 - d
+   * @param s1 Value to subtract
+   * @return v1 - s1
    */
-  public static double[] minus(final double[] v1, final double d) {
+  public static double[] minus(final double[] v1, final double s1) {
     final double[] result = new double[v1.length];
     for(int i = 0; i < v1.length; i++) {
-      result[i] = v1[i] - d;
+      result[i] = v1[i] - s1;
     }
     return result;
   }
 
   /**
-   * Computes v1 = v1 - d, overwriting v1
+   * Subtract component-wise in-place v1 = v1 - s1,
+   * overwriting the vector v1.
    *
    * @param v1 original vector
-   * @param d Value to subtract
-   * @return v1 = v1 - d
+   * @param s1 Value to subtract
+   * @return v1 = v1 - s1
    */
-  public static double[] minusEquals(final double[] v1, final double d) {
+  public static double[] minusEquals(final double[] v1, final double s1) {
     for(int i = 0; i < v1.length; i++) {
-      v1[i] -= d;
+      v1[i] -= s1;
     }
     return v1;
   }
 
   /**
-   * Computes v1 * s1
+   * Multiply component-wise v1 * s1.
    *
    * @param v1 original vector
    * @param s1 the scalar to be multiplied
@@ -465,7 +475,8 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1, overwriting v1
+   * Multiply component-wise v1 = v1 * s1,
+   * overwriting the vector v1.
    *
    * @param v1 original vector
    * @param s scalar
@@ -479,8 +490,10 @@ public final class VMath {
   }
 
   /**
-   * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>)
-   *
+   * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>).
+   * <p>
+   * Note: this is an unusual operation, m2 must be a costly column matrix.
+   * <p>
    * This method is equivalent to the
    * {@link #timesTranspose(double[], double[])} method
    * with m2 being the second vector as matrix, but transposed.
@@ -488,7 +501,9 @@ public final class VMath {
    * @param v1 vector
    * @param m2 other matrix, must have one row.
    * @return Matrix product, v1 * m2
+   * @deprecated this is fairly inefficient memory layout, rewriting your code
    */
+  @Deprecated
   public static double[][] times(final double[] v1, final double[][] m2) {
     assert m2.length == 1 : ERR_MATRIX_INNERDIM;
     final int columndimension = m2[0].length;
@@ -502,7 +517,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
+   * Vector to matrix multiplication, v1<sup>T</sup> m2.
    *
    * @param v1 vector
    * @param m2 other matrix
@@ -523,7 +538,8 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, v1<sup>T</sup> * v2
+   * Vector scalar product (dot product),
+   * v1<sup>T</sup> v2 = v1·v2 = &lt;v1,v2&gt;.
    *
    * @param v1 vector
    * @param v2 other vector
@@ -539,16 +555,21 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, v1 * m2^T
-   *
+   * Vector with transposed matrix multiplication, v1 * m2<sup>T</sup>
+   * (m2 <em>must have one row only</em>).
+   * <p>
+   * Note: this is an unusual operation, m2 must be a costly column matrix.
+   * <p>
    * This method is equivalent to the
    * {@link #timesTranspose(double[], double[])} method
    * with m2 being the second vector as matrix.
    *
    * @param v1 vector
    * @param m2 other matrix
-   * @return Matrix product, v1 * m2^T
+   * @return Matrix product, v1 * m2<sup>T</sup>
+   * @deprecated this is fairly inefficient memory layout, rewriting your code
    */
+  @Deprecated
   public static double[][] timesTranspose(final double[] v1, final double[][] m2) {
     assert m2[0].length == 1 : ERR_MATRIX_INNERDIM;
 
@@ -562,11 +583,11 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, v1 * v2^T
+   * Vectors to matrix multiplication, v1 * v2<sup>T</sup>.
    *
    * @param v1 vector
    * @param v2 other vector
-   * @return Matrix product, v1 * v2^T
+   * @return Matrix product, v1 * v2<sup>T</sup>
    */
   public static double[][] timesTranspose(final double[] v1, final double[] v2) {
     final double[][] re = new double[v1.length][v2.length];
@@ -579,8 +600,8 @@ public final class VMath {
   }
 
   /**
-   * Returns the scalar product (dot product) of this vector and the specified
-   * vector v.
+   * Returns the scalar product (dot product) of two vectors,
+   * &lt;v1,v2&gt; = v1<sup>T</sup> v2.
    * <p>
    * This is the same as {@link #transposeTimes(double[], double[])}.
    *
@@ -593,7 +614,21 @@ public final class VMath {
   }
 
   /**
-   * Sum of the vector
+   * Returns the dot product (scalar product) of two vectors,
+   * v1·v2 = v1<sup>T</sup> v2.
+   * <p>
+   * This is the same as {@link #transposeTimes(double[], double[])}.
+   *
+   * @param v1 vector
+   * @param v2 other vector
+   * @return double the scalar product of vectors v1 and v2
+   */
+  public static double dot(final double[] v1, final double[] v2) {
+    return transposeTimes(v1, v2);
+  }
+
+  /**
+   * Sum of the vector components.
    *
    * @param v1 vector
    * @return sum of this vector
@@ -607,7 +642,7 @@ public final class VMath {
   }
 
   /**
-   * Squared Euclidean length of the vector
+   * Squared Euclidean length of the vector v1<sup>T</sup> v1 = v1·v1.
    *
    * @param v1 vector
    * @return squared Euclidean length of this vector
@@ -622,7 +657,7 @@ public final class VMath {
   }
 
   /**
-   * Euclidean length of the vector
+   * Euclidean length of the vector sqrt(v1<sup>T</sup> v1).
    *
    * @param v1 vector
    * @return Euclidean length of this vector
@@ -669,9 +704,9 @@ public final class VMath {
   }
 
   /**
-   * Normalizes v1 to the length of 1.0.
+   * Normalizes v1 to the length of 1.0 in place.
    *
-   * @param v1 vector
+   * @param v1 vector (overwritten)
    * @return normalized v1
    */
   public static double[] normalizeEquals(final double[] v1) {
@@ -685,8 +720,7 @@ public final class VMath {
   }
 
   /**
-   * Projects this row vector into the subspace formed by the specified matrix
-   * v.
+   * Projects this row vector into the subspace given by the specified matrix v.
    *
    * @param m2 the subspace matrix
    * @return the projection of p into the subspace formed by v
@@ -705,7 +739,7 @@ public final class VMath {
   }
 
   /**
-   * Compute the hash code for the vector
+   * Compute the hash code for the vector.
    *
    * @param v1 elements
    * @return hash code
@@ -726,7 +760,7 @@ public final class VMath {
   }
 
   /**
-   * Reset the Vector to 0.
+   * Reset the vector to 0.
    *
    * @param v1 vector
    */
@@ -735,7 +769,7 @@ public final class VMath {
   }
 
   /**
-   * Reset the Matrix to 0.
+   * Reset the matrix to 0.
    *
    * @param m Matrix
    */
@@ -746,7 +780,7 @@ public final class VMath {
   }
 
   /**
-   * Rotate vector by 90 degrees.
+   * Rotate the two-dimensional vector by 90 degrees.
    *
    * @param v1 first vector
    * @return modified v1, rotated by 90 degrees
@@ -762,7 +796,7 @@ public final class VMath {
   // *********** MATRIX operations
 
   /**
-   * Returns the unit matrix of the specified dimension.
+   * Returns the unit / identity / "eye" matrix of the specified dimension.
    *
    * @param dim the dimensionality of the unit matrix
    * @return the unit matrix of the specified dimension
@@ -786,7 +820,7 @@ public final class VMath {
   }
 
   /**
-   * Generate identity matrix
+   * Generate unit / identity / "eye" matrix.
    *
    * @param m Number of rows.
    * @param n Number of columns.
@@ -802,7 +836,7 @@ public final class VMath {
   }
 
   /**
-   * Returns a quadratic Matrix consisting of zeros and of the given values on
+   * Returns a quadratic matrix consisting of zeros and of the given values on
    * the diagonal.
    *
    * @param v1 the values on the diagonal
@@ -1097,7 +1131,7 @@ public final class VMath {
   }
 
   /**
-   * m3 = m1 + m2
+   * Component-wise matrix sum: m3 = m1 + m2.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1108,21 +1142,22 @@ public final class VMath {
   }
 
   /**
-   * m3 = m1 + s2 * m2
+   * Component-wise matrix operation: m3 = m1 + m2 * s2.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @param s2 scalar
-   * @return m1 + s2 * m2 in a new Matrix
+   * @return m1 + m2 * s2 in a new matrix
    */
   public static double[][] plusTimes(final double[][] m1, final double[][] m2, final double s2) {
     return plusTimesEquals(copy(m1), m2, s2);
   }
 
   /**
-   * m1 = m1 + m2, overwriting m1
+   * Component-wise matrix operation: m1 = m1 + m2,
+   * overwriting the existing matrix m1.
    *
-   * @param m1 input matrix
+   * @param m1 input matrix (overwritten)
    * @param m2 another matrix
    * @return m1 = m1 + m2
    */
@@ -1139,12 +1174,13 @@ public final class VMath {
   }
 
   /**
-   * m1 = m1 + s2 * m2, overwriting m1
+   * Component-wise matrix operation: m1 = m1 + m2 * s2,
+   * overwriting the existing matrix m1.
    *
-   * @param m1 input matrix
+   * @param m1 input matrix (overwritten)
    * @param m2 another matrix
    * @param s2 scalar for s2
-   * @return m1 = m1 + s2 * m2, overwriting m1
+   * @return m1 = m1 + m2 * s2, overwriting m1
    */
   public static double[][] plusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
     final int rowdim = m1.length, coldim = getColumnDimensionality(m1);
@@ -1159,7 +1195,7 @@ public final class VMath {
   }
 
   /**
-   * m3 = m1 - m2
+   * Component-wise matrix subtraction m3 = m1 - m2.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1170,19 +1206,20 @@ public final class VMath {
   }
 
   /**
-   * m3 = m1 - s2 * m2
+   * Component-wise matrix operation: m3 = m1 - m2 * s2
    *
    * @param m1 Input matrix
    * @param m2 another matrix
    * @param s2 Scalar
-   * @return m1 - s2 * m2 in a new Matrix
+   * @return m1 - m2 * s2 in a new Matrix
    */
   public static double[][] minusTimes(final double[][] m1, final double[][] m2, final double s2) {
     return minusTimesEquals(copy(m1), m2, s2);
   }
 
   /**
-   * m1 = m1 - m2, overwriting m1
+   * Component-wise matrix subtraction: m1 = m1 - m2,
+   * overwriting the existing matrix m1.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1192,15 +1229,17 @@ public final class VMath {
     final int columndimension = getColumnDimensionality(m1);
     assert getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2) : ERR_MATRIX_DIMENSIONS;
     for(int i = 0; i < m1.length; i++) {
+      final double[] row1 = m1[i], row2 = m2[i];
       for(int j = 0; j < columndimension; j++) {
-        m1[i][j] -= m2[i][j];
+        row1[j] -= row2[j];
       }
     }
     return m1;
   }
 
   /**
-   * m1 = m1 - s2 * m2, overwriting m1
+   * Component-wise matrix operation: m1 = m1 - m2 * s2,
+   * overwriting the existing matrix m1.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1219,22 +1258,23 @@ public final class VMath {
   }
 
   /**
-   * Multiply a matrix by a scalar, m3 = s1*m1
+   * Multiply a matrix by a scalar component-wise, m3 = m1 * s1.
    *
    * @param m1 Input matrix
    * @param s1 scalar
-   * @return s1*m1, in a new matrix
+   * @return m1 * s1, in a new matrix
    */
   public static double[][] times(final double[][] m1, final double s1) {
     return timesEquals(copy(m1), s1);
   }
 
   /**
-   * Multiply a matrix by a scalar in place, m1 = s1 * m1
+   * Multiply a matrix by a scalar component-wise in place, m1 = m1 * s1,
+   * overwriting the existing matrix m1.
    *
    * @param m1 Input matrix
    * @param s1 scalar
-   * @return m1 = s1 * m1, overwriting m1
+   * @return m1 = m1 * s1, overwriting m1
    */
   public static double[][] timesEquals(final double[][] m1, final double s1) {
     final int rowdim = m1.length;
@@ -1248,7 +1288,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1 * m2
+   * Matrix multiplication, m1 * m2.
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1281,7 +1321,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1 * v2
+   * Matrix with vector multiplication, m1 * v2.
    *
    * @param m1 Input matrix
    * @param v2 a vector
@@ -1305,7 +1345,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
+   * Transposed matrix with vector multiplication, m1<sup>T</sup> * v2
    *
    * @param m1 Input matrix
    * @param v2 another matrix
@@ -1327,7 +1367,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1<sup>T</sup> * m2
+   * Matrix multiplication, m1<sup>T</sup> * m2
    *
    * @param m1 Input matrix
    * @param m2 another matrix
@@ -1357,35 +1397,35 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
+   * Matrix multiplication, v1<sup>T</sup> * m2 * v3
    *
-   * @param a vector on the left
-   * @param B matrix
-   * @param c vector on the right
-   * @return Matrix product, a<sup>T</sup> * B * c
+   * @param v1 vector on the left
+   * @param m2 matrix
+   * @param v3 vector on the right
+   * @return Matrix product, v1<sup>T</sup> * m2 * v3
    */
-  public static double transposeTimesTimes(final double[] a, final double[][] B, final double[] c) {
-    final int rowdim = B.length, coldim = getColumnDimensionality(B);
-    assert rowdim == a.length : ERR_MATRIX_INNERDIM;
-    assert coldim == c.length : ERR_MATRIX_INNERDIM;
+  public static double transposeTimesTimes(final double[] v1, final double[][] m2, final double[] v3) {
+    final int rowdim = m2.length, coldim = getColumnDimensionality(m2);
+    assert rowdim == v1.length : ERR_MATRIX_INNERDIM;
+    assert coldim == v3.length : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
     for(int k = 0; k < rowdim; k++) {
-      final double[] B_k = B[k];
+      final double[] B_k = m2[k];
       double s = 0;
       for(int j = 0; j < coldim; j++) {
-        s += c[j] * B_k[j];
+        s += v3[j] * B_k[j];
       }
-      sum += s * a[k];
+      sum += s * v1[k];
     }
     return sum;
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1 * m2^T
+   * Matrix multiplication, m1 * m2<sup>T</sup>
    *
    * @param m1 Input matrix
    * @param m2 another matrix
-   * @return Matrix product, m1 * m2^T
+   * @return Matrix product, m1 * m2<sup>T</sup>
    */
   public static double[][] timesTranspose(final double[][] m1, final double[][] m2) {
     final int rowdim1 = m1.length, coldim1 = getColumnDimensionality(m1);
@@ -1410,11 +1450,12 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1^T * m2^T. Computed as (m2*m1)^T
+   * Matrix multiplication, m1<sup>T</sup> * m2<sup>T</sup>.
+   * Computed as (m2*m1)<sup>T</sup>
    *
    * @param m1 Input matrix
    * @param m2 another matrix
-   * @return Matrix product, m1^T * m2^T
+   * @return Matrix product, m1<sup>T</sup> * m2<sup>T</sup>
    */
   public static double[][] transposeTimesTranspose(final double[][] m1, final double[][] m2) {
     // Optimized implementation, exploiting the storage layout
@@ -1442,7 +1483,7 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
+   * Matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
    * <p>
    * Note: it may (or may not) be more efficient to materialize (a-c), then use
    * {@code transposeTimesTimes(a_minus_c, B, a_minus_c)} instead.

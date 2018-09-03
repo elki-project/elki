@@ -143,7 +143,9 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final double score = mahalanobisDistance(cmati, deltas.get(iditer), mean);
+      // Note: we modify deltas here
+      double[] v = minusEquals(deltas.get(iditer), mean);
+      final double score = transposeTimesTimes(v, cmati, v);
       minmax.put(score);
       scores.putDouble(iditer, score);
     }

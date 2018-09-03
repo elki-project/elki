@@ -626,8 +626,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     ids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double[] v = relation.get(iditer).getColumnVector();
-      double d = mahalanobisDistance(weightMatrix, v, centroid);
+      double[] v = minusEquals(relation.get(iditer).getColumnVector(), centroid);
+      double d = transposeTimesTimes(v, weightMatrix, v);
       if(d <= eps) {
         ids.add(iditer);
       }

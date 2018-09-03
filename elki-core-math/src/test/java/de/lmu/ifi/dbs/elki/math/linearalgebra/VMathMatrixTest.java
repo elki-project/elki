@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -30,11 +30,12 @@ import org.junit.Test;
  * Class testing the methods of the {@link VMath} class,
  * which provide mathematical operations and have two dimensional double arrays
  * as input.
- *
+ * <p>
  * Two dimensional double arrays are interpreted as rows x columns matrixes.
  *
  * @author Merlin Dietrich
  */
+@SuppressWarnings("deprecation")
 public class VMathMatrixTest {
   /**
    * A non symmetric 4 x 5 (rows x columns) matrix as test-data.
