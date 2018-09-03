@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -38,9 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Matthew Arcifa
  */
 public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataSourceTest {
-  /**
-   * Test with default parameters.
-   */
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "transformation-test-1.csv";
@@ -56,10 +55,7 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
       DoubleVector d = get(bundle, row, 0, DoubleVector.class);
       cm.put(d);
       for(int col = 0; col < dim; col++) {
-        final double v = d.doubleValue(col);
-        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
-          mvs[col].put(v);
-        }
+        mvs[col].put(d.doubleValue(col));
       }
     }
     double[][] ncm = cm.destroyToPopulationMatrix();
@@ -69,6 +65,40 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
       }
       assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-15);
       assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-15);
+    }
+  }
+
+  @Test
+  public void rotateOnly() {
+    String filename = UNITTEST + "transformation-test-1.csv";
+    GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = new ELKIBuilder<GlobalPrincipalComponentAnalysisTransform<DoubleVector>>(GlobalPrincipalComponentAnalysisTransform.class) //
+        .with(GlobalPrincipalComponentAnalysisTransform.Parameterizer.MODE_ID, GlobalPrincipalComponentAnalysisTransform.Mode.CENTER_ROTATE).build();
+    MultipleObjectsBundle bundle = readBundle(filename, filter);
+    int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
+
+    // We verify that the result has mean 0.
+    // We also expect that covariances of any two columns are 0.
+    CovarianceMatrix cm = new CovarianceMatrix(dim);
+    double[] mvs = new double[dim];
+    for(int row = 0; row < bundle.dataLength(); row++) {
+      DoubleVector d = get(bundle, row, 0, DoubleVector.class);
+      cm.put(d);
+      for(int col = 0; col < dim; col++) {
+        mvs[col] += d.doubleValue(col);
+      }
+    }
+    VMath.timesEquals(mvs, 1. / bundle.dataLength());
+    double[][] ncm = cm.destroyToPopulationMatrix();
+    for(int col = 0; col < dim; col++) {
+      for(int row = 0; row < dim; row++) {
+        if(row == col) {
+          assertTrue("Unexpected variance", ncm[row][col] > 10);
+        }
+        else {
+          assertEquals("Unexpected covariance", 0., ncm[row][col], 1e-12);
+        }
+      }
+      assertEquals("Mean not as expected", 0., mvs[col], 1e-13);
     }
   }
 }

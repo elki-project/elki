@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -27,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
@@ -39,20 +41,27 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
- * Apply principal component analysis to the data set.
- * 
- * This process is also known as "Whitening transformation".
- * 
+ * Apply Principal Component Analysis (PCA) to the data set.
+ * <p>
+ * This is also popular form of "Whitening transformation", and will project the
+ * data to have a unit covariance matrix.
+ * <p>
  * If you want to also reduce dimensionality, set the {@code -pca.filter}
  * parameter! Note that this implementation currently will always perform a full
  * matrix inversion. For very high dimensional data, this can take an excessive
  * amount of time O(d³) and memory O(d²). Please contribute a better
  * implementation to ELKI that only computes the requiried dimensions, yet
  * allows for the same filtering flexibility.
+ * <p>
+ * TODO: design an API (and implementation) that allows plugging in efficient
+ * solvers that do not need to decompose the entire matrix. This may, however,
+ * require external dependencies such as jBlas.
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -72,14 +81,19 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   private static final Logging LOG = Logging.getLogger(GlobalPrincipalComponentAnalysisTransform.class);
 
   /**
+   * Transformation mode.
+   */
+  public static enum Mode {
+    /** Center, rotate, and scale */
+    FULL,
+    /** Center and rotate */
+    CENTER_ROTATE,
+  }
+
+  /**
    * Filter to use for dimensionality reduction.
    */
   EigenPairFilter filter = null;
-
-  /**
-   * Actual dataset dimensionality.
-   */
-  int dim = -1;
 
   /**
    * Covariance matrix builder.
@@ -102,13 +116,29 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   double[] mean = null;
 
   /**
+   * Mode.
+   */
+  Mode mode;
+
+  /**
    * Constructor.
    * 
    * @param filter Filter to use for dimensionality reduction.
    */
   public GlobalPrincipalComponentAnalysisTransform(EigenPairFilter filter) {
+    this(filter, Mode.FULL);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param filter Filter to use for dimensionality reduction.
+   * @param mode Mode
+   */
+  public GlobalPrincipalComponentAnalysisTransform(EigenPairFilter filter, Mode mode) {
     super();
     this.filter = filter;
+    this.mode = mode;
   }
 
   @Override
@@ -116,8 +146,10 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     if(!(in instanceof VectorFieldTypeInformation)) {
       throw new AbortException("PCA can only applied to fixed dimensionality vectors");
     }
-    dim = ((VectorFieldTypeInformation<?>) in).getDimensionality();
+    int dim = ((VectorFieldTypeInformation<?>) in).getDimensionality();
     covmat = new CovarianceMatrix(dim);
+    proj = null;
+    mean = null;
     return true;
   }
 
@@ -130,48 +162,30 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   protected void prepareComplete() {
     mean = covmat.getMeanVector();
     PCAResult pcares = (new PCARunner(null)).processCovarMatrix(covmat.destroyToPopulationMatrix());
-    SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;
+    SortedEigenPairs eps = pcares.getEigenPairs();
 
-    if(filter == null) {
-      proj = new double[dim][dim];
-      for(int d = 0; d < dim; d++) {
-        EigenPair ep = eps.getEigenPair(d);
-        double[] ev = ep.getEigenvector();
-        double mult = 1. / FastMath.sqrt(ep.getEigenvalue());
-        // Fill weighted and transposed:
-        for(int i = 0; i < dim; i++) {
-          proj[d][i] = ev[i] * mult;
-        }
-      }
+    final int dim = mean.length;
+    final int pdim = filter != null ? filter.filter(eps.eigenValues()) : dim;
+    if(filter != null && LOG.isVerbose()) {
+      LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
     }
-    else {
-      final int pdim = filter.filter(eps.eigenValues());
-      if(LOG.isVerbose()) {
-        LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
-      }
-      proj = new double[pdim][dim];
-      for(int d = 0; d < pdim; d++) {
-        EigenPair ep = eps.getEigenPair(d);
-        double[] ev = ep.getEigenvector();
-        double mult = 1. / FastMath.sqrt(ep.getEigenvalue());
-        // Fill weighted and transposed:
-        for(int i = 0; i < dim; i++) {
-          proj[d][i] = ev[i] * mult;
-        }
-      }
+    // Build the projection matrux
+    proj = new double[pdim][dim];
+    for(int d = 0; d < pdim; d++) {
+      EigenPair ep = eps.getEigenPair(d);
+      plusTimesEquals(proj[d], ep.getEigenvector(), mode == Mode.FULL ? 1. / FastMath.sqrt(ep.getEigenvalue()) : 1.);
     }
     buf = new double[dim];
   }
 
   @Override
   protected O filterSingleObject(O obj) {
-    // Shift by mean and copy
-    for(int i = 0; i < dim; i++) {
+    // Shift by mean and copy to scratch buffer
+    for(int i = 0; i < mean.length; i++) {
       buf[i] = obj.doubleValue(i) - mean[i];
     }
-    double[] p = VMath.times(proj, buf);
-    return factory.newNumberVector(p);
+    return factory.newNumberVector(times(proj, buf));
   }
 
   @Override
@@ -204,23 +218,36 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     public static final OptionID FILTER_ID = new OptionID("globalpca.filter", "Filter to use for dimensionality reduction.");
 
     /**
+     * Mode control.
+     */
+    public static final OptionID MODE_ID = new OptionID("globalpca.mode", "Operation mode: full, or rotate only.");
+
+    /**
      * Filter to use for dimensionality reduction.
      */
     EigenPairFilter filter = null;
 
+    /**
+     * Mode.
+     */
+    Mode mode;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(FILTER_ID, EigenPairFilter.class, true);
       if(config.grab(filterP)) {
         filter = filterP.instantiateClass(config);
+      }
+      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.FULL);
+      if(config.grab(modeP)) {
+        mode = modeP.getValue();
       }
     }
 
     @Override
     protected GlobalPrincipalComponentAnalysisTransform<O> makeInstance() {
-      return new GlobalPrincipalComponentAnalysisTransform<>(filter);
+      return new GlobalPrincipalComponentAnalysisTransform<>(filter, mode);
     }
   }
 }
