@@ -83,7 +83,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   /**
    * Transformation mode.
    */
-  public static enum Mode {
+  public enum Mode {
     /** Center, rotate, and scale */
     FULL,
     /** Center and rotate */
