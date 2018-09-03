@@ -344,26 +344,6 @@ public class VMathMatrixTest {
   }
 
   /**
-   * Testing the project(vector, matrix) method of VMath class.
-   */
-  @Test
-  public void testProject() {
-    final double[][] m1 = { { 1, 0 }, { 0, 1 }, { 0, 0 } };
-
-    // testvector v1 is already in subspace
-    final double[] v1 = { -8, 9, 0 }, pv1 = v1;
-    assertTrue(VMath.equals(project(v1, m1), pv1));
-
-    // testvector v2 is orthogonal to subspace
-    final double[] v2 = { 0, 0, -1 }, pv2 = { 0, 0, 0 };
-    assertTrue(VMath.equals(project(v2, m1), pv2));
-
-    // third testcase
-    final double[] v3 = { 4, 3, 13 }, pv3 = { 4, 3, 0 };
-    assertTrue(VMath.equals(project(v3, m1), pv3));
-  }
-
-  /**
    * Testing that the *Equals methods tested in this class
    * class work in place and that other methods tested
    * create a new instance.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.data.model;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.project;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -148,8 +141,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     double variance = 0;
     DBIDs ids = db.getDBIDs();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double distance = distance(db.get(iter).toArray());
-      variance += distance * distance;
+      variance += squaredDistance(db.get(iter));
     }
     standardDeviation = FastMath.sqrt(variance / ids.size());
   }
@@ -191,25 +183,11 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  public double distance(V p) {
-    return distance(p.toArray());
-  }
-
-  /**
-   * Returns the distance of Matrix p from the hyperplane underlying this
-   * solution.
-   * 
-   * @param p a vector in the space underlying this solution
-   * @return the distance of p from the hyperplane underlying this solution
-   */
-  private double distance(double[] p) {
-    // TODO: Is there a particular reason not to do this:
-    // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
+  public double squaredDistance(V p) {
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
-    double[] p_minus_a = minus(p, centroid);
-    double[] proj = project(p_minus_a, strongEigenvectors);
-    return euclideanLength(minusEquals(p_minus_a, proj));
+    double[] p_minus_a = minusEquals(p.toArray(), centroid);
+    return squareSum(minusEquals(p_minus_a, times(strongEigenvectors, transposeTimes(strongEigenvectors, p_minus_a))));
   }
 
   /**
@@ -219,24 +197,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] errorVector(V p) {
-    return project(minusEquals(p.toArray(), centroid), weakEigenvectors);
-  }
-
-  /**
-   * Returns the data vectors after projection.
-   * 
-   * @param p a vector in the space underlying this solution
-   * @return the data projections
-   */
-  public double[][] dataProjections(V p) {
-    double[] centered = minusEquals(p.toArray(), centroid);
-    double[][] sum = new double[p.getDimensionality()][strongEigenvectors[0].length];
-    for(int i = 0; i < strongEigenvectors[0].length; i++) {
-      double[] v_i = getCol(strongEigenvectors, i);
-      timesEquals(v_i, transposeTimes(centered, v_i));
-      setCol(sum, i, v_i);
-    }
-    return sum;
+    return times(weakEigenvectors, transposeTimes(weakEigenvectors, minusEquals(p.toArray(), centroid)));
   }
 
   /**
@@ -246,7 +207,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] dataVector(V p) {
-    return project(minusEquals(p.toArray(), centroid), strongEigenvectors);
+    return times(strongEigenvectors, transposeTimes(strongEigenvectors, minusEquals(p.toArray(), centroid)));
   }
 
   /**

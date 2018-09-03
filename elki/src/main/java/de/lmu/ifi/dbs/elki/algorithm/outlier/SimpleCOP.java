@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Algorithm to compute local correlation outlier probability.
@@ -125,7 +126,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDataStore<double[]> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
-    WritableDataStore<double[][]> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[][].class);
+    WritableDataStore<double[]> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
     WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
@@ -140,15 +141,14 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
         CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(data, nids);
 
         double stddev = depsol.getStandardDeviation();
-        double distance = depsol.distance(data.get(id));
+        double distance = FastMath.sqrt(depsol.squaredDistance(data.get(id)));
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
         cop_score.putDouble(id, prob);
 
         cop_err_v.put(id, times(depsol.errorVector(data.get(id)), -1));
 
-        double[][] datav = depsol.dataProjections(data.get(id));
-        cop_datav.put(id, datav);
+        cop_datav.put(id, depsol.dataVector(data.get(id)));
 
         cop_dim.putInt(id, depsol.getCorrelationDimensionality());
 
@@ -165,7 +165,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     // extra results
     result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
     result.addChildResult(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
-    result.addChildResult(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
+    result.addChildResult(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.DOUBLE_ARRAY, cop_datav, ids));
     result.addChildResult(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
   }

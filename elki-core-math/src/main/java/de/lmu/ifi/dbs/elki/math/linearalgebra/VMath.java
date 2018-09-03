@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-
 import net.jafama.FastMath;
 
 /**
@@ -717,25 +716,6 @@ public final class VMath {
       }
     }
     return v1;
-  }
-
-  /**
-   * Projects this row vector into the subspace given by the specified matrix v.
-   *
-   * @param m2 the subspace matrix
-   * @return the projection of p into the subspace formed by v
-   */
-  public static double[] project(final double[] v1, final double[][] m2) {
-    assert v1.length == m2.length : ERR_DIMENSIONS;
-    final int columndimension = m2[0].length;
-
-    final double[] sum = new double[v1.length];
-    for(int i = 0; i < columndimension; i++) {
-      // TODO: optimize - copy less.
-      final double[] v_i = getCol(m2, i);
-      plusTimesEquals(sum, v_i, scalarProduct(v1, v_i));
-    }
-    return sum;
   }
 
   /**
