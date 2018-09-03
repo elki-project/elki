@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
@@ -52,7 +50,7 @@ import net.jafama.FastMath;
     booktitle = "IEEE Transactions on Information Theory, 49(7)", //
     url = "https://doi.org/10.1109/TIT.2003.813506", //
     bibkey = "DBLP:journals/tit/EndresS03")
-public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector> {
+public class SqrtJensenShannonDivergenceDistanceFunction extends JensenShannonDivergenceDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -70,46 +68,12 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberV
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim = dimensionality(v1, v2);
-    double agg = 0.;
-    for(int d = 0; d < dim; d++) {
-      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      if(xd == yd) {
-        continue;
-      }
-      final double md = .5 * (xd + yd);
-      if(!(md > 0. || md < 0.)) {
-        continue;
-      }
-      if(xd > 0.) {
-        agg += xd * FastMath.log(xd / md);
-      }
-      if(yd > 0.) {
-        agg += yd * FastMath.log(yd / md);
-      }
-    }
-    return FastMath.sqrt(.5 * agg);
+    return FastMath.sqrt(super.distance(v1, v2));
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = dimensionality(mbr1, mbr2);
-    double agg = 0;
-    for(int d = 0; d < dim; d++) {
-      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      final double md = .5 * (max1 + max2);
-      if(!(md > 0. || md < 0.)) {
-        continue;
-      }
-      if(min1 > 0.) {
-        agg += min1 * FastMath.log(min1 / md);
-      }
-      if(min2 > 0.) {
-        agg += min2 * FastMath.log(min2 / md);
-      }
-    }
-    return FastMath.sqrt(.5 * agg);
+    return FastMath.sqrt(super.minDist(mbr1, mbr2));
   }
 
   @Override
@@ -120,16 +84,6 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberV
   @Override
   public String toString() {
     return "SqrtJensenShannonDivergenceDistance";
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
   }
 
   /**

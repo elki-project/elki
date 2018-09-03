@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
+import static net.jafama.FastMath.log;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -30,26 +31,26 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDis
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for Chi<sup>2</sup> distance.
- *
+ * Unit test for Jeffrey distance.
+ * 
  * @author Erich Schubert
  */
-public class ChiSquaredDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class JeffreyDivergenceDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    ChiSquaredDistanceFunction df = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();
+    JeffreyDivergenceDistanceFunction df = new ELKIBuilder<>(JeffreyDivergenceDistanceFunction.class).build();
     nonnegativeSpatialConsistency(df);
   }
 
+  // Manual computation of correct distances:
   static double[][] TOY_DISTANCES;
   static {
-    // Manual computation of correct distances:
-    double d01 = 2 * (49. / 90 * 2);
-    double d03 = 2 * (49. / 255 + 49. / 390 * 2);
-    double d04 = 2 * (4. / 140 + 1. / 30 * 2);
-    double d14 = 2 * (25. / 70 + .36 + 1. / 30);
-    double d34 = 2 * (8. / 105 + 1. / 30 * 2);
+    double d01 = (.8 * log(16. / 9) + .1 * log(2. / 9)) * 2;
+    double d03 = (.8 * log(24. / 17) + log(10. / 17) / 3) + (.1 * log(6. / 13) + log(20. / 13) / 3) * 2;
+    double d04 = (.8 * log(8. / 7) + .6 * log(6. / 7)) + (.1 * log(2. / 3) + .2 * log(4. / 3)) * 2;
+    double d14 = (.1 * log(2. / 7) + .6 * log(12. / 7)) + (.8 * log(1.6) + .2 * log(.4)) + (.1 * log(2. / 3) + .2 * log(4. / 3));
+    double d34 = (.6 * log(9. / 7) + log(5. / 7) / 3) + (.2 * log(.75) + 1. / 3 * log(1.25)) * 2;
     TOY_DISTANCES = new double[][] { //
         { 0., d01, d01, d03, d04 }, //
         { d01, 0., d01, d03, d14 }, //
@@ -60,10 +61,10 @@ public class ChiSquaredDistanceFunctionTest extends AbstractSpatialPrimitiveDist
   }
 
   @Test
-  public void testChiSquaredDistance() {
+  public void testJeffreyDivergenceDistance() {
     double[][] vecs = TOY_VECTORS;
 
-    ChiSquaredDistanceFunction df = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();
+    JeffreyDivergenceDistanceFunction df = new ELKIBuilder<>(JeffreyDivergenceDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {
       DoubleVector vi = DoubleVector.wrap(vecs[i]);
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);

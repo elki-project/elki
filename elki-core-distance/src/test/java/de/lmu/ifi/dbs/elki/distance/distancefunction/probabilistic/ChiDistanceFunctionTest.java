@@ -46,20 +46,7 @@ public class ChiDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFun
   @Test
   public void testChiSquaredDistance() {
     double[][] vecs = TOY_VECTORS;
-
-    // Manual computation of correct distances:
-    double d01 = 2 * (49. / 90 * 2);
-    double d03 = 2 * (49. / 255 + 49. / 390 * 2);
-    double d04 = 2 * (4. / 140 + 1. / 30 * 2);
-    double d14 = 2 * (25. / 70 + .36 + 1. / 30);
-    double d34 = 2 * (8. / 105 + 1. / 30 * 2);
-    double[][] distances = { //
-        { 0., d01, d01, d03, d04 }, //
-        { d01, 0., d01, d03, d14 }, //
-        { d01, d01, 0., d03, d14 }, //
-        { d03, d03, d03, 0., d34 }, //
-        { d04, d14, d14, d34, 0. }, //
-    };
+    double[][] distances = ChiSquaredDistanceFunctionTest.TOY_DISTANCES;
     ChiDistanceFunction df = new ELKIBuilder<>(ChiDistanceFunction.class).build();
     ChiSquaredDistanceFunction df2 = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {

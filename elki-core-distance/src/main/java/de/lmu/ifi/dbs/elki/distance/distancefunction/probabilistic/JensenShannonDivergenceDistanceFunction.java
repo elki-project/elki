@@ -104,16 +104,6 @@ public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDi
     return "JensenShannonDivergenceDistance";
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
-
   /**
    * Parameterization class, using the static instance.
    * 

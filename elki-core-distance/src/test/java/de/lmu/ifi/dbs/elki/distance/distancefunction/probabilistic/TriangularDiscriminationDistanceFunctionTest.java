@@ -42,10 +42,8 @@ public class TriangularDiscriminationDistanceFunctionTest extends AbstractSpatia
     nonnegativeSpatialConsistency(df);
   }
 
-  @Test
-  public void testTriganular() {
-    double[][] vecs = TOY_VECTORS;
-
+  static double[][] TOY_DISTANCES;
+  static {
     // Manual computation of correct distances:
     double d10 = .49 / .9 + .49 / .9 + 0.;
     double d30 = (.8 - 1. / 3) * (.8 - 1. / 3) / (.8 + 1. / 3) //
@@ -54,13 +52,18 @@ public class TriangularDiscriminationDistanceFunctionTest extends AbstractSpatia
     double d41 = .25 / 0.7 + .36 / 1. + .01 / .3;
     double d43 = (.6 - 1. / 3) * (.6 - 1. / 3) / (.6 + 1. / 3) //
         + 2 * (.2 - 1. / 3) * (.2 - 1. / 3) / (.2 + 1. / 3);
-    double[][] distances = { //
+    TOY_DISTANCES = new double[][] { //
         { 0., d10, d10, d30, d40 }, //
         { d10, 0., d10, d30, d41 }, //
         { d10, d10, 0., d30, d41 }, //
         { d30, d30, d30, 0., d43 }, //
         { d40, d41, d41, d43, 0. }, //
     };
+  }
+
+  @Test
+  public void testTriganular() {
+    double[][] vecs = TOY_VECTORS;
 
     TriangularDiscriminationDistanceFunction df = new ELKIBuilder<>(TriangularDiscriminationDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {
@@ -68,7 +71,7 @@ public class TriangularDiscriminationDistanceFunctionTest extends AbstractSpatia
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j, distances[i][j], df.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, TOY_DISTANCES[i][j], df.distance(vi, vj), 1e-15);
         compareDistances(vj, vi, mbri, df);
       }
     }

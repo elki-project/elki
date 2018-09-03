@@ -22,9 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -65,7 +62,7 @@ import net.jafama.FastMath;
     booktitle = "IEEE Transactions on Information Theory, 49(7)", //
     url = "https://doi.org/10.1109/TIT.2003.813506", //
     bibkey = "DBLP:journals/tit/EndresS03")
-public class ChiDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector> {
+public class ChiDistanceFunction extends ChiSquaredDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -83,84 +80,12 @@ public class ChiDistanceFunction extends AbstractNumberVectorDistanceFunction im
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
-    double agg = 0.;
-    for(int d = 0; d < mindim; d++) {
-      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double di = xd - yd;
-      final double si = xd + yd;
-      if(!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
-        continue;
-      }
-      agg += di * di / si;
-    }
-    for(int d = mindim; d < dim1; d++) {
-      final double xd = v1.doubleValue(d);
-      if(xd != xd) { /* avoid NaNs */
-        continue;
-      }
-      agg += xd;
-    }
-    for(int d = mindim; d < dim2; d++) {
-      final double xd = v2.doubleValue(d);
-      if(xd != xd) { /* avoid NaNs */
-        continue;
-      }
-      agg += xd;
-    }
-    return FastMath.sqrt(2. * agg);
+    return FastMath.sqrt(super.distance(v1, v2));
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
-    final int mindim = (dim1 < dim2) ? dim1 : dim2;
-    double agg = 0.;
-    for(int d = 0; d < mindim; d++) {
-      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      final double diff; // Minimum difference
-      if(max1 < min2) {
-        diff = min2 - max1;
-      }
-      else if(max2 < min1) {
-        diff = max2 - min1;
-      }
-      else {
-        continue; // 0.
-      }
-      final double si = max1 + max2; // Maximum sum
-      if(!(si > 0. || si < 0.) || !(diff > 0. || diff < 0.)) {
-        continue;
-      }
-      agg += diff * diff / si;
-    }
-    for(int d = mindim; d < dim1; d++) {
-      final double min1 = mbr1.getMin(d);
-      if(min1 > 0.) {
-        agg += min1;
-      }
-      else {
-        final double max1 = mbr1.getMax(d);
-        if(max1 < 0.) { // Should never happen.
-          agg += max1;
-        }
-      }
-    }
-    for(int d = mindim; d < dim2; d++) {
-      final double min2 = mbr2.getMin(d);
-      if(min2 > 0.) {
-        agg += min2;
-      }
-      else {
-        final double max2 = mbr2.getMax(d);
-        if(max2 < 0.) { // Should never happen.
-          agg += max2;
-        }
-      }
-    }
-    return FastMath.sqrt(2. * agg);
+    return FastMath.sqrt(super.minDist(mbr1, mbr2));
   }
 
   @Override
@@ -171,21 +96,6 @@ public class ChiDistanceFunction extends AbstractNumberVectorDistanceFunction im
   @Override
   public String toString() {
     return "ChiDistance";
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
-
-  @Override
-  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return NumberVector.VARIABLE_LENGTH;
   }
 
   /**

@@ -112,11 +112,6 @@ public class FisherRaoDistanceFunction extends AbstractNumberVectorDistanceFunct
   }
 
   @Override
-  public boolean isSymmetric() {
-    return true;
-  }
-
-  @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return NumberVector.VARIABLE_LENGTH;
   }

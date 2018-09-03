@@ -30,46 +30,29 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDis
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for Chi<sup>2</sup> distance.
- *
+ * Unit test for Jensen-Shannon distance.
+ * 
  * @author Erich Schubert
  */
-public class ChiSquaredDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class JensenShannonDivergenceDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    ChiSquaredDistanceFunction df = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();
+    JensenShannonDivergenceDistanceFunction df = new ELKIBuilder<>(JensenShannonDivergenceDistanceFunction.class).build();
     nonnegativeSpatialConsistency(df);
   }
 
-  static double[][] TOY_DISTANCES;
-  static {
-    // Manual computation of correct distances:
-    double d01 = 2 * (49. / 90 * 2);
-    double d03 = 2 * (49. / 255 + 49. / 390 * 2);
-    double d04 = 2 * (4. / 140 + 1. / 30 * 2);
-    double d14 = 2 * (25. / 70 + .36 + 1. / 30);
-    double d34 = 2 * (8. / 105 + 1. / 30 * 2);
-    TOY_DISTANCES = new double[][] { //
-        { 0., d01, d01, d03, d04 }, //
-        { d01, 0., d01, d03, d14 }, //
-        { d01, d01, 0., d03, d14 }, //
-        { d03, d03, d03, 0., d34 }, //
-        { d04, d14, d14, d34, 0. }, //
-    };
-  }
-
   @Test
-  public void testChiSquaredDistance() {
+  public void testJensenShannonDivergenceDistance() {
     double[][] vecs = TOY_VECTORS;
-
-    ChiSquaredDistanceFunction df = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();
+    double[][] distances = JeffreyDivergenceDistanceFunctionTest.TOY_DISTANCES;
+    JensenShannonDivergenceDistanceFunction df = new ELKIBuilder<>(JensenShannonDivergenceDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {
       DoubleVector vi = DoubleVector.wrap(vecs[i]);
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j, TOY_DISTANCES[i][j], df.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, 0.5 * distances[i][j], df.distance(vi, vj), 1e-15);
         compareDistances(vj, vi, mbri, df);
       }
     }

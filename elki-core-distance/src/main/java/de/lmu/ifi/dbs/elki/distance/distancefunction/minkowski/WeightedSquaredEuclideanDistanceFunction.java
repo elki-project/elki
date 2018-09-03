@@ -108,11 +108,6 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractNumberVect
   }
 
   @Override
-  public boolean isMetric() {
-    return false;
-  }
-  
-  @Override
   public boolean isSquared() {
     return true;
   }

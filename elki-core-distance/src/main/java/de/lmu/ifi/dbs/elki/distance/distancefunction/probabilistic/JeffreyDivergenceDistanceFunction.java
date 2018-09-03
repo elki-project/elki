@@ -110,15 +110,11 @@ public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDista
         continue;
       }
       final double md = .5 * (xd + yd);
-      if(!(md > 0. || md < 0.)) {
+      if(!(md > 0.)) {
         continue;
       }
-      if(xd > 0.) {
-        agg += xd * FastMath.log(xd / md);
-      }
-      if(yd > 0.) {
-        agg += yd * FastMath.log(yd / md);
-      }
+      agg += (xd > 0 ? xd * FastMath.log(xd / md) : 0) //
+          + (yd > 0 ? yd * FastMath.log(yd / md) : 0);
     }
     return agg;
   }
@@ -128,20 +124,15 @@ public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDista
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0;
     for(int d = 0; d < dim; d++) {
-      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      final double md = .5 * (max1 + max2);
-      if(!(md > 0. || md < 0.)) {
+      final double min1 = mbr1.getMin(d), min2 = mbr2.getMin(d);
+      final double md = .5 * (mbr1.getMax(d) + mbr2.getMax(d));
+      if(!(md > 0.)) {
         continue;
       }
-      if(min1 > 0.) {
-        agg += min1 * FastMath.log(min1 / md);
-      }
-      if(min2 > 0.) {
-        agg += min2 * FastMath.log(min2 / md);
-      }
+      agg += (min1 > 0 ? min1 * FastMath.log(min1 / md) : 0) //
+          + (min2 > 0 ? min2 * FastMath.log(min2 / md) : 0);
     }
-    return agg;
+    return agg > 0 ? agg : 0;
   }
 
   @Override

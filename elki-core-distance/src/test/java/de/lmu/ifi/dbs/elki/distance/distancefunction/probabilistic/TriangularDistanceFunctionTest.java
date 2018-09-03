@@ -45,22 +45,7 @@ public class TriangularDistanceFunctionTest extends AbstractSpatialPrimitiveDist
   @Test
   public void testTriganular() {
     double[][] vecs = TOY_VECTORS;
-
-    // Manual computation of correct distances:
-    double d10 = .49 / .9 + .49 / .9 + 0.;
-    double d30 = (.8 - 1. / 3) * (.8 - 1. / 3) / (.8 + 1. / 3) //
-        + 2 * (.1 - 1. / 3) * (.1 - 1. / 3) / (.1 + 1. / 3);
-    double d40 = .04 / 1.4 + .01 / .3 + .01 / .3;
-    double d41 = .25 / 0.7 + .36 / 1. + .01 / .3;
-    double d43 = (.6 - 1. / 3) * (.6 - 1. / 3) / (.6 + 1. / 3) //
-        + 2 * (.2 - 1. / 3) * (.2 - 1. / 3) / (.2 + 1. / 3);
-    double[][] distances = { //
-        { 0., d10, d10, d30, d40 }, //
-        { d10, 0., d10, d30, d41 }, //
-        { d10, d10, 0., d30, d41 }, //
-        { d30, d30, d30, 0., d43 }, //
-        { d40, d41, d41, d43, 0. }, //
-    };
+    double[][] distances = TriangularDiscriminationDistanceFunctionTest.TOY_DISTANCES;
 
     TriangularDistanceFunction df = new ELKIBuilder<>(TriangularDistanceFunction.class).build();
     for(int i = 0; i < vecs.length; i++) {

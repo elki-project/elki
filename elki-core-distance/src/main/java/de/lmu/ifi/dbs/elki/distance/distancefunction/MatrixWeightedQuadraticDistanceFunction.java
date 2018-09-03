@@ -67,6 +67,11 @@ public class MatrixWeightedQuadraticDistanceFunction extends AbstractNumberVecto
   }
 
   @Override
+  public boolean isSquared() {
+    return true;
+  }
+
+  @Override
   public double norm(NumberVector obj) {
     double[] v = obj.toArray();
     return transposeTimesTimes(v, weightMatrix, v);
