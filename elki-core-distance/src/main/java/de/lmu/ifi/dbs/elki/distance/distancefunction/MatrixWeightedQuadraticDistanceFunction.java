@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.Arrays;
@@ -62,8 +61,12 @@ public class MatrixWeightedQuadraticDistanceFunction extends AbstractNumberVecto
 
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
-    dimensionality(o1, o2, weightMatrix.length);
-    return mahalanobisDistance(weightMatrix, o1.toArray(), o2.toArray());
+    int dim = dimensionality(o1, o2, weightMatrix.length);
+    final double[] tmp = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      tmp[i] = o1.doubleValue(i) - o2.doubleValue(i);
+    }
+    return transposeTimesTimes(tmp, weightMatrix, tmp);
   }
 
   @Override
@@ -74,6 +77,7 @@ public class MatrixWeightedQuadraticDistanceFunction extends AbstractNumberVecto
   @Override
   public double norm(NumberVector obj) {
     double[] v = obj.toArray();
+    dimensionality(v, weightMatrix[0]);
     return transposeTimesTimes(v, weightMatrix, v);
   }
 

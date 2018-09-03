@@ -1369,13 +1369,13 @@ public final class VMath {
     assert rowdim == a.length : ERR_MATRIX_INNERDIM;
     assert coldim == c.length : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for(int j = 0; j < coldim; j++) {
-      // multiply it with each row from A
+    for(int k = 0; k < rowdim; k++) {
+      final double[] B_k = B[k];
       double s = 0;
-      for(int k = 0; k < rowdim; k++) {
-        s += a[k] * B[k][j];
+      for(int j = 0; j < coldim; j++) {
+        s += c[j] * B_k[j];
       }
-      sum += s * c[j];
+      sum += s * a[k];
     }
     return sum;
   }
@@ -1443,6 +1443,9 @@ public final class VMath {
 
   /**
    * Linear algebraic matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
+   * <p>
+   * Note: it may (or may not) be more efficient to materialize (a-c), then use
+   * {@code transposeTimesTimes(a_minus_c, B, a_minus_c)} instead.
    *
    * @param B matrix
    * @param a First vector
@@ -1454,16 +1457,18 @@ public final class VMath {
       booktitle = "Proceedings of the National Institute of Sciences of India. 2 (1)", //
       bibkey = "journals/misc/Mahalanobis36")
   public static double mahalanobisDistance(final double[][] B, final double[] a, final double[] c) {
-    final int rowdim = B.length, coldim = B[0].length;
-    assert rowdim == a.length && rowdim == c.length : ERR_MATRIX_INNERDIM;
+    final int rowdim = B.length, coldim = getColumnDimensionality(B);
+    assert rowdim == a.length : ERR_MATRIX_INNERDIM;
+    assert coldim == c.length : ERR_MATRIX_INNERDIM;
+    assert a.length == c.length : ERR_VEC_DIMENSIONS;
     double sum = 0.0;
-    for(int j = 0; j < coldim; j++) {
-      // multiply it with each row from A
+    for(int k = 0; k < rowdim; k++) {
+      final double[] B_k = B[k];
       double s = 0;
-      for(int k = 0; k < rowdim; k++) {
-        s += (a[k] - c[k]) * B[k][j];
+      for(int j = 0; j < coldim; j++) {
+        s += (a[j] - c[j]) * B_k[j];
       }
-      sum += s * (a[j] - c[j]);
+      sum += (a[k] - c[k]) * s;
     }
     return sum;
   }
