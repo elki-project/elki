@@ -81,7 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Improving the Cluster Structure Extracted from OPTICS Plots", //
     booktitle = "Proc. Lernen, Wissen, Daten, Analysen (LWDA 2018)", //
-    url = "http://web.informatik.uni-mannheim.de/ponzetto/lwda18/paper37.pdf", //
+    url = "http://ceur-ws.org/Vol-2191/paper37.pdf", //
     bibkey = "DBLP:conf/lwa/SchubertG18")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
 @Priority(Priority.RECOMMENDED)
