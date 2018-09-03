@@ -44,7 +44,7 @@ public class ArcCosineUnitlengthDistanceFunctionTest extends AbstractSpatialPrim
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     ArcCosineUnitlengthDistanceFunction dist = new ELKIBuilder<>(ArcCosineUnitlengthDistanceFunction.class).build();
-    varyingLength(dist);
+    // data is not unit length: varyingLength(dist);
     nonnegativeSpatialConsistency(dist);
   }
 

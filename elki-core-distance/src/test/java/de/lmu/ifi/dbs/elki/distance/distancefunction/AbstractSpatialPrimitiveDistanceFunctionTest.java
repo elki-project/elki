@@ -98,15 +98,39 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
    *
    * @param dist Distance function
    */
-  public static void varyingLength(PrimitiveDistanceFunction<? super DoubleVector> dist) {
+  public static void varyingLength(PrimitiveDistanceFunction<? super NumberVector> dist) {
     assertFalse("Test setup inconsistent.", VMath.equals(TOY_VECTORS[1], TOY_VECTORS_VAR[1]));
-    DoubleVector v1 = DoubleVector.wrap(TOY_VECTORS[0]);
-    DoubleVector v2 = DoubleVector.wrap(TOY_VECTORS[1]);
-    DoubleVector v3 = DoubleVector.wrap(TOY_VECTORS_VAR[1]);
+    DoubleVector v1 = DoubleVector.wrap(TOY_VECTORS[0]),
+        v2 = DoubleVector.wrap(TOY_VECTORS[1]),
+        v3 = DoubleVector.wrap(TOY_VECTORS_VAR[1]);
     double expect = dist.distance(v1, v2);
     double have1 = dist.distance(v1, v3), have2 = dist.distance(v3, v1);
     assertEquals("Distance not as expected", expect, have1, 1e-15);
-    assertEquals("Distance not as expected", expect, have2, 1e-15);
+    if(dist.isSymmetric()) {
+      assertEquals("Distance not as expected", expect, have2, 1e-15);
+    }
+    if(dist instanceof Norm) {
+      DoubleVector v4 = DoubleVector.wrap(new double[] {});
+      double expect4 = dist.distance(v1, v4);
+      double norm = ((Norm<? super NumberVector>) dist).norm(v1);
+      assertEquals("Distance not as expected", expect4, norm, 1e-15);
+    }
+    if(dist instanceof SpatialPrimitiveDistanceFunction) {
+      SpatialPrimitiveDistanceFunction<? super NumberVector> sdf = (SpatialPrimitiveDistanceFunction<? super NumberVector>) dist;
+      compareDistances(v1, v2, new HyperBoundingBox(TOY_VECTORS_VAR[1], TOY_VECTORS_VAR[1]), sdf);
+      compareDistances(v2, v3, new HyperBoundingBox(TOY_VECTORS[1], TOY_VECTORS[1]), sdf);
+    }
+    if(dist.isMetric()) {
+      DoubleVector m1 = DoubleVector.wrap(new double[] { .1 }),
+          m2 = DoubleVector.wrap(new double[] { .2 }),
+          m3 = DoubleVector.wrap(new double[] { .3 });
+      double d12 = dist.distance(m1, m2), d23 = dist.distance(m2, m3),
+          d13 = dist.distance(m1, m3);
+      assertTrue("Trivial metric test failed.", d13 <= d12 + d23);
+    }
+    assertFalse("Equals not null safe", dist.equals(null));
+    assertFalse("Equals Object.class?", dist.equals(new Object()));
+    assertTrue("Inconsistent equals", dist.equals(dist));
   }
 
   /**
@@ -137,13 +161,13 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
   /**
    * Test not involving negative values.
    * 
-   * @param dis Distance function to test
+   * @param dist Distance function to test
    */
-  public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dis) {
+  public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
     // These should probably go into a more generic function.
-    assertFalse("Equals not null safe", dis.equals(null));
-    assertFalse("Equals Object.class?", dis.equals(new Object()));
-    assertTrue("Inconsistent equals", dis.equals(dis));
+    assertFalse("Equals not null safe", dist.equals(null));
+    assertFalse("Equals Object.class?", dist.equals(new Object()));
+    assertTrue("Inconsistent equals", dist.equals(dist));
     // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
 
     final Random rnd = new FastNonThreadsafeRandom(1);
@@ -153,7 +177,7 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
     d1[0] = d2[1] = d4[1] = d4[2] = 1.; // Trivial sitations, with many zeros.
-    compareDistances(v1, v2, mbr, dis);
+    compareDistances(v1, v2, mbr, dist);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;
@@ -161,15 +185,18 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
         d3[d] = rnd.nextDouble() * v;
         d4[d] = rnd.nextDouble() * (2E4 - v) + v;
       }
-      compareDistances(v1, v2, mbr, dis);
+      compareDistances(v1, v2, mbr, dist);
     }
   }
 
   public static void compareDistances(NumberVector v1, NumberVector v2, HyperBoundingBox mbr2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
     double exact = dist.distance(v1, v2), mind = dist.minDist(v1, v2),
-        mbrd = dist.minDist(v1, mbr2), zero = dist.minDist(v2, mbr2);
+        mbrd = dist.minDist(v1, mbr2), zero = dist.minDist(v2, mbr2),
+        mbrd2 = dist.minDist(mbr2, v1), zero2 = dist.minDist(mbr2, v2);
     assertEquals("Not same: " + dist.toString(), exact, mind, 1e-10);
     assertTrue("Not smaller:" + dist.toString() + " " + mbrd + " > " + exact + " " + mbr2 + " " + v1, mbrd <= exact);
+    assertTrue("Not smaller:" + dist.toString() + " " + mbrd2 + " > " + exact + " " + mbr2 + " " + v1, mbrd2 <= exact);
     assertEquals("Not zero: " + dist.toString(), 0., zero, 1e-10);
+    assertEquals("Not zero: " + dist.toString(), 0., zero2, 1e-10);
   }
 }
