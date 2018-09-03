@@ -97,7 +97,7 @@ public class FisherRaoDistanceFunction extends AbstractNumberVectorDistanceFunct
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
-      final double v12 = mbr1.getMin(d) * mbr2.getMin(d);
+      final double v12 = mbr1.getMax(d) * mbr2.getMax(d);
       assert (v12 >= 0) : "This distance is not defined on negative values.";
       if(v12 > 0) {
         agg += FastMath.sqrt(v12);

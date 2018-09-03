@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
@@ -94,6 +95,7 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
         d4 = new double[dim];
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
+    compareDistances(v1, v2, mbr, dis);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
@@ -112,6 +114,8 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
    */
   public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dis) {
     // These should probably go into a more generic function.
+    assertFalse("Equals not null safe", dis.equals(null));
+    assertFalse("Equals Object.class?", dis.equals(new Object()));
     assertTrue("Inconsistent equals", dis.equals(dis));
     // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
 
@@ -121,6 +125,8 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
         d4 = new double[dim];
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
+    d1[0] = d2[1] = d4[1] = d4[2] = 1.; // Trivial sitations, with many zeros.
+    compareDistances(v1, v2, mbr, dis);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;

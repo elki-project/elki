@@ -104,7 +104,7 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
       sumdiff += Math.abs(xd - yd);
       sumsum += Math.abs(xd) + Math.abs(yd);
     }
-    return sumdiff / sumsum;
+    return sumsum > 0 ? sumdiff / sumsum : 0;
   }
 
   @Override
@@ -117,7 +117,7 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
       sumdiff += (max1 < min2) ? min2 - max1 : (min1 > max2) ? min1 - max2 : 0;
       sumsum += Math.max(-min1, max1) + Math.max(-min2, max2);
     }
-    return sumdiff / sumsum;
+    return sumsum > 0 ? sumdiff / sumsum : 0;
   }
 
   @Override

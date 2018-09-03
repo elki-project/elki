@@ -89,7 +89,8 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
       norm1 += Math.max(0, min1);
       norm2 += Math.max(0, min2);
     }
-    return Math.max(0, 1 - agg / Math.min(norm1, norm2));
+    final double norm = Math.min(norm1, norm2);
+    return norm > 0 && agg < norm ? (1 - agg / norm) : 0;
   }
 
   @Override

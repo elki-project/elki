@@ -164,7 +164,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
+    if(obj == null || !(obj instanceof WeightedLPNormDistanceFunction)) {
       return false;
     }
     WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
