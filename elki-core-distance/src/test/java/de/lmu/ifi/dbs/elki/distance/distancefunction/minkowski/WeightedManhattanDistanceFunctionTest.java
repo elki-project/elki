@@ -38,10 +38,10 @@ public class WeightedManhattanDistanceFunctionTest extends AbstractSpatialPrimit
   @Test
   public void testSpatialConsistency() {
     // Also test the builder
-    WeightedManhattanDistanceFunction dis = new ELKIBuilder<>(WeightedManhattanDistanceFunction.class) //
+    WeightedManhattanDistanceFunction dist = new ELKIBuilder<>(WeightedManhattanDistanceFunction.class) //
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

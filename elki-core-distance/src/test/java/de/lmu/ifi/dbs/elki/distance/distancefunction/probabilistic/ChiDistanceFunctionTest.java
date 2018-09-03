@@ -45,7 +45,7 @@ public class ChiDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFun
 
   @Test
   public void testChiSquaredDistance() {
-    double[][] vecs = TOY_VECTORS;
+    double[][] vecs = TOY_VECTORS_VAR;
     double[][] distances = ChiSquaredDistanceFunctionTest.TOY_DISTANCES;
     ChiDistanceFunction df = new ELKIBuilder<>(ChiDistanceFunction.class).build();
     ChiSquaredDistanceFunction df2 = new ELKIBuilder<>(ChiSquaredDistanceFunction.class).build();

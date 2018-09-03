@@ -33,8 +33,8 @@ public class BrayCurtisDistanceFunctionTest extends AbstractSpatialPrimitiveDist
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    BrayCurtisDistanceFunction dis = new ELKIBuilder<>(BrayCurtisDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    BrayCurtisDistanceFunction dist = new ELKIBuilder<>(BrayCurtisDistanceFunction.class).build();
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

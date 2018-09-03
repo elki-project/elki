@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
 
 /**
@@ -49,6 +50,16 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
       { 0.1, 0.1, 0.8 }, //
       { 1. / 3, 1. / 3, 1. / 3 }, //
       { 0.6, 0.2, 0.2 } };
+
+  /**
+   * Toy vectors, used for unit testing distribution distances.
+   */
+  public static final double[][] TOY_VECTORS_VAR = new double[][] { //
+      { 0.8, 0.1, 0.1 }, //
+      { 0.1, 0.8, 0.1, 0, 0 }, //
+      { 0.1, 0.1, 0.8 }, //
+      { 1. / 3, 1. / 3, 1. / 3 }, //
+      { 0.6, 0.2, 0.2, 0 } };
 
   /**
    * Number of dimensions to use in basic test.
@@ -83,11 +94,27 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
   }
 
   /**
+   * Test that we can compare vectors with extra 0s.
+   *
+   * @param dist Distance function
+   */
+  public static void varyingLength(PrimitiveDistanceFunction<? super DoubleVector> dist) {
+    assertFalse("Test setup inconsistent.", VMath.equals(TOY_VECTORS[1], TOY_VECTORS_VAR[1]));
+    DoubleVector v1 = DoubleVector.wrap(TOY_VECTORS[0]);
+    DoubleVector v2 = DoubleVector.wrap(TOY_VECTORS[1]);
+    DoubleVector v3 = DoubleVector.wrap(TOY_VECTORS_VAR[1]);
+    double expect = dist.distance(v1, v2);
+    double have1 = dist.distance(v1, v3), have2 = dist.distance(v3, v1);
+    assertEquals("Distance not as expected", expect, have1, 1e-15);
+    assertEquals("Distance not as expected", expect, have2, 1e-15);
+  }
+
+  /**
    * MBR consistency check, around 0.
    *
-   * @param dis Distance function to check
+   * @param dist Distance function to check
    */
-  public static void spatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dis) {
+  public static void spatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
     final Random rnd = new FastNonThreadsafeRandom(0);
     final int dim = TEST_DIM, iters = 1000;
 
@@ -95,7 +122,7 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
         d4 = new double[dim];
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
-    compareDistances(v1, v2, mbr, dis);
+    compareDistances(v1, v2, mbr, dist);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
@@ -103,7 +130,7 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
         d3[d] = m - rnd.nextDouble() * 1E4;
         d4[d] = m + rnd.nextDouble() * 1E4;
       }
-      compareDistances(v1, v2, mbr, dis);
+      compareDistances(v1, v2, mbr, dist);
     }
   }
 

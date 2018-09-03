@@ -33,7 +33,8 @@ public class CosineDistanceFunctionTest extends AbstractSpatialPrimitiveDistance
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    CosineDistanceFunction dis = new ELKIBuilder<>(CosineDistanceFunction.class).build();
-    nonnegativeSpatialConsistency(dis);
+    CosineDistanceFunction dist = new ELKIBuilder<>(CosineDistanceFunction.class).build();
+    varyingLength(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

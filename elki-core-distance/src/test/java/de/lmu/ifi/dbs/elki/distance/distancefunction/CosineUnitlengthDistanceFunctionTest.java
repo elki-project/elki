@@ -43,8 +43,9 @@ public class CosineUnitlengthDistanceFunctionTest extends AbstractSpatialPrimiti
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    CosineUnitlengthDistanceFunction dis = new ELKIBuilder<>(CosineUnitlengthDistanceFunction.class).build();
-    nonnegativeSpatialConsistency(dis);
+    CosineUnitlengthDistanceFunction dist = new ELKIBuilder<>(CosineUnitlengthDistanceFunction.class).build();
+    varyingLength(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 
   @Test

@@ -34,8 +34,9 @@ public class SquaredEuclideanDistanceFunctionTest extends AbstractSpatialPrimiti
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    SquaredEuclideanDistanceFunction dis = new ELKIBuilder<>(SquaredEuclideanDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    SquaredEuclideanDistanceFunction dist = new ELKIBuilder<>(SquaredEuclideanDistanceFunction.class).build();
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

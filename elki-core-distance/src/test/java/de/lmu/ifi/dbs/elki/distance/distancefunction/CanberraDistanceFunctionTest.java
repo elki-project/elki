@@ -33,8 +33,9 @@ public class CanberraDistanceFunctionTest extends AbstractSpatialPrimitiveDistan
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    CanberraDistanceFunction dis = new ELKIBuilder<>(CanberraDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    CanberraDistanceFunction dist = new ELKIBuilder<>(CanberraDistanceFunction.class).build();
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

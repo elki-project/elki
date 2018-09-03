@@ -38,10 +38,10 @@ public class WeightedEuclideanDistanceFunctionTest extends AbstractSpatialPrimit
   @Test
   public void testSpatialConsistency() {
     // Also test the builder
-    WeightedEuclideanDistanceFunction dis = new ELKIBuilder<>(WeightedEuclideanDistanceFunction.class) //
+    WeightedEuclideanDistanceFunction dist = new ELKIBuilder<>(WeightedEuclideanDistanceFunction.class) //
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

@@ -36,11 +36,12 @@ public class LPIntegerNormDistanceFunctionTest extends AbstractSpatialPrimitiveD
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    LPIntegerNormDistanceFunction dis = new ELKIBuilder<>(LPIntegerNormDistanceFunction.class) //
+    LPIntegerNormDistanceFunction dist = new ELKIBuilder<>(LPIntegerNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, 3) //
         .build();
-    assertSame("Subtyped", LPIntegerNormDistanceFunction.class, dis.getClass());
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    assertSame("Subtyped", LPIntegerNormDistanceFunction.class, dist.getClass());
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

@@ -46,7 +46,7 @@ public class FisherRaoDistanceFunctionTest extends AbstractSpatialPrimitiveDista
 
   @Test
   public void testFisherRaoDistance() {
-    double[][] vecs = TOY_VECTORS;
+    double[][] vecs = TOY_VECTORS_VAR;
 
     // Manual computation of correct distances:
     double d01 = 2 * acos(sqrt(0.08) * 2 + 0.1);

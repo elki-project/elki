@@ -34,8 +34,9 @@ public class ManhattanDistanceFunctionTest extends AbstractSpatialPrimitiveDista
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    ManhattanDistanceFunction dis = new ELKIBuilder<>(ManhattanDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    ManhattanDistanceFunction dist = new ELKIBuilder<>(ManhattanDistanceFunction.class).build();
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

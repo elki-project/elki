@@ -33,8 +33,9 @@ public class ClarkDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceF
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    ClarkDistanceFunction dis = new ELKIBuilder<>(ClarkDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    ClarkDistanceFunction dist = new ELKIBuilder<>(ClarkDistanceFunction.class).build();
+    // contains 1/d factor, unfortunately. varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

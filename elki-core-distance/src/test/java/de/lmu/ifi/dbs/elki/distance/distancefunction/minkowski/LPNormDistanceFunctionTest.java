@@ -38,19 +38,21 @@ public class LPNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistance
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    LPNormDistanceFunction dis = new ELKIBuilder<>(LPNormDistanceFunction.class) //
+    LPNormDistanceFunction dist = new ELKIBuilder<>(LPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, .5) //
         .build();
-    assertSame("Subtyped", LPNormDistanceFunction.class, dis.getClass());
-    assertFalse("Not metric", dis.isMetric());
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
-    dis = new ELKIBuilder<>(LPNormDistanceFunction.class) //
+    assertSame("Subtyped", LPNormDistanceFunction.class, dist.getClass());
+    assertFalse("Not metric", dist.isMetric());
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
+    dist = new ELKIBuilder<>(LPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, 3) //
         .build();
-    assertSame("Not optimized", LPIntegerNormDistanceFunction.class, dis.getClass());
-    assertTrue("Not metric", dis.isMetric());
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    assertSame("Not optimized", LPIntegerNormDistanceFunction.class, dist.getClass());
+    assertTrue("Not metric", dist.isMetric());
+    varyingLength(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

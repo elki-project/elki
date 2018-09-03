@@ -27,24 +27,24 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
- * Unit test for matrix weighted distance.
+ * Unit test for Mahalanobis distance.
  *
  * @author Erich Schubert
  */
-public class MatrixWeightedQuadraticDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class MahalanobisDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
   @Test
   public void testEuclideanConsistency() {
     double[][] data = TOY_VECTORS; // TODO: use data with more dimensions.
     final int dim = data[0].length;
     double[][] weights = VMath.identity(dim, dim);
     // TODO: No builder yet.
-    MatrixWeightedQuadraticDistanceFunction dis = new MatrixWeightedQuadraticDistanceFunction(weights);
-    MatrixWeightedQuadraticDistanceFunction dis2 = new MatrixWeightedQuadraticDistanceFunction(VMath.times(weights, 2));
-    SquaredEuclideanDistanceFunction ref = SquaredEuclideanDistanceFunction.STATIC;
+    MahalanobisDistanceFunction dis = new MahalanobisDistanceFunction(weights);
+    MahalanobisDistanceFunction dis2 = new MahalanobisDistanceFunction(VMath.times(weights, 4));
+    EuclideanDistanceFunction ref = EuclideanDistanceFunction.STATIC;
     for(int i = 0; i < data.length; i++) {
       final DoubleVector vi = DoubleVector.wrap(data[i]);
       for(int j = 0; j < data.length; j++) {
@@ -53,7 +53,7 @@ public class MatrixWeightedQuadraticDistanceFunctionTest extends AbstractSpatial
         assertEquals("Not consistent at " + i + "," + j, ref.distance(vi, vj) * 2, dis2.distance(vi, vj), 1e-15);
       }
     }
-    assertTrue("Equals not recreatable.", dis.equals(new MatrixWeightedQuadraticDistanceFunction(VMath.copy(weights))));
+    assertTrue("Equals not recreatable.", dis.equals(new MahalanobisDistanceFunction(VMath.copy(weights))));
     assertFalse("Equals not null safe", dis.equals(null));
     assertFalse("Equals Object.class?", dis.equals(new Object()));
     assertTrue("Inconsistent equals", dis.equals(dis));

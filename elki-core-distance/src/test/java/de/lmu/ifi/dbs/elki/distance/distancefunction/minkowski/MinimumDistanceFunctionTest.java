@@ -34,8 +34,8 @@ public class MinimumDistanceFunctionTest extends AbstractSpatialPrimitiveDistanc
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    MinimumDistanceFunction dis = new ELKIBuilder<>(MinimumDistanceFunction.class).build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    MinimumDistanceFunction dist = new ELKIBuilder<>(MinimumDistanceFunction.class).build();
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

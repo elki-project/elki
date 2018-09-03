@@ -46,7 +46,7 @@ public class HellingerDistanceFunctionTest extends AbstractSpatialPrimitiveDista
 
   @Test
   public void testHellingerDistance() {
-    double[][] vecs = TOY_VECTORS;
+    double[][] vecs = TOY_VECTORS_VAR;
 
     // Manual computation of correct distances:
     double d0102sq = pow(sqrt(0.1) - sqrt(0.2), 2);
