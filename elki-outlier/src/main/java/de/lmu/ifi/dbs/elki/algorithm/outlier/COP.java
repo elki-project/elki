@@ -30,13 +30,15 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.*;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.*;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
@@ -185,64 +187,49 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDataStore<double[]> cop_err_v = null;
-    WritableIntegerDataStore cop_dim = null;
-    if(models) {
-      cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
-      cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
-    }
+    WritableDataStore<double[]> cop_err_v = models ? DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class) : null;
+    WritableIntegerDataStore cop_dim = models ? DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1) : null;
     // compute neighbors of each db object
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
 
+    double[] centroid = new double[dim];
+    double[] scores = new double[dim];
+    ModifiableDBIDs nids = DBIDUtil.newHashSet(k + 10);
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
-      ModifiableDBIDs nids = DBIDUtil.newHashSet(neighbors);
+      nids.clear();
+      nids.addDBIDs(knnQuery.getKNNForDBID(id, k + 1));
       nids.remove(id); // Do not use query object
 
-      double[] centroid = Centroid.make(relation, nids).getArrayRef();
-      double[] relative = minusEquals(relation.get(id).toArray(), centroid);
-
+      computeCentroid(centroid, relation, nids);
       PCAResult pcares = pca.processIds(nids, relation);
-      double[][] evecs = pcares.getEigenvectors();
-      double[] projected = transposeTimes(evecs, relative);
+      double[][] tevecs = transpose(pcares.getEigenvectors()); // in rows!
       double[] evs = pcares.getEigenvalues();
+      double[] projected = times(tevecs, minusEquals(relation.get(id).toArray(), centroid));
 
-      double min = Double.POSITIVE_INFINITY;
-      int vdim = dim;
-      switch(dist){
-      case CHISQUARED: {
+      if(dist == DistanceDist.CHISQUARED) {
         double sqdevs = 0;
         for(int d = 0; d < dim; d++) {
-          // Scale with Stddev
           double dev = projected[d];
-          // Accumulate
+          // Scale with variance and accumulate
           sqdevs += dev * dev / evs[d];
-          // Evaluate
-          double score = 1 - ChiSquaredDistribution.cdf(sqdevs, d + 1);
-          if(score < min) {
-            min = score;
-            vdim = d + 1;
-          }
+          scores[d] = 1 - ChiSquaredDistribution.cdf(sqdevs, d + 1);
         }
-        break;
       }
-      case GAMMA: {
+      else {
+        assert (dist == DistanceDist.GAMMA);
         double[][] dists = new double[dim][nids.size()];
         int j = 0;
         double[] srel = new double[dim];
-        for(DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance()) {
+        for(DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance(), j++) {
           V vec = relation.get(s);
           for(int d = 0; d < dim; d++) {
             srel[d] = vec.doubleValue(d) - centroid[d];
           }
-          double[] serr = transposeTimes(evecs, srel);
           double sqdist = 0.0;
           for(int d = 0; d < dim; d++) {
-            double serrd = serr[d];
-            sqdist += serrd * serrd / evs[d];
-            dists[d][j] = sqdist;
+            double serrd = transposeTimes(tevecs[d], srel);
+            dists[d][j] = (sqdist += serrd * serrd / evs[d]);
           }
-          j++;
         }
         double sqdevs = 0;
         for(int d = 0; d < dim; d++) {
@@ -253,29 +240,28 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
           // Sort, so we can trim the top 15% below.
           Arrays.sort(dists[d]);
           // Evaluate
-          double score = 1 - GammaChoiWetteEstimator.STATIC.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
-          if(score < min) {
-            min = score;
-            vdim = d + 1;
-          }
+          scores[d] = 1 - GammaChoiWetteEstimator.STATIC.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
         }
-        break;
       }
+      // Find best score
+      double min = Double.POSITIVE_INFINITY;
+      int vdim = dim - 1;
+      for(int d = 0; d < dim; d++) {
+        double v = scores[d];
+        if(v < min) {
+          min = v;
+          vdim = d;
+        }
       }
       // Normalize the value
       final double prob = expect * (1 - min) / (expect + min);
-      // Construct the error vector:
-      for(int d = vdim; d < dim; d++) {
-        projected[d] = 0.;
-      }
-      double[] ev = timesEquals(times(evecs, projected), -1 * prob);
-
       cop_score.putDouble(id, prob);
       if(models) {
-        cop_err_v.put(id, ev);
-        cop_dim.putInt(id, dim + 1 - vdim);
+        // Construct the error vector:
+        Arrays.fill(projected, vdim + 1, dim, 0.);
+        cop_err_v.put(id, timesEquals(transposeTimes(tevecs, projected), -prob));
+        cop_dim.putInt(id, dim - vdim);
       }
-
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -289,6 +275,25 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
     }
     return result;
+  }
+
+  /**
+   * Recompute the centroid of a set.
+   *
+   * @param centroid Scratch buffer
+   * @param relation Input data
+   * @param ids IDs to include
+   */
+  private static void computeCentroid(double[] centroid, Relation<? extends NumberVector> relation, DBIDs ids) {
+    Arrays.fill(centroid, 0);
+    int dim = centroid.length;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      NumberVector v = relation.get(it);
+      for(int i = 0; i < dim; i++) {
+        centroid[i] += v.doubleValue(i);
+      }
+    }
+    timesEquals(centroid, 1. / ids.size());
   }
 
   @Override
@@ -311,47 +316,27 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its COP_SCORE, must be an integer greater than
-     * 0.
-     * <p>
-     * Key: {@code -cop.k}
-     * </p>
+     * considered for computing its score, must be an integer greater than 0.
      */
     public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
     /**
      * Distribution assumption for distances.
-     * <p>
-     * Key: {@code -cop.dist}
-     * </p>
      */
     public static final OptionID DIST_ID = new OptionID("cop.dist", "The assumed distribution of squared distances. ChiSquared is faster, Gamma expected to be more accurate but could also overfit.");
 
     /**
      * Class to compute the PCA with.
-     * <p>
-     * Key: {@code -cop.pcarunner}
-     * </p>
      */
     public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
 
     /**
      * Expected share of outliers.
-     * <p>
-     * Key: {@code -cop.expect}
-     *
-     * Default: 0.001
-     * </p>
      */
     public static final OptionID EXPECT_ID = new OptionID("cop.expect", "Expected share of outliers. Only affect score normalization.");
 
     /**
      * Include COP error vectors in output.
-     * <p>
-     * Key: {@code -cop.models}
-     *
-     * Default: off
-     * </p>
      */
     public static final OptionID MODELS_ID = new OptionID("cop.models", "Include COP models (error vectors) in output. This needs more memory.");
 

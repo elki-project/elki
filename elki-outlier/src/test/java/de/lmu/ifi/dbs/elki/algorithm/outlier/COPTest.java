@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,6 +46,18 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
         .with(COP.Parameterizer.K_ID, 30).build().run(db);
     testAUC(db, "Noise", result, 0.89476666);
     testSingleScore(result, 416, 0.26795866);
+  }
+
+  @Test
+  public void testCOPChisquared() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
+        .with(COP.Parameterizer.K_ID, 30) //
+        .with(COP.Parameterizer.MODELS_ID) //
+        .with(COP.Parameterizer.DIST_ID, COP.DistanceDist.CHISQUARED)//
+        .build().run(db);
+    testAUC(db, "Noise", result, 0.897);
+    testSingleScore(result, 416, 0.0080449);
   }
 
   @Test
