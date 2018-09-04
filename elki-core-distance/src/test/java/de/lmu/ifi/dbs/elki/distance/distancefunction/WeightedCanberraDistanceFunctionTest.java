@@ -32,14 +32,15 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class WeightedCanberraDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class WeightedCanberraDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder
-    WeightedCanberraDistanceFunction dis = new ELKIBuilder<>(WeightedCanberraDistanceFunction.class) //
+    WeightedCanberraDistanceFunction dist = new ELKIBuilder<>(WeightedCanberraDistanceFunction.class) //
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
-    spatialConsistency(dis);
-    nonnegativeSpatialConsistency(dis);
+    basicChecks(dist);
+    spatialConsistency(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

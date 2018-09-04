@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -29,12 +30,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class ClarkDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class ClarkDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     ClarkDistanceFunction dist = new ELKIBuilder<>(ClarkDistanceFunction.class).build();
-    // contains 1/d factor, unfortunately. varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

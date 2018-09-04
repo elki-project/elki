@@ -92,6 +92,11 @@ public class ChiDistanceFunction extends ChiSquaredDistanceFunction {
   public boolean isMetric() {
     return true;
   }
+  
+  @Override
+  public boolean isSquared() {
+    return false;
+  }
 
   @Override
   public String toString() {

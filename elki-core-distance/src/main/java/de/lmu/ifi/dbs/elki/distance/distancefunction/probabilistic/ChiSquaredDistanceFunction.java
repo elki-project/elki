@@ -143,6 +143,11 @@ public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunc
   public String toString() {
     return "ChiSquaredDistance";
   }
+  
+  @Override
+  public boolean isSquared() {
+    return true;
+  }
 
   @Override
   public boolean equals(Object obj) {

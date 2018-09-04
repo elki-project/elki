@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 
 /**
  * Unit test for Absolute Pearson correlation distance.
@@ -32,7 +33,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class AbsoluteUncenteredCorrelationDistanceFunctionTest {
+public class AbsoluteUncenteredCorrelationDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /** Inherited test data */
   final static DoubleVector[] TESTS = UncenteredCorrelationDistanceFunctionTest.TESTS;
 
@@ -42,6 +43,7 @@ public class AbsoluteUncenteredCorrelationDistanceFunctionTest {
   @Test
   public void testAbsoluteUncenteredCorrelation() {
     AbsoluteUncenteredCorrelationDistanceFunction f = AbsoluteUncenteredCorrelationDistanceFunction.STATIC;
+    basicChecks(f);
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);

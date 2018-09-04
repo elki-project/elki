@@ -24,7 +24,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
@@ -34,13 +34,14 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class WeightedSquaredEuclideanDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class WeightedSquaredEuclideanDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder
     WeightedSquaredEuclideanDistanceFunction dist = new ELKIBuilder<>(WeightedSquaredEuclideanDistanceFunction.class) //
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
+    basicChecks(dist);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

@@ -28,7 +28,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -36,11 +37,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * 
  * @author Erich Schubert
  */
-public class HellingerDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class HellingerDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
-  public void testSpatialConsistency() {
+  public void testBasic() {
     // Also test the builder - we could have just used .STATIC
     HellingerDistanceFunction df = new ELKIBuilder<>(HellingerDistanceFunction.class).build();
+    basicChecks(df);
+    varyingLengthBasic(1e-15, df, MathUtil.SQRTHALF, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
     nonnegativeSpatialConsistency(df);
   }
 

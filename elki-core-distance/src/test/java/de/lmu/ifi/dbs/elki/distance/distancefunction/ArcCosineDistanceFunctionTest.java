@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -29,12 +30,14 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class ArcCosineDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class ArcCosineDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     ArcCosineDistanceFunction dist = new ELKIBuilder<>(ArcCosineDistanceFunction.class).build();
-    varyingLength(dist);
+    basicChecks(dist);
+    // Note: some of these are not well defined, as we have zero vectors.
+    varyingLengthBasic(0, dist, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI);
     nonnegativeSpatialConsistency(dist);
   }
 }

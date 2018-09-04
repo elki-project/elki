@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Some inequalities for information divergence and related measures of
  * discrimination<br>
  * IEEE Transactions on information theory, 46(4).
+ * <p>
+ * TODO: support sparse vectors, varying length
  *
  * @author Erich Schubert
  */

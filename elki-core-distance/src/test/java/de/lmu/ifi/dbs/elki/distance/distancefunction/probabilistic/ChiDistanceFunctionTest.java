@@ -27,7 +27,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -35,11 +36,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class ChiDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class ChiDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
-  public void testSpatialConsistency() {
+  public void testBasic() {
     // Also test the builder - we could have just used .STATIC
     ChiDistanceFunction df = new ELKIBuilder<>(ChiDistanceFunction.class).build();
+    basicChecks(df);
+    varyingLengthBasic(0, df, MathUtil.SQRT2, 0, MathUtil.SQRT2, MathUtil.SQRT2, 2, MathUtil.SQRT2);
     nonnegativeSpatialConsistency(df);
   }
 

@@ -21,8 +21,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -35,27 +33,24 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  *
  * @author Erich Schubert
  */
-public class MatrixWeightedQuadraticDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class MatrixWeightedQuadraticDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testEuclideanConsistency() {
     double[][] data = TOY_VECTORS; // TODO: use data with more dimensions.
     final int dim = data[0].length;
     double[][] weights = VMath.identity(dim, dim);
     // TODO: No builder yet.
-    MatrixWeightedQuadraticDistanceFunction dis = new MatrixWeightedQuadraticDistanceFunction(weights);
+    MatrixWeightedQuadraticDistanceFunction dist = new MatrixWeightedQuadraticDistanceFunction(weights);
     MatrixWeightedQuadraticDistanceFunction dis2 = new MatrixWeightedQuadraticDistanceFunction(VMath.times(weights, 2));
     SquaredEuclideanDistanceFunction ref = SquaredEuclideanDistanceFunction.STATIC;
     for(int i = 0; i < data.length; i++) {
       final DoubleVector vi = DoubleVector.wrap(data[i]);
       for(int j = 0; j < data.length; j++) {
         final DoubleVector vj = DoubleVector.wrap(data[j]);
-        assertEquals("Not consistent at " + i + "," + j, ref.distance(vi, vj), dis.distance(vi, vj), 1e-15);
+        assertEquals("Not consistent at " + i + "," + j, ref.distance(vi, vj), dist.distance(vi, vj), 1e-15);
         assertEquals("Not consistent at " + i + "," + j, ref.distance(vi, vj) * 2, dis2.distance(vi, vj), 1e-15);
       }
     }
-    assertTrue("Equals not recreatable.", dis.equals(new MatrixWeightedQuadraticDistanceFunction(VMath.copy(weights))));
-    assertFalse("Equals not null safe", dis.equals(null));
-    assertFalse("Equals Object.class?", dis.equals(new Object()));
-    assertTrue("Inconsistent equals", dis.equals(dis));
+    basicChecks(dist);
   }
 }

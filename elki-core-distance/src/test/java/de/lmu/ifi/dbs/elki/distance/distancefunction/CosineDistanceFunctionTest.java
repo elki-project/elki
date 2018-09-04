@@ -29,12 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class CosineDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class CosineDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     CosineDistanceFunction dist = new ELKIBuilder<>(CosineDistanceFunction.class).build();
-    varyingLength(dist);
+    basicChecks(dist);
+    // Note: some of these are not well defined, as we have zero vectors.
+    varyingLengthBasic(0, dist, 1, 1, 1, 1, 1, 1);
     nonnegativeSpatialConsistency(dist);
   }
 }

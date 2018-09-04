@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 
 /**
  * Unit test for Absolute Pearson correlation distance.
@@ -32,7 +33,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class UncenteredCorrelationDistanceFunctionTest {
+public class UncenteredCorrelationDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /** Inherited test data */
   final static DoubleVector[] TESTS = PearsonCorrelationDistanceFunctionTest.TESTS;
 
@@ -44,17 +45,18 @@ public class UncenteredCorrelationDistanceFunctionTest {
    * The associated scores.
    */
   static final double[][] SCORES = { //
-  { 0., 0., 2., C1, 1., C2 },//
-  { 0., 0., 2., C1, 1., C2 },//
-  { 2., 2., 0., C3, 1., 2. - C2 },//
-  { C1, C1, C3, 0., 1., 1.6 },//
-  { 1., 1., 1., 1., 0., 1. },//
-  { C2, C2, 2. - C2, 1.6, 1., 0. },//
+      { 0., 0., 2., C1, 1., C2 }, //
+      { 0., 0., 2., C1, 1., C2 }, //
+      { 2., 2., 0., C3, 1., 2. - C2 }, //
+      { C1, C1, C3, 0., 1., 1.6 }, //
+      { 1., 1., 1., 1., 0., 1. }, //
+      { C2, C2, 2. - C2, 1.6, 1., 0. },//
   };
 
   @Test
   public void testUncenteredCorrelation() {
     UncenteredCorrelationDistanceFunction f = UncenteredCorrelationDistanceFunction.STATIC;
+    basicChecks(f);
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);

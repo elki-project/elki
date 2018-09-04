@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-
 import net.jafama.FastMath;
 
 /**
@@ -75,5 +74,10 @@ public class MahalanobisDistanceFunction extends MatrixWeightedQuadraticDistance
   @Override
   public boolean isMetric() {
     return true;
+  }
+
+  @Override
+  public boolean isSquared() {
+    return false;
   }
 }

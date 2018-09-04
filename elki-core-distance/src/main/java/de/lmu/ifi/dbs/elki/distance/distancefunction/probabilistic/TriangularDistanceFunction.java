@@ -46,6 +46,8 @@ import net.jafama.FastMath;
  * Hilbert Exclusion: Improved Metric Search through Finite Isometric
  * Embeddings<br>
  * arXiv preprint arXiv:1604.08640
+ * <p>
+ * TODO: support sparse vectors, varying length
  *
  * @author Erich Schubert
  */

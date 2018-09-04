@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,13 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
+
 /**
  * Unit test for Levenshtein distance.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class LevenshteinDistanceFunctionTest {
+public class LevenshteinDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /**
    * Some test strings, from the Wikipedia article.
    */
@@ -58,6 +60,7 @@ public class LevenshteinDistanceFunctionTest {
   @Test
   public void testStringLevenshtein() {
     LevenshteinDistanceFunction f = LevenshteinDistanceFunction.STATIC_SENSITIVE;
+    basicChecks(f);
     for(int i = 0; i < TESTS.length; i++) {
       assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], (int) f.distance(TESTS[i][0], TESTS[i][1]));
     }

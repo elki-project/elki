@@ -27,7 +27,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class WeightedLPNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class WeightedLPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder
@@ -46,6 +46,7 @@ public class WeightedLPNormDistanceFunctionTest extends AbstractSpatialPrimitive
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertFalse("Not metric", dist.isMetric());
+    basicChecks(dist);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(WeightedLPNormDistanceFunction.class) //
@@ -53,6 +54,7 @@ public class WeightedLPNormDistanceFunctionTest extends AbstractSpatialPrimitive
         .with(WeightedNumberVectorDistanceFunction.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertTrue("Not metric", dist.isMetric());
+    basicChecks(dist);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

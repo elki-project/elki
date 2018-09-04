@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -30,11 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class HistogramIntersectionDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class HistogramIntersectionDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
-    HistogramIntersectionDistanceFunction dis = new ELKIBuilder<>(HistogramIntersectionDistanceFunction.class).build();
-    nonnegativeSpatialConsistency(dis);
+    HistogramIntersectionDistanceFunction dist = new ELKIBuilder<>(HistogramIntersectionDistanceFunction.class).build();
+    basicChecks(dist);
+    nonnegativeSpatialConsistency(dist);
   }
 }

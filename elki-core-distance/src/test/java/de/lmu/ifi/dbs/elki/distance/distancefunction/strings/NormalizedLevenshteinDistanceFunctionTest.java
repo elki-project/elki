@@ -24,13 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
+
 /**
  * Unit test for Levenshtein distance.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class NormalizedLevenshteinDistanceFunctionTest {
+public class NormalizedLevenshteinDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /**
    * Some test strings, from the Wikipedia article.
    */
@@ -56,6 +58,7 @@ public class NormalizedLevenshteinDistanceFunctionTest {
   @Test
   public void testStringLevenshtein() {
     NormalizedLevenshteinDistanceFunction f = NormalizedLevenshteinDistanceFunction.STATIC_SENSITIVE;
+    basicChecks(f);
     for(int i = 0; i < TESTS.length; i++) {
       assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], f.distance(TESTS[i][0], TESTS[i][1]), 1E-10);
     }

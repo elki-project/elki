@@ -80,6 +80,11 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends JensenShannonDi
   public boolean isMetric() {
     return true;
   }
+  
+  @Override
+  public boolean isSquared() {
+    return false;
+  }
 
   @Override
   public String toString() {

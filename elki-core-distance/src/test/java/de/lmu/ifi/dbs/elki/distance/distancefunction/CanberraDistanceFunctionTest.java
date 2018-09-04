@@ -29,12 +29,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class CanberraDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class CanberraDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     CanberraDistanceFunction dist = new ELKIBuilder<>(CanberraDistanceFunction.class).build();
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

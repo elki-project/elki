@@ -26,15 +26,16 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+import net.jafama.FastMath;
 
 /**
  * Unit test for Euclidean distance.
  *
  * @author Erich Schubert
  */
-public class LPNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class LPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
@@ -43,7 +44,8 @@ public class LPNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistance
         .build();
     assertSame("Subtyped", LPNormDistanceFunction.class, dist.getClass());
     assertFalse("Not metric", dist.isMetric());
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, 4, 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(LPNormDistanceFunction.class) //
@@ -51,7 +53,8 @@ public class LPNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistance
         .build();
     assertSame("Not optimized", LPIntegerNormDistanceFunction.class, dist.getClass());
     assertTrue("Not metric", dist.isMetric());
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

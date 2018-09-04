@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -30,12 +30,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class ManhattanDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class ManhattanDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     ManhattanDistanceFunction dist = new ELKIBuilder<>(ManhattanDistanceFunction.class).build();
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

@@ -29,11 +29,12 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class BrayCurtisDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class BrayCurtisDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     BrayCurtisDistanceFunction dist = new ELKIBuilder<>(BrayCurtisDistanceFunction.class).build();
+    basicChecks(dist);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

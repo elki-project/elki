@@ -59,6 +59,8 @@ import net.jafama.FastMath;
  * D. M. Endres, J. E. Schindelin<br>
  * A new metric for probability distributions<br>
  * IEEE Transactions on Information Theory 49(7)
+ * <p>
+ * TODO: add support for sparse vectors + varying length
  *
  * @author Erich Schubert
  * @since 0.4.0

@@ -24,15 +24,16 @@ import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+import net.jafama.FastMath;
 
 /**
  * Unit test for Lp norms with integer p.
  *
  * @author Erich Schubert
  */
-public class LPIntegerNormDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class LPIntegerNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
@@ -40,7 +41,8 @@ public class LPIntegerNormDistanceFunctionTest extends AbstractSpatialPrimitiveD
         .with(LPNormDistanceFunction.Parameterizer.P_ID, 3) //
         .build();
     assertSame("Subtyped", LPIntegerNormDistanceFunction.class, dist.getClass());
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

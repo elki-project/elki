@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import net.jafama.FastMath;
 
@@ -35,11 +35,12 @@ import net.jafama.FastMath;
  * 
  * @author Erich Schubert
  */
-public class SqrtJensenShannonDivergenceDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class SqrtJensenShannonDivergenceDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
-  public void testSpatialConsistency() {
+  public void testBasic() {
     // Also test the builder - we could have just used .STATIC
     SqrtJensenShannonDivergenceDistanceFunction df = new ELKIBuilder<>(SqrtJensenShannonDivergenceDistanceFunction.class).build();
+    basicChecks(df);
     nonnegativeSpatialConsistency(df);
   }
 

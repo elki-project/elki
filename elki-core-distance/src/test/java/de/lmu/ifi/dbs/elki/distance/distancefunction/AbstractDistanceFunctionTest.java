@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
 
 /**
@@ -38,9 +38,76 @@ import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
  * random objects.
  * 
  * @author Erich Schubert
- * @since 0.5.0
  */
-public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
+public abstract class AbstractDistanceFunctionTest {
+  /**
+   * Basic integrity checks.
+   * 
+   * @param dist Distance function
+   */
+  public static void basicChecks(DistanceFunction<?> dist) {
+    // Additional API checks
+    assertFalse("Equals not null safe", dist.equals(null));
+    assertFalse("Equals Object.class?", dist.equals(new Object()));
+    assertTrue("Inconsistent equals", dist.equals(dist));
+    assertFalse("Squared distances shouldn't be metric?", dist.isMetric() && dist.isSquared());
+    assertTrue("Squared distances shouldn't be metric?", dist.isSquared() || !dist.toString().contains("Square"));
+    assertTrue("Squared distances shouldn't be metric?", !dist.isSquared() || !dist.toString().contains("Sqrt"));
+    // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
+  }
+
+  /**
+   * Simple toy vectors
+   */
+  public static final DoubleVector[] BASIC = new DoubleVector[] { //
+      new DoubleVector(new double[] { 0 }), //
+      new DoubleVector(new double[] { 1 }), //
+      new DoubleVector(new double[] { 0, 0 }), //
+      new DoubleVector(new double[] { 0, 1 }), //
+      new DoubleVector(new double[] { .1 }), //
+      new DoubleVector(new double[] { .2 }), //
+      new DoubleVector(new double[] { .3 }), //
+  };
+
+  /**
+   * Basic regression test for variable length vectors.
+   *
+   * @param delta tolerance
+   * @param dist Distance function
+   * @param ds Correct vectors
+   */
+  public static void varyingLengthBasic(double tolerance, PrimitiveDistanceFunction<? super NumberVector> dist, double... ds) {
+    // Should accept variable lengths in the API:
+    assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(DoubleVector.class, 1, 2)));
+
+    assertEquals("Basic 0", ds[0], dist.distance(BASIC[0], BASIC[1]), tolerance);
+    assertEquals("Basic 1", ds[1], dist.distance(BASIC[0], BASIC[2]), tolerance);
+    assertEquals("Basic 2", ds[2], dist.distance(BASIC[0], BASIC[3]), tolerance);
+    assertEquals("Basic 3", ds[3], dist.distance(BASIC[1], BASIC[2]), tolerance);
+    assertEquals("Basic 4", ds[4], dist.distance(BASIC[1], BASIC[3]), tolerance);
+    assertEquals("Basic 5", ds[5], dist.distance(BASIC[2], BASIC[3]), tolerance);
+
+    double expect = dist.distance(BASIC[0], BASIC[3]);
+    assertEquals("Distance not as expected", expect, dist.distance(BASIC[1], BASIC[2]), 1e-15);
+    if(dist.isSymmetric()) {
+      assertEquals("Distance not as expected", expect, dist.distance(BASIC[3], BASIC[0]), 1e-15);
+      assertEquals("Distance not as expected", expect, dist.distance(BASIC[2], BASIC[1]), 1e-15);
+    }
+    if(dist instanceof Norm) {
+      Norm<? super NumberVector> norm = (Norm<? super NumberVector>) dist;
+      assertEquals("Distance not as expected", dist.distance(BASIC[0], BASIC[1]), norm.norm(BASIC[1]), 1e-15);
+      assertEquals("Distance not as expected", dist.distance(BASIC[2], BASIC[3]), norm.norm(BASIC[3]), 1e-15);
+    }
+    if(dist instanceof SpatialPrimitiveDistanceFunction) {
+      SpatialPrimitiveDistanceFunction<? super NumberVector> sdf = (SpatialPrimitiveDistanceFunction<? super NumberVector>) dist;
+      compareDistances(BASIC[0], BASIC[3], new HyperBoundingBox(BASIC[3].toArray(), BASIC[3].toArray()), sdf);
+      compareDistances(BASIC[2], BASIC[1], new HyperBoundingBox(BASIC[1].toArray(), BASIC[1].toArray()), sdf);
+    }
+    if(dist.isMetric()) {
+      assertTrue("Trivial metric test failed.", dist.distance(BASIC[4], BASIC[6]) <= dist.distance(BASIC[4], BASIC[5]) + dist.distance(BASIC[5], BASIC[6]));
+    }
+  }
+
   /**
    * Toy vectors, used for unit testing distribution distances.
    */
@@ -94,46 +161,6 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
   }
 
   /**
-   * Test that we can compare vectors with extra 0s.
-   *
-   * @param dist Distance function
-   */
-  public static void varyingLength(PrimitiveDistanceFunction<? super NumberVector> dist) {
-    assertFalse("Test setup inconsistent.", VMath.equals(TOY_VECTORS[1], TOY_VECTORS_VAR[1]));
-    DoubleVector v1 = DoubleVector.wrap(TOY_VECTORS[0]),
-        v2 = DoubleVector.wrap(TOY_VECTORS[1]),
-        v3 = DoubleVector.wrap(TOY_VECTORS_VAR[1]);
-    double expect = dist.distance(v1, v2);
-    double have1 = dist.distance(v1, v3), have2 = dist.distance(v3, v1);
-    assertEquals("Distance not as expected", expect, have1, 1e-15);
-    if(dist.isSymmetric()) {
-      assertEquals("Distance not as expected", expect, have2, 1e-15);
-    }
-    if(dist instanceof Norm) {
-      DoubleVector v4 = DoubleVector.wrap(new double[] {});
-      double expect4 = dist.distance(v1, v4);
-      double norm = ((Norm<? super NumberVector>) dist).norm(v1);
-      assertEquals("Distance not as expected", expect4, norm, 1e-15);
-    }
-    if(dist instanceof SpatialPrimitiveDistanceFunction) {
-      SpatialPrimitiveDistanceFunction<? super NumberVector> sdf = (SpatialPrimitiveDistanceFunction<? super NumberVector>) dist;
-      compareDistances(v1, v2, new HyperBoundingBox(TOY_VECTORS_VAR[1], TOY_VECTORS_VAR[1]), sdf);
-      compareDistances(v2, v3, new HyperBoundingBox(TOY_VECTORS[1], TOY_VECTORS[1]), sdf);
-    }
-    if(dist.isMetric()) {
-      DoubleVector m1 = DoubleVector.wrap(new double[] { .1 }),
-          m2 = DoubleVector.wrap(new double[] { .2 }),
-          m3 = DoubleVector.wrap(new double[] { .3 });
-      double d12 = dist.distance(m1, m2), d23 = dist.distance(m2, m3),
-          d13 = dist.distance(m1, m3);
-      assertTrue("Trivial metric test failed.", d13 <= d12 + d23);
-    }
-    assertFalse("Equals not null safe", dist.equals(null));
-    assertFalse("Equals Object.class?", dist.equals(new Object()));
-    assertTrue("Inconsistent equals", dist.equals(dist));
-  }
-
-  /**
    * MBR consistency check, around 0.
    *
    * @param dist Distance function to check
@@ -164,12 +191,6 @@ public abstract class AbstractSpatialPrimitiveDistanceFunctionTest {
    * @param dist Distance function to test
    */
   public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
-    // These should probably go into a more generic function.
-    assertFalse("Equals not null safe", dist.equals(null));
-    assertFalse("Equals Object.class?", dist.equals(new Object()));
-    assertTrue("Inconsistent equals", dist.equals(dist));
-    // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
-
     final Random rnd = new FastNonThreadsafeRandom(1);
     final int dim = TEST_DIM, iters = 10000;
     double[] d1 = new double[dim], d2 = new double[dim], d3 = new double[dim],

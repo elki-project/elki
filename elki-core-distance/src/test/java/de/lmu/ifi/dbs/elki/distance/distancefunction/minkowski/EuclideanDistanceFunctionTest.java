@@ -22,7 +22,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -30,12 +31,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class EuclideanDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class EuclideanDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     EuclideanDistanceFunction dist = new ELKIBuilder<>(EuclideanDistanceFunction.class).build();
-    varyingLength(dist);
+    basicChecks(dist);
+    varyingLengthBasic(0, dist, 1, 0, 1, 1, MathUtil.SQRT2, 1);
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
   }

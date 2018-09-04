@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialPrimitiveDistanceFunctionTest;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -36,11 +36,13 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * 
  * @author Erich Schubert
  */
-public class FisherRaoDistanceFunctionTest extends AbstractSpatialPrimitiveDistanceFunctionTest {
+public class FisherRaoDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
-  public void testSpatialConsistency() {
+  public void testBasic() {
     // Also test the builder - we could have just used .STATIC
     FisherRaoDistanceFunction df = new ELKIBuilder<>(FisherRaoDistanceFunction.class).build();
+    basicChecks(df);
+    varyingLengthBasic(0, df, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI);
     nonnegativeSpatialConsistency(df);
   }
 
