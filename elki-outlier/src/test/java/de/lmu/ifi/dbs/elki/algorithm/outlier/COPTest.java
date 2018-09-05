@@ -84,7 +84,7 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
         .with(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25) //
         .with(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0) //
         .build().run(db);
-    testAUC(db, "Noise", result, 0.89526);
+    testAUC(db, "Noise", result, 0.89077);
     testSingleScore(result, 416, 0.382879);
   }
 }

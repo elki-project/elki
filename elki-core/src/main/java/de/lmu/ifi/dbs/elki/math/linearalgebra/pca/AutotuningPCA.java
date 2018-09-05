@@ -231,7 +231,7 @@ public class AutotuningPCA extends PCARunner {
         weaksum += eigenPairs.eigenValue(i);
       }
     }
-    return strongsum / (strongsum / weaksum);
+    return strongsum / (strongsum + weaksum);
   }
 
   /**
