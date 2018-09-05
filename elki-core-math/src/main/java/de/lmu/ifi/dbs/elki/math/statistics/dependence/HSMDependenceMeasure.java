@@ -95,8 +95,7 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
       off1 = mi;
       scale1 = (ma > mi) ? (1. / (ma - mi)) : 1.;
       // Second data
-      mi = adapter2.getDouble(data2, 0);
-      ma = mi;
+      mi = ma = adapter2.getDouble(data2, 0);
       for(int i = 1; i < len; ++i) {
         double v = adapter2.getDouble(data2, i);
         mi = v < mi ? v : mi;

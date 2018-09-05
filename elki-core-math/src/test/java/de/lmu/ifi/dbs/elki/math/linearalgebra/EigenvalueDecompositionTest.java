@@ -80,7 +80,7 @@ public class EigenvalueDecompositionTest {
 
   @Test
   public void testAsymmetric() {
-    double[][] a = VMath.transpose(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } });
+    double[][] a = transpose(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } });
     EigenvalueDecomposition ev = new EigenvalueDecomposition(a);
     double[][] v = ev.getV(), d = ev.getD();
     assertEquals("Asymmetric decomposition", 0., normF(minus(times(a, v), times(v, d))), 1e-13);

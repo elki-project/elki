@@ -68,26 +68,17 @@ public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
       double mi = adapter1.getDouble(data1, 0), ma = mi;
       for(int i = 1; i < len; ++i) {
         double v = adapter1.getDouble(data1, i);
-        if(v < mi) {
-          mi = v;
-        }
-        else if(v > ma) {
-          ma = v;
-        }
+        mi = v < mi ? v : mi;
+        ma = v > ma ? v : ma;
       }
       off1 = mi;
       scale1 = (ma > mi) ? (1. / (ma - mi)) : 1.;
       // Second data
-      mi = adapter2.getDouble(data2, 0);
-      ma = mi;
+      mi = ma = adapter2.getDouble(data2, 0);
       for(int i = 1; i < len; ++i) {
         double v = adapter2.getDouble(data2, i);
-        if(v < mi) {
-          mi = v;
-        }
-        else if(v > ma) {
-          ma = v;
-        }
+        mi = v < mi ? v : mi;
+        ma = v > ma ? v : ma;
       }
       off2 = mi;
       scale2 = (ma > mi) ? (1. / (ma - mi)) : 1.;
