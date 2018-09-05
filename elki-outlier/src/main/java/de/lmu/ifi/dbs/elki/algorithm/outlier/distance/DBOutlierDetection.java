@@ -114,6 +114,9 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     if(knnQuery != null) {
+      if(LOG.isVeryVerbose()) {
+        LOG.veryverbose("Using kNN query: " + knnQuery.toString());
+      }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         KNNList knns = knnQuery.getKNNForDBID(iditer, m);
         scores.putDouble(iditer, (knns.getKNNDistance() > d) ? 1. : 0.);
@@ -121,6 +124,9 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
       }
     }
     else if(rangeQuery != null) {
+      if(LOG.isVeryVerbose()) {
+        LOG.veryverbose("Using range query: " + rangeQuery.toString());
+      }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, d);
         scores.putDouble(iditer, (neighbors.size() < m) ? 1. : 0.);

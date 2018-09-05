@@ -25,6 +25,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
@@ -40,7 +41,15 @@ public class FlexibleLOFTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<FlexibleLOF<DoubleVector>>(FlexibleLOF.class) //
         .with(FlexibleLOF.Parameterizer.KREF_ID, 10).build().run(db);
-    testSingleScore(result, 1293, 1.1945314199156365);
     testAUC(db, "Noise", result, 0.8921680672268908);
+    testSingleScore(result, 1293, 1.1945314199156365);
+
+    result = new ELKIBuilder<FlexibleLOF<DoubleVector>>(FlexibleLOF.class) //
+        .with(FlexibleLOF.Parameterizer.KREACH_ID, 15)//
+        .with(FlexibleLOF.Parameterizer.KREF_ID, 10)//
+        .with(FlexibleLOF.Parameterizer.REACHABILITY_DISTANCE_FUNCTION_ID, SquaredEuclideanDistanceFunction.class)//
+        .build().run(db);
+    testAUC(db, "Noise", result, 0.8904);
+    testSingleScore(result, 1293, 1.427456);
   }
 }
