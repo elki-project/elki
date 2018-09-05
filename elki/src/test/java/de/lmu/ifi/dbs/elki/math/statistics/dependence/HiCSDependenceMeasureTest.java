@@ -27,37 +27,30 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
 
 /**
- * Validate jensen shannon dependence.
+ * Ensure basic integrity.
  * 
  * @author Erich Schubert
- * @since 0.4.0
  */
-public class AbstractDependenceMeasureTest {
+public class HiCSDependenceMeasureTest {
   @Test
-  public void testIndexing() {
-    double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
-    int[] indexes = { 0, 2, 1, 3, 5, 4 };
-    int[] idx = AbstractDependenceMeasure.sortedIndex(DoubleArrayAdapter.STATIC, data, data.length);
-    for(int i = 0; i < indexes.length; i++) {
-      assertEquals("Index " + i, indexes[i], idx[i]);
-    }
+  public void testBasic() {
+    DependenceMeasure cor = new ELKIBuilder<>(HiCSDependenceMeasure.class) //
+        .with(HiCS.Parameterizer.SEED_ID, 0) //
+        .build();
+    // Note: only positive correlations are accepted.
+    checkPerfectLinear(cor, 1000, 0.800, 0.280, 0.05);
+    checkUniform(cor, 1000, 0.950, 0.02, 0.50, 0.08);
   }
 
-  @Test
-  public void testRanks() {
-    double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
-    double[] ranks = { 1., 4, 2., 4, 6, 4 };
-    double[] r = AbstractDependenceMeasure.ranks(DoubleArrayAdapter.STATIC, data, data.length);
-    for(int i = 0; i < ranks.length; i++) {
-      assertEquals("Rank " + i, ranks[i], r[i], 1e-20);
-    }
-  }
-
+  // Ugly duplication, but necessary because we cannot access the *test* classes
+  // of other modules easily
   public static void checkPerfectLinear(DependenceMeasure m, int len, double expectp, double expectn, double tol) {
     Random r = new FastNonThreadsafeRandom(0L);
     double[] x = new double[len], y = new double[len], z = new double[len];
@@ -83,16 +76,5 @@ public class AbstractDependenceMeasureTest {
     assertEquals("Uniform", expectCross, m.dependence(x, y), tolCross);
     assertEquals("Uniform-self1", expectSelf, m.dependence(x, x), tolSelf);
     assertEquals("Uniform-self2", expectSelf, m.dependence(y, y), tolSelf);
-  }
-
-  public static void checkTwoClusters(DependenceMeasure m, int len, double expect, double tol) {
-    Random r = new FastNonThreadsafeRandom(0L);
-    double[] x = new double[len], y = new double[len];
-    int halflen = len >>> 1;
-    for(int i = 0; i < len; i++) {
-      x[i] = r.nextDouble() + (i > halflen ? 10 : 0);
-      y[i] = r.nextDouble() + (i > halflen ? 10 : 0);
-    }
-    assertEquals("Clustered", expect, m.dependence(x, y), tol);
   }
 }

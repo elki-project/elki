@@ -44,14 +44,14 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees<br>
  * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
  * <p>
  * Based on:
  * <p>
- * F. Keller, E. Müller, and K. Böhm.<br>
- * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking.<br>
+ * F. Keller, E. Müller, K. Böhm<br>
+ * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br>
  * In ICDE, pages 1037–1048, 2012.
  *
  * @author Erich Schubert
@@ -164,14 +164,14 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
       deviationSum += contrast;
     }
 
-    return deviationSum / m;
+    return 1 - deviationSum / m;
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -181,16 +181,12 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     private GoodnessOfFitTest statTest;
 
     /**
-     * Holds the value of
-     * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#M_ID}
-     * .
+     * Monte-Carlo iterations
      */
     private int m = 50;
 
     /**
-     * Holds the value of
-     * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#ALPHA_ID}
-     * .
+     * Alpha threshold
      */
     private double alpha = 0.1;
 

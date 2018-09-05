@@ -28,6 +28,9 @@ import net.jafama.FastMath;
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
  * <p>
+ * This version only accepts <em>positive</em> correlations, see also
+ * {@link SlopeInversionDependenceMeasure}.
+ * <p>
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>

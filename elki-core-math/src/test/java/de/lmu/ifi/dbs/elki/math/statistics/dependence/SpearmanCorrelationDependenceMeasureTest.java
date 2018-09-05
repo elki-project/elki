@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,23 +36,30 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  */
 public class SpearmanCorrelationDependenceMeasureTest {
   double[][] data = { //
-  { 1, 2, 3, 4 }, //
-  { 1, 3, 5, 700 }, //
-  { 400, 3, 2, 1 }, //
-  { 1, 400, 2, 3 }, //
-  { 100, 0, 0, 100 }, //
+      { 1, 2, 3, 4 }, //
+      { 1, 3, 5, 700 }, //
+      { 400, 3, 2, 1 }, //
+      { 1, 400, 2, 3 }, //
+      { 100, 0, 0, 100 }, //
   };
 
   double[][] R = { //
-  { 1. }, //
-  { 1., 1. }, //
-  { -1., -1., 1. }, //
-  { 0.4, 0.4, -0.4, 1. }, //
-  { 0., 0., 0., -0.4472136, 1 }, //
+      { 1. }, //
+      { 1., 1. }, //
+      { -1., -1., 1. }, //
+      { 0.4, 0.4, -0.4, 1. }, //
+      { 0., 0., 0., -0.4472136, 1 }, //
   };
 
   @Test
-  public void testSpearmanCorrelation() {
+  public void testBasic() {
+    DependenceMeasure cor = SpearmanCorrelationDependenceMeasure.STATIC;
+    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, -1.0, 1e-15);
+    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, -0.026, 0.01);
+  }
+
+  @Test
+  public void testR() {
     DependenceMeasure cor = SpearmanCorrelationDependenceMeasure.STATIC;
     // Single computations
     for(int i = 0; i < data.length; i++) {

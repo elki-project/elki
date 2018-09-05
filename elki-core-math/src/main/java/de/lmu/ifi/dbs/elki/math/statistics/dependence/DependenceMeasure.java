@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -59,7 +60,9 @@ public interface DependenceMeasure {
    * @param <A> Array type
    * @return Dependence measure
    */
-  <A> double dependence(NumberArrayAdapter<?, A> adapter, A data1, A data2);
+  default <A> double dependence(NumberArrayAdapter<?, A> adapter, A data1, A data2) {
+    return dependence(adapter, data1, adapter, data2);
+  }
 
   /**
    * Measure the dependence of two variables.
@@ -83,7 +86,18 @@ public interface DependenceMeasure {
    * @param <A> Array type
    * @return Lower triangular serialized matrix
    */
-  <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data);
+  default <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
+    final int dims = data.size();
+    double[] out = new double[(dims * (dims - 1)) >> 1];
+    int o = 0;
+    for(int y = 1; y < dims; y++) {
+      A dy = data.get(y);
+      for(int x = 0; x < y; x++) {
+        out[o++] = dependence(adapter, data.get(x), adapter, dy);
+      }
+    }
+    return out;
+  }
 
   /**
    * Measure the dependence of two variables.
@@ -92,5 +106,7 @@ public interface DependenceMeasure {
    * @param data2 Second data set
    * @return Dependence measure
    */
-  double dependence(double[] data1, double[] data2);
+  default double dependence(double[] data1, double[] data2) {
+    return dependence(DoubleArrayAdapter.STATIC, data1, DoubleArrayAdapter.STATIC, data2);
+  }
 }

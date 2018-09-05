@@ -21,32 +21,38 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
 import de.lmu.ifi.dbs.elki.math.SinCosTable;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Compute the similarity of dimensions by using a hough transformation.
- * 
- * Reference: <br>
+ * Compute the "interestingness" of dimension connections using the hough
+ * transformation. This is a very visual approach, designed to find certain
+ * patterns in parallel coordinates visualizations. The patterns detected
+ * here occur mostly if you have mutliple <em>clusters</em> of linear patterns
+ * as far as we understood the approach (which is not easy to use,
+ * unfortunately).
+ * <p>
+ * Reference:
  * <p>
  * A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor,
- * D. A. Keim.<br />
- * Automated Analytical Methods to Support Visual Exploration of High-
- * Dimensional Data. <br/>
- * IEEEVisualization and Computer Graphics, 2011.
- * </p>
- * 
- * FIXME: This needs serious TESTING before release. Large parts have been
- * rewritten, but could not be tested at the time of rewriting.
+ * D. A. Keim.<br>
+ * Automated Analytical Methods to Support Visual Exploration of
+ * High-Dimensional Data.<br>
+ * IEEE Trans. Visualization and Computer Graphics
+ * <p>
+ * FIXME: while the plots look reasonable, this fails to find interesting
+ * associations. This needs closer investigation.
  * 
  * @author Erich Schubert
  * @author Robert Rödler
  * @since 0.5.5
  */
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, D. A. Keim", //
     title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", //
-    booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", //
+    booktitle = "IEEE Trans. Visualization and Computer Graphics", //
     url = "https://doi.org/10.1109/TVCG.2010.242", //
     bibkey = "DBLP:journals/tvcg/TatuAEBTMK11")
 public class HSMDependenceMeasure extends AbstractDependenceMeasure {
@@ -60,7 +66,7 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
    * 
    * The original publication used 50.
    */
-  private final static int STEPS = 48; // 64;
+  private final static int STEPS = 52; // 64;
 
   /**
    * Resolution of image.
@@ -70,7 +76,7 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Precompute sinus and cosinus
    */
-  private final static SinCosTable table = SinCosTable.make(STEPS);
+  private final static SinCosTable table = SinCosTable.make(STEPS * 2);
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
@@ -83,12 +89,8 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
       double mi = adapter1.getDouble(data1, 0), ma = mi;
       for(int i = 1; i < len; ++i) {
         double v = adapter1.getDouble(data1, i);
-        if(v < mi) {
-          mi = v;
-        }
-        else if(v > ma) {
-          ma = v;
-        }
+        mi = v < mi ? v : mi;
+        ma = v > ma ? v : ma;
       }
       off1 = mi;
       scale1 = (ma > mi) ? (1. / (ma - mi)) : 1.;
@@ -97,12 +99,8 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
       ma = mi;
       for(int i = 1; i < len; ++i) {
         double v = adapter2.getDouble(data2, i);
-        if(v < mi) {
-          mi = v;
-        }
-        else if(v > ma) {
-          ma = v;
-        }
+        mi = v < mi ? v : mi;
+        ma = v > ma ? v : ma;
       }
       off2 = mi;
       scale2 = (ma > mi) ? (1. / (ma - mi)) : 1.;
@@ -114,15 +112,13 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
       drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pic);
     }
 
-    final double stepsq = (double) STEPS * (double) STEPS;
     int[][] hough = houghTransformation(pic);
     // The original publication said "median", but judging from the text,
     // meant "mean". Otherwise, always half of the cells are above the
     // threshold, which doesn't match the explanation there.
-    double mean = sumMatrix(hough) / stepsq;
+    double mean = sumMatrix(hough) / (double) (STEPS * (long) STEPS);
     int abovemean = countAboveThreshold(hough, mean);
-
-    return 1. - (abovemean / stepsq);
+    return 1. - (abovemean / (double) (STEPS * (long) STEPS));
   }
 
   /**
@@ -170,12 +166,13 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
    */
   private int[][] houghTransformation(boolean[][] mat) {
     final int xres = mat.length, yres = mat[0].length;
-    final double tscale = STEPS * .5 / (xres + yres);
+    final double tscale = STEPS * .66 / (xres + yres);
     final int[][] ret = new int[STEPS][STEPS];
 
     for(int x = 0; x < mat.length; x++) {
+      final boolean[] row = mat[x];
       for(int y = 0; y < mat[0].length; y++) {
-        if(mat[x][y]) {
+        if(row[y]) {
           for(int i = 0; i < STEPS; i++) {
             final int d = (STEPS >> 1) + (int) (tscale * (x * table.cos(i) + y * table.sin(i)));
             if(d > 0 && d < STEPS) {

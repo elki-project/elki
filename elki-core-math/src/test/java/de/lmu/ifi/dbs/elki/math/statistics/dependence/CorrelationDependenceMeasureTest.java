@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,23 +36,31 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  */
 public class CorrelationDependenceMeasureTest {
   double[][] data = { //
-  { 1, 2, 3, 4 }, //
-  { 1, 3, 5, 7 }, //
-  { 4, 3, 2, 1 }, //
-  { 1, 4, 2, 3 }, //
-  { 1, 0, 0, 1 }, //
+      { 1, 2, 3, 4 }, //
+      { 1, 3, 5, 7 }, //
+      { 4, 3, 2, 1 }, //
+      { 1, 4, 2, 3 }, //
+      { 1, 0, 0, 1 }, //
   };
 
   double[][] R = { //
-  { 1. }, //
-  { 1., 1. }, //
-  { -1., -1., 1. }, //
-  { 0.4, 0.4, -0.4, 1. }, //
-  { 0., 0., 0., -0.4472136, 1 }, //
+      { 1. }, //
+      { 1., 1. }, //
+      { -1., -1., 1. }, //
+      { 0.4, 0.4, -0.4, 1. }, //
+      { 0., 0., 0., -0.4472136, 1 }, //
   };
 
   @Test
-  public void testPearsonCorrelation() {
+  public void testBasic() {
+    DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
+    // This will become better with data size.
+    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1, -1, 1e-14);
+    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.03);
+  }
+
+  @Test
+  public void testR() {
     DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
     // Single computations
     for(int i = 0; i < data.length; i++) {

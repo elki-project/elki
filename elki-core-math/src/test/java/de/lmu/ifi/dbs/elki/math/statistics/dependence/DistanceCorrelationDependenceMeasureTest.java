@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,24 +36,32 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  */
 public class DistanceCorrelationDependenceMeasureTest {
   double[][] data = { //
-  { 1, 2, 3, 4 }, //
-  { 1, 3, 5, 7 }, //
-  { 4, 3, 2, 1 }, //
-  { 1, 4, 2, 3 }, //
-  { 1, 0, 0, 1 }, //
-  { 0, 0, 0, 0 } };
+      { 1, 2, 3, 4 }, //
+      { 1, 3, 5, 7 }, //
+      { 4, 3, 2, 1 }, //
+      { 1, 4, 2, 3 }, //
+      { 1, 0, 0, 1 }, //
+      { 0, 0, 0, 0 } };
 
   double[][] R = { //
-  { 1. }, //
-  { 1., 1. }, //
-  { 1., 1., 1. }, //
-  { 0.7337994, 0.7337994, 0.7337994, 1. }, //
-  { 0.5266404, 0.5266404, 0.5266404, 0.5266404, 1 }, //
-  { 0., 0., 0., 0., 0., 0. }, //
+      { 1. }, //
+      { 1., 1. }, //
+      { 1., 1., 1. }, //
+      { 0.7337994, 0.7337994, 0.7337994, 1. }, //
+      { 0.5266404, 0.5266404, 0.5266404, 0.5266404, 1 }, //
+      { 0., 0., 0., 0., 0., 0. }, //
   };
 
   @Test
-  public void testDistanceCorrelation() {
+  public void testBasic() {
+    DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
+    // This will become better with data size.
+    AbstractDependenceMeasureTest.checkPerfectLinear(dCor, 1000, 1, 1, 1e-13);
+    AbstractDependenceMeasureTest.checkUniform(dCor, 1000, 1.0, 1e-15, 0.05, 0.01);
+  }
+
+  @Test
+  public void testR() {
     DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {

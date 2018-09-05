@@ -20,8 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
@@ -39,8 +40,8 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees<br>
  * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
  * <p>
  * Based on:
@@ -51,11 +52,14 @@ import net.jafama.FastMath;
  * Proc. IEEE International Conference on Data Mining (ICDM 2004)
  * <p>
  * TODO: make the subspace distance function and k parameterizable.
+ * <p>
+ * TODO: results are not convincing, maybe try inserting points.
  *
  * @author Robert Rödler
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
@@ -86,33 +90,42 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
 
     double[] knns = new double[len];
 
-    DoubleMinHeap heap = new DoubleMinHeap(k);
+    DoubleMaxHeap heap = new DoubleMaxHeap(k);
     double kdistmean = 0.;
     for(int i = 0; i < len; ++i) {
       double ix = adapter1.getDouble(data1, i),
           iy = adapter2.getDouble(data2, i);
       heap.clear();
       for(int j = 0; j < len; ++j) {
+        if(i == j) {
+          continue;
+        }
         double jx = adapter1.getDouble(data1, j),
             jy = adapter2.getDouble(data2, j);
         double dx = ix - jx, dy = iy - jy;
-        heap.add(dx * dx + dy * dy); // Squared Euclidean.
+        final double dist = dx * dx + dy * dy; // Squared Euclidean.
+        if(heap.size() < k) {
+          heap.add(dist);
+        }
+        else if(dist < heap.peek()) {
+          heap.replaceTopElement(dist);
+        }
       }
-      double kdist = FastMath.sqrt(heap.peek()); // Euclidean
-      knns[i] = kdist;
-      kdistmean += kdist;
+      // sqrt to get Euclidean
+      kdistmean += knns[i] = FastMath.sqrt(heap.peek());
     }
     kdistmean /= len;
     // Deviation from mean:
     double diff = 0.;
     int below = 0;
     for(int l = 0; l < knns.length; l++) {
-      diff += Math.abs(kdistmean - knns[l]);
-      if(knns[l] < kdistmean) {
+      final double kdist = knns[l];
+      if(kdist < kdistmean) {
+        diff += kdist;
         below++;
       }
     }
-    return (below > 0) ? diff / (2. * kdistmean * below) : 0;
+    return (below > 0) ? 1 - diff / (kdistmean * below) : 0;
   }
 
   /**

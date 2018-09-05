@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import org.junit.Test;
 
@@ -37,12 +36,12 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  */
 public class JensenShannonEquiwidthDependenceMeasureTest {
   double[][] data = { //
-  { 1, 2, 3, 4 }, //
-  { 1, 3, 5, 7 }, //
-  { 4, 3, 2, 1 }, //
-  { 1, 4, 2, 3 }, //
-  { 1, 0, 0, 1 }, //
-  { 0, 1, 1, 1 }, //
+      { 1, 2, 3, 4 }, //
+      { 1, 3, 5, 7 }, //
+      { 4, 3, 2, 1 }, //
+      { 1, 4, 2, 3 }, //
+      { 1, 0, 0, 1 }, //
+      { 0, 1, 1, 1 }, //
   };
 
   // Regression testing
@@ -52,12 +51,12 @@ public class JensenShannonEquiwidthDependenceMeasureTest {
   final static double H4 = 0.773079609;
 
   double[][] manual = { //
-  { 1. }, //
-  { 1., 1. }, //
-  { 1., 1., 1. }, //
-  { 0., 0., 0., 1. }, //
-  { 0., 0., 0., 0., 1 }, //
-  { HH, HH, HH, HH, HH, H4 }, //
+      { 1. }, //
+      { 1., 1. }, //
+      { 1., 1., 1. }, //
+      { 0., 0., 0., 1. }, //
+      { 0., 0., 0., 0., 1 }, //
+      { HH, HH, HH, HH, HH, H4 }, //
   };
 
   @Test
@@ -79,22 +78,12 @@ public class JensenShannonEquiwidthDependenceMeasureTest {
       }
     }
   }
-
+  
   @Test
-  public void testUniform() {
-    int len = 10000;
-    DependenceMeasure mi = MutualInformationEquiwidthDependenceMeasure.STATIC;
-    double[] data1 = new double[len], data2 = new double[len];
-    Random r = new Random(0);
-    for(int i = 0; i < len; i++) {
-      data1[i] = r.nextDouble();
-      data2[i] = r.nextDouble();
-    }
-    // These values are only regression tests...
-    // Our implementation will use 100 bins, and rescale via
-    // log2(100.) = 6.6438561897747244!
-    assertEquals("Self-MI1", 0.999, mi.dependence(data1, data1), 1e-3);
-    assertEquals("Self-MI2", 0.999, mi.dependence(data2, data2), 1e-3);
-    assertEquals("MI", 0.1235388559, mi.dependence(data1, data2), 1e-8);
+  public void testBasic() {
+    DependenceMeasure mi = JensenShannonEquiwidthDependenceMeasure.STATIC;
+    // This will become better with data size.
+    AbstractDependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.938, 0.938, 0.001);
+    AbstractDependenceMeasureTest.checkUniform(mi, 1000, 0.998, 0.001, 0.267, 0.001);
   }
 }
