@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -81,17 +81,17 @@ public class CorrelationModel extends SimplePrototypeModel<double[]> {
     out.commentPrintLn("Model class: " + getClass().getName());
     out.commentPrintLn("Centroid: " + getPrototype().toString());
     out.commentPrintLn("Strong Eigenvectors:");
-    String strong = getPCAResult().getStrongEigenvectors().toString();
+    String strong = FormatUtil.format(getPCAResult().getStrongEigenvectors());
     while(strong.endsWith("\n")) {
       strong = strong.substring(0, strong.length() - 1);
     }
     out.commentPrintLn(strong);
     out.commentPrintLn("Weak Eigenvectors:");
-    String weak = getPCAResult().getWeakEigenvectors().toString();
+    String weak = FormatUtil.format(getPCAResult().getWeakEigenvectors());
     while(weak.endsWith("\n")) {
       weak = weak.substring(0, weak.length() - 1);
     }
     out.commentPrintLn(weak);
-    out.commentPrintLn("Eigenvalues: " + FormatUtil.format(getPCAResult().getEigenvalues(), " ", FormatUtil.NF2));
+    out.commentPrintLn("Eigenvalues: " + FormatUtil.format(getPCAResult().getEigenvalues()));
   }
 }
