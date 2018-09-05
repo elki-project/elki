@@ -24,29 +24,27 @@ import net.jafama.FastMath;
 
 /**
  * Singular Value Decomposition.
- * <P>
+ * <p>
  * For an m-by-n matrix A with m >= n, the singular value decomposition is an
  * m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and an n-by-n
- * orthogonal matrix V so that A = U*S*V'.
- * <P>
+ * ozthogonal matrix V so that A = U*S*V'.
+ * <p>
  * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >=
  * sigma[1] >= ... >= sigma[n-1].
- * <P>
+ * <p>
  * The singular value decomposition always exists, so the constructor will never
  * fail. The matrix condition number and the effective numerical rank can be
  * computed from this decomposition.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
  *
  * @apiviz.uses Matrix - - transforms
  */
 public class SingularValueDecomposition {
-  private static final double EPS = 0x1p-52; // = Math.pow(2.0, -52.0);
-
   /**
    * Arrays for internal storage of U and V.
-   * 
+   *
    * @serial internal storage of U.
    * @serial internal storage of V.
    */
@@ -82,8 +80,7 @@ public class SingularValueDecomposition {
     s = new double[Math.min(m + 1, n)];
     U = new double[m][nu];
     V = new double[n][n];
-    double[] e = new double[n];
-    double[] work = new double[m];
+    double[] e = new double[n], work = new double[m];
     boolean wantu = true, wantv = true;
 
     // Reduce A to bidiagonal form, storing the diagonal elements
@@ -202,7 +199,7 @@ public class SingularValueDecomposition {
     // Main iteration loop for the singular values.
 
     final int pp = p - 1;
-    final double eps = EPS;
+    final double eps = 0x1p-52, tiny = 0x1p-966;
     while(p > 0) {
       // TODO: add an iteration limit.
 
@@ -210,7 +207,7 @@ public class SingularValueDecomposition {
       // negligible elements in the s and e arrays.
       int k;
       for(k = p - 2; k > -1; k--) {
-        if(Math.abs(e[k]) <= eps * (Math.abs(s[k]) + Math.abs(s[k + 1]))) {
+        if(Math.abs(e[k]) <= tiny + eps * (Math.abs(s[k]) + Math.abs(s[k + 1]))) {
           e[k] = 0.0;
           break;
         }
@@ -224,7 +221,7 @@ public class SingularValueDecomposition {
       int ks;
       for(ks = p - 1; ks > k; ks--) {
         double t = (ks != p ? Math.abs(e[ks]) : 0.) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
-        if(Math.abs(s[ks]) <= eps * t) {
+        if(Math.abs(s[ks]) <= tiny + eps * t) {
           s[ks] = 0.0;
           break;
         }
@@ -511,8 +508,7 @@ public class SingularValueDecomposition {
    * @return Number of non-negligible singular values.
    */
   public int rank() {
-    double eps = EPS;
-    double tol = Math.max(m, n) * s[0] * eps;
+    final double eps = 0x1p-52, tol = (m > n ? m : n) * s[0] * eps;
     int r = 0;
     for(int i = 0; i < s.length; i++) {
       if(s[i] > tol) {

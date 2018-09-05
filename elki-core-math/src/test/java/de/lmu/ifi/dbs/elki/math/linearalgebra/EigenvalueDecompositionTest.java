@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,15 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.almostEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.diagonal;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normF;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -36,8 +44,7 @@ public class EigenvalueDecompositionTest {
   @Test
   public void testToyExample() {
     double[][] evs = { { 0.5, MathUtil.SQRT3 / 2 }, { -MathUtil.SQRT3 / 2, 0.5 } };
-    double[][] lam = { { 4, 0 }, { 0, 9 } };
-    double[][] lam2 = { { 9, 0 }, { 0, 4 } };
+    double[][] lam = { { 4, 0 }, { 0, 9 } }, lam2 = { { 9, 0 }, { 0, 4 } };
     testBasics(timesTranspose(times(evs, lam), evs));
     testBasics(timesTranspose(times(evs, lam2), evs));
   }
@@ -60,5 +67,22 @@ public class EigenvalueDecompositionTest {
       assertTrue("Not an eigenvector.", almostEquals(times(evec[i], eval[i]), times(s, evec[i])));
     }
     return ev;
+  }
+
+  /**
+   * Test added in Jama 1.0.3, causing an infinite loop.
+   */
+  @Test(timeout = 60000)
+  public void testJama103() {
+    double[][] badeigs = { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 1 }, { 0, 0, 0, 1, 0 }, { 1, 1, 0, 0, 1 }, { 1, 0, 1, 0, 1 } };
+    new EigenvalueDecomposition(badeigs);
+  }
+
+  @Test
+  public void testAsymmetric() {
+    double[][] a = VMath.transpose(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } });
+    EigenvalueDecomposition ev = new EigenvalueDecomposition(a);
+    double[][] v = ev.getV(), d = ev.getD();
+    assertEquals("Asymmetric decomposition", 0., normF(minus(times(a, v), times(v, d))), 1e-13);
   }
 }

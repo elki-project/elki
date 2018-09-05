@@ -93,7 +93,7 @@ public final class CholeskyDecompositionTest {
   }
 
   @Test
-  public void testJamaSolve() {
+  public void testJamaSolve() { // Test case from Jama 1.0.2
     double[][] p = { { 4., 1., 1. }, { 1., 2., 3. }, { 1., 3., 6. } };
     CholeskyDecomposition c = new CholeskyDecomposition(p);
     double[][] l = c.getL();

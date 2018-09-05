@@ -20,6 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+
 import java.util.Arrays;
 
 import net.jafama.FastMath;
@@ -43,11 +46,6 @@ import net.jafama.FastMath;
  * @since 0.2
  */
 public class EigenvalueDecomposition {
-  /**
-   * Epsilon.
-   */
-  private static final double EPS = 0x1P-52; // = Math.pow(2.0, -52.0);
-
   /**
    * Row and column dimension (square matrix).
    *
@@ -90,7 +88,6 @@ public class EigenvalueDecomposition {
    */
   public EigenvalueDecomposition(double[][] A) {
     n = A.length;
-    V = new double[n][n];
     d = new double[n];
     e = new double[n];
 
@@ -108,30 +105,23 @@ public class EigenvalueDecomposition {
     }
 
     if(issymmetric) {
-      for(int i = 0; i < n; i++) {
-        System.arraycopy(A[i], 0, V[i], 0, n);
-      }
-
+      V = VMath.copy(A);
       // Tridiagonalize.
       tred2();
-
       // Diagonalize.
       tql2();
     }
     else {
-      H = new double[n][n];
+      V = new double[n][n];
+      H = VMath.copy(A);
       ort = new double[n];
-
-      for(int i = 0; i < n; i++) {
-        System.arraycopy(A[i], 0, H[i], 0, n);
-      }
-
       // Reduce to Hessenberg form.
       orthes();
-
       // Reduce Hessenberg to real Schur form.
       hqr2();
     }
+    // Sort eigenvalues and corresponding vectors.
+    sortEigen();
   }
 
   /**
@@ -148,24 +138,24 @@ public class EigenvalueDecomposition {
     for(int i = n - 1; i > 0; i--) {
       double[] V_i = V[i], V_im1 = V[i - 1];
       // Scale to avoid under/overflow.
-      double scale = 0.0;
+      double scale = 0.;
       for(int k = 0; k < i; k++) {
-        scale += Math.abs(d[k]);
+        scale += abs(d[k]);
       }
       if(scale < Double.MIN_NORMAL) {
         e[i] = d[i - 1];
         for(int j = 0; j < i; j++) {
           d[j] = V_im1[j];
-          V_i[j] = V[j][i] = 0.0;
+          V_i[j] = V[j][i] = 0.;
         }
         d[i] = 0;
         continue;
       }
       // Generate Householder vector.
-      double h = 0.0;
+      double h = 0.;
       for(int k = 0; k < i; k++) {
-        d[k] /= scale;
-        h += d[k] * d[k];
+        double dk = d[k] /= scale;
+        h += dk * dk;
       }
       {
         double f = d[i - 1], g = FastMath.sqrt(h);
@@ -178,18 +168,18 @@ public class EigenvalueDecomposition {
 
       // Apply similarity transformation to remaining columns.
       for(int j = 0; j < i; j++) {
-        double dj = V[j][i] = d[j];
-        double ej = e[j] + V[j][j] * dj;
+        final double[] Vj = V[j];
+        double dj = Vj[i] = d[j], ej = e[j] + Vj[j] * dj;
         for(int k = j + 1; k <= i - 1; k++) {
-          ej += V[k][j] * d[k];
-          e[k] += V[k][j] * dj;
+          final double Vkj = V[k][j];
+          ej += Vkj * d[k];
+          e[k] += Vkj * dj;
         }
         e[j] = ej;
       }
-      double sum = 0.0;
+      double sum = 0.;
       for(int j = 0; j < i; j++) {
-        e[j] /= h;
-        sum += e[j] * d[j];
+        sum += (e[j] /= h) * d[j];
       }
       double hh = sum / (h + h);
       for(int j = 0; j < i; j++) {
@@ -201,7 +191,7 @@ public class EigenvalueDecomposition {
           V[k][j] -= (dj * e[k] + ej * d[k]);
         }
         d[j] = V_im1[j];
-        V_i[j] = 0.0;
+        V_i[j] = 0.;
       }
       d[i] = h;
     }
@@ -210,14 +200,15 @@ public class EigenvalueDecomposition {
     tred2AccumulateTransformations();
     System.arraycopy(V[n - 1], 0, d, 0, n);
     Arrays.fill(V[n - 1], 0.);
-    V[n - 1][n - 1] = 1.0;
-    e[0] = 0.0;
+    V[n - 1][n - 1] = 1.;
+    e[0] = 0.;
   }
 
   private void tred2AccumulateTransformations() {
     for(int i = 0; i < n - 1; i++) {
-      V[n - 1][i] = V[i][i];
-      V[i][i] = 1.0;
+      final double[] Vi = V[i];
+      V[n - 1][i] = Vi[i];
+      Vi[i] = 1.;
       final double h = d[i + 1];
       if(h > 0.0 || h < 0.0) {
         for(int k = 0; k <= i; k++) {
@@ -226,7 +217,8 @@ public class EigenvalueDecomposition {
         for(int j = 0; j <= i; j++) {
           double g = 0.0;
           for(int k = 0; k <= i; k++) {
-            g += V[k][i + 1] * V[k][j];
+            final double[] Vk = V[k];
+            g += Vk[i + 1] * Vk[j];
           }
           for(int k = 0; k <= i; k++) {
             V[k][j] -= g * d[k];
@@ -249,17 +241,15 @@ public class EigenvalueDecomposition {
     // Fortran subroutine in EISPACK.
 
     System.arraycopy(e, 1, e, 0, n - 1);
-    e[n - 1] = 0.0;
+    e[n - 1] = 0.;
 
-    double f = 0.0;
-    double tst1 = 0.0;
-    final double eps = EPS;
+    double f = 0., tst1 = 0.;
     for(int l = 0; l < n; l++) {
       // Find small subdiagonal element
-      tst1 = Math.max(tst1, Math.abs(d[l]) + Math.abs(e[l]));
+      tst1 = max(tst1, abs(d[l]) + abs(e[l]));
       int m = l;
       for(; m < n; ++m) {
-        if(Math.abs(e[m]) <= eps * tst1) {
+        if(abs(e[m]) <= 0x1P-52 * tst1) {
           break;
         }
       }
@@ -270,31 +260,25 @@ public class EigenvalueDecomposition {
         do {
           // Compute implicit shift
           f += tql2ComputeImplicitShift(l);
-
           // Implicit QL transformation.
           tql2ImplicitQL(l, m, d[l + 1]);
-
           // Check for convergence.
           // TODO: Iteration limit?
         }
-        while(Math.abs(e[l]) > eps * tst1);
+        while(abs(e[l]) > 0x1P-52 * tst1);
       }
       d[l] += f;
-      e[l] = 0.0;
+      e[l] = 0.;
     }
-
-    // Sort eigenvalues and corresponding vectors.
-    sortEigen();
   }
 
   private double tql2ComputeImplicitShift(int l) {
-    final double g = d[l];
-    final double p = (d[l + 1] - g) / (2.0 * e[l]);
-    double r = FastMath.hypot(p, 1.0);
-    r = (p >= 0) ? r : -r;
-    d[l] = e[l] / (p + r);
-    d[l + 1] = e[l] * (p + r);
-    double h = g - d[l];
+    final double el = e[l], g = d[l], p = (d[l + 1] - g) / (2. * el);
+    final double r = FastMath.sqrt(p * p + 1.);
+    final double pr = (p >= 0) ? p + r : p - r;
+    final double dl = d[l] = el / pr;
+    d[l + 1] = el * pr;
+    final double h = g - dl;
     for(int i = l + 2; i < n; i++) {
       d[i] -= h;
     }
@@ -302,22 +286,19 @@ public class EigenvalueDecomposition {
   }
 
   private void tql2ImplicitQL(int l, int m, double dl1) {
-    double p = d[m];
-    double c = 1.0, c2 = 1.0, c3 = 1.0;
+    double p = d[m], c = 1., c2 = 1., c3 = 1., s = 0., s2 = 0.;
     final double el1 = e[l + 1];
-    double s = 0.0, s2 = 0.0;
     for(int i = m - 1; i >= l; i--) {
       c3 = c2;
       c2 = c;
       s2 = s;
-      double g = c * e[i];
-      double h = c * p;
-      double r = FastMath.hypot(p, e[i]);
+      final double di = d[i], ei = e[i];
+      double g = c * ei, h = c * p, r = FastMath.hypot(p, ei);
       e[i + 1] = s * r;
-      s = e[i] / r;
+      s = ei / r;
       c = p / r;
-      p = c * d[i] - s * g;
-      d[i + 1] = h + s * (c * g + s * d[i]);
+      p = c * di - s * g;
+      d[i + 1] = h + s * (c * g + s * di);
 
       // Accumulate transformation.
       for(int k = 0; k < n; k++) {
@@ -334,26 +315,29 @@ public class EigenvalueDecomposition {
 
   private void sortEigen() {
     for(int i = 0; i < n - 1; i++) {
-      // Find minimum:
+      // Find maximum:
       int k = i;
-      double p = d[i];
+      double p = abs(d[i]);
       for(int j = i + 1; j < n; j++) {
-        final double d_j = d[j];
-        if(d_j < p) {
+        final double d_j = abs(d[j]);
+        if(d_j > p) {
           k = j;
           p = d_j;
         }
       }
-      // Swap
-      if(k != i) {
-        d[k] = d[i];
-        d[i] = p; // d[k], from above.
-        for(int j = 0; j < n; j++) {
-          final double[] Vj = V[j];
-          final double swap = Vj[i];
-          Vj[i] = Vj[k];
-          Vj[k] = swap;
-        }
+      if(k == i) {
+        continue;
+      }
+      // Swap Eigenvalues
+      double tmp = d[k]; // p, or -p...
+      d[k] = d[i];
+      d[i] = tmp;
+      // Swap columns of V
+      for(int j = 0; j < n; j++) {
+        final double[] Vj = V[j];
+        final double swap = Vj[i];
+        Vj[i] = Vj[k];
+        Vj[k] = swap;
       }
     }
   }
@@ -369,25 +353,24 @@ public class EigenvalueDecomposition {
     // Vol.ii-Linear Algebra, and the corresponding
     // Fortran subroutines in EISPACK.
 
-    int low = 0, high = n - 1;
-
+    final int low = 0, high = n - 1;
     for(int m = low + 1; m <= high - 1; m++) {
       // Scale column.
       double scale = 0.0;
       for(int i = m; i <= high; i++) {
-        scale += Math.abs(H[i][m - 1]);
+        scale += abs(H[i][m - 1]);
       }
       if(scale > 0.0 || scale < 0.0) {
         // Compute Householder transformation.
         double h = 0.0;
         for(int i = high; i >= m; i--) {
-          ort[i] = H[i][m - 1] / scale;
-          h += ort[i] * ort[i];
+          double oi = ort[i] = H[i][m - 1] / scale;
+          h += oi * oi;
         }
-        double g = FastMath.sqrt(h);
-        g = (ort[m] > 0) ? -g : g;
-        h -= ort[m] * g;
-        ort[m] -= g;
+        double g = FastMath.sqrt(h), om = ort[m];
+        g = (om > 0) ? -g : g;
+        h -= om * g;
+        ort[m] = om - g;
 
         // Apply Householder similarity transformation
         // H = (I-u*u'/h)*H*(I-u*u')/h)
@@ -422,7 +405,7 @@ public class EigenvalueDecomposition {
     // Accumulate transformations (Algol's ortran).
     for(int i = 0; i < n; i++) {
       Arrays.fill(V[i], 0.);
-      V[i][i] = 1.0;
+      V[i][i] = 1.;
     }
 
     for(int m = high - 1; m >= low + 1; m--) {
@@ -447,23 +430,21 @@ public class EigenvalueDecomposition {
     }
   }
 
-  // Complex scalar division.
-
+  /** Complex scalar division, writing into buf[off++] */
   private static void cdiv(double xr, double xi, double yr, double yi, double[] buf, int off) {
-    if(Math.abs(yr) > Math.abs(yi)) {
-      final double r = yi / yr, d = 1. / (yr + r * yi);
-      buf[off] = (xr + r * xi) * d;
-      buf[off + 1] = (xi - r * xr) * d;
+    if(abs(yr) > abs(yi)) {
+      final double r = yi / yr, d = yr + r * yi;
+      buf[off] = (xr + r * xi) / d;
+      buf[off + 1] = (xi - r * xr) / d;
     }
     else {
-      final double r = yr / yi, d = 1. / (yi + r * yr);
-      buf[off] = (r * xr + xi) * d;
-      buf[off + 1] = (r * xi - xr) * d;
+      final double r = yr / yi, d = yi + r * yr;
+      buf[off] = (r * xr + xi) / d;
+      buf[off + 1] = (r * xi - xr) / d;
     }
   }
 
-  // Nonsymmetric reduction from Hessenberg to real Schur form.
-
+  /** Nonsymmetric reduction from Hessenberg to real Schur form. */
   private void hqr2() {
     // FIXME: does this fail on NaN/inf values?
 
@@ -473,114 +454,99 @@ public class EigenvalueDecomposition {
     // Fortran subroutine in EISPACK.
 
     // Initialize
-
-    final int nn = this.n;
-    final int low = 0;
-    final int high = nn - 1;
-    final double eps = EPS;
-    double exshift = 0.0;
-    double p = 0, q = 0, r = 0, s = 0, z = 0;
+    final int nn = this.n, low = 0, high = nn - 1;
 
     // Store roots isolated by balanc and compute matrix norm
-
-    double norm = 0.0;
+    double norm = 0.;
     for(int i = 0; i < nn; i++) {
       if(i < low || i > high) {
         d[i] = H[i][i];
-        e[i] = 0.0;
+        e[i] = 0.;
       }
       for(int j = (i > 0 ? i - 1 : 0); j < nn; j++) {
-        norm += Math.abs(H[i][j]);
+        norm += abs(H[i][j]);
       }
     }
 
     // Outer loop over eigenvalue index
-    int iter = 0;
-    for(int n = nn - 1; n >= low;) {
-      // Look for single small sub-diagonal element
-      int l = n;
-      for(; l > low; --l) {
-        s = Math.abs(H[l - 1][l - 1]) + Math.abs(H[l][l]);
-        s = (s == 0.0) ? norm : s;
-        if(Math.abs(H[l][l - 1]) < eps * s) {
-          break;
-        }
-      }
-
-      // Check for convergence
-      if(l == n) {
-        // One root found
-        d[n] = (H[n][n] += exshift);
-        e[n] = 0.0;
-        n--;
-        iter = 0;
-      }
-      else if(l == n - 1) {
-        // Two roots found
-        double w = H[n][n - 1] * H[n - 1][n];
-        p = (H[n - 1][n - 1] - H[n][n]) * 0.5;
-        q = p * p + w;
-        z = FastMath.sqrt(Math.abs(q));
-        double x = (H[n][n] += exshift);
-        H[n - 1][n - 1] += exshift;
-
-        if(q >= 0) {
-          // Real pair
-          z = (p >= 0) ? p + z : p - z;
-          d[n - 1] = x + z;
-          d[n] = (z != 0.0) ? x - w / z : d[n - 1];
-          e[n - 1] = 0.0;
-          e[n] = 0.0;
-          x = H[n][n - 1];
-          s = Math.abs(x) + Math.abs(z);
-          p = x / s;
-          q = z / s;
-          r = FastMath.hypot(p, q);
-          p /= r;
-          q /= r;
-
-          // Row modification
-          for(int j = n - 1; j < nn; j++) {
-            z = H[n - 1][j];
-            H[n - 1][j] = q * z + p * H[n][j];
-            H[n][j] = q * H[n][j] - p * z;
-          }
-
-          // Column modification
-          for(int i = 0; i <= n; i++) {
-            final double[] Hi = H[i];
-            z = Hi[n - 1];
-            Hi[n - 1] = q * z + p * Hi[n];
-            Hi[n] = q * Hi[n] - p * z;
-          }
-
-          // Accumulate transformations
-          for(int i = low; i <= high; i++) {
-            final double[] Vi = V[i];
-            z = Vi[n - 1];
-            Vi[n - 1] = q * z + p * Vi[n];
-            Vi[n] = q * Vi[n] - p * z;
+    {
+      double exshift = 0.0;
+      // double p = 0, q = 0, r = 0; // , s = 0, z = 0;
+      int iter = 0;
+      for(int n = nn - 1; n >= low;) {
+        // Look for single small sub-diagonal element
+        int l = n;
+        for(; l > low; --l) {
+          double s = abs(H[l - 1][l - 1]) + abs(H[l][l]);
+          if(abs(H[l][l - 1]) < 0x1P-52 * (s == 0. ? norm : s)) {
+            break;
           }
         }
-        else {
-          // Complex pair
-          d[n] = d[n - 1] = x + p;
-          e[n - 1] = z;
-          e[n] = -z;
+
+        // Check for convergence
+        if(l == n) {
+          // One root found
+          d[n] = (H[n][n] += exshift);
+          e[n] = 0.;
+          n--;
+          iter = 0;
+          continue;
         }
-        n -= 2;
-        iter = 0;
-      }
-      else {
+        final double[] Hn = H[n], Hnm1 = H[n - 1];
+        if(l == n - 1) {
+          // Two roots found
+          double w = Hn[n - 1] * Hnm1[n];
+          double p = (Hnm1[n - 1] - Hn[n]) * 0.5, q = p * p + w;
+          double x = (Hn[n] += exshift), z = FastMath.sqrt(abs(q));
+          Hnm1[n - 1] += exshift;
+
+          if(q >= 0) {
+            // Real pair
+            z = (p >= 0) ? p + z : p - z;
+            d[n - 1] = x + z;
+            d[n] = (z != 0.) ? x - w / z : d[n - 1];
+            e[n] = e[n - 1] = 0.;
+            x = Hn[n - 1];
+            double s = abs(x) + abs(z);
+            p = x / s;
+            q = z / s;
+            double r = FastMath.hypot(p, q);
+            p /= r;
+            q /= r;
+
+            // Row modification
+            for(int j = n - 1; j < nn; j++) {
+              double tmp = Hnm1[j];
+              Hnm1[j] = q * tmp + p * Hn[j];
+              Hn[j] = q * Hn[j] - p * tmp;
+            }
+
+            // Column modification
+            for(int i = 0; i <= n; i++) {
+              modifyQP(H[i], n, p, q);
+            }
+
+            // Accumulate transformations
+            for(int i = low; i <= high; i++) {
+              modifyQP(V[i], n, p, q);
+            }
+          }
+          else {
+            // Complex pair
+            d[n] = d[n - 1] = x + p;
+            e[n] = -(e[n - 1] = z);
+          }
+          n -= 2;
+          iter = 0;
+          continue;
+        }
         // No convergence yet
 
         // Form shift
-        double x = H[n][n];
-        double y = 0.0;
-        double w = 0.0;
+        double x = Hn[n], y = 0., w = 0.;
         if(l < n) {
-          y = H[n - 1][n - 1];
-          w = H[n][n - 1] * H[n - 1][n];
+          y = Hnm1[n - 1];
+          w = Hn[n - 1] * Hnm1[n];
         }
 
         // Wilkinson's original ad hoc shift
@@ -589,14 +555,14 @@ public class EigenvalueDecomposition {
           for(int i = low; i <= n; i++) {
             H[i][i] -= x;
           }
-          s = Math.abs(H[n][n - 1]) + Math.abs(H[n - 1][n - 2]);
+          double s = abs(Hn[n - 1]) + abs(Hnm1[n - 2]);
           x = y = 0.75 * s;
           w = -0.4375 * s * s;
         }
 
         // MATLAB's new ad hoc shift
         if(iter == 30) {
-          s = (y - x) * 0.5;
+          double s = (y - x) * 0.5;
           s = s * s + w;
           if(s > 0) {
             s = FastMath.sqrt(s);
@@ -610,53 +576,52 @@ public class EigenvalueDecomposition {
           }
         }
 
-        iter = iter + 1; // (Could check iteration count here.)
+        ++iter; // (Could check iteration count here.)
 
+        double p = 0., q = 0., r = 0.;
         // Look for two consecutive small sub-diagonal elements
         int m = n - 2;
-        while(m >= l) {
-          z = H[m][m];
-          r = x - z;
-          s = y - z;
-          p = (r * s - w) / H[m + 1][m] + H[m][m + 1];
-          q = H[m + 1][m + 1] - z - r - s;
+        for(; m >= l; m--) {
+          final double[] Hm = H[m], Hmp1 = H[m + 1];
+          final double z = Hm[m], xz = x - z;
+          p = (xz * (y - z) - w) / Hmp1[m] + Hm[m + 1];
+          q = Hmp1[m + 1] - xz - y;
           r = H[m + 2][m + 1];
-          s = Math.abs(p) + Math.abs(q) + Math.abs(r);
-          p /= s;
-          q /= s;
-          r /= s;
-          if(m == l || Math.abs(H[m][m - 1]) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p) * (Math.abs(H[m - 1][m - 1]) + Math.abs(z) + Math.abs(H[m + 1][m + 1])))) {
+          double tmp = abs(p) + abs(q) + abs(r);
+          p /= tmp;
+          q /= tmp;
+          r /= tmp;
+          if(m == l || abs(Hm[m - 1]) * (abs(q) + abs(r)) < 0x1P-52 * (abs(p) * (abs(H[m - 1][m - 1]) + abs(z) + abs(Hmp1[m + 1])))) {
             break;
           }
-          m--;
         }
 
         for(int i = m + 2; i <= n; i++) {
-          H[i][i - 2] = 0.0;
+          final double[] Hi = H[i];
+          Hi[i - 2] = 0.;
           if(i > m + 2) {
-            H[i][i - 3] = 0.0;
+            Hi[i - 3] = 0.;
           }
         }
 
         // Double QR step involving rows l:n and columns m:n
-        for(int k = m; k <= n - 1; k++) {
-          boolean notlast = (k != n - 1);
-          final double[] Hk = H[k], Hkp1 = H[k + 1], Hkp2 = H[k + 2];
+        for(int k = m, last = n - 1; k <= last; k++) {
+          boolean notlast = (k != last);
+          final double[] Hk = H[k], Hkp1 = H[k + 1],
+              Hkp2 = notlast ? H[k + 2] : null;
           if(k != m) {
             p = Hk[k - 1];
             q = Hkp1[k - 1];
-            r = (notlast ? Hkp2[k - 1] : 0.0);
-            x = Math.abs(p) + Math.abs(q) + Math.abs(r);
-            if(x != 0.0) {
-              p /= x;
-              q /= x;
-              r /= x;
+            r = notlast ? Hkp2[k - 1] : 0.;
+            x = abs(p) + abs(q) + abs(r);
+            if(x == 0.0) {
+              continue; // Jama 1.0.3 fix
             }
+            p /= x;
+            q /= x;
+            r /= x;
           }
-          if(x == 0.0) {
-            break;
-          }
-          s = FastMath.hypot(p, q, r);
+          double s = FastMath.hypot(p, q, r);
           s = (p < 0) ? -s : s;
           if(s != 0) {
             if(k != m) {
@@ -668,7 +633,7 @@ public class EigenvalueDecomposition {
             p += s;
             x = p / s;
             y = q / s;
-            z = r / s;
+            double z = r / s;
             q /= p;
             r /= p;
 
@@ -685,144 +650,31 @@ public class EigenvalueDecomposition {
 
             // Column modification
             for(int i = 0; i <= Math.min(n, k + 3); i++) {
-              final double[] Hi = H[i];
-              double tmp = x * Hi[k] + y * Hi[k + 1];
-              if(notlast) {
-                tmp += z * Hi[k + 2];
-                Hi[k + 2] -= tmp * r;
-              }
-              Hi[k] -= tmp;
-              Hi[k + 1] -= tmp * q;
+              modifyQR(H[i], k, notlast, q, r, x, y, z);
             }
 
             // Accumulate transformations
             for(int i = low; i <= high; i++) {
-              double[] Vi = V[i];
-              double tmp = x * Vi[k] + y * Vi[k + 1];
-              if(notlast) {
-                tmp += z * Vi[k + 2];
-                Vi[k + 2] -= tmp * r;
-              }
-              Vi[k] -= tmp;
-              Vi[k + 1] -= tmp * q;
+              modifyQR(V[i], k, notlast, q, r, x, y, z);
             }
           } // (s != 0)
         } // k loop
-      } // check convergence
-    } // while (n >= low)
+        // check convergence
+      } // while (n >= low)
+    }
 
-    // Backsubstitute to find vectors of upper triangular form
     if(norm == 0.0) {
       return;
     }
 
+    // Backsubstitute to find vectors of upper triangular form
     for(int n = nn - 1; n >= 0; n--) {
-      final double[] Hn = H[n];
-      p = d[n];
-      q = e[n];
-
+      double p = d[n], q = e[n];
       if(q == 0) {
-        // Real vector
-        int l = n;
-        Hn[n] = 1.0;
-        for(int i = n - 1; i >= 0; i--) {
-          final double[] Hi = H[i];
-          double w = Hi[i] - p;
-          r = 0.0;
-          for(int j = l; j <= n; j++) {
-            r += Hi[j] * H[j][n];
-          }
-          if(e[i] < 0.0) {
-            z = w;
-            s = r;
-            continue;
-          }
-          l = i;
-          if(!(e[i] > 0.0)) {
-            Hi[n] = -r / ((w > 0.0 || w < 0.0) ? w : (eps * norm));
-          }
-          else {
-            // Solve real equations
-            double x = Hi[i + 1];
-            double y = H[i + 1][i];
-            q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
-            double t = (x * s - z * r) / q;
-            Hi[n] = t;
-            H[i + 1][n] = (Math.abs(x) > Math.abs(z)) ? (-r - w * t) / x : (-s - y * t) / z;
-          }
-
-          // Overflow control
-          double t = Math.abs(Hi[n]);
-          if((eps * t) * t > 1) {
-            for(int j = i; j <= n; j++) {
-              H[j][n] /= t;
-            }
-          }
-        }
+        hqr2BacksubstituteReal(n, p, norm);
       }
       else if(q < 0) {
-        // Complex vector
-        int l = n - 1;
-
-        // Last vector component imaginary so matrix is triangular
-        final double[] Hnm1 = H[n - 1];
-        if(Math.abs(Hn[n - 1]) > Math.abs(Hnm1[n])) {
-          Hnm1[n - 1] = q / Hn[n - 1];
-          Hnm1[n] = -(Hn[n] - p) / Hn[n - 1];
-        }
-        else {
-          cdiv(0.0, -Hnm1[n], Hnm1[n - 1] - p, q, Hnm1, n - 1);
-        }
-        Hn[n - 1] = 0.0;
-        Hn[n] = 1.0;
-        for(int i = n - 2; i >= 0; i--) {
-          final double[] Hi = H[i], Hip1 = H[i + 1];
-          double ra = 0.0, sa = 0.0, vr, vi;
-          for(int j = l; j <= n; j++) {
-            ra += Hi[j] * H[j][n - 1];
-            sa += Hi[j] * H[j][n];
-          }
-          double w = Hi[i] - p;
-
-          if(e[i] < 0.0) {
-            z = w;
-            r = ra;
-            s = sa;
-            continue;
-          }
-          l = i;
-          if(!(e[i] > 0.0)) {
-            cdiv(-ra, -sa, w, q, Hi, n - 1);
-          }
-          else {
-            // Solve complex equations
-            double x = Hi[i + 1];
-            double y = Hip1[i];
-            vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
-            vi = (d[i] - p) * 2.0 * q;
-            if(vr == 0.0 && vi == 0.0) {
-              vr = eps * norm * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z));
-            }
-            cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi, Hi, n - 1);
-            if(Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
-              Hip1[n - 1] = (-ra - w * Hi[n - 1] + q * Hi[n]) / x;
-              Hip1[n] = (-sa - w * Hi[n] - q * Hi[n - 1]) / x;
-            }
-            else {
-              cdiv(-r - y * Hi[n - 1], -s - y * Hi[n], z, q, Hip1, n - 1);
-            }
-          }
-
-          // Overflow control
-          double t = Math.max(Math.abs(Hi[n - 1]), Math.abs(Hi[n]));
-          if((eps * t) * t > 1) {
-            for(int j = i; j <= n; j++) {
-              final double[] Hj = H[j];
-              Hj[n - 1] /= t;
-              Hj[n] /= t;
-            }
-          }
-        }
+        hqr2BacksubstituteComplex(n, p, q, norm);
       }
     }
 
@@ -834,11 +686,136 @@ public class EigenvalueDecomposition {
     }
 
     // Back transformation to get eigenvectors of original matrix
+    hqr2BackTransformation(nn, low, high);
+  }
+
+  private static void modifyQP(final double[] Hi, int n, double p, double q) {
+    double tmp = Hi[n - 1];
+    Hi[n - 1] = q * tmp + p * Hi[n];
+    Hi[n] = q * Hi[n] - p * tmp;
+  }
+
+  private static void modifyQR(final double[] Hi, int k, boolean notlast, double q, double r, double x, double y, double z) {
+    double tmp = x * Hi[k] + y * Hi[k + 1];
+    if(notlast) {
+      tmp += z * Hi[k + 2];
+      Hi[k + 2] -= tmp * r;
+    }
+    Hi[k] -= tmp;
+    Hi[k + 1] -= tmp * q;
+  }
+
+  // Real vector
+  private void hqr2BacksubstituteReal(int n, double p, double norm) {
+    H[n][n] = 1.0;
+    double s = 0, z = 0;
+    for(int i = n - 1, l = n; i >= 0; i--) {
+      final double[] Hi = H[i];
+      double w = Hi[i] - p, r = 0.;
+      for(int j = l; j <= n; j++) {
+        r += Hi[j] * H[j][n];
+      }
+      if(e[i] < 0.0) {
+        z = w;
+        s = r;
+        continue;
+      }
+      l = i;
+      if(!(e[i] > 0.0)) {
+        Hi[n] = -r / ((w > 0.0 || w < 0.0) ? w : (0x1P-52 * norm));
+      }
+      else {
+        // Solve real equations
+        final double[] Hip1 = H[i + 1];
+        final double x = Hi[i + 1], y = Hip1[i], dip = d[i] - p, ei = e[i];
+        final double t = Hi[n] = (x * s - z * r) / (dip * dip + ei * ei);
+        Hip1[n] = (abs(x) > abs(z)) ? (-r - w * t) / x : (-s - y * t) / z;
+      }
+
+      // Overflow control
+      final double t = abs(Hi[n]);
+      if((0x1P-52 * t) * t > 1) {
+        for(int j = i; j <= n; j++) {
+          H[j][n] /= t;
+        }
+      }
+    }
+  }
+
+  // Complex vector
+  private void hqr2BacksubstituteComplex(int n, double p, double q, double norm) {
+    final double[] Hn = H[n], Hnm1 = H[n - 1];
+    // Last vector component imaginary so matrix is triangular
+    final double tmp = Hn[n - 1];
+    if(abs(tmp) > abs(Hnm1[n])) {
+      Hnm1[n - 1] = q / tmp;
+      Hnm1[n] = -(Hn[n] - p) / tmp;
+    }
+    else {
+      cdiv(0., -Hnm1[n], Hnm1[n - 1] - p, q, Hnm1, n - 1);
+    }
+    Hn[n - 1] = 0.;
+    Hn[n] = 1.;
+    double r = 0., s = 0., z = 0.;
+    for(int i = n - 2, l = n - 1; i >= 0; i--) {
+      final double[] Hi = H[i], Hip1 = H[i + 1];
+      double w = Hi[i] - p, ra = 0., sa = 0.;
+      for(int j = l; j <= n; j++) {
+        final double Hij = Hi[j];
+        final double[] Hj = H[j];
+        ra += Hij * Hj[n - 1];
+        sa += Hij * Hj[n];
+      }
+
+      if(e[i] < 0.) {
+        z = w;
+        r = ra;
+        s = sa;
+        continue;
+      }
+      l = i;
+      if(!(e[i] > 0.0)) {
+        cdiv(-ra, -sa, w, q, Hi, n - 1);
+      }
+      else {
+        // Solve complex equations
+        final double x = Hi[i + 1], y = Hip1[i], dip = d[i] - p;
+        double vr = dip * dip + e[i] * e[i] - q * q, vi = dip * 2. * q;
+        if(vr == 0. && vi == 0.) {
+          vr = 0x1P-52 * norm * (abs(w) + abs(q) + abs(x) + abs(y) + abs(z));
+        }
+        cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi, Hi, n - 1);
+        if(abs(x) > (abs(z) + abs(q))) {
+          Hip1[n - 1] = (-ra - w * Hi[n - 1] + q * Hi[n]) / x;
+          Hip1[n] = (-sa - w * Hi[n] - q * Hi[n - 1]) / x;
+        }
+        else {
+          cdiv(-r - y * Hi[n - 1], -s - y * Hi[n], z, q, Hip1, n - 1);
+        }
+      }
+
+      // Overflow control
+      double t = max(abs(Hi[n - 1]), abs(Hi[n]));
+      if((0x1P-52 * t) * t > 1) {
+        for(int j = i; j <= n; j++) {
+          final double[] Hj = H[j];
+          Hj[n - 1] /= t;
+          Hj[n] /= t;
+        }
+      }
+    }
+  }
+
+  /**
+   * Back transformation to get eigenvectors of original matrix.
+   */
+  private void hqr2BackTransformation(int nn, int low, int high) {
     for(int j = nn - 1; j >= low; j--) {
+      final int last = j < high ? j : high;
       for(int i = low; i <= high; i++) {
         final double[] Vi = V[i];
-        double sum = 0.0;
-        for(int k = low; k <= Math.min(j, high); k++) {
+        double sum = 0.;
+        for(int k = low; k <= last; k++) {
           sum += Vi[k] * H[k][j];
         }
         Vi[j] = sum;
@@ -887,7 +864,7 @@ public class EigenvalueDecomposition {
       if(e_i > 0) {
         D_i[i + 1] = e_i;
       }
-      else if (e_i < 0){
+      else if(e_i < 0) {
         D_i[i - 1] = e_i;
       } // else: e_i = 0
     }
