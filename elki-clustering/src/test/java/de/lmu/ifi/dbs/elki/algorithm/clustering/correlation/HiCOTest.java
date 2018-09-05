@@ -42,10 +42,26 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
         .with(OPTICSXi.Parameterizer.XI_ID, 0.1) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, HiCO.class) //
         .with(HiCO.Parameterizer.MU_ID, 20) //
+        .with(HiCO.Parameterizer.K_ID, 20) //
         .with(HiCO.Parameterizer.DELTA_ID, 0.05) //
         .with(HiCO.Parameterizer.ALPHA_ID, 0.9) //
         .build().run(db);
-    testFMeasure(db, result, 0.68314);
-    testClusterSizes(result, new int[] { 165, 435 });
+    testFMeasure(db, result, 0.7151379);
+    testClusterSizes(result, new int[] { 186, 414 });
+  }
+
+  @Test
+  public void testHiCOOverlap() {
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
+    Clustering<OPTICSModel> result = new ELKIBuilder<OPTICSXi>(OPTICSXi.class) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.1) //
+        .with(OPTICSXi.Parameterizer.XIALG_ID, HiCO.class) //
+        .with(HiCO.Parameterizer.MU_ID, 20) //
+        .with(HiCO.Parameterizer.K_ID, 20) //
+        .with(HiCO.Parameterizer.DELTA_ID, 0.25) //
+        .with(HiCO.Parameterizer.ALPHA_ID, 0.9) //
+        .build().run(db);
+    testFMeasure(db, result, 0.736385);
+    testClusterSizes(result, new int[] { 3, 168, 220, 259 });
   }
 }

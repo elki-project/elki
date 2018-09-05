@@ -226,6 +226,10 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
       DBIDArrayIter iter = tmpIds.iter();
       for(; iter.valid(); iter.advance()) {
+        if(processedIDs.contains(iter)) {
+          tmpCorrelation.putInt(iter, 0);
+          continue;
+        }
         PCAFilteredResult pca2 = index.getLocalProjection(iter);
         V dv2 = relation.get(iter);
 
@@ -244,7 +248,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         }
         int prevcorr = correlationValue.intValue(iter);
         int curcorr = tmpCorrelation.intValue(iter);
-        if(prevcorr <= curcorr) {
+        if(prevcorr < curcorr) {
           continue; // No improvement.
         }
         double currdist = MathUtil.max(tmpDistance.doubleValue(iter), coredist);
@@ -268,7 +272,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public int compare(DBIDRef o1, DBIDRef o2) {
       int c1 = correlationValue.intValue(o1),
           c2 = correlationValue.intValue(o2);
-      return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
+      return (c1 < c2) ? +1 : (c1 > c2) ? -1 : //
           super.compare(o1, o2);
     }
 
@@ -283,7 +287,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       @Override
       public int compare(DBIDRef o1, DBIDRef o2) {
         int c1 = tmpCorrelation.intValue(o1), c2 = tmpCorrelation.intValue(o2);
-        return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
+        return (c1 < c2) ? +1 : (c1 > c2) ? -1 : //
             Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
       }
     }
@@ -390,7 +394,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       plusTimesEquals(sum, v_k, transposeTimes(v_i, v_k));
     }
     minusEquals(v_i, sum);
-    normalize(v_i);
+    normalizeEquals(v_i);
     setCol(v, corrDim, v_i);
   }
 
