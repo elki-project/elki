@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
@@ -126,7 +126,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @return Clustering result
    */
   public Clustering<CorrelationModel> run(Database database, Relation<V> relation) {
-    final int dimensionality = RelationUtil.dimensionality(relation);
+    final int dim = RelationUtil.dimensionality(relation);
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
@@ -139,7 +139,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     // extract correlation clusters
     LOG.beginStep(stepprog, 2, "Extract correlation clusters");
-    List<List<Cluster<CorrelationModel>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality, npred);
+    List<List<Cluster<CorrelationModel>>> clusterMap = extractCorrelationClusters(copacResult, relation, dim, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 2: Extract correlation clusters...");
       for(int corrDim = 0; corrDim < clusterMap.size(); corrDim++) {
@@ -200,8 +200,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * correlation dimension. Each cluster is defined by the basis vectors
    * defining the subspace in which the cluster appears.
    * 
-   * @param dbscanResult
-   * 
+   * @param dbscanResult DBSCAN clustering to use
    * @param relation the database containing the objects
    * @param dimensionality the dimensionality of the feature space
    * @param npred ERiC predicate
@@ -227,9 +226,9 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
         // get cluster list for this dimension.
         List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(dim);
-        SortedEigenPairs epairs = settings.pca.processIds(group, relation).getEigenPairs();
-        int numstrong = filter.filter(epairs.eigenValues());
-        PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
+        PCAResult epairs = settings.pca.processIds(group, relation);
+        int numstrong = filter.filter(epairs.getEigenvalues());
+        PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.);
 
         double[] centroid = Centroid.make(relation, group).getArrayRef();
         Cluster<CorrelationModel> correlationCluster = new Cluster<>("[" + dim + "_" + correlationClusters.size() + "]", group, new CorrelationModel(pcares, centroid));
@@ -239,12 +238,11 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       else {
         if(noise == null) {
           noise = clus;
+          continue;
         }
-        else {
-          ModifiableDBIDs merged = DBIDUtil.newHashSet(noise.getIDs());
-          merged.addDBIDs(clus.getIDs());
-          noise.setIDs(merged);
-        }
+        ModifiableDBIDs merged = DBIDUtil.newHashSet(noise.getIDs());
+        merged.addDBIDs(clus.getIDs());
+        noise.setIDs(merged);
       }
     }
 
@@ -252,9 +250,9 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       // get cluster list for this dimension.
       List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(dimensionality);
       EigenPairFilter filter = new FirstNEigenPairFilter(dimensionality);
-      SortedEigenPairs epairs = settings.pca.processIds(noise.getIDs(), relation).getEigenPairs();
-      int numstrong = filter.filter(epairs.eigenValues());
-      PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
+      PCAResult epairs = settings.pca.processIds(noise.getIDs(), relation);
+      int numstrong = filter.filter(epairs.getEigenvalues());
+      PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.);
 
       double[] centroid = Centroid.make(relation, noise.getIDs()).getArrayRef();
       Cluster<CorrelationModel> correlationCluster = new Cluster<>("[noise]", noise.getIDs(), new CorrelationModel(pcares, centroid));
@@ -268,7 +266,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       }
       clusterMap.remove(i);
     }
-
     return clusterMap;
   }
 
@@ -426,12 +423,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
      * strong eigenvectors p if the following condition holds for all strong
      * eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <=
      * delta^2, must be a double equal to or greater than 0.
-     * <p>
-     * Default value: {@code 0.1}
-     * </p>
-     * <p>
-     * Key: {@code -ericdf.delta}
-     * </p>
      */
     public static final OptionID DELTA_ID = new OptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
 
@@ -440,12 +431,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
      * approximately linear dependent subspaces of two objects p and q (lambda_q
      * < lambda_p) before considering them as parallel, must be a double equal
      * to or greater than 0.
-     * <p>
-     * Default value: {@code 0.1}
-     * </p>
-     * <p>
-     * Key: {@code -ericdf.tau}
-     * </p>
      */
     public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
 

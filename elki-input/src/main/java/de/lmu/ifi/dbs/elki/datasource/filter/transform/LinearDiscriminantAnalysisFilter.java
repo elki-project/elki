@@ -20,12 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -89,36 +87,31 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
     final double[][] sigmaB, sigmaI;
     // Between classes covariance:
-    {
-      CovarianceMatrix covmake = new CovarianceMatrix(dim);
-      for(Centroid c : centroids) {
-        covmake.put(c);
-      }
-      sigmaB = covmake.destroyToSampleMatrix();
+    CovarianceMatrix covmake = new CovarianceMatrix(dim);
+    for(Centroid c : centroids) {
+      covmake.put(c);
     }
-    {
-      // (Average) within class variance:
-      CovarianceMatrix covmake = new CovarianceMatrix(dim);
-      int numc = keys.size();
-      for(int i = 0; i < numc; i++) {
-        double[] c = centroids.get(i).getArrayRef();
-        // TODO: different weighting strategies? Sampling?
-        for(IntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-          covmake.put(minusEquals(vectorcolumn.get(it.nextInt()).toArray(), c));
-        }
+    sigmaB = covmake.destroyToSampleMatrix();
+    // (Average) within class variance:
+    covmake.reset();
+    int numc = keys.size();
+    for(int i = 0; i < numc; i++) {
+      double[] c = centroids.get(i).getArrayRef();
+      // TODO: different weighting strategies? Sampling?
+      for(IntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
+        covmake.put(minusEquals(vectorcolumn.get(it.nextInt()).toArray(), c));
       }
-      sigmaI = covmake.destroyToSampleMatrix();
-      if(new LUDecomposition(sigmaI).det() == 0) {
-        for(int i = 0; i < dim; i++) {
-          sigmaI[i][i] += 1e-10;
-        }
+    }
+    sigmaI = covmake.destroyToSampleMatrix();
+    if(new LUDecomposition(sigmaI).det() == 0) {
+      for(int i = 0; i < dim; i++) {
+        sigmaI[i][i] += 1e-10;
       }
     }
 
     double[][] sol = times(inverse(sigmaI), sigmaB);
-    EigenvalueDecomposition decomp = new EigenvalueDecomposition(sol);
-    SortedEigenPairs sorted = new SortedEigenPairs(decomp, false);
-    return transpose(sorted.eigenVectors(tdim));
+    EigenvalueDecomposition evd = new EigenvalueDecomposition(sol);
+    return Arrays.copyOf(new PCAResult(evd).getEigenvectors(), tdim);
   }
 
   /**

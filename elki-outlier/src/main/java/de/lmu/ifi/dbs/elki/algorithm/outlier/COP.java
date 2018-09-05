@@ -202,7 +202,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
       computeCentroid(centroid, relation, nids);
       PCAResult pcares = pca.processIds(nids, relation);
-      double[][] tevecs = transpose(pcares.getEigenvectors()); // in rows!
+      double[][] tevecs = pcares.getEigenvectors();
       double[] evs = pcares.getEigenvalues();
       double[] projected = times(tevecs, minusEquals(relation.get(id).toArray(), centroid));
 

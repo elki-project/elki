@@ -249,9 +249,9 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
      */
     protected boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
       double[][] m1_czech = pca1.dissimilarityMatrix();
-      double[][] v2_strong = pca2.adapatedStrongEigenvectors();
-      for(int i = 0; i < v2_strong[0].length; i++) {
-        double[] v2_i = getCol(v2_strong, i);
+      double[][] v2_strong = pca2.getStrongEigenvectors();
+      for(int i = 0; i < v2_strong.length; i++) {
+        double[] v2_i = v2_strong[i];
         // check, if distance of v2_i to the space of pca_1 > delta
         // (i.e., if v2_i spans up a new dimension)
         double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i);
@@ -261,7 +261,6 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
           return false;
         }
       }
-
       return true;
     }
 

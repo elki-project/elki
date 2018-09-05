@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrder;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -56,8 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Implementation of the HiCO algorithm, an algorithm for detecting hierarchies
@@ -106,7 +106,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   /**
    * Delta parameter
    */
-  double delta;
+  double deltasq;
 
   /**
    * Mu parameter.
@@ -123,7 +123,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     super();
     this.mu = mu;
     this.indexfactory = indexfactory;
-    this.delta = delta;
+    this.deltasq = delta * delta;
   }
 
   @Override
@@ -180,7 +180,13 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Sort object by the temporary fields.
      */
-    Comparator<DBIDRef> tmpcomp = new Sorter();
+    Comparator<DBIDRef> tmpcomp = new Comparator<DBIDRef>() {
+      @Override
+      public int compare(DBIDRef o1, DBIDRef o2) {
+        int c = Integer.compare(tmpCorrelation.intValue(o2), tmpCorrelation.intValue(o1));
+        return c != 0 ? c : Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
+      }
+    };
 
     /**
      * Constructor.
@@ -270,26 +276,8 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     public int compare(DBIDRef o1, DBIDRef o2) {
-      int c1 = correlationValue.intValue(o1),
-          c2 = correlationValue.intValue(o2);
-      return (c1 < c2) ? +1 : (c1 > c2) ? -1 : //
-          super.compare(o1, o2);
-    }
-
-    /**
-     * Sort new candidates by their distance, for determining the core size.
-     *
-     * @author Erich Schubert
-     *
-     * @apiviz.exclude
-     */
-    private final class Sorter implements Comparator<DBIDRef> {
-      @Override
-      public int compare(DBIDRef o1, DBIDRef o2) {
-        int c1 = tmpCorrelation.intValue(o1), c2 = tmpCorrelation.intValue(o2);
-        return (c1 < c2) ? +1 : (c1 > c2) ? -1 : //
-            Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
-      }
+      int c = Integer.compare(correlationValue.intValue(o2), correlationValue.intValue(o1));
+      return c != 0 ? c : super.compare(o1, o2);
     }
 
     @Override
@@ -309,65 +297,55 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *         specified PCAs
    */
   public int correlationDistance(PCAFilteredResult pca1, PCAFilteredResult pca2, int dimensionality) {
-    // TODO nur in eine Richtung?
-
-    // TODO: Do we need to clone/copy all these?
+    // TODO: Can we delay copying the matrixes?
     // pca of rv1
-    double[][] v1 = copy(pca1.getEigenvectors());
-    double[][] v1_strong = copy(pca1.adapatedStrongEigenvectors());
-    double[][] e1_czech = copy(pca1.selectionMatrixOfStrongEigenvectors());
+    double[][] v1t = copy(pca1.getEigenvectors());
+    double[][] v1t_strong = pca1.getStrongEigenvectors();
     int lambda1 = pca1.getCorrelationDimension();
 
     // pca of rv2
-    double[][] v2 = copy(pca2.getEigenvectors());
-    double[][] v2_strong = copy(pca2.adapatedStrongEigenvectors());
-    double[][] e2_czech = copy(pca2.selectionMatrixOfStrongEigenvectors());
+    double[][] v2t = copy(pca2.getEigenvectors());
+    double[][] v2t_strong = pca2.getStrongEigenvectors();
     int lambda2 = pca2.getCorrelationDimension();
 
     // for all strong eigenvectors of rv2
     double[][] m1_czech = pca1.dissimilarityMatrix();
-    for(int i = 0; i < v2_strong[0].length; i++) {
-      double[] v2_i = getCol(v2_strong, i);
+    for(int i = 0; i < v2t_strong.length; i++) {
+      double[] v2_i = v2t_strong[i];
       // check, if distance of v2_i to the space of rv1 > delta
       // (i.e., if v2_i spans up a new dimension)
-      double dist = FastMath.sqrt(squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i));
+      double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i);
 
       // if so, insert v2_i into v1 and adjust v1
       // and compute m1_czech new, increase lambda1
-      if(lambda1 < dimensionality && dist > delta) {
-        adjust(v1, e1_czech, v2_i, lambda1++);
-        m1_czech = timesTranspose(times(v1, e1_czech), v1);
+      if(lambda1 < dimensionality && distsq > deltasq) {
+        adjust(v1t, v2_i, lambda1++);
+        // TODO: make this incremental?
+        double[] e1_czech_d = new double[v1t.length];
+        Arrays.fill(e1_czech_d, 0, lambda1, 1);
+        m1_czech = transposeDiagonalTimes(v1t, e1_czech_d, v1t);
       }
     }
 
     // for all strong eigenvectors of rv1
     double[][] m2_czech = pca2.dissimilarityMatrix();
-    for(int i = 0; i < v1_strong[0].length; i++) {
-      double[] v1_i = getCol(v1_strong, i);
+    for(int i = 0; i < v1t_strong.length; i++) {
+      double[] v1_i = v1t_strong[i];
       // check, if distance of v1_i to the space of rv2 > delta
       // (i.e., if v1_i spans up a new dimension)
-      double dist = FastMath.sqrt(squareSum(v1_i) - transposeTimesTimes(v1_i, m2_czech, v1_i));
+      double distsq = squareSum(v1_i) - transposeTimesTimes(v1_i, m2_czech, v1_i);
 
       // if so, insert v1_i into v2 and adjust v2
       // and compute m2_czech new , increase lambda2
-      if(lambda2 < dimensionality && dist > delta) {
-        adjust(v2, e2_czech, v1_i, lambda2++);
-        m2_czech = timesTranspose(times(v2, e2_czech), v2);
+      if(lambda2 < dimensionality && distsq > deltasq) {
+        adjust(v2t, v1_i, lambda2++);
+        // TODO: make this incremental?
+        double[] e2_czech_d = new double[v1t.length];
+        Arrays.fill(e2_czech_d, 0, lambda2, 1);
+        m2_czech = transposeDiagonalTimes(v2t, e2_czech_d, v2t);
       }
     }
-
-    int correlationDistance = Math.max(lambda1, lambda2);
-
-    // TODO re-insert again?
-    // Matrix m_1_czech = pca1.dissimilarityMatrix();
-    // double dist_1 = normalizedDistance(dv1, dv2, m1_czech);
-    // Matrix m_2_czech = pca2.dissimilarityMatrix();
-    // double dist_2 = normalizedDistance(dv1, dv2, m2_czech);
-    // if (dist_1 > delta || dist_2 > delta) {
-    // correlationDistance++;
-    // }
-
-    return correlationDistance;
+    return Math.max(lambda1, lambda2);
   }
 
   /**
@@ -377,25 +355,15 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * <code>e_czech</code> is set to the <code>corrDim</code>-th unit vector.
    *
    * @param v the orthonormal matrix of the eigenvectors
-   * @param e_czech the selection matrix of the strong eigenvectors
    * @param vector the vector to be inserted
    * @param corrDim the column at which the vector should be inserted
    */
-  private void adjust(double[][] v, double[][] e_czech, double[] vector, int corrDim) {
-    final int dim = v.length;
-
-    e_czech[corrDim][corrDim] = 1;
-
-    // normalize v
-    double[] v_i = vector.clone();
-    double[] sum = new double[dim];
+  private void adjust(double[][] v, double[] vector, int corrDim) {
+    double[] sum = new double[v.length];
     for(int k = 0; k < corrDim; k++) {
-      double[] v_k = getCol(v, k);
-      plusTimesEquals(sum, v_k, transposeTimes(v_i, v_k));
+      plusTimesEquals(sum, v[k], transposeTimes(vector, v[k]));
     }
-    minusEquals(v_i, sum);
-    normalizeEquals(v_i);
-    setCol(v, corrDim, v_i);
+    v[corrDim] = normalizeEquals(minus(vector, sum));
   }
 
   @Override
@@ -425,10 +393,6 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      * Parameter to specify the smoothing factor, must be an integer greater
      * than 0. The {link {@link #MU_ID}-nearest neighbor is used to compute the
      * correlation reachability of an object.
-     *
-     * <p>
-     * Key: {@code -hico.mu}
-     * </p>
      */
     public static final OptionID MU_ID = new OptionID("hico.mu", "Specifies the smoothing factor. The mu-nearest neighbor is used to compute the correlation reachability of an object.");
 
@@ -436,12 +400,6 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      * Optional parameter to specify the number of nearest neighbors considered
      * in the PCA, must be an integer greater than 0. If this parameter is not
      * set, k is set to the value of {@link #MU_ID}.
-     * <p>
-     * Key: {@code -hico.k}
-     * </p>
-     * <p>
-     * Default value: {@link #MU_ID}
-     * </p>
      */
     public static final OptionID K_ID = new OptionID("hico.k", "Optional parameter to specify the number of nearest neighbors considered in the PCA. If this parameter is not set, k is set to the value of parameter mu.");
 
@@ -449,24 +407,12 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      * Parameter to specify the threshold of a distance between a vector q and a
      * given space that indicates that q adds a new dimension to the space, must
      * be a double equal to or greater than 0.
-     * <p>
-     * Default value: {@code 0.25}
-     * </p>
-     * <p>
-     * Key: {@code -hico.delta}
-     * </p>
      */
     public static final OptionID DELTA_ID = new OptionID("hico.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
 
     /**
      * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors
      * explain a portion of at least alpha of the total variance.
-     * <p>
-     * Default value: {@link #DEFAULT_ALPHA}
-     * </p>
-     * <p>
-     * Key: {@code -hico.alpha}
-     * </p>
      */
     public static final OptionID ALPHA_ID = new OptionID("hico.alpha", "The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain a portion of at least alpha of the total variance.");
 
@@ -518,7 +464,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       ListParameterization params = new ListParameterization();
       // preprocessor
       params.addParameter(KNNQueryFilteredPCAIndex.Factory.Parameterizer.K_ID, k);
-      params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, alpha);
+      params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, new PercentageEigenPairFilter(alpha));
 
       ChainedParameterization chain = new ChainedParameterization(params, config);
       chain.errorsTo(config);

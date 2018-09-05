@@ -22,10 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -254,7 +251,8 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    */
   private double[][] findBasis(Relation<V> database, ORCLUSCluster cluster, int dim) {
     PCAResult pcares = pca.processIds(cluster.objectIDs, database);
-    return pcares.getEigenPairs().reverseEigenVectors(dim);
+    final double[][] evs = pcares.getEigenvectors();
+    return Arrays.copyOfRange(evs, evs.length - dim, evs.length);
   }
 
   /**
@@ -377,7 +375,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     }
     else {
       c.centroid = timesEquals(plusEquals(c1.centroid, c2.centroid), .5);
-      c.basis = identity(c1.basis.length, dim);
+      c.basis = identity(dim, c.centroid.length);
     }
     return c;
   }
@@ -390,7 +388,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @return the projection of double vector o in the subspace of cluster c
    */
   private double[] project(ORCLUSCluster c, double[] o) {
-    return transposeTimes(c.basis, o);
+    return times(c.basis, o);
   }
 
   @Override
@@ -417,6 +415,9 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
 
     /**
      * The matrix defining the subspace of this cluster.
+     * 
+     * Note: we store the vectors in rows here, think of an array of
+     * Eigenvectors.
      */
     double[][] basis;
 
@@ -489,12 +490,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
      * Parameter to specify the factor for reducing the number of current
      * clusters in each iteration, must be an integer greater than 0 and less
      * than 1.
-     * <p>
-     * Default value: {@code 0.5}
-     * </p>
-     * <p>
-     * Key: {@code -orclus.alpha}
-     * </p>
      */
     public static final OptionID ALPHA_ID = new OptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
 

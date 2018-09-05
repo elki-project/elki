@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,12 +26,12 @@ import net.jafama.FastMath;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
- *
+ * <p>
  * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal
  * and the eigenvector matrix V is orthogonal. I.e. A =
  * V.times(D.timesTranspose(V)) and V.timesTranspose(V) equals the identity
  * matrix.
- *
+ * <p>
  * If A is not symmetric, then the eigenvalue matrix D is block diagonal with
  * the real eigenvalues in 1-by-1 blocks and any complex eigenvalues, lambda +
  * i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda]. The columns of V represent
@@ -146,6 +146,7 @@ public class EigenvalueDecomposition {
 
     // Householder reduction to tridiagonal form.
     for(int i = n - 1; i > 0; i--) {
+      double[] V_i = V[i], V_im1 = V[i - 1];
       // Scale to avoid under/overflow.
       double scale = 0.0;
       for(int k = 0; k < i; k++) {
@@ -154,8 +155,8 @@ public class EigenvalueDecomposition {
       if(scale < Double.MIN_NORMAL) {
         e[i] = d[i - 1];
         for(int j = 0; j < i; j++) {
-          d[j] = V[i - 1][j];
-          V[i][j] = V[j][i] = 0.0;
+          d[j] = V_im1[j];
+          V_i[j] = V[j][i] = 0.0;
         }
         d[i] = 0;
         continue;
@@ -167,8 +168,7 @@ public class EigenvalueDecomposition {
         h += d[k] * d[k];
       }
       {
-        double f = d[i - 1];
-        double g = FastMath.sqrt(h);
+        double f = d[i - 1], g = FastMath.sqrt(h);
         g = (f > 0) ? -g : g;
         e[i] = scale * g;
         h -= f * g;
@@ -200,8 +200,8 @@ public class EigenvalueDecomposition {
         for(int k = j; k <= i - 1; k++) {
           V[k][j] -= (dj * e[k] + ej * d[k]);
         }
-        d[j] = V[i - 1][j];
-        V[i][j] = 0.0;
+        d[j] = V_im1[j];
+        V_i[j] = 0.0;
       }
       d[i] = h;
     }

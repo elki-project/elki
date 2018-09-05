@@ -104,8 +104,7 @@ public class PCARunner {
    * @return PCA result
    */
   public PCAResult processEVD(EigenvalueDecomposition evd) {
-    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-    return new PCAResult(eigenPairs);
+    return new PCAResult(evd);
   }
 
   /**

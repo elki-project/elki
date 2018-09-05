@@ -162,13 +162,6 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
        * considered in the PCA, must be an integer greater than 0. If this
        * parameter is not set, k is set to three times of the dimensionality of
        * the database objects.
-       * <p>
-       * Key: {@code -localpca.k}
-       * </p>
-       * <p>
-       * Default value: three times of the dimensionality of the database
-       * objects
-       * </p>
        */
       public static final OptionID K_ID = new OptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
 

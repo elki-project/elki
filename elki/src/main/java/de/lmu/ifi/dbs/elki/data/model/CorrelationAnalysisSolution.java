@@ -51,6 +51,11 @@ import net.jafama.FastMath;
  */
 public class CorrelationAnalysisSolution<V extends NumberVector> implements TextWriteable, Result, Model {
   /**
+   * Empty constant vector returned when no subspace was used.
+   */
+  private static final double[] EMPTY_VECTOR = new double[0];
+
+  /**
    * Stores the solution equations.
    */
   private LinearEquationSystem linearEquationSystem;
@@ -197,7 +202,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] errorVector(V p) {
-    return times(weakEigenvectors, transposeTimes(weakEigenvectors, minusEquals(p.toArray(), centroid)));
+    return weakEigenvectors.length > 0 ? times(weakEigenvectors, transposeTimes(weakEigenvectors, minusEquals(p.toArray(), centroid))) : EMPTY_VECTOR;
   }
 
   /**
@@ -207,7 +212,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] dataVector(V p) {
-    return times(strongEigenvectors, transposeTimes(strongEigenvectors, minusEquals(p.toArray(), centroid)));
+    return strongEigenvectors.length > 0 ? times(strongEigenvectors, transposeTimes(strongEigenvectors, minusEquals(p.toArray(), centroid))) : EMPTY_VECTOR;
   }
 
   /**

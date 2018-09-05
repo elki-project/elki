@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+
 /**
  * Result class for Principal Component Analysis with some convenience methods
  * 
@@ -27,13 +33,13 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  * @since 0.2
  * 
  * @apiviz.landmark
- * @apiviz.has SortedEigenPairs
+ * @apiviz.has EigenPair
  */
 public class PCAResult {
   /**
    * The eigenpairs in decreasing order.
    */
-  private SortedEigenPairs eigenPairs;
+  private EigenPair[] eigenPairs;
 
   /**
    * The eigenvalues in decreasing order.
@@ -46,48 +52,62 @@ public class PCAResult {
   private double[][] eigenvectors;
 
   /**
-   * Build a PCA result object.
-   * 
-   * @param eigenvalues Eigenvalues
-   * @param eigenvectors Eigenvector matrix
-   * @param eigenPairs Eigenpairs
-   */
-
-  public PCAResult(double[] eigenvalues, double[][] eigenvectors, SortedEigenPairs eigenPairs) {
-    super();
-    this.eigenPairs = eigenPairs;
-    this.eigenvalues = eigenvalues;
-    this.eigenvectors = eigenvectors;
-  }
-
-  /**
    * Build a PCA result from an existing set of EigenPairs.
    * 
    * @param eigenPairs existing eigenpairs
    */
-  public PCAResult(SortedEigenPairs eigenPairs) {
+  public PCAResult(EigenPair[] eigenPairs) {
     super();
-    // TODO: we might want to postpone the instantiation of eigenvalue and
-    // eigenvectors.
     this.eigenPairs = eigenPairs;
-    this.eigenvalues = eigenPairs.eigenValues();
-    this.eigenvectors = eigenPairs.eigenVectors();
+    this.eigenvalues = new double[eigenPairs.length];
+    this.eigenvectors = new double[eigenPairs.length][];
+    for(int i = 0; i < eigenPairs.length; i++) {
+      this.eigenvalues[i] = eigenPairs[i].getEigenvalue();
+      this.eigenvectors[i] = eigenPairs[i].getEigenvector();
+    }
   }
 
   /**
-   * Returns the matrix of eigenvectors of the object to which this PCA belongs
-   * to.
-   * 
-   * @return the matrix of eigenvectors
+   * Constructor from an eigenvalue decomposition.
+   *
+   * @param evd Eigenvalue decomposition
+   */
+  public PCAResult(EigenvalueDecomposition evd) {
+    this(processDecomposition(evd));
+  }
+
+  /**
+   * Convert an eigenvalue decomposition into EigenPair objects.
+   *
+   * @param evd Eigenvalue decomposition
+   * @return Eigenpairs
+   */
+  private static EigenPair[] processDecomposition(EigenvalueDecomposition evd) {
+    double[] eigenvalues = evd.getRealEigenvalues();
+    double[][] eigenvectors = evd.getV();
+
+    EigenPair[] eigenPairs = new EigenPair[eigenvalues.length];
+    for(int i = 0; i < eigenvalues.length; i++) {
+      double e = Math.abs(eigenvalues[i]);
+      double[] v = VMath.getCol(eigenvectors, i);
+      eigenPairs[i] = new EigenPair(v, e);
+    }
+    Arrays.sort(eigenPairs, Comparator.reverseOrder());
+    return eigenPairs;
+  }
+
+  /**
+   * Returns the local PCA eigenvectors, <b>in rows</b>.
+   *
+   * @return eigenvectors of the object.
    */
   public final double[][] getEigenvectors() {
     return eigenvectors;
   }
 
   /**
-   * Returns the eigenvalues of the object to which this PCA belongs to in
-   * decreasing order.
-   * 
+   * Returns the local PCA eigenvalues in decreasing order.
+   *
    * @return the eigenvalues
    */
   public final double[] getEigenvalues() {
@@ -100,16 +120,7 @@ public class PCAResult {
    * 
    * @return the eigenpairs
    */
-  public final SortedEigenPairs getEigenPairs() {
+  public final EigenPair[] getEigenPairs() {
     return eigenPairs;
-  }
-
-  /**
-   * Returns the number of eigenvectors stored
-   * 
-   * @return length
-   */
-  public final int length() {
-    return eigenPairs.size();
   }
 }

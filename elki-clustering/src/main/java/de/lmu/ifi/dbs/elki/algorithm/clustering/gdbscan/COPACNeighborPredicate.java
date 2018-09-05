@@ -33,13 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -48,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -143,14 +137,12 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * @return COPAC object model
    */
   protected COPACModel computeLocalModel(DBIDRef id, DoubleDBIDList knnneighbors, Relation<V> relation) {
-    SortedEigenPairs epairs = settings.pca.processIds(knnneighbors, relation).getEigenPairs();
-    int pdim = settings.filter.filter(epairs.eigenValues());
-    PCAFilteredResult pcares = new PCAFilteredResult(epairs, pdim, 1., 0.);
+    PCAResult epairs = settings.pca.processIds(knnneighbors, relation);
+    int pdim = settings.filter.filter(epairs.getEigenvalues());
+    PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), pdim, 1., 0.);
 
     double[][] mat = pcares.similarityMatrix();
-
     double[] vecP = relation.get(id).toArray();
-
     if(pdim == vecP.length) {
       // Full dimensional - noise!
       return new COPACModel(pdim, DBIDUtil.EMPTYDBIDS);
@@ -161,12 +153,10 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     for(DBIDIter neighbor = relation.iterDBIDs(); neighbor.valid(); neighbor.advance()) {
       double[] diff = minusEquals(relation.get(neighbor).toArray(), vecP);
       double cdistP = transposeTimesTimes(diff, mat, diff);
-
       if(cdistP <= epsilonsq) {
         survivors.add(neighbor);
       }
     }
-
     return new COPACModel(pdim, survivors);
   }
 

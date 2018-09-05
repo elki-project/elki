@@ -20,7 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeDiagonalTimes;
+
+import java.util.Arrays;
 
 /**
  * Result class for a filtered PCA. This differs from regular PCA by having the
@@ -62,12 +64,12 @@ public class PCAFilteredResult extends PCAResult {
   /**
    * The selection matrix of the weak eigenvectors.
    */
-  private double[][] e_hat;
+  // private double[][] e_hat;
 
   /**
    * The selection matrix of the strong eigenvectors.
    */
-  private double[][] e_czech;
+  // private double[][] e_czech;
 
   /**
    * The similarity matrix.
@@ -80,11 +82,6 @@ public class PCAFilteredResult extends PCAResult {
   private double[][] m_czech;
 
   /**
-   * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
-   */
-  private double[][] adapatedStrongEigenvectors = null;
-
-  /**
    * Construct a result object for the filtered PCA result.
    * 
    * @param eigenPairs All EigenPairs
@@ -92,55 +89,48 @@ public class PCAFilteredResult extends PCAResult {
    * @param big large value in selection matrix
    * @param small small value in selection matrix
    */
-
-  public PCAFilteredResult(SortedEigenPairs eigenPairs, int numstrong, double big, double small) {
+  public PCAFilteredResult(EigenPair[] eigenPairs, int numstrong, double big, double small) {
     super(eigenPairs);
 
-    int dim = eigenPairs.getEigenPair(0).getEigenvector().length;
+    int dim = eigenPairs[0].getEigenvector().length;
 
     double sumStrongEigenvalues = 0;
     double sumWeakEigenvalues = 0;
     {// strong eigenpairs
       strongEigenvalues = new double[numstrong];
-      strongEigenvectors = new double[dim][numstrong];
-      for (int i = 0; i < numstrong; i++) {
-        EigenPair eigenPair = eigenPairs.getEigenPair(i);
+      strongEigenvectors = new double[numstrong][];
+      for(int i = 0; i < numstrong; i++) {
+        EigenPair eigenPair = eigenPairs[i];
+        strongEigenvectors[i] = eigenPair.getEigenvector();
         strongEigenvalues[i] = eigenPair.getEigenvalue();
-        setCol(strongEigenvectors, i, eigenPair.getEigenvector());
         sumStrongEigenvalues += strongEigenvalues[i];
       }
     }
 
     {// weak eigenpairs
       weakEigenvalues = new double[dim - numstrong];
-      weakEigenvectors = new double[dim][dim - numstrong];
-      for (int i = numstrong, j = 0; i < dim; i++, j++) {
-        EigenPair eigenPair = eigenPairs.getEigenPair(i);
+      weakEigenvectors = new double[dim - numstrong][];
+      for(int i = numstrong, j = 0; i < dim; i++, j++) {
+        EigenPair eigenPair = eigenPairs[i];
+        weakEigenvectors[j] = eigenPair.getEigenvector();
         weakEigenvalues[j] = eigenPair.getEigenvalue();
-        setCol(weakEigenvectors, j, eigenPair.getEigenvector());
         sumWeakEigenvalues += weakEigenvalues[j];
       }
     }
     explainedVariance = sumStrongEigenvalues / (sumStrongEigenvalues + sumWeakEigenvalues);
     int localdim = strongEigenvalues.length;
 
-    // selection Matrix for weak and strong EVs
-    e_hat = new double[dim][dim];
-    e_czech = new double[dim][dim];
-    for(int d = 0; d < dim; d++) {
-      if(d < localdim) {
-        e_czech[d][d]=big;
-        e_hat[d][d]=small;
-      }
-      else {
-        e_czech[d][d] = small;
-        e_hat[d][d] = big;
-      }
-    }
+    // Diagonal selections for weak and strong EVs
+    double[] e_hat_d = new double[dim];
+    Arrays.fill(e_hat_d, 0, localdim, small);
+    Arrays.fill(e_hat_d, localdim, dim, big);
+    double[] e_czech_d = new double[dim];
+    Arrays.fill(e_czech_d, 0, localdim, big);
+    Arrays.fill(e_czech_d, localdim, dim, small);
 
-    double[][] V = getEigenvectors();
-    m_hat = timesTranspose(times(V, e_hat), V);
-    m_czech = timesTranspose(times(V, e_czech), V);
+    double[][] Vt = getEigenvectors(); // = transposed matrix!
+    m_hat = transposeDiagonalTimes(Vt, e_hat_d, Vt);
+    m_czech = transposeDiagonalTimes(Vt, e_czech_d, Vt);
   }
 
   /**
@@ -202,26 +192,6 @@ public class PCAFilteredResult extends PCAResult {
   }
 
   /**
-   * Returns the selection matrix of the weak eigenvectors (E_hat) of the object
-   * to which this PCA belongs to.
-   * 
-   * @return the selection matrix of the weak eigenvectors E_hat
-   */
-  public double[][] selectionMatrixOfWeakEigenvectors() {
-    return e_hat;
-  }
-
-  /**
-   * Returns the selection matrix of the strong eigenvectors (E_czech) of this
-   * LocalPCA.
-   * 
-   * @return the selection matrix of the weak eigenvectors E_czech
-   */
-  public double[][] selectionMatrixOfStrongEigenvectors() {
-    return e_czech;
-  }
-
-  /**
    * Returns the similarity matrix (M_hat) of this LocalPCA.
    * 
    * @return the similarity matrix M_hat
@@ -237,18 +207,5 @@ public class PCAFilteredResult extends PCAResult {
    */
   public double[][] dissimilarityMatrix() {
     return m_czech;
-  }
-
-  /**
-   * Returns the adapted strong eigenvectors.
-   * 
-   * @return the adapted strong eigenvectors
-   */
-  public double[][] adapatedStrongEigenvectors() {
-    if(adapatedStrongEigenvectors == null) {
-      final double[][] ev = getEigenvectors();
-      adapatedStrongEigenvectors = times(times(ev, e_czech), identity(ev.length, strongEigenvalues.length));
-    }
-    return adapatedStrongEigenvectors;
   }
 }

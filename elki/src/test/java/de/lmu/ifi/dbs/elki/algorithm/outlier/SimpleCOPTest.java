@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Tests the SimpleCOP algorithm.
- * 
+ * <p>
  * Note: this test is quite fragile to numeric differences in the EVD.
  *
  * @author Erich Schubert

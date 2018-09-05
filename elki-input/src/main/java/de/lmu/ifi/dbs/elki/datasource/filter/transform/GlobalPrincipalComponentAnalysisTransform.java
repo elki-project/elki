@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
@@ -163,17 +162,16 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     mean = covmat.getMeanVector();
     PCAResult pcares = (new PCARunner(null)).processCovarMatrix(covmat.destroyToPopulationMatrix());
     covmat = null;
-    SortedEigenPairs eps = pcares.getEigenPairs();
 
     final int dim = mean.length;
-    final int pdim = filter != null ? filter.filter(eps.eigenValues()) : dim;
+    final int pdim = filter != null ? filter.filter(pcares.getEigenvalues()) : dim;
     if(filter != null && LOG.isVerbose()) {
       LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
     }
     // Build the projection matrux
     proj = new double[pdim][dim];
     for(int d = 0; d < pdim; d++) {
-      EigenPair ep = eps.getEigenPair(d);
+      EigenPair ep = pcares.getEigenPairs()[d];
       plusTimesEquals(proj[d], ep.getEigenvector(), mode == Mode.FULL ? 1. / FastMath.sqrt(ep.getEigenvalue()) : 1.);
     }
     buf = new double[dim];

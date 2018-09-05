@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -40,6 +41,16 @@ public interface DistributionEstimator<D extends Distribution> {
    * @return Estimated distribution
    */
   <A> D estimate(A data, NumberArrayAdapter<?, A> adapter);
+
+  /**
+   * General form of the parameter estimation
+   * 
+   * @param data Data set
+   * @return Estimated distribution
+   */
+  default D estimate(double[] data) {
+    return estimate(data, DoubleArrayAdapter.STATIC);
+  }
 
   /**
    * Get the class that is produced by the estimator.

@@ -1444,7 +1444,7 @@ public final class VMath {
     // Optimized ala Jama. jik order.
     final double[] Acolj = new double[m1.length];
     for(int j = 0; j < re.length; j++) {
-      // Make a linear copy of column j from B
+      // Make a linear copy of column j from A
       for(int k = 0; k < m1.length; k++) {
         Acolj[k] = m1[k][j];
       }
@@ -1460,6 +1460,40 @@ public final class VMath {
       }
     }
     return re;
+  }
+
+  /**
+   * Matrix multiplication with diagonal, m1^T * d2 * m3
+   * 
+   * @param m1 Left matrix
+   * @param d2 Diagonal entries
+   * @param m3 Right matrix
+   * @return m1^T * d2 * m3
+   */
+  public static double[][] transposeDiagonalTimes(double[][] m1, double[] d2, double[][] m3) {
+    final int innerdim = d2.length;
+    assert m1.length == innerdim : ERR_MATRIX_INNERDIM;
+    assert m3.length == innerdim : ERR_MATRIX_INNERDIM;
+    final int coldim1 = getColumnDimensionality(m1);
+    final int coldim2 = getColumnDimensionality(m3);
+    final double[][] r = new double[coldim1][coldim2];
+    final double[] Acoli = new double[innerdim]; // Buffer
+    // multiply it with each row from A
+    for(int i = 0; i < coldim1; i++) {
+      final double[] r_i = r[i]; // Output row
+      // Make a linear copy of column i from A
+      for(int k = 0; k < innerdim; k++) {
+        Acoli[k] = m1[k][i] * d2[k];
+      }
+      for(int j = 0; j < coldim2; j++) {
+        double s = 0;
+        for(int k = 0; k < innerdim; k++) {
+          s += Acoli[k] * m3[k][j];
+        }
+        r_i[j] = s;
+      }
+    }
+    return r;
   }
 
   /**

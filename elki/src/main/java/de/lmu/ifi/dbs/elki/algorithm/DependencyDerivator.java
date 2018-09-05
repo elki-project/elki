@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
@@ -193,62 +193,52 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    * @return a matrix of equations describing the dependencies
    */
   public CorrelationAnalysisSolution<V> generateModel(Relation<V> relation, DBIDs ids, double[] centroid) {
-    CorrelationAnalysisSolution<V> sol;
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("PCA...");
     }
+    PCAResult epairs = pca.processIds(ids, relation);
+    int numstrong = filter.filter(epairs.getEigenvalues());
+    PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.);
 
-    SortedEigenPairs epairs = pca.processIds(ids, relation).getEigenPairs();
-    int numstrong = filter.filter(epairs.eigenValues());
-    PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
-
-    // Matrix weakEigenvectors =
-    // pca.getEigenvectors().times(pca.selectionMatrixOfWeakEigenvectors());
-    double[][] weakEigenvectors = pcares.getWeakEigenvectors();
-    // Matrix strongEigenvectors =
-    // pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
-    double[][] strongEigenvectors = pcares.getStrongEigenvectors();
+    double[][] transposedWeakEigenvectors = pcares.getWeakEigenvectors();
+    double[][] transposedStrongEigenvectors = pcares.getStrongEigenvectors();
 
     // TODO: what if we don't have any weak eigenvectors?
-    if(weakEigenvectors[0].length == 0) {
-      sol = new CorrelationAnalysisSolution<>(null, relation, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid);
+    if(transposedWeakEigenvectors.length == 0) {
+      return new CorrelationAnalysisSolution<>(null, relation, transpose(transposedStrongEigenvectors), new double[0][], pcares.similarityMatrix(), centroid);
     }
-    else {
-      double[][] transposedWeakEigenvectors = transpose(weakEigenvectors);
-      if(LOG.isDebugging()) {
-        StringBuilder msg = new StringBuilder(1000);
-        formatTo(msg.append("Strong Eigenvectors:\n"), pcares.getStrongEigenvectors(), " [", "]\n", ", ", nf);
-        formatTo(msg.append("\nTransposed weak Eigenvectors:\n"), transposedWeakEigenvectors, " [", "]\n", ", ", nf);
-        formatTo(msg.append("\nEigenvalues:\n"), pcares.getEigenvalues(), ", ", nf);
-        LOG.debugFine(msg.toString());
-      }
-      double[] b = times(transposedWeakEigenvectors, centroid);
-      if(LOG.isDebugging()) {
-        StringBuilder msg = new StringBuilder(1000);
-        formatTo(msg.append("Centroid:\n"), centroid, ", ", nf);
-        formatTo(msg.append("\ntEV * Centroid\n"), b, ", ", nf);
-        LOG.debugFine(msg.toString());
-      }
+    // double[][] transposedWeakEigenvectors = transpose(weakEigenvectors);
+    if(LOG.isDebugging()) {
+      StringBuilder msg = new StringBuilder(1000);
+      formatTo(msg.append("Strong Eigenvectors:\n"), transposedStrongEigenvectors, " [", "]\n", ", ", nf);
+      formatTo(msg.append("\nWeak Eigenvectors:\n"), transposedWeakEigenvectors, " [", "]\n", ", ", nf);
+      formatTo(msg.append("\nEigenvalues:\n"), pcares.getEigenvalues(), ", ", nf);
+      LOG.debugFine(msg.toString());
+    }
+    double[] b = times(transposedWeakEigenvectors, centroid);
+    if(LOG.isDebugging()) {
+      StringBuilder msg = new StringBuilder(1000);
+      formatTo(msg.append("Centroid:\n"), centroid, ", ", nf);
+      formatTo(msg.append("\ntEV * Centroid\n"), b, ", ", nf);
+      LOG.debugFine(msg.toString());
+    }
 
-      // +1 == + B[0].length
-      double[][] gaussJordan = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length + 1];
-      setMatrix(gaussJordan, 0, transposedWeakEigenvectors.length, 0, transposedWeakEigenvectors[0].length, transposedWeakEigenvectors);
-      setCol(gaussJordan, transposedWeakEigenvectors[0].length, b);
+    // +1 == + B[0].length
+    double[][] gaussJordan = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length + 1];
+    setMatrix(gaussJordan, 0, transposedWeakEigenvectors.length, 0, transposedWeakEigenvectors[0].length, transposedWeakEigenvectors);
+    setCol(gaussJordan, transposedWeakEigenvectors[0].length, b);
 
-      if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Gauss-Jordan-Elimination of " + format(gaussJordan, " [", "]\n", ", ", nf));
-      }
+    if(LOG.isDebuggingFiner()) {
+      LOG.debugFiner("Gauss-Jordan-Elimination of " + format(gaussJordan, " [", "]\n", ", ", nf));
+    }
+    LinearEquationSystem lq = new LinearEquationSystem(copy(transposedWeakEigenvectors), b);
+    lq.solveByTotalPivotSearch();
 
-      LinearEquationSystem lq = new LinearEquationSystem(copy(transposedWeakEigenvectors), b);
-      lq.solveByTotalPivotSearch();
-
-      sol = new CorrelationAnalysisSolution<>(lq, relation, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
-
-      if(LOG.isDebuggingFine()) {
-        LOG.debugFine(new StringBuilder().append("Solution:\n") //
-            .append("Standard deviation ").append(sol.getStandardDeviation()) //
-            .append(lq.equationsToString(nf.getMaximumFractionDigits())).toString());
-      }
+    CorrelationAnalysisSolution<V> sol = new CorrelationAnalysisSolution<>(lq, relation, transpose(transposedStrongEigenvectors), transpose(transposedWeakEigenvectors), pcares.similarityMatrix(), centroid);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine(new StringBuilder().append("Solution:\n") //
+          .append("Standard deviation ").append(sol.getStandardDeviation()) //
+          .append(lq.equationsToString(nf.getMaximumFractionDigits())).toString());
     }
     return sol;
   }
@@ -288,7 +278,6 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
      * sample to use, must be an integer greater than 0.
      * <p>
      * Default value: the size of the complete dataset
-     * </p>
      */
     public static final OptionID SAMPLE_SIZE_ID = new OptionID("derivator.sampleSize", "Threshold for the size of the random sample to use. " + "Default value is size of the complete dataset.");
 

@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -101,21 +101,16 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
     // TODO: use a bulk operation?
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DoubleDBIDList objects = objectsForPCA(iditer);
-
-      SortedEigenPairs epairs = pca.processIds(objects, relation).getEigenPairs();
-      int numstrong = filter.filter(epairs.eigenValues());
-      PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
-
+      PCAResult epairs = pca.processIds(objectsForPCA(iditer), relation);
+      int numstrong = filter.filter(epairs.getEigenvalues());
+      PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.);
       storage.put(iditer, pcares);
-
       getLogger().incrementProcessed(progress);
     }
     getLogger().ensureCompleted(progress);
 
-    long end = System.currentTimeMillis();
     if(getLogger().isVerbose()) {
-      long elapsedTime = end - start;
+      long elapsedTime = System.currentTimeMillis() - start;
       getLogger().verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
   }

@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.*;
@@ -131,37 +128,27 @@ public class AutotuningPCA extends PCARunner {
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
-    List<double[][]> best = new ArrayList<>(dim);
-    for(int i = 0; i < dim; i++) {
-      best.add(null);
-    }
+    double[][][] best = new double[dim][][];
     double[] beststrength = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      beststrength[i] = -1;
-    }
+    Arrays.fill(beststrength, -1);
     int[] bestk = new int[dim];
     // 'history'
     LinkedList<Cand> prev = new LinkedList<>();
     // TODO: starting parameter shouldn't be hardcoded...
     int smooth = 3;
-    int startk = 4;
-    if(startk > results.size() - 1) {
-      startk = results.size() - 1;
-    }
+    int startk = Math.min(4, results.size() - 1);
     // TODO: add smoothing options, handle border cases better.
     for(int k = startk; k < results.size(); k++) {
-      // sorted eigenpairs, eigenvectors, eigenvalues
       double[][] covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
-      SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-      int filteredEigenPairs = filter.filter(eigenPairs.eigenValues());
+      double[] evs = reversed(evd.getRealEigenvalues().clone());
 
       // correlationDimension = #strong EV
-      int thisdim = filteredEigenPairs;
+      int thisdim = filter.filter(evs);
 
       // FIXME: handle the case of no strong EVs.
       assert ((thisdim > 0) && (thisdim <= dim));
-      double thisexplain = computeExplainedVariance(eigenPairs, filteredEigenPairs);
+      double thisexplain = computeExplainedVariance(evs, thisdim);
 
       prev.add(new Cand(covMat, thisexplain, thisdim));
 
@@ -183,7 +170,7 @@ public class AutotuningPCA extends PCARunner {
 
           if(avgexplain > beststrength[thisdim - 1]) {
             beststrength[thisdim - 1] = avgexplain;
-            best.set(thisdim - 1, prev.get(smooth).m);
+            best[thisdim - 1] = prev.get(smooth).m;
             bestk[thisdim - 1] = k - smooth;
           }
         }
@@ -192,19 +179,13 @@ public class AutotuningPCA extends PCARunner {
     }
     // Try all dimensions, lowest first.
     for(int i = 0; i < dim; i++) {
-      if(beststrength[i] > 0.0) {
+      if(beststrength[i] > 0.) {
         // If the best was the lowest or the biggest k, skip it!
-        if(bestk[i] == startk + smooth) {
+        if(bestk[i] == startk + smooth || bestk[i] == results.size() - smooth - 1) {
           continue;
         }
-        if(bestk[i] == results.size() - smooth - 1) {
-          continue;
-        }
-        double[][] covMat = best.get(i);
-
         // We stop at the lowest dimension that did the job for us.
-        // System.err.println("Auto-k: "+bestk[i]+" dim: "+(i+1));
-        return processCovarMatrix(covMat);
+        return processCovarMatrix(best[i]);
       }
     }
     // NOTE: if we didn't get a 'maximum' anywhere, we end up with the data from
@@ -214,22 +195,36 @@ public class AutotuningPCA extends PCARunner {
   }
 
   /**
+   * Sort an array of doubles in descending order.
+   *
+   * @param a Values
+   * @return Values in descending order
+   */
+  private static double[] reversed(double[] a) {
+    // TODO: there doesn't appear to be a nicer version in Java, unfortunately.
+    Arrays.sort(a);
+    for(int i = 0, j = a.length - 1; i < j; i++, j--) {
+      double tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  /**
    * Compute the explained variance for a filtered EigenPairs.
    * 
    * @param eigenPairs Eigenpairs
    * @param filteredEigenPairs Filtered eigenpairs
    * @return explained variance by the strong eigenvectors.
    */
-  private double computeExplainedVariance(SortedEigenPairs eigenPairs, int filteredEigenPairs) {
-    double strongsum = 0.0;
-    double weaksum = 0.0;
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      if(i <= filteredEigenPairs) {
-        strongsum += eigenPairs.eigenValue(i);
-      }
-      else {
-        weaksum += eigenPairs.eigenValue(i);
-      }
+  private double computeExplainedVariance(double[] eigenValues, int filteredEigenPairs) {
+    double strongsum = 0., weaksum = 0.;
+    for(int i = 0; i < filteredEigenPairs; i++) {
+      strongsum += eigenValues[i];
+    }
+    for(int i = filteredEigenPairs; i < eigenValues.length; i++) {
+      weaksum += eigenValues[i];
     }
     return strongsum / (strongsum + weaksum);
   }

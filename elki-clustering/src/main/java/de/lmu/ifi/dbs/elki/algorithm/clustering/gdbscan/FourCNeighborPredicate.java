@@ -39,10 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.*;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -148,11 +145,10 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   @Override
   protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<V> relation) {
     mvSize.put(neighbors.size());
-    SortedEigenPairs epairs = pca.processIds(neighbors, relation).getEigenPairs();
-    int cordim = filter.filter(epairs.eigenValues());
-    PCAFilteredResult pcares = new PCAFilteredResult(epairs, cordim, settings.kappa, 1.);
+    PCAResult epairs = pca.processIds(neighbors, relation);
+    int cordim = filter.filter(epairs.getEigenvalues());
+    PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), cordim, settings.kappa, 1.);
     double[][] m_hat = pcares.similarityMatrix();
-
     double[] obj = relation.get(id).toArray();
 
     // To save computing the square root below.
@@ -171,7 +167,6 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
       mvSize2.put(survivors.size());
     }
     mvCorDim.put(cordim);
-
     return new PreDeConModel(cordim, survivors);
   }
 
