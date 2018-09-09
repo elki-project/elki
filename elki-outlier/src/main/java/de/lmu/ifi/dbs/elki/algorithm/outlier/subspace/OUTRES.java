@@ -27,12 +27,10 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -61,10 +59,12 @@ import net.jafama.FastMath;
 /**
  * Adaptive outlierness for subspace outlier ranking (OUTRES).
  * <p>
- * Note: this algorithm seems to have a O(n³) complexity without appropriate
- * index structures to accelerate range queries: each object in each tested
- * subspace will need to know the mean and standard deviation of the density of
- * the neighbors, which in turn needs another range query.
+ * Note: this algorithm seems to have a O(n³d!) complexity with no obvious way
+ * to accelerate it with usual index structures for range queries: each object
+ * in each tested subspace will need to know the mean and standard deviation of
+ * the density of the neighbors, which in turn needs another range query; except
+ * if we precomputed the densities for each of O(d!) possible subsets of
+ * dimensions.
  * <p>
  * Reference:
  * <p>
@@ -77,15 +77,13 @@ import net.jafama.FastMath;
  * @since 0.5.0
  * 
  * @apiviz.composedOf KernelDensityEstimator
- * 
- * @param <V> vector type
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", //
     title = "Adaptive outlierness for subspace outlier ranking", //
     booktitle = "Proc. 19th ACM Int. Conf. on Information and Knowledge Management", //
     url = "https://doi.org/10.1145/1871437.1871690", //
     bibkey = "DBLP:conf/cikm/MullerSS10")
-public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,18 +115,19 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * @param relation Relation to process
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<V> relation) {
-    WritableDoubleDataStore ranks = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
+    final DBIDs ids = relation.getDBIDs();
+    WritableDoubleDataStore ranks = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
-    KernelDensityEstimator kernel = new KernelDensityEstimator(relation);
+    KernelDensityEstimator kernel = new KernelDensityEstimator(relation, eps);
     long[] subspace = BitsUtil.zero(kernel.dim);
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OUTRES scores", relation.size(), LOG) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OUTRES scores", ids.size(), LOG) : null;
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       BitsUtil.zeroI(subspace);
-      double score = outresScore(0, subspace, iditer, kernel);
+      double score = outresScore(0, subspace, iditer, kernel, ids);
       ranks.putDouble(iditer, score);
       minmax.put(score);
       LOG.incrementProcessed(progress);
@@ -136,8 +135,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
     LOG.ensureCompleted(progress);
 
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., 1., 1.);
-    OutlierResult outresResult = new OutlierResult(meta, new MaterializedDoubleRelation("OUTRES", "outres-score", ranks, relation.getDBIDs()));
-    return outresResult;
+    return new OutlierResult(meta, new MaterializedDoubleRelation("OUTRES", "outres-score", ranks, ids));
   }
 
   /**
@@ -147,45 +145,39 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * @param subspace Current subspace
    * @param id Current object ID
    * @param kernel Kernel
+   * @param cands neighbor candidates
    * @return Score
    */
-  public double outresScore(final int s, long[] subspace, DBIDRef id, KernelDensityEstimator kernel) {
+  public double outresScore(final int s, long[] subspace, DBIDRef id, KernelDensityEstimator kernel, DBIDs cands) {
     double score = 1.0; // Initial score is 1.0
     final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(subspace);
     MeanVariance meanv = new MeanVariance();
+    ModifiableDoubleDBIDList neighcand = DBIDUtil.newDistanceDBIDList(cands.size());
+    ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList(cands.size());
 
     for(int i = s; i < kernel.dim; i++) {
-      if(BitsUtil.get(subspace, i)) { // TODO: needed? Or should we always start
-                                      // with i=0?
-        continue;
-      }
+      assert !BitsUtil.get(subspace, i);
       BitsUtil.setI(subspace, i);
       df.setSelectedDimensions(subspace);
       final double adjustedEps = kernel.adjustedEps(kernel.dim);
-      // Query with a larger window, to also get neighbors of neighbors
-      // Subspace euclidean is metric!
-      final double range = adjustedEps * 2.;
-      RangeQuery<V> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
-
-      DoubleDBIDList neighc = rq.getRangeForDBID(id, range);
-      DoubleDBIDList neigh = refineRange(neighc, adjustedEps);
+      DoubleDBIDList neigh = initialRange(id, cands, df, adjustedEps * 2, kernel, neighcand);
+      // Relevance test
       if(neigh.size() > 2) {
-        // Relevance test
         if(relevantSubspace(subspace, neigh, kernel)) {
           final double density = kernel.subspaceDensity(subspace, neigh);
           // Compute mean and standard deviation for densities of neighbors.
           meanv.reset();
           for(DoubleDBIDListIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
-            DoubleDBIDList n2 = subsetNeighborhoodQuery(neighc, neighbor, df, adjustedEps, kernel);
-            meanv.put(kernel.subspaceDensity(subspace, n2));
+            subsetNeighborhoodQuery(neighcand, neighbor, df, adjustedEps, kernel, nn);
+            meanv.put(kernel.subspaceDensity(subspace, nn));
           }
           final double deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
           // High deviation:
           if(deviation >= 1) {
-            score *= (density / deviation);
+            score *= density / deviation;
           }
           // Recursion
-          score *= outresScore(i + 1, subspace, id, kernel);
+          score *= outresScore(i + 1, subspace, id, kernel, neighcand);
         }
       }
       BitsUtil.clearI(subspace, i);
@@ -194,23 +186,32 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
   }
 
   /**
-   * Refine a range query.
-   * 
-   * @param neighc Original result
-   * @param adjustedEps New epsilon
-   * @return refined list
+   * Initial range query.
+   *
+   * @param obj Object
+   * @param cands Candidates
+   * @param df Distance function
+   * @param eps Epsilon radius
+   * @param kernel Kernel
+   * @param n Output buffer
+   * @return Neighbors
    */
-  private DoubleDBIDList refineRange(DoubleDBIDList neighc, double adjustedEps) {
-    ModifiableDoubleDBIDList n = DBIDUtil.newDistanceDBIDList(neighc.size());
-    // We don't have a guarantee for this list to be sorted
-    for(DoubleDBIDListIter neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
-      DoubleDBIDPair p = neighbor.getPair();
-      double dist = p.doubleValue();
-      if(dist <= adjustedEps) {
-        n.add(dist, p);
+  private DoubleDBIDList initialRange(DBIDRef obj, DBIDs cands, PrimitiveDistanceFunction<? super NumberVector> df, double eps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
+    n.clear();
+    NumberVector o = kernel.relation.get(obj);
+    final double twoeps = eps * 2;
+    int matches = 0;
+    for(DBIDIter cand = cands.iter(); cand.valid(); cand.advance()) {
+      final double dist = df.distance(o, kernel.relation.get(cand));
+      if(dist <= twoeps) {
+        n.add(dist, cand);
+        if(dist <= eps) {
+          ++matches;
+        }
       }
     }
-    return n;
+    n.sort();
+    return n.slice(0, matches);
   }
 
   /**
@@ -221,16 +222,17 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * @param df distance function
    * @param adjustedEps Epsilon range
    * @param kernel Kernel
+   * @param n Output list
    * @return Neighbors of neighbor object
    */
-  private DoubleDBIDList subsetNeighborhoodQuery(DoubleDBIDList neighc, DBIDRef dbid, PrimitiveDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
-    ModifiableDoubleDBIDList n = DBIDUtil.newDistanceDBIDList(neighc.size());
-    V query = kernel.relation.get(dbid);
+  private DoubleDBIDList subsetNeighborhoodQuery(DoubleDBIDList neighc, DBIDRef dbid, PrimitiveDistanceFunction<? super NumberVector> df, double adjustedEps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
+    n.clear();
+    NumberVector query = kernel.relation.get(dbid);
     for(DoubleDBIDListIter neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
-      DoubleDBIDPair p = neighbor.getPair();
-      double dist = df.distance(query, kernel.relation.get(p));
+      // TODO: use triangle inequality for pruning
+      double dist = df.distance(query, kernel.relation.get(neighbor));
       if(dist <= adjustedEps) {
-        n.add(dist, p);
+        n.add(dist, neighbor);
       }
     }
     return n;
@@ -245,32 +247,30 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * @return relevance test result
    */
   protected boolean relevantSubspace(long[] subspace, DoubleDBIDList neigh, KernelDensityEstimator kernel) {
-    Relation<V> relation = kernel.relation;
-    final double crit = K_S_CRITICAL001 / FastMath.sqrt(neigh.size());
+    final double crit = K_S_CRITICAL001 / FastMath.sqrt(neigh.size() - 2);
 
-    for(int dim = BitsUtil.nextSetBit(subspace, 0); dim > 0; dim = BitsUtil.nextSetBit(subspace, dim + 1)) {
-      // TODO: can we save this copy somehow?
-      double[] data = new double[neigh.size()];
-      {
-        int count = 0;
-        for(DBIDIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
-          V vector = relation.get(neighbor);
-          data[count] = vector.doubleValue(dim);
-          count++;
-        }
-        assert (count == neigh.size());
+    double[] data = new double[neigh.size()];
+    Relation<? extends NumberVector> relation = kernel.relation;
+    for(int dim = BitsUtil.nextSetBit(subspace, 0); dim >= 0; dim = BitsUtil.nextSetBit(subspace, dim + 1)) {
+      // TODO: can/should we save this copy?
+      int count = 0;
+      for(DBIDIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
+        data[count++] = relation.get(neighbor).doubleValue(dim);
       }
+      assert (count == neigh.size());
       Arrays.sort(data);
 
-      final double norm = data[data.length - 1] - data[0];
-      final double min = data[0];
-
+      final double min = data[0], norm = data[data.length - 1] - min;
       // Kolmogorow-Smirnow-Test against uniform distribution:
-      for(int j = 1; j < data.length - 2; j++) {
-        double delta = (j / (data.length - 1.)) - ((data[j] - min) / norm);
-        if(Math.abs(delta) > crit) {
-          return false;
+      boolean flag = false;
+      for(int j = 1, end = data.length - 1; j < end; j++) {
+        if(Math.abs(j / (data.length - 2.) - (data[j] - min) / norm) > crit) {
+          flag = true;
+          break;
         }
+      }
+      if(!flag) {
+        return false;
       }
     }
     return true;
@@ -281,7 +281,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * 
    * @author Erich Schubert
    */
-  protected class KernelDensityEstimator {
+  protected static class KernelDensityEstimator {
     /**
      * Actual kernel in use
      */
@@ -290,7 +290,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
     /**
      * Relation to retrieve data from
      */
-    final Relation<V> relation;
+    final Relation<? extends NumberVector> relation;
 
     /**
      * Epsilon values for different subspace dimensionalities
@@ -312,14 +312,14 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
      * 
      * @param relation Relation to apply to
      */
-    public KernelDensityEstimator(Relation<V> relation) {
+    public KernelDensityEstimator(Relation<? extends NumberVector> relation, double eps) {
       super();
       this.relation = relation;
       dim = RelationUtil.dimensionality(relation);
       hopttwo = optimalBandwidth(2);
       epsilons = new double[dim + 1];
       Arrays.fill(epsilons, Double.NEGATIVE_INFINITY);
-      epsilons[2] = OUTRES.this.eps;
+      epsilons[2] = eps;
     }
 
     /**
@@ -331,15 +331,11 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
      */
     protected double subspaceDensity(long[] subspace, DoubleDBIDList neighbors) {
       final double bandwidth = optimalBandwidth(BitsUtil.cardinality(subspace));
-
       double density = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         double v = neighbor.doubleValue() / bandwidth;
-        if(v < 1) {
-          density += 1 - (v * v);
-        }
+        density += v < 1 ? 1 - (v * v) : 0;
       }
-
       return density / relation.size();
     }
 
@@ -365,8 +361,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
       // Cached
       double e = epsilons[dim];
       if(e < 0) {
-        e = epsilons[2] * optimalBandwidth(dim) / hopttwo;
-        epsilons[dim] = e;
+        epsilons[dim] = e = epsilons[2] * optimalBandwidth(dim) / hopttwo;
       }
       return e;
     }
@@ -389,7 +384,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Option ID for Epsilon parameter
      */
@@ -410,8 +405,8 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
     }
 
     @Override
-    protected OUTRES<O> makeInstance() {
-      return new OUTRES<>(eps);
+    protected OUTRES makeInstance() {
+      return new OUTRES(eps);
     }
   }
 }
