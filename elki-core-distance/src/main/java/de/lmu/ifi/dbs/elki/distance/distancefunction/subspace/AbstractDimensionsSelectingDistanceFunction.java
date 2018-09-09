@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @author Elke Achtert
  * @since 0.2
+ *
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public abstract class AbstractDimensionsSelectingDistanceFunction<V extends FeatureVector<?>> implements PrimitiveDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V> {
@@ -68,12 +69,7 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
 
   @Override
   public void setSelectedDimensions(long[] dimensions) {
-    if(this.dimensions == null || this.dimensions.length < dimensions.length) {
-      this.dimensions = dimensions.clone();
-      return;
-    }
-    BitsUtil.zeroI(this.dimensions);
-    BitsUtil.orI(this.dimensions, dimensions);
+    this.dimensions = dimensions;
   }
 
   @Override
@@ -108,7 +104,7 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntListParameter dimsP = new IntListParameter(DIMS_ID)//
+      final IntListParameter dimsP = new IntListParameter(DIMS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .setOptional(true);
       if(config.grab(dimsP)) {

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
    * @param dimensions Selected dimensions
    */
   public SubspaceMaximumDistanceFunction(long[] dimensions) {
-    super(1.0, dimensions);
+    super(Double.POSITIVE_INFINITY, dimensions);
   }
 
   @Override
@@ -52,9 +52,7 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
     double agg = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double v = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
-      if(v > agg) {
-        agg = v;
-      }
+      agg = v > agg ? v : agg;
     }
     return agg;
   }
@@ -67,20 +65,13 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
 
     double agg = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double value = v.doubleValue(d);
-      final double omin = mbr.getMin(d);
-      final double diff1 = omin - value;
+      final double value = v.doubleValue(d), diff1 = mbr.getMin(d) - value;
       if(diff1 > 0.) {
-        if(diff1 > agg) {
-          agg = diff1;
-        }
+        agg = diff1 > agg ? diff1 : agg;
       }
       else {
-        final double omax = mbr.getMax(d);
-        final double diff2 = value - omax;
-        if(diff2 > agg) {
-          agg = diff2;
-        }
+        final double diff2 = value - mbr.getMax(d);
+        agg = diff2 > agg ? diff2 : agg;
       }
     }
     return agg;
@@ -93,21 +84,15 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
     }
     double agg = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d);
+      final double max1 = mbr1.getMax(d), min2 = mbr2.getMin(d);
       if(max1 < min2) {
-        double v = min2 - max1;
-        if(v > agg) {
-          agg = v;
-        }
+        final double v = min2 - max1;
+        agg = v > agg ? v : agg;
       }
       else {
-        final double min1 = mbr1.getMin(d);
-        final double max2 = mbr2.getMax(d);
-        double v = min1 - max2;
-        if(v > agg) {
-          agg = v;
-        }
+        final double min1 = mbr1.getMin(d), max2 = mbr2.getMax(d);
+        final double v = min1 - max2;
+        agg = v > agg ? v : agg;
       }
     }
     return agg;
@@ -118,9 +103,7 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
     double agg = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double v = Math.abs(obj.doubleValue(d));
-      if(v > agg) {
-        agg = v;
-      }
+      agg = v > agg ? v : agg;
     }
     return agg;
   }

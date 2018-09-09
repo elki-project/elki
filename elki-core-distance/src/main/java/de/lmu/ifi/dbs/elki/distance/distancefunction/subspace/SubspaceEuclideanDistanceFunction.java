@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -76,22 +76,19 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double delta;
-      final double value = v.doubleValue(d);
-      final double omin = mbr.getMin(d);
+      final double value = v.doubleValue(d), omin = mbr.getMin(d);
       if(value < omin) {
-        delta = omin - value;
+        final double delta = omin - value;
+        sqrDist += delta * delta;
       }
       else {
         final double omax = mbr.getMax(d);
         if(value > omax) {
-          delta = value - omax;
+          final double delta = value - omax;
+          sqrDist += delta * delta;
         }
-        else {
-          continue;
-        }
+        // Else they intersect.
       }
-      sqrDist += delta * delta;
     }
     return FastMath.sqrt(sqrDist);
   }
@@ -103,23 +100,19 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
     }
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double delta;
-      final double max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d);
+      final double max1 = mbr1.getMax(d), min2 = mbr2.getMin(d);
       if(max1 < min2) {
-        delta = min2 - max1;
+        final double delta = min2 - max1;
+        sqrDist += delta * delta;
       }
       else {
-        final double min1 = mbr1.getMin(d);
-        final double max2 = mbr2.getMax(d);
+        final double min1 = mbr1.getMin(d), max2 = mbr2.getMax(d);
         if(min1 > max2) {
-          delta = min1 - max2;
+          final double delta = min1 - max2;
+          sqrDist += delta * delta;
         }
-        else { // The mbrs intersect!
-          continue;
-        }
+        // Else the mbrs intersect!
       }
-      sqrDist += delta * delta;
     }
     return FastMath.sqrt(sqrDist);
   }

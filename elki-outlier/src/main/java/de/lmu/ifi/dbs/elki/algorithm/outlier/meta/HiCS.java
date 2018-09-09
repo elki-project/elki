@@ -294,8 +294,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       // TODO: optimize APRIORI style, by not even computing the bit set or?
       for(int i = 0; i < candidateList.size() - 1; i++) {
         for(int j = i + 1; j < candidateList.size(); j++) {
-          HiCSSubspace set1 = candidateList.get(i);
-          HiCSSubspace set2 = candidateList.get(j);
+          HiCSSubspace set1 = candidateList.get(i), set2 = candidateList.get(j);
 
           HiCSSubspace joinedSet = new HiCSSubspace();
           joinedSet.or(set1);
@@ -384,8 +383,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       {
         int l = 0;
         for(DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
-          sampleValues[l] = relation.get(iter).doubleValue(chosen);
-          l++;
+          sampleValues[l++] = relation.get(iter).doubleValue(chosen);
         }
       }
       // Project full set
@@ -393,8 +391,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       {
         int l = 0;
         for(DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
-          fullValues[l] = relation.get(iter).doubleValue(chosen);
-          l++;
+          fullValues[l++] = relation.get(iter).doubleValue(chosen);
         }
       }
       double contrast = statTest.deviation(fullValues, sampleValues);
@@ -448,7 +445,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
     @Override
     public String toString() {
-      StringBuilder buf = new StringBuilder();
+      StringBuilder buf = new StringBuilder(1000);
       buf.append("[contrast=").append(contrast);
       for(int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
         buf.append(' ').append(i + 1);
@@ -463,10 +460,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_ASC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
-        if(o1.contrast == o2.contrast) {
-          return 0;
-        }
-        return o1.contrast > o2.contrast ? 1 : -1;
+        return o1.contrast == o2.contrast ? 0 : o1.contrast > o2.contrast ? 1 : -1;
       }
     };
 
@@ -476,10 +470,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_DESC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
-        if(o1.contrast == o2.contrast) {
-          return 0;
-        }
-        return o1.contrast < o2.contrast ? 1 : -1;
+        return o1.contrast == o2.contrast ? 0 : o1.contrast < o2.contrast ? 1 : -1;
       }
     };
 
@@ -489,8 +480,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     public static final Comparator<HiCSSubspace> SORT_BY_SUBSPACE = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
-        int dim1 = o1.nextSetBit(0);
-        int dim2 = o2.nextSetBit(0);
+        int dim1 = o1.nextSetBit(0), dim2 = o2.nextSetBit(0);
         while(dim1 >= 0 && dim2 >= 0) {
           if(dim1 < dim2) {
             return -1;

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 public interface DimensionSelectingSubspaceDistanceFunction<O> extends DistanceFunction<O> {
   /**
    * Returns a bit set representing the selected dimensions.
+   * <p>
+   * Warning: no defensive copy is performed.
    * 
    * @return a bit set representing the selected dimensions
    */
@@ -40,6 +42,8 @@ public interface DimensionSelectingSubspaceDistanceFunction<O> extends DistanceF
 
   /**
    * Sets the selected dimensions according to the set bits in the given BitSet.
+   * <p>
+   * Warning: no defensive copy is performed.
    * 
    * @param dimensions a bit set designating the new selected dimensions
    */

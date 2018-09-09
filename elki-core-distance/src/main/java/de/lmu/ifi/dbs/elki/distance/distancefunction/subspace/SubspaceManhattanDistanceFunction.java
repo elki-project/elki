@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
 
-    double sum = 0;
+    double sum = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       sum += Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
     }
@@ -62,10 +62,9 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
 
-    double sum = 0;
+    double sum = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double value = v.doubleValue(d);
-      final double omin = mbr.getMin(d);
+      final double value = v.doubleValue(d), omin = mbr.getMin(d);
       if(value < omin) {
         sum += omin - value;
       }
@@ -73,9 +72,6 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
         final double omax = mbr.getMax(d);
         if(value > omax) {
           sum += value - omax;
-        }
-        else {
-          continue;
         }
       }
     }
@@ -87,22 +83,18 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
-    double sum = 0;
+    double sum = 0.;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d);
+      final double max1 = mbr1.getMax(d), min2 = mbr2.getMin(d);
       if(max1 < min2) {
         sum += min2 - max1;
       }
       else {
-        final double min1 = mbr1.getMin(d);
-        final double max2 = mbr2.getMax(d);
+        final double min1 = mbr1.getMin(d), max2 = mbr2.getMax(d);
         if(min1 > max2) {
           sum += min1 - max2;
         }
-        else { // The mbrs intersect!
-          continue;
-        }
+        // else the mbrs intersect!
       }
     }
     return sum;

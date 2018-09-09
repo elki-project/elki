@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -113,10 +113,10 @@ public class OnedimensionalDistanceFunction extends AbstractNumberVectorDistance
   public void setSelectedDimensions(long[] dimensions) {
     dim = BitsUtil.nextSetBit(dimensions, 0);
     if(dim == -1) {
-      throw new IllegalStateException("No dimension was set.");
+      throw new IllegalArgumentException("No dimension was set.");
     }
     if(BitsUtil.nextSetBit(dimensions, dim + 1) > 0) {
-      throw new IllegalStateException("More than one dimension was set.");
+      throw new IllegalArgumentException("More than one dimension was set.");
     }
   }
 
@@ -157,7 +157,7 @@ public class OnedimensionalDistanceFunction extends AbstractNumberVectorDistance
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimP = new IntParameter(DIM_ID)//
+      final IntParameter dimP = new IntParameter(DIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimP)) {
         dim = dimP.getValue();

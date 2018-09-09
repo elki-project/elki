@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import net.jafama.FastMath;
 
 /**
- * LP-Norm distance function between {@link NumberVector}s only in specified
- * dimensions.
+ * L<sub>p</sub>-Norm distance function between {@link NumberVector}s only in
+ * specified dimensions.
  * 
  * @author Elke Achtert
  * @since 0.2
@@ -83,22 +83,17 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   protected double minDistObject(SpatialComparable mbr, NumberVector v) {
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double delta;
-      final double value = v.doubleValue(d);
-      final double omin = mbr.getMin(d);
+      final double value = v.doubleValue(d), omin = mbr.getMin(d);
       if(value < omin) {
-        delta = omin - value;
+        sqrDist += FastMath.pow(omin - value, p);
       }
       else {
         final double omax = mbr.getMax(d);
         if(value > omax) {
-          delta = value - omax;
+          sqrDist += FastMath.pow(value - omax, p);
         }
-        else {
-          continue;
-        }
+        // Else they intersect
       }
-      sqrDist += FastMath.pow(delta, p);
     }
     return FastMath.pow(sqrDist, 1. / p);
   }
@@ -110,23 +105,17 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     }
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      final double delta;
-      final double max1 = mbr1.getMax(d);
-      final double min2 = mbr2.getMin(d);
+      final double max1 = mbr1.getMax(d), min2 = mbr2.getMin(d);
       if(max1 < min2) {
-        delta = min2 - max1;
+        sqrDist += FastMath.pow(min2 - max1, p);
       }
       else {
-        final double min1 = mbr1.getMin(d);
-        final double max2 = mbr2.getMax(d);
+        final double min1 = mbr1.getMin(d), max2 = mbr2.getMax(d);
         if(min1 > max2) {
-          delta = min1 - max2;
+          sqrDist += FastMath.pow(min1 - max2, p);
         }
-        else { // The mbrs intersect!
-          continue;
-        }
+        // else the mbrs intersect!
       }
-      sqrDist += FastMath.pow(delta, p);
     }
     return FastMath.pow(sqrDist, 1. / p);
   }
@@ -135,8 +124,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   public double norm(NumberVector obj) {
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      double delta = Math.abs(obj.doubleValue(d));
-      sqrDist += FastMath.pow(delta, p);
+      sqrDist += FastMath.pow(Math.abs(obj.doubleValue(d)), p);
     }
     return FastMath.pow(sqrDist, 1. / p);
   }
@@ -193,13 +181,9 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     @Override
     protected SubspaceLPNormDistanceFunction makeInstance() {
-      if(p == 2.0) {
-        return new SubspaceEuclideanDistanceFunction(dimensions);
-      }
-      if(p == 1.0) {
-        return new SubspaceManhattanDistanceFunction(dimensions);
-      }
-      return new SubspaceLPNormDistanceFunction(p, dimensions);
+      return p == 2. ? new SubspaceEuclideanDistanceFunction(dimensions) : //
+          p == 1. ? new SubspaceManhattanDistanceFunction(dimensions) : //
+              new SubspaceLPNormDistanceFunction(p, dimensions);
     }
   }
 }
