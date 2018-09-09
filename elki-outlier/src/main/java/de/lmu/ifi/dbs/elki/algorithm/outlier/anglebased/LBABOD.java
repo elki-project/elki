@@ -62,21 +62,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import net.jafama.FastMath;
 
 /**
+ * LB-ABOD (lower-bound) version of
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
- *
- * LB-ABOD (lower-bound) version. Exact on the top k outliers, approximate on
- * the remaining.
- *
+ * <p>
+ * Exact on the top k outliers, approximate on the remaining.
+ * <p>
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets.
- *
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
- * Angle-Based Outlier Detection in High-dimensional Data.<br />
- * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
- * (KDD '08), Las Vegas, NV, 2008.
- * </p>
+ * Hans-Peter Kriegel, Matthias Schubert, Arthur Zimek<br>
+ * Angle-Based Outlier Detection in High-dimensional Data<br>
+ * Proc. 14th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining (KDD'08)
  *
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
@@ -86,9 +84,9 @@ import net.jafama.FastMath;
  */
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
-@Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Matthias Schubert, Arthur Zimek", //
     title = "Angle-Based Outlier Detection in High-dimensional Data", //
-    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining (KDD'08)", //
     url = "https://doi.org/10.1145/1401890.1401946", //
     bibkey = "DBLP:conf/kdd/KriegelSZ08")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD", "lb-abod" })

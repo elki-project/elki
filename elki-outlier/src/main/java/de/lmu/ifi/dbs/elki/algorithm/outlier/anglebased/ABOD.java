@@ -54,23 +54,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
- *
+ * <p>
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets. Exact version, which has cubic runtime (see also
  * {@link FastABOD} and {@link LBABOD} for faster versions).
- *
+ * <p>
  * Reference:
  * <p>
- * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
- * Angle-Based Outlier Detection in High-dimensional Data.<br />
- * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
- * (KDD '08), Las Vegas, NV, 2008.
- * </p>
- *
+ * Hans-Peter Kriegel, Matthias Schubert, Arthur Zimek<br>
+ * Angle-Based Outlier Detection in High-dimensional Data<br>
+ * Proc. 14th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining (KDD'08)
+ * 
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
  * @since 0.2
@@ -79,9 +78,9 @@ import net.jafama.FastMath;
  */
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
-@Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
+@Reference(authors = "Hans-Peter Kriegel, Matthias Schubert, Arthur Zimek", //
     title = "Angle-Based Outlier Detection in High-dimensional Data", //
-    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining (KDD'08)", //
     url = "https://doi.org/10.1145/1401890.1401946", //
     bibkey = "DBLP:conf/kdd/KriegelSZ08")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD", "abod" })

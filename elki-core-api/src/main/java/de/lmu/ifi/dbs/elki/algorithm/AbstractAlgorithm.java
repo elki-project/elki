@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,17 +32,15 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * <p>
  * This class serves also as a model of implementing an algorithm within this
  * framework. Any Algorithm that makes use of these flags may extend this class.
- * </p>
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.landmark
  * @apiviz.excludeSubtypes
- * 
+ *
  * @param <R> the result type
  */
 public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
@@ -89,7 +87,8 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
     catch(NoSuchMethodException e) {
       // continue below.
     }
-    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
+    catch(IllegalArgumentException | IllegalAccessException
+        | SecurityException e) {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(InvocationTargetException e) {
@@ -110,7 +109,8 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
     catch(NoSuchMethodException e) {
       // continue below.
     }
-    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
+    catch(IllegalArgumentException | IllegalAccessException
+        | SecurityException e) {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(InvocationTargetException e) {
@@ -143,9 +143,6 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
 
   /**
    * Parameter to specify the algorithm to run.
-   * <p>
-   * Key: {@code -algorithm}
-   * </p>
    */
   public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
 }
