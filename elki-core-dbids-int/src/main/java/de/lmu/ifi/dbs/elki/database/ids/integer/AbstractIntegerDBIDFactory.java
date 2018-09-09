@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.KNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
@@ -153,12 +152,12 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public ModifiableDoubleDBIDList newDistanceDBIDList(int size) {
-    return new DoubleIntegerDBIDList(size);
+    return new DoubleIntegerDBIDArrayList(size);
   }
 
   @Override
   public ModifiableDoubleDBIDList newDistanceDBIDList() {
-    return new DoubleIntegerDBIDList();
+    return new DoubleIntegerDBIDArrayList();
   }
 
   @Override
@@ -176,17 +175,6 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
       return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
     }
     return new UnmodifiableDBIDs(existing);
-  }
-
-  @Override
-  public KNNList subList(KNNList list, int k) {
-    if(k >= list.size()) {
-      return list;
-    }
-    if(list instanceof IntegerDBIDKNNList) {
-      return new IntegerDBIDKNNSubList((IntegerDBIDKNNList) list, k);
-    }
-    return new KNNSubList(list, k);
   }
 
   @Override

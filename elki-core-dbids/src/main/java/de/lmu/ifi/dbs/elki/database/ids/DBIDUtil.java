@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -792,17 +792,6 @@ public final class DBIDUtil {
       beg += psize;
     }
     return split;
-  }
-
-  /**
-   * Get a subset of the KNN result.
-   *
-   * @param list Existing list
-   * @param k k
-   * @return Subset
-   */
-  public static KNNList subList(KNNList list, int k) {
-    return DBIDFactory.FACTORY.subList(list, k);
   }
 
   /**

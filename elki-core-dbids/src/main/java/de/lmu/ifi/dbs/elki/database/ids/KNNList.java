@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Interface for kNN results.
- *
+ * <p>
  * To iterate over the results, use the following code:
- *
+ * 
  * <pre>
  * {@code
  * for (DistanceDBIDResultIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
@@ -49,16 +49,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @since 0.5.5
  *
  * @apiviz.landmark
- *
- * @apiviz.composedOf DoubleDBIDPair
  */
 public interface KNNList extends DoubleDBIDList {
-  /**
-   * Size
-   */
-  @Override
-  int size();
-
   /**
    * Get the K parameter (note: this may be less than the size of the list!)
    *
@@ -67,17 +59,17 @@ public interface KNNList extends DoubleDBIDList {
   int getK();
 
   /**
-   * Direct object access.
-   *
-   * @param index
-   */
-  @Override
-  DoubleDBIDPair get(int index);
-
-  /**
-   * Get the distance to the k nearest neighbor, or maxdist otherwise.
+   * Get the distance to the k nearest neighbor, or infinity otherwise.
    *
    * @return Maximum distance
    */
   double getKNNDistance();
+
+  /**
+   * Select a subset for a smaller k.
+   *
+   * @param k New k
+   * @return KNN result for the smaller k.
+   */
+  KNNList subList(int k);
 }

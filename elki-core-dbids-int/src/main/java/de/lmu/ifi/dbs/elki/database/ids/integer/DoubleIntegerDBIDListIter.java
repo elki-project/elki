@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,5 +29,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  * @since 0.7.0
  */
 public interface DoubleIntegerDBIDListIter extends DoubleDBIDListIter, IntegerDBIDIter {
-  // No additional methods.
+  @Override
+  DoubleIntegerDBIDListIter advance();
+
+  @Override
+  DoubleIntegerDBIDListIter advance(int count);
+
+  @Override
+  DoubleIntegerDBIDPair getPair();
+
+  @Override
+  DoubleIntegerDBIDListIter retract();
+
+  @Override
+  DoubleIntegerDBIDListIter seek(int off);
 }

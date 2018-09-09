@@ -46,13 +46,13 @@ public class KNNListTest {
     KNNList list = heap.toKNNList();
     assertEquals("Tie @7 not handled correctly.", 8, list.size());
     assertEquals("7NN distance wrong", 6., list.getKNNDistance(), 0.);
-    assertEquals("Tie @5 not handled correctly.", 6, DBIDUtil.subList(list, 5).size());
-    assertEquals("6NN distance wrong", 4., DBIDUtil.subList(list, 6).getKNNDistance(), 0.);
-    assertEquals("5NN distance wrong", 4., DBIDUtil.subList(list, 5).getKNNDistance(), 0.);
-    assertEquals("4NN distance wrong", 2., DBIDUtil.subList(list, 4).getKNNDistance(), 0.);
-    assertEquals("3NN distance wrong", 2., DBIDUtil.subList(list, 3).getKNNDistance(), 0.);
-    assertEquals("2NN distance wrong", 1., DBIDUtil.subList(list, 2).getKNNDistance(), 0.);
-    assertEquals("1NN distance wrong", 0., DBIDUtil.subList(list, 1).getKNNDistance(), 0.);
+    assertEquals("Tie @5 not handled correctly.", 6, list.subList(5).size());
+    assertEquals("6NN distance wrong", 4., list.subList(6).getKNNDistance(), 0.);
+    assertEquals("5NN distance wrong", 4., list.subList(5).getKNNDistance(), 0.);
+    assertEquals("4NN distance wrong", 2., list.subList(4).getKNNDistance(), 0.);
+    assertEquals("3NN distance wrong", 2., list.subList(3).getKNNDistance(), 0.);
+    assertEquals("2NN distance wrong", 1., list.subList(2).getKNNDistance(), 0.);
+    assertEquals("1NN distance wrong", 0., list.subList(1).getKNNDistance(), 0.);
     for(DoubleDBIDListIter it = list.iter(); it.valid(); it.advance()) {
       assertEquals("Distance wrong @" + it.getOffset(), dists[range.getOffset(it)], it.doubleValue(), 0.);
     }

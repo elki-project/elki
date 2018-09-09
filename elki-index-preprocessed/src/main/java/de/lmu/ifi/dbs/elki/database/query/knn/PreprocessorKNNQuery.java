@@ -23,12 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -81,11 +76,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
       getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
       warned = true;
     }
-    KNNList dr = preprocessor.get(id);
-    if(k < preprocessor.getK() && k < dr.size()) {
-      return getSublist(dr, k);
-    }
-    return dr;
+    return preprocessor.get(id).subList(k);
   }
 
   @Override
@@ -97,7 +88,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
     if(k < preprocessor.getK()) {
       List<KNNList> result = new ArrayList<>(ids.size());
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        result.add(getSublist(preprocessor.get(iter), k));
+        result.add(preprocessor.get(iter).subList(k));
       }
       return result;
     }
@@ -106,28 +97,6 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
       result.add(preprocessor.get(iter));
     }
     return result;
-  }
-
-  /**
-   * Subset a knn list for a smaller k.
-   * 
-   * @param knn k nearest neighbor list
-   * @param k New k
-   * @return Sublist
-   */
-  protected static KNNList getSublist(KNNList knn, int k) {
-    DoubleDBIDListIter it = knn.iter();
-    // k-distance for the new k.
-    final double kdist = it.seek(k - 1).doubleValue();
-    if(kdist >= knn.getKNNDistance()) {
-      return knn;
-    }
-    // Find ties:
-    int subk = k;
-    for(it.advance(); it.valid() && kdist < it.doubleValue() && subk < k; it.advance()) {
-      subk++;
-    }
-    return subk < knn.size() ? DBIDUtil.subList(knn, subk) : knn;
   }
 
   @Override

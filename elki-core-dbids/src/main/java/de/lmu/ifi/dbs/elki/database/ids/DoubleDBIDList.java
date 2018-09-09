@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Collection of double values associated with objects.
- *
+ * <p>
  * To iterate over the results, use the following code:
  *
  * <pre>
@@ -75,6 +75,15 @@ public interface DoubleDBIDList extends DBIDs {
 
   @Override
   DoubleDBIDListIter iter();
+
+  /**
+   * Get a subset list.
+   *
+   * @param begin Begin
+   * @param end End
+   * @return Sublist
+   */
+  DoubleDBIDList slice(int begin, int end);
 
   /**
    * Execute a function for each ID.

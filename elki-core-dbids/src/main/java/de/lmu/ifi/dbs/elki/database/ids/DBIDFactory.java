@@ -270,13 +270,4 @@ public interface DBIDFactory {
    * @return Immutable version
    */
   StaticDBIDs makeUnmodifiable(DBIDs existing);
-
-  /**
-   * Get a subset of the KNN result.
-   *
-   * @param list Existing list
-   * @param k k
-   * @return Subset
-   */
-  KNNList subList(KNNList list, int k);
 }

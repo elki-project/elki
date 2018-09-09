@@ -20,23 +20,27 @@
  */
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 
 /**
  * Class to store double distance, integer DBID results.
- * <p>
- * Currently unused. Needs benchmarking.
  *
  * @author Erich Schubert
  * @since 0.6.0
+ *
+ * @apiviz.uses DoubleIntegerArrayQuickSort
  */
-class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleIntegerDBIDList {
+class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleIntegerDBIDList {
+  /**
+   * Initial size allocation.
+   */
+  private static final int INITIAL_SIZE = 21;
+
   /**
    * The size
    */
@@ -45,14 +49,29 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
   /**
    * Distance values
    */
-  DoubleIntegerDBIDPair[] data;
+  double[] dists;
+
+  /**
+   * DBIDs
+   */
+  int[] ids;
+
+  /**
+   * Empty.
+   */
+  private static final double[] EMPTY_DISTS = new double[0];
+
+  /**
+   * Empty.
+   */
+  private static final int[] EMPTY_IDS = new int[0];
 
   /**
    * Constructor.
    */
-  protected DoubleIntegerDBIDPairList() {
-    super();
-    this.data = new DoubleIntegerDBIDPair[21];
+  protected DoubleIntegerDBIDArrayList() {
+    dists = EMPTY_DISTS;
+    ids = EMPTY_IDS;
   }
 
   /**
@@ -60,12 +79,9 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
    *
    * @param size Initial size
    */
-  protected DoubleIntegerDBIDPairList(int size) {
-    super();
-    if(size > 0) {
-      size = 21;
-    }
-    this.data = new DoubleIntegerDBIDPair[size];
+  protected DoubleIntegerDBIDArrayList(int size) {
+    this.dists = size > 0 ? new double[size] : EMPTY_DISTS;
+    this.ids = size > 0 ? new int[size] : EMPTY_IDS;
   }
 
   @Override
@@ -77,7 +93,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
   public boolean contains(DBIDRef o) {
     final int q = o.internalGetIndex();
     for(int i = 0; i < size; i++) {
-      if(q == data[i].internalGetIndex()) {
+      if(q == ids[i]) {
         return true;
       }
     }
@@ -95,54 +111,74 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
   }
 
   @Override
+  @Deprecated
   public DoubleIntegerDBIDPair get(int index) {
-    return data[index];
+    return new DoubleIntegerDBIDPair(dists[index], ids[index]);
   }
 
   @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
-    var.set(data[index]);
+    if(var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(ids[index]);
+    }
+    else {
+      var.set(new IntegerDBID(ids[index]));
+    }
     return var;
   }
 
   /**
    * Add an entry, consisting of distance and internal index.
    *
-   * @param pair entry
+   * @param dist Distance
+   * @param id Internal index
    */
-  protected void addInternal(DoubleIntegerDBIDPair pair) {
-    if(size == data.length) {
-      DoubleIntegerDBIDPair[] old = data;
-      data = new DoubleIntegerDBIDPair[(data.length << 1) + 1];
-      System.arraycopy(old, 0, data, 0, old.length);
+  protected void addInternal(double dist, int id) {
+    if(size == dists.length) {
+      grow();
     }
-    data[size++] = pair;
+    dists[size] = dist;
+    ids[size] = id;
+    ++size;
+  }
+
+  /**
+   * Grow the data storage.
+   */
+  protected void grow() {
+    if(dists == EMPTY_DISTS) {
+      dists = new double[INITIAL_SIZE];
+      ids = new int[INITIAL_SIZE];
+      return;
+    }
+    final int len = dists.length;
+    final int newlength = len + (len >> 1) + 1;
+    double[] odists = dists;
+    dists = new double[newlength];
+    System.arraycopy(odists, 0, dists, 0, odists.length);
+    int[] oids = ids;
+    ids = new int[newlength];
+    System.arraycopy(oids, 0, ids, 0, oids.length);
   }
 
   @Override
   public void add(double dist, DBIDRef id) {
-    addInternal(new DoubleIntegerDBIDPair(dist, id.internalGetIndex()));
+    addInternal(dist, id.internalGetIndex());
   }
 
   @Override
   public void add(DoubleDBIDPair pair) {
-    if(pair instanceof DoubleIntegerDBIDPair) {
-      addInternal((DoubleIntegerDBIDPair) pair);
-    }
-    else {
-      addInternal(new DoubleIntegerDBIDPair(pair.doubleValue(), pair.internalGetIndex()));
-    }
+    addInternal(pair.doubleValue(), pair.internalGetIndex());
   }
 
   @Override
   public void clear() {
-    Arrays.fill(data, null);
     size = 0;
   }
 
   @Override
   public void sort() {
-    Arrays.sort(data, 0, size);
+    DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
   }
 
   /**
@@ -150,9 +186,12 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
    */
   protected void reverse() {
     for(int i = 0, j = size - 1; i < j; i++, j--) {
-      DoubleIntegerDBIDPair tmpd = data[j];
-      data[j] = data[i];
-      data[i] = tmpd;
+      double tmpd = dists[j];
+      dists[j] = dists[i];
+      dists[i] = tmpd;
+      int tmpi = ids[j];
+      ids[j] = ids[i];
+      ids[i] = tmpi;
     }
   }
 
@@ -162,9 +201,10 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
       throw new ArrayIndexOutOfBoundsException(p);
     }
     if(p < --size) {
-      System.arraycopy(data, p + 1, data, p, size - p);
+      System.arraycopy(dists, p + 1, dists, p, size - p);
+      System.arraycopy(ids, p + 1, ids, p, size - p);
     }
-    data[size] = null;
+    // TODO: put NaN, -1?
   }
 
   @Override
@@ -173,31 +213,54 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
       throw new ArrayIndexOutOfBoundsException(p);
     }
     if(--size > 0) {
-      data[p] = data[size];
+      dists[p] = dists[size];
+      ids[p] = ids[size];
     }
-    data[size] = null;
   }
 
   @Override
   public void swap(int i, int j) {
-    final DoubleIntegerDBIDPair tmp = data[i];
-    data[i] = data[j];
-    data[j] = tmp;
+    final double tmpd = dists[i];
+    dists[i] = dists[j];
+    dists[j] = tmpd;
+    final int tmpi = ids[i];
+    ids[i] = ids[j];
+    ids[j] = tmpi;
+  }
+
+  /**
+   * Truncate the list to the given size, freeing the memory.
+   *
+   * @param newsize New size
+   */
+  public void truncate(int newsize) {
+    if(newsize < size) {
+      double[] odists = dists;
+      dists = new double[newsize];
+      System.arraycopy(odists, 0, dists, 0, newsize);
+      int[] oids = ids;
+      ids = new int[newsize];
+      System.arraycopy(oids, 0, ids, 0, newsize);
+      size = newsize;
+    }
+  }
+
+  @Override
+  public DoubleIntegerDBIDList slice(int begin, int end) {
+    return begin == 0 && end == size ? this : new DoubleIntegerDBIDSubList(this, begin, end);
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("kNNList[");
-    for(DoubleDBIDListIter iter = this.iter(); iter.valid();) {
+    StringBuilder buf = new StringBuilder(20 + size * 20).append("DoubleDBIDList[");
+    DoubleDBIDListIter iter = this.iter();
+    if(iter.valid()) {
       buf.append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
-      iter.advance();
-      if(iter.valid()) {
-        buf.append(',');
+      while(iter.advance().valid()) {
+        buf.append(',').append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
       }
     }
-    buf.append(']');
-    return buf.toString();
+    return buf.append(']').toString();
   }
 
   /**
@@ -207,8 +270,18 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
    *
    * @apiviz.exclude
    */
-  private class Itr implements DoubleIntegerDBIDListMIter, IntegerDBIDArrayIter {
+  private class Itr implements DoubleIntegerDBIDListMIter {
+    /**
+     * Current offset.
+     */
     int pos = 0;
+
+    /**
+     * Constructor.
+     */
+    private Itr() {
+      super();
+    }
 
     @Override
     public boolean valid() {
@@ -234,7 +307,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
 
     @Override
     public Itr retract() {
-      pos--;
+      --pos;
       return this;
     }
 
@@ -246,12 +319,17 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
 
     @Override
     public int internalGetIndex() {
-      return data[pos].internalGetIndex();
+      return ids[pos];
     }
 
     @Override
     public double doubleValue() {
-      return data[pos].doubleValue();
+      return dists[pos];
+    }
+
+    @Override
+    public void remove() {
+      DoubleIntegerDBIDArrayList.this.remove(pos--);
     }
 
     @Override
@@ -259,7 +337,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
       if(pos >= size) {
         throw new ArrayIndexOutOfBoundsException();
       }
-      data[pos].id = ref.internalGetIndex();
+      ids[pos] = ref.internalGetIndex();
     }
 
     @Override
@@ -267,17 +345,17 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
       if(pos >= size) {
         throw new ArrayIndexOutOfBoundsException();
       }
-      data[pos].value = value;
+      dists[pos] = value;
     }
 
     @Override
     public DoubleIntegerDBIDPair getPair() {
-      return data[pos];
+      return new DoubleIntegerDBIDPair(dists[pos], ids[pos]);
     }
 
     @Override
-    public void remove() {
-      DoubleIntegerDBIDPairList.this.remove(pos--);
+    public String toString() {
+      return doubleValue() + ":" + internalGetIndex() + "@" + pos;
     }
   }
 }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDList implements IntegerDBIDKNNList {
+class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements IntegerDBIDKNNList {
   /**
    * The k value this list was generated for.
    */
@@ -66,16 +66,14 @@ public class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDList implements I
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("kNNList[");
-    for(DoubleDBIDListIter iter = this.iter(); iter.valid();) {
+    StringBuilder buf = new StringBuilder(size() * 20 + 20).append("kNNList[");
+    DoubleDBIDListIter iter = this.iter();
+    if(iter.valid()) {
       buf.append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
-      iter.advance();
-      if(iter.valid()) {
-        buf.append(',');
-      }
     }
-    buf.append(']');
-    return buf.toString();
+    while(iter.advance().valid()) {
+      buf.append(',').append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
+    }
+    return buf.append(']').toString();
   }
 }

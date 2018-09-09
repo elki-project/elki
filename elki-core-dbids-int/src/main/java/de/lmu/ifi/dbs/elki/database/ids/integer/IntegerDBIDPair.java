@@ -305,7 +305,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
 
     @Override
     public Slice slice(int begin, int end) {
-      return new Slice(begin + begin, begin + end);
+      return new Slice(this.begin + begin, this.begin + end);
     }
 
     /**

@@ -24,75 +24,56 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 
 /**
- * Sublist of an existing result to contain only the first k elements.
+ * Sublist of an existing result to contain only some of the elements.
  *
  * @author Erich Schubert
- * @since 0.5.5
  */
-public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
+public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
   /**
-   * Parameter k.
+   * Start offset.
    */
-  private final int k;
+  private final int begin;
 
   /**
-   * Actual size, including ties.
+   * End offset.
    */
-  private final int size;
+  private final int end;
 
   /**
    * Wrapped inner result.
    */
-  private final IntegerDBIDKNNList inner;
+  private final DoubleIntegerDBIDList inner;
 
   /**
    * Constructor.
    *
    * @param inner Inner instance
-   * @param k k value
+   * @param begin Begin offset
+   * @param end End offset
    */
-  public IntegerDBIDKNNSubList(IntegerDBIDKNNList inner, int k) {
+  public DoubleIntegerDBIDSubList(DoubleIntegerDBIDList inner, int begin, int end) {
     this.inner = inner;
-    this.k = k;
-    // Compute list size
-    if(k < inner.getK()) {
-      DoubleIntegerDBIDListIter iter = inner.iter();
-      final double kdist = iter.seek(k - 1).doubleValue();
-      // Add all values tied:
-      int i = k;
-      for(iter.advance(); iter.valid() && iter.doubleValue() <= kdist; iter.advance()) {
-        i++;
-      }
-      size = i;
-    }
-    else {
-      size = inner.size();
-    }
+    assert (end < inner.size()) : "Access beyond size of list.";
+    assert (begin >= 0 && end >= begin);
+    this.begin = begin;
+    this.end = end;
   }
 
-  @Override
-  public int getK() {
-    return k;
-  }
-
+  @Deprecated
   @Override
   public DoubleIntegerDBIDPair get(int index) {
-    assert (index < size) : "Access beyond design size of list.";
+    index += begin;
+    assert (index < end) : "Access beyond size of list.";
     return inner.get(index);
   }
 
   @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
-    assert (index < size) : "Access beyond design size of list.";
+    index += begin;
+    assert (index < end) : "Access beyond size of list.";
     return inner.assignVar(index, var);
-  }
-
-  @Override
-  public double getKNNDistance() {
-    return inner.get(k - 1).doubleValue();
   }
 
   @Override
@@ -112,17 +93,20 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
   @Override
   public boolean isEmpty() {
-    return size == 0;
+    return begin == end;
   }
 
   @Override
   public int size() {
-    return size;
+    return end - begin;
   }
 
   @Override
-  public KNNList subList(int k) {
-    return new IntegerDBIDKNNSubList(inner, k);
+  public DoubleIntegerDBIDList slice(int begin, int end) {
+    begin += this.begin;
+    end += this.begin;
+    assert (end < this.end) : "Access beyond size of list.";
+    return new DoubleIntegerDBIDSubList(inner, begin, end);
   }
 
   /**
@@ -136,54 +120,54 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
     /**
      * Current position.
      */
-    private int pos = 0;
+    private DoubleIntegerDBIDListIter it = inner.iter().seek(begin);
 
     @Override
     public boolean valid() {
-      return pos < size && pos >= 0;
+      return it.getOffset() < end && it.getOffset() >= begin;
     }
 
     @Override
     public Itr advance() {
-      pos++;
+      it.advance();
       return this;
     }
 
     @Override
     public double doubleValue() {
-      return inner.get(pos).doubleValue();
+      return it.doubleValue();
     }
 
     @Override
     public DoubleIntegerDBIDPair getPair() {
-      return inner.get(pos);
+      return it.getPair();
     }
 
     @Override
     public int internalGetIndex() {
-      return inner.get(pos).internalGetIndex();
+      return it.internalGetIndex();
     }
 
     @Override
     public int getOffset() {
-      return pos;
+      return it.getOffset() - begin;
     }
 
     @Override
     public Itr advance(int count) {
-      pos += count;
+      it.advance(count);
       return this;
     }
 
     @Override
     public Itr retract() {
-      --pos;
+      it.retract();
       return this;
     }
 
     @Override
     public Itr seek(int off) {
-      pos = off;
+      it.seek(begin + off);
       return this;
     }
   }

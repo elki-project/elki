@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -121,6 +122,16 @@ public class KNNSubList implements KNNList {
   @Override
   public int size() {
     return size;
+  }
+
+  @Override
+  public KNNList subList(int k) {
+    return k < this.k ? new KNNSubList(inner, k) : this;
+  }
+
+  @Override
+  public DoubleDBIDList slice(int begin, int end) {
+    return inner.slice(begin, Math.min(size, end));
   }
 
   /**
