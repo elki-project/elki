@@ -51,11 +51,6 @@ subprojects {
         footer += """ built at $buildTime"""
       }
       bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a><!-- so we get to know what people search for: --><script>if(window.location.hostname=="elki-project.github.io"){(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create","UA-87792924-1","auto");ga("send","pageview");}</script>"""
-      links = [
-        "http://trove4j.sourceforge.net/javadocs/",
-        "http://www.w3.org/2003/01/dom2-javadoc/",
-        "https://xmlgraphics.apache.org/batik/javadoc/"
-      ]
       addBooleanOption('Xdoclint:none', true)
       // Add --allow-script-in-comments if available (some 1.8 versions only)
       try {
