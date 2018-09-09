@@ -62,8 +62,8 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * <p>
  * Reference:
  * <p>
- * Outlier detection for high dimensional data<br />
- * C. C. Aggarwal, P. S. Yu <br />
+ * Outlier detection for high dimensional data<br>
+ * C. C. Aggarwal, P. S. Yu<br>
  * Proc. 2001 ACM SIGMOD international conference on Management of data
  *
  * @author Ahmed Hettab
@@ -75,7 +75,6 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  *
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-// TODO: progress logging!
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C. C. Aggarwal, P. S. Yu", //
@@ -153,8 +152,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double val = outlierScore.doubleValue(iditer);
       if(Double.isNaN(val)) {
-        outlierScore.putDouble(iditer, 0.0);
-        val = 0.0;
+        outlierScore.putDouble(iditer, val = 0.);
       }
       minmax.put(val);
     }

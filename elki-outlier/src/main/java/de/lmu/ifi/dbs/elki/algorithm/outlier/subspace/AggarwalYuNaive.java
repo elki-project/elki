@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -33,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -53,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Reference:
  * <p>
  * Outlier detection for high dimensional data<br>
- * C. C. Aggarwal, P. S. Yu <br>
+ * C. C. Aggarwal, P. S. Yu<br>
  * Proc. 2001 ACM SIGMOD international conference on Management of data
  * 
  * @author Ahmed Hettab
@@ -62,7 +64,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @param <V> Vector type
  */
-// TODO: progress logging!
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
 @Reference(authors = "C. C. Aggarwal, P. S. Yu", //
@@ -94,56 +95,58 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<V> relation) {
-    final int dimensionality = RelationUtil.dimensionality(relation);
+    final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    ArrayList<ArrayList<IntIntPair>> Rk;
+    ArrayList<int[]> Rk;
     // Build a list of all subspaces
-    {
-      // R1 initial one-dimensional subspaces.
-      Rk = new ArrayList<>();
-      // Set of all dim*phi ranges
-      ArrayList<IntIntPair> q = new ArrayList<>();
-      for(int i = 0; i < dimensionality; i++) {
-        for(int j = 0; j < phi; j++) {
-          IntIntPair s = new IntIntPair(i, j);
-          q.add(s);
-          // Add to first Rk
-          ArrayList<IntIntPair> v = new ArrayList<>();
-          v.add(s);
-          Rk.add(v);
-        }
-      }
-
-      // build Ri
-      for(int i = 2; i <= k; i++) {
-        ArrayList<ArrayList<IntIntPair>> Rnew = new ArrayList<>();
-
-        for(int j = 0; j < Rk.size(); j++) {
-          ArrayList<IntIntPair> c = Rk.get(j);
-          for(IntIntPair pair : q) {
-            boolean invalid = false;
-            for(int t = 0; t < c.size(); t++) {
-              if(c.get(t).first == pair.first) {
-                invalid = true;
-                break;
-              }
-            }
-            if(!invalid) {
-              ArrayList<IntIntPair> neu = new ArrayList<>(c);
-              neu.add(pair);
-              Rnew.add(neu);
-            }
-          }
-        }
-        Rk = Rnew;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Subspace size", k, LOG) : null;
+    // R1 initial one-dimensional subspaces.
+    Rk = new ArrayList<>();
+    // Set of all dim*phi ranges
+    ArrayList<IntIntPair> q = new ArrayList<>();
+    for(int i = 0; i < dim; i++) {
+      for(int j = 0; j < phi; j++) {
+        q.add(new IntIntPair(i, j));
+        Rk.add(new int[] { i, j });
       }
     }
+    LOG.incrementProcessed(prog);
+
+    // build Ri
+    for(int i = 2; i <= k; i++) {
+      ArrayList<int[]> Rnew = new ArrayList<>();
+
+      for(int j = 0; j < Rk.size(); j++) {
+        int[] c = Rk.get(j);
+        for(IntIntPair pair : q) {
+          boolean invalid = false;
+          for(int t = 0; t < c.length; t += 2) {
+            if(c[t] == pair.first) {
+              invalid = true;
+              break;
+            }
+          }
+          if(!invalid) {
+            int[] neu = Arrays.copyOf(c, c.length + 2);
+            neu[c.length] = pair.first;
+            neu[c.length + 1] = pair.second;
+            Rnew.add(neu);
+          }
+        }
+      }
+      Rk = Rnew;
+      LOG.incrementProcessed(prog);
+    }
+    if(prog != null) {
+      prog.setProcessed(k, LOG);
+    }
+    LOG.ensureCompleted(prog);
 
     WritableDoubleDataStore sparsity = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     // calculate the sparsity coefficient
-    for(ArrayList<IntIntPair> sub : Rk) {
+    for(int[] sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
       final double sparsityC = sparsity(ids.size(), size, k, phi);
 

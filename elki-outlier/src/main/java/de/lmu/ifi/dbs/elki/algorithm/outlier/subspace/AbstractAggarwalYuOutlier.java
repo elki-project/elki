@@ -28,11 +28,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -43,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
+
 import net.jafama.FastMath;
 
 /**
@@ -53,7 +49,7 @@ import net.jafama.FastMath;
  * Reference:
  * <p>
  * Outlier detection for high dimensional data<br>
- * C. C. Aggarwal, P. S. Yu <br>
+ * C. C. Aggarwal, P. S. Yu<br>
  * Proc. 2001 ACM SIGMOD international conference on Management of data
  *
  * @author Ahmed Hettab
@@ -101,8 +97,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
   }
 
   /**
-   * Grid discretization of the data:<br />
-   * Each attribute of data is divided into phi equi-depth ranges.<br />
+   * Grid discretization of the data:<br>
+   * Each attribute of data is divided into phi equi-depth ranges.<br>
    * Each range contains a fraction f=1/phi of the records.
    * 
    * @param relation Relation to process
@@ -148,10 +144,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    */
   protected static double sparsity(final int setsize, final int dbsize, final int k, final double phi) {
     // calculate sparsity c
-    final double f = 1. / phi;
-    final double fK = MathUtil.powi(f, k);
-    final double sC = (setsize - (dbsize * fK)) / FastMath.sqrt(dbsize * fK * (1 - fK));
-    return sC;
+    final double fK = MathUtil.powi(1. / phi, k);
+    return (setsize - (dbsize * fK)) / FastMath.sqrt(dbsize * fK * (1 - fK));
   }
 
   /**
@@ -161,11 +155,11 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * @param ranges List of DBID ranges
    * @return ids
    */
-  protected DBIDs computeSubspace(ArrayList<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
-    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).first).get(subspace.get(0).second));
+  protected DBIDs computeSubspace(int[] subspace, ArrayList<ArrayList<DBIDs>> ranges) {
+    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace[0]).get(subspace[1]));
     // intersect all selected dimensions
-    for(int i = 1; i < subspace.size(); i++) {
-      DBIDs current = ranges.get(subspace.get(i).first).get(subspace.get(i).second - GENE_OFFSET);
+    for(int i = 2; i < subspace.length; i += 2) {
+      DBIDs current = ranges.get(subspace[i]).get(subspace[i + 1] - GENE_OFFSET);
       ids.retainAll(current);
       if(ids.size() == 0) {
         break;
