@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,17 +24,17 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 
 /**
  * Static DBID range.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
 public interface DBIDRange extends ArrayStaticDBIDs, DataStoreIDMap {
   /**
    * Get offset in the array for a particular DBID.
-   * 
+   * <p>
    * Should satisfy {@code range.get(getOffset(id)) == id} and
    * {@code range.getOffset(range.get(idx)) == idx}.
-   * 
+   *
    * @param dbid ID to compute index for
    * @return index
    */

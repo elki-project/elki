@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,14 +24,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Iterator for DBIDs.
- * 
+ * <p>
  * Important note: this iterator has a <em>significantly</em> different syntax
  * and semantics than the Java iterators. It is much more aligned with C than
  * with Java, but at the same time, the syntax is much more compatible with for
  * loops.
- * 
+ * <p>
  * Usage example:
- * 
+ *
  * <pre>
  * {@code 
  * for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * }
  * }
  * </pre>
- * 
+ *
  * We list some fundamental differences.
  * <ul>
  * <li>{@link DBIDIter#valid() iter.valid()} refers to the current element,
@@ -49,10 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * {@code get...} to access it.</li>
  * <li>{@code DBIDIter.get...} do not advance the iterator.</li>
  * </ul>
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.landmark
  */
 public interface DBIDIter extends DBIDRef, Iter {

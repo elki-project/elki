@@ -63,7 +63,7 @@ public final class DBIDUtil {
 
   /**
    * Import and integer as DBID.
-   *
+   * <p>
    * Note: this may not be possible for some factories!
    *
    * @param id Integer ID to import
@@ -75,7 +75,7 @@ public final class DBIDUtil {
 
   /**
    * Export a DBID as int.
-   *
+   * <p>
    * Note: this may not be possible for some factories!
    *
    * @param id DBID to export
@@ -114,10 +114,7 @@ public final class DBIDUtil {
    * @return DBID
    */
   public static DBID deref(DBIDRef ref) {
-    if(ref instanceof DBID) {
-      return (DBID) ref;
-    }
-    return importInteger(ref.internalGetIndex());
+    return ref instanceof DBID ? (DBID) ref : importInteger(ref.internalGetIndex());
   }
 
   /**
@@ -137,15 +134,18 @@ public final class DBIDUtil {
    * @return String representation
    */
   public static String toString(DBIDs ids) {
+    final DBIDFactory factory = DBIDFactory.FACTORY;
     if(ids instanceof DBID) {
-      return DBIDFactory.FACTORY.toString((DBID) ids);
+      return factory.toString((DBID) ids);
     }
-    StringBuilder buf = new StringBuilder();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      if(buf.length() > 0) {
-        buf.append(", ");
-      }
-      buf.append(DBIDFactory.FACTORY.toString(iter));
+    if(ids.isEmpty()) {
+      return "";
+    }
+    DBIDIter iter = ids.iter();
+    StringBuilder buf = new StringBuilder(ids.size() * 6) //
+        .append(factory.toString(iter));
+    while(iter.advance().valid()) {
+      buf.append(',').append(factory.toString(iter));
     }
     return buf.toString();
   }
@@ -287,13 +287,32 @@ public final class DBIDUtil {
    *
    * @param first First set
    * @param second Second set
+   * @return intersection
+   */
+  public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
+    // If exactly one is a Set, use it as second parameter.
+    if(second instanceof SetDBIDs) {
+      if(!(first instanceof SetDBIDs)) {
+        return internalIntersection(first, second);
+      }
+    }
+    else if(first instanceof SetDBIDs) {
+      return internalIntersection(second, first);
+    }
+    // Both are the same type: both set or both non set.
+    // Smaller goes first.
+    return first.size() <= second.size() ? internalIntersection(first, second) : internalIntersection(second, first);
+  }
+
+  /**
+   * Compute the set intersection of two sets.
+   *
+   * @param first First set
+   * @param second Second set
    * @return result.
    */
-  // TODO: optimize better?
-  public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
-    if(first.size() > second.size()) {
-      return intersection(second, first);
-    }
+  private static ModifiableDBIDs internalIntersection(DBIDs first, DBIDs second) {
+    second = second.size() > 16 && !(second instanceof SetDBIDs) ? newHashSet(second) : second;
     ModifiableDBIDs inter = newHashSet(first.size());
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       if(second.contains(it)) {
@@ -317,19 +336,12 @@ public final class DBIDUtil {
         return internalIntersectionSize(first, second);
       }
     }
-    else {
-      if(first instanceof SetDBIDs) {
-        return internalIntersectionSize(second, first);
-      }
+    else if(first instanceof SetDBIDs) {
+      return internalIntersectionSize(second, first);
     }
     // Both are the same type: both set or both non set.
     // Smaller goes first.
-    if(first.size() <= second.size()) {
-      return internalIntersectionSize(first, second);
-    }
-    else {
-      return internalIntersectionSize(second, first);
-    }
+    return first.size() <= second.size() ? internalIntersectionSize(first, second) : internalIntersectionSize(second, first);
   }
 
   /**
@@ -340,6 +352,7 @@ public final class DBIDUtil {
    * @return size
    */
   private static int internalIntersectionSize(DBIDs first, DBIDs second) {
+    second = second.size() > 16 && !(second instanceof SetDBIDs) ? newHashSet(second) : second;
     int c = 0;
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       if(second.contains(it)) {
@@ -371,12 +384,7 @@ public final class DBIDUtil {
     secondonly.addDBIDs(second);
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       // Try to remove
-      if(secondonly.remove(it)) {
-        intersection.add(it);
-      }
-      else {
-        firstonly.add(it);
-      }
+      (secondonly.remove(it) ? intersection : firstonly).add(it);
     }
   }
 
@@ -424,12 +432,7 @@ public final class DBIDUtil {
    * @return Array DBIDs.
    */
   public static ArrayDBIDs ensureArray(DBIDs ids) {
-    if(ids instanceof ArrayDBIDs) {
-      return (ArrayDBIDs) ids;
-    }
-    else {
-      return newArray(ids);
-    }
+    return ids instanceof ArrayDBIDs ? (ArrayDBIDs) ids : newArray(ids);
   }
 
   /**
@@ -439,12 +442,7 @@ public final class DBIDUtil {
    * @return Set DBIDs.
    */
   public static SetDBIDs ensureSet(DBIDs ids) {
-    if(ids instanceof SetDBIDs) {
-      return (SetDBIDs) ids;
-    }
-    else {
-      return newHashSet(ids);
-    }
+    return ids instanceof SetDBIDs ? (SetDBIDs) ids : newHashSet(ids);
   }
 
   /**
@@ -454,18 +452,8 @@ public final class DBIDUtil {
    * @return Modifiable DBIDs.
    */
   public static ModifiableDBIDs ensureModifiable(DBIDs ids) {
-    if(ids instanceof ModifiableDBIDs) {
-      return (ModifiableDBIDs) ids;
-    }
-    else {
-      if(ids instanceof ArrayDBIDs) {
-        return newArray(ids);
-      }
-      if(ids instanceof HashSetDBIDs) {
-        return newHashSet(ids);
-      }
-      return newArray(ids);
-    }
+    return ids instanceof ModifiableDBIDs ? (ModifiableDBIDs) ids : //
+        ids instanceof HashSetDBIDs ? newHashSet(ids) : newArray(ids);
   }
 
   /**
@@ -571,12 +559,7 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
-    if(seed != null) {
-      return randomSample(source, k, new Random(seed.longValue()));
-    }
-    else {
-      return randomSample(source, k, new Random());
-    }
+    return randomSample(source, k, seed != null ? new Random(seed.longValue()) : new Random());
   }
 
   /**
@@ -616,21 +599,18 @@ public final class DBIDUtil {
     if(k < 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
-    if(random == null) {
-      // Fast, and we're single-threaded here anyway.
-      random = new FastNonThreadsafeRandom();
-    }
+    // Fast, and we're single-threaded here anyway.
+    random = (random != null) ? random : new FastNonThreadsafeRandom();
 
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
-    if(k < source.size() >> 1) {
+    if(k < source.size() >> 2) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
       final int size = aids.size();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
       while(sample.size() < k) {
-        iter.seek(random.nextInt(size));
-        sample.add(iter);
+        sample.add(iter.seek(random.nextInt(size)));
       }
       return sample;
     }
@@ -658,21 +638,18 @@ public final class DBIDUtil {
     if(k < 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
-    if(random == null) {
-      // Fast, and we're single-threaded here anyway.
-      random = new FastNonThreadsafeRandom();
-    }
+    // Fast, and we're single-threaded here anyway.
+    random = (random != null) ? random : new FastNonThreadsafeRandom();
 
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
-    if(k < source.size() >> 1) {
+    if(k < source.size() >> 2) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
       int size = aids.size();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
       while(sample.size() < k) {
-        iter.seek(random.nextInt(size));
-        if(!equal(iter, except)) {
+        if(!equal(iter.seek(random.nextInt(size)), except)) {
           sample.add(iter);
         }
       }
@@ -710,6 +687,11 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
+   * <ul>
+   * <li>values less or equal 0 mean no sampling.
+   * <li>values larger than 0, but at most 1, are relative rates.
+   * <li>values larger than 1 are supposed to be integer counts.
+   * </ul>
    *
    * @param ids Original ids, no duplicates allowed
    * @param rate Sampling rate
@@ -717,15 +699,9 @@ public final class DBIDUtil {
    * @return Sample
    */
   public static DBIDs randomSample(DBIDs ids, double rate, Random random) {
-    if(rate <= 0) {
-      return ids;
-    }
-    if(rate < 1.1) {
-      int size = Math.min((int) (rate * ids.size()), ids.size());
-      return randomSample(ids, size, random);
-    }
-    int size = Math.min((int) rate, ids.size());
-    return randomSample(ids, size, random);
+    return rate <= 0 ? ids : // Magic for "no sampling"
+        randomSample(ids, Math.min(ids.size(), //
+            (int) (rate <= 1 ? rate * ids.size() : rate)), random);
   }
 
   /**
@@ -736,10 +712,7 @@ public final class DBIDUtil {
    * @return Random ID
    */
   public static DBIDVar randomSample(DBIDs ids, Random random) {
-    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
-    DBIDVar v = DBIDUtil.newVar();
-    aids.assignVar(random.nextInt(aids.size()), v);
-    return v;
+    return DBIDUtil.ensureArray(ids).assignVar(random.nextInt(ids.size()), DBIDUtil.newVar());
   }
 
   /**
@@ -772,10 +745,8 @@ public final class DBIDUtil {
    * @param random Random generator
    */
   public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
-    if(random == null) {
-      // Fast, and we're single-threaded here anyway.
-      random = new FastNonThreadsafeRandom();
-    }
+    // Fast, and we're single-threaded here anyway.
+    random = random != null ? random : new FastNonThreadsafeRandom();
     ArrayModifiableDBIDs ids = newArray(oids);
     final int size = ids.size();
     ArrayDBIDs[] split = new ArrayDBIDs[p];
@@ -783,8 +754,8 @@ public final class DBIDUtil {
     for(int i = 1; i < size; i++) {
       ids.swap(i - 1, i + random.nextInt(size - i));
     }
-    final int minsize = size / p; // Floor.
-    final int extra = size % p; // Remainder
+    final int minsize = size / p, // Floor.
+        extra = size % p; // Remainder
     for(int beg = 0, part = 0; part < p; part++) {
       // First partitions are smaller, last partitions are larger.
       final int psize = minsize + ((part < extra) ? 1 : 0);

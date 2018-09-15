@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,13 +31,12 @@ package de.lmu.ifi.dbs.elki.database.ids;
 public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
-   *
+   * <p>
    * If possible, use an {@link DBIDArrayIter} via {@link #iter()} instead, or
    * an {@link DBIDVar} via {@link #assignVar}
    *
    * @param i Index
    * @return DBID of i'th entry.
-   *
    * @deprecated Preferably use a {@link DBIDArrayIter} or a {@link DBIDVar}
    *             instead of materializing expensive {@link DBID} objects.
    */
@@ -71,7 +70,7 @@ public interface ArrayDBIDs extends DBIDs {
   /**
    * Search for the position of the given key, assuming that the data set is
    * sorted. For unsorted arrays, the result is undefined.
-   *
+   * <p>
    * For keys not found, <code>-(1+insertion position)</code> is returned, as
    * for Java {@link java.util.Collections#binarySearch}
    *
