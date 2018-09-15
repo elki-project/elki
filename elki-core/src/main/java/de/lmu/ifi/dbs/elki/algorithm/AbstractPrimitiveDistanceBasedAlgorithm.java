@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * only database objects!
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has PrimitiveDistanceFunction
  * @apiviz.excludeSubtypes

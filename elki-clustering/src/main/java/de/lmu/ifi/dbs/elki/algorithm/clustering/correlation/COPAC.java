@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has DimensionModel
  * @apiviz.composedOf COPACNeighborPredicate

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
  * objects.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLiCluEntry {
   private static final long serialVersionUID = 1;

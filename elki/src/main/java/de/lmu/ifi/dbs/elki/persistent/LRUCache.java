@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * object is dropped.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.uses PageFile
  * 

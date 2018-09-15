@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
  * M-Tree.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class MTreeLeafEntry implements LeafEntry, MTreeEntry {
   /**

@@ -28,7 +28,7 @@ import java.io.RandomAccessFile;
  * must at least store the size of a page in Bytes.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public interface PageHeader {
   /**

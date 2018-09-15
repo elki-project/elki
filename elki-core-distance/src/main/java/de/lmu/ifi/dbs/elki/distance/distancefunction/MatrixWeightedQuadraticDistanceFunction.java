@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * only be used from Java and from subclasses, not from command line or MiniGUI.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class MatrixWeightedQuadraticDistanceFunction extends AbstractNumberVectorDistanceFunction implements Norm<NumberVector> {
   /**

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * FIXME: Unfortunately, we cannot have good type safety anymore right now.
  * 
  * @author Steffi Wanka
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.uses 
  *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter

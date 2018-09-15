@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
   /**

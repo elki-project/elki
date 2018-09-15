@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * \[ \text{Euclidean}(\vec{x},\vec{y}) := \sqrt{\sum\nolimits_i (x_i-y_i)^2} \]
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 @Priority(300) // Everybody expects Euclidean to come first.
 @Alias({ "euclidean", "euclid", "l2", //

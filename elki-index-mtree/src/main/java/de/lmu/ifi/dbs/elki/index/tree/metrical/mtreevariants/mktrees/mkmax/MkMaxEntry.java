@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * neighbor distance of the underlying data object or MkMax-Tree node.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public interface MkMaxEntry extends MTreeEntry {
   /**

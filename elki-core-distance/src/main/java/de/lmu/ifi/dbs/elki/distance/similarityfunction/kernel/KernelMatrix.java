@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * Kernel matrix representation.
  * 
  * @author Simon Paradies
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.uses PrimitiveSimilarityFunction
  */

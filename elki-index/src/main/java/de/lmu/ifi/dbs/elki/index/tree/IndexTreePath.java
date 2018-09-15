@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * Represents a path to a node in an index structure.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has Entry oneway - - «contains»
  *

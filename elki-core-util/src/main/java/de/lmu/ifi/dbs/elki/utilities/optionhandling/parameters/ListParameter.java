@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  *
  * @param <THIS> Type self-reference
  * @param <T> List type

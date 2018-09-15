@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * RBF kernel ({@link RadialBasisFunctionKernelFunction}).
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 public class RationalQuadraticKernelFunction extends AbstractVectorSimilarityFunction {
   /**

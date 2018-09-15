@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * and {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS}.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm

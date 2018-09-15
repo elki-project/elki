@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
  * the routing object of the entry to its parent's routing object in the M-Tree.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class MTreeDirectoryEntry implements DirectoryEntry, MTreeEntry {
   /**

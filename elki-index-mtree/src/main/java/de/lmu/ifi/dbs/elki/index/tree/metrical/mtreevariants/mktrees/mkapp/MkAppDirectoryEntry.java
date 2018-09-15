@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
  * of its knn-distances.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 class MkAppDirectoryEntry extends MTreeDirectoryEntry implements MkAppEntry {
   /**

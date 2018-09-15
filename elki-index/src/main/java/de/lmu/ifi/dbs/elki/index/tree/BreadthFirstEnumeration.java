@@ -26,7 +26,7 @@ import java.util.*;
  * Breadth first enumeration over the nodes of an index structure.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.uses IndexTree
  * @apiviz.has IndexTreePath

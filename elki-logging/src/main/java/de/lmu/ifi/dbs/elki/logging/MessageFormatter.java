@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * origin information. Usually, the formatter will try to ensure a newline at the end.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 public class MessageFormatter extends Formatter {
   /**

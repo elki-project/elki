@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Abstract superclass for all non-flat R*-Tree variants.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @param <N> Node type
  * @param <E> Entry type

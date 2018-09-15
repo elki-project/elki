@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * Represents a unit in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf CLIQUEInterval
  * @apiviz.composedOf ModifiableDBIDs

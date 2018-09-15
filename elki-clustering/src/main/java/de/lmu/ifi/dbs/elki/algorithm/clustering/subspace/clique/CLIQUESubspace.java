@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Represents a subspace of the original data space in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has CoverageComparator
  * @apiviz.composedOf CLIQUEUnit

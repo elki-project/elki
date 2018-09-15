@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * Represents a node in an R*-Tree.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialEntry> {
   private static final long serialVersionUID = 1;

@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * for knn-distances consisting of parameters b0, ..., bp.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class PolynomialApproximation implements Externalizable {
   private static final long serialVersionUID = 1;

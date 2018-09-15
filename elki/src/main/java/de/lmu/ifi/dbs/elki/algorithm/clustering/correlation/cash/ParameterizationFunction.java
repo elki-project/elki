@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * belonging to the normal vector n.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class ParameterizationFunction {
   /**

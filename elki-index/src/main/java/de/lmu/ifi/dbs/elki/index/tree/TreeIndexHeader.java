@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader;
  * information is needed for persistent storage.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class TreeIndexHeader extends DefaultPageHeader {
   /**

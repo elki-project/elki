@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Base interface for any kind of distances.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  * 
  * @param <O> Object type
  * 

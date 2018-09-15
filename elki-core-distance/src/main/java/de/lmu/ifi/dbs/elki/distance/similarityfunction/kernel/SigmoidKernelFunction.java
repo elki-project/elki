@@ -35,7 +35,7 @@ import net.jafama.FastMath;
  * perceptron MLP kernel).
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 @Alias("sigmoid")
 public class SigmoidKernelFunction extends AbstractVectorSimilarityFunction {

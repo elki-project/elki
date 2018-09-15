@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
  * and the values of the underlying data object.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class SpatialPointLeafEntry implements LeafEntry, SpatialEntry, NumberVector {
   /**

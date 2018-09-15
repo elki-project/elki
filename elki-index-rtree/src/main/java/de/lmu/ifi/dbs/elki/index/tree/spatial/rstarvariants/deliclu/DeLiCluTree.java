@@ -38,7 +38,7 @@ import it.unimi.dsi.fastutil.ints.IntSets;
  * algorithm.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has DeLiCluNode oneway - - contains
  */

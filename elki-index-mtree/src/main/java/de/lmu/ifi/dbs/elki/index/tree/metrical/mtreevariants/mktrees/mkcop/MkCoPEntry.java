@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * provided.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf ApproximationLine
  */

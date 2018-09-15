@@ -43,7 +43,7 @@ import net.jafama.FastMath;
  * validity of the equation A = V*D*inverse(V) depends upon V.cond().
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 public class EigenvalueDecomposition {
   /**

@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * of an external binary matrix file.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")

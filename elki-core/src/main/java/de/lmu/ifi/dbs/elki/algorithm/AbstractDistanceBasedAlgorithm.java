@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for distance-based algorithms.
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.landmark
  * @apiviz.has DistanceFunction

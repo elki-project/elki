@@ -57,7 +57,7 @@ import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
  *
  * @author Elke Achtert
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.composedOf DistanceCacheWriter
  */

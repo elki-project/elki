@@ -52,7 +52,7 @@ import net.jafama.FastMath;
  * parameter k < kmax.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.composedOf MkAppTreeSettings
  * @apiviz.has MkAppTreeNode oneway - - contains

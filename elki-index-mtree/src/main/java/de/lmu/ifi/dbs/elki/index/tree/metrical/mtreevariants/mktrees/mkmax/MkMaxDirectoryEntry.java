@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
  * the underlying MkMax-Tree node.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 class MkMaxDirectoryEntry extends MTreeDirectoryEntry implements MkMaxEntry {
   /**

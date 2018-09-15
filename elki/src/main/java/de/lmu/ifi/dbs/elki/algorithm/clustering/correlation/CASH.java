@@ -88,7 +88,7 @@ import net.jafama.FastMath;
  * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has CASHInterval
  * @apiviz.has ParameterizationFunction

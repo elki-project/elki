@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.composedOf FourCNeighborPredicate
  * @apiviz.composedOf FourCCorePredicate

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Vector using {@code byte[]} storage.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 public class ByteVector implements NumberVector {
   /**

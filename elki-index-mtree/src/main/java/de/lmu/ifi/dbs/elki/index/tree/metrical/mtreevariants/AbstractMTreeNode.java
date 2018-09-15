@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.InconsistentDataException;
  * Abstract super class for nodes in M-Tree variants.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has MTreeEntry oneway - - contains
  * @apiviz.excludeSubtypes

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  * Defines the requirements for an entry in an M-Tree node.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public interface MTreeEntry extends Entry {
   /**

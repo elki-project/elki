@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
  * data object.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class RdKNNLeafEntry extends SpatialPointLeafEntry implements RdKNNEntry {
   private static final long serialVersionUID = 2;

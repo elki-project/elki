@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging.Level;
  * Facility for configuration of logging.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 public final class LoggingConfiguration {
   /**

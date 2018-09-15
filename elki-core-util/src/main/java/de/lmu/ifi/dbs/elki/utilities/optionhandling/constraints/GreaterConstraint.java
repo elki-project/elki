@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
  * constraint value.
  * 
  * @author Steffi Wanka
- * @since 0.2
+ * @since 0.1
  */
 public class GreaterConstraint extends AbstractNumberConstraint {
   /**

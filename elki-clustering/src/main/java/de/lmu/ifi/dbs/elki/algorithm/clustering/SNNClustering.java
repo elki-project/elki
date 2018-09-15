@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. of SIAM Data Mining (SDM'03)
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.uses SharedNearestNeighborSimilarityFunction
  *

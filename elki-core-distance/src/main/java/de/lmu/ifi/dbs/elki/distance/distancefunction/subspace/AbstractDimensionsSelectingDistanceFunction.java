@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * Selected dimensions are encuded as bits in a {@code long[]}.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @param <V> the type of FeatureVector to compute the distances in between
  */

@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * Abstract super class for all M-Tree variants.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf MTreeSettings
  * @apiviz.composedOf Statistics

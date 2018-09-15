@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
  * underlying RdKNN-Tree node.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * @param Distance type
  */
 public class RdKNNDirectoryEntry extends SpatialDirectoryEntry implements RdKNNEntry {

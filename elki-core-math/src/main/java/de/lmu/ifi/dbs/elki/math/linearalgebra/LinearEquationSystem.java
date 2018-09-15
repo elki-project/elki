@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * Class for systems of linear equations.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class LinearEquationSystem {
   /**

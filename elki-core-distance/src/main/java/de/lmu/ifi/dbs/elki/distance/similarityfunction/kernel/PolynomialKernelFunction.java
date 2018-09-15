@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * vectors x and y defined by \((x^T\cdot y+b)^{\text{degree}}\).
  * 
  * @author Simon Paradies
- * @since 0.2
+ * @since 0.1
  */
 public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction implements PrimitiveDistanceFunction<NumberVector> {
   /**

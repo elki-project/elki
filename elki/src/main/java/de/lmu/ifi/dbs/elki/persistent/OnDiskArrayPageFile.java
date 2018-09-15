@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferInputStream;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf OnDiskArray
  * @apiviz.composedOf PageHeader

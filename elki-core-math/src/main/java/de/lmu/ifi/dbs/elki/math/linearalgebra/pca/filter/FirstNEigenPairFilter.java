@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * eigenpairs, where n is a user specified number.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 @Title("First n Eigenpair filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.")

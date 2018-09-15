@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * Gaussian radial basis function kernel (RBF Kernel).
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 @Priority(Priority.RECOMMENDED)
 @Alias("rbf")

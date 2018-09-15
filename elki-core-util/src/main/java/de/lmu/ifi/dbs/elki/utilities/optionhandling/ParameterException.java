@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Abstract super class for all exceptions thrown during parameterization.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class ParameterException extends Exception {
   /**

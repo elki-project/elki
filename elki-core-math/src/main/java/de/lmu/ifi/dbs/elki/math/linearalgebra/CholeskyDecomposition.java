@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * isSPD() method.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.uses Matrix - - transforms
  */

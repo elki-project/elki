@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * others are marked as strong eigenpairs.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 @Title("Limit-based Eigenpair Filter")
 @Description("Filters all eigenvalues, which are lower than a given value.")

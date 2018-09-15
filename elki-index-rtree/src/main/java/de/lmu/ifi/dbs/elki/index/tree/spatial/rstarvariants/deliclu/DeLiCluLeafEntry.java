@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
  * whether this entry's node contains handled or unhandled data objects.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEntry {
   private static final long serialVersionUID = 1;

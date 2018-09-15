@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Abstract super class for all tree based index classes.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.composedOf PageFile
  * @apiviz.has Node oneway - - contains

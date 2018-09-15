@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * persistently saved.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.excludeSubtypes
  */

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * high variances and weak eigenpairs having small variances.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public interface EigenPairFilter {
   /**

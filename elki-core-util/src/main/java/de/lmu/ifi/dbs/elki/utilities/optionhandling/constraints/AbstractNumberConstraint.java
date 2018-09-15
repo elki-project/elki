@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  * Abstract super class for constraints dealing with a certain number value.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public abstract class AbstractNumberConstraint implements ParameterConstraint<Number> {
   /**

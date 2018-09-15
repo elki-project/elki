@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * </p>
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 public interface Algorithm {
   /**

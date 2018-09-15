@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * dimensions.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction")
 public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFunction {

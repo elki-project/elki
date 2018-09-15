@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06)
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @param <V> the type of FeatureVector handled by this Algorithm
  */

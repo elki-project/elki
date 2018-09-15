@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  * simultaneous linear equations. This will fail if isFullRank() returns false.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.uses Matrix - - transforms
  */

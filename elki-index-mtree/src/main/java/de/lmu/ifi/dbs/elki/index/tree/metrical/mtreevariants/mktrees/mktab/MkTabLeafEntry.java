@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * parameters k <= k_max.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
   private static final long serialVersionUID = 2;

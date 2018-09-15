@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has TokenizedReader
  */

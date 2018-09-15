@@ -82,7 +82,7 @@ import net.jafama.FastMath;
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf EMClusterModelFactory
  * 

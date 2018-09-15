@@ -29,7 +29,7 @@ import net.jafama.FastMath;
  * Represents a node in an MkCop-Tree.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has MkCoPEntry oneway - - contains
  * 

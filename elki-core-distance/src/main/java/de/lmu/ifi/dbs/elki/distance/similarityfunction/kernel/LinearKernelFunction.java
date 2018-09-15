@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
  * 
  * @author Simon Paradies
- * @since 0.2
+ * @since 0.1
  */
 @Priority(Priority.RECOMMENDED)
 public class LinearKernelFunction extends PolynomialKernelFunction {

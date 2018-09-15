@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberVectorAdapte
  * Object that is element of a real vector space of type N.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.landmark
  * @apiviz.exclude de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*

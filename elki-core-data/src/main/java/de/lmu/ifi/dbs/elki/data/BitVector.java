@@ -38,7 +38,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * Vector using a dense bit set encoding, based on {@code long[]} storage.
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.composedOf Bit
  */

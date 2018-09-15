@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  *
  * @param <THIS> type self-reference
  * @param <T> the type of a possible value (i.e., the type of the option)

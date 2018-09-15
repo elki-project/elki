@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * actually store numerical features.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.1
  */
 public interface FeatureVector<D> {
   /**

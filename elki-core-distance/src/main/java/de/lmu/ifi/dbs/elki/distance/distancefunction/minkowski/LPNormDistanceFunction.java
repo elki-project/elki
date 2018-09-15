@@ -48,7 +48,7 @@ import net.jafama.FastMath;
  * {@link EuclideanDistanceFunction}.
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.landmark
  */

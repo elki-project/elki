@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)
  *
  * @author Peer Kröger
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has PreDeCon.Settings
  * @apiviz.composedOf PreDeConNeighborPredicate

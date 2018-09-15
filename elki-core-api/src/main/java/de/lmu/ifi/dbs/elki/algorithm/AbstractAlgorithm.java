@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * framework. Any Algorithm that makes use of these flags may extend this class.
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

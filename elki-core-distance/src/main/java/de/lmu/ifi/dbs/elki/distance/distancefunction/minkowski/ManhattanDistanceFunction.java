@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * \[ \text{Manhattan}(\vec{x},\vec{y}) := \sum_i |x_i-y_i| \]
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 @Alias({ "taxicab", "cityblock", "l1", //
     "de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction" })

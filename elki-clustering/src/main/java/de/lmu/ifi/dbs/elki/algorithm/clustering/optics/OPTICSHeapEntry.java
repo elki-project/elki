@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * Entry in the priority heap.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.exclude
  */

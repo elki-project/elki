@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Proc. 1990 ACM SIGMOD Int. Conf. Management of Data
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has RStarTreeNode oneway - - contains
  */

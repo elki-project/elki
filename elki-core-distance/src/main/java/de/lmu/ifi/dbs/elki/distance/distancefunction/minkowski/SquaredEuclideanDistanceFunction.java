@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * \[ \text{Euclidean}^2(\vec{x},\vec{y}) := \sum_i (x_i-y_i)^2 \]
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 @Alias({ "squaredeuclidean", "de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction" })
 public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, Norm<NumberVector> {

@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * axes intercept t and a start value for k.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class ApproximationLine implements Externalizable {
   private static final long serialVersionUID = 1;

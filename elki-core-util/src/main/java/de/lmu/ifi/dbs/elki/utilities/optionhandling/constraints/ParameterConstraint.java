@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * test should be implemented in the method {@link #test(Object) test(T)}.
  *
  * @author Steffi Wanka
- * @since 0.2
+ * @since 0.1
  * @param <T> the type of the parameter the constraint applies to
  */
 public interface ParameterConstraint<T> {

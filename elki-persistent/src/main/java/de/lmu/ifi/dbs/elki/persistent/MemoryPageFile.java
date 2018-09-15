@@ -28,7 +28,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * Implemented as a Map with keys representing the ids of the saved pages.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @param <P> Page type
  */

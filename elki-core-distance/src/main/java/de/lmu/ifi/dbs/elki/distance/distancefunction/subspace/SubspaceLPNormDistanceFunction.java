@@ -42,7 +42,7 @@ import net.jafama.FastMath;
  * specified dimensions.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDistanceFunction<NumberVector> implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

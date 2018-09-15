@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * Represents a node in a DeLiClu-Tree.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has DeLiCluEntry oneway - - contains
  */

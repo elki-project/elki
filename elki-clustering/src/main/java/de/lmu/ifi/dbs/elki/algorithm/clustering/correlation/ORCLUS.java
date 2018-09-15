@@ -68,7 +68,7 @@ import net.jafama.FastMath;
  * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.has PCARunner
  * @param <V> the type of NumberVector handled by this Algorithm

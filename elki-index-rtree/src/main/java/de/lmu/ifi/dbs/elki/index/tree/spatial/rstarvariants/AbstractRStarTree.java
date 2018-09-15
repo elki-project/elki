@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * FeatureVector) is intentional, because we have spatial requirements.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  *
  * @apiviz.landmark
  * @apiviz.has AbstractRStarTreeNode oneway - - contains

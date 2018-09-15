@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * absolute difference of their values in a specified dimension only.
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.1
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction")
 public class OnedimensionalDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, DimensionSelectingSubspaceDistanceFunction<NumberVector>, Norm<NumberVector> {

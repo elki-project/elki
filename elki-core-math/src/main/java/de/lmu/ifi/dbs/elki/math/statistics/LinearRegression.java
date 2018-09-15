@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 /**
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  */
 // TODO: arthur comment
 // TODO: use covariance matrix, add incremental API?

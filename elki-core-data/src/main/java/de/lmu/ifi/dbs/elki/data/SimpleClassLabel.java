@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * A simple class label casting a String as it is as label.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.composedOf String
  */
