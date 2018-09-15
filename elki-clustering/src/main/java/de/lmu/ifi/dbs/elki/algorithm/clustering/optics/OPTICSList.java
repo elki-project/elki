@@ -25,16 +25,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -42,12 +33,15 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
+ * <p>
+ * Algorithm to find density-connected sets in a database based on the
+ * parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters
+ * determine a density threshold for clustering.
  * <p>
  * This version is implemented using a list, always scanning the list for the
  * maximum. While this could be cheaper than the complex heap updates,
@@ -65,10 +59,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @apiviz.composedOf OPTICSList.Instance
  *
- * @param <O> the type of DatabaseObjects handled by the algorithm
+ * @param <O> the type of objects handled by the algorithm
  */
-@Title("OPTICS: Density-Based Hierarchical Clustering")
-@Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
+@Title("OPTICS: Density-Based Hierarchical Clustering (implementation using a list)")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
     title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -65,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Generalized Outlier Detection with Flexible Kernel Density Estimates.
- *
+ * <p>
  * This is an outlier detection inspired by LOF, but using kernel density
  * estimation (KDE) from statistics. Unfortunately, for higher dimensional data,
  * kernel density estimation itself becomes difficult. At this point, the
@@ -76,18 +77,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * embedded into a higher data representation. Adjusting the kernel to account
  * for the representation seems to yield worse results than using a lower,
  * intrinsic, dimensionality.
- *
+ * <p>
  * If your data set has many duplicates, the <tt>kdeos.kernel.minbw</tt>
  * parameter sets a minimum kernel bandwidth, which may improve results in these
  * cases, as it prevents kernels from degenerating to single points.
- *
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
- * Generalized Outlier Detection with Flexible Kernel Density Estimates<br />
- * In Proceedings of the 14th SIAM International Conference on Data Mining
- * (SDM), Philadelphia, PA, 2014.
- * </p>
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
+ * Generalized Outlier Detection with Flexible Kernel Density Estimates<br>
+ * Proc. 14th SIAM International Conference on Data Mining (SDM 2014)
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -97,9 +96,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
+@Title("KDEOS: Kernel Density Estimator Outlier Score")
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Generalized Outlier Detection with Flexible Kernel Density Estimates", //
-    booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM), Philadelphia, PA, 2014", //
+    booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM 2014)", //
     url = "https://doi.org/10.1137/1.9781611973440.63", //
     bibkey = "DBLP:conf/sdm/SchubertZK14")
 public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

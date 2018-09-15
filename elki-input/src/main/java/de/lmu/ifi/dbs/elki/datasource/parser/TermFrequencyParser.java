@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,8 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,7 +44,16 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 /**
  * A parser to load term frequency data, which essentially are sparse vectors
  * with text keys.
- *
+ * <p>
+ * Parse a file containing term frequencies. The expected format is:
+ * 
+ * <pre>
+ * rowlabel1 term1 &lt;freq&gt; term2 &lt;freq&gt; ...
+ * rowlabel2 term1 &lt;freq&gt; term3 &lt;freq&gt; ...
+ * </pre>
+ * 
+ * Terms must not contain the separator character!
+ * <p>
  * If your data does not contain frequencies, you can maybe use
  * {@link SimpleTransactionParser} instead.
  *
@@ -55,8 +62,6 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *
  * @apiviz.has SparseNumberVector
  */
-@Title("Term frequency parser")
-@Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
 public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVectorLabelParser<V> {
   /**
    * Class logger.

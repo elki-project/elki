@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -71,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has KNNQuery
  * @param <O> the type of objects processed by this algorithm
  */
+@Title("KNNDD: k-Nearest Neighbor Data Description")
 @Reference(authors = "D. de Ridder, D. M. J. Tax, R. P. W. Duin", //
     title = "An experimental comparison of one-class classification methods", //
     booktitle = "Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)", //

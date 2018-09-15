@@ -45,13 +45,14 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Connectivity-based outlier factor (COF).
+ * Connectivity-based Outlier Factor (COF).
  * <p>
  * Reference:
  * <p>
@@ -64,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> Object type
  */
+@Title("COF: Connectivity-based Outlier Factor")
 @Reference(authors = "J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung", //
     title = "Enhancing effectiveness of outlier detections for low density patterns", //
     booktitle = "In Advances in Knowledge Discovery and Data Mining", //

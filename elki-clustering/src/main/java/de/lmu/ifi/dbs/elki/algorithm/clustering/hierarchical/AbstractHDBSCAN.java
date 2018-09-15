@@ -34,9 +34,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleLongHeap;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -60,8 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Input object type
  * @param <R> Output result type
  */
-@Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
-@Description("Density-Based Clustering Based on Hierarchical Density Estimates")
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //

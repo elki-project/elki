@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Arthur Zimek
  * @since 0.7.0
  *
- * @param <O> the type of objects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")

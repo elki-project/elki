@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.3
  *
  * @apiviz.has KNNQuery
- * @param <O> the type of objects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Reference(authors = "B. Yu, M. Song, L. Wang", //
     title = "Local Isolation Coefficient-Based Outlier Mining Algorithm", //

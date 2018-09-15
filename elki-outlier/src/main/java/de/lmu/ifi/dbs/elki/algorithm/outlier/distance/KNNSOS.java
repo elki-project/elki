@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -75,11 +76,17 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type.
  */
+@Title("KNNSOS: k-Nearest-Neighbor Stochastic Outlier Selection")
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //
     bibkey = "DBLP:conf/sisap/SchubertG17")
+@Reference(authors = "J. Janssens, F. Huszár, E. Postma, J. van den Herik", //
+    title = "Stochastic Outlier Selection", //
+    booktitle = "TiCC TR 2012–001", //
+    url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
+    bibkey = "tr/tilburg/JanssensHPv12")
 public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

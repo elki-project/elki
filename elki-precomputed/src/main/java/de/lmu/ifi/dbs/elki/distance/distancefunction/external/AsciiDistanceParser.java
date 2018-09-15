@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,8 +28,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -37,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Parser for parsing one distance value per line.
- *
+ * <p>
  * A line must have the following format: {@code id1 id2 distanceValue}, where
  * id1 and id2 are integers starting at 0 representing the two ids belonging to
  * the distance value. Lines starting with &quot;#&quot; will be ignored.
@@ -51,10 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @apiviz.composedOf Tokenizer
  * @apiviz.uses DistanceCacheWriter
  */
-@Title("Number Distance Parser")
-@Description("Parser for the following line format:\n" //
-    + "id1 id2 distanceValue, where id1 and is2 are integers starting at 0 representing the two ids belonging to the distance value.\n" //
-    + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser", //
     "de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser", //
     "de.lmu.ifi.dbs.elki.parser.NumberDistanceParser" })

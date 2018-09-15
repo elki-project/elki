@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDime
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -71,6 +72,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type
  */
+@Title("Intrinsic t-Stochastic Neighbor Embedding")
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP 2017", //

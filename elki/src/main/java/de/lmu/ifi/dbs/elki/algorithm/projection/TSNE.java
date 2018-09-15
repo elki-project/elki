@@ -38,7 +38,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -66,11 +68,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
+@Title("t-SNE")
 @Reference(authors = "L. J. P. van der Maaten, G. E. Hinton", //
     title = "Visualizing High-Dimensional Data Using t-SNE", //
     booktitle = "Journal of Machine Learning Research 9", //
     url = "http://www.jmlr.org/papers/v9/vandermaaten08a.html", //
     bibkey = "journals/jmlr/MaatenH08")
+@Alias({ "t-SNE", "tSNE" })
 public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> {
   /**
    * Class logger.

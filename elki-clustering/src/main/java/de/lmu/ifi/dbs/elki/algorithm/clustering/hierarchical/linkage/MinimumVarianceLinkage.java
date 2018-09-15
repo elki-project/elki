@@ -32,7 +32,6 @@ import net.jafama.FastMath;
  * This is subtly different from Ward's method ({@link WardLinkage}, MISSQ),
  * because variance is normalized by the cluster size; and Ward minimizes the
  * increase in sum of squares (without normalization).
- * <p>
  * \[d_{\text{MIVAR}}(A\cup B,C)=
  * \left(\tfrac{|A|+|C|}{|A|+|B|+|C|}\right)^2 d(A,C) +
  * \left(\tfrac{|B|+|C|}{|A|+|B|+|C|}\right)^2 d(B,C)

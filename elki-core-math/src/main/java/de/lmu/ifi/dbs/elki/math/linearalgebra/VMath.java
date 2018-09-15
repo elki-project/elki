@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import net.jafama.FastMath;
 
 /**
@@ -35,6 +36,7 @@ import net.jafama.FastMath;
  *
  * @apiviz.landmark
  */
+@Title("Vector and Matrix Math Library")
 public final class VMath {
   /**
    * A small number to handle numbers near 0 as 0.

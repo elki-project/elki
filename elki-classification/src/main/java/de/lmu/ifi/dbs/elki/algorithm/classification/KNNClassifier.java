@@ -59,7 +59,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *
  * @author Arthur Zimek
  * @since 0.7.0
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")

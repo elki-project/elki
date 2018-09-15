@@ -43,21 +43,25 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * The standard k-means algorithm, using Lloyd-style bulk iterations.
- *
+ * The standard k-means algorithm, using bulk iterations and commonly attributed
+ * to Lloyd and Forgy (independently).
+ * <p>
  * Reference:
  * <p>
- * S. Lloyd:<br/>
- * Least squares quantization in PCM<br/>
- * IEEE Transactions on Information Theory 28 (2)<br/>
+ * S. Lloyd<br>
+ * Least squares quantization in PCM<br>
+ * IEEE Transactions on Information Theory 28 (2)<br>
  * previously published as Bell Telephone Laboratories Paper
- * </p>
- *
+ * <p>
+ * E. W. Forgy<br>
+ * Cluster analysis of multivariate data: efficiency versus interpretability of
+ * classifications<br>
+ * Abstract published in Biometrics 21(3)
+F *
  * @author Arthur Zimek
  * @since 0.5.0
  *
@@ -66,14 +70,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @param <V> vector datatype
  */
-@Title("K-Means")
-@Description("Finds a least-squared partitioning into k clusters.")
+@Title("k-Means (Lloyd/Forgy Algorithm)")
 @Reference(authors = "S. Lloyd", //
     title = "Least squares quantization in PCM", //
     booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", //
     url = "https://doi.org/10.1109/TIT.1982.1056489", //
     bibkey = "DBLP:journals/tit/Lloyd82")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans", //
+@Reference(authors = "E. W. Forgy", //
+title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
+booktitle = "Biometrics 21(3)", //
+bibkey = "journals/biometrics/Forgy65")
+@Alias({ "lloyd", "forgy", "de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans" })
 public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**

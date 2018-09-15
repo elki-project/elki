@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @param <O> Database object type
  */
-@Title("Distance based outlier score")
+@Title("Distance Based Outlier Score")
 @Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", //
     authors = "E. M. Knorr, R. T. Ng", //

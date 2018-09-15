@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @apiviz.has KNNQuery
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")

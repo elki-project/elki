@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has PrimitiveDistanceFunction
  * @apiviz.excludeSubtypes
  * 
- * @param <O> the type of objects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
 public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R extends Result> extends AbstractAlgorithm<R> {

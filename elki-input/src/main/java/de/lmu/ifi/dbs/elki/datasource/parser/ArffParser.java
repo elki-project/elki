@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,6 +42,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -57,19 +57,20 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
- *
+ * <p>
  * This parser is quite hackish, and contains lots of not yet configurable
  * magic.
- *
+ * <p>
  * TODO: Allow configuration of the vector types (double, float)
- *
+ * <p>
  * TODO: when encountering integer columns, produce integer vectors.
- *
+ * <p>
  * TODO: allow optional class labels.
  *
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Title("ARFF File Format Parser")
 public class ArffParser implements Parser {
   /**
    * Logger.

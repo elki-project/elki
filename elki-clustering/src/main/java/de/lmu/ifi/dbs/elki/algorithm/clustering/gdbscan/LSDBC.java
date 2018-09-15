@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -58,7 +59,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.jafama.FastMath;
 
 /**
- * Locally scaled Density Based Clustering.
+ * Locally Scaled Density Based Clustering.
  * <p>
  * This is a variant of DBSCAN which starts with the most dense point first,
  * then expands clusters until density has dropped below a threshold.
@@ -74,6 +75,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type
  */
+@Title("LSDBC: Locally Scaled Density Based Clustering")
 @Reference(authors = "E. Biçici, D. Yuret", //
     title = "Locally Scaled Density Based Clustering", //
     booktitle = "Adaptive and Natural Computing Algorithms", //

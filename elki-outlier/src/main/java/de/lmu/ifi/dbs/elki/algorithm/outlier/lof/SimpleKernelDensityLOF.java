@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction
  *
- * @param <O> the type of objects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleKernelDensityLOF")
 public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

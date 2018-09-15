@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * A preprocessor for annotation of the ids of nearest neighbors to each
  * database object.
- * <p/>
+ * <p>
  * The k nearest neighbors are assigned based on an arbitrary distance function.
- * 
+ * <p>
  * This functionality is similar but not identical to
  * {@link MaterializeKNNPreprocessor}: While it also computes the k nearest
  * neighbors, it does not keep the actual distances, but organizes the NN set in
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  */
-@Title("Shared nearest neighbor Preprocessor")
+@Title("Shared Nearest Neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
 public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIndex<O, ArrayDBIDs> implements SharedNearestNeighborIndex<O> {
   /**

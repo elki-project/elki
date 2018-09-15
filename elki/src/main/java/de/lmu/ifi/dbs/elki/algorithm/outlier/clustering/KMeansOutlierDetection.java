@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,20 +55,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Outlier detection by using k-means clustering.
- * 
+ * <p>
  * The scores are assigned by the objects distance to the nearest center.
- * 
+ * <p>
  * We don't have a clear reference for this approach, but it seems to be a best
  * practise in some areas to remove objects that have the largest distance from
  * their center. If you need to cite this approach, please cite the ELKI version
- * you used (use the <a href="http://elki.dbs.ifi.lmu.de/wiki/Publications">ELKI
+ * you used (use the <a href="https://elki-project.github.io/publications">ELKI
  * publication list</a> for citation information and BibTeX templates).
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.has KMeans
- * 
+ *
  * @param <O> Object type
  */
 public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
@@ -84,7 +84,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
 
   /**
    * Constructor.
-   * 
+   *
    * @param clusterer Clustering algorithm
    */
   public KMeansOutlierDetection(KMeans<O, ?> clusterer) {
@@ -94,7 +94,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
 
   /**
    * Run the outlier detection algorithm.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Outlier detection result
@@ -140,11 +140,11 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
 
   /**
    * Parameterizer.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
@@ -152,7 +152,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
      * Parameter for choosing the clustering algorithm.
      */
     public static final OptionID CLUSTERING_ID = new OptionID("kmeans.algorithm", //
-    "Clustering algorithm to use for detecting outliers.");
+        "Clustering algorithm to use for detecting outliers.");
 
     /**
      * Clustering algorithm to use

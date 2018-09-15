@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Omar Yousry
  * @since 0.6.0
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("DWOF: Dynamic Window Outlier Factor")
 @Description("Algorithm to compute dynamic-window outlier factors in a database based on the neighborhood size parameter 'k'")

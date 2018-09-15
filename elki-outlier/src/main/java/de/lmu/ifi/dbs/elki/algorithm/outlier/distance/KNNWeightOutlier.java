@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.3
  *
  * @apiviz.has KNNQuery
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("KNNWeight outlier detection")
 @Description("Outlier detection based on the sum of distances of an object to its k nearest neighbors.")

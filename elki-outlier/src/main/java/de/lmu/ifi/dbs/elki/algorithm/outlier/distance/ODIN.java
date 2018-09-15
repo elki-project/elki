@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -66,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> Object type
  */
+@Title("ODIN: Outlier Detection Using k-Nearest Neighbour Graph")
 @Reference(authors = "V. Hautamäki, I. Kärkkäinen, P. Fränti", //
     title = "Outlier detection using k-nearest neighbour graph", //
     booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //

@@ -32,9 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Linear memory implementation of HDBSCAN clustering based on SLINK.
@@ -65,8 +63,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @apiviz.has PointerDensityHierarchyRepresentationResult
  */
-@Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
-@Description("Density-Based Clustering Based on Hierarchical Density Estimates")
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //

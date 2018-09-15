@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * k-medians clustering algorithm, but using Lloyd-style bulk iterations instead
@@ -61,7 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @param <V> vector datatype
  */
-@Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", //
     authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", //
     booktitle = "Advances in Neural Information Processing Systems", //

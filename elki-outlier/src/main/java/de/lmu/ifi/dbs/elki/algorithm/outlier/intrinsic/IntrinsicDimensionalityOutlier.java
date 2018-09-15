@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -50,17 +51,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Use intrinsic dimensionality for outlier detection. This idea was first
- * explored by Michael Houle, Arthur Zimek, Jonathan von Brünken, et al., and is
- * provided for completeness and for visualization purposes. It turns out that
- * ID provides some insight into outlierness, but cannot be simply used as is.
- * Please see their upcoming publications for an improved solution.
+ * Use intrinsic dimensionality for outlier detection.
+ * <p>
+ * Reference:
+ * <p>
+ * Michael E. Houle, Erich Schubert, Arthur Zimek<br>
+ * On the Correlation Between Local Intrinsic Dimensionality and Outlierness<br>
+ * Proc. 11th Int. Conf. Similarity Search and Applications (SISAP'2018)
+ * <p>
+ * This idea was also briefly explored before by Michael Houle, Arthur Zimek,
+ * Jonathan von Brünken, et al.
  *
  * @author Erich Schubert
  * @since 0.3
  *
  * @param <O> Object type
  */
+@Reference(authors = "Michael E. Houle, Erich Schubert, Arthur Zimek", //
+    title = "On the Correlation Between Local Intrinsic Dimensionality and Outlierness", //
+    booktitle = "Proc. 11th Int. Conf. Similarity Search and Applications (SISAP'2018)", //
+    // TODO: add url when DOI is assigned.
+    bibkey = "DBLP:conf/sisap/HouleSZ18")
 public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -111,9 +122,8 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
         id = estimator.estimate(knnQuery, iditer, k + 1);
       }
       catch(ArithmeticException e) {
-        id = 0.;
+        // pass
       }
-
       id_score.putDouble(iditer, id);
       minmax.put(id);
 
@@ -167,7 +177,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }

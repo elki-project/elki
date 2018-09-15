@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Arthur Zimek
  * @since 0.7.0
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 public interface Classifier<O> extends Algorithm {
   /**

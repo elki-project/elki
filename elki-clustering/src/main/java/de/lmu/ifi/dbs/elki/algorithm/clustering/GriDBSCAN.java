@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -78,8 +79,8 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * S. Mahran, K. Mahar:<br>
- * Using grid for accelerating density-based clustering.<br>
+ * S. Mahran, K. Mahar<br>
+ * Using grid for accelerating density-based clustering<br>
  * In 8th IEEE Int. Conf. on Computer and Information Technology, 2008.
  *
  * @author Erich Schubert
@@ -88,6 +89,7 @@ import net.jafama.FastMath;
  * @apiviz.composedOf Instance
  * @param <V> the type of vector the algorithm is applied to
  */
+@Title("GriDBSCAN: Using Grid for Accelerating Density-Based Clustering")
 @Reference(authors = "S. Mahran, K. Mahar", //
     title = "Using grid for accelerating density-based clustering", //
     booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //

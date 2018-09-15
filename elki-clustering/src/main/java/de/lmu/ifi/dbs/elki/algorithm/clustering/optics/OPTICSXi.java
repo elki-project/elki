@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -48,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Class to handle OPTICS Xi extraction.
+ * Extract clusters from OPTICS Plots using the original Xi extraction.
  * <p>
  * Note: this implementation includes an additional filter step that prunes
  * elements from a steep up area that don't have the predecessor in the cluster.
@@ -73,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.uses ClusterOrder
  * @apiviz.has SteepAreaResult
  */
+@Title("OPTICS Xi Cluster Extraction")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
     title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //

@@ -39,9 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -75,9 +73,6 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @apiviz.composedOf Instance
  */
-@Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
-@Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the" //
-    + " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
 @Reference(authors = "Hans-Peter Kriegel, Martin Pfeifle", //
     title = "Density-based clustering of uncertain data", //
     booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)", //

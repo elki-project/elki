@@ -27,9 +27,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -53,8 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> the type of DatabaseObjects handled by the algorithm
  */
-@Title("OPTICS: Density-Based Hierarchical Clustering")
-@Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
     title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //

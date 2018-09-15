@@ -92,9 +92,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has LOFResult oneway - - computes
  * @apiviz.has KNNQuery
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
-@Title("LOF: Local Outlier Factor")
+@Title("FlexibleLOF: Local Outlier Factor with additional options")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "Markus M. Breunig, Hans-Peter Kriegel, Raymond Ng, Jörg Sander", //
     title = "LOF: Identifying Density-Based Local Outliers", //

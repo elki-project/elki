@@ -37,10 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * A flexible extension of Jaccard similarity to non-binary vectors.
  * <p>
  * Jaccard coefficient is commonly defined as \(\frac{A\cap B}{A\cup B}\).
- * </p>
- * We can extend this definition to non-binary vectors as follows:
  * <p>
- * \[\frac{|\{i\mid a_i = b_i\}|}{|\{i\mid a_i = 0 \wedge b_i = 0\}|}\]
+ * We can extend this definition to non-binary vectors as follows:
+ * \(\tfrac{|\{i\mid a_i = b_i\}|}{|\{i\mid a_i = 0 \wedge b_i = 0\}|}\)
  * <p>
  * For binary vectors, this will obviously be the same quantity. However, this
  * version is more useful for categorical data.

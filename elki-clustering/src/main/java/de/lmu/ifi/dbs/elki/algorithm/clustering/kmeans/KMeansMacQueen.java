@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * <p>
  * Reference:
  * <p>
- * J. MacQueen:<br>
+ * J. MacQueen<br>
  * Some Methods for Classification and Analysis of Multivariate Observations<br>
  * 5th Berkeley Symp. Math. Statist. Prob.
  *
@@ -66,8 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @param <V> vector type to use
  */
-@Title("K-Means")
-@Description("Finds a least-squares partitioning into k clusters.")
+@Title("k-Means (MacQueen Algorithm)")
 @Reference(authors = "J. MacQueen", //
     title = "Some Methods for Classification and Analysis of Multivariate Observations", //
     booktitle = "5th Berkeley Symp. Math. Statist. Prob.", //

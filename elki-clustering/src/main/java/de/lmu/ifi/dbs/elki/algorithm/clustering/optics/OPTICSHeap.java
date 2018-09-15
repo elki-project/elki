@@ -31,12 +31,15 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
+ * <p>
+ * Algorithm to find density-connected sets in a database based on the
+ * parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters
+ * determine a density threshold for clustering.
  * <p>
  * This implementation uses a heap.
  * <p>
@@ -51,10 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @since 0.7.0
  *
  * @apiviz.composedOf Instance
- * @param <O> the type of DatabaseObjects handled by the algorithm
+ * @param <O> the type of objects handled by the algorithm
  */
-@Title("OPTICS: Density-Based Hierarchical Clustering")
-@Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
+@Title("OPTICS: Density-Based Hierarchical Clustering (implementation using a heap)")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
     title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //

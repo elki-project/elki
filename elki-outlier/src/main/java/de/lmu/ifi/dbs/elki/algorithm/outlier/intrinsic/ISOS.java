@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Intrinsic stochastic outlier score.
+ * Intrinsic Stochastic Outlier Selection.
  * <p>
  * Reference:
  * <p>
@@ -65,6 +66,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type.
  */
+@Title("ISOS: Intrinsic Stochastic Outlier Selection")
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //

@@ -25,13 +25,13 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Intersection distance for color histograms.
+ * <p>
+ * Distance function for color histograms that emphasizes 'strong' bins.
  * <p>
  * Reference:
  * <p>
@@ -42,8 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.3
  */
-@Title("Color histogram intersection distance")
-@Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", //
     title = "Color Indexing", //
     booktitle = "International Journal of Computer Vision, 7(1), 32, 1991", //

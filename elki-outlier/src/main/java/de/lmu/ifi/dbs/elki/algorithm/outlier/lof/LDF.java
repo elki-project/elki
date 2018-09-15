@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -65,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Reference:
  * <p>
- * Outlier Detection with Kernel Density Functions.<br>
+ * Outlier Detection with Kernel Density Functions<br>
  * L. J. Latecki, A. Lazarevic, D. Pokrajac<br>
  * Machine Learning and Data Mining in Pattern Recognition
  *
@@ -75,8 +76,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction
  *
- * @param <O> the type of objects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
+@Title("LDF: Outlier Detection with Kernel Density Functions")
 @Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", //
     title = "Outlier Detection with Kernel Density Functions", //
     booktitle = "Machine Learning and Data Mining in Pattern Recognition", //

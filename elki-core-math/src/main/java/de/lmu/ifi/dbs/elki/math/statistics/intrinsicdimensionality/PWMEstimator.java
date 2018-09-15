@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,18 +21,26 @@
 package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator.
- *
+ * <p>
+ * Reference:
+ * <p>
+ * L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi,
+ * M. Nett<br>
+ * Estimating Local Intrinsic Dimensionality<br>
+ * Proc. SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
+ * <p>
  * We use the unbiased weights of Maciunas Landwehr et al.:
  * <p>
- * J. Maciunas Landwehr and N. C. Matalas and J. R. Wallis<br />
+ * J. Maciunas Landwehr, N. C. Matalas, J. R. Wallis<br>
  * Probability weighted moments compared with some traditional techniques in
- * estimating Gumbel parameters and quantiles.<br />
- * Water Resources Research 15.5 (1979): 1055-1064.
- * </p>
+ * estimating Gumbel parameters and quantiles<br>
+ * Water Resources Research 15(5)
+ * <p>
  * but we pretend we had one additional data point at 0, to not lose valuable
  * data. When implemented exactly, we would have to assign a weight of 0 to the
  * first point. But since we are not using the mean, we don't want to do this.
@@ -42,6 +50,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Reference(authors = "L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi, M. Nett", //
+    title = "Estimating Local Intrinsic Dimensionality", //
+    booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
+    url = "https://doi.org/10.1145/2783258.2783405", //
+    bibkey = "DBLP:conf/kdd/AmsalegCFGHKN15")
+@Reference(authors = "J. Maciunas Landwehr, N. C. Matalas, J. R. Wallis", //
+    title = "Probability weighted moments compared with some traditional techniques in estimating Gumbel parameters and quantiles", //
+    booktitle = "Water Resources Research 15(5)", //
+    url = "https://doi.org/10.1029/WR015i005p01055", //
+    bibkey = "doi:10.1029/WR015i005p01055")
 public class PWMEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

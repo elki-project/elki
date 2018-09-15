@@ -27,8 +27,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -43,8 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @author Erich Schubert
  * @since 0.1
  */
-@Title("File based double distance for database objects.")
-@Description("Loads double distance values from an external matrix.")
 public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
    * Class logger.

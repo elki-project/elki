@@ -30,11 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -50,6 +46,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -72,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
+@Title("IDOS: Intrinsic Dimensional Outlier Score")
 @Reference(authors = "Jonathan von Brünken, Michael E. Houle, Arthur Zimek", //
     title = "Intrinsic Dimensional Outlier Detection in High-Dimensional Data", //
     booktitle = "NII Technical Report (NII-2015-003E)", //

@@ -84,7 +84,7 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type
  */
-@Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
+@Title("Approximate LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
     title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //

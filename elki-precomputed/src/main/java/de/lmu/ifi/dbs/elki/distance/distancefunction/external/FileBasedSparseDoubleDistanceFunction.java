@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
@@ -33,8 +29,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -43,17 +37,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 
 /**
  * Distance function that is based on double distances given by a distance
  * matrix of an external ASCII file.
- *
+ * <p>
  * Note: parsing an ASCII file is rather expensive.
- *
+ * <p>
  * See {@link AsciiDistanceParser} for the default input format.
- *
- * TODO: use a {@code double[]} instead of the hash map.
+ * <p>
+ * TODO: use a {@code double[]} instead of the hash map?
  *
  * @author Elke Achtert
  * @author Erich Schubert
@@ -61,8 +56,6 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
  *
  * @apiviz.composedOf DistanceCacheWriter
  */
-@Title("File based double distance for database objects.")
-@Description("Loads double distance values from an external text file.")
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction")
 public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**

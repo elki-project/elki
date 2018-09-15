@@ -60,8 +60,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Silhouette values are computed as by Rousseeuw and then used as outlier
  * scores. To cite this outlier detection approach,
- * please cite the ELKI version you used (use the <a
- * href="http://elki.dbs.ifi.lmu.de/wiki/Publications">ELKI publication list</a>
+ * please cite the ELKI version you used (use the
+ * <a href="https://elki-project.github.io/publications">ELKI publication
+ * list</a>
  * for citation information and BibTeX templates).
  *
  * @author Erich Schubert

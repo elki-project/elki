@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @apiviz.has KNNQuery
  *
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this algorithm
  */
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")

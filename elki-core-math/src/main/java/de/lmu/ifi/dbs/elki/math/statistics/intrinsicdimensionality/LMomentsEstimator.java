@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,17 +22,39 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator using L-Moments.
- *
- * Derived from the L-Moments estimation for the exponential distribution.
+ * <p>
+ * This is dervied from the PWM estimators of Amsaleg et al. using the L-Moments
+ * estimation for the exponential distribution.
+ * <p>
+ * Reference:
+ * <p>
+ * L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi,
+ * M. Nett<br>
+ * Estimating Local Intrinsic Dimensionality<br>
+ * Proc. SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
+ * <p>
+ * J. R. M. Hosking<br>
+ * Fortran routines for use with the method of L-moments Version 3.03<br>
+ * IBM Research.
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Reference(authors = "L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi, M. Nett", //
+    title = "Estimating Local Intrinsic Dimensionality", //
+    booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
+    url = "https://doi.org/10.1145/2783258.2783405", //
+    bibkey = "DBLP:conf/kdd/AmsalegCFGHKN15")
+@Reference(authors = "J. R. M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report", //
+    bibkey = "tr/ibm/Hosking00")
 public class LMomentsEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.

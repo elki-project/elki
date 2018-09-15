@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -43,16 +44,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * (Note that ELKI uses 0-based indexing, so we will map these to index-1) to
  * not always have a constant-0 dimension 0.
  * <p>
- * The FAQ states that you can also put comments into the file, separated by a
- * hash: <tt>#</tt>, but they must not contain colons and are not officially
- * supported. ELKI will simply stop parsing a line when encountering a
- * <tt>#</tt>.
+ * The libSVM FAQ states that you can also put comments into the file, separated
+ * by a hash: <tt>#</tt>, but they must not contain colons and are not
+ * officially supported.<br>
+ * ELKI will simply stop parsing a line when encountering a <tt>#</tt>.
  *
  * @author Erich Schubert
  * @since 0.7.0
  *
  * @param <V> Vector type
  */
+@Title("libSVM Format Parser")
 public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumberVectorLabelParser<V> {
   /**
    * Class logger.

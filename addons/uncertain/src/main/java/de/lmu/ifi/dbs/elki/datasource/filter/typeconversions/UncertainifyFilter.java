@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,10 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Filter class to transform a database containing vector fields (TODO I need to
- * express this more correctly) into a database containing
- * {@link UncertainObject} fields.
- *
+ * Filter class to transform a database containing vector fields into a database
+ * containing {@link UncertainObject} fields by invoking a
+ * {@link Uncertainifier} on each vector.
+ * <p>
  * The purpose for that is to use those transformed databases in experiments
  * regarding uncertain data in some way.
  *
@@ -145,19 +145,19 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
      * uncertainification.
      */
     public static final OptionID UNCERTAINITY_MODEL_ID = new OptionID("uofilter.generator", //
-    "Generator to derive uncertain objects from certain vectors.");
+        "Generator to derive uncertain objects from certain vectors.");
 
     /**
      * Flag to keep the original data.
      */
     public static final OptionID KEEP_ID = new OptionID("uofilter.keep", //
-    "Keep the original data as well.");
+        "Keep the original data as well.");
 
     /**
      * Seed for random generation.
      */
     public static final OptionID SEED_ID = new OptionID("uofilter.seed", //
-    "Random seed for uncertainification.");
+        "Random seed for uncertainification.");
 
     /**
      * Field to hold the generator to produce uncertain objects.

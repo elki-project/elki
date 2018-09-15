@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 /**
  * Parser for parsing one BitVector per line, bits separated by whitespace.
- * <p/>
+ * <p>
  * Several labels may be given per BitVector. A label must not be parseable as
  * Bit. Lines starting with &quot;#&quot; will be ignored.
  *
@@ -42,11 +42,11 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
  */
 @Title("Bit Vector Label Parser")
 @Description("Parses the following format of lines:\n" + //
-"A single line provides a single BitVector. Bits are separated by whitespace. " + //
-"Any substring not containing whitespace is tried to be read as Bit. " + //
-"If this fails, it will be appended to a label. " + //
-"(Thus, any label must not be parseable as Bit.) " + //
-"Empty lines and lines beginning with \"#\" will be ignored.")
+    "A single line provides a single BitVector. Bits are separated by whitespace. " + //
+    "Any substring not containing whitespace is tried to be read as Bit. " + //
+    "If this fails, it will be appended to a label. " + //
+    "(Thus, any label must not be parseable as Bit.) " + //
+    "Empty lines and lines beginning with \"#\" will be ignored.")
 @Alias("de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser")
 public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> implements Parser {
   /**
