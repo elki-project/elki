@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Interface for kNN heaps.
- *
+ * <p>
  * To instantiate, use:
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
  *
@@ -66,7 +66,7 @@ public interface KNNHeap {
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
-   *
+   * <p>
    * Compared to the super.add() method, this often saves the pair construction.
    *
    * @param distance Distance value
@@ -77,7 +77,7 @@ public interface KNNHeap {
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
-   *
+   * <p>
    * Use for existing pairs.
    *
    * @param e Existing distance pair
@@ -96,7 +96,9 @@ public interface KNNHeap {
    *
    * @return true when empty.
    */
-  boolean isEmpty();
+  default boolean isEmpty() {
+    return size() == 0;
+  }
 
   /**
    * Clear the heap.
@@ -105,7 +107,7 @@ public interface KNNHeap {
 
   /**
    * Poll the <em>largest</em> element from the heap.
-   *
+   * <p>
    * This is in descending order because of the heap structure. For a convenient
    * way to serialize the heap into a list that you can iterate in ascending
    * order, see {@link #toKNNList()}.

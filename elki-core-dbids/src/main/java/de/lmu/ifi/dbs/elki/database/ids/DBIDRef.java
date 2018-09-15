@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.database.ids;
 /**
  * Some object referencing a {@link DBID}. Could be a {@link DBID}, a
  * {@link DBIDIter}, for example.
- * 
+ * <p>
  * Important note: <em>do not assume this reference to be stable</em>. Iterators
  * are a good example how the DBIDRef may change.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  * 
@@ -36,22 +36,21 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 public interface DBIDRef {
   /**
-   * Get the internal index.
-   * 
-   * <b>NOT FOR PUBLIC USE - ELKI Optimization engine only</b>
-   * 
+   * <b>Internal only:</b> Get the internal index.
+   * <p>
+   * <b>NOT FOR PUBLIC USE - ELKI Optimization engine only.</b>
+   *
    * @return Internal index
    */
   int internalGetIndex();
-  
+
   /**
-   * WARNING: Hash codes of this interface <b>might not be stable</b> (e.g. for
-   * iterators).
-   * 
+   * <b>WARNING:</b> Hash codes of this interface <b>might not be stable</b>
+   * (e.g. for iterators).
+   * <p>
    * Use {@link DBIDUtil#deref} to get an object with a stable hash code!
-   * 
+   *
    * @return current hash code (<b>may change!</b>)
-   * 
    * @deprecated Do not use this hash code. Some implementations will not offer
    *             stable hash codes!
    */
@@ -60,14 +59,15 @@ public interface DBIDRef {
   int hashCode();
 
   /**
-   * WARNING: calling equality on a reference may be an indicator of incorrect
-   * usage, as it is not clear whether the programmer meant the references to be
-   * the same or the DBIDs.
-   * 
+   * <b>WARNING:</b> calling equality on a reference may be an indicator of
+   * incorrect usage, as it is not clear whether the programmer meant the
+   * references to be the same or the DBIDs.
+   * <p>
    * Use {@link DBIDUtil#equal} or {@link DBIDUtil#compare}!
-   * 
+   *
    * @param obj Object to compare with
    * @return True when they are the same object
+   * @deprecated Use {@link DBIDUtil.equal} instead.
    */
   @Override
   @Deprecated

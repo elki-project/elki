@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,17 +22,17 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Database ID object.
- * 
+ * <p>
  * While this currently is just an Integer, it should be avoided to store the
  * object IDs in regular integers to reduce problems if this API ever changes
  * (for example if someone needs to do context tracking for debug purposes!)
- * 
+ * <p>
  * In particular, a developer should not make any assumption of these IDs being
  * consistent across multiple results/databases.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.landmark
  */
 public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs {
@@ -40,7 +40,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
    * stable hash code. However, it is generally preferred to use optimized
    * storage classes instead of Java collections!
-   * 
+   *
    * @return hash code
    */
   @Override
@@ -49,9 +49,9 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
   /**
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
    * stable equals for other DBIDs.
-   * 
+   * <p>
    * Yet, {@link DBIDUtil#equal} is more type safe and explicit.
-   * 
+   *
    * @param obj Other object
    * @return true when the object is the same DBID.
    */
@@ -61,9 +61,9 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
 
   /**
    * Compare two DBIDs for ordering.
-   * 
+   * <p>
    * Consider using {@link DBIDUtil#compare}, which is more explicit.
-   * 
+   *
    * @param other Other DBID object
    * @return Comparison result
    */

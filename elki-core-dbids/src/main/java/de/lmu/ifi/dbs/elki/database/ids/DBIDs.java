@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,10 @@ import java.util.function.Consumer;
 
 /**
  * Interface for a collection of database references (IDs).
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf DBID
  * @apiviz.has DBIDIter
@@ -35,9 +35,9 @@ import java.util.function.Consumer;
 public interface DBIDs {
   /**
    * Get a DBID iterator (a more efficient API).
-   * 
-   * usage example:
-   * 
+   * <p>
+   * Example:
+   *
    * <pre>
    * {@code
    * for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -45,21 +45,21 @@ public interface DBIDs {
    * }
    * }
    * </pre>
-   * 
+   *
    * @return iterator
    */
   DBIDIter iter();
 
   /**
    * Retrieve the collection / data size.
-   * 
+   *
    * @return collection size
    */
   int size();
 
   /**
    * Test whether an ID is contained.
-   * 
+   *
    * @param o object to test
    * @return true when contained
    */
@@ -67,10 +67,12 @@ public interface DBIDs {
 
   /**
    * Test for an empty DBID collection.
-   * 
+   *
    * @return true when empty.
    */
-  boolean isEmpty();
+  default boolean isEmpty() {
+    return size() == 0;
+  }
 
   /**
    * Execute a function for each ID.
@@ -78,7 +80,7 @@ public interface DBIDs {
    * @param action Action to execute
    */
   default void forEach(Consumer<? super DBIDRef> action) {
-    for (DBIDIter it = iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = iter(); it.valid(); it.advance()) {
       action.accept(it);
     }
   }

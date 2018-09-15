@@ -38,7 +38,7 @@
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory#FACTORY DBIDFactory.FACTORY}, which is also wrapped in the {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil} class.
  * <p>
  * <h2>Examples:</h2>
- * {@code
+ * <pre>{@code
  * DBIDs allids = database.getIDs();
  * // preallocate an array of initial capacity 123 
  * ArrayModifiableDBIDs array = DBIDUtil.newArraySet(123);
