@@ -121,25 +121,24 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   public List<C> instantiateClasses(Parameterization config) {
     if(instances == null) {
       // instantiateClasses will descend itself.
-      instances = super.instantiateClasses(config);
+      return instances = super.instantiateClasses(config);
     }
-    else {
-      Parameterization cfg = null;
-      for(int i = 0; i < instances.size(); i++) {
-        if(instances.get(i) == null) {
-          Class<? extends C> cls = getValue().get(i);
-          try {
-            // Descend at most once, and only when needed
-            cfg = (cfg == null) ? config.descend(this) : null;
-            C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, cfg);
-            instances.set(i, instance);
-          }
-          catch(Exception e) {
-            config.reportError(new WrongParameterValueException(this, cls.getName(), e.getMessage(), e));
-          }
+    Parameterization cfg = null;
+    final List<Class<? extends C>> classes = getValue();
+    for(int i = 0; i < classes.size(); i++) {
+      if(instances.get(i) == null) {
+        Class<? extends C> cls = classes.get(i);
+        try {
+          // Descend at most once, and only when needed
+          cfg = (cfg == null) ? config.descend(this) : cfg;
+          instances.set(i, ClassGenericsUtil.tryInstantiate(restrictionClass, cls, cfg));
+        }
+        catch(Exception e) {
+          e.printStackTrace();
+          config.reportError(new WrongParameterValueException(this, cls.getName(), e.getMessage(), e));
         }
       }
     }
-    return new ArrayList<>(instances);
+    return instances;
   }
 }

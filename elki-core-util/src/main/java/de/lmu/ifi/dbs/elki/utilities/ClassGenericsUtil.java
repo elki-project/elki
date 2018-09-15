@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,27 +31,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Utils for handling class instantiation especially with respect to Java
+ * Utilities for handling class instantiation, especially with respect to Java
  * generics.
- *
  * <p>
  * Due to the way generics are implemented - via erasure - type safety cannot be
  * guaranteed properly at compile time here. These classes collect such cases
  * using helper functions, so that we have to suppress these warnings only in
  * one place.
- * </p>
- *
  * <p>
  * Note that many of these situations are still type safe, i.e. an <i>empty</i>
- * array of List<List<?>> can indeed be cast into a List<List<Whatever>>.
- * </p>
- *
+ * array of {@code List<List<?>>} can indeed be cast into a
+ * {@code List<List<Whatever>>}.
  * <p>
  * The only one potentially unsafe is {@link #instantiateGenerics}, since we
  * can't verify that the runtime type 'type' adhers to the compile time
  * restriction T. When T is not generic, such a check is possible, and then the
  * developer should use {@link #instantiate} instead.
- * </p>
  *
  * @author Erich Schubert
  * @since 0.2
@@ -80,14 +75,10 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * <p>
    * Returns a new instance of the given type for the specified className.
-   * </p>
-   *
    * <p>
    * If the Class for className is not found, the instantiation is tried using
    * the package of the given type as package of the given className.
-   * </p>
    *
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
@@ -105,25 +96,20 @@ public final class ClassGenericsUtil {
         return type.cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
-    catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {
+    catch(InstantiationException | IllegalAccessException
+        | ClassNotFoundException | ClassCastException e) {
       throw new ClassInstantiationException(e);
     }
   }
 
   /**
-   * <p>
    * Returns a new instance of the given type for the specified className.
-   * </p>
-   *
    * <p>
-   * If the Class for className is not found, the instantiation is tried using
+   * If the class for className is not found, the instantiation is tried using
    * the package of the given type as package of the given className.
-   * </p>
-   *
    * <p>
    * This is a weaker type checked version of "{@link #instantiate}" for use
-   * with Generics.
-   * </p>
+   * with generics.
    *
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
@@ -144,7 +130,8 @@ public final class ClassGenericsUtil {
         return ((Class<T>) type).cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
-    catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {
+    catch(InstantiationException | IllegalAccessException
+        | ClassNotFoundException | ClassCastException e) {
       throw new ClassInstantiationException(e);
     }
   }
@@ -201,7 +188,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Force parameterization method.
-   *
+   * <p>
    * Please use this only in "runner" classes such as unit tests, since the
    * error handling is not very flexible.
    *
@@ -223,28 +210,24 @@ public final class ClassGenericsUtil {
       if(config.hasErrors()) {
         for(ParameterException err : config.getErrors()) {
           LOG.warning(err.toString());
+          err.printStackTrace();
         }
       }
-      if(e instanceof AbortException) {
-        throw (AbortException) e;
-      }
-      else {
-        throw new AbortException("Instantiation failed", e);
-      }
+      throw e instanceof AbortException ? (AbortException) e : new AbortException("Instantiation failed", e);
     }
   }
 
   /**
    * Cast the (erased) generics onto a class.
-   *
+   * <p>
    * Note: this function is a hack - notice that it would allow you to up-cast
    * any class! Still it is preferable to have this cast in one place than in
    * dozens without any explanation.
-   *
+   * <p>
    * The reason this is needed is the following: There is no
-   * Class&lt;Set&lt;String&gt;&gt;.class. This method allows you to do <code>
-   * Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);
-   * </code>
+   * <code>Class&lt;Set&lt;String&gt;&gt;.class</code>.
+   * This method allows you to do
+   * <code>Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);</code>
    *
    * We can't type check at runtime, since we don't have T.
    *
@@ -261,9 +244,9 @@ public final class ClassGenericsUtil {
   /**
    * This class performs an ugly cast, from <code>Class&lt;F&gt;</code> to
    * <code>Class&lt;T&gt;</code>, where both F and T need to extend B.
-   *
+   * <p>
    * The restrictions are there to avoid misuse of this cast helper.
-   *
+   * <p>
    * While this sounds really ugly, the common use case will be something like
    *
    * <pre>
@@ -284,17 +267,14 @@ public final class ClassGenericsUtil {
   @SuppressWarnings("unchecked")
   public static <BASE, FROM extends BASE, TO extends BASE> Class<TO> uglyCrossCast(Class<FROM> cls, Class<BASE> base) {
     if(!base.isAssignableFrom(cls)) {
-      if(cls == null) {
-        throw new ClassCastException("Attempted to use 'null' as class.");
-      }
-      throw new ClassCastException(cls.getName() + " is not a superclass of " + base);
+      throw cls == null ? new ClassCastException("Attempted to use 'null' as class.") : new ClassCastException(cls.getName() + " is not a superclass of " + base);
     }
     return (Class<TO>) cls;
   }
 
   /**
    * Instantiate the first available implementation of an interface.
-   *
+   * <p>
    * Only supports public and parameterless constructors.
    *
    * @param clz Class to instantiate.
