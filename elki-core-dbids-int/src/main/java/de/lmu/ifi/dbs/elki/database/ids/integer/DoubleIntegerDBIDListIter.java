@@ -36,9 +36,6 @@ public interface DoubleIntegerDBIDListIter extends DoubleDBIDListIter, IntegerDB
   DoubleIntegerDBIDListIter advance(int count);
 
   @Override
-  DoubleIntegerDBIDPair getPair();
-
-  @Override
   DoubleIntegerDBIDListIter retract();
 
   @Override

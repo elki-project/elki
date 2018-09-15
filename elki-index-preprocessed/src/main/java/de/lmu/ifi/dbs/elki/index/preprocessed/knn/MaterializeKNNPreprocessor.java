@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- *
+ * <p>
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
  *
  * @author Erich Schubert
@@ -226,17 +226,14 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
       // look for new kNNs
       KNNHeap heap = null;
       for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        double dist = distanceQuery.distance(iter, iter2);
+        final double dist = distanceQuery.distance(iter, iter2);
         if(dist <= knnDist) {
-          if(heap == null) {
-            heap = DBIDUtil.newHeap(kNNs);
-          }
+          heap = heap != null ? heap : DBIDUtil.newHeap(kNNs);
           heap.insert(dist, iter2);
         }
       }
       if(heap != null) {
-        kNNs = heap.toKNNList();
-        storage.put(iter, kNNs);
+        storage.put(iter, kNNs = heap.toKNNList());
         rkNN_ids.add(iter);
       }
     }
@@ -350,8 +347,8 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   }
 
   /**
-   * Removes a {@link KNNListener} previously added with {@link #addKNNListener}
-   * .
+   * Removes a {@link KNNListener} previously added with
+   * {@link #addKNNListener}.
    *
    * @param l the listener to remove
    * @see #addKNNListener

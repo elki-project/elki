@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,16 +22,18 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -40,10 +42,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
@@ -54,95 +55,54 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * deletions (of the previously inserted objects) have been applied to the
  * database.
  *
- * BUG: This currently does not appear to work correctly!
- *
  * @author Elke Achtert
  * @since 0.4.0
  */
-@Ignore
-public class OnlineLOFTest {
-  // the following values depend on the data set used!
-  static String dataset = "elki/testdata/unittests/3clusters-and-noise-2d.csv";
-
-  // parameter k for LOF and OnlineLOF
-  static int k = 5;
-
-  // neighborhood distance function for LOF and OnlineLOF
-  @SuppressWarnings("rawtypes")
-  static DistanceFunction neighborhoodDistanceFunction = EuclideanDistanceFunction.STATIC;
-
-  // reachability distance function for LOF and OnlineLOF
-  @SuppressWarnings("rawtypes")
-  static DistanceFunction reachabilityDistanceFunction = CosineDistanceFunction.STATIC;
-
-  // seed for the generator
-  static int seed = 5;
-
-  // size of the data set
-  static int size = 50;
-
-  /**
-   * First, run the {@link LOF} algorithm on the database. Second, run the
-   * {@link OnlineLOF} algorithm on the database, insert new objects and
-   * afterwards delete them. Then, compare the two results for equality.
-   */
-  @SuppressWarnings("unchecked")
+public class OnlineLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testOnlineLOF() {
-    UpdatableDatabase db = getDatabase();
+  public void testOnlineLOF() throws IOException {
+    // Allow loading test data from resources.
+    try (InputStream is = open(UNITTEST + "3clusters-and-noise-2d.csv")) {
+      UpdatableDatabase db = new ELKIBuilder<>(HashmapDatabase.class) //
+          .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class) //
+          .with(InputStreamDatabaseConnection.Parameterizer.STREAM_ID, is) //
+          .build();
+      // Initialize database.
+      db.initialize();
+      Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
-    // 1. Run LOF
-    FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
-    DoubleRelation scores1 = lof.run(db).getScores();
+      // Algorithms we will compare:
+      final int k = 5;
+      FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistanceFunction.STATIC, CosineDistanceFunction.STATIC);
+      OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistanceFunction.STATIC, CosineDistanceFunction.STATIC);
 
-    // 2. Run OnlineLOF (with insertions and removals) on database
-    DoubleRelation scores2 = runOnlineLOF(db).getScores();
+      // 1. Run LOF on original data:
+      DoubleRelation scores1 = lof.run(db).getScores();
 
-    // 3. Compare results
-    for(DBIDIter id = scores1.getDBIDs().iter(); id.valid(); id.advance()) {
-      double lof1 = scores1.doubleValue(id);
-      double lof2 = scores2.doubleValue(id);
-      assertEquals("lof(" + DBIDUtil.toString(id) + ") != lof(" + DBIDUtil.toString(id) + "): " + lof1 + " != " + lof2, lof1, lof2, 1e-10);
+      // 2. Run OnlineLOF
+      OutlierResult result = onlinelof.run(db);
+
+      // prepare synthetic new objects
+      ArrayList<DoubleVector> insertions = new ArrayList<>();
+      int dim = RelationUtil.dimensionality(rep);
+      Random random = new Random(5);
+      for(int i = 0; i < 50; i++) {
+        insertions.add(VectorUtil.randomVector(DoubleVector.FACTORY, dim, random));
+      }
+      // insert objects
+      DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
+
+      // delete objects
+      db.delete(deletions);
+
+      // Get final OnlineLOF scores.
+      DoubleRelation scores2 = result.getScores();
+
+      // 3. Compare results
+      for(DBIDIter id = scores1.getDBIDs().iter(); id.valid(); id.advance()) {
+        double lof1 = scores1.doubleValue(id), lof2 = scores2.doubleValue(id);
+        assertEquals("lof(" + DBIDUtil.toString(id) + ") != lof(" + DBIDUtil.toString(id) + "): " + lof1 + " != " + lof2, lof1, lof2, 1e-10);
+      }
     }
-  }
-
-  /**
-   * Run OnlineLOF (with insertions and removals) on database.
-   */
-  @SuppressWarnings("unchecked")
-  private static OutlierResult runOnlineLOF(UpdatableDatabase db) {
-    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-
-    // setup algorithm
-    OnlineLOF<DoubleVector> lof = new OnlineLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
-
-    // run OnlineLOF on database
-    OutlierResult result = lof.run(db);
-
-    // insert new objects
-    ArrayList<DoubleVector> insertions = new ArrayList<>();
-    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rep);
-    int dim = RelationUtil.dimensionality(rep);
-    Random random = new Random(seed);
-    for(int i = 0; i < size; i++) {
-      DoubleVector obj = VectorUtil.randomVector(o, dim, random);
-      insertions.add(obj);
-    }
-    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
-
-    // delete objects
-    db.delete(deletions);
-    return result;
-  }
-
-  /**
-   * Returns the database.
-   */
-  private static UpdatableDatabase getDatabase() {
-    UpdatableDatabase db = new ELKIBuilder<>(HashmapDatabase.class) //
-        .with(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset) //
-        .build();
-    db.initialize();
-    return db;
   }
 }

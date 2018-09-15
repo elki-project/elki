@@ -79,20 +79,20 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
   }
 
   @Override
-  public DoubleIntegerDBIDPair get(int index) {
-    assert (index < size) : "Access beyond design size of list.";
-    return inner.get(index);
-  }
-
-  @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
     assert (index < size) : "Access beyond design size of list.";
     return inner.assignVar(index, var);
   }
 
   @Override
+  public double doubleValue(int index) {
+    assert (index < size) : "Access beyond design size of list.";
+    return inner.doubleValue(index);
+  }
+
+  @Override
   public double getKNNDistance() {
-    return inner.get(k - 1).doubleValue();
+    return inner.doubleValue(k - 1);
   }
 
   @Override
@@ -129,56 +129,51 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
    */
   private class Itr implements DoubleIntegerDBIDListIter {
     /**
-     * Current position.
+     * Inner iterator.
      */
-    private int pos = 0;
+    private DoubleIntegerDBIDListIter inneriter = inner.iter();
 
     @Override
     public boolean valid() {
-      return pos < size && pos >= 0;
+      return inneriter.getOffset() < size && inneriter.valid();
     }
 
     @Override
     public Itr advance() {
-      pos++;
+      inneriter.advance();
       return this;
     }
 
     @Override
     public double doubleValue() {
-      return inner.get(pos).doubleValue();
-    }
-
-    @Override
-    public DoubleIntegerDBIDPair getPair() {
-      return inner.get(pos);
+      return inneriter.doubleValue();
     }
 
     @Override
     public int internalGetIndex() {
-      return inner.get(pos).internalGetIndex();
+      return inneriter.internalGetIndex();
     }
 
     @Override
     public int getOffset() {
-      return pos;
+      return inneriter.getOffset();
     }
 
     @Override
     public Itr advance(int count) {
-      pos += count;
+      inneriter.advance(count);
       return this;
     }
 
     @Override
     public Itr retract() {
-      --pos;
+      inneriter.retract();
       return this;
     }
 
     @Override
     public Itr seek(int off) {
-      pos = off;
+      inneriter.seek(off);
       return this;
     }
   }

@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 
 /**
@@ -62,15 +61,14 @@ public class KNNSubList implements KNNList {
     this.k = k;
     // Compute list size
     if(k < inner.getK()) {
-      DoubleDBIDPair dist = inner.get(k);
-      int i = k;
-      while(i + 1 < inner.size()) {
-        if(dist.doubleValue() < inner.get(i + 1).doubleValue()) {
+      DoubleDBIDListIter iter = inner.iter();
+      final double dist = iter.seek(k).doubleValue();
+      while(iter.advance().valid()) {
+        if(dist < iter.doubleValue()) {
           break;
         }
-        i++;
       }
-      size = i;
+      size = iter.getOffset() - 1;
     }
     else {
       size = inner.size();
@@ -83,20 +81,19 @@ public class KNNSubList implements KNNList {
   }
 
   @Override
-  public DoubleDBIDPair get(int index) {
-    assert (index < size) : "Access beyond design size of list.";
-    return inner.get(index);
-  }
-
-  @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
     assert (index < size) : "Access beyond design size of list.";
     return inner.assignVar(index, var);
   }
 
   @Override
+  public double doubleValue(int index) {
+    return inner.doubleValue(index);
+  }
+
+  @Override
   public double getKNNDistance() {
-    return inner.get(k).doubleValue();
+    return inner.doubleValue(k);
   }
 
   @Override
@@ -138,56 +135,51 @@ public class KNNSubList implements KNNList {
    */
   private class Itr implements DoubleDBIDListIter {
     /**
-     * Current position.
+     * Inner iterator
      */
-    private int pos = 0;
+    private DoubleDBIDListIter inneriter = inner.iter();
 
     @Override
     public boolean valid() {
-      return pos < size && pos >= 0;
+      return inneriter.getOffset() < size && inneriter.valid();
     }
 
     @Override
     public Itr advance() {
-      pos++;
+      inneriter.advance();
       return this;
     }
 
     @Override
     public double doubleValue() {
-      return inner.get(pos).doubleValue();
-    }
-
-    @Override
-    public DoubleDBIDPair getPair() {
-      return inner.get(pos);
+      return inneriter.doubleValue();
     }
 
     @Override
     public int internalGetIndex() {
-      return inner.get(pos).internalGetIndex();
+      return inneriter.internalGetIndex();
     }
 
     @Override
     public int getOffset() {
-      return pos;
+      return inneriter.getOffset();
     }
 
     @Override
     public Itr advance(int count) {
-      pos += count;
+      inneriter.advance(count);
       return this;
     }
 
     @Override
     public Itr retract() {
-      --pos;
+      inneriter.retract();
       return this;
     }
 
     @Override
     public Itr seek(int off) {
-      pos = off;
+      inneriter.seek(off);
       return this;
     }
   }

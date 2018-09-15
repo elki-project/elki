@@ -58,20 +58,21 @@ public interface DoubleDBIDList extends DBIDs {
   int size();
 
   /**
-   * Materialize a single pair.
-   *
-   * @param off Offset
-   * @return Pair
-   */
-  DoubleDBIDPair get(int off);
-
-  /**
    * Assign a DBID variable the value of position {@code index}.
    *
    * @param index Position
    * @param var Variable to assign the value to.
    */
   DBIDVar assignVar(int index, DBIDVar var);
+
+  /**
+   * Get the double value at a given index (to access the DBID, either use
+   * {@link #iter} or {@link #assignVar}.
+   *
+   * @param index Index
+   * @return Value
+   */
+  double doubleValue(int index);
 
   @Override
   DoubleDBIDListIter iter();

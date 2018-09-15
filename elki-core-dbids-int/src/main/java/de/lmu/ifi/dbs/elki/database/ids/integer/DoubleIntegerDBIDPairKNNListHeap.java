@@ -89,7 +89,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
         truncate();
       }
     }
-    return (size < k) ? Double.POSITIVE_INFINITY : get(kminus1).doubleValue();
+    return (size < k) ? Double.POSITIVE_INFINITY : data[kminus1].doubleValue();
   }
 
   private void truncate() {
@@ -180,7 +180,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
   @Override
   public double getKNNDistance() {
-    return (size >= k) ? get(k - 1).doubleValue() : Double.POSITIVE_INFINITY;
+    return (size >= k) ? data[k - 1].doubleValue() : Double.POSITIVE_INFINITY;
   }
 
   @Override
@@ -199,14 +199,14 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
   }
 
   @Override
-  public DoubleIntegerDBIDPair get(int index) {
-    return data[index];
-  }
-
-  @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
     var.set(data[index]);
     return var;
+  }
+
+  @Override
+  public double doubleValue(int index) {
+    return data[index].doubleValue();
   }
 
   @Override
@@ -238,7 +238,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
   public DoubleDBIDListIter unorderedIterator() {
     return new Itr();
   }
-  
+
   /**
    * Iterator.
    *
@@ -254,7 +254,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
     @Override
     public int internalGetIndex() {
-      return get(pos).internalGetIndex();
+      return data[pos].internalGetIndex();
     }
 
     @Override
@@ -270,12 +270,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
     @Override
     public double doubleValue() {
-      return get(pos).doubleValue();
-    }
-
-    @Override
-    public DoubleIntegerDBIDPair getPair() {
-      return get(pos);
+      return data[pos].doubleValue();
     }
 
     @Override

@@ -108,8 +108,8 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
-        assertTrue("kNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin_knn.get(j), pre_knn.get(j)));
-        assertEquals("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).doubleValue(), pre_knn.get(j).doubleValue(), 0.);
+        assertTrue("kNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin.seek(j), pre.seek(j)));
+        assertEquals("kNNs of linear scan and preprocessor do not match!", lin.seek(j).doubleValue(), pre.seek(j).doubleValue(), 0.);
       }
     }
   }

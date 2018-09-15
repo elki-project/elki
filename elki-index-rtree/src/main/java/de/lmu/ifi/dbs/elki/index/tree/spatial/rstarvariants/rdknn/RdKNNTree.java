@@ -364,16 +364,9 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq <= p.getKnnDistance()) {
-          O obj = relation.get(p.getDBID());
-          KNNList knns_without_q = knnQuery.getKNNForObject(obj, settings.k_max);
-
-          if(knns_without_q.size() + 1 < settings.k_max) {
-            p.setKnnDistance(Double.NaN);
-          }
-          else {
-            double knnDist_p = Math.min(knns_without_q.get(knns_without_q.size() - 1).doubleValue(), dist_pq);
-            p.setKnnDistance(knnDist_p);
-          }
+          KNNList knns_without_q = knnQuery.getKNNForObject(relation.get(p.getDBID()), settings.k_max);
+          p.setKnnDistance(knns_without_q.size() + 1 < settings.k_max ? Double.NaN : //
+              Math.min(knns_without_q.doubleValue(knns_without_q.size() - 1), dist_pq));
         }
         knnDist_node = Math.max(knnDist_node, p.getKnnDistance());
       }

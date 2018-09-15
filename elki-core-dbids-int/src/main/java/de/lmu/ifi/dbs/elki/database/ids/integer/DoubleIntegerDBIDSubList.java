@@ -61,19 +61,17 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
     this.end = end;
   }
 
-  @Deprecated
-  @Override
-  public DoubleIntegerDBIDPair get(int index) {
-    index += begin;
-    assert (index < end) : "Access beyond size of list.";
-    return inner.get(index);
-  }
-
   @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
     index += begin;
-    assert (index < end) : "Access beyond size of list.";
+    assert index < end : "Access beyond size of list.";
     return inner.assignVar(index, var);
+  }
+
+  @Override
+  public double doubleValue(int index) {
+    assert index < end : "Access beyond size of list.";
+    return inner.doubleValue(index);
   }
 
   @Override
@@ -136,11 +134,6 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
     @Override
     public double doubleValue() {
       return it.doubleValue();
-    }
-
-    @Override
-    public DoubleIntegerDBIDPair getPair() {
-      return it.getPair();
     }
 
     @Override

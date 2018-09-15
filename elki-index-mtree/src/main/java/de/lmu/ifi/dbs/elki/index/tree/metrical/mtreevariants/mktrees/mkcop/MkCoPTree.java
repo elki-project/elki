@@ -355,11 +355,11 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       msg.append("knnDistances ").append(knnDistances);
     }
 
+    DoubleDBIDListIter iter = knnDistances.iter();
     // count the zero distances
     int k_0 = 0;
-    for(int i = 0; i < settings.kmax; i++) {
-      double dist = knnDistances.get(i).doubleValue();
-      if(dist != 0) {
+    for(iter.seek(0); iter.valid(); iter.advance()) {
+      if(iter.doubleValue() != 0) {
         break;
       }
       k_0++;
@@ -369,23 +369,21 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     double[] log_k = new double[settings.kmax - k_0];
     System.arraycopy(this.log_k, k_0, log_k, 0, settings.kmax - k_0);
 
-    double sum_log_kDist = 0;
-    double sum_log_k_kDist = 0;
+    double sum_log_kDist = 0, sum_log_k_kDist = 0;
     double[] log_kDist = new double[settings.kmax - k_0];
 
-    for(int i = 0; i < settings.kmax - k_0; i++) {
-      double dist = knnDistances.get(i + k_0).doubleValue();
-      log_kDist[i] = FastMath.log(dist);
-      sum_log_kDist += log_kDist[i];
-      sum_log_k_kDist += log_kDist[i] * log_k[i];
+    iter.seek(k_0);
+    for(int i = 0; iter.valid(); iter.advance(), i++) {
+      final double logd = log_kDist[i] = FastMath.log(iter.doubleValue());
+      sum_log_kDist += logd;
+      sum_log_k_kDist += logd * log_k[i];
     }
 
-    double sum_log_k = 0;
-    double sum_log_k2 = 0;
-    // noinspection ForLoopReplaceableByForEach
+    double sum_log_k = 0, sum_log_k2 = 0;
     for(int i = 0; i < log_k.length; i++) {
-      sum_log_k += log_k[i];
-      sum_log_k2 += (log_k[i] * log_k[i]);
+      final double logki = log_k[i];
+      sum_log_k += logki;
+      sum_log_k2 += logki * logki;
     }
 
     if(msg != null) {

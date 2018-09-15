@@ -90,14 +90,14 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
   }
 
   @Override
-  public DoubleIntegerDBIDPair get(int index) {
-    return data[index];
-  }
-
-  @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
     var.set(data[index]);
     return var;
+  }
+  
+  @Override
+  public double doubleValue(int index) {
+    return data[index].doubleValue();
   }
 
   /**
@@ -263,11 +263,6 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, DoubleInteg
         throw new ArrayIndexOutOfBoundsException();
       }
       data[pos].value = value;
-    }
-
-    @Override
-    public DoubleIntegerDBIDPair getPair() {
-      return data[pos];
     }
 
     @Override

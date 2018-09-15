@@ -106,13 +106,8 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
   }
 
   @Override
-  @Deprecated
-  public DoubleIntegerDBIDPair get(int index) {
-    return new DoubleIntegerDBIDPair(dists[index], ids[index]);
-  }
-
-  @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
+    assert index < size : "Index: " + index + " Size: " + size;
     if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(ids[index]);
     }
@@ -120,6 +115,12 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
       var.set(new IntegerDBID(ids[index]));
     }
     return var;
+  }
+
+  @Override
+  public double doubleValue(int index) {
+    assert index < size : "Index: " + index + " Size: " + size;
+    return dists[index];
   }
 
   /**
@@ -191,30 +192,28 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
   }
 
   @Override
-  public void remove(int p) {
-    if(p >= size) {
-      throw new ArrayIndexOutOfBoundsException(p);
-    }
-    if(p < --size) {
-      System.arraycopy(dists, p + 1, dists, p, size - p);
-      System.arraycopy(ids, p + 1, ids, p, size - p);
+  public void remove(int index) {
+    assert index < size : "Index: " + index + " Size: " + size;
+    if(index < --size) {
+      System.arraycopy(dists, index + 1, dists, index, size - index);
+      System.arraycopy(ids, index + 1, ids, index, size - index);
     }
     // TODO: put NaN, -1?
   }
 
   @Override
-  public void removeSwap(int p) {
-    if(p >= size) {
-      throw new ArrayIndexOutOfBoundsException(p);
-    }
+  public void removeSwap(int index) {
+    assert index < size : "Index: " + index + " Size: " + size;
     if(--size > 0) {
-      dists[p] = dists[size];
-      ids[p] = ids[size];
+      dists[index] = dists[size];
+      ids[index] = ids[size];
     }
   }
 
   @Override
   public void swap(int i, int j) {
+    assert i < size : "Index: " + i + " Size: " + size;
+    assert j < size : "Index: " + j + " Size: " + size;
     final double tmpd = dists[i];
     dists[i] = dists[j];
     dists[j] = tmpd;
@@ -341,11 +340,6 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
         throw new ArrayIndexOutOfBoundsException();
       }
       dists[pos] = value;
-    }
-
-    @Override
-    public DoubleIntegerDBIDPair getPair() {
-      return new DoubleIntegerDBIDPair(dists[pos], ids[pos]);
     }
 
     @Override

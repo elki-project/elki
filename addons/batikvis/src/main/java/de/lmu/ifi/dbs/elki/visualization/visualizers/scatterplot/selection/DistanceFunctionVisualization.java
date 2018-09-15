@@ -254,7 +254,8 @@ public class DistanceFunctionVisualization implements VisFactory {
 
         for(DBIDIter i = selection.iter(); i.valid(); i.advance()) {
           final KNNList knn = result.get(i);
-          for(DoubleDBIDListIter iter = knn.iter(); iter.valid(); iter.advance()) {
+          DoubleDBIDListIter iter = knn.iter();
+          for(; iter.valid(); iter.advance()) {
             try {
               double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
               if(v[0] != v[0] || v[1] != v[1]) {
@@ -273,23 +274,23 @@ public class DistanceFunctionVisualization implements VisFactory {
             }
           }
           // Last element
-          DoubleDBIDPair last = knn.get(knn.size() - 1);
+          iter.seek(knn.size() - 1);
           // Draw hypersphere if possible
           {
             final Element dist;
             if(p == 1.0) {
-              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), last.doubleValue());
+              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), iter.doubleValue());
             }
             else if(p == 2.0) {
-              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), last.doubleValue());
+              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), iter.doubleValue());
             }
             else if(!Double.isNaN(p)) {
-              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.doubleValue(), p);
+              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), iter.doubleValue(), p);
             }
             else if(angular) {
               final NumberVector refvec = rel.get(i);
               // Recompute the angle - it could be cosine or arccosine distance
-              double maxangle = Math.acos(VectorUtil.cosAngle(refvec, rel.get(last)));
+              double maxangle = Math.acos(VectorUtil.cosAngle(refvec, rel.get(iter)));
               dist = drawCosine(svgp, proj, refvec, maxangle);
             }
             else {

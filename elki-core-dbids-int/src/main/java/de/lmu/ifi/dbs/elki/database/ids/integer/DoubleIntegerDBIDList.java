@@ -35,7 +35,4 @@ interface DoubleIntegerDBIDList extends DoubleDBIDList, IntegerDBIDs {
 
   @Override
   DoubleIntegerDBIDListIter iter();
-
-  @Override
-  DoubleIntegerDBIDPair get(int off);
 }

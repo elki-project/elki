@@ -104,7 +104,7 @@ public class KDistanceProcessor extends AbstractDoubleProcessor {
 
     @Override
     public void map(DBIDRef id) {
-      output.set(input.get().get(k - 1).doubleValue());
+      output.set(input.get().doubleValue(k - 1));
     }
   }
 }

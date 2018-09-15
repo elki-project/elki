@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
@@ -144,8 +145,8 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   public KNNHeap newHeap(KNNList exist) {
     KNNHeap heap = newHeap(exist.getK());
     // Insert backwards, as this will produce a proper heap
-    for(int i = exist.size() - 1; i >= 0; i--) {
-      heap.insert(exist.get(i));
+    for(DoubleDBIDListIter iter = exist.iter().seek(exist.size() - 1); iter.valid(); iter.retract()) {
+      heap.insert(iter.doubleValue(), iter);
     }
     return heap;
   }

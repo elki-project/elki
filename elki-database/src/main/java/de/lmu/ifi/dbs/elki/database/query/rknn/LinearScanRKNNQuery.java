@@ -23,14 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -72,15 +65,13 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
     List<? extends KNNList> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
-    int i = 0;
-    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = kNNLists.get(i);
-      int last = Math.min(k - 1, knn.size() - 1);
-      double dist = distanceQuery.distance(obj, iter);
-      if(last < k - 1 || dist <= knn.get(last).doubleValue()) {
+    for(DBIDArrayIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      KNNList knn = kNNLists.get(iter.getOffset());
+      final double dist = distanceQuery.distance(obj, iter);
+      final int last = Math.min(k - 1, knn.size() - 1);
+      if(last < k - 1 || dist <= knn.doubleValue(last)) {
         rNNlist.add(dist, iter);
       }
-      i++;
     }
     rNNlist.sort();
     return rNNlist;
