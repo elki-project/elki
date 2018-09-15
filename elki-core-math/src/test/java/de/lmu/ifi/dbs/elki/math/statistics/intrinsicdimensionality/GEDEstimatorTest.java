@@ -32,7 +32,7 @@ public class GEDEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTe
   public void testGED() {
     IntrinsicDimensionalityEstimator est = GEDEstimator.STATIC;
     regressionTest(est, 5, 1000, 0L, 4.895086664189283);
-    regressionTest(est, 7, 10000, 0L, 6.970114678708026);
+    regressionTest(est, 7, 1000, 0L, 6.853121329865002);
   }
 
   @Test(expected = ArithmeticException.class)
