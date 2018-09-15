@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -35,13 +37,11 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.BinarySplitSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for space-filling curve NN search.
@@ -76,18 +76,18 @@ public class SpacefillingKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, AchlioptasRandomProjectionFamily.class);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
-    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
-    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList(//
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
+                ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, AchlioptasRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -111,18 +111,18 @@ public class SpacefillingKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, CauchyRandomProjectionFamily.class);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(CauchyRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
-    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
-    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
+                ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, CauchyRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(CauchyRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L)//
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -146,18 +146,18 @@ public class SpacefillingKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, GaussianRandomProjectionFamily.class);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(GaussianRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
-    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
-    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
+                ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, GaussianRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(GaussianRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -181,18 +181,18 @@ public class SpacefillingKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, RandomSubsetProjectionFamily.class);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(RandomSubsetProjectionFamily.Parameterizer.RANDOM_ID, 0L);
-    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
-    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
+                ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, RandomSubsetProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(RandomSubsetProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -216,18 +216,18 @@ public class SpacefillingKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, SimplifiedRandomHyperplaneProjectionFamily.class);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    config.addParameter(SimplifiedRandomHyperplaneProjectionFamily.Parameterizer.RANDOM_ID, 1L);
-    SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
-    SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
+                ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, SimplifiedRandomHyperplaneProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(SimplifiedRandomHyperplaneProjectionFamily.Parameterizer.RANDOM_ID, 1L) //
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -240,7 +240,7 @@ public class SpacefillingKNNPreprocessorTest {
     testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
   }
 
-  private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
+  public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
     for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
       KNNList lin_knn = lin_knn_query.getKNNForDBID(it, k);

@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
+ * <p>
  * This version does the bulk kNN-join operation, i.e. precomputes the k nearest
  * neighbors for every object, then discards the curves. This is usually more
  * memory intensive but faster than {@link SpacefillingKNNPreprocessor}.

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -28,19 +30,16 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.BinarySplitSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for space-filling curve NN search
@@ -71,16 +70,15 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
-    ListParameterization config = new ListParameterization();
-    config.addParameter(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
-        HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
-            + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingMaterializeKNNPreprocessor.Factory.K_ID, k);
-    config.addParameter(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 1.);
-    config.addParameter(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
-    SpacefillingMaterializeKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingMaterializeKNNPreprocessor.Factory.class, config);
-    SpacefillingMaterializeKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
+    SpacefillingMaterializeKNNPreprocessor<DoubleVector> preproc = //
+        new ELKIBuilder<SpacefillingMaterializeKNNPreprocessor.Factory<DoubleVector>>(SpacefillingMaterializeKNNPreprocessor.Factory.class) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+                HilbertSpatialSorter.class, PeanoSpatialSorter.class, ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.K_ID, k) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 1.) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .build().instantiate(rel);
     preproc.initialize();
     // add as index
     db.getHierarchy().add(rel, preproc);
@@ -88,29 +86,8 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    SpacefillingKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
-  }
-
-  private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
-    ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
-      KNNList lin_knn = lin_knn_query.getKNNForDBID(it, k);
-      KNNList pre_knn = preproc_knn_query.getKNNForDBID(it, k);
-      DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
-      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
-        if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {
-          continue;
-        }
-        fail(new StringBuilder(1000).append("Neighbor distances do not agree: ") //
-            .append(lin_knn.toString()).append(" got: ").append(pre_knn.toString()).toString());
-      }
-      assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
-      for(int j = 0; j < lin_knn.size(); j++) {
-        assertTrue("kNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin.seek(j), pre.seek(j)));
-        assertEquals("kNNs of linear scan and preprocessor do not match!", lin.seek(j).doubleValue(), pre.seek(j).doubleValue(), 0.);
-      }
-    }
+    SpacefillingKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
   }
 }

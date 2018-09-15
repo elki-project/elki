@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
+ * <p>
  * This version computes the data projections and stores, then queries this data
  * on-demand. This usually needs less memory (except for very small neighborhood
  * sizes k) than {@link SpacefillingMaterializeKNNPreprocessor}, but will also
@@ -144,6 +145,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
    * @param window Window multiplicator
    * @param variants Number of curve variants to generate
    * @param odim Number of dimensions to use -1 == all.
+   * @param proj Random projection to apply
    * @param random Random number generator
    */
   public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, Random random) {
