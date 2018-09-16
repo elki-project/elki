@@ -133,13 +133,22 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    * @return the preference vector
    */
   private long[] determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs) {
+    NumberVector p = relation.get(id);
     // variances
-    double[] variances = RelationUtil.variances(relation, relation.get(id), neighborIDs);
+    final int size = neighborIDs.size(), dim = p.getDimensionality();
+    double[] sumsq = new double[dim];
+    for(DBIDIter iter = neighborIDs.iter(); iter.valid(); iter.advance()) {
+      NumberVector o = relation.get(iter);
+      for(int d = 0; d < dim; d++) {
+        final double diff = o.doubleValue(d) - p.doubleValue(d);
+        sumsq[d] += diff * diff;
+      }
+    }
 
     // preference vector
-    long[] preferenceVector = BitsUtil.zero(variances.length);
-    for(int d = 0; d < variances.length; d++) {
-      if(variances[d] < alpha) {
+    long[] preferenceVector = BitsUtil.zero(dim);
+    for(int d = 0; d < dim; d++) {
+      if(sumsq[d] < alpha * size) {
         BitsUtil.setI(preferenceVector, d);
       }
     }

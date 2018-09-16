@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Utility functions for handling database relation.
@@ -122,32 +121,6 @@ public final class RelationUtil {
       }
     }
     return new double[][] { mins, maxs };
-  }
-
-  /**
-   * Determines the variances in each dimension of the specified objects stored
-   * in the given database.
-   *
-   * @param database the database storing the objects
-   * @param ids the ids of the objects
-   * @param centroid the centroid or reference vector of the ids
-   * @return the variances in each dimension of the specified objects
-   */
-  public static double[] variances(Relation<? extends NumberVector> database, NumberVector centroid, DBIDs ids) {
-    final int size = ids.size(), dim = centroid.getDimensionality();
-    double[] variances = new double[dim];
-
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      NumberVector o = database.get(iter);
-      for(int d = 0; d < dim; d++) {
-        final double diff = o.doubleValue(d) - centroid.doubleValue(d);
-        variances[d] += diff * diff;
-      }
-    }
-    for(int d = 0; d < dim; d++) {
-      variances[d] /= size;
-    }
-    return variances;
   }
 
   /**

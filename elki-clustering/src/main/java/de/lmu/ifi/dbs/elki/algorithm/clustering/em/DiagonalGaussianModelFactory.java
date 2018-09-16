@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,16 +27,17 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInit
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 
 import net.jafama.FastMath;
 
 /**
  * Factory for EM with multivariate gaussian models using diagonal matrixes.
- *
+ * <p>
  * These models have individual variances, but no covariance, so this
  * corresponds to the {@code 'VVI'} model in Mclust (R).
  *
@@ -63,8 +62,19 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
   public List<DiagonalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.length == k);
-    double[] variances = RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs());
-    timesEquals(variances, FastMath.pow(k, -2. / variances.length));
+    final int dim = RelationUtil.dimensionality(relation);
+    MeanVariance[] mvs = MeanVariance.newArray(dim);
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      NumberVector v = relation.get(it);
+      for(int d = 0; d < dim; d++) {
+        mvs[d].put(v.doubleValue(d));
+      }
+    }
+    double[] variances = new double[dim];
+    final double f = FastMath.pow(k, -2. / variances.length);
+    for(int d = 0; d < dim; d++) {
+      variances[d] = mvs[d].getSampleVariance() * f;
+    }
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
