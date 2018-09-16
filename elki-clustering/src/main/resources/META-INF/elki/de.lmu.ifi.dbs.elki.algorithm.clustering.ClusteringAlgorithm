@@ -16,7 +16,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans lloyd forgy
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMinusMinus

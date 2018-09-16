@@ -10,7 +10,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.OutRankS1
 de.lmu.ifi.dbs.elki.algorithm.projection.BarnesHutTSNE
-de.lmu.ifi.dbs.elki.algorithm.projection.TSNE
+de.lmu.ifi.dbs.elki.algorithm.projection.TSNE t-SNE tSNE
 de.lmu.ifi.dbs.elki.algorithm.projection.SNE
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddSingleScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddUniformScale
