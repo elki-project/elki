@@ -210,7 +210,6 @@ public final class ClassGenericsUtil {
       if(config.hasErrors()) {
         for(ParameterException err : config.getErrors()) {
           LOG.warning(err.toString());
-          err.printStackTrace();
         }
       }
       throw e instanceof AbortException ? (AbortException) e : new AbortException("Instantiation failed", e);
@@ -228,7 +227,7 @@ public final class ClassGenericsUtil {
    * <code>Class&lt;Set&lt;String&gt;&gt;.class</code>.
    * This method allows you to do
    * <code>Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);</code>
-   *
+   * <p>
    * We can't type check at runtime, since we don't have T.
    *
    * @param cls Class type

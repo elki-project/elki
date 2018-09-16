@@ -134,7 +134,6 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
           instances.set(i, ClassGenericsUtil.tryInstantiate(restrictionClass, cls, cfg));
         }
         catch(Exception e) {
-          e.printStackTrace();
           config.reportError(new WrongParameterValueException(this, cls.getName(), e.getMessage(), e));
         }
       }
