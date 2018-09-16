@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+
 /**
  * Unit test for Hill estimator.
  * 
@@ -30,7 +32,7 @@ import org.junit.Test;
 public class HillEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testHill() {
-    IntrinsicDimensionalityEstimator e = HillEstimator.STATIC;
+    IntrinsicDimensionalityEstimator e = new ELKIBuilder<>(HillEstimator.class).build();
     regressionTest(e, 5, 1000, 0L, 4.848665990083162);
     regressionTest(e, 7, 10000, 0L, 6.945428878740164);
   }

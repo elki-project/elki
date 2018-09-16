@@ -91,10 +91,8 @@ public class OutlierGammaScaling implements OutlierScaling {
   public double getScaled(double value) {
     assert (theta > 0) : "prepare() was not run prior to using the scaling function.";
     value = preScale(value);
-    if(Double.isNaN(value) || Double.isInfinite(value)) {
-      return 1.0;
-    }
-    return Math.max(0, (GammaDistribution.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
+    return Double.isNaN(value) || Double.isInfinite(value) ? 1. : //
+        Math.max(0, (GammaDistribution.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
   }
 
   @Override
@@ -103,19 +101,15 @@ public class OutlierGammaScaling implements OutlierScaling {
     MeanVariance mv = new MeanVariance();
     DoubleRelation scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double score = scores.doubleValue(id);
-      score = preScale(score);
+      double score = preScale(scores.doubleValue(id));
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
-    final double mean = mv.getMean();
-    final double var = mv.getSampleVariance();
+    final double mean = mv.getMean(), var = mv.getSampleVariance();
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
-    // valatmean"+atmean);
   }
 
   @Override
@@ -123,19 +117,15 @@ public class OutlierGammaScaling implements OutlierScaling {
     MeanVariance mv = new MeanVariance();
     final int size = adapter.size(array);
     for(int i = 0; i < size; i++) {
-      double score = adapter.getDouble(array, i);
-      score = preScale(score);
+      double score = preScale(adapter.getDouble(array, i));
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
-    final double mean = mv.getMean();
-    final double var = mv.getSampleVariance();
+    final double mean = mv.getMean(), var = mv.getSampleVariance();
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
-    // valatmean"+atmean);
   }
 
   /**
@@ -147,10 +137,7 @@ public class OutlierGammaScaling implements OutlierScaling {
    * @return Normalized score.
    */
   protected double preScale(double score) {
-    if(normalize) {
-      score = meta.normalizeScore(score);
-    }
-    return score;
+    return normalize ? meta.normalizeScore(score) : score;
   }
 
   @Override
@@ -173,10 +160,6 @@ public class OutlierGammaScaling implements OutlierScaling {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Normalization flag.
-     * 
-     * <pre>
-     * -gammascale.normalize
-     * </pre>
      */
     public static final OptionID NORMALIZE_ID = new OptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
 

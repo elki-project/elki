@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+
 /**
  * Unit test for RV estimator.
  * 
@@ -30,7 +32,7 @@ import org.junit.Test;
 public class RVEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testRV() {
-    IntrinsicDimensionalityEstimator est = RVEstimator.STATIC;
+    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(RVEstimator.class).build();
     regressionTest(est, 5, 1000, 0L, 5.05005440246909);
     regressionTest(est, 7, 10000, 0L, 6.9778378824587275);
   }

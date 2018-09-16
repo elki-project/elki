@@ -60,5 +60,7 @@ public abstract class AbstractIntrinsicDimensionalityEstimatorTest {
    */
   protected static void testZeros(IntrinsicDimensionalityEstimator est) {
     est.estimate(new double[] { 0., 0., 0., 0. });
+    est.estimate(new double[] { 0., 0., 0., 1. });
+    est.estimate(new double[] { 0., 0., 0., 1., 2. });
   }
 }

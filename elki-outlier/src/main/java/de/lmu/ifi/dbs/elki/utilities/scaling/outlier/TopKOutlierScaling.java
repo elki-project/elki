@@ -20,8 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -40,22 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.3
  */
 public class TopKOutlierScaling implements OutlierScaling {
-  /**
-   * Parameter to specify the number of outliers to keep
-   * <p>
-   * Key: {@code -topk.k}
-   * </p>
-   */
-  public static final OptionID K_ID = new OptionID("topk.k", "Number of outliers to keep.");
-
-  /**
-   * Parameter to specify the lambda value
-   * <p>
-   * Key: {@code -topk.binary}
-   * </p>
-   */
-  public static final OptionID BINARY_ID = new OptionID("topk.binary", "Make the top k a binary scaling.");
-
   /**
    * Number of outliers to keep.
    */
@@ -95,75 +79,41 @@ public class TopKOutlierScaling implements OutlierScaling {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(k <= 0) {
-      LoggingUtil.warning("No k configured for Top-k outlier scaling!");
-    }
-    DBIDIter order = or.getOrdering().order(or.getOrdering().getDBIDs()).iter();
-    for(int i = 0; i < k && order.valid(); i++, order.advance()) {
-      cutoff = or.getScores().doubleValue(order);
-    }
+    OrderingResult ordering = or.getOrdering();
+    DBIDs ids = ordering.getDBIDs();
+    cutoff = or.getScores().doubleValue(ordering.order(ids).iter().seek(Math.min(k, ids.size()) - 1));
     max = or.getOutlierMeta().getActualMaximum();
     ground = or.getOutlierMeta().getTheoreticalBaseline();
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
-      ground = or.getOutlierMeta().getTheoreticalMinimum();
-    }
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
-      ground = or.getOutlierMeta().getActualMinimum();
-    }
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
-      ground = Math.min(0.0, cutoff);
-    }
+    // Fallback options:
+    ground = Double.isInfinite(ground) || Double.isNaN(ground) ? or.getOutlierMeta().getTheoreticalMinimum() : ground;
+    ground = Double.isInfinite(ground) || Double.isNaN(ground) ? or.getOutlierMeta().getActualMinimum() : ground;
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if(k <= 0) {
-      LoggingUtil.warning("No k configured for Top-k outlier scaling!");
-    }
     double[] scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
-    QuickSelect.quickSelect(scores, k);
-    cutoff = scores[k - 1];
+    cutoff = QuickSelect.quickSelect(scores, k - 1);
     max = Double.NEGATIVE_INFINITY;
     for(double v : scores) {
       max = Math.max(max, v);
     }
-    ground = Math.min(0.0, cutoff);
+    ground = Math.min(0., cutoff);
   }
 
   @Override
   public double getMax() {
-    if(binary) {
-      return 1.0;
-    }
-    return max;
+    return binary ? 1. : max;
   }
 
   @Override
   public double getMin() {
-    if(binary) {
-      return 0.0;
-    }
-    return ground;
+    return binary ? 0. : ground;
   }
 
   @Override
   public double getScaled(double value) {
-    if(binary) {
-      if(value >= cutoff) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    }
-    else {
-      if(value >= cutoff) {
-        return (value - ground) / (max - ground);
-      }
-      else {
-        return 0.0;
-      }
-    }
+    return binary ? value >= cutoff ? 1 : 0 : //
+        value >= cutoff ? (value - ground) / (max - ground) : 0.;
   }
 
   /**
@@ -174,9 +124,25 @@ public class TopKOutlierScaling implements OutlierScaling {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected int k = 0;
+    /**
+     * Parameter to specify the number of outliers to keep
+     */
+    public static final OptionID K_ID = new OptionID("topk.k", "Number of outliers to keep.");
 
-    protected boolean binary = false;
+    /**
+     * Parameter to specify the lambda value
+     */
+    public static final OptionID BINARY_ID = new OptionID("topk.binary", "Make the top k a binary scaling.");
+
+    /**
+     * Number of outliers to keep.
+     */
+    private int k = -1;
+
+    /**
+     * Do a binary decision
+     */
+    private boolean binary = false;
 
     @Override
     protected void makeOptions(Parameterization config) {

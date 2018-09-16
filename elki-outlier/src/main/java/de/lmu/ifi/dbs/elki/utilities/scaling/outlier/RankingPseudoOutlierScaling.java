@@ -54,13 +54,12 @@ public class RankingPseudoOutlierScaling implements OutlierScaling {
     // collect all outlier scores
     DoubleRelation oscores = or.getScores();
     scores = new double[oscores.size()];
-    int pos = 0;
     if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
+    int pos = 0;
     for(DBIDIter iditer = oscores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      scores[pos] = oscores.doubleValue(iditer);
-      pos++;
+      scores[pos++] = oscores.doubleValue(iditer);
     }
     if(pos != oscores.size()) {
       throw new AbortException("Database size is incorrect!");
@@ -71,8 +70,7 @@ public class RankingPseudoOutlierScaling implements OutlierScaling {
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
-    Arrays.sort(scores);
+    Arrays.sort(scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter));
   }
 
   @Override
@@ -98,6 +96,6 @@ public class RankingPseudoOutlierScaling implements OutlierScaling {
       ++last;
     }
     double v = (first + last) * .5 / (scores.length - 1.);
-    return (inverted) ? (1.0 - v) : v;
+    return inverted ? 1.0 - v : v;
   }
 }

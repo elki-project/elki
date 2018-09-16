@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+
 /**
  * Unit test for GED estimator.
  * 
@@ -30,7 +32,7 @@ import org.junit.Test;
 public class GEDEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testGED() {
-    IntrinsicDimensionalityEstimator est = GEDEstimator.STATIC;
+    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(GEDEstimator.class).build();
     regressionTest(est, 5, 1000, 0L, 4.895086664189283);
     regressionTest(est, 7, 1000, 0L, 6.853121329865002);
   }

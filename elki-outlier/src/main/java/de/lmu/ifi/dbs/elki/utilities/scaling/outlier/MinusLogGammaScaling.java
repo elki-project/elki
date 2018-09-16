@@ -90,14 +90,12 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double score = scores.doubleValue(id);
-      score = preScale(score);
+      double score = preScale(scores.doubleValue(id));
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
-    final double mean = mv.getMean();
-    final double var = mv.getSampleVariance();
+    final double mean = mv.getMean(), var = mv.getSampleVariance();
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);

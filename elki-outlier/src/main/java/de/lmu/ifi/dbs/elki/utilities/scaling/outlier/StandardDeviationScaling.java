@@ -102,44 +102,35 @@ public class StandardDeviationScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if(value <= mean) {
-      return 0;
-    }
-    return Math.max(0, NormalDistribution.erf((value - mean) / factor));
+    return value <= mean ? 0 : Math.max(0, NormalDistribution.erf((value - mean) / factor));
   }
 
   @Override
   public void prepare(OutlierResult or) {
+    DoubleRelation scores = or.getScores();
     if(Double.isNaN(fixedmean)) {
       MeanVariance mv = new MeanVariance();
-      DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = scores.doubleValue(id);
+        final double val = scores.doubleValue(id);
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
       }
       mean = mv.getMean();
       factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
-      if(factor == 0.0) {
-        factor = Double.MIN_NORMAL;
-      }
     }
     else {
       mean = fixedmean;
       Mean sqsum = new Mean();
-      DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = scores.doubleValue(id);
+        final double val = scores.doubleValue(id) - mean;
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
-          sqsum.put((val - mean) * (val - mean));
+          sqsum.put(val * val);
         }
       }
       factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
-      if(factor == 0.0) {
-        factor = Double.MIN_NORMAL;
-      }
     }
+    factor = factor > 0 ? factor : Double.MIN_NORMAL;
   }
 
   @Override
@@ -155,9 +146,6 @@ public class StandardDeviationScaling implements OutlierScaling {
       }
       mean = mv.getMean();
       factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
-      if(factor == 0.0) {
-        factor = Double.MIN_NORMAL;
-      }
     }
     else {
       mean = fixedmean;
@@ -170,10 +158,8 @@ public class StandardDeviationScaling implements OutlierScaling {
         }
       }
       factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
-      if(factor == 0.0) {
-        factor = Double.MIN_NORMAL;
-      }
     }
+    factor = factor > 0 ? factor : Double.MIN_NORMAL;
   }
 
   @Override

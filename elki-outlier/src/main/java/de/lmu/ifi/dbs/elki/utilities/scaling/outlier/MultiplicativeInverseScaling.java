@@ -50,16 +50,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
     bibkey = "DBLP:conf/sdm/KriegelKSZ11")
 public class MultiplicativeInverseScaling implements OutlierScaling {
   /**
+   * Scaling value, set by {@link #prepare}.
+   */
+  double scaleval = 0;
+
+  /**
    * Constructor.
    */
   public MultiplicativeInverseScaling() {
     super();
   }
-
-  /**
-   * Scaling value, set by {@link #prepare}.
-   */
-  double scaleval = 0;
 
   @Override
   public double getScaled(double value) {
@@ -77,8 +77,7 @@ public class MultiplicativeInverseScaling implements OutlierScaling {
     double max = Double.MIN_VALUE;
     DoubleRelation scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double val = scores.doubleValue(id);
-      double inv = Math.abs(1.0 / val);
+      double val = scores.doubleValue(id), inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
         max = Math.max(max, inv);
       }

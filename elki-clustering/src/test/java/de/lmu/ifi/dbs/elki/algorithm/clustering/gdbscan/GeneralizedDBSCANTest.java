@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.RadialBasisFunctionKernelFunction;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -41,10 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.3
  */
 public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run Generalized DBSCAN with fixed parameters and compare the result to a
-   * golden standard.
-   */
   @Test
   public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
@@ -56,10 +53,6 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
 
-  /**
-   * Run Generalized DBSCAN with fixed parameters and compare the result to a
-   * golden standard.
-   */
   @Test
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -69,5 +62,21 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });
+  }
+
+  /**
+   * Run Generalized DBSCAN with a similarity function.
+   */
+  @Test
+  public void testSimilarityDBSCAN() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<Model> result = new ELKIBuilder<>(GeneralizedDBSCAN.class) //
+        .with(GeneralizedDBSCAN.Parameterizer.NEIGHBORHOODPRED_ID, SimilarityNeighborPredicate.class) //
+        .with(SimilarityNeighborPredicate.Parameterizer.SIMILARITY_FUNCTION_ID, RadialBasisFunctionKernelFunction.class) //
+        .with(SimilarityNeighborPredicate.Parameterizer.EPSILON_ID, 0.999) //
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .build().run(db);
+    testFMeasure(db, result, 0.992897);
+    testClusterSizes(result, new int[] { 28, 50, 102, 150 });
   }
 }

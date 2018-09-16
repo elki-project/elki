@@ -34,7 +34,7 @@ import net.jafama.FastMath;
 /**
  * Scaling that can map arbitrary positive values to a value in the range of
  * [0:1].
- * 
+ * <p>
  * Transformation is done by taking the square root, then doing a linear linear
  * mapping onto 0:1 using the minimum values seen.
  * 
@@ -72,10 +72,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if(value <= min) {
-      return 0;
-    }
-    return Math.min(1, (FastMath.sqrt(value - min) / factor));
+    return value <= min ? 0. : Math.min(1, (FastMath.sqrt(value - min) / factor));
   }
 
   @Override
@@ -132,17 +129,11 @@ public class OutlierSqrtScaling implements OutlierScaling {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the fixed minimum to use.
-     * <p>
-     * Key: {@code -sqrtscale.min}
-     * </p>
      */
     public static final OptionID MIN_ID = new OptionID("sqrtscale.min", "Fixed minimum to use in sqrt scaling.");
 
     /**
      * Parameter to specify the fixed maximum to use.
-     * <p>
-     * Key: {@code -sqrtscale.max}
-     * </p>
      */
     public static final OptionID MAX_ID = new OptionID("sqrtscale.max", "Fixed maximum to use in sqrt scaling.");
 

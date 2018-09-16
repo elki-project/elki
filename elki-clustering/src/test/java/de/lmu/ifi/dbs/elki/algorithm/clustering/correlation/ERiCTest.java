@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.ProgressiveEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
@@ -47,9 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.2
  */
 public class ERiCTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run ERiC with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
@@ -69,9 +67,6 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
     testClusterSizes(result, new int[] { 109, 188, 303 });
   }
 
-  /**
-   * Run ERiC with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
@@ -90,5 +85,24 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
         .build().run(db);
     testFMeasure(db, result, 0.831136946);
     testClusterSizes(result, new int[] { 29, 189, 207, 225 });
+  }
+
+  @Test
+  public void testERiCSubspaceOverlap() {
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
+    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+        // ERiC
+        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        // ERiC Distance function in DBSCAN:
+        .with(ERiC.Parameterizer.DELTA_ID, 1.0) //
+        .with(ERiC.Parameterizer.TAU_ID, 1.0) //
+        .with(ERiC.Parameterizer.K_ID, 100) //
+        // PCA options:
+        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, ProgressiveEigenPairFilter.class) //
+        .build().run(db);
+    testFMeasure(db, result, 0.732609);
+    testClusterSizes(result, new int[] { 104, 188, 211, 597 });
   }
 }

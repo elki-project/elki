@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,12 +30,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -59,27 +54,30 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * concept. For the naive implementation, mean-shift is applied to all objects
  * until they converge to other. This implementation is quite naive, and various
  * optimizations can be made.
- * 
+ * <p>
  * It also is not really parameter-free: the kernel needs to be specified,
  * including a radius/bandwidth.
- * 
- * By using range queries, the algorithm does benefit from index structures!
- * 
- * TODO: add methods to automatically choose the bandwidth?
- * 
  * <p>
- * Reference:<br />
- * Y. Cheng<br />
- * Mean shift, mode seeking, and clustering<br />
+ * By using range queries, the algorithm does benefit from index structures!
+ * <p>
+ * TODO: add methods to automatically choose the bandwidth?
+ * <p>
+ * Reference:
+ * <p>
+ * Y. Cheng<br>
+ * Mean shift, mode seeking, and clustering<br>
  * IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.5.5
  * 
  * @param <V> Vector type
  */
-@Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "https://doi.org/10.1109/34.400568")
+@Reference(authors = "Y. Cheng", //
+    title = "Mean shift, mode seeking, and clustering", //
+    booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", //
+    url = "https://doi.org/10.1109/34.400568", //
+    bibkey = "DBLP:journals/pami/Cheng95")
 public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
