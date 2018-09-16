@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -43,11 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 import net.jafama.FastMath;
 
@@ -57,14 +52,14 @@ import net.jafama.FastMath;
  * <p>
  * Reference:
  * <p>
- * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Ina
- * Müller-Gorman, Arthur Zimek<br>
- * Finding Hierarchies of Subspace Clusters. <br>
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger,
+ * Ina Müller-Gorman, Arthur Zimek<br>
+ * Finding Hierarchies of Subspace Clusters<br>
  * Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in
- * Databases (PKDD'06).
+ * Databases (PKDD'06)F
  * 
  * @author Elke Achtert
- * @since 0.3
+ * @since 0.1
  * 
  * @apiviz.uses HiSCPreferenceVectorIndex
  * 
@@ -98,10 +93,10 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * 
    * @param indexfactory HiSC index factory
    */
-  public HiSC(HiSCPreferenceVectorIndex.Factory<V> indexfactory, double epsilon) {
+  public HiSC(HiSCPreferenceVectorIndex.Factory<V> indexfactory) {
     super();
     this.indexfactory = indexfactory;
-    this.alpha = epsilon;
+    this.alpha = indexfactory.getAlpha();
   }
 
   @Override
@@ -203,12 +198,12 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         if(dist1 > alpha || dist2 > alpha) {
           subspaceDim++;
           if(LOG.isDebugging()) {
-            StringBuilder msg = new StringBuilder(100);
-            msg.append("dist1 ").append(dist1) //
+            LOG.debugFine(new StringBuilder(100) //
+                .append("dist1 ").append(dist1) //
                 .append("\ndist2 ").append(dist2) //
                 .append("\nsubspaceDim ").append(subspaceDim) //
-                .append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
-            LOG.debugFine(msg.toString());
+                .append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim)) //
+                .toString());
           }
         }
         int prevdim = correlationValue.intValue(iter);
@@ -296,12 +291,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      * Parameter to specify the maximum distance between two vectors with equal
      * preference vectors before considering them as parallel, must be a double
      * equal to or greater than 0.
-     * <p>
-     * Default value: {@code 0.001}
-     * </p>
-     * <p>
-     * Key: {@code -hisc.epsilon}
-     * </p>
      */
     public static final OptionID EPSILON_ID = new OptionID("hisc.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
 
@@ -311,36 +300,33 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     private HiSCPreferenceVectorIndex.Factory<V> indexfactory;
 
     /**
-     * Alpha parameter.
+     * The maximum absolute variance along a coordinate axis.
+     * Must be in the range of [0.0, 1.0).
      */
-    double alpha;
+    public static final OptionID ALPHA_ID = new OptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
+
+    /**
+     * The default value for alpha.
+     */
+    public static final double DEFAULT_ALPHA = 0.01;
+
+    /**
+     * The number of nearest neighbors considered to determine the preference
+     * vector. If this value is not defined, k is set to three times of the
+     * dimensionality of the database objects.
+     */
+    public static final OptionID K_ID = new OptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter alphaP = new DoubleParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, HiSCPreferenceVectorIndex.Factory.DEFAULT_ALPHA) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      // Configure HiSC distance function
-      ListParameterization opticsParameters = new ListParameterization();
-
-      // preprocessor
-      opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, HiSCPreferenceVectorIndex.Factory.class);
-      opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, alpha);
-
-      ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
-      chain.errorsTo(config);
-      final Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
-      indexfactory = chain.tryInstantiate(cls);
+      Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
+      indexfactory = config.tryInstantiate(cls);
     }
 
     @Override
     protected HiSC<V> makeInstance() {
-      return new HiSC<>(indexfactory, alpha);
+      return new HiSC<>(indexfactory);
     }
   }
 }

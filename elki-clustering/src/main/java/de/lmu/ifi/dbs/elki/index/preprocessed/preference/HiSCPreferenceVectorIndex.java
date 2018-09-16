@@ -27,23 +27,20 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -52,9 +49,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
  * database.
+ * <p>
+ * Reference:
+ * <p>
+ * Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger,
+ * Ina Müller-Gorman, Arthur Zimek<br>
+ * Finding Hierarchies of Subspace Clusters<br>
+ * Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in
+ * Databases (PKDD'06)
  *
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.1
  *
  * @see HiSC
  *
@@ -74,12 +79,13 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   private static final Logging LOG = Logging.getLogger(HiSCPreferenceVectorIndex.class);
 
   /**
-   * Holds the value of parameter alpha.
+   * The maximum absolute variance along a coordinate axis.
    */
   protected double alpha;
 
   /**
-   * Holds the value of parameter k.
+   * The number of nearest neighbors considered to determine the preference
+   * vector.
    */
   protected int k;
 
@@ -101,40 +107,19 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     if(relation == null || relation.size() <= 0) {
       throw new EmptyDataException();
     }
-
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
-
-    StringBuilder msg = new StringBuilder();
-
-    long start = System.currentTimeMillis();
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
     KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
+    long start = System.currentTimeMillis();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      if(LOG.isDebugging()) {
-        msg.append("\n\nid = ").append(DBIDUtil.toString(it));
-        // /msg.append(" ").append(database.getObjectLabelQuery().get(id));
-        msg.append("\n knns: ");
-      }
-
-      KNNList knns = knnQuery.getKNNForDBID(it, k);
-      long[] preferenceVector = determinePreferenceVector(relation, it, knns, msg);
-      storage.put(it, preferenceVector);
-
+      storage.put(it, determinePreferenceVector(relation, it, knnQuery.getKNNForDBID(it, k)));
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
-
-    if(LOG.isDebugging()) {
-      LOG.debugFine(msg.toString());
-    }
-
-    long end = System.currentTimeMillis();
-    // TODO: re-add timing code!
-    if(LOG.isVerbose()) {
-      long elapsedTime = end - start;
-      LOG.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getName() + ".runtime.ms", System.currentTimeMillis() - start));
     }
   }
 
@@ -145,10 +130,9 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    * @param id the id of the object for which the preference vector should be
    *        determined
    * @param neighborIDs the ids of the neighbors
-   * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private long[] determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuilder msg) {
+  private long[] determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs) {
     // variances
     double[] variances = RelationUtil.variances(relation, relation.get(id), neighborIDs);
 
@@ -159,15 +143,6 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         BitsUtil.setI(preferenceVector, d);
       }
     }
-
-    if(msg != null && LOG.isDebugging()) {
-      msg.append("\nalpha ").append(alpha);
-      msg.append("\nvariances ");
-      msg.append(FormatUtil.format(variances, ", ", FormatUtil.NF4));
-      msg.append("\npreference ");
-      msg.append(BitsUtil.toStringLow(preferenceVector, variances.length));
-    }
-
     return preferenceVector;
   }
 
@@ -203,44 +178,15 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    */
   public static class Factory<V extends NumberVector> extends AbstractPreferenceVectorIndex.Factory<V> {
     /**
-     * The default value for alpha.
-     */
-    public static final double DEFAULT_ALPHA = 0.01;
-
-    /**
-     * The maximum absolute variance along a coordinate axis. Must be in the
-     * range of [0.0, 1.0).
-     * <p>
-     * Default value: {@link #DEFAULT_ALPHA}
-     * </p>
-     * <p>
-     * Key: {@code -hisc.alpha}
-     * </p>
-     */
-    public static final OptionID ALPHA_ID = new OptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
-
-    /**
-     * The number of nearest neighbors considered to determine the preference
-     * vector. If this value is not defined, k is set to three times of the
-     * dimensionality of the database objects.
-     * <p>
-     * Key: {@code -hisc.k}
-     * </p>
-     * <p>
-     * Default value: three times of the dimensionality of the database objects
-     * </p>
-     */
-    public static final OptionID K_ID = new OptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
-
-    /**
-     * Holds the value of parameter {@link #ALPHA_ID}.
+     * The maximum absolute variance along a coordinate axis.
      */
     protected double alpha;
 
     /**
-     * Holds the value of parameter {@link #K_ID}.
+     * The number of nearest neighbors considered to determine the preference
+     * vector.
      */
-    protected Integer k;
+    protected int k;
 
     /**
      * Constructor.
@@ -248,21 +194,24 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * @param alpha Alpha
      * @param k k
      */
-    public Factory(double alpha, Integer k) {
+    public Factory(double alpha, int k) {
       super();
       this.alpha = alpha;
       this.k = k;
     }
 
+    /**
+     * Get the alpha parameter.
+     *
+     * @return Alpha
+     */
+    public double getAlpha() {
+      return alpha;
+    }
+
     @Override
     public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
-      final int usek;
-      if(k == null) {
-        usek = 3 * RelationUtil.dimensionality(relation);
-      }
-      else {
-        usek = k;
-      }
+      final int usek = k > 0 ? k : 3 * RelationUtil.dimensionality(relation);
       return new HiSCPreferenceVectorIndex<>(relation, alpha, usek);
     }
 
@@ -275,26 +224,27 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**
-       * Holds the value of parameter {@link #ALPHA_ID}.
+       * The maximum absolute variance along a coordinate axis.
        */
       protected double alpha;
 
       /**
-       * Holds the value of parameter {@link #K_ID}.
+       * The number of nearest neighbors considered to determine the preference
+       * vector.
        */
-      protected Integer k;
+      protected int k = 0;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA) //
+        final DoubleParameter alphaP = new DoubleParameter(HiSC.Parameterizer.ALPHA_ID, HiSC.Parameterizer.DEFAULT_ALPHA) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
             .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
         if(config.grab(alphaP)) {
           alpha = alphaP.doubleValue();
         }
 
-        final IntParameter kP = new IntParameter(K_ID) //
+        final IntParameter kP = new IntParameter(HiSC.Parameterizer.K_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .setOptional(true);
         if(config.grab(kP)) {

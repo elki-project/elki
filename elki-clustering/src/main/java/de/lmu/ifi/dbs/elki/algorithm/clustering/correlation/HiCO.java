@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06)
  *
  * @author Elke Achtert
- * @since 0.3
+ * @since 0.1
  *
  * @apiviz.composedOf HiCO.Instance
  * @param <V> the type of NumberVector handled by the algorithm
