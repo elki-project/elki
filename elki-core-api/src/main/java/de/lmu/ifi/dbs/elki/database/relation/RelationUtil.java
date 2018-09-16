@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -134,22 +134,25 @@ public final class RelationUtil {
    * @return the variances in each dimension of the specified objects
    */
   public static double[] variances(Relation<? extends NumberVector> database, NumberVector centroid, DBIDs ids) {
-    final int size = ids.size();
-    double[] variances = new double[centroid.getDimensionality()];
+    final int size = ids.size(), dim = centroid.getDimensionality();
+    double[] variances = new double[dim];
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       NumberVector o = database.get(iter);
-      for(int d = 0; d < centroid.getDimensionality(); d++) {
+      for(int d = 0; d < dim; d++) {
         final double diff = o.doubleValue(d) - centroid.doubleValue(d);
-        variances[d] += diff * diff / size;
+        variances[d] += diff * diff;
       }
+    }
+    for(int d = 0; d < dim; d++) {
+      variances[d] /= size;
     }
     return variances;
   }
 
   /**
    * <em>Copy</em> a relation into a double matrix.
-   *
+   * <p>
    * This is <em>not recommended</em> unless you need to modify the data
    * temporarily.
    *
@@ -169,7 +172,7 @@ public final class RelationUtil {
         row[c] = vec.doubleValue(c);
       }
     }
-    assert(r == rowdim);
+    assert (r == rowdim);
     return mat;
   }
 
@@ -261,7 +264,7 @@ public final class RelationUtil {
    *
    * @author Erich Schubert
    */
-  public static class CollectionFromRelation<O> extends AbstractCollection<O>implements Collection<O> {
+  public static class CollectionFromRelation<O> extends AbstractCollection<O> implements Collection<O> {
     /**
      * The database we query.
      */

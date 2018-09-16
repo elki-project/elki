@@ -21,7 +21,7 @@
 package tutorial.javaapi;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -78,7 +78,7 @@ public class PassingDataToELKI {
     SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
     // Default initialization, using global random:
     // To fix the random seed, use: new RandomFactory(seed);
-    RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
+    RandomUniformGeneratedInitialMeans init = new RandomUniformGeneratedInitialMeans(RandomFactory.DEFAULT);
 
     // Textbook k-means clustering:
     KMeansLloyd<NumberVector> km = new KMeansLloyd<>(dist, //

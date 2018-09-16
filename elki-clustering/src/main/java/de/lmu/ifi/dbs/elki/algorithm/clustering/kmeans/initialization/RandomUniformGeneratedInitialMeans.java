@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,32 +27,53 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Initialize k-means by generating random vectors (within the data sets value
- * range).
+ * Initialize k-means by generating random vectors (uniform, within the value
+ * range of the data set).
+ * <p>
+ * This is attributed to Jancey, but who wrote little more details but
+ * "introduced into known but arbitrary positions". This class assumes this
+ * refers to uniform positions within the value domain. For a normal distributed
+ * variant, see {@link RandomNormalGeneratedInitialMeans}.
+ * <p>
+ * <b>Warning:</b> this tends to produce empty clusters, and is one of the least
+ * effective initialization strategies, not recommended for use.
+ * <p>
+ * Reference:
+ * <p>
+ * R. C. Jancey<br>
+ * Multidimensional group analysis<br>
+ * Australian Journal of Botany 14(1)
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans")
-public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
+@Priority(Priority.SUPPLEMENTARY - 1)
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans", "de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans" })
+@Reference(authors = "R. C. Jancey", //
+    title = "Multidimensional group analysis", //
+    booktitle = "Australian Journal of Botany 14(1)", //
+    url = "https://doi.org/10.1071/BT9660127", //
+    bibkey = "doi:10.1071/BT9660127")
+public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
   /**
    * Constructor.
    *
    * @param rnd Random generator.
    */
-  public RandomlyGeneratedInitialMeans(RandomFactory rnd) {
+  public RandomUniformGeneratedInitialMeans(RandomFactory rnd) {
     super(rnd);
   }
 
   @Override
   public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
-    final int dim = RelationUtil.dimensionality(relation);
     double[][] minmax = RelationUtil.computeMinMax(relation);
+    final int dim = minmax[0].length;
     double[] min = minmax[0], scale = minmax[1];
     for(int d = 0; d < dim; d++) {
       scale[d] = scale[d] - min[d];
@@ -60,10 +81,9 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
     double[][] means = new double[k][];
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
-      double[] r = MathUtil.randomDoubleArray(dim, random);
-      // Rescale
+      double[] r = new double[dim];
       for(int d = 0; d < dim; d++) {
-        r[d] = min[d] + scale[d] * r[d];
+        r[d] = min[d] + scale[d] * random.nextDouble();
       }
       means[i] = r;
     }
@@ -79,8 +99,8 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
    */
   public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
     @Override
-    protected RandomlyGeneratedInitialMeans makeInstance() {
-      return new RandomlyGeneratedInitialMeans(rnd);
+    protected RandomUniformGeneratedInitialMeans makeInstance() {
+      return new RandomUniformGeneratedInitialMeans(rnd);
     }
   }
 }

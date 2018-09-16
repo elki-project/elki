@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class RandomlyGeneratedInitialMeansTest extends AbstractClusterAlgorithmTest {
+public class RandomUniformGeneratedInitialMeansTest extends AbstractClusterAlgorithmTest {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -47,7 +47,7 @@ public class RandomlyGeneratedInitialMeansTest extends AbstractClusterAlgorithmT
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 0) //
-        .with(KMeans.INIT_ID, RandomlyGeneratedInitialMeans.class) //
+        .with(KMeans.INIT_ID, RandomUniformGeneratedInitialMeans.class) //
         .build().run(db);
     testFMeasure(db, result, 0.74344789);
     testClusterSizes(result, new int[] { 1, 145, 208, 246, 400 });
