@@ -34,29 +34,46 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Initialize K-means by randomly choosing k existing elements as cluster
- * centers.
+ * Initialize K-means by randomly choosing k existing elements as initial
+ * cluster centers.
  * <p>
  * Reference:
+ * <p>
+ * D. J. McRae<br>
+ * MIKCA: A FORTRAN IV Iterative K-Means Cluster Analysis Program<br>
+ * Behavioral Science 16(4)
  * <p>
  * E. W. Forgy<br>
  * Cluster analysis of multivariate data: efficiency versus interpretability of
  * classifications<br>
  * Abstract published in Biometrics 21(3)
  * <p>
- * This initialization is attributed to above source, but we were unable to
- * verify this so far (apparently, only an abstract is available in print,
- * so we mostly can rely on indirect references).
+ * M. R. Anderberg<br>
+ * Hierarchical Clustering Methods<br>
+ * Cluster Analysis for Applications
+ * <p>
+ * This initialization is often attributed to Forgy (but this is also debated),
+ * but we were unable to verify neither McRae (not available online?) nor Forgy
+ * so far (apparently, only an abstract is available in print, so we mostly can
+ * rely on indirect references, such as Anderberg).
  *
  * @author Erich Schubert
  * @since 0.4.0
  *
  * @param <O> Vector type
  */
+@Reference(authors = "D. J. McRae", //
+    title = "MIKCA: A FORTRAN IV Iterative K-Means Cluster Analysis Program", //
+    booktitle = "Behavioral Science 16(4)", //
+    bibkey = "journals/misc/McRae71")
 @Reference(authors = "E. W. Forgy", //
     title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
     booktitle = "Biometrics 21(3)", //
     bibkey = "journals/biometrics/Forgy65")
+@Reference(authors = "M. R. Anderberg", //
+    title = "Nonhierarchical Clustering Methods", //
+    booktitle = "Cluster Analysis for Applications", //
+    bibkey = "books/academic/Anderberg73/Ch7")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans")
 public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
