@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  * Produce OPTICS plot projections
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.4.0
  *
  * @apiviz.has OPTICSProjector
  */

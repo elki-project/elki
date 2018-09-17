@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 5th Berkeley Symp. Math. Statist. Prob.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.1
  * @apiviz.has KMeansModel
  *
  * @param <V> vector type to use

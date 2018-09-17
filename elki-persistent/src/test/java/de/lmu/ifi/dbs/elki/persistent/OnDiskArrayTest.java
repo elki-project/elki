@@ -33,7 +33,7 @@ import org.junit.Test;
  * Test to validate proper OnDiskArray operation.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 // TODO: also test with a static sample file.
 public class OnDiskArrayTest {

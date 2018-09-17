@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.5
  *
  * @apiviz.has Instance
  *

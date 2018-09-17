@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * FIXME: some values do not make sense.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.5
  */
 public class ExpGammaDistributionTest extends AbstractDistributionTest {
   @Test

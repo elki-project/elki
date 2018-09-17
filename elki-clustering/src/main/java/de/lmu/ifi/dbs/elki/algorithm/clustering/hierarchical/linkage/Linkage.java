@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * The Computer Journal 9.4 (1967): 373-380.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //

@@ -32,7 +32,7 @@ import org.junit.Test;
  * Test the updateable heap used by OPTICS.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public class UpdatableHeapTest {
   @Test

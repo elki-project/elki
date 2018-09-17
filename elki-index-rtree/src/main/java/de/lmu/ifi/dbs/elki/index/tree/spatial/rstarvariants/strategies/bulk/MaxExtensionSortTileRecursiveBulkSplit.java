@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * further, by also varying the fan-out degree.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  */
 public class MaxExtensionSortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**

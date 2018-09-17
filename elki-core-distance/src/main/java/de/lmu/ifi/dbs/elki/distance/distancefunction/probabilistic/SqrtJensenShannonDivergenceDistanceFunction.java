@@ -43,7 +43,7 @@ import net.jafama.FastMath;
  * IEEE Transactions on Information Theory, 49(7)
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Reference(authors = "D. M. Endres, J. E. Schindelin", //
     title = "A new metric for probability distributions", //

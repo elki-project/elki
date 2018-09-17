@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Performs a single assignment with different k-means initializations.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class PAMInitialMeansTest extends AbstractClusterAlgorithmTest {
   /**

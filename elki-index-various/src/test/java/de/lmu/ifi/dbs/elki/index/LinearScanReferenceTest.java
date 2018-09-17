@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRange
  * This unit test verifies that the linear scan produces the reference result.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class LinearScanReferenceTest extends AbstractIndexStructureTest {
   /**

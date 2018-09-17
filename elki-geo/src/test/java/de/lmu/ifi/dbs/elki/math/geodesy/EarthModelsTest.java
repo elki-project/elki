@@ -32,7 +32,7 @@ import org.junit.Test;
  * give different values. But in the end, it's always just an approximation.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class EarthModelsTest {
   // New York City

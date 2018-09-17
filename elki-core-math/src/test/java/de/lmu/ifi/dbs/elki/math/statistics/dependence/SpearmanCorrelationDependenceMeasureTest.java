@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Validate correlation by comparing to the results of R.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class SpearmanCorrelationDependenceMeasureTest {
   double[][] data = { //

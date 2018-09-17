@@ -48,7 +48,7 @@ import net.jafama.FastMath;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 @Reference(authors = "G. Schwarz", //
     title = "Estimating the dimension of a model", //

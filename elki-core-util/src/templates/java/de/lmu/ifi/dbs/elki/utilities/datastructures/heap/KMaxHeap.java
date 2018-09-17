@@ -26,7 +26,7 @@ import java.util.Arrays;
  * Binary heap for primitive types.
  *
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  *
  * @apiviz.has UnsortedIter
 ${genu ? " *\n * @param "+genu+" Key type\n" : ""} */

@@ -32,7 +32,7 @@ import org.junit.Test;
  * Test the on-disk OnDiskUpperTriangleMatrix class.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 // TODO: also test with a static sample file.
 public class OnDiskUpperTriangleMatrixTest {

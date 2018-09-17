@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * \( 1-\prod_i(1-s_i) \)
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  */
 public class EnsembleVotingInverseMultiplicative implements EnsembleVoting {
   /**

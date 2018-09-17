@@ -33,7 +33,7 @@ import org.junit.Test;
  * Test the specialized heap structures.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public class TiedTopBoundedUpdatableHeapTest {
   @Test

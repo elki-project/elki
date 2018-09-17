@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Precompute the k nearest neighbors in a disk cache.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  * 
  * @apiviz.has DistanceFunction
  * 

@@ -29,7 +29,7 @@ import org.junit.Test;
  * Test class for Prim's minmum spanning tree algorithm.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.7.0
  */
 public class PrimsMinimumSpanningTreeTest {
   @Test

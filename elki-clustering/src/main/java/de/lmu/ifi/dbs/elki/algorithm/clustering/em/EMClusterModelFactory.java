@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * Factory for initializing the EM models.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  *
  * @param <V> Vector type
  */

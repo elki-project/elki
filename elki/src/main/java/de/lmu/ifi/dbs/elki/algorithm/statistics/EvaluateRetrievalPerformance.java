@@ -62,7 +62,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * distance.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  *
  * @apiviz.has RetrievalPerformanceResult
  * @apiviz.composedOf KNNEvaluator

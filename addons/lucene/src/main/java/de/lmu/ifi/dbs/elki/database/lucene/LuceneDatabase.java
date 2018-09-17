@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * Database backend using Lucene 3.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class LuceneDatabase extends AbstractDatabase {
   /**

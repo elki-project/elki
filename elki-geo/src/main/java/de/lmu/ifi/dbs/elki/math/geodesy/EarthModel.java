@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ public interface EarthModel {
   /**
    * Map a degree latitude, longitude pair to 3D X-Y-Z coordinates, using a
    * spherical earth model.
-   * 
+   * <p>
    * The coordinate system is usually chosen such that the earth rotates around
    * the Z axis and X points to the prime meridian and Equator.
    * 
@@ -52,7 +52,7 @@ public interface EarthModel {
   /**
    * Map a radians latitude, longitude pair to 3D X-Y-Z coordinates, using a
    * spherical earth model.
-   * 
+   * <p>
    * The coordinate system is usually chosen such that the earth rotates around
    * the Z axis and X points to the prime meridian and Equator.
    * 
@@ -65,7 +65,7 @@ public interface EarthModel {
   /**
    * Map a degree latitude, longitude pair to 3D X-Y-Z coordinates, using a
    * spherical earth model.
-   * 
+   * <p>
    * The coordinate system is usually chosen such that the earth rotates around
    * the Z axis and X points to the prime meridian and Equator.
    * 
@@ -79,7 +79,7 @@ public interface EarthModel {
   /**
    * Map a radians latitude, longitude pair to 3D X-Y-Z coordinates, using a
    * spherical earth model.
-   * 
+   * <p>
    * The coordinate system is usually chosen such that the earth rotates around
    * the Z axis and X points to the prime meridian and Equator.
    * 
@@ -131,7 +131,7 @@ public interface EarthModel {
   /**
    * Convert a 3D coordinate pair to the corresponding latitude, longitude and
    * height.
-   * 
+   * <p>
    * Note: if you are not interested in the height, use {@link #ecefToLatDeg}
    * and {@link #ecefToLngDeg} instead, which has a smaller memory footprint.
    * 
@@ -145,7 +145,7 @@ public interface EarthModel {
   /**
    * Convert a 3D coordinate pair to the corresponding latitude, longitude and
    * height.
-   * 
+   * <p>
    * Note: if you are not interested in the height, use {@link #ecefToLatRad}
    * and {@link #ecefToLngRad} instead, which has a smaller memory footprint.
    * 

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * On the first set, its an all-or-nothing depending on the parameters.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.5
  */
 public class DOCTest extends AbstractClusterAlgorithmTest {
   /**

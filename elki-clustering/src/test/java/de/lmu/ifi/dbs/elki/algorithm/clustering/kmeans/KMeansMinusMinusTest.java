@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the k-means-- algorithm
  *
  * @author Erich Schubert
- * @since 0.7.2
  */
 public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   @Test

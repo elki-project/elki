@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.6.0
  *
  * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree

@@ -33,7 +33,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
  * Writable data store for double values.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.5.5
  */
 public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
   /**

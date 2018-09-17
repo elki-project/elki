@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the KMeansBisecting
  * 
  * @author Stephan Baier
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class KMeansBisectingTest extends AbstractClusterAlgorithmTest {
   /**

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.2
  */
 public class Mean {
   /**

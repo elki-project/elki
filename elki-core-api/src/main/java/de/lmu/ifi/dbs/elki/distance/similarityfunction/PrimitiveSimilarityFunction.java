@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * function.
  * 
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.1
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

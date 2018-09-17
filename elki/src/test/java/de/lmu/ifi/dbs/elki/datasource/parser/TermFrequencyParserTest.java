@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * TODO: maybe also run an example algorithm?
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class TermFrequencyParserTest {
   /** Test data set to use. */

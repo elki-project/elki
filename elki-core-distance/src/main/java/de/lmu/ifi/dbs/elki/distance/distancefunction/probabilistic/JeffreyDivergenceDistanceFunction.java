@@ -54,7 +54,7 @@ import net.jafama.FastMath;
  * F. Topsøe<br>
  * Some inequalities for information divergence and related measures of
  * discrimination<br>
- * IEEE Transactions on information theory, 46(4).
+ * IEEE Transactions on information theory, 46(4)
  * <p>
  * D. M. Endres, J. E. Schindelin<br>
  * A new metric for probability distributions<br>
@@ -63,7 +63,7 @@ import net.jafama.FastMath;
  * TODO: add support for sparse vectors + varying length
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  */
 @Reference(authors = "H. Jeffreys", //
     title = "An invariant form for the prior probability in estimation problems", //

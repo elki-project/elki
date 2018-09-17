@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test Affinity Propagation
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  */
 public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterAlgorithmTest {
   /**

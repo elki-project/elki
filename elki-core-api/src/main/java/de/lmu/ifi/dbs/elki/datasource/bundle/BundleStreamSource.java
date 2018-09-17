@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * Soruce for a bundle stream
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  * 
  * @apiviz.composedOf BundleMeta
  * @apiviz.has BundleStreamSource.Event

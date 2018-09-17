@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract super class for distance functions needing a database index.
  * 
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.1
  * 
  * @apiviz.has AbstractIndexBasedDistanceFunction.Instance
  * @apiviz.composedOf IndexFactory

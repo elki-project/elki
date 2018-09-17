@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.math.scales.Scales;
  * Class to keep shared scales across visualizers.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @apiviz.composedOf LinearScale
  */

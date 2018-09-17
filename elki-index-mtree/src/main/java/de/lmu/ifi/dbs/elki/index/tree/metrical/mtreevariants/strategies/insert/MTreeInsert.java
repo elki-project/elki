@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * FIXME: move this to the actual insert.
  * 
  * @author Erich Schubert
- * @since 0.1
+ * @since 0.6.0
  */
 public interface MTreeInsert<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> {
   /**

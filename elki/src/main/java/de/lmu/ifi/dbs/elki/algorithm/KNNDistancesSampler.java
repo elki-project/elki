@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * ACM Trans. Database Systems (TODS)
  *
  * @author Arthur Zimek
- * @since 0.7.0
+ * @since 0.1
  *
  * @param <O> the type of objects handled by this algorithm
  */

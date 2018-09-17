@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the ODIN algorithm.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class ODINTest extends AbstractOutlierAlgorithmTest {
   @Test

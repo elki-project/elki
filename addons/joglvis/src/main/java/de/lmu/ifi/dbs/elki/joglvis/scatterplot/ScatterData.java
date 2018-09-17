@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Class to manage the vector data in the GPU.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class ScatterData {
   /**

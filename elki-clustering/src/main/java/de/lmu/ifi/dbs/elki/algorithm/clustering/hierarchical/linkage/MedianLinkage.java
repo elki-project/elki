@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Biometrics (1967): 623-637.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Reference(authors = "J. C. Gower", //
     title = "A comparison of some methods of cluster analysis", //

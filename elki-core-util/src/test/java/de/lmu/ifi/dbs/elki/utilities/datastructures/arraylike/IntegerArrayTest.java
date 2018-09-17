@@ -31,7 +31,7 @@ import org.junit.Test;
  * Unit test for this arraylist of primitive ints.
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  */
 public class IntegerArrayTest {
   @Test

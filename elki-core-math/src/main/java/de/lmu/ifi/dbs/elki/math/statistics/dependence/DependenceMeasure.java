@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * Measure the dependence of two variables.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public interface DependenceMeasure {
   /**

@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Abstract base class for relations.
  *
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.1
  *
  * @param <O> Data type
  */

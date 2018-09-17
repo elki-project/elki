@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Katharina Rausch
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class KMediansLloydTest extends AbstractClusterAlgorithmTest {
   /**

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * </p>
  * 
  * @author Arthur Zimek
- * @since 0.4.0
+ * @since 0.5.5
  * 
  * @apiviz.uses NumberVector
  * 

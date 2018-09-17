@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * Chi-Squared distribution (a specialization of the Gamma distribution).
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.0
  */
 public class ChiSquaredDistribution extends GammaDistribution {
   /**

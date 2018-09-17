@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  * Simple combination rule, by taking the maximum.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.5
  */
 public class EnsembleVotingMax implements EnsembleVoting {
   /**

@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * associated patents, and therefore must not be included in the release.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

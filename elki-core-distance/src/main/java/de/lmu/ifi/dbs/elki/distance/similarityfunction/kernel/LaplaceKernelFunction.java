@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * Laplace / exponential radial basis function kernel.
  * 
  * @author Erich Schubert
- * @since 0.1
+ * @since 0.6.0
  */
 public class LaplaceKernelFunction extends AbstractVectorSimilarityFunction {
   /**

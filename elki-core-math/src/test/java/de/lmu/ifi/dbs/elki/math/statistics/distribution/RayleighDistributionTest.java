@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.5
  */
 public class RayleighDistributionTest extends AbstractDistributionTest {
   @Test

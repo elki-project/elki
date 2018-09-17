@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * a normal distribution.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class LogRankingPseudoOutlierScaling implements OutlierScaling {
   /**

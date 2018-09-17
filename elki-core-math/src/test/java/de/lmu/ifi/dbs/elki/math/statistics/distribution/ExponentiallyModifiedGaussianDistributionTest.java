@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * The reference values were computed using SciPy and GNU R.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistributionTest {
   @Test

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * A collection of inspection-related utility functions.
  *
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.2
  */
 public class ELKIServiceScanner {
   /**

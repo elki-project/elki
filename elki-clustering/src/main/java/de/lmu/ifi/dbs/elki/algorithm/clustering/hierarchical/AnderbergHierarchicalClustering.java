@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * ISBN: 0120576503
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  *
  * @apiviz.composedOf LinkageMethod
  * @apiviz.composedOf PointerHierarchyRepresentationBuilder

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
  * Default linear scan range query class.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  *
  * @apiviz.landmark
  * @apiviz.has SimilarityQuery

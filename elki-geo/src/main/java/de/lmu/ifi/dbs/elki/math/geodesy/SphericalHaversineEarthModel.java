@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import net.jafama.FastMath;
 
 /**
  * A simple spherical earth model using radius 6371009 m.
- * 
+ * <p>
  * For distance computations, this variant uses the Haversine formula, which is
  * faster but less accurate than Vincenty's formula.
  * 

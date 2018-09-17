@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
  * Modifiable iterator interface for integer DBIDs.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  */
 interface IntegerDBIDMIter extends DBIDMIter, IntegerDBIDIter {
   // Empty.

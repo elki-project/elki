@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * \[ \text{Maximum}_{\vec{w}}(\vec{x},\vec{y}) := \max_i w_i |x_i-y_i| \]
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunction {
   /**

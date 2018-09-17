@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * exact indexing (e.g. linear scanning).
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  * 
  * @param <O> Object type
  * 

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,16 +26,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * The WGS84 spheroid earth model, without height model (so not a geoid, just a
  * spheroid!)
- *
+ * <p>
  * Note that EGM96 uses the same spheroid, but what really makes the difference
- * is it's geoid expansion.
- *
+ * is its geoid expansion.
+ * <p>
  * Radius: 6378137.0 m
- *
+ * <p>
  * Flattening: 1 / 298.257223563
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  *
  * @apiviz.landmark
  */

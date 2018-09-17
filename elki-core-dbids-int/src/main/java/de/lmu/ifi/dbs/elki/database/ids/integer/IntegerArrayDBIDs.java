@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
  * Trivial combination interface.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 public interface IntegerArrayDBIDs extends IntegerDBIDs, ArrayDBIDs {
   @Override

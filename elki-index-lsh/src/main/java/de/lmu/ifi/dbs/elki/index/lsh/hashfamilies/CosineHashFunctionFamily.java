@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * (SIGIR 2006)
  *
  * @author Evgeniy Faerman
- * @since 0.6.0
+ * @since 0.7.0
  */
 @Reference(authors = "M. S. Charikar", //
     title = "Similarity estimation techniques from rounding algorithms", //

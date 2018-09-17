@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
  * Algorithms in C, Parts 1-4
  *
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.7.1
  */
 @Reference(authors = "R. Sedgewick", //
     title = "Algorithms in C, Parts 1-4", //

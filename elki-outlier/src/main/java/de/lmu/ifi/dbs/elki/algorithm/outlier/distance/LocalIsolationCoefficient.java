@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Int. Conf. on Information Technology and Computer Science (ITCS) 2009
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.0
  *
  * @apiviz.has KNNQuery
  * @param <O> the type of objects handled by this algorithm

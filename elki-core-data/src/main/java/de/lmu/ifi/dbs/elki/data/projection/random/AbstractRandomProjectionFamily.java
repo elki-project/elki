@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Abstract base class for random projection families.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 public abstract class AbstractRandomProjectionFamily implements RandomProjectionFamily {
   /**

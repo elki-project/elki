@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * Interface for random projection families.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  *
  * @apiviz.has Projection
  */

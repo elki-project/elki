@@ -32,7 +32,7 @@ import java.util.List;
  * Charles Antony Richard Hoare
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.4.0
  *
  * @apiviz.uses List
  * @apiviz.uses Adapter

@@ -32,7 +32,7 @@ import org.junit.Test;
  * Small experiment to assert the console output logger works as expected.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  * 
  */
 public class OutputStreamLoggerTest {

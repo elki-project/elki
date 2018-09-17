@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
  * Sublist of an existing result to contain only the first k elements.
  *
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  */
 public class KNNSubList implements KNNList {
   /**

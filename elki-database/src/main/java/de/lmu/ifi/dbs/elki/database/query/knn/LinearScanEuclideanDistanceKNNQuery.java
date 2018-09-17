@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * retrieve the query object from the relation only once!
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  *
  * @apiviz.uses PrimitiveDistanceQuery
  * @apiviz.uses EuclideanDistanceFunction

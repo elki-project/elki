@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
  * best of 5 heuristic.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  */
 public final class DoubleIntegerArrayQuickSort {
   /**

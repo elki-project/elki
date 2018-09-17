@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * By default b=1, and thus the transformation is \(\log_2(1+|x|)\).
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  *
  * @param <V> vector type
  */

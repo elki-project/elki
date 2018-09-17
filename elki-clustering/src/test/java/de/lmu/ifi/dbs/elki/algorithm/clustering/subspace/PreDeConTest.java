@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Erich Schubert
  * @author Katharina Rausch
- * @since 0.3
+ * @since 0.7.0
  */
 public class PreDeConTest extends AbstractClusterAlgorithmTest {
   /**

@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission 5:3
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Reference(authors = "L. N. Vaserstein", //
     title = "Markov processes over denumerable products of spaces describing large systems of automata", //

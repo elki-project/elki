@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the k-d-tree index.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class SmallMemoryKDTreeTest extends AbstractIndexStructureTest {
   /**

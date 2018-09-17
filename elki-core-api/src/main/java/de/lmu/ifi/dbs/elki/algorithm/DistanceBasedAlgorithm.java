@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Very broad interface for distance based algorithms.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.1
  * 
  * @param <O> Object type
  */

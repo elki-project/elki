@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * be used for dimension labels in the overview.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»

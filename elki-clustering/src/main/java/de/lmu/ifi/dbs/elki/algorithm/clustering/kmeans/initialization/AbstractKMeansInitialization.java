@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Abstract base class for common k-means initializations.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.0
  * 
  * @param <V> Vector type
  */

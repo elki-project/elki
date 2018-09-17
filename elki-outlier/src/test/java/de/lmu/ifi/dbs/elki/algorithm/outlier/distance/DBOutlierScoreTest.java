@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the DBOutlierScore algorithm.
  * 
  * @author Lucia Cichella
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class DBOutlierScoreTest extends AbstractOutlierAlgorithmTest {
   @Test

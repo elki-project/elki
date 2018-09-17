@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for Elkan k-means.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class KMeansElkanTest extends AbstractClusterAlgorithmTest {
   /**

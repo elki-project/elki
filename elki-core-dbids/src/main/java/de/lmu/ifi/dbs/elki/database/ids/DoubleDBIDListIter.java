@@ -27,7 +27,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.5
  *
  * @apiviz.landmark
  *

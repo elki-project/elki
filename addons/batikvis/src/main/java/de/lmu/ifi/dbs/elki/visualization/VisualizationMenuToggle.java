@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  * Toggle action.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public interface VisualizationMenuToggle extends VisualizationItem {
   /**

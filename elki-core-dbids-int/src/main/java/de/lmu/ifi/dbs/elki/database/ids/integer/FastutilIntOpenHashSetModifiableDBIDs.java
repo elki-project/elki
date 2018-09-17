@@ -35,7 +35,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * Implementation using Fastutil IntSet.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @apiviz.has Itr
  */

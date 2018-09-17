@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * TODO: add support for weighted Minkowski distances.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  *
  * @apiviz.has KDTreeKNNQuery
  * @apiviz.has KDTreeRangeQuery

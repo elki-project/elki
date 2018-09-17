@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * Test the main hierarchy implementation.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class HashMapHierarchyTest {
   @Test

@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.math;
  * 
  * @author Erich Schubert
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.5.5
  */
 public class IntegerMinMax {
   /**

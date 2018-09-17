@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * A Parser shall provide a ParsingResult by parsing an InputStream.
  * 
  * @author Arthur Zimek
- * @since 0.4.0
+ * @since 0.1
  * 
  * @apiviz.landmark
  * @apiviz.uses InputStream

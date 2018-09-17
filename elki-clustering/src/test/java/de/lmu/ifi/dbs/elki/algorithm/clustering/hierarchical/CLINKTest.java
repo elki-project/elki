@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * work, as a side effect).
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class CLINKTest extends AbstractClusterAlgorithmTest {
   /**

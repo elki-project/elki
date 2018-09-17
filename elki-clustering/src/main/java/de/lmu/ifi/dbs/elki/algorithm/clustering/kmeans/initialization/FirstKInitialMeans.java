@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 5th Berkeley Symp. Math. Statist. Prob.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @param <O> Object type for KMedoids
  */

@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Colloquium Mathematicae 2(3-4)
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Reference(authors = "K. Florek, J. Łukaszewicz, J. Perkal, H. Steinhaus, S. Zubrzycki", //
     title = "Sur la liaison et la division des points d'un ensemble fini", //

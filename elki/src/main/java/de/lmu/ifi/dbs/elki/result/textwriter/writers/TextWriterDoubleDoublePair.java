@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * Write a pair
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.4.0
  * 
  */
 public class TextWriterDoubleDoublePair extends TextWriterWriterInterface<DoubleDoublePair> {

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTes
  * Unit test for Absolute Pearson correlation distance.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class AbsoluteUncenteredCorrelationDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /** Inherited test data */

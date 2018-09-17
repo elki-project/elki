@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * Trivial string based statistic.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 public class StringStatistic extends AbstractStatistic {
   /**

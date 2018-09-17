@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * Unit test for Kernel implementation.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class LinearKernelFunctionTest {
   @Test

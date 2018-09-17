@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public class GammaDistributionTest extends AbstractDistributionTest {
   @Test

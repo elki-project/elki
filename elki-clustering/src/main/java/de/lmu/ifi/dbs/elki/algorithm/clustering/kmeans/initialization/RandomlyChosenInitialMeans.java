@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * rely on indirect references, such as Anderberg).
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @param <O> Vector type
  */

@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * {@link java.io.ByteArrayOutputStream}
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.2
  *
  * @apiviz.landmark
  *

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
  * candidate.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  */
 public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
   /**

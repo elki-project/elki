@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
  * Example: external precomputed distances
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  * 
  * @apiviz.landmark
  * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - defined on

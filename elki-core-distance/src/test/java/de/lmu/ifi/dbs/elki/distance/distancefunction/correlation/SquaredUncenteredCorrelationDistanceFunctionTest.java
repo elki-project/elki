@@ -28,10 +28,10 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
 
 /**
- * Unit test for Squared Pearson correlation distance.
+ * Unit test for Squared uncentered correlation distance.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class SquaredUncenteredCorrelationDistanceFunctionTest extends AbstractDistanceFunctionTest {
   /** Inherited test data */

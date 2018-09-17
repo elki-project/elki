@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Progress class with a moving target.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  */
 public class MutableProgress extends AbstractProgress {
   /**

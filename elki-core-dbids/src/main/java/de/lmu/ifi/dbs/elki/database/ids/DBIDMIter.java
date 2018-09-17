@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.MIter;
  * Modifiable DBID iterator.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  */
 public interface DBIDMIter extends DBIDIter, MIter {
   /**

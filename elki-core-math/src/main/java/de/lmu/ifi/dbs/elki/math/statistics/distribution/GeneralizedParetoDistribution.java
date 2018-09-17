@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * distributions.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class GeneralizedParetoDistribution extends AbstractDistribution {
   /**

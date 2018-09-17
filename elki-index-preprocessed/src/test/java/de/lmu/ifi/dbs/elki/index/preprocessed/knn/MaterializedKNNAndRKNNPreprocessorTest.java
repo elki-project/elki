@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * preprocessors.
  *
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class MaterializedKNNAndRKNNPreprocessorTest {
   // the following values depend on the data set used!

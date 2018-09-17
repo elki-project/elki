@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Jonathan von Brünken, et al.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.0
  *
  * @param <O> Object type
  */

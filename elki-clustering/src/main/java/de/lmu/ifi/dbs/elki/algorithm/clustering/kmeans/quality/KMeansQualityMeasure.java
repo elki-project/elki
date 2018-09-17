@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * Important note: some measures are ascending, others are descending!
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  *
  * @param <O> Input Object restriction type
  */

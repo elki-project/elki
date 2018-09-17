@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Vector type using {@code int[]} storage.
  * 
  * @author Erich Schubert
- * @since 0.1
+ * @since 0.4.0
  */
 public class IntegerVector implements NumberVector {
   /**

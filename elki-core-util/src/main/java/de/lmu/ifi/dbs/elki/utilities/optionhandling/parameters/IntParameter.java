@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.1
  */
 public class IntParameter extends NumberParameter<IntParameter, Integer> {
   /**

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * A class to answer representation queries using the stored Array.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */

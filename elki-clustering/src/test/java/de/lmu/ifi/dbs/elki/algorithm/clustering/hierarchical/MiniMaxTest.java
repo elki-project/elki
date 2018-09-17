@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Perform agglomerative hierarchical clustering, using the naive algorithm.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.5
  */
 public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   // TODO: add more data sets.

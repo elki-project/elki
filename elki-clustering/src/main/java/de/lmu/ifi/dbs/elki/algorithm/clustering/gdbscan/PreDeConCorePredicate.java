@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  */

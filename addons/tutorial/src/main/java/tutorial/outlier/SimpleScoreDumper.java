@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * Simple example output handler for processing outlier scores.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  */
 public class SimpleScoreDumper implements ResultHandler {
   @Override

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * dimensions.
  * 
  * @author Elke Achtert
- * @since 0.5.0
+ * @since 0.1
  */
 public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFunction {
   /**

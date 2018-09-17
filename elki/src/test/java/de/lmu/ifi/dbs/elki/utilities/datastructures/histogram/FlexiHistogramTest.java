@@ -31,7 +31,7 @@ import org.junit.Test;
  * JUnit test to test the {@link AbstractObjDynamicHistogram} class.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.7.0
  */
 public class FlexiHistogramTest {
   /**

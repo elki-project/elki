@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * Distance and similarity measure for clusterings.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public interface ClusteringDistanceSimilarityFunction extends PrimitiveSimilarityFunction<Clustering<?>>, PrimitiveDistanceFunction<Clustering<?>> {
   @Override

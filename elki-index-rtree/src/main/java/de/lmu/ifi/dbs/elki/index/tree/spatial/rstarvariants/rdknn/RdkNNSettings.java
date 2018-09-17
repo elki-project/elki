@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
  * Settings for the RdKNN Tree.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class RdkNNSettings extends RTreeSettings {
   /**

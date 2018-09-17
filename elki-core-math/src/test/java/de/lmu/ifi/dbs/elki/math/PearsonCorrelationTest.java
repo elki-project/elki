@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * Unit test for pearson correlation.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class PearsonCorrelationTest {
 

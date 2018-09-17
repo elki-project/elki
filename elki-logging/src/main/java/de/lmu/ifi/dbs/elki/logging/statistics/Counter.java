@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * Simple statistic by counting. For example: invocations of a method.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  */
 public interface Counter extends Statistic {
   /**

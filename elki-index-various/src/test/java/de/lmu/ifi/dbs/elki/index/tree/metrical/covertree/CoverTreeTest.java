@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the Cover-tree.
  *
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.7.5
  */
 public class CoverTreeTest extends AbstractIndexStructureTest {
   /**

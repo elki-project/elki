@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
  * Projection interface.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  * 
  * @param <IN> Input data type
  * @param <OUT> Output data type

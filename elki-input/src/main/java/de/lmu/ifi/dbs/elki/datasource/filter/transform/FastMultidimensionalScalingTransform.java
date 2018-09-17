@@ -57,7 +57,7 @@ import net.jafama.FastMath;
  * This implementation is O(n²), and uses O(n²) memory.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  *
  * @param <I> Data type
  */

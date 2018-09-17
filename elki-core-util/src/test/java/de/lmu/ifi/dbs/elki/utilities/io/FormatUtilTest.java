@@ -28,7 +28,7 @@ import org.junit.Test;
  * Test formatting code.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class FormatUtilTest {
   @Test

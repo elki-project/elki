@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: add a version <i>optimized</i> for sparse vectors / binary data.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Reference(authors = "J. R. Bray, J. T. Curtis", //
     title = "An ordination of the upland forest communities of southern Wisconsin", //

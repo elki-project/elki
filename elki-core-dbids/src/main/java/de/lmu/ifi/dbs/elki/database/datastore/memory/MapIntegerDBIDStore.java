@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * wrapper around a regular map.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @param <T> Representation object type
  */

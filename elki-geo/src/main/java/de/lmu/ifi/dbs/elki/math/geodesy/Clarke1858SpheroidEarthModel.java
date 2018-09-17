@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The Clarke 1858 spheroid earth model.
- *
+ * <p>
  * Radius: 6378293.645 m
- *
+ * <p>
  * Flattening: 1 / 294.26068
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Alias({ "Clarke1858" })
 public class Clarke1858SpheroidEarthModel extends AbstractEarthModel {

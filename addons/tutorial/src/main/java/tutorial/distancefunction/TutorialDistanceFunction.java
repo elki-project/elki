@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanc
  * function tutorial</a>
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  */
 public class TutorialDistanceFunction extends AbstractNumberVectorDistanceFunction {
   @Override

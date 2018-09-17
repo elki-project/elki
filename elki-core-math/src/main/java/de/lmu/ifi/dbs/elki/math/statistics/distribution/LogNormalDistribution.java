@@ -42,7 +42,7 @@ import net.jafama.FastMath;
  * <tt>scipy.stats.lognorm(logstddev, shift, FastMath.exp(logmean))</tt>
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.5.0
  */
 @Alias({ "lognormal" })
 public class LogNormalDistribution extends AbstractDistribution {

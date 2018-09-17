@@ -30,7 +30,7 @@ import org.junit.Test;
  * Test the in-memory bounded heap class.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class TopBoundedHeapTest {
   /**

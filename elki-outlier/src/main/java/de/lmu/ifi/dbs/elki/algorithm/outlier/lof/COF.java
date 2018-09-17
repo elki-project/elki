@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Advances in Knowledge Discovery and Data Mining.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  *
  * @param <O> Object type
  */

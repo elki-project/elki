@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * The common use of the flat rstar tree: indexing number vectors.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  * 
  * @param <O> Object type
  */

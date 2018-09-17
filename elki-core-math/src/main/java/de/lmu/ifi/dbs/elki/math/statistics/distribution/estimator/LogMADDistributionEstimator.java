@@ -30,7 +30,7 @@ import net.jafama.FastMath;
  * Distribuition estimators that use the method of moments (MOM) in logspace.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  * 
  * @param <D> Distribution estimated.
  */

@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @author Elke Achtert
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.1
  *
  * @apiviz.composedOf Instance
  * @param <O> the type of objects handled by the algorithm

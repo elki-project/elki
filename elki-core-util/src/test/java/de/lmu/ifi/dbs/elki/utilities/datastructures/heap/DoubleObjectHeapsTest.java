@@ -30,7 +30,7 @@ import org.junit.Test;
  * Perform standard unit tests on the double-object heap structures.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.7.0
  */
 public class DoubleObjectHeapsTest {
   @Test

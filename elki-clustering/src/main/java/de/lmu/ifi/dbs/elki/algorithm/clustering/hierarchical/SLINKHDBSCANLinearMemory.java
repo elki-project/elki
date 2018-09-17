@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  *
  * @apiviz.has PointerDensityHierarchyRepresentationResult
  */

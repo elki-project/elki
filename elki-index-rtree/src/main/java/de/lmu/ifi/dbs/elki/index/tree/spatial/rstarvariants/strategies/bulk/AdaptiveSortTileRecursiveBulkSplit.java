@@ -44,7 +44,7 @@ import net.jafama.FastMath;
  * See {@link SortTileRecursiveBulkSplit} for the original STR bulk load.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  */
 public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**

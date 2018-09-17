@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Elke Achtert
  * @author Katharina Rausch
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.0
  */
 public class PROCLUSTest extends AbstractClusterAlgorithmTest {
   /**

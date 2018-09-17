@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the LOF algorithm.
  *
  * @author Lucia Cichella
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class FlexibleLOFTest extends AbstractOutlierAlgorithmTest {
   @Test

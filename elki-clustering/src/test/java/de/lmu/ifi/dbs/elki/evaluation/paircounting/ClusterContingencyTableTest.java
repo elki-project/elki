@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
  * data clusterings.
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 public class ClusterContingencyTableTest {
   // the following values depend on the data set used!

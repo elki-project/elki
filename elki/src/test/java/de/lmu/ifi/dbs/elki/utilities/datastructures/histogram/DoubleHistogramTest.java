@@ -29,7 +29,7 @@ import org.junit.Test;
  * JUnit test to test the {@link ReplacingHistogram} class.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 public class DoubleHistogramTest {
   /**

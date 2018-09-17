@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Modifiable API for Distance-DBID results
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.5
  *
  * @apiviz.composedOf DoubleDBIDPair
  */

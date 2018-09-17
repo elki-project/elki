@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * value (limited to -128..+127).
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.6.0
  */
 public class SparseByteVector implements SparseNumberVector {
   /**

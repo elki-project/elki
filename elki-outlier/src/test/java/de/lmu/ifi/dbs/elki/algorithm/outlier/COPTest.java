@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the COP algorithm.
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  */
 public class COPTest extends AbstractOutlierAlgorithmTest {
   @Test

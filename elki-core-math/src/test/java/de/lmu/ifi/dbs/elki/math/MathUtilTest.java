@@ -32,7 +32,7 @@ import org.junit.Test;
  * Unit test for some basic math functions.
  *
  * @author Erich Schubert
- * @since 0.4.1
+ * @since 0.7.0
  */
 public class MathUtilTest {
   @Test

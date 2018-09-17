@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the Uniform distribution in ELKI.
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  */
 public class UniformDistributionTest extends AbstractDistributionTest {
   @Test

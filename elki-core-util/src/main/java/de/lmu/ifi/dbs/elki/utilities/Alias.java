@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * This interface defines alias names for classes.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

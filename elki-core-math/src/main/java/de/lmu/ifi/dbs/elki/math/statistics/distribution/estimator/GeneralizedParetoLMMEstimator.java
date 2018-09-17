@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Technometrics 27.3
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  *
  * @apiviz.has GeneralizedParetoDistribution
  */

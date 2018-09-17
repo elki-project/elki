@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * to search for certain object in the structure and ensures persistence.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.7.0
  *
  * @apiviz.has FlatRStarTreeNode oneway - - contains
  */

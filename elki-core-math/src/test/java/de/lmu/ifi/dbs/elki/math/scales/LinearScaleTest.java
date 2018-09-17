@@ -28,7 +28,7 @@ import org.junit.Test;
  * Test class to test rounding of the linear scale.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  * 
  */
 public class LinearScaleTest {

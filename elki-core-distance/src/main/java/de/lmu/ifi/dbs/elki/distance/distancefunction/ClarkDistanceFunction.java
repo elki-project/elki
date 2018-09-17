@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * Dictionary of distances
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Priority(Priority.RECOMMENDED)
 @Reference(authors = "M.-M. Deza, E. Deza", //

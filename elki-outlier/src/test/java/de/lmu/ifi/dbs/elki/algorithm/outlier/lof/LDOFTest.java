@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the LDOF algorithm.
  *
  * @author Lucia Cichella
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class LDOFTest extends AbstractOutlierAlgorithmTest {
   @Test

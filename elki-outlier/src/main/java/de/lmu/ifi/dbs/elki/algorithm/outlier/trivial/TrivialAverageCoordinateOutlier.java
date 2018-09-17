@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.Priority;
  * convert a 1d data set into a score, e.g. in geodata.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  */

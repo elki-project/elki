@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * Represents a node in a flat R*-Tree.
  *
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.7.0
  */
 public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, SpatialEntry> {
   /**

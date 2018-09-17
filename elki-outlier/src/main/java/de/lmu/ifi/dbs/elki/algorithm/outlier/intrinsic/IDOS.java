@@ -64,8 +64,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * NII Technical Report (NII-2015-003E)
  *
  * @author Jonathan von Brünken
- * @since 0.7.0
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <O> Object type
  */

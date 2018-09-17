@@ -57,7 +57,7 @@ import net.jafama.FastMath;
  *
  * @author Robert Rödler
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.5.5
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //

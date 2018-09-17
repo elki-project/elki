@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * of an external binary matrix file.
  * 
  * @author Erich Schubert
- * @since 0.1
+ * @since 0.2
  */
 public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**

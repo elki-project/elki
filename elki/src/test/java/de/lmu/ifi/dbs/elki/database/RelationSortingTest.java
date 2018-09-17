@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * the database and ID layers.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.7.0
  * 
  */
 public class RelationSortingTest {

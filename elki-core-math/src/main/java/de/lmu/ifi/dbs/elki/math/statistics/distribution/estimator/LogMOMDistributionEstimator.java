@@ -31,7 +31,7 @@ import net.jafama.FastMath;
  * i.e. that only need the statistical moments of a data set after logarithms.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  * 
  * @param <D> Distribution estimated.
  */

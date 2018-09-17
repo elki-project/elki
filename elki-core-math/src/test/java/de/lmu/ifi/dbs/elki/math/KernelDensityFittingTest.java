@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
  * JUnit test that does a complete Kernel and Levenberg-Marquadt fitting.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 public class KernelDensityFittingTest {
   // the following values depend on the data set used!

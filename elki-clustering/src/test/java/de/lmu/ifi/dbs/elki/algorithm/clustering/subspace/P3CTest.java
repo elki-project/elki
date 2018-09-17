@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * But from visual inspection, this might be a true positive.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.0
  */
 public class P3CTest extends AbstractClusterAlgorithmTest {
   /**

@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
     title = "Knee Point Detection on Bayesian Information Criterion", //

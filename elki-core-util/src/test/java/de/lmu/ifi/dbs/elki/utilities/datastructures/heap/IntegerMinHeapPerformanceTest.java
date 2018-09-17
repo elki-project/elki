@@ -38,7 +38,7 @@ import org.junit.Test;
  * regular PriorityQueue.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public class IntegerMinHeapPerformanceTest {
   final private int queueSize = 100000;

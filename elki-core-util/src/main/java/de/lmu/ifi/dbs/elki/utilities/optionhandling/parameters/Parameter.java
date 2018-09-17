@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.1
  * 
  * @apiviz.composedOf OptionID
  * @apiviz.uses ParameterConstraint

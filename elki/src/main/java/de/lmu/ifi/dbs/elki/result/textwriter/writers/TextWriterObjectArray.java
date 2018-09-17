@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * Write an object into the inline section, using the objects toString method.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.4.0
  * 
  */
 public class TextWriterObjectArray<T> extends TextWriterWriterInterface<T[]> {

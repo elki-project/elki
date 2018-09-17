@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualize an OPTICS result by constructing an OPTICS plot for it.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

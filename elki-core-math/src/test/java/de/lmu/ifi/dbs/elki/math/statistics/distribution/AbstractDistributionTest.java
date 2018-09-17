@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
  * Abstract base class for distribution unit testing.
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.0
  */
 public class AbstractDistributionTest {
   HashMap<String, double[]> data;

@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 @Reference(authors = "H. Akaike", //
     title = "Information Theory and an Extension of the Maximum Likelihood Principle", //

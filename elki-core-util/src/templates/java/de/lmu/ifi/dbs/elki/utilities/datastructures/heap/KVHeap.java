@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * This class is generated from a template.
  *
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  *
  * @apiviz.has UnsortedIter
 ${key.gend || val.gend ? " *\n" : ""}${key.gend ? " * @param "+key.genu+" Key type\n" : ""}${val.gend ? " * @param "+val.genu+" Value type\n" : ""} */

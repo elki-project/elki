@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * database complete or is in any other sense a relaxed clustering result.
  * 
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.1
  * 
  * @apiviz.has Clustering
  * @apiviz.has Model

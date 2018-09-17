@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.*;
  * Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.5
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */

@@ -31,7 +31,7 @@ import java.util.Comparator;
  * Charles Antony Richard Hoare
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.7.5
  *
  * @apiviz.uses ArrayModifiableDBIDs
  */

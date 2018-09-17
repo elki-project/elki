@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for LSDBC.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.5
  */
 public class LSDBCTest extends AbstractClusterAlgorithmTest {
   @Test

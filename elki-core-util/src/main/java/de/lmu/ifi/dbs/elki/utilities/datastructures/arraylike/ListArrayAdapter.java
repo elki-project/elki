@@ -28,7 +28,7 @@ import java.util.List;
  * Use the static instance from {@link ArrayLikeUtil}!
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  * 
  * @param <T> Data object type.
  */

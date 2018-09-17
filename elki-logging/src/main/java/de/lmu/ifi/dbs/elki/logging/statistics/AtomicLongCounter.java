@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Class to count events in a thread-safe counter.
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  */
 public class AtomicLongCounter extends AbstractStatistic implements Counter {
   /**

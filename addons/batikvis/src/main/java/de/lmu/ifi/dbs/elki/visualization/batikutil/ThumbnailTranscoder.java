@@ -30,7 +30,7 @@ import org.apache.batik.transcoder.image.ImageTranscoder;
  * Transcode images to in-memory thumbnails.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.0
  */
 public class ThumbnailTranscoder extends ImageTranscoder {
   /**

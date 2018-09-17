@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the KNNOutlier algorithm.
  * 
  * @author Lucia Cichella
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class ParallelKNNOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test

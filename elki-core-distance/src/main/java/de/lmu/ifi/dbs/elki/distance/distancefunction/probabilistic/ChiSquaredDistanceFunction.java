@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Proc. 7th IEEE International Conference on Computer Vision
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Alias("chisq")
 @Priority(Priority.IMPORTANT)

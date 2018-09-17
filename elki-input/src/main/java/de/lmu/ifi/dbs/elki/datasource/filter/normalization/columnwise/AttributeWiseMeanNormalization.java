@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Each attribute is processed separately.
  * 
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.4.0
  * 
  * @apiviz.uses NumberVector
  *

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * synthetic numerical vectors such as <b>mean</b> vectors.
  *
  * @author Erich Schubert
- * @since 0.1
+ * @since 0.7.0
  *
  * @apiviz.has NumberVectorDistanceFunction
  * @apiviz.excludeSubtypes

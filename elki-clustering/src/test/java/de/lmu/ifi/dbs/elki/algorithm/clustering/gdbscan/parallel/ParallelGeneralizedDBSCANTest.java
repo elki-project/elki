@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * work, as a side effect).
  * 
  * @author Erich Schubert
- * @since 0.7.2
  */
 public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
   /**

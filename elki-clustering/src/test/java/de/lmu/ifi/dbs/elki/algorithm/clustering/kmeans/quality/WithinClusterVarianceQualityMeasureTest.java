@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test cluster quality measure computations.
  *
  * @author Stephan Baier
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class WithinClusterVarianceQualityMeasureTest extends AbstractClusterAlgorithmTest {
   /**

@@ -73,7 +73,7 @@ import libsvm.svm_problem;
  * Neural computation 13.7
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  * 
  * @param V vector type
  */

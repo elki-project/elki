@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  * Cluster model that stores a mean for the cluster.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.5.0
  */
 public class MedoidModel extends SimplePrototypeModel<DBID> implements TextWriteable {
   /**

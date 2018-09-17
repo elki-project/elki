@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * uses a fixed mean of 0 instead of the sample mean.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.0
  */
 public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Abstract super class for distance functions needing a database context.
  * 
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.1
  * 
  * @apiviz.has AbstractDatabaseDistanceFunction.Instance
  * @apiviz.excludeSubtypes

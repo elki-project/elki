@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * creation (i.e. notifying them of inserts and deletions).
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  *
  * @param <O> Data type.
  */

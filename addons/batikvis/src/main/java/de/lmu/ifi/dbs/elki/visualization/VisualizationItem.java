@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  * of improving type safety.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public interface VisualizationItem {
   /**

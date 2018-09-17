@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * Factory interface for generating page files.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  * 
  * @param <P> Page type
  */

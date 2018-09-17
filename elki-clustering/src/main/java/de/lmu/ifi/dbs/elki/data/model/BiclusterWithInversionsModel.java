@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * have inverted rows.
  * 
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.2
  */
 public class BiclusterWithInversionsModel extends BiclusterModel {
   /**

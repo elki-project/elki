@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * 1st SIAM Int. Conf. on Data Mining (SDM-2001)
  * 
  * @author Lara Hirschbeck, Daniel Kolb
- * @since 0.2
+ * @since 0.7.0
  */
 @Title("Derivative dynamic time warping")
 @Reference(authors = "E. J. Keogh, M. J. Pazzani", //

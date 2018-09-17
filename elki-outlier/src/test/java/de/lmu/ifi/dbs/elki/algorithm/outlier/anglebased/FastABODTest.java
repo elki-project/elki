@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the FastABOD algorithm.
  *
  * @author Lucia Cichella
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class FastABODTest extends AbstractOutlierAlgorithmTest {
   @Test

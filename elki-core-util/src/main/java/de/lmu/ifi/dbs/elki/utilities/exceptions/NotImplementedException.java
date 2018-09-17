@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Exception thrown when a particular code path was not yet implemented.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 public class NotImplementedException extends AbortException {
   /**

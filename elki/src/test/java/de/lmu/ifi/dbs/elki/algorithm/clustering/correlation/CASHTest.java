@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  * @author Katharina Rausch
- * @since 0.2
+ * @since 0.7.0
  */
 public class CASHTest extends AbstractClusterAlgorithmTest {
   /**

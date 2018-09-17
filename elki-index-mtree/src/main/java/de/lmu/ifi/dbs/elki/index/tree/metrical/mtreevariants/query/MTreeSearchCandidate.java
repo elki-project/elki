@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * covering radius.
  * 
  * @author Elke Achtert
- * @since 0.4.0
+ * @since 0.5.5
  */
 public class MTreeSearchCandidate implements Comparable<MTreeSearchCandidate> {
   /**

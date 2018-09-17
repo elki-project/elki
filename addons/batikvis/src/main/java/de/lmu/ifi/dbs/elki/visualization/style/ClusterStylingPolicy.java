@@ -41,7 +41,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
  * Styling policy based on cluster membership.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  */
 // TODO: fast enough? Some other kind of mapping we can use?
 public class ClusterStylingPolicy implements ClassStylingPolicy {

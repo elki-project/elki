@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
  * Class with settings for MkTrees.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  *
  * @param <O> Object type
  * @param <N> Node type

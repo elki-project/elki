@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * A holdout providing a seed for randomized operations.
  * 
  * @author Arthur Zimek
- * @since 0.3
+ * @since 0.7.0
  */
 public abstract class RandomizedHoldout extends AbstractHoldout {
   /**

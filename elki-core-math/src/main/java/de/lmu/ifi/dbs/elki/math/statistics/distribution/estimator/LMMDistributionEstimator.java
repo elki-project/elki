@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * (LMM).
  * 
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.6.0
  * 
  * @param <D> Distribution class.
  */

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * should come for free!
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  */
 class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   /**

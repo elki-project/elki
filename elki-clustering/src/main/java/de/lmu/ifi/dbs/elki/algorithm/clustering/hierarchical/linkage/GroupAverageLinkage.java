@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * University of Kansas science bulletin, 28, 1409-1438.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Reference(authors = "R. R. Sokal, C. D. Michener", //
     title = "A statistical method for evaluating systematic relationship", //

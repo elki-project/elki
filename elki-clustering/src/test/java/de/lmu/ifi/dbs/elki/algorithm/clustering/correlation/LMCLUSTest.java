@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the LMCLUS algorithm.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.7.5
  */
 public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   /**

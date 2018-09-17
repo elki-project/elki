@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the Halton pseudo-Uniform distribution in ELKI.
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  */
 public class HaltonUniformDistributionTest extends AbstractDistributionTest {
   @Test

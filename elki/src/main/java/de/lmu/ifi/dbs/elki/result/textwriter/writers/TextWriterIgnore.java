@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * Ignore the given object when serializing to text.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.7.0
  */
 public class TextWriterIgnore extends TextWriterWriterInterface<Object> {
   /**

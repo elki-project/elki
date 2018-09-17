@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The GRS 67 spheroid earth model.
- *
+ * <p>
  * Radius: 6378160.0 m
- *
+ * <p>
  * Flattening: 1 / 298.25
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Alias({ "GRS67", "GRS-67" })
 public class GRS67SpheroidEarthModel extends AbstractEarthModel {

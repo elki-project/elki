@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * In: Computer Journal, Volume 9, Issue 1
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  */
 @Priority(Priority.RECOMMENDED)
 @Reference(authors = "G. N. Lance, W. T. Williams", //

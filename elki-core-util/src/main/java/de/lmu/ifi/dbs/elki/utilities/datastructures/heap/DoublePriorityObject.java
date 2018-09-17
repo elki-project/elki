@@ -27,7 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * the priority.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @param <O> Stored object type.
  */

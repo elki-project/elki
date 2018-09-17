@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * A score iterator wrapping a DBIDRef object.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public interface DBIDRefIter {
   /**

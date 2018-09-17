@@ -35,7 +35,7 @@ import org.junit.Test;
  * TODO: add more test cases, refactor into input, expected-output pattern.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class TokenizerTest {
   Tokenizer t = new Tokenizer(Pattern.compile("\\s"), "\"'");

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Note: this test is quite fragile to numeric differences in the EVD.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.5
  */
 public class SimpleCOPTest extends AbstractOutlierAlgorithmTest {
   @Test

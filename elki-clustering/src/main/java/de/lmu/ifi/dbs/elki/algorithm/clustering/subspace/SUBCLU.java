@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Proc. SIAM Int. Conf. on Data Mining (SDM'04)
  * 
  * @author Elke Achtert
- * @since 0.2
+ * @since 0.3
  * 
  * @apiviz.uses DBSCAN
  * @apiviz.uses DimensionSelectingSubspaceDistanceFunction

@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualize an arbitrary pixmap result.
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.4.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

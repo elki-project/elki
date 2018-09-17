@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Write a double array.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.4.0
  */
 public class TextWriterDoubleArray extends TextWriterWriterInterface<double[]> {
   /**

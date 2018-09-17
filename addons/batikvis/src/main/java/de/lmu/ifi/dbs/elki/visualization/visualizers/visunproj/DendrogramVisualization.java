@@ -67,7 +67,7 @@ import net.jafama.FastMath;
  * Dendrogram visualizer.
  *
  * @author Erich Schubert
- * @since 0.7.1
+ * @since 0.7.5
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

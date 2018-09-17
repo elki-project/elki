@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  * Visualizer actions.
  *
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public interface VisualizationMenuAction extends VisualizationItem {
   /**

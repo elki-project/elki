@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,14 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The WGS72 spheroid earth model, without height model.
- *
- *
+ * <p>
  * Radius: 6378135.0 m
- *
+ * <p>
  * Flattening: 1 / 298.26
  *
  * @author Erich Schubert
- * @since 0.3
+ * @since 0.6.0
  */
 @Alias({ "WGS72", "WGS-72" })
 public class WGS72SpheroidEarthModel extends AbstractEarthModel {

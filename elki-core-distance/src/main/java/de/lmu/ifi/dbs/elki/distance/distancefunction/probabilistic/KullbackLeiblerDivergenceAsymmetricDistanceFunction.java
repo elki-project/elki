@@ -44,7 +44,7 @@ import net.jafama.FastMath;
  * Information theory and statistics
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 @Reference(authors = "S. Kullback", //
     title = "Information theory and statistics", booktitle = "", //

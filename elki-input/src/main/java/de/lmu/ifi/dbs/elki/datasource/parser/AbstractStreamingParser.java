@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Base class for streaming parsers.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.0
  *
  * @apiviz.uses CSVReaderFormat
  * @apiviz.composedOf TokenizedReader

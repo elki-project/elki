@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.Priority;
  * "all-in-one" clustering.
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.0
  */
 @Priority(Priority.SUPPLEMENTARY - 50)
 public class ByLabelOrAllInOneClustering extends ByLabelClustering {

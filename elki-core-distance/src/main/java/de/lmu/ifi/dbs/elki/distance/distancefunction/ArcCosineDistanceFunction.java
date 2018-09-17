@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * same ranking of neighbors.
  *
  * @author Arthur Zimek
- * @since 0.1
+ * @since 0.2
  */
 @Priority(Priority.IMPORTANT)
 @Alias({ "arccos" })

@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * Laplace distribution also known as double exponential distribution
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  */
 @Alias("DoubleExponentialDistribution")
 public class LaplaceDistribution extends AbstractDistribution {

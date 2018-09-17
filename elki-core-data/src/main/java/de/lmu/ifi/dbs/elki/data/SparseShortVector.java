@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * value.
  *
  * @author Arthur Zimek
- * @since 0.2
+ * @since 0.6.0
  */
 public class SparseShortVector implements SparseNumberVector {
   /**

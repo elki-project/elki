@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for kNN joins.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public class KNNJoinTest {
   // the following values depend on the data set used!

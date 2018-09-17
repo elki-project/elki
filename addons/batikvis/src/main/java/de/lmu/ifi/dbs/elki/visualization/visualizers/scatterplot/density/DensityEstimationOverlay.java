@@ -55,7 +55,7 @@ import net.jafama.FastMath;
  * <em>in the projection, not the actual data!</em>
  *
  * @author Erich Schubert
- * @since 0.5.0
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

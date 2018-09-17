@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * produced by k-means (so the Voronoi cell visualization is sensible).
  * 
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.5.5
  */
 public class KMeansModel extends MeanModel {
   /**

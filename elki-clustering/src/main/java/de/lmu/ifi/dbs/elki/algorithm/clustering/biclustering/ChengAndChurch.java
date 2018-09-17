@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Proc. 8th Int. Conf. on Intelligent Systems for Molecular Biology (ISMB)
  *
  * @author Erich Schubert
- * @since 0.2
+ * @since 0.6.0
  * @param <V> Vector type.
  */
 @Reference(authors = "Y. Cheng, G. M. Church", //

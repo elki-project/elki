@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * However, this comes at the cost of a matrix multiplication.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.3
  */
 public class AffineProjection extends AbstractFullProjection implements Projection2D {
   /**

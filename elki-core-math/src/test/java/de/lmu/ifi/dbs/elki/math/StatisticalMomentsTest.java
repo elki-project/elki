@@ -29,7 +29,7 @@ import org.junit.Test;
  * Unit test to check our statistical moments class for correctness.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.0
  */
 public class StatisticalMomentsTest {
   @Test

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * Abstract base class for double-valued primitive similarity functions.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  */
 public abstract class AbstractVectorSimilarityFunction implements PrimitiveSimilarityFunction<NumberVector> {
   // FIXME: Do not default, but every similarity function should be explicit

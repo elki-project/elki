@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Proc. 34th ACM Symposium on Theory of Computing, STOC'02
  *
  * @author Evgeniy Faerman
- * @since 0.3
+ * @since 0.7.0
  */
 @Reference(authors = "M. S. Charikar", //
     title = "Similarity estimation techniques from rounding algorithms", //

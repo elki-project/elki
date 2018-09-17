@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Elke Achtert
  * @author Erich Schubert
  * @author Katharina Rausch
- * @since 0.3
+ * @since 0.7.0
  */
 public class DBSCANTest extends AbstractClusterAlgorithmTest {
   /**

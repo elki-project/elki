@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  * Interface to plug in the cache storage into the parser.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.7.0
  */
 public interface DistanceCacheWriter {
   /**

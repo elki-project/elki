@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * object, i.e. {@code hierarchy.iterChildren(object);}.
  *
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.2
  *
  * @apiviz.has It
  *
