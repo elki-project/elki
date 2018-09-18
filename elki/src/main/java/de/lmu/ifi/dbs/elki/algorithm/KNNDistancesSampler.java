@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -50,11 +51,24 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.
- *
+ * <p>
  * This class can be used to estimate parameters for other algorithms, such as
  * estimating the epsilon parameter for DBSCAN: set k to minPts-1, and then
  * choose a percentile from the sample as epsilon, or plot the result as a graph
  * and look for a bend or knee in this plot.
+ * <p>
+ * Reference:
+ * <p>
+ * Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu<br>
+ * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
+ * with Noise<br>
+ * Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)
+ * <p>
+ * Further discussion:
+ * <p>
+ * Erich Schubert, Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br>
+ * DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN<br>
+ * ACM Trans. Database Systems (TODS)
  *
  * @author Arthur Zimek
  * @since 0.7.0
@@ -64,6 +78,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder")
+@Reference(authors = "Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu", //
+    title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+    booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
+    url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php", //
+    bibkey = "DBLP:conf/kdd/EsterKSX96")
+@Reference(authors = "Erich Schubert, Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
+    title = "DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN", //
+    booktitle = "ACM Trans. Database Systems (TODS)", //
+    url = "https://doi.org/10.1145/3068335", //
+    bibkey = "DBLP:journals/tods/SchubertSEKX17")
 public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KNNDistanceOrderResult> {
   /**
    * The logger for this class.

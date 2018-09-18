@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.data.projection.RandomProjection;
 import de.lmu.ifi.dbs.elki.data.projection.random.AchlioptasRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -39,13 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Projection-Indexed nearest-neighbors (PINN) is an index to retrieve the
  * nearest neighbors in high dimensional spaces by using a random projection
  * based index.
- * 
+ * <p>
  * Reference:
  * <p>
- * Finding local anomalies in very high dimensional space<br />
- * T. de Vries, S. Chawla, M. E. Houle<br />
+ * Finding local anomalies in very high dimensional space<br>
+ * T. de Vries, S. Chawla, M. E. Houle<br>
  * In: Proc. IEEE 10th International Conference on Data Mining (ICDM)
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * @param <O> Object type
  */
+@Title("PINN: Projection Indexed Nearest Neighbors")
 @Reference(title = "Finding local anomalies in very high dimensional space", //
     authors = "T. de Vries, S. Chawla, M. E. Houle", //
     booktitle = "Proc. IEEE 10th International Conference on Data Mining (ICDM)", //

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,10 +30,17 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Initialize K-means by using the first k objects as initial means.
+ * <p>
+ * Reference:
+ * <p>
+ * J. MacQueen<br>
+ * Some Methods for Classification and Analysis of Multivariate Observations<br>
+ * 5th Berkeley Symp. Math. Statist. Prob.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -41,6 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <O> Object type for KMedoids
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FirstKInitialMeans")
+@Reference(authors = "J. MacQueen", //
+    title = "Some Methods for Classification and Analysis of Multivariate Observations", //
+    booktitle = "5th Berkeley Symp. Math. Statist. Prob.", //
+    url = "http://projecteuclid.org/euclid.bsmsp/1200512992", //
+    bibkey = "conf/bsmsp/MacQueen67")
 public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
    * Constructor.

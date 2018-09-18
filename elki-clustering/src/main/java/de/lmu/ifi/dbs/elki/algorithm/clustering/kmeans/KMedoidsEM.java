@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -51,18 +52,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A k-medoids clustering algorithm, implemented as EM-style bulk algorithm.
- * 
+ * <p>
  * In contrast to PAM, which will in each iteration update one medoid with one
  * (arbitrary) non-medoid, this implementation follows the EM pattern. In the
  * expectation step, the best medoid from the cluster members is chosen; in the
  * M-step, the objects are reassigned to their nearest medoid.
- * 
- * We do not have a reference for this algorithm. It borrows ideas from EM and
- * PAM. If needed, you are welcome cite it using the latest ELKI publication
- * (this variation is likely not worth publishing on its own).
- *
+ * <p>
+ * This implementation evolved naturally from EM and k-means algorithms, but
+ * apparently a similar approach was published by Park and Jun.
+ * <p>
  * In our experiments, it tends to be much faster than PAM, but also find less
  * good solutions, as the medoids are only chosen from the cluster members.
+ * <p>
+ * Reference:
+ * <p>
+ * H.-S. Park, C.-H. Jun<br>
+ * A simple and fast algorithm for K-medoids clustering<br>
+ * Expert Systems with Applications 36(2)
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -72,6 +78,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector datatype
  */
+@Reference(authors = "H.-S. Park, C.-H. Jun", //
+    title = "A simple and fast algorithm for K-medoids clustering", //
+    booktitle = "Expert Systems with Applications 36(2)", //
+    url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
+    bibkey = "DBLP:journals/eswa/ParkJ09")
 public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.

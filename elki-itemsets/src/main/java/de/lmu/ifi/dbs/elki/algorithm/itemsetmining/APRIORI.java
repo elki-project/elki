@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,17 +54,16 @@ import net.jafama.FastMath;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
- *
+ * <p>
  * Reference:
  * <p>
- * R. Agrawal, R. Srikant:<br />
- * Fast Algorithms for Mining Association Rules<br />
- * In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de
- * Chile, Chile 1994.
- * </p>
- *
- * This implementation uses some simple optimizations for 1- and 2-itemsets.
- *
+ * R. Agrawal, R. Srikant<br>
+ * Fast Algorithms for Mining Association Rules<br>
+ * In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94)
+ * <p>
+ * This implementation uses some simple optimizations for 1- and 2-itemsets, but
+ * does not implement the original hash tree (yet, please contribute).
+ * <p>
  * Note: this algorithm scales well to a large number of transactions, but not
  * so well to a large number of frequent itemsets (items). For best results, use
  * domain-specific preprocessing to aggregate items into groups. Use statistics
@@ -81,7 +80,7 @@ import net.jafama.FastMath;
 @Description("Searches for frequent itemsets")
 @Reference(authors = "R. Agrawal, R. Srikant", //
     title = "Fast Algorithms for Mining Association Rules", //
-    booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
+    booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94)", //
     url = "http://www.vldb.org/conf/1994/P487.PDF", //
     bibkey = "DBLP:conf/vldb/AgrawalS94")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.APRIORI")

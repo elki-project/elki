@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,23 +29,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The XTree is a spatial index structure extending the R*-Tree.
- * 
+ * <p>
  * Reference:
  * <p>
  * Stefan Berchtold, Daniel A. Keim, Hans-Peter Kriegel: The X-tree: An Index
  * Structure for High-Dimensional Data<br>
- * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India,
- * 1996.
- * </p>
+ * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96).
  * 
  * @author Marisa Thoma
  */
 @Title("X-Tree")
 @Description("Index structure for High-Dimensional data")
-@Reference(authors = "S. Berchtold, D. A. Keim, H.-P. Kriegel", //
-title = "The X-tree: An Index Structure for High-Dimensional Data", //
-booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
-url = "http://www.vldb.org/conf/1996/P028.PDF")
+@Reference(authors = "Stefan Berchtold, Daniel A. Keim, Hans-Peter Kriegel", //
+    title = "The X-tree: An Index Structure for High-Dimensional Data", //
+    booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96)", //
+    url = "http://www.vldb.org/conf/1996/P028.PDF", //
+    bibkey = "DBLP:conf/vldb/BerchtoldKK96")
 public class XTree extends AbstractXTree<XTreeNode> {
   /**
    * The logger for this class.
@@ -99,12 +98,12 @@ public class XTree extends AbstractXTree<XTreeNode> {
   protected Logging getLogger() {
     return LOG;
   }
-  
+
   @Override
   public String getLongName() {
     return "X-Tree";
   }
-  
+
   @Override
   public String getShortName() {
     return "x-tree";

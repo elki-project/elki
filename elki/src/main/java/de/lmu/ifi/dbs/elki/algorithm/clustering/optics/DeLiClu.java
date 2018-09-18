@@ -65,19 +65,18 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 
 /**
  * DeliClu: Density-Based Hierarchical Clustering
- *
+ * <p>
  * A hierarchical algorithm to find density-connected sets in a database,
  * closely related to OPTICS but exploiting the structure of a R-tree for
  * acceleration.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, P. Kröger<br />
+ * Elke Achtert, Christian Böhm, Peer Kröger<br>
  * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of
- * Hierarchical Clustering by a Closest Pair Ranking.<br />
- * In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining
- * (PAKDD 2006), Singapore, 2006.
- * </p>
+ * Hierarchical Clustering by a Closest Pair Ranking<br>
+ * Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD
+ * 2006)
  *
  * @author Elke Achtert
  * @since 0.7.0
@@ -85,9 +84,9 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
-@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", //
+@Reference(authors = "Elke Achtert, Christian Böhm, Peer Kröger", //
     title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", //
-    booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
+    booktitle = "Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2006)", //
     url = "https://doi.org/10.1007/11731139_16", //
     bibkey = "DBLP:conf/pakdd/AchtertBK06")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })

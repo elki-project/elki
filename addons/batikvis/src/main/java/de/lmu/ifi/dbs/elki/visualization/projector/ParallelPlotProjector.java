@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
@@ -37,6 +38,11 @@ import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 /**
  * ParallelPlotProjector is responsible for producing a parallel axes
  * visualization.
+ * <p>
+ * Reference:
+ * <p>
+ * A. Inselberg<br>
+ * Parallel Coordinates. Visual Multidimensional Geometry and Its Applications
  *
  * @author Robert Rödler
  * @since 0.5.0
@@ -44,6 +50,10 @@ import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
  * @param <V> Vector type
  */
 // TODO: support categorical features, and multiple relations too
+@Reference(authors = "A. Inselberg", //
+    title = "Parallel Coordinates. Visual Multidimensional Geometry and Its Applications", booktitle = "", //
+    url = "https://doi.org/10.1007/978-0-387-68628-8", //
+    bibkey = "doi:10.1007/978-0-387-68628-8")
 public class ParallelPlotProjector<V extends SpatialComparable> implements Projector {
   /**
    * Relation we project.
