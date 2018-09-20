@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
@@ -31,10 +30,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Variable for storing a single DBID reference.
- *
- * TODO: what is the actual memory cost for adding a flag to indicate "null"
- * values, to allow the variable to be unset? Given 8-byte alignment of Java, it
- * should come for free!
  *
  * @author Erich Schubert
  * @since 0.5.5
@@ -76,20 +71,9 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
-  public void set(DBIDRef ref) {
+  public DBIDVar set(DBIDRef ref) {
     id = ref.internalGetIndex();
-  }
-
-  @Override
-  public void setFirst(DBIDPair pair) {
-    assert pair instanceof IntegerDBIDPair;
-    id = ((IntegerDBIDPair) pair).first;
-  }
-
-  @Override
-  public void setSecond(DBIDPair pair) {
-    assert pair instanceof IntegerDBIDPair;
-    id = ((IntegerDBIDPair) pair).second;
+    return this;
   }
 
   @Override
@@ -118,13 +102,13 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public boolean isSet() {
-    return id > 0;
+    return id != Integer.MIN_VALUE;
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
     final int other = key.internalGetIndex();
-    return (other == id) ? 0 : (other < id) ? -1 : -2;
+    return other == id ? 0 : other < id ? -1 : -2;
   }
 
   @Override
@@ -134,36 +118,24 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public DBIDVar assignVar(int i, DBIDVar var) {
-    if(var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar) var).internalSetIndex(i);
-      return var;
-    }
-    else {
-      // Much less efficient:
-      var.set(get(i));
-      return var;
-    }
+    assert var instanceof IntegerDBIDVar;
+    ((IntegerDBIDVar) var).internalSetIndex(i);
+    return var;
   }
 
   @Override
   public DBIDVar from(DBIDDataStore store, DBIDRef ref) {
-    store.assignVar(ref, this);
-    return this;
+    return store.assignVar(ref, this);
   }
 
   @Override
   public ArrayDBIDs slice(int begin, int end) {
-    if(begin == 0 && end == 1) {
-      return this;
-    }
-    else {
-      return DBIDUtil.EMPTYDBIDS;
-    }
+    return begin == 0 && end == 1 ? this : DBIDUtil.EMPTYDBIDS;
   }
 
   @Override
   public String toString() {
-    return (id != Integer.MIN_VALUE) ? Integer.toString(id) : "null";
+    return id != Integer.MIN_VALUE ? Integer.toString(id) : "null";
   }
 
   @Override
@@ -220,7 +192,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
     @Override
     public boolean valid() {
-      return (pos == 0);
+      return pos == 0;
     }
 
     @Override

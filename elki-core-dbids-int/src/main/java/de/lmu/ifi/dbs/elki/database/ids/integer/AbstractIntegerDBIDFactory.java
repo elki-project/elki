@@ -64,20 +64,16 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public void assignVar(DBIDVar var, int val) {
-    if(var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar) var).internalSetIndex(val);
-    }
-    else {
-      var.set(new IntegerDBID(val));
-    }
+  public DBIDVar assignVar(DBIDVar var, int val) {
+    assert var instanceof IntegerDBIDVar;
+    ((IntegerDBIDVar) var).internalSetIndex(val);
+    return var;
   }
 
   @Override
   public int compare(DBIDRef a, DBIDRef b) {
-    final int inta = a.internalGetIndex();
-    final int intb = b.internalGetIndex();
-    return (inta < intb ? -1 : (inta == intb ? 0 : 1));
+    final int inta = a.internalGetIndex(), intb = b.internalGetIndex();
+    return inta < intb ? -1 : inta == intb ? 0 : 1;
   }
 
   @Override
@@ -163,19 +159,11 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public StaticDBIDs makeUnmodifiable(DBIDs existing) {
-    if(existing instanceof StaticDBIDs) {
-      return (StaticDBIDs) existing;
-    }
-    if(existing instanceof IntegerArrayDBIDs) {
-      return new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
-    }
-    if(existing instanceof IntegerDBIDs) {
-      return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
-    }
-    if(existing instanceof ArrayDBIDs) {
-      return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
-    }
-    return new UnmodifiableDBIDs(existing);
+    return existing instanceof StaticDBIDs ? (StaticDBIDs) existing : //
+        existing instanceof IntegerArrayDBIDs ? new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing) : //
+            existing instanceof IntegerDBIDs ? new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing) : //
+                existing instanceof ArrayDBIDs ? new UnmodifiableArrayDBIDs((ArrayDBIDs) existing) : //
+                    new UnmodifiableDBIDs(existing);
   }
 
   @Override

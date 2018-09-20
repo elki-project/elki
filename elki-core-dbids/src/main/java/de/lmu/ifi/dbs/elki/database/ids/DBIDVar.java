@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 
 /**
  * (Persistent) variable storing a DBID reference.
- *
+ * <p>
  * In contrast to the {@link DBIDRef} API, which are read-only references, this
  * variable can be updated to point to a different DBID, e.g. the current best
  * candidate.
@@ -37,15 +37,16 @@ public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
    * Assign a new value for the reference.
    *
    * @param ref Reference
+   * @return {@code this}, for inlining.
    */
-  void set(DBIDRef ref);
+  DBIDVar set(DBIDRef ref);
 
   /**
    * Update variable from a data store.
    *
    * @param store Data store
    * @param ref Reference
-   * @return Self, for inlining.
+   * @return {@code this}, for inlining.
    */
   DBIDVar from(DBIDDataStore store, DBIDRef ref);
 
@@ -60,18 +61,4 @@ public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
    * @return {@code true} when assigned.
    */
   boolean isSet();
-
-  /**
-   * Assign the first pair member to this variable.
-   *
-   * @param pair Pair
-   */
-  void setFirst(DBIDPair pair);
-
-  /**
-   * Assign the second pair member to this variable.
-   *
-   * @param pair Pair
-   */
-  void setSecond(DBIDPair pair);
 }

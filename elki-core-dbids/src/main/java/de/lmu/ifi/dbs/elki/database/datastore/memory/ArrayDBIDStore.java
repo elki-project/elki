@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,8 +72,7 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
 
   @Override
   public DBIDVar assignVar(DBIDRef id, DBIDVar var) {
-    data.assignVar(idmap.mapDBIDToOffset(id), var);
-    return var;
+    return data.assignVar(idmap.mapDBIDToOffset(id), var);
   }
 
   @Override
@@ -87,14 +86,12 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
 
   @Override
   public void putDBID(DBIDRef id, DBIDRef value) {
-    final int off = idmap.mapDBIDToOffset(id);
-    data.set(off, value);
+    data.set(idmap.mapDBIDToOffset(id), value);
   }
 
   @Override
   public void put(DBIDRef id, DBIDRef value) {
-    final int off = idmap.mapDBIDToOffset(id);
-    data.set(off, value);
+    data.set(idmap.mapDBIDToOffset(id), value);
   }
 
   @Override
@@ -117,5 +114,10 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   @Override
   public void delete(DBIDRef id) {
     put(id, DBIDUtil.invalid());
+  }
+  
+  @Override
+  public String toString() {
+    return data.toString();
   }
 }

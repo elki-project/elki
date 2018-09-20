@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,13 +67,13 @@ public interface DBIDFactory {
 
   /**
    * Assign an integer value to a DBID variable.
-   *
+   * <p>
    * Note: this may not be possible for some factories!
    *
    * @param var Variable
    * @param val Integer value
    */
-  void assignVar(DBIDVar var, int val);
+  DBIDVar assignVar(DBIDVar var, int val);
 
   /**
    * Generate a single DBID.
