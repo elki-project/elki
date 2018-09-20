@@ -186,17 +186,14 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       while(!candidates.isEmpty()) {
         findBest(candidates, it, cur);
         processedIDs.add(cur);
-        { // Build cluster order entry
-          predecessor.assignVar(cur, prev);
-          double dist = reachability.doubleValue(cur);
-          clusterOrder.add(cur, dist, prev);
-          LOG.incrementProcessed(progress);
-        }
+        // Build cluster order entry
+        clusterOrder.add(cur, reachability.doubleValue(cur), predecessor.assignVar(cur, prev));
+        LOG.incrementProcessed(progress);
 
         neighbors.clear();
         rangeQuery.getRangeForDBID(cur, epsilon, neighbors);
         if(neighbors.size() >= minpts) {
-          neighbors.sort();
+          neighbors.sort(); // A quick select would be enough, but its cheap.
           final double coreDistance = neighbor.seek(minpts - 1).doubleValue();
 
           for(neighbor.seek(0); neighbor.valid(); neighbor.advance()) {
@@ -208,7 +205,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
             if(reach < prevreach) {
               reachability.put(neighbor, reach);
               predecessor.putDBID(neighbor, cur);
-              if(prevreach >= Double.POSITIVE_INFINITY) {
+              if(prevreach == Double.POSITIVE_INFINITY) {
                 candidates.add(neighbor);
               }
             }
@@ -226,17 +223,17 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
      */
     public void findBest(ArrayModifiableDBIDs candidates, DBIDArrayMIter it, DBIDVar out) {
       assert (candidates.size() > 0);
-      int best = 0;
-      double min = reachability.doubleValue(it.seek(0));
+      int bestidx = 0;
+      double min = reachability.doubleValue(out.set(it.seek(0)));
       for(it.advance(); it.valid(); it.advance()) {
         final double reach = reachability.doubleValue(it);
-        if(reach < min) {
+        if(reach < min || reach == min && DBIDUtil.compare(it, out) < 0) {
           min = reach;
-          best = it.getOffset();
+          out.set(it);
+          bestidx = it.getOffset();
         }
       }
-      out.set(it.seek(best));
-      it.remove();
+      it.seek(bestidx).remove();
     }
   }
 

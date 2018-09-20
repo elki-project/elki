@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,25 +62,16 @@ public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
 
   /**
    * Indicates whether some other object is "equal to" this one.
-   * 
+   * <p>
    * NOTE: for the use in an UpdatableHeap, only the ID is compared!
-   * 
+   * <p>
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values as
    *         the o argument; <code>false</code> otherwise.
    */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(!(o instanceof OPTICSHeapEntry)) {
-      return false;
-    }
-
-    final OPTICSHeapEntry that = (OPTICSHeapEntry) o;
-    // Compare by ID only, for UpdatableHeap!
-    return DBIDUtil.equal(objectID, that.objectID);
+    return this == o || (o instanceof OPTICSHeapEntry) && DBIDUtil.equal(objectID, ((OPTICSHeapEntry) o).objectID);
   }
 
   /**
@@ -105,12 +96,8 @@ public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
 
   @Override
   public int compareTo(OPTICSHeapEntry o) {
-    if(this.reachability < o.reachability) {
-      return -1;
-    }
-    if(this.reachability > o.reachability) {
-      return +1;
-    }
-    return -DBIDUtil.compare(objectID, o.objectID);
+    return this.reachability < o.reachability ? -1 : //
+        this.reachability > o.reachability ? +1 : //
+            DBIDUtil.compare(objectID, o.objectID);
   }
 }

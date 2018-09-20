@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,19 +38,16 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class OPTICSHeapTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run OPTICS with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
-  public void testOPTICSResults() {
+  public void testOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSHeap.Parameterizer.MINPTS_ID, 18) //
+        .with(OPTICSList.Parameterizer.EPSILON_ID, 0.1) //
         .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSHeap.class) //
         .build().run(db);
-    testFMeasure(db, clustering, 0.8819664);
-    testClusterSizes(clustering, new int[] { 108, 120, 209, 273 });
+    testFMeasure(db, clustering, 0.8891673);
+    testClusterSizes(clustering, new int[] { 108, 117, 209, 276 });
   }
 }
