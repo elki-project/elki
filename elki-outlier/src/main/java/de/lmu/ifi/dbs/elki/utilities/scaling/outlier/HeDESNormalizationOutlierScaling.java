@@ -30,11 +30,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Normalization used by HeDES
+ * <p>
+ * Reference:<br>
+ * H. V. Nguyen, H. H. Ang, V. Gopalkrishnan<br>
+ * Mining Outliers with Ensemble of Heterogeneous Detectors on Random
+ * Subspaces<br>
+ * Proc. 15th Int. Conf. Database Systems for Advanced Applications (DASFAA
+ * 2010)
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Reference(authors = "H. V. Nguyen, H. H. Ang, V. Gopalkrishnan", title = "Mining Outliers with Ensemble of Heterogeneous Detectors on Random Subspaces", booktitle = "Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA 2010)", url = "https://doi.org/10.1007/978-3-642-12026-8_29")
+@Reference(authors = "H. V. Nguyen, H. H. Ang, V. Gopalkrishnan", //
+    title = "Mining Outliers with Ensemble of Heterogeneous Detectors on Random Subspaces", //
+    booktitle = "Proc. 15th Int. Conf. Database Systems for Advanced Applications (DASFAA 2010)", //
+    url = "https://doi.org/10.1007/978-3-642-12026-8_29", //
+    bibkey = "DBLP:conf/dasfaa/VuAG10")
 public class HeDESNormalizationOutlierScaling implements OutlierScaling {
   /**
    * Mean
@@ -62,9 +73,9 @@ public class HeDESNormalizationOutlierScaling implements OutlierScaling {
     DoubleMinMax minmax = new DoubleMinMax();
 
     DoubleRelation scores = or.getScores();
-    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double val = scores.doubleValue(id);
-      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
         minmax.put(val);
       }
@@ -82,9 +93,9 @@ public class HeDESNormalizationOutlierScaling implements OutlierScaling {
     DoubleMinMax minmax = new DoubleMinMax();
 
     final int size = adapter.size(array);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       double val = adapter.getDouble(array, i);
-      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
         minmax.put(val);
       }
@@ -109,9 +120,10 @@ public class HeDESNormalizationOutlierScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (stddev > 0 || (value == mean)) : "prepare() was not run prior to using the scaling function.";
-    if (stddev > 0.) {
+    if(stddev > 0.) {
       return (value - mean) / stddev;
-    } else {
+    }
+    else {
       return 0.;
     }
   }

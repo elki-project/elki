@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Reference:
  * <p>
  * G. N. Lance, W. T. Williams<br>
- * A general theory of classificatory sorting strategies 1. Hierarchical
- * systems<br>
- * The Computer Journal 9.4 (1967): 373-380.
+ * A general theory of classificatory sorting strategies<br>
+ * 1. Hierarchical systems<br>
+ * The Computer Journal 9.4
  * 
  * @author Erich Schubert
  * @since 0.6.0

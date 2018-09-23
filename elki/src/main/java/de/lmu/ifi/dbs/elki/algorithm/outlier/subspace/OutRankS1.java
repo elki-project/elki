@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,25 +54,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * OutRank: ranking outliers in high dimensional data.
- * 
+ * <p>
  * Algorithm to score outliers based on a subspace clustering result. This class
  * implements score 1 of the OutRank publication, which is a score based on
  * cluster sizes and cluster dimensionality.
- * 
+ * <p>
  * Reference:
  * <p>
- * Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl<br />
- * OutRank: ranking outliers in high dimensional data<br />
+ * E. Müller, I. Assent, U. Steinhausen, T. Seidl<br>
+ * OutRank: ranking outliers in high dimensional data<br>
  * In Proceedings 24th International Conference on Data Engineering (ICDE)
- * Workshop on Ranking in Databases (DBRank), Cancun, Mexico
- * </p>
+ * Workshop on Ranking in Databases (DBRank)
  * 
  * @author Erich Schubert
  * @since 0.5.0
  */
 @Title("OutRank: ranking outliers in high dimensional data")
 @Description("Ranking outliers in high dimensional data - score 1")
-@Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", title = "OutRank: ranking outliers in high dimensional data", booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank), Cancun, Mexico", url = "https://doi.org/10.1109/ICDEW.2008.4498387")
+@Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", //
+    title = "OutRank: ranking outliers in high dimensional data", //
+    booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank)", //
+    url = "https://doi.org/10.1109/ICDEW.2008.4498387", //
+    bibkey = "DBLP:conf/icde/MullerASS08")
 public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -92,8 +95,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   /**
    * Constructor.
    * 
-   * @param clusteralg Clustering algorithm to use (must implement
-   *        {@link SubspaceClusteringAlgorithm}!)
+   * @param clusteralg {@link SubspaceClusteringAlgorithm} to use
    * @param alpha Alpha parameter to balance size and dimensionality.
    */
   public OutRankS1(SubspaceClusteringAlgorithm<? extends SubspaceModel> clusteralg, double alpha) {

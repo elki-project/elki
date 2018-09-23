@@ -62,7 +62,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 @Reference(authors = "D. Müllner", //
     title = "Modern hierarchical, agglomerative clustering algorithms", //
     booktitle = "arXiv preprint arXiv:1109.2378", //
-    url = "https://arxiv.org/abs/1109.2378")
+    url = "https://arxiv.org/abs/1109.2378", //
+    bibkey = "DBLP:journals/corr/abs-1109-2378")
 public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

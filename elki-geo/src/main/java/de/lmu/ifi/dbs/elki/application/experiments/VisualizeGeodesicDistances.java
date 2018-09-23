@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphereUtil;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -43,15 +44,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Visualization function for Cross-track distance function
- *
+ * Visualization function for Cross-track, Along-track, and minimum distance
+ * function.
+ * <p>
  * TODO: make origin point / rectangle configurable.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br>
+ * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br>
+ * Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)
  *
  * @author Niels Dörre
  * @author Erich Schubert
  * @since 0.5.5
  */
 @Alias({ "de.lmu.ifi.dbs.elki.application.geo.VisualizeGeodesicDistances" })
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
+    title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+    booktitle = "Int. Symp. Advances in Spatial and Temporal Databases (SSTD'2013)", //
+    url = "https://doi.org/10.1007/978-3-642-40235-7_9", //
+    bibkey = "DBLP:conf/ssd/SchubertZK13")
 public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Get a logger for this class.

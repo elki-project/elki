@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -60,26 +60,26 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * A simple ensemble method called "Feature bagging" for outlier detection.
- *
  * <p>
  * Since the proposed method is only sensible to run on multiple instances of
  * the same algorithm (due to incompatible score ranges), we do not allow using
  * arbitrary algorithms.
- * </p>
- *
  * <p>
- * Reference: <br>
- * A. Lazarevic, V. Kumar: Feature Bagging for Outlier Detection<br />
- * In: Proc. of the 11th ACM SIGKDD international conference on Knowledge
- * discovery in data mining
- * </p>
+ * Reference:<br>
+ * A. Lazarevic, V. Kumar<br>
+ * Feature Bagging for Outlier Detection<br>
+ * Proc. 11th ACM SIGKDD Int. Conf. on Knowledge Discovery in Data Mining
  *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * @since 0.4.0
  */
 @Title("Feature Bagging for Outlier Detection")
-@Reference(title = "Feature Bagging for Outlier Detection", authors = "A. Lazarevic, V. Kumar", booktitle = "Proc. of the 11th ACM SIGKDD international conference on Knowledge discovery in data mining", url = "https://doi.org/10.1145/1081870.1081891")
+@Reference(authors = "A. Lazarevic, V. Kumar", //
+    title = "Feature Bagging for Outlier Detection", //
+    booktitle = "Proc. 11th ACM SIGKDD Int. Conf. on Knowledge Discovery in Data Mining", //
+    url = "https://doi.org/10.1145/1081870.1081891", //
+    bibkey = "DBLP:conf/kdd/LazarevicK05")
 public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

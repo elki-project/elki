@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -46,6 +47,17 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Initialize k-means by running k-means on a sample of the data set only.
+ * <p>
+ * Reference:
+ * <p>
+ * The idea of finding centers on a sample can be found in:
+ * <p>
+ * P. S. Bradley, U. M. Fayyad<br>
+ * Refining Initial Points for K-Means Clustering<br>
+ * Proc. 15th Int. Conf. on Machine Learning (ICML 1998)
+ * <p>
+ * But Bradley and Fayyad also suggest to repeat this multiple times. This
+ * implementation uses a single attempt only.
  *
  * @author Erich Schubert
  * @since 0.6.0
@@ -53,6 +65,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <V> Vector type
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SampleKMeansInitialization")
+@Reference(authors = "P. S. Bradley, U. M. Fayyad", //
+    title = "Refining Initial Points for K-Means Clustering", //
+    booktitle = "Proc. 15th Int. Conf. on Machine Learning (ICML 1998)", //
+    bibkey = "DBLP:conf/icml/BradleyF98")
 public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
   /**
    * Variant of kMeans to use for initialization.

@@ -58,7 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "D. Müllner", //
     title = "Modern hierarchical, agglomerative clustering algorithms", //
     booktitle = "arXiv preprint arXiv:1109.2378", //
-    url = "https://arxiv.org/abs/1109.2378")
+    url = "https://arxiv.org/abs/1109.2378", //
+    bibkey = "DBLP:journals/corr/abs-1109-2378")
 public class NNChain<O> extends AGNES<O> {
   /**
    * Class logger.

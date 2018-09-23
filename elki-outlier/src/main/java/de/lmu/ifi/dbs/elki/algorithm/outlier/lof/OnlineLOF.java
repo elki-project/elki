@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,8 +57,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Incremental version of the {@link LOF} Algorithm, supports insertions and
  * removals.
- *
- * BUG: this currently does not appear to work.
  *
  * @author Elke Achtert
  * @since 0.4.0

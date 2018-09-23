@@ -450,11 +450,13 @@ public class GammaDistribution extends AbstractDistribution {
   @Reference(authors = "J. H. Ahrens, U. Dieter", //
       title = "Computer methods for sampling from gamma, beta, Poisson and binomial distributions", //
       booktitle = "Computing 12", //
-      url = "https://doi.org/10.1007/BF02293108")
+      url = "https://doi.org/10.1007/BF02293108", //
+      bibkey = "DBLP:journals/computing/AhrensD74")
   @Reference(authors = "J. H. Ahrens, U. Dieter", //
       title = "Generating gamma variates by a modified rejection technique", //
       booktitle = "Communications of the ACM 25", //
-      url = "https://doi.org/10.1145/358315.358390")
+      url = "https://doi.org/10.1145/358315.358390", //
+      bibkey = "DBLP:journals/cacm/AhrensD82")
   public static double nextRandom(double k, double theta, Random random) {
     /* Constants */
     final double q1 = 0.0416666664, q2 = 0.0208333723, q3 = 0.0079849875;

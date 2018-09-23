@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,8 +62,6 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
 
   /**
    * Predecessor storage.
-   * 
-   * TODO: make optional.
    */
   WritableDBIDDataStore predecessor;
 
@@ -113,8 +111,7 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
   public void add(DBIDRef id, double reach, DBIDRef pre) {
     ids.add(id);
     reachability.putDouble(id, reach);
-    if(pre == null || //
-    pre instanceof DBIDVar && !((DBIDVar) pre).isSet()) {
+    if(pre == null || pre instanceof DBIDVar && !((DBIDVar) pre).isSet()) {
       return;
     }
     predecessor.putDBID(id, pre);

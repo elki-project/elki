@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,23 +33,25 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
  * Quadratic-time complexity split as used by Diane Greene for the R-Tree.
- * 
+ * <p>
  * Seed selection is quadratic, distribution is O(n log n).
- * 
+ * <p>
  * This contains a slight modification to improve performance with point data:
  * with points as seeds, the normalized separation is always 1, so we choose the
  * raw separation then.
- * 
  * <p>
- * Diane Greene:<br />
- * An implementation and performance analysis of spatial data access methods<br />
- * In: Proceedings of the Fifth International Conference on Data Engineering
- * </p>
- * 
+ * D. Greene<br>
+ * An implementation and performance analysis of spatial data access methods<br>
+ * Proceedings of the Fifth International Conference on Data Engineering
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Diane Greene", title = "An implementation and performance analysis of spatial data access methods", booktitle = "Proceedings of the Fifth International Conference on Data Engineering", url = "https://doi.org/10.1109/ICDE.1989.47268")
+@Reference(authors = "D, Greene", //
+    title = "An implementation and performance analysis of spatial data access methods", //
+    booktitle = "Proceedings of the Fifth International Conference on Data Engineering", //
+    url = "https://doi.org/10.1109/ICDE.1989.47268", //
+    bibkey = "DBLP:conf/icde/Greene89")
 public class GreeneSplit implements SplitStrategy {
   /**
    * Static instance.

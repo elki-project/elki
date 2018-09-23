@@ -62,7 +62,8 @@ import net.jafama.FastMath;
 @Reference(authors = "J. Beirlant, G. Dierckx, A. Guillou", //
     title = "Estimation of the extreme-value index and generalized quantile plots", //
     booktitle = "Bernoulli 11(6)", //
-    url = "https://doi.org/10.3150/bj/1137421635")
+    url = "https://doi.org/10.3150/bj/1137421635", //
+    bibkey = "doi:10.3150/bj/1137421635")
 public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
   /**
    * Static instance.
