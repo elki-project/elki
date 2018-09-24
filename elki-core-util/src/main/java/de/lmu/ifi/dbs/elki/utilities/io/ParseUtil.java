@@ -108,16 +108,6 @@ public final class ParseUtil {
   };
 
   /**
-   * Maximum long that we can process without overflowing.
-   */
-  private static final long MAX_LONG_OVERFLOW = Long.MAX_VALUE / 10;
-
-  /**
-   * Maximum integer that we can process without overflowing.
-   */
-  private static final int MAX_INT_OVERFLOW = Integer.MAX_VALUE / 10;
-
-  /**
    * Infinity pattern, with any capitalization
    */
   private static final char[] INFINITY_PATTERN = { //
@@ -174,10 +164,12 @@ public final class ParseUtil {
       final int digit = cur - '0';
       if((digit >= 0) && (digit <= 9)) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
-        if((decimal > MAX_LONG_OVERFLOW) || (tmp < decimal)) {
+        if(tmp >= decimal) {
+          decimal = tmp; // Otherwise, silently ignore the extra digits.
+        }
+        else if(++decimalPoint == 0) { // Because we ignored the digit
           throw PRECISION_OVERFLOW;
         }
-        decimal = tmp;
       }
       else if((cur == '.') && (decimalPoint < 0)) {
         decimalPoint = pos;
@@ -185,12 +177,10 @@ public final class ParseUtil {
       else { // No more digits, or a second dot.
         break;
       }
-      if(++pos < end) {
-        cur = str[pos];
-      }
-      else {
+      if(++pos >= end) {
         break;
       }
+      cur = str[pos];
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -209,33 +199,22 @@ public final class ParseUtil {
       }
       while(true) {
         final int digit = cur - '0';
-        if((digit >= 0) && (digit < 10)) {
-          final int tmp = (exp << 3) + (exp << 1) + digit;
-          // Actually, double can only handle Double.MAX_EXPONENT? How about
-          // subnormal?
-          if((exp > MAX_INT_OVERFLOW) || (tmp < exp)) {
-            throw EXPONENT_OVERFLOW;
-          }
-          exp = tmp;
-        }
-        else {
+        if(digit < 0 || digit > 9) {
           break;
         }
-        if(++pos < end) {
-          cur = str[pos];
+        exp = (exp << 3) + (exp << 1) + digit;
+        if(exp > Double.MAX_EXPONENT) {
+          throw EXPONENT_OVERFLOW;
         }
-        else {
+        if(++pos >= end) {
           break;
         }
+        cur = str[pos];
       }
-      if(isNegativeExp) {
-        exp = -exp;
-      }
+      exp = isNegativeExp ? -exp : exp;
     }
     // Adjust exponent by the offset of the dot in our long.
-    if(decimalPoint >= 0) {
-      exp = exp - decimalPoint;
-    }
+    exp = decimalPoint > 0 ? (exp - decimalPoint) : exp;
     if(pos != end) {
       throw TRAILING_CHARACTERS;
     }
@@ -305,10 +284,12 @@ public final class ParseUtil {
       final int digit = cur - '0';
       if((digit >= 0) && (digit <= 9)) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
-        if((decimal > MAX_LONG_OVERFLOW) || (tmp < decimal)) {
+        if(tmp >= decimal) {
+          decimal = tmp; // Otherwise, silently ignore the extra digits.
+        }
+        else if(++decimalPoint == 0) { // Because we ignored the digit
           throw PRECISION_OVERFLOW;
         }
-        decimal = tmp;
       }
       else if((cur == '.') && (decimalPoint < 0)) {
         decimalPoint = pos;
@@ -316,12 +297,10 @@ public final class ParseUtil {
       else { // No more digits, or a second dot.
         break;
       }
-      if(++pos < end) {
-        cur = str.charAt(pos);
-      }
-      else {
+      if(++pos >= end) {
         break;
       }
+      cur = str.charAt(pos);
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -340,33 +319,22 @@ public final class ParseUtil {
       }
       while(true) {
         final int digit = cur - '0';
-        if((digit >= 0) && (digit < 10)) {
-          final int tmp = (exp << 3) + (exp << 1) + digit;
-          // Actually, double can only handle Double.MAX_EXPONENT? How about
-          // subnormal?
-          if((exp > MAX_INT_OVERFLOW) || (tmp < exp)) {
-            throw EXPONENT_OVERFLOW;
-          }
-          exp = tmp;
-        }
-        else {
+        if(digit < 0 || digit > 9) {
           break;
         }
-        if(++pos < end) {
-          cur = str.charAt(pos);
+        exp = (exp << 3) + (exp << 1) + digit;
+        if(exp > Double.MAX_EXPONENT) {
+          throw EXPONENT_OVERFLOW;
         }
-        else {
+        if(++pos >= end) {
           break;
         }
+        cur = str.charAt(pos);
       }
-      if(isNegativeExp) {
-        exp = -exp;
-      }
+      exp = isNegativeExp ? -exp : exp;
     }
     // Adjust exponent by the offset of the dot in our long.
-    if(decimalPoint >= 0) {
-      exp = exp - decimalPoint;
-    }
+    exp = decimalPoint > 0 ? (exp - decimalPoint) : exp;
     if(pos != end) {
       throw TRAILING_CHARACTERS;
     }
