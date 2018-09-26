@@ -106,24 +106,6 @@ public interface KNNHeap {
   void clear();
 
   /**
-   * Poll the <em>largest</em> element from the heap.
-   * <p>
-   * This is in descending order because of the heap structure. For a convenient
-   * way to serialize the heap into a list that you can iterate in ascending
-   * order, see {@link #toKNNList()}.
-   *
-   * @return largest element
-   */
-  DoubleDBIDPair poll();
-
-  /**
-   * Peek at the <em>largest</em> element in the heap.
-   *
-   * @return The current largest element.
-   */
-  DoubleDBIDPair peek();
-
-  /**
    * Unordered iterator over the heap.
    *
    * @return Iterator

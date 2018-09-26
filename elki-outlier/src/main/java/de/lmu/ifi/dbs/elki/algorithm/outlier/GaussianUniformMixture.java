@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
@@ -31,11 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -48,7 +43,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -56,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -71,7 +66,6 @@ import net.jafama.FastMath;
  * E. Eskin<br>
  * Anomaly detection over noisy data using learned probability distributions<br>
  * Proc. 17th Int. Conf. on Machine Learning (ICML-2000)
- * </p>
  *
  * @author Lisa Reichert
  * @since 0.3
@@ -91,6 +85,11 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(GaussianUniformMixture.class);
+
+  /**
+   * Maximum number of iterations to do.
+   */
+  private static final int MAX_ITER = 10;
 
   /**
    * Holds the cutoff value.
@@ -129,93 +128,85 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
   public OutlierResult run(Relation<V> relation) {
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
-    // A bit set to flag objects as anomalous, none at the beginning
-    long[] bits = BitsUtil.zero(objids.size());
-    // Positive masked collection
-    DBIDs normalObjs = new MaskedDBIDs(objids, bits, true);
-    // Positive masked collection
-    DBIDs anomalousObjs = new MaskedDBIDs(objids, bits, false);
+    // Build entire covariance matrix:
+    CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
+
+    // Anomalous objects
+    HashSetModifiableDBIDs anomalous = DBIDUtil.newHashSet();
     // resulting scores
     WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // compute loglikelihood
-    double logLike = relation.size() * logml + loglikelihoodNormal(normalObjs, relation);
-    // LOG.debugFine("normalsize " + normalObjs.size() + " anormalsize " +
-    // anomalousObjs.size() + " all " + (anomalousObjs.size() +
-    // normalObjs.size()));
-    // LOG.debugFine(logLike + " loglike beginning" +
-    // loglikelihoodNormal(normalObjs, database));
+    double logLike = objids.size() * logml + loglikelihoodNormal(objids, anomalous, builder, relation);
+
     DoubleMinMax minmax = new DoubleMinMax();
+    for(int loop = 0; loop < MAX_ITER; ++loop) {
+      boolean changed = false;
+      for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
+        // Change mask to make the current Fobject anomalous
+        boolean wasadded = anomalous.add(iter) || !anomalous.remove(iter);
+        final V vec = relation.get(iter);
+        builder.put(vec, wasadded ? -1 : +1); // Remove
+        // Compute new likelihoods
+        double currentLogLike = (objids.size() - anomalous.size()) * logml + loglikelihoodNormal(objids, anomalous, builder, relation) //
+            + anomalous.size() * logl + loglikelihoodAnomalous(anomalous);
 
-    DBIDIter iter = objids.iter();
-    for(int i = 0; i < objids.size(); i++, iter.advance()) {
-      // LOG.debugFine("i " + i);
-      // Change mask to make the current object anomalous
-      BitsUtil.setI(bits, i);
-      // Compute new likelihoods
-      double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, relation) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
+        // if the loglike increases more than a threshold, the object remains in
+        // the assigned state:
+        final double loglikeGain = currentLogLike - logLike;
+        oscores.putDouble(iter, loglikeGain);
+        minmax.put(loglikeGain);
 
-      // if the loglike increases more than a threshold, object stays in
-      // anomalous set and is flagged as outlier
-      final double loglikeGain = currentLogLike - logLike;
-      oscores.putDouble(iter, loglikeGain);
-      minmax.put(loglikeGain);
-
-      if(loglikeGain > c) {
-        // flag as outlier
-        // LOG.debugFine("Outlier: " + curid + " " + (currentLogLike -
-        // logLike));
-        // Update best logLike
-        logLike = currentLogLike;
+        if(loglikeGain > c) {
+          logLike = currentLogLike;
+          changed = true;
+        }
+        else {
+          // remove from anomalous again
+          wasadded = wasadded ? anomalous.remove(iter) : !anomalous.add(iter);
+          builder.put(vec, wasadded ? +1 : -1);
+        }
       }
-      else {
-        // LOG.debugFine("Inlier: " + curid + " " + (currentLogLike - logLike));
-        // undo bit set
-        BitsUtil.clearI(bits, i);
+      assert anomalous.size() == Math.round(objids.size() - builder.getWeight());
+      if(!changed) {
+        break;
       }
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
+
     DoubleRelation res = new MaterializedDoubleRelation("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 
   /**
-   * Loglikelihood anomalous objects. Uniform distribution
+   * Loglikelihood anomalous objects. Uniform distribution.
    *
    * @param anomalousObjs
    * @return loglikelihood for anomalous objects
    */
   private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
-    int n = anomalousObjs.size();
-    return n * FastMath.log(1.0 / n);
+    return anomalousObjs.isEmpty() ? 0 : anomalousObjs.size() * -FastMath.log(anomalousObjs.size());
   }
 
   /**
    * Computes the loglikelihood of all normal objects. Gaussian model
    *
    * @param objids Object IDs for 'normal' objects.
+   * @param builder Covariance matrix builder
    * @param relation Database
    * @return loglikelihood for normal objects
    */
-  private double loglikelihoodNormal(DBIDs objids, Relation<V> relation) {
-    if(objids.isEmpty()) {
-      return 0;
-    }
-    CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
+  private double loglikelihoodNormal(DBIDs objids, SetDBIDs anomalous, CovarianceMatrix builder, Relation<V> relation) {
     double[] mean = builder.getMeanVector();
-    double[][] covarianceMatrix = builder.destroyToSampleMatrix();
-
-    // test singulaere matrix
-    double[][] covInv = inverse(covarianceMatrix);
-
-    double covarianceDet = new LUDecomposition(covarianceMatrix).det();
-    double fakt = 1.0 / FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceDet);
+    final LUDecomposition lu = new LUDecomposition(builder.makeSampleMatrix());
+    double[][] covInv = lu.inverse();
     // for each object compute probability and sum
-    double prob = 0;
+    double prob = (objids.size() - anomalous.size()) * -FastMath.log(FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * lu.det()));
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
-      double[] x = minusEquals(relation.get(iter).toArray(), mean);
-      double mDist = transposeTimesTimes(x, covInv, x);
-      prob += FastMath.log(fakt * FastMath.exp(-mDist * .5));
+      if(!anomalous.contains(iter)) {
+        double[] xcent = minusEquals(relation.get(iter).toArray(), mean);
+        prob -= .5 * transposeTimesTimes(xcent, covInv, xcent);
+      }
     }
     return prob;
   }

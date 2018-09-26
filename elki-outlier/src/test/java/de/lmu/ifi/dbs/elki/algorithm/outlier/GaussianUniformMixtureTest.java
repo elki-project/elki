@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ public class GaussianUniformMixtureTest extends AbstractOutlierAlgorithmTest {
   public void testGaussianUniformMixture() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     OutlierResult result = new ELKIBuilder<GaussianUniformMixture<DoubleVector>>(GaussianUniformMixture.class).build().run(db);
-    testSingleScore(result, 1025, -20.27211494);
-    testAUC(db, "Noise", result, 0.97251282);
+    testAUC(db, "Noise", result, 0.9932512);
+    testSingleScore(result, 1025, -20.131949);
   }
 }

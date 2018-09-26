@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -35,8 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
@@ -161,9 +158,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   public StaticDBIDs makeUnmodifiable(DBIDs existing) {
     return existing instanceof StaticDBIDs ? (StaticDBIDs) existing : //
         existing instanceof IntegerArrayDBIDs ? new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing) : //
-            existing instanceof IntegerDBIDs ? new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing) : //
-                existing instanceof ArrayDBIDs ? new UnmodifiableArrayDBIDs((ArrayDBIDs) existing) : //
-                    new UnmodifiableDBIDs(existing);
+            new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
   }
 
   @Override

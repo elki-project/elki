@@ -170,16 +170,6 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     ++numties;
   }
 
-  @Override
-  public DoubleIntegerDBIDPair poll() {
-    if(numties > 0) {
-      return new DoubleIntegerDBIDPair(kdist, ties[--numties]);
-    }
-    final DoubleIntegerDBIDPair ret = new DoubleIntegerDBIDPair(heap.peekKey(), heap.peekValue());
-    heap.poll();
-    return ret;
-  }
-
   /**
    * Pop the topmost element.
    */
@@ -190,14 +180,6 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     else {
       heap.poll();
     }
-  }
-
-  @Override
-  public DoubleIntegerDBIDPair peek() {
-    if(numties > 0) {
-      return new DoubleIntegerDBIDPair(kdist, ties[numties - 1]);
-    }
-    return new DoubleIntegerDBIDPair(heap.peekKey(), heap.peekValue());
   }
 
   @Override

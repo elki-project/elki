@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -159,10 +158,10 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
           }
           E[j][i] = e;
         }
-        // Convert kNN Heap into DBID array
+        // Convert kNN Heap into DBID array (unordered)
         ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
-        while(heap.size() > 0) {
-          nids.add(heap.poll());
+        for(DBIDIter it = heap.unorderedIterator(); it.valid(); it.advance()) {
+          nids.add(it);
         }
         neighbors.put(id, nids);
       }
@@ -211,7 +210,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
         if(DBIDUtil.equal(id, iter)) {
           continue;
         }
-        double sim = VMath.angle(similarityVectors.get(id), similarityVectors.get(iter));
+        double sim = angle(similarityVectors.get(id), similarityVectors.get(iter));
         gmean *= sim;
         cnt++;
       }
