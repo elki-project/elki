@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
@@ -92,11 +93,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
   private static final Logging LOG = Logging.getLogger(KMedoidsPAM.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMedoidsPAM.class.getName();
-
-  /**
    * The number of clusters to produce.
    */
   protected int k;
@@ -142,18 +138,13 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     }
     DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
     DBIDs ids = relation.getDBIDs();
-    // Choose initial medoids
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
-    if(medoids.size() != k) {
-      throw new AbortException("Initializer " + initializer.toString() + " did not return " + k + " means, but " + medoids.size());
-    }
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids);
 
     // Setup cluster assignment store
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     run(distQ, ids, medoids, assignment);
+    getLogger().statistics(optd.end());
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
@@ -163,6 +154,26 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
     }
     return result;
+  }
+
+  /**
+   * Choose the initial medoids.
+   *
+   * @param distQ Distance query
+   * @param ids IDs to choose from
+   * @return Initial medoids
+   */
+  protected ArrayModifiableDBIDs initialMedoids(DistanceQuery<V> distQ, DBIDs ids) {
+    if(getLogger().isStatistics()) {
+      getLogger().statistics(new StringStatistic(getClass().getName() + ".initialization", initializer.toString()));
+    }
+    Duration initd = getLogger().newDuration(getClass().getName() + ".initialization-time").begin();
+    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
+    getLogger().statistics(initd.end());
+    if(medoids.size() != k) {
+      throw new AbortException("Initializer " + initializer.toString() + " did not return " + k + " means, but " + medoids.size());
+    }
+    return medoids;
   }
 
   /**
@@ -242,8 +253,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
       double tc = assignToNearestCluster(medoids);
+      String key = getClass().getName();
       if(LOG.isStatistics()) {
-        LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
+        LOG.statistics(new DoubleStatistic(key + ".iteration-" + 0 + ".cost", tc));
       }
 
       final boolean metric = distQ.getDistanceFunction().isMetric();
@@ -286,7 +298,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         // Reassign
         double nc = assignToNearestCluster(medoids);
         if(LOG.isStatistics()) {
-          LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
+          LOG.statistics(new DoubleStatistic(key + ".iteration-" + iteration + ".cost", nc));
         }
         if(nc > tc) {
           if(nc - tc < 1e-7 * tc) {
@@ -300,15 +312,15 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       }
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
-        LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+        LOG.statistics(new LongStatistic(key + ".iterations", iteration));
       }
       return this;
     }
 
     /**
-     * Compute the reassignment cost, for all medoids in one pass.
+     * Compute the reassignment cost of one swap.
      *
-     * @param h Current object to swap with any medoid.
+     * @param h Current object to swap with the medoid
      * @param mnum Medoid number to be replaced
      * @return cost
      */
