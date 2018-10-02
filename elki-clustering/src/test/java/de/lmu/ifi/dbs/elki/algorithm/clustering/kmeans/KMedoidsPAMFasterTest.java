@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class KMedoidsPAMFastTest extends AbstractClusterAlgorithmTest {
+public class KMedoidsPAMFasterTest extends AbstractClusterAlgorithmTest {
   /**
    * Run KMedians PAM with fixed parameters and compare the result to a golden
    * standard.
@@ -47,7 +47,7 @@ public class KMedoidsPAMFastTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsPAM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMFast<DoubleVector>>(KMedoidsPAMFast.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMFaster<DoubleVector>>(KMedoidsPAMFaster.class) //
         .with(KMeans.K_ID, 5) //
         .build().run(db);
     testFMeasure(db, result, 0.998005);

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -48,7 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @param <V> vector datatype
  */
-@Priority(Priority.IMPORTANT + 1)
 public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
   /**
    * The logger for this class.
@@ -120,7 +118,6 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
       double[] cost = new double[k];
       for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
         LOG.incrementProcessed(prog);
-        // Try to swap a non-medoid with a medoid member:
         double best = Double.POSITIVE_INFINITY;
         int bestcluster = -1;
         // Iterate over all non-medoids:
@@ -138,17 +135,17 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           computeReassignmentCost(h, cost);
 
           // Find the best possible swap for h:
-          for(int pi = 0; pi < k; pi++) {
-            final double cpi = cost[pi];
-            if(cpi < best) {
-              best = cpi;
+          for(int i = 0; i < k; i++) {
+            final double costi = cost[i];
+            if(costi < best) {
+              best = costi;
               bestid.set(h);
-              bestcluster = pi;
+              bestcluster = i;
             }
           }
         }
         if(best >= 0.) {
-          break;
+          break; // Converged
         }
         // Update values for new medoid.
         medoids.set(bestcluster, bestid);
@@ -162,8 +159,10 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         else {
           assignment.putInt(bestid, bestcluster | (olda & 0x7FFF0000));
         }
-        assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) & 0x7FFF)) == nearest.doubleValue(bestid));
-        assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) >>> 16)) == second.doubleValue(bestid));
+        // assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) &
+        // 0x7FFF)) == nearest.doubleValue(bestid));
+        // assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) >>>
+        // 16)) == second.doubleValue(bestid));
         // Reassign
         updateAssignment(m, bestid, bestcluster);
         tc += best;
