@@ -101,13 +101,16 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
       if(weightsum < Double.MIN_NORMAL) {
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
       }
-      double r = random.nextDouble() * weightsum, s = 0.;
+      double r = random.nextDouble() * weightsum;
       DBIDIter it = ids.iter();
-      for(; s < r && it.valid(); it.advance()) {
-        s += weights.doubleValue(it);
+      while(it.valid()) {
+        if((r -= weights.doubleValue(it)) < 0) {
+          break;
+        }
+        it.advance();
       }
       if(!it.valid()) { // Rare case, but happens due to floating math
-        weightsum -= (r - s); // Decrease
+        weightsum -= r; // Decrease
         continue; // Retry
       }
       // Add new mean:
@@ -155,8 +158,15 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
         r = random.nextDouble() * weightsum; // Try harder to not choose 0.
       }
       DBIDIter it = ids.iter();
-      for(; r > 0. && it.valid(); it.advance()) {
-        r -= weights.doubleValue(it);
+      while(it.valid()) {
+        if((r -= weights.doubleValue(it)) <= 0) {
+          break;
+        }
+        it.advance();
+      }
+      if(!it.valid()) { // Rare case, but happens due to floating math
+        weightsum -= r; // Decrease
+        continue; // Retry
       }
       // Add new mean:
       means.add(it);
@@ -169,6 +179,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     }
 
     return means;
+
   }
 
   /**

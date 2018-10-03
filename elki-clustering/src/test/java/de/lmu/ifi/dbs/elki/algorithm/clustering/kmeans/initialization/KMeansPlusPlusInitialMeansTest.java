@@ -50,8 +50,8 @@ public class KMeansPlusPlusInitialMeansTest extends AbstractClusterAlgorithmTest
         .with(KMeans.SEED_ID, 3) //
         .with(KMeans.INIT_ID, KMeansPlusPlusInitialMeans.class) //
         .build().run(db);
-    testFMeasure(db, result, 0.99800500);
-    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    testFMeasure(db, result, 0.99205);
+    testClusterSizes(result, new int[] { 197, 199, 200, 201, 203 });
   }
 
   /**
@@ -69,7 +69,7 @@ public class KMeansPlusPlusInitialMeansTest extends AbstractClusterAlgorithmTest
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
         .with(CLARA.Parameterizer.RANDOM_ID, 0) //
         .build().run(db);
-    testFMeasure(db, result, 0.932711);
-    testClusterSizes(result, new int[] { 165, 199, 201, 201, 234 });
+    testFMeasure(db, result, 0.99602);
+    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 }
