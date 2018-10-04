@@ -8,3 +8,4 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomUniformGene
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomNormalGeneratedInitialMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PredefinedInitialMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.ParkInitialMeans

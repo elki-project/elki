@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.ParkInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
@@ -38,16 +38,12 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class KMedoidsParkTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMedoidsPark with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
-  public void testKMedoidsEM() {
+  public void testKMedoidsPark() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPark<DoubleVector>>(KMedoidsPark.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.INIT_ID, PAMInitialMeans.class) //
+        .with(KMeans.INIT_ID, ParkInitialMeans.class) //
         .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
