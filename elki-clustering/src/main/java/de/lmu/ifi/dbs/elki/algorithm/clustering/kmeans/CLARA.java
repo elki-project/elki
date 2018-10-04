@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -140,8 +141,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store
       WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-      new /* PAM */Instance(distQ, rids, assignment).run(medoids, maxiter);
-      double score = assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
+      double score = new /* PAM */Instance(distQ, rids, assignment).run(medoids, maxiter) //
+          + assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(getClass().getName() + ".sample-" + j + ".cost", score));
+      }
       if(score < best) {
         best = score;
         bestmedoids = medoids;
@@ -150,6 +154,9 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", best));
+    }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
 

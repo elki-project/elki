@@ -246,9 +246,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
      *
      * @param medoids Medoids list
      * @param maxiter
-     * @return this
+     * @return final cost
      */
-    protected Instance run(ArrayModifiableDBIDs medoids, int maxiter) {
+    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
@@ -314,7 +314,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(key + ".iterations", iteration));
       }
-      return this;
+      return tc;
     }
 
     /**

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -195,6 +196,9 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         scratch = tmp;
         j = 1;
       }
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(getClass().getName() + ".sample-" + i + ".cost", total));
+      }
       // New best:
       if(total < bestscore) {
         // Swap:
@@ -206,6 +210,9 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", bestscore));
+    }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, best.assignment, k);
 

@@ -112,9 +112,9 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
      *
      * @param medoids Medoids list
      * @param maxiter
-     * @return this
+     * @return final cost
      */
-    protected Instance run(ArrayModifiableDBIDs medoids, int maxiter) {
+    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
@@ -184,7 +184,7 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
       }
-      return this;
+      return tc;
     }
 
     /**
