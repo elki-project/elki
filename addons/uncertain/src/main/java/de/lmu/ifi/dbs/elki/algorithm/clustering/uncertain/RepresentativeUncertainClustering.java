@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -462,7 +462,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       predef.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
-      ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsEM.class);
+      ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsPAM.class);
       if(chain.grab(malgorithm)) {
         metaAlgorithm = malgorithm.instantiateClass(chain);
         if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //

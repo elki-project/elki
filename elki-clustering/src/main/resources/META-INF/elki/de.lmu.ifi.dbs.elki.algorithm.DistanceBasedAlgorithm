@@ -24,7 +24,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMinusMinus
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAMReynolds
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPark de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARANS
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans

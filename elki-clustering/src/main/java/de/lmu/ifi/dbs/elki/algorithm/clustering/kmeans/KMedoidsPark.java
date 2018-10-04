@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
@@ -44,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -83,16 +83,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Expert Systems with Applications 36(2)", //
     url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
     bibkey = "DBLP:journals/eswa/ParkJ09")
-public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM")
+public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsEM.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsPark.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsEM.class.getName();
+  private static final String KEY = KMedoidsPark.class.getName();
 
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
@@ -117,7 +118,7 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsEM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPark(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -135,14 +136,7 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     if(relation.size() <= 0) {
       return new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
     }
-    DistanceQuery<V> distQ = null;
-    // Only enforce a distance matrix for PAM initialization, which is slow.
-    if(initializer instanceof PAMInitialMeans) {
-      distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
-    }
-    else {
-      distQ = database.getDistanceQuery(relation, getDistanceFunction());
-    }
+    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
@@ -182,6 +176,9 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
           }
           double sum = 0;
           for(DBIDIter iter2 = clusters.get(i).iter(); iter2.valid(); iter2.advance()) {
+            if(DBIDUtil.equal(iter, iter2)) {
+              continue;
+            }
             sum += distQ.distance(iter, iter2);
           }
           if(sum < bestm) {
@@ -196,10 +193,10 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
           mdists[i] = bestm;
         }
       }
-      // Reassign
       if(!changed) {
-        break;
+        break; // Converged
       }
+      // Reassign
       double nc = assignToNearestCluster(miter, mdists, clusters, distQ);
       ++iteration;
       if(LOG.isStatistics()) {
@@ -334,8 +331,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     }
 
     @Override
-    protected KMedoidsEM<V> makeInstance() {
-      return new KMedoidsEM<>(distanceFunction, k, maxiter, initializer);
+    protected KMedoidsPark<V> makeInstance() {
+      return new KMedoidsPark<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

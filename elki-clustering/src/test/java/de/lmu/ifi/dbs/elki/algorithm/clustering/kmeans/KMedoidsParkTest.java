@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,21 +31,21 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Test k-Medoids using the EM approach.
+ * Test k-Medoids using the Park approach.
  *
  * @author Katharina Rausch
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class KMedoidsEMTest extends AbstractClusterAlgorithmTest {
+public class KMedoidsParkTest extends AbstractClusterAlgorithmTest {
   /**
-   * Run KMedoidsEM with fixed parameters and compare the result to a golden
+   * Run KMedoidsPark with fixed parameters and compare the result to a golden
    * standard.
    */
   @Test
   public void testKMedoidsEM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsEM<DoubleVector>>(KMedoidsEM.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPark<DoubleVector>>(KMedoidsPark.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, PAMInitialMeans.class) //
         .build().run(db);
