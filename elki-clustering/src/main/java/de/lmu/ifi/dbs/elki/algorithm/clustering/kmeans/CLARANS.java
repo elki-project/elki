@@ -143,18 +143,17 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     DBIDArrayIter cand = DBIDUtil.ensureArray(ids).iter(); // Might copy!
 
     // Setup cluster assignment store
-    Assignment best = new Assignment(distQ, ids, DBIDUtil.newArray(k));
-    Assignment curr = new Assignment(distQ, ids, DBIDUtil.newArray(k));
-    Assignment scratch = new Assignment(distQ, ids, DBIDUtil.newArray(k));
+    Assignment best = new Assignment(distQ, ids, k);
+    Assignment curr = new Assignment(distQ, ids, k);
+    Assignment scratch = new Assignment(distQ, ids, k);
 
     // 1. initialize
     double bestscore = Double.POSITIVE_INFINITY;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("CLARANS sampling restarts", numlocal, LOG) : null;
     for(int i = 0; i < numlocal; i++) {
       // 2. choose random initial medoids
-      // TODO: should we always use uniform sampling, to be closer to the paper?
       curr.medoids.clear();
-      curr.medoids.addDBIDs(DBIDUtil.randomSample(ids, k, random));
+      curr.medoids.addDBIDs(DBIDUtil.randomSample(ids, k, rnd));
       // Cost of initial solution:
       double total = curr.assignToNearestCluster();
 
@@ -213,8 +212,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("CLARANS Clustering", "clarans-clustering");
     for(DBIDArrayIter it = best.medoids.iter(); it.valid(); it.advance()) {
-      MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
-      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
+      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
     }
     return result;
   }
@@ -273,12 +271,12 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      *
      * @param distQ Distance query
      * @param ids IDs to process
-     * @param medoids Medoids iterator
+     * @param k Number of medoids
      */
-    public Assignment(DistanceQuery<?> distQ, DBIDs ids, ArrayModifiableDBIDs medoids) {
+    public Assignment(DistanceQuery<?> distQ, DBIDs ids, int k) {
       this.distQ = distQ;
       this.ids = ids;
-      this.medoids = medoids;
+      this.medoids = DBIDUtil.newArray(k);
       this.miter = medoids.iter();
       this.assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
       this.nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -290,7 +288,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * Compute the reassignment cost, for one swap.
      *
      * @param h Current object to swap with any medoid.
-     * @param mnum Current cluster assignment of h.
+     * @param mnum Medoid number to swap with h.
      * @param scratch Scratch assignment to fill.
      * @return Cost change
      */
@@ -368,7 +366,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      * @param known Known distance
      * @return cost
      */
-    private double recompute(DBIDRef id, int mnum, double known, int snum, double sknown) {
+    protected double recompute(DBIDRef id, int mnum, double known, int snum, double sknown) {
       double mindist = mnum >= 0 ? known : Double.POSITIVE_INFINITY,
           mindist2 = Double.POSITIVE_INFINITY;
       int minIndex = mnum, minIndex2 = -1;

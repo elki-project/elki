@@ -41,11 +41,13 @@ public class CLARANSTest extends AbstractClusterAlgorithmTest {
     Clustering<MedoidModel> result = new ELKIBuilder<CLARANS<DoubleVector>>(CLARANS.class) //
         .with(KMeans.K_ID, 5) //
         .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
-        .with(CLARANS.Parameterizer.NEIGHBORS_ID, 10) //
+        .with(CLARANS.Parameterizer.NEIGHBORS_ID, 5) //
         .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
         .build().run(db);
-    testFMeasure(db, result, 0.996);
-    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    // This test uses fairly low parameters. It's easy to find some that give
+    // perfect results, but that is less useful for regression testing.
+    testFMeasure(db, result, 0.76375);
+    testClusterSizes(result, new int[] { 114, 173, 200, 200, 313 });
   }
 
   @Test
