@@ -129,9 +129,9 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
      *
      * @param medoids Medoids list
      * @param maxiter
-     * @return this
+     * @return final cost
      */
-    protected Instance run(ArrayModifiableDBIDs medoids, int maxiter) {
+    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
@@ -237,7 +237,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         assignment.putInt(it, assignment.intValue(it) & 0x7FFF);
       }
-      return this;
+      return tc;
     }
 
     /**
