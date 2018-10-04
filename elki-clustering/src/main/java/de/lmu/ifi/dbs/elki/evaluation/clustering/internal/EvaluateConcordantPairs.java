@@ -196,9 +196,9 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     tau = tau > 0. ? tau : 0.;
 
     if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));
+      LOG.statistics(new StringStatistic(key + ".noise-handling", noiseHandling.toString()));
       if(ignorednoise > 0) {
-        LOG.statistics(new LongStatistic(key + ".pbm.ignored", ignorednoise));
+        LOG.statistics(new LongStatistic(key + ".ignored", ignorednoise));
       }
       LOG.statistics(new DoubleStatistic(key + ".gamma", gamma));
       LOG.statistics(new DoubleStatistic(key + ".tau", tau));
