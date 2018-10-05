@@ -138,7 +138,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
     final boolean metric = getDistanceFunction().isMetric();
 
     // Number of retries, relative rate, or absolute count:
-    final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * ids.size() : maxneighbor);
+    final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * k * (ids.size() - k) : maxneighbor);
     Random rnd = random.getSingleThreadedRandom();
     DBIDArrayIter cand = DBIDUtil.ensureArray(ids).iter(); // Might copy!
 
@@ -474,13 +474,13 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         k = kP.intValue();
       }
 
-      IntParameter numlocalP = new IntParameter(RESTARTS_ID, 10) //
+      IntParameter numlocalP = new IntParameter(RESTARTS_ID, 2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(numlocalP)) {
         numlocal = numlocalP.intValue();
       }
 
-      DoubleParameter maxneighborP = new DoubleParameter(NEIGHBORS_ID, 0.01) //
+      DoubleParameter maxneighborP = new DoubleParameter(NEIGHBORS_ID, 0.0125) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(maxneighborP)) {
         maxneighbor = maxneighborP.doubleValue();
