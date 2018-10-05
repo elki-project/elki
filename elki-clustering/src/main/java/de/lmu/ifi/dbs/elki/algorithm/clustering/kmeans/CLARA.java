@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
@@ -84,6 +85,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
   int numsamples;
 
   /**
+   * Keep the previous medoids in the sample (see page 145).
+   */
+  boolean keepmed;
+
+  /**
    * Random factory for initialization.
    */
   RandomFactory random;
@@ -97,13 +103,15 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * @param initializer Initialization function
    * @param numsamples Number of samples (sampling iterations)
    * @param sampling Sampling rate (absolute or relative)
+   * @param keepmed Keep the previous medoids in the next sample
    * @param random Random generator
    */
-  public CLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, RandomFactory random) {
+  public CLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.numsamples = numsamples;
     this.sampling = sampling;
     this.random = random;
+    this.keepmed = keepmed;
   }
 
   @Override
@@ -113,6 +121,10 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     }
     DBIDs ids = relation.getDBIDs();
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
+    int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
+    if(samplesize < 3 * k) {
+      LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
+    }
 
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
@@ -121,7 +133,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     Random rnd = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
-      DBIDs rids = DBIDUtil.randomSample(ids, sampling, rnd);
+      DBIDs rids = randomSample(ids, samplesize, rnd, keepmed ? bestmedoids : null);
       // FIXME: precompute and use a distance matrix for this sample!
 
       // Choose initial medoids
@@ -148,6 +160,34 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
     }
     return result;
+  }
+
+  /**
+   * Draw a random sample of the desired size.
+   * 
+   * @param ids IDs to sample from
+   * @param samplesize Sample size
+   * @param rnd Random generator
+   * @param previous Previous medoids to always include in the sample.
+   * @return Sample
+   */
+  private static DBIDs randomSample(DBIDs ids, int samplesize, Random rnd, DBIDs previous) {
+    if(previous == null) {
+      return DBIDUtil.randomSample(ids, samplesize, rnd);
+    }
+    ModifiableDBIDs sample = DBIDUtil.newHashSet(samplesize);
+    sample.addDBIDs(previous);
+    sample.addDBIDs(DBIDUtil.randomSample(ids, samplesize - previous.size(), rnd));
+    // If these two were not disjoint, we can be short of the desired size!
+    if(sample.size() < samplesize) {
+      // Draw a large enough sample to make sure to be able to fill it now.
+      // This can be less random though, because the iterator may impose an
+      // order; but this is a rare code path.
+      for(DBIDIter it = DBIDUtil.randomSample(ids, samplesize, rnd).iter(); sample.size() < samplesize && it.valid(); it.advance()) {
+        sample.add(it);
+      }
+    }
+    return sample;
   }
 
   /**
@@ -204,6 +244,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     public static final OptionID SAMPLESIZE_ID = new OptionID("clara.samplesize", "The size of the sample.");
 
     /**
+     * Draw independent samples.
+     */
+    public static final OptionID NOKEEPMED_ID = new OptionID("clara.independent", "Draw independent samples (default is to keep the previous best medoids in the sample).");
+
+    /**
      * Random generator.
      */
     public static final OptionID RANDOM_ID = new OptionID("clara.random", "Random generator seed.");
@@ -217,6 +262,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
      * Number of samples to draw (i.e. iterations).
      */
     int numsamples;
+
+    /**
+     * Keep the previous medoids in the sample.
+     */
+    boolean keepmed;
 
     /**
      * Random factory for initialization.
@@ -239,6 +289,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         sampling = samplingP.doubleValue();
       }
 
+      Flag nokeepmedF = new Flag(NOKEEPMED_ID);
+      if(numsamples != 1 && config.grab(nokeepmedF)) {
+        keepmed = nokeepmedF.isFalse();
+      }
+
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
       if(config.grab(randomP)) {
         random = randomP.getValue();
@@ -247,7 +302,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
 
     @Override
     protected CLARA<V> makeInstance() {
-      return new CLARA<>(distanceFunction, k, maxiter, initializer, numsamples, sampling, random);
+      return new CLARA<>(distanceFunction, k, maxiter, initializer, numsamples, sampling, keepmed, random);
     }
   }
 }
