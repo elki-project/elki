@@ -148,23 +148,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           break; // Converged
         }
         // Update values for new medoid.
-        medoids.set(bestcluster, bestid);
-        final double hdist = nearest.putDouble(bestid, 0);
-        final int olda = assignment.intValue(bestid);
-        // In the high short, we store the second nearest center!
-        if((olda & 0x7FFF) != bestcluster) {
-          assignment.putInt(bestid, bestcluster | ((olda & 0x7FFF) << 16));
-          second.putDouble(bestid, hdist);
-        }
-        else {
-          assignment.putInt(bestid, bestcluster | (olda & 0x7FFF0000));
-        }
-        // assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) &
-        // 0x7FFF)) == nearest.doubleValue(bestid));
-        // assert (distQ.distance(bestid, m.seek(assignment.intValue(bestid) >>>
-        // 16)) == second.doubleValue(bestid));
-        // Reassign
-        updateAssignment(m, bestid, bestcluster);
+        updateAssignment(medoids, m, bestid, bestcluster);
         tc += best;
         if(LOG.isStatistics()) {
           LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", tc));
@@ -241,8 +225,8 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         // Case 1b: j switches to new medoid, or to the second nearest:
         final int pj = assignment.intValue(j) & 0x7FFF;
         cost[pj] += Math.min(dist_h, distsec) - distcur;
-        final double delta = dist_h - distcur;
-        if(delta < 0) {
+        if(dist_h < distcur) {
+          final double delta = dist_h - distcur;
           // Case 1c: j is closer to h than its current medoid
           for(int pi = 0; pi < pj; pi++) {
             cost[pi] += delta;
@@ -257,12 +241,29 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
     /**
      * Update an existing cluster assignment.
      *
-     * @param medoids Medoid iterator
+     * @param medoids Medoids set
+     * @param miter Medoid iterator
      * @param h New medoid
      * @param m Position of replaced medoid
      */
-    protected void updateAssignment(DBIDArrayIter medoids, DBIDRef h, int m) {
-      assert (DBIDUtil.equal(h, medoids.seek(m)));
+    protected void updateAssignment(ArrayModifiableDBIDs medoids, DBIDArrayIter miter, DBIDRef h, int m) {
+      // The new medoid itself.
+      medoids.set(m, h);
+      final double hdist = nearest.putDouble(h, 0);
+      final int olda = assignment.intValue(h);
+      // In the high short, we store the second nearest center!
+      if((olda & 0x7FFF) != m) {
+        assignment.putInt(h, m | ((olda & 0x7FFF) << 16));
+        second.putDouble(h, hdist);
+      }
+      else {
+        assignment.putInt(h, m | (olda & 0x7FFF0000));
+      }
+      // assert (distQ.distance(h, m.seek(assignment.intValue(h) & 0x7FFF)) ==
+      // nearest.doubleValue(h));
+      // assert (distQ.distance(h, m.seek(assignment.intValue(h) >>> 16)) ==
+      // second.doubleValue(h));
+      assert (DBIDUtil.equal(h, miter.seek(m)));
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
         if(DBIDUtil.equal(h, j)) {
@@ -286,7 +287,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           else { // Second is new nearest.
             nearest.putDouble(j, distsec);
             // Find new second nearest.
-            assignment.putInt(j, po | (updateSecondNearest(j, medoids, m, dist_h, po) << 16));
+            assignment.putInt(j, po | (updateSecondNearest(j, miter, m, dist_h, po) << 16));
           }
         }
         else { // Nearest medoid not replaced
@@ -297,7 +298,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           }
           else if(po == m) { // Second was replaced.
             po = -1; // FIXME: sentinel
-            assignment.putInt(j, pj | (updateSecondNearest(j, medoids, m, dist_h, pj) << 16));
+            assignment.putInt(j, pj | (updateSecondNearest(j, miter, m, dist_h, pj) << 16));
           }
           else if(dist_h < distsec) {
             second.putDouble(j, dist_h);

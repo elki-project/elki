@@ -143,64 +143,26 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
       final boolean metric = distQ.getDistanceFunction().isMetric();
 
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
+      int fastswaps = 0; // For statistics
       // Swap phase
       DBIDArrayIter m = medoids.iter();
       int iteration = 1;
-      int fastswaps = 0; // Statistics
       ArrayModifiableDBIDs bestids = DBIDUtil.newArray(k);
+      DBIDVar bestid = DBIDUtil.newVar();
       double[] best = new double[k], cost = new double[k];
       for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
         LOG.incrementProcessed(prog);
-        Arrays.fill(best, Double.POSITIVE_INFINITY);
-        // Try to swap a non-medoid with a medoid member:
-        // Iterate over all non-medoids:
-        for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
-          // Compare object to its own medoid.
-          if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
-            continue; // This is a medoid.
-          }
-          final double hdist = nearest.doubleValue(h); // Current cost of h.
-          if(metric && hdist <= 0.) {
-            continue; // Duplicate of a medoid.
-          }
-          // hdist is the cost we get back by making the non-medoid h medoid.
-          Arrays.fill(cost, -hdist);
-          computeReassignmentCost(h, cost);
-
-          // Find the best possible swap for h:
-          for(int i = 0; i < k; i++) {
-            final double costi = cost[i];
-            if(costi < best[i]) {
-              best[i] = costi;
-              bestids.set(i, h);
-            }
-          }
-        }
+        findBestSwaps(m, bestids, best, cost, metric);
         // Convergence check
         int min = argminNegative(best);
         if(min < 0) {
           break; // Converged
         }
         // Update values for new medoid.
-        DBIDVar bestid = DBIDUtil.newVar();
         while(min >= 0) {
           assert best[min] < 0;
-          {
-            medoids.set(min, bestids.assignVar(min, bestid));
-            final double hdist = nearest.putDouble(bestid, 0);
-            final int olda = assignment.intValue(bestid);
-            // In the high short, we store the second nearest center!
-            if((olda & 0x7FFF) != min) {
-              assignment.putInt(bestid, min | ((olda & 0x7FFF) << 16));
-              second.putDouble(bestid, hdist);
-            }
-            else {
-              assignment.putInt(bestid, min | (olda & 0x7FFF0000));
-            }
-            // Reassign
-            updateAssignment(m, bestid, min);
-            tc += best[min];
-          }
+          updateAssignment(medoids, m, bestids.assignVar(min, bestid), min);
+          tc += best[min];
           best[min] = Double.POSITIVE_INFINITY; // Deactivate
           // Find next candidate:
           while((min = argminNegative(best)) >= 0) {
@@ -218,9 +180,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
               ++fastswaps;
               break;
             }
-            else {
-              best[min] = Double.POSITIVE_INFINITY;
-            }
+            best[min] = Double.POSITIVE_INFINITY; // Deactivate
           }
         }
         if(LOG.isStatistics()) {
@@ -238,6 +198,42 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
         assignment.putInt(it, assignment.intValue(it) & 0x7FFF);
       }
       return tc;
+    }
+
+    /**
+     * Find the best swaps.
+     *
+     * @param m Medoids
+     * @param bestids Storage for best non-medois
+     * @param best Storage for best cost
+     * @param cost Scratch space for cost
+     * @param metric Apply additional metric pruning rule
+     */
+    private void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost, boolean metric) {
+      Arrays.fill(best, Double.POSITIVE_INFINITY);
+      // Iterate over all non-medoids:
+      for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
+        // Compare object to its own medoid.
+        if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
+          continue; // This is a medoid.
+        }
+        final double hdist = nearest.doubleValue(h); // Current cost of h.
+        if(metric && hdist <= 0.) {
+          continue; // Duplicate of a medoid.
+        }
+        // hdist is the cost we get back by making the non-medoid h medoid.
+        Arrays.fill(cost, -hdist);
+        computeReassignmentCost(h, cost);
+
+        // Find the best possible swap for each medoid:
+        for(int i = 0; i < cost.length; i++) {
+          final double costi = cost[i];
+          if(costi < best[i]) {
+            best[i] = costi;
+            bestids.set(i, h);
+          }
+        }
+      }
     }
 
     /**
@@ -280,9 +276,8 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
         // Check if current medoid of j is removed:
         if((assignment.intValue(j) & 0x7FFF) == mnum) {
           // distance(j, o) to second nearest / possible reassignment
-          final double distsec = second.doubleValue(j);
           // Case 1b: j switches to new medoid, or to the second nearest:
-          cost += Math.min(dist_h, distsec) - distcur;
+          cost += Math.min(dist_h, second.doubleValue(j)) - distcur;
         }
         else if(dist_h < distcur) {
           // Case 1c: j is closer to h than its current medoid
@@ -291,7 +286,6 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
       }
       return cost;
     }
-
   }
 
   @Override
