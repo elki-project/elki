@@ -63,6 +63,7 @@ public class ParkInitialMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, ParkInitialMeans.class) //
         .with(KMeans.MAXITER_ID, 1) //
+        .with(CLARA.Parameterizer.NOKEEPMED_ID) //
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
         .with(CLARA.Parameterizer.RANDOM_ID, 0) //
         .build().run(db);

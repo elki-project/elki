@@ -66,6 +66,7 @@ public class KMeansPlusPlusInitialMeansTest extends AbstractClusterAlgorithmTest
         .with(KMeans.SEED_ID, 3) //
         .with(KMeans.INIT_ID, KMeansPlusPlusInitialMeans.class) //
         .with(KMeans.MAXITER_ID, 1) //
+        .with(CLARA.Parameterizer.NOKEEPMED_ID) //
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
         .with(CLARA.Parameterizer.RANDOM_ID, 0) //
         .build().run(db);

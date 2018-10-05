@@ -66,6 +66,7 @@ public class RandomlyChosenInitialMeansTest extends AbstractClusterAlgorithmTest
         .with(KMeans.SEED_ID, 7) //
         .with(KMeans.INIT_ID, RandomlyChosenInitialMeans.class) //
         .with(KMeans.MAXITER_ID, 1) //
+        .with(CLARA.Parameterizer.NOKEEPMED_ID) //
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
         .with(CLARA.Parameterizer.RANDOM_ID, 0) //
         .build().run(db);
