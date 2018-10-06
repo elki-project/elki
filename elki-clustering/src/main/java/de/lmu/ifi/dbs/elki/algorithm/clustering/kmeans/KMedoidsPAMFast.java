@@ -79,6 +79,8 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
    * Instance for a single dataset.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class Instance extends KMedoidsPAM.Instance {
     /**
@@ -108,8 +110,6 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
       }
 
-      final boolean metric = distQ.getDistanceFunction().isMetric();
-
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
@@ -126,12 +126,8 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
           if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
             continue; // This is a medoid.
           }
-          final double hdist = nearest.doubleValue(h); // Current cost of h.
-          if(metric && hdist <= 0.) {
-            continue; // Duplicate of a medoid.
-          }
-          // hdist is the cost we get back by making the non-medoid h medoid.
-          Arrays.fill(cost, -hdist);
+          // The cost we get back by making the non-medoid h medoid.
+          Arrays.fill(cost, -nearest.doubleValue(h));
           computeReassignmentCost(h, cost);
 
           // Find the best possible swap for h:
@@ -279,7 +275,6 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
         int pj = assignment.intValue(j), po = pj >>> 16;
         pj &= 0x7FFF; // Low byte is the old nearest cluster.
         if(pj == m) { // Nearest medoid is gone.
-          pj = -1; // FIXME: sentinel
           if(dist_h < distsec) { // Replace nearest.
             nearest.putDouble(j, dist_h);
             assignment.putInt(j, m | (po << 16));
@@ -297,7 +292,6 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
             assignment.putInt(j, m | (pj << 16));
           }
           else if(po == m) { // Second was replaced.
-            po = -1; // FIXME: sentinel
             assignment.putInt(j, pj | (updateSecondNearest(j, miter, m, dist_h, pj) << 16));
           }
           else if(dist_h < distsec) {

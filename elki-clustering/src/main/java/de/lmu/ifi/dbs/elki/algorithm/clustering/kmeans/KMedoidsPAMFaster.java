@@ -140,8 +140,6 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
       }
 
-      final boolean metric = distQ.getDistanceFunction().isMetric();
-
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       int fastswaps = 0; // For statistics
       // Swap phase
@@ -152,7 +150,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
       double[] best = new double[k], cost = new double[k];
       for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
         LOG.incrementProcessed(prog);
-        findBestSwaps(m, bestids, best, cost, metric);
+        findBestSwaps(m, bestids, best, cost);
         // Convergence check
         int min = argmin(best);
         if(!(best[min] < -1e-12 * tc)) {
@@ -206,9 +204,8 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
      * @param bestids Storage for best non-medois
      * @param best Storage for best cost
      * @param cost Scratch space for cost
-     * @param metric Apply additional metric pruning rule
      */
-    private void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost, boolean metric) {
+    private void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost) {
       Arrays.fill(best, Double.POSITIVE_INFINITY);
       // Iterate over all non-medoids:
       for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
@@ -216,12 +213,8 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
         if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
           continue; // This is a medoid.
         }
-        final double hdist = nearest.doubleValue(h); // Current cost of h.
-        if(metric && hdist <= 0.) {
-          continue; // Duplicate of a medoid.
-        }
-        // hdist is the cost we get back by making the non-medoid h medoid.
-        Arrays.fill(cost, -hdist);
+        // The cost we get back by making the non-medoid h medoid.
+        Arrays.fill(cost, -nearest.doubleValue(h));
         computeReassignmentCost(h, cost);
 
         // Find the best possible swap for each medoid:
