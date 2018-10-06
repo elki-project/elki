@@ -144,7 +144,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
             }
           }
         }
-        if(best >= 0.) {
+        if(!(best < -1e-12 * tc)) {
           break; // Converged
         }
         // Update values for new medoid.

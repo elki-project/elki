@@ -120,7 +120,7 @@ public class CLARANSFast<V> extends CLARANS<V> {
         }
         // 5. check lower cost
         double cost = curr.computeCostDifferential(cand);
-        if(!(cost < 0)) {
+        if(!(cost < -1e-12 * total)) {
           ++j; // 6. try again
           continue;
         }

@@ -154,18 +154,17 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
         LOG.incrementProcessed(prog);
         findBestSwaps(m, bestids, best, cost, metric);
         // Convergence check
-        int min = argminNegative(best);
-        if(min < 0) {
+        int min = argmin(best);
+        if(!(best[min] < -1e-12 * tc)) {
           break; // Converged
         }
         // Update values for new medoid.
-        while(min >= 0) {
-          assert best[min] < 0;
+        while(min >= 0 && best[min] < -1e-12 * tc) {
           updateAssignment(medoids, m, bestids.assignVar(min, bestid), min);
           tc += best[min];
           best[min] = Double.POSITIVE_INFINITY; // Deactivate
           // Find next candidate:
-          while((min = argminNegative(best)) >= 0) {
+          while((min = argmin(best)) >= 0 && best[min] < -1e-12 * tc) {
             bestids.assignVar(min, bestid);
             // Compare object to its own medoid.
             if(DBIDUtil.equal(m.seek(assignment.intValue(bestid) & 0x7FFF), bestid)) {
@@ -237,13 +236,13 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
     }
 
     /**
-     * Check if there is any negative cost (= improvement).
+     * Find the smallest (most negative) value.
      * 
      * @param best Best changes
-     * @return Index of smallest value, -1 if no negative values.
+     * @return Index of smallest value
      */
-    protected int argminNegative(double[] best) {
-      double min = 0.;
+    protected int argmin(double[] best) {
+      double min = Double.POSITIVE_INFINITY;
       int ret = -1;
       for(int i = 0; i < best.length; i++) {
         final double v = best[i];
