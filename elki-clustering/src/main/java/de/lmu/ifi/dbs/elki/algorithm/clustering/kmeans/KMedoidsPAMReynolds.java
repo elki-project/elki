@@ -20,9 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -123,37 +124,26 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
       }
 
-      final boolean metric = distQ.getDistanceFunction().isMetric();
+      WritableDoubleDataStore tnearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
-      DBIDArrayIter m = medoids.iter();
       int iteration = 1;
-      double[] basecost = new double[k];
       for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
         LOG.incrementProcessed(prog);
         // Try to swap a non-medoid with a medoid member:
         double best = Double.POSITIVE_INFINITY;
         int bestcluster = -1;
-        // Compute medoid removal costs only once, c.f., Reynolds et al.
-        computeRemovalCost(basecost);
-        // Iterate over all non-medoids:
-        for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
-          // Compare point to its medoid.
-          if(DBIDUtil.equal(m.seek(assignment.intValue(h)), h)) {
-            continue; // This is a medoid.
-          }
-          double hdist = nearest.doubleValue(h); // Current cost of h.
-          if(metric && hdist <= 0.) {
-            continue; // Duplicate of a medoid.
-          }
-          // h is a non-medoid currently in cluster of medoid m.
-          // Find the best possible swap for h:
-          for(int pi = 0; pi < k; pi++) {
-            // basecost are the precomputed costs for removing each medoid.
+        // Iterate over each medoid:
+        for(int pi = 0; pi < k; pi++) {
+          // Compute medoid removal costs only once, c.f., Reynolds et al.
+          double basecost = computeRemovalCost(pi, tnearest);
+          // Iterate over all non-medoids:
+          for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
+            // h is a non-medoid currently in cluster of medoid m.
             // hdist is the cost we get back by making the non-medoid h medoid.
-            final double cpi = basecost[pi] + computeReassignmentCost(h, pi) - (pi != assignment.intValue(h) ? hdist : second.doubleValue(h));
+            double cpi = basecost + computeReassignmentCost(h, tnearest);
             if(cpi < best) {
               best = cpi;
               bestid.set(h);
@@ -188,42 +178,48 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
     }
 
     /**
-     * Compute the cost of removing each medoid once. This can then be reused
+     * Compute the cost of removing a medoid just once. This can then be reused
      * for every point, thus decreasing the runtime cost at low memory overhead.
      *
      * The output array contains for each medoid the cost of removing all its
      * points, and reassigning them to the second nearest medoid instead.
      *
-     * @param cost Cost aggregation array, must have size k
+     * @return Cost
      */
-    protected void computeRemovalCost(double[] cost) {
-      Arrays.fill(cost, 0);
+    protected double computeRemovalCost(int i, WritableDoubleDataStore tnearest) {
+      double cost = 0;
       // Compute costs of reassigning to the second closest medoid.
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-        cost[assignment.intValue(j)] += second.doubleValue(j) - nearest.doubleValue(j);
+        final double n = nearest.doubleValue(j);
+        if(assignment.intValue(j) == i) {
+          final double s = second.doubleValue(j);
+          cost += s - n;
+          tnearest.put(j, s);
+        }
+        else {
+          tnearest.put(j, n);
+        }
       }
+      return cost;
     }
 
     /**
      * Compute the reassignment cost, for all medoids in one pass.
      *
      * @param h Current object to swap with any medoid.
-     * @param m Current medoid
-     * @return cost
+     * @param tnearest Distance to the nearest except the removed medoid
+     * @return cost change
      */
-    protected double computeReassignmentCost(DBIDRef h, int m) {
+    protected double computeReassignmentCost(DBIDRef h, WritableDoubleDataStore tnearest) {
       double cost = 0.;
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-        if(DBIDUtil.equal(h, j)) {
-          continue;
-        }
         // New medoid is closest. Reassignment to second nearest was
         // precomputed already, in {@link #computeRemovalCost}
         // Case 1c: j is closer to h than its current medoid
-        double delta = distQ.distance(h, j) - (assignment.intValue(j) != m ? nearest.doubleValue(j) : second.doubleValue(j));
-        if(delta < 0) {
-          cost += delta;
+        double dist = distQ.distance(h, j), cur = tnearest.doubleValue(j);
+        if(dist < cur) {
+          cost += dist - cur;
         }
       }
       return cost;
