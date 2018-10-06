@@ -161,7 +161,7 @@ public class KMedoidsPAMReynolds<V> extends KMedoidsPAM<V> {
             }
           }
         }
-        if(best >= 0.) {
+        if(!(best < -1e-12 * tc)) {
           break;
         }
         medoids.set(bestcluster, bestid);

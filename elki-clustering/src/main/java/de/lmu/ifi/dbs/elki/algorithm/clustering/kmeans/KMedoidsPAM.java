@@ -291,7 +291,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
             }
           }
         }
-        if(best >= 0.) {
+        if(!(best < -1e-12 * tc)) {
           break;
         }
         medoids.set(bestcluster, bestid);

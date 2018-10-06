@@ -185,7 +185,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         final int otherm = rnd.nextInt(k);
         // 5. check lower cost
         double cost = curr.computeCostDifferential(cand, otherm, scratch);
-        if(!(cost < 0)) {
+        if(!(cost < -1e-12 * total)) {
           ++j; // 6. try again
           continue;
         }
