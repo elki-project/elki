@@ -56,6 +56,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Reference:
  * <p>
  * L. Kaufman, P. J. Rousseeuw<br>
+ * Clustering Large Data Sets<br>
+ * Pattern Recognition in Practice
+ * <p>
+ * L. Kaufman, P. J. Rousseeuw<br>
  * Clustering Large Applications (Program CLARA)<br>
  * Finding Groups in Data: An Introduction to Cluster Analysis
  *
@@ -64,6 +68,11 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @param <V> Data type
  */
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
+    title = "Clustering Large Data Sets", //
+    booktitle = "Pattern Recognition in Practice", //
+    url = "https://doi.org/10.1016/B978-0-444-87877-9.50039-X", //
+    bibkey = "doi:10.1016/B978-0-444-87877-9.50039-X")
 @Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
     title = "Clustering Large Applications (Program CLARA)", //
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
