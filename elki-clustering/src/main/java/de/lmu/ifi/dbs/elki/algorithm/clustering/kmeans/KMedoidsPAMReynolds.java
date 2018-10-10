@@ -43,10 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * where saving an addition may be neglibile compared to caching and pipelining.
  * <p>
  * Reference:
- * </p>
+ * <p>
+ * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>
  * Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering
  * Algorithms<br>
- * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>
  * J. Math. Model. Algorithms 5(4)
  *
  * @author Erich Schubert
@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @param <V> vector datatype
  */
-@Reference(title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
-    authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
+@Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
+    title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
     booktitle = "J. Math. Model. Algorithms 5(4)", //
     url = "https://doi.org/10.1007/s10852-005-9022-1", //
     bibkey = "DBLP:journals/jmma/ReynoldsRIR06")

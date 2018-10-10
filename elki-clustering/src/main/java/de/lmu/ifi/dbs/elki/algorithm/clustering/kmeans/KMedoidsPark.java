@@ -59,16 +59,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * M-step, the objects are reassigned to their nearest medoid.
  * <p>
  * This implementation evolved naturally from EM and k-means algorithms, but
- * apparently a similar approach was published by Park and Jun.
+ * apparently a similar approach was published by Park and Jun, and also
+ * Reynolds et al. discussed this kind of approach before as a side note.
  * <p>
  * In our experiments, it tends to be much faster than PAM, but also find less
- * good solutions, as the medoids are only chosen from the cluster members.
+ * good solutions, as the medoids are only chosen from the cluster members. This
+ * aligns with findings of Reynolds et al. and can be explained with the
+ * requirement of the new medoid to cover the entire cluster.
  * <p>
  * Reference:
  * <p>
  * H.-S. Park, C.-H. Jun<br>
  * A simple and fast algorithm for K-medoids clustering<br>
  * Expert Systems with Applications 36(2)
+ * <p>
+ * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>
+ * Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering
+ * Algorithms<br>
+ * J. Math. Model. Algorithms 5(4)
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -83,6 +91,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Expert Systems with Applications 36(2)", //
     url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
     bibkey = "DBLP:journals/eswa/ParkJ09")
+@Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
+    title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
+    booktitle = "J. Math. Model. Algorithms 5(4)", //
+    url = "https://doi.org/10.1007/s10852-005-9022-1", //
+    bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM")
 public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
