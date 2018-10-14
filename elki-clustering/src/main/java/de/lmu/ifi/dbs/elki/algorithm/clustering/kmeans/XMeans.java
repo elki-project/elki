@@ -20,7 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -265,10 +266,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     timesEquals(randomVector, (.4 + random.nextDouble() * .5) * radius);
 
     // Get the new centroids
-    double[][] vecs = new double[2][];
-    vecs[0] = minus(parentCentroid, randomVector);
-    vecs[1] = plusEquals(randomVector, parentCentroid);
-    return vecs;
+    for(int d = 0; d < dim; d++) {
+      double a = parentCentroid[d], b = randomVector[d];
+      parentCentroid[d] = a - b;
+      randomVector[d] = a + b;
+    }
+    return new double[][] { parentCentroid, randomVector };
   }
 
   @Override

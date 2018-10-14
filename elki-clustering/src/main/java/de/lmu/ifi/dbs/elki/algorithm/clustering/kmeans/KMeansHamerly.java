@@ -246,10 +246,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       // Assign to nearest cluster.
       clusters.get(minIndex).add(it);
       assignment.putInt(it, minIndex);
-      double[] newsum = sums[minIndex];
-      for(int d = 0; d < fv.getDimensionality(); d++) {
-        newsum[d] += fv.doubleValue(d);
-      }
+      plusEquals(sums[minIndex], fv);
       upper.putDouble(it, issquared ? FastMath.sqrt(min1) : min1);
       lower.putDouble(it, issquared ? FastMath.sqrt(min2) : min2);
     }
@@ -308,12 +305,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         clusters.get(minIndex).add(it);
         clusters.get(cur).remove(it);
         assignment.putInt(it, minIndex);
-        double[] newsum = sums[minIndex], oldsum = sums[cur];
-        for(int d = 0; d < fv.getDimensionality(); d++) {
-          final double v = fv.doubleValue(d);
-          newsum[d] += v;
-          oldsum[d] -= v;
-        }
+        plusMinusEquals(sums[minIndex], sums[cur], fv);
         ++changed;
         upper.putDouble(it, issquared ? FastMath.sqrt(min1) : min1);
       }

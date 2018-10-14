@@ -491,6 +491,22 @@ public final class VMath {
   }
 
   /**
+   * Multiply component-wise v1 = v2 * s,
+   * overwriting the vector v1.
+   *
+   * @param v1 output vector
+   * @param v2 input vector
+   * @param s scalar
+   * @return v1 with new values
+   */
+  public static double[] overwriteTimes(final double[] v1, final double[] v2, final double s) {
+    for(int i = 0; i < v1.length; i++) {
+      v1[i] = v2[i] * s;
+    }
+    return v1;
+  }
+
+  /**
    * Matrix multiplication: v1 * m2 (m2 <em>must have one row only</em>).
    * <p>
    * Note: this is an unusual operation, m2 must be a costly column matrix.

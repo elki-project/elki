@@ -253,10 +253,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       clusters.get(minIndex).add(it);
       assignment.putInt(it, minIndex);
       upper.putDouble(it, best);
-      double[] newsum = sums[minIndex];
-      for(int d = 0; d < fv.getDimensionality(); d++) {
-        newsum[d] += fv.doubleValue(d);
-      }
+      plusEquals(sums[minIndex], fv);
     }
     return relation.size();
   }
@@ -318,12 +315,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         clusters.get(cur).add(it);
         clusters.get(orig).remove(it);
         assignment.putInt(it, cur);
-        double[] newsum = sums[cur], oldsum = sums[orig];
-        for(int d = 0; d < fv.getDimensionality(); d++) {
-          final double v = fv.doubleValue(d);
-          newsum[d] += v;
-          oldsum[d] -= v;
-        }
+        plusMinusEquals(sums[cur], sums[orig], fv);
         ++changed;
       }
     }

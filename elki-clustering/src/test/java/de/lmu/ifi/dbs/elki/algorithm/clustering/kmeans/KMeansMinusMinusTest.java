@@ -67,7 +67,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
         .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
         .with(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID) //
         .build().run(db);
-    testFMeasure(db, result, 0.92674);
-    testClusterSizes(result, new int[] { 100, 115, 185, 200, 200, 200 });
+    testFMeasure(db, result, 0.92562);
+    testClusterSizes(result, new int[] { 100, 116, 184, 200, 200, 200 });
   }
 }

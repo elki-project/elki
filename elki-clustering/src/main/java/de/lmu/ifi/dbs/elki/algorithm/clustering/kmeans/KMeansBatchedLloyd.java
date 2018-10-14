@@ -235,19 +235,13 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     {
       clusters.get(minIndex).add(id);
       changesize[minIndex]++;
-      double[] raw = meanshift[minIndex];
-      for(int j = 0; j < fv.getDimensionality(); j++) {
-        raw[j] += fv.doubleValue(j);
-      }
+      plusEquals(meanshift[minIndex], fv);
     }
     // Remove from previous cluster
     if(cur >= 0) {
       clusters.get(cur).remove(id);
       changesize[cur]--;
-      double[] raw = meanshift[cur];
-      for(int j = 0; j < fv.getDimensionality(); j++) {
-        raw[j] -= fv.doubleValue(j);
-      }
+      minusEquals(meanshift[cur], fv);
     }
     assignment.putInt(id, minIndex);
     return true;

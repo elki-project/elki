@@ -271,9 +271,11 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
           continue;
         }
         NumberVector vec = database.get(iter);
-        raw = raw != null ? raw : vec.toArray(); // Initialize
-        for(int j = 0; j < raw.length; j++) {
-          raw[j] += vec.doubleValue(j);
+        if(raw == null) {
+          raw = vec.toArray();
+        }
+        else {
+          plusEquals(raw, vec);
         }
         count++;
       }

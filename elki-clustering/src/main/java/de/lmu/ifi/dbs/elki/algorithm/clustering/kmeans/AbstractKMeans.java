@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.sum;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -175,17 +177,53 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       }
       DBIDIter iter = list.iter();
       // Initialize with first.
-      double[] mean = relation.get(iter).toArray();
+      double[] sum = relation.get(iter).toArray();
       // Update with remaining instances
       for(iter.advance(); iter.valid(); iter.advance()) {
-        NumberVector vec = relation.get(iter);
-        for(int j = 0; j < mean.length; j++) {
-          mean[j] += vec.doubleValue(j);
-        }
+        plusEquals(sum, relation.get(iter));
       }
-      newMeans[i] = timesEquals(mean, 1.0 / list.size());
+      newMeans[i] = timesEquals(sum, 1.0 / list.size());
     }
     return newMeans;
+  }
+
+  /**
+   * Similar to VMath.plusEquals, but accepts a number vector.
+   *
+   * @param sum Aggregation array
+   * @param vec Vector to add
+   */
+  public static void plusEquals(double[] sum, NumberVector vec) {
+    for(int d = 0; d < sum.length; d++) {
+      sum[d] += vec.doubleValue(d);
+    }
+  }
+
+  /**
+   * Similar to VMath.minusEquals, but accepts a number vector.
+   *
+   * @param sum Aggregation array
+   * @param vec Vector to subtract
+   */
+  public static void minusEquals(double[] sum, NumberVector vec) {
+    for(int d = 0; d < sum.length; d++) {
+      sum[d] -= vec.doubleValue(d);
+    }
+  }
+
+  /**
+   * Add to one, remove from another.
+   *
+   * @param add Array to add to
+   * @param sub Array to remove from
+   * @param vec Vector to subtract
+   */
+  public static void plusMinusEquals(double[] add, double[] sub, NumberVector vec) {
+    for(int d = 0; d < add.length; d++) {
+      final double v = vec.doubleValue(d);
+      add[d] += v;
+      sub[d] -= v;
+    }
   }
 
   /**
@@ -244,8 +282,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       double[] mean = new double[dim];
       for(int d = 0; d < dim; d++) {
         sorter.setDimension(d);
-        it.seek(QuickSelectDBIDs.median(list, sorter));
-        mean[d] = database.get(it).doubleValue(d);
+        mean[d] = database.get(it.seek(QuickSelectDBIDs.median(list, sorter))).doubleValue(d);
       }
       newMedians[i] = mean;
     }
@@ -265,7 +302,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       return; // Keep old mean
     }
     // Note: numerically stabilized version:
-    plusTimesEquals(mean, minusEquals(vec.toArray(), mean), op / newsize);
+    VMath.plusTimesEquals(mean, VMath.minusEquals(vec.toArray(), mean), op / newsize);
   }
 
   /**

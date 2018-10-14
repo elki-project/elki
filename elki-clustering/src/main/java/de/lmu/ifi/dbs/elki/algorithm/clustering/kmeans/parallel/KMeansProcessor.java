@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
@@ -259,11 +260,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
       int prev = assignment.putInt(id, minIndex);
       // Update changed flag:
       changed |= (prev != minIndex);
-      double[] cent = centroids[minIndex];
-      for(int d = 0; d < fv.getDimensionality(); d++) {
-        // TODO: improve numerical stability via Kahan summation?
-        cent[d] += fv.doubleValue(d);
-      }
+      AbstractKMeans.plusEquals(centroids[minIndex], fv);
       ++sizes[minIndex];
     }
   }

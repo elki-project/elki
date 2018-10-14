@@ -227,12 +227,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
         clusters.get(cur).add(it);
         clusters.get(orig).remove(it);
         assignment.putInt(it, cur);
-        double[] newsum = sums[cur], oldsum = sums[orig];
-        for(int d = 0; d < fv.getDimensionality(); d++) {
-          final double v = fv.doubleValue(d);
-          newsum[d] += v;
-          oldsum[d] -= v;
-        }
+        plusMinusEquals(sums[cur], sums[orig], fv);
         ++changed;
       }
     }
