@@ -146,8 +146,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
       }
       if(rstat != null) {
-        rstat.setLong(changed);
-        LOG.statistics(rstat);
+        LOG.statistics(rstat.setLong(changed));
       }
       // Stop if no cluster assignment changed.
       if(changed == 0) {

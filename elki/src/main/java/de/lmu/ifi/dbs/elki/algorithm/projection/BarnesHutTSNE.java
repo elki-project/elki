@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -122,9 +123,9 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
   public Relation<DoubleVector> run(Database database, Relation<O> relation) {
     AffinityMatrix neighbors = affinity.computeAffinityMatrix(relation, EARLY_EXAGGERATION);
     double[][] solution = randomInitialSolution(neighbors.size(), dim, random.getSingleThreadedRandom());
-    projectedDistances.setLong(0L);
+    projectedDistances = 0L;
     optimizetSNE(neighbors, solution);
-    LOG.statistics(projectedDistances);
+    LOG.statistics(new LongStatistic(getClass().getName() + ".projected-distances", projectedDistances));
 
     // Remove the original (unprojected) data unless configured otherwise.
     removePreviousRelation(relation);

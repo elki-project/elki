@@ -56,18 +56,22 @@ public class LongStatistic extends AbstractStatistic {
    * Set the statistics.
    * 
    * @param value New value
+   * @return {@code this} for chaining
    */
-  public void setLong(long value) {
+  public LongStatistic setLong(long value) {
     this.value = value;
+    return this;
   }
 
   /**
    * Increment counter.
    * 
    * @param inc Increment
+   * @return {@code this} for chaining
    */
-  public void increment(long inc) {
+  public LongStatistic increment(long inc) {
     this.value += inc;
+    return this;
   }
 
   @Override

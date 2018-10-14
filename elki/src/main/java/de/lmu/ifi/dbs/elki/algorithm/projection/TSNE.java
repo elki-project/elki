@@ -116,7 +116,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
   /**
    * Number of distance computations performed in projected space.
    */
-  protected LongStatistic projectedDistances = new LongStatistic(getClass().getName() + ".projected-distances", 0L);
+  protected long projectedDistances;
 
   /**
    * Desired projection dimensionality
@@ -188,9 +188,9 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
     // Create initial solution.
     final int size = pij.size();
     double[][] sol = randomInitialSolution(size, dim, random.getSingleThreadedRandom());
-    projectedDistances.setLong(0L);
+    projectedDistances = 0L;
     optimizetSNE(pij, sol);
-    LOG.statistics(projectedDistances);
+    LOG.statistics(new LongStatistic(getClass().getName() + ".projected-distances", projectedDistances));
 
     // Remove the original (unprojected) data unless configured otherwise.
     removePreviousRelation(relation);
@@ -297,7 +297,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
       final double diff = v1[i] - v2[i];
       sum += diff * diff;
     }
-    projectedDistances.increment(1);
+    ++projectedDistances;
     return sum;
   }
 

@@ -157,8 +157,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
       }
       if(rstat != null) {
-        rstat.setLong(changed);
-        LOG.statistics(rstat);
+        LOG.statistics(rstat.setLong(changed));
       }
       // Stop if no cluster assignment changed.
       if(changed == 0) {
