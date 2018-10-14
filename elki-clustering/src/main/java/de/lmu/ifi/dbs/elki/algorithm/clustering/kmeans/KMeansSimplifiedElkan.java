@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
@@ -38,61 +37,48 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 import net.jafama.FastMath;
 
 /**
- * Elkan's fast k-means by exploiting the triangle inequality.
+ * Simplified version of Elkan's k-means by exploiting the triangle inequality.
  * <p>
- * This variant needs O(n*k) additional memory to store bounds.
- * <p>
- * See {@link KMeansHamerly} for a close variant that only uses O(n*2)
- * additional memory for bounds.
+ * Compared to {@link KMeansElkan}, this uses less pruning, but also does not
+ * need to maintain a matrix of pairwise centroid separation.
  * <p>
  * Reference:
  * <p>
- * C. Elkan<br>
- * Using the triangle inequality to accelerate k-means<br>
- * Proc. 20th International Conference on Machine Learning, ICML 2003
+ * J. Newling<br>
+ * Fast k-means with accurate bounds<br>
+ * Proc. 33nd Int. Conf. on Machine Learning, ICML 2016
  *
  * @author Erich Schubert
- * @since 0.7.0
  *
  * @apiviz.has KMeansModel
  *
  * @param <V> vector datatype
  */
-@Reference(authors = "C. Elkan", //
-    title = "Using the triangle inequality to accelerate k-means", //
-    booktitle = "Proc. 20th International Conference on Machine Learning, ICML 2003", //
-    url = "http://www.aaai.org/Library/ICML/2003/icml03-022.php", //
-    bibkey = "DBLP:conf/icml/Elkan03")
-public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
+@Reference(authors = "J. Newling", //
+    title = "Fast k-means with accurate bounds", //
+    booktitle = "Proc. 33nd Int. Conf. on Machine Learning, ICML 2016", //
+    url = "http://jmlr.org/proceedings/papers/v48/newling16.html", //
+    bibkey = "DBLP:conf/icml/NewlingF16")
+public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMeansElkan.class);
+  private static final Logging LOG = Logging.getLogger(KMeansSimplifiedElkan.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMeansElkan.class.getName();
-
-  /**
-   * Flag whether to compute the final variance statistic.
-   */
-  protected boolean varstat = false;
+  private static final String KEY = KMeansSimplifiedElkan.class.getName();
 
   /**
    * Constructor.
@@ -103,9 +89,8 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
-    super(distanceFunction, k, maxiter, initializer);
-    this.varstat = varstat;
+  public KMeansSimplifiedElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
+    super(distanceFunction, k, maxiter, initializer, varstat);
   }
 
   @Override
@@ -134,10 +119,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     final int dim = means[0].length;
     double[][] sums = new double[k][dim], newmeans = new double[k][dim];
 
-    // Cluster separation
-    double[] sep = new double[k];
-    // Cluster distances
-    double[][] cdist = new double[k][k];
+    double[] moved = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     LongStatistic rstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
@@ -149,8 +131,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
       }
       else {
-        recomputeSeperation(means, sep, cdist); // #1
-        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
+        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
       }
       if(rstat != null) {
         LOG.statistics(rstat.setLong(changed));
@@ -167,8 +148,8 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
           newmean[d] = sum[d] * f;
         }
       }
-      movedDistance(means, newmeans, sep); // Overwrites sep
-      updateBounds(relation, assignment, upper, lower, sep);
+      movedDistance(means, newmeans, moved);
+      updateBounds(relation, assignment, upper, lower, moved);
       for(int i = 0; i < k; i++) {
         System.arraycopy(newmeans[i], 0, means[i], 0, dim);
       }
@@ -206,103 +187,31 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
   }
 
   /**
-   * Recompute the separation of cluster means.
-   *
-   * @param means Means
-   * @param sep Output array of separation
-   * @param cdist Center-to-Center distances
-   */
-  protected void recomputeSeperation(double[][] means, double[] sep, double[][] cdist) {
-    final int k = means.length;
-    assert (sep.length == k);
-    boolean issquared = distanceFunction.isSquared();
-    Arrays.fill(sep, Double.POSITIVE_INFINITY);
-    for(int i = 1; i < k; i++) {
-      DoubleVector mi = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-        d = .5 * (issquared ? FastMath.sqrt(d) : d);
-        cdist[i][j] = cdist[j][i] = d;
-        sep[i] = (d < sep[i]) ? d : sep[i];
-        sep[j] = (d < sep[j]) ? d : sep[j];
-      }
-    }
-  }
-
-  /**
-   * Perform initial cluster assignment.
-   *
-   * @param relation Data
-   * @param means Current means
-   * @param sums Running sums of the new means
-   * @param clusters Current clusters
-   * @param assignment Cluster assignment
-   * @param upper Upper bounds
-   * @param lower Lower bounds
-   * @return Number of changes (i.e. relation size)
-   */
-  protected int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
-    assert (k == means.length);
-    final boolean issquared = distanceFunction.isSquared();
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      V fv = relation.get(it);
-      double[] l = lower.get(it);
-      // Check all (other) means:
-      double best = Double.POSITIVE_INFINITY;
-      int minIndex = -1;
-      for(int j = 0; j < k; j++) {
-        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[j]));
-        dist = issquared ? FastMath.sqrt(dist) : dist;
-        l[j] = dist;
-        if(dist < best) {
-          minIndex = j;
-          best = dist;
-        }
-      }
-      // Assign to nearest cluster.
-      clusters.get(minIndex).add(it);
-      assignment.putInt(it, minIndex);
-      upper.putDouble(it, best);
-      double[] newsum = sums[minIndex];
-      for(int d = 0; d < fv.getDimensionality(); d++) {
-        newsum[d] += fv.doubleValue(d);
-      }
-    }
-    return relation.size();
-  }
-
-  /**
    * Reassign objects, but avoid unnecessary computations based on their bounds.
    *
    * @param relation Data
    * @param means Current means
-   * @param sums New means as running sums
+   * @param sums New cluster sum
    * @param clusters Current clusters
    * @param assignment Cluster assignment
-   * @param sep Separation of means
-   * @param cdist Center-to-center distances
    * @param upper Upper bounds
    * @param lower Lower bounds
    * @return true when the object was reassigned
    */
-  protected int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, double[][] cdist, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
+  private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
     assert (k == means.length);
     final boolean issquared = distanceFunction.isSquared();
     int changed = 0;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int orig = assignment.intValue(it);
       double u = upper.doubleValue(it);
-      // Upper bound check (#2):
-      if(u <= sep[orig]) {
-        continue;
-      }
       boolean recompute_u = true; // Elkan's r(x)
       V fv = relation.get(it);
       double[] l = lower.get(it);
       // Check all (other) means:
       int cur = orig;
       for(int j = 0; j < k; j++) {
-        if(orig == j || u <= l[j] || u <= cdist[cur][j]) {
+        if(orig == j || u <= l[j]) {
           continue; // Condition #3 i-iii not satisfied
         }
         if(recompute_u) { // Need to update bound? #3a
@@ -310,7 +219,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
           u = issquared ? FastMath.sqrt(u) : u;
           upper.putDouble(it, u);
           recompute_u = false; // Once only
-          if(u <= l[j] || u <= cdist[cur][j]) { // #3b
+          if(u <= l[j]) { // #3b
             continue;
           }
         }
@@ -340,40 +249,6 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     return changed;
   }
 
-  /**
-   * Maximum distance moved.
-   *
-   * @param means Old means
-   * @param newmeans New means
-   * @param dists Distances moved (output)
-   */
-  protected void movedDistance(double[][] means, double[][] newmeans, double[] dists) {
-    assert (means.length == k);
-    assert (newmeans.length == k);
-    assert (dists.length == k);
-    boolean issquared = distanceFunction.isSquared();
-    for(int i = 0; i < k; i++) {
-      double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
-      dists[i] = issquared ? FastMath.sqrt(d) : d;
-    }
-  }
-
-  /**
-   * Update the bounds for k-means.
-   *
-   * @param relation Relation
-   * @param assignment Cluster assignment
-   * @param upper Upper bounds
-   * @param lower Lower bounds
-   * @param move Movement of centers
-   */
-  protected void updateBounds(Relation<V> relation, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower, double[] move) {
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      upper.increment(it, move[assignment.intValue(it)]);
-      VMath.minusEquals(lower.get(it), move);
-    }
-  }
-
   @Override
   protected Logging getLogger() {
     return LOG;
@@ -386,45 +261,15 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
-    /**
-     * Flag to compute the final clustering variance statistic.
-     */
-    public static final OptionID VARSTAT_ID = new OptionID("kmeans.varstat", "Compute the final clustering variance statistic. Needs an additional full pass over the data set.");
-
-    /**
-     * Compute the final variance statisic.
-     */
-    protected boolean varstat = false;
-
+  public static class Parameterizer<V extends NumberVector> extends KMeansElkan.Parameterizer<V> {
     @Override
     protected Logging getLogger() {
       return LOG;
     }
 
     @Override
-    protected void getParameterDistanceFunction(Parameterization config) {
-      super.getParameterDistanceFunction(config);
-      if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
-        return; // Proper choice.
-      }
-      if(distanceFunction != null && !distanceFunction.isMetric()) {
-        LOG.warning("Elkan k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
-      }
-    }
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      Flag varF = new Flag(VARSTAT_ID);
-      if(config.grab(varF)) {
-        varstat = varF.isTrue();
-      }
-    }
-
-    @Override
-    protected KMeansElkan<V> makeInstance() {
-      return new KMeansElkan<>(distanceFunction, k, maxiter, initializer, varstat);
+    protected KMeansSimplifiedElkan<V> makeInstance() {
+      return new KMeansSimplifiedElkan<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }
 }

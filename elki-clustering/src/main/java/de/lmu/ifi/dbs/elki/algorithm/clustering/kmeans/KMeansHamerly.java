@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -91,7 +89,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   /**
    * Flag whether to compute the final variance statistic.
    */
-  private boolean varstat = false;
+  protected boolean varstat = false;
 
   /**
    * Constructor.
@@ -128,7 +126,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     WritableDoubleDataStore lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
     // Storage for updated means:
     final int dim = means[0].length;
-    double[][] sums = new double[k][dim];
+    double[][] sums = new double[k][dim], newmeans = new double[k][dim];
     // Separation of means / distance moved.
     double[] sep = new double[k];
 
@@ -154,23 +152,22 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       // Recompute means.
       for(int i = 0; i < k; i++) {
-        final int s = clusters.get(i).size();
-        timesEquals(sums[i], s > 0 ? 1. / s : 1.);
+        final double[] newmean = newmeans[i], sum = sums[i];
+        final double f = 1. / clusters.get(i).size();
+        for(int d = 0; d < dim; d++) {
+          newmean[d] = sum[d] * f;
+        }
       }
-      double delta = maxMoved(means, sums, sep);
+      double delta = maxMovedDistance(means, newmeans, sep);
       updateBounds(relation, assignment, upper, lower, sep, delta);
       for(int i = 0; i < k; i++) {
-        final int s = clusters.get(i).size();
-        System.arraycopy(sums[i], 0, means[i], 0, dim);
-        // Restore to sum for next iteration
-        timesEquals(sums[i], s > 0 ? s : 1.);
+        System.arraycopy(newmeans[i], 0, means[i], 0, dim);
       }
     }
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     }
-
     upper.destroy();
     lower.destroy();
 
@@ -191,8 +188,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         }
         totalvariance += varsum;
       }
-      KMeansModel model = new KMeansModel(mean, varsum);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, varsum)));
     }
     if(LOG.isStatistics() && varstat) {
       LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
@@ -204,9 +200,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * Recompute the separation of cluster means.
    *
    * @param means Means
-   * @param sep Output array
+   * @param sep Output array of separation
    */
-  private void recomputeSeperation(double[][] means, double[] sep) {
+  protected void recomputeSeperation(double[][] means, double[] sep) {
     final int k = means.length;
     assert (sep.length == k);
     boolean issquared = distanceFunction.isSquared();
@@ -221,14 +217,12 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
     // We need half the Euclidean distance
     for(int i = 0; i < k; i++) {
-      sep[i] = issquared ? FastMath.sqrt(sep[i]) : sep[i];
-      sep[i] *= .5;
+      sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
     }
   }
 
   /**
-   * Reassign objects, but only if their bounds indicate it is necessary to do
-   * so.
+   * Perform initial cluster assignment.
    *
    * @param relation Data
    * @param means Current means
@@ -237,9 +231,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param assignment Cluster assignment
    * @param upper Upper bounds
    * @param lower Lower bounds
-   * @return true when the object was reassigned
+   * @return Number of changes (i.e. relation size)
    */
-  private int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
+  protected int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.length);
     boolean issquared = distanceFunction.isSquared();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
@@ -258,27 +252,21 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
           min2 = dist;
         }
       }
-      // make squared Euclidean a metric:
-      if(issquared) {
-        min1 = FastMath.sqrt(min1);
-        min2 = FastMath.sqrt(min2);
-      }
-      ModifiableDBIDs newc = clusters.get(minIndex);
-      newc.add(it);
+      // Assign to nearest cluster.
+      clusters.get(minIndex).add(it);
       assignment.putInt(it, minIndex);
-      double[] newmean = sums[minIndex];
+      double[] newsum = sums[minIndex];
       for(int d = 0; d < fv.getDimensionality(); d++) {
-        newmean[d] += fv.doubleValue(d);
+        newsum[d] += fv.doubleValue(d);
       }
-      upper.putDouble(it, min1);
-      lower.putDouble(it, min2);
+      upper.putDouble(it, issquared ? FastMath.sqrt(min1) : min1);
+      lower.putDouble(it, issquared ? FastMath.sqrt(min2) : min2);
     }
     return relation.size();
   }
 
   /**
-   * Reassign objects, but only if their bounds indicate it is necessary to do
-   * so.
+   * Reassign objects, but avoid unnecessary computations based on their bounds.
    *
    * @param relation Data
    * @param means Current means
@@ -290,10 +278,10 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param lower Lower bounds
    * @return true when the object was reassigned
    */
-  private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
+  protected int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.length);
+    final boolean issquared = distanceFunction.isSquared();
     int changed = 0;
-    boolean issquared = distanceFunction.isSquared();
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int cur = assignment.intValue(it);
       // Compute the current bound:
@@ -325,26 +313,20 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
           min2 = dist;
         }
       }
-      // make squared Euclidean a metric:
-      if(issquared) {
-        min1 = FastMath.sqrt(min1);
-        min2 = FastMath.sqrt(min2);
-      }
       if(minIndex != cur) {
-        assignment.putInt(it, minIndex);
         clusters.get(minIndex).add(it);
         clusters.get(cur).remove(it);
-        double[] newmean = sums[minIndex];
-        double[] oldmean = sums[cur];
+        assignment.putInt(it, minIndex);
+        double[] newsum = sums[minIndex], oldsum = sums[cur];
         for(int d = 0; d < fv.getDimensionality(); d++) {
           final double v = fv.doubleValue(d);
-          newmean[d] += v;
-          oldmean[d] -= v;
+          newsum[d] += v;
+          oldsum[d] -= v;
         }
         ++changed;
-        upper.putDouble(it, min1);
+        upper.putDouble(it, issquared ? FastMath.sqrt(min1) : min1);
       }
-      lower.putDouble(it, min2);
+      lower.putDouble(it, issquared ? FastMath.sqrt(min2) : min2);
     }
     return changed;
   }
@@ -354,10 +336,10 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @param means Old means
    * @param newmeans New means
-   * @param dists Distances moved
+   * @param dists Distances moved (output)
    * @return Maximum distance moved
    */
-  private double maxMoved(double[][] means, double[][] newmeans, double[] dists) {
+  protected double maxMovedDistance(double[][] means, double[][] newmeans, double[] dists) {
     assert (means.length == k);
     assert (newmeans.length == k);
     assert (dists.length == k);
@@ -365,8 +347,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
-      d = issquared ? FastMath.sqrt(d) : d;
-      dists[i] = d;
+      dists[i] = d = issquared ? FastMath.sqrt(d) : d;
       max = (d > max) ? d : max;
     }
     return max;
@@ -382,7 +363,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param move Movement of centers
    * @param delta Maximum center movement.
    */
-  private void updateBounds(Relation<V> relation, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower, double[] move, double delta) {
+  protected void updateBounds(Relation<V> relation, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower, double[] move, double delta) {
     delta = -delta;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       upper.increment(it, move[assignment.intValue(it)]);
