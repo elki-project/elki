@@ -82,7 +82,7 @@ import net.jafama.FastMath;
     title = "Accelerating Lloyd’s Algorithm for k-Means Clustering", //
     booktitle = "Partitional Clustering Algorithms", //
     url = "https://doi.org/10.1007/978-3-319-09259-1_2", //
-    bibkey = "book/partclust15/HamerlyD15")
+    bibkey = "doi:10.1007/978-3-319-09259-1_2")
 public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
   /**
    * The logger for this class.

@@ -93,7 +93,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     title = "Hierarchical clustering schemes", //
     booktitle = "Psychometrika 32", //
     url = "https://doi.org/10.1007/BF02289588", //
-    bibkey = "journals/psychometrika/Johnson67")
+    bibkey = "doi:10.1007/BF02289588")
 public class CompleteLinkage implements Linkage {
   /**
    * Static instance of class.
