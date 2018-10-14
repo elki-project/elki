@@ -94,9 +94,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -119,14 +117,11 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       medians = medians(clusters, medians, relation);
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel model = new MeanModel(medians[i]);
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(medians[i])));
     }
     return result;
   }

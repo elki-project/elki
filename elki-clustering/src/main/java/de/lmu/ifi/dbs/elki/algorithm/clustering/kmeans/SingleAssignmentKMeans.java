@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -78,9 +78,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -95,8 +93,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), new KMeansModel(means[i], varsum[i])));
     }
     return result;
   }

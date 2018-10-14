@@ -170,7 +170,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
       KMeansModel model = new KMeansModel(means[i], varsum[i]);

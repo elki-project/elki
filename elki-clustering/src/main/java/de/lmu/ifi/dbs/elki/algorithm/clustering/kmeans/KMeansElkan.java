@@ -114,9 +114,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -152,20 +150,14 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         recomputeSeperation(means, sep, cdist); // #1
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
       }
-      if(rstat != null) {
-        LOG.statistics(rstat.setLong(changed));
-      }
+      LOG.statistics(rstat != null ? rstat.setLong(changed) : null);
       // Stop if no cluster assignment changed.
       if(changed == 0) {
         break;
       }
       // Recompute means.
       for(int i = 0; i < k; i++) {
-        final double[] newmean = newmeans[i], sum = sums[i];
-        final double f = 1. / clusters.get(i).size();
-        for(int d = 0; d < dim; d++) {
-          newmean[d] = sum[d] * f;
-        }
+        VMath.overwriteTimes(newmeans[i], sums[i], 1. / clusters.get(i).size());
       }
       movedDistance(means, newmeans, sep); // Overwrites sep
       updateBounds(relation, assignment, upper, lower, sep);
@@ -174,9 +166,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       }
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     upper.destroy();
     lower.destroy();
 
@@ -185,7 +175,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
       double[] mean = means[i];

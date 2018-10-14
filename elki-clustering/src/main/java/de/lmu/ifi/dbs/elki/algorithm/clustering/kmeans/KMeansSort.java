@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,14 +55,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * Sort-Means: Accelerated k-means by exploiting the triangle inequality and
  * pairwise distances of means to prune candidate means (with sorting).
- *
+ * <p>
  * Reference:
  * <p>
- * S. J. Phillips<br />
- * Acceleration of k-means and related clustering algorithms<br />
- * Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX
- * 2002)
- * </p>
+ * S. J. Phillips<br>
+ * Acceleration of k-means and related clustering algorithms<br>
+ * Proc. 4th Int. W. on Algorithm Engineering and Experiments (ALENEX 2002)
  *
  * @author Erich Schubert
  * @since 0.7.1
@@ -107,9 +105,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -119,7 +115,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
 
-    // Cluster distances
+    // Cluster distancesonly
     double[][] cdist = new double[k][k];
     int[][] cnum = new int[k][k - 1];
 
@@ -132,9 +128,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       recomputeSeperation(means, cdist, cnum, diststat);
       boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, cdist, cnum, diststat);
       logVarstat(varstat, varsum);
-      if(LOG.isStatistics()) {
-        LOG.statistics(diststat);
-      }
+      LOG.statistics(diststat);
       // Stop if no cluster assignment changed.
       if(!changed) {
         break;
@@ -143,19 +137,16 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       means = means(clusters, means, relation);
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
     }
     return result;
   }
@@ -213,7 +204,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     for(ModifiableDBIDs cluster : clusters) {
       cluster.clear();
     }
-    double mult = (distanceFunction instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
+    final double mult = (distanceFunction instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
       // Distance to current mean:

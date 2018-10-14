@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -85,9 +85,7 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -122,19 +120,16 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
       }
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
     }
     return result;
   }

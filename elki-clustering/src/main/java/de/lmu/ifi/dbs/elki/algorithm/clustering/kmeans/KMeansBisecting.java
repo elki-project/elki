@@ -131,9 +131,6 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
       currentClusterList.addAll(innerResult.getAllClusters());
 
       LOG.incrementProcessed(prog);
-      if(LOG.isVerbose()) {
-        LOG.verbose("Iteration " + j);
-      }
     }
     LOG.ensureCompleted(prog);
 

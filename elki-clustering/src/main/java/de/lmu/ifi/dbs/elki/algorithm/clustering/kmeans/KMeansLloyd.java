@@ -61,7 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Cluster analysis of multivariate data: efficiency versus interpretability of
  * classifications<br>
  * Abstract published in Biometrics 21(3)
-F *
+ * F *
+ * 
  * @author Arthur Zimek
  * @since 0.5.0
  *
@@ -77,9 +78,9 @@ F *
     url = "https://doi.org/10.1109/TIT.1982.1056489", //
     bibkey = "DBLP:journals/tit/Lloyd82")
 @Reference(authors = "E. W. Forgy", //
-title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
-booktitle = "Biometrics 21(3)", //
-bibkey = "journals/biometrics/Forgy65")
+    title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
+    booktitle = "Biometrics 21(3)", //
+    bibkey = "journals/biometrics/Forgy65")
 @Alias({ "lloyd", "forgy", "de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans", //
     "de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans" })
 public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
@@ -111,9 +112,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -138,19 +137,16 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
       means = means(clusters, means, relation);
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
     }
     return result;
   }

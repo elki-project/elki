@@ -158,9 +158,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistanceFunction()));
     Clustering<M> clustering = innerKMeans.run(database, relation);
 
@@ -202,14 +200,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       prog.setTotal(k);
       prog.setProcessed(k, LOG);
     }
-
-    if(LOG.isDebugging()) {
-      LOG.debug("X-means returned k=" + k + " clusters.");
-    }
-
-    // add all current clusters to the result
-    Clustering<M> result = new Clustering<>("X-Means Result", "X-Means", clusters);
-    return result;
+    return new Clustering<>("X-Means Result", "X-Means", clusters);
   }
 
   /**

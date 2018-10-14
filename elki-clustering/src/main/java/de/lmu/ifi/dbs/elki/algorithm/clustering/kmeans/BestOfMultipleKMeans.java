@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Model type
  */
-public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>>implements KMeans<V, M> {
+public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -101,10 +101,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     for(int i = 0; i < trials; i++) {
       Clustering<M> currentCandidate = innerkMeans.run(database, relation);
       double currentCost = qualityMeasure.quality(currentCandidate, df, relation);
-
-      if(LOG.isVerbose()) {
-        LOG.verbose("Cost of candidate " + i + ": " + currentCost);
-      }
+      LOG.verbose("Cost of candidate " + i + ": " + currentCost);
 
       if(qualityMeasure.isBetter(currentCost, bestCost)) {
         bestResult = currentCandidate;
@@ -113,7 +110,6 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-
     return bestResult;
   }
 

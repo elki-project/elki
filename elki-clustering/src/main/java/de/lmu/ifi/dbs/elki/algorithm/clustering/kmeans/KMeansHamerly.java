@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -111,9 +112,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -143,20 +142,14 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         recomputeSeperation(means, sep);
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
       }
-      if(rstat != null) {
-        LOG.statistics(rstat.setLong(changed));
-      }
+      LOG.statistics(rstat != null ? rstat.setLong(changed) : null);
       // Stop if no cluster assignment changed.
       if(changed == 0) {
         break;
       }
       // Recompute means.
       for(int i = 0; i < k; i++) {
-        final double[] newmean = newmeans[i], sum = sums[i];
-        final double f = 1. / clusters.get(i).size();
-        for(int d = 0; d < dim; d++) {
-          newmean[d] = sum[d] * f;
-        }
+        VMath.overwriteTimes(newmeans[i], sums[i], 1. / clusters.get(i).size());
       }
       double delta = maxMovedDistance(means, newmeans, sep);
       updateBounds(relation, assignment, upper, lower, sep, delta);
@@ -165,9 +158,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     upper.destroy();
     lower.destroy();
 
@@ -176,7 +167,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
       double[] mean = means[i];

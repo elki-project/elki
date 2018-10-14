@@ -126,9 +126,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
 
     // Intialisieren der means
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
@@ -148,7 +146,6 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".variance-sum");
-    assert (varstat != null); // Otherwise, the vartotal break below will fail!
 
     int iteration = 0;
     double prevvartotal = Double.POSITIVE_INFINITY;
@@ -188,31 +185,25 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
         }
       }
     }
-
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < k; i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
     }
 
     // Noise Cluster
     if(noiseFlag) {
-      KMeansModel model = new KMeansModel(null, 0);
-      DBIDs ids = noiseids;
-      if(ids.size() == 0) {
+      if(noiseids.isEmpty()) {
         return result;
       }
-      result.addToplevelCluster(new Cluster<>(ids, true, model));
+      result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(null, 0)));
     }
     return result;
   }
@@ -237,10 +228,8 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     Arrays.fill(varsum, 0.);
     final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY;
-
       V fv = relation.get(iditer);
-
+      double mindist = Double.POSITIVE_INFINITY;
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
         double dist = df.distance(fv, DoubleVector.wrap(means[i]));
@@ -282,15 +271,13 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
           continue;
         }
         NumberVector vec = database.get(iter);
-        if(raw == null) { // Initialize:
-          raw = vec.toArray();
-        }
+        raw = raw != null ? raw : vec.toArray(); // Initialize
         for(int j = 0; j < raw.length; j++) {
           raw[j] += vec.doubleValue(j);
         }
         count++;
       }
-      newMeans[i] = (raw != null) ? VMath.timesEquals(raw, 1.0 / count) : means[i];
+      newMeans[i] = (raw != null) ? VMath.timesEquals(raw, 1. / count) : means[i];
     }
     return newMeans;
   }
@@ -337,7 +324,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
+      DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(rateP)) {
         rate = rateP.doubleValue();

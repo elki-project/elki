@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 import net.jafama.FastMath;
@@ -99,9 +100,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
+    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -118,7 +117,6 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
     // Storage for updated means:
     final int dim = means[0].length;
     double[][] sums = new double[k][dim], newmeans = new double[k][dim];
-
     double[] moved = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
@@ -133,20 +131,14 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
       else {
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
       }
-      if(rstat != null) {
-        LOG.statistics(rstat.setLong(changed));
-      }
+      LOG.statistics(rstat != null ? rstat.setLong(changed) : null);
       // Stop if no cluster assignment changed.
       if(changed == 0) {
         break;
       }
       // Recompute means.
       for(int i = 0; i < k; i++) {
-        final double[] newmean = newmeans[i], sum = sums[i];
-        final double f = 1. / clusters.get(i).size();
-        for(int d = 0; d < dim; d++) {
-          newmean[d] = sum[d] * f;
-        }
+        VMath.overwriteTimes(newmeans[i], sums[i], 1. / clusters.get(i).size());
       }
       movedDistance(means, newmeans, moved);
       updateBounds(relation, assignment, upper, lower, moved);
@@ -155,9 +147,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
       }
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     upper.destroy();
     lower.destroy();
 
@@ -166,7 +156,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         continue;
       }
       double[] mean = means[i];
