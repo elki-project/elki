@@ -15,6 +15,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch.BIRCHLeafClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansExponion
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansAnnulus
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSimplifiedElkan
