@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -33,13 +32,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
@@ -121,15 +118,16 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     LongStatistic rstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
+    LongStatistic diststat = LOG.isStatistics() ? new LongStatistic(KEY + ".distance-computations") : null;
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       int changed;
       if(iteration == 0) {
-        changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
+        changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower, diststat);
       }
       else {
-        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
+        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower, diststat);
       }
       LOG.statistics(rstat != null ? rstat.setLong(changed) : null);
       // Stop if no cluster assignment changed.
@@ -148,32 +146,11 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
     }
     LOG.setCompleted(prog);
     LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    LOG.statistics(diststat);
     upper.destroy();
     lower.destroy();
 
-    // Wrap result
-    double totalvariance = 0.;
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      double[] mean = means[i];
-      double varsum = 0.;
-      if(varstat) {
-        DoubleVector mvec = DoubleVector.wrap(mean);
-        for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-          varsum += distanceFunction.distance(mvec, relation.get(it));
-        }
-        totalvariance += varsum;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, varsum)));
-    }
-    if(LOG.isStatistics() && varstat) {
-      LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
-    }
-    return result;
+    return buildResult(clusters, means, varstat, relation, diststat);
   }
 
   /**
@@ -186,12 +163,13 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
    * @param assignment Cluster assignment
    * @param upper Upper bounds
    * @param lower Lower bounds
+   * @param diststat Distance statistics
    * @return true when the object was reassigned
    */
-  private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
+  private int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower, LongStatistic diststat) {
     assert (k == means.length);
     final boolean issquared = distanceFunction.isSquared();
-    int changed = 0;
+    int changed = 0, dists = 0;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int orig = assignment.intValue(it);
       double u = upper.doubleValue(it);
@@ -206,6 +184,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
         }
         if(recompute_u) { // Need to update bound? #3a
           u = distanceFunction.distance(fv, DoubleVector.wrap(means[cur]));
+          ++dists;
           u = issquared ? FastMath.sqrt(u) : u;
           upper.putDouble(it, u);
           recompute_u = false; // Once only
@@ -214,6 +193,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
           }
         }
         double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[j]));
+        ++dists;
         dist = issquared ? FastMath.sqrt(dist) : dist;
         l[j] = dist;
         if(dist < u) {
@@ -230,6 +210,9 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
         plusMinusEquals(sums[cur], sums[orig], fv);
         ++changed;
       }
+    }
+    if(diststat != null) {
+      diststat.increment(dists);
     }
     return changed;
   }

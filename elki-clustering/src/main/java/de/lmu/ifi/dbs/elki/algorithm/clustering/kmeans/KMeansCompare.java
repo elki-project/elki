@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -36,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -136,42 +134,12 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
     LOG.setCompleted(prog);
     LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-
-    // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
-    }
-    return result;
+    LOG.statistics(diststat);
+    return buildResult(clusters, means, varsum);
   }
 
   /**
-   * Recompute the separation of cluster means.
-   *
-   * @param means Means
-   * @param cdist Center-to-Center distances
-   * @param diststat Distance counting statistic
-   */
-  private void recomputeSeperation(double[][] means, double[][] cdist, LongStatistic diststat) {
-    final int k = means.length;
-    for(int i = 1; i < k; i++) {
-      DoubleVector mi = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        cdist[i][j] = cdist[j][i] = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-      }
-    }
-    if(diststat != null) {
-      diststat.increment((k * (k - 1)) >> 1);
-    }
-  }
-
-  /**
-   * Reassign objects, but only if their bounds indicate it is necessary to do
-   * so.
+   * Reassign objects, but avoid unnecessary computations based on their bounds.
    *
    * @param relation Data
    * @param means Current means

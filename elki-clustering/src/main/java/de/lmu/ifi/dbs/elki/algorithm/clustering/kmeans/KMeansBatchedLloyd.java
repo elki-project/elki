@@ -20,16 +20,13 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -38,11 +35,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -162,21 +155,8 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
       }
     }
     LOG.setCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    }
-
-    // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(ids, model));
-    }
-    return result;
+    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    return buildResult(clusters, means, varsum);
   }
 
   /**

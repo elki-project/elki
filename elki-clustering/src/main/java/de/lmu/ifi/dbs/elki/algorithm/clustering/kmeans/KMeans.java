@@ -64,6 +64,12 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
   OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
 
   /**
+   * Flag to compute the final clustering variance statistic (for methods that
+   * employ bounds to avoid computing all distances).
+   */
+  public static final OptionID VARSTAT_ID = new OptionID("kmeans.varstat", "Compute the final clustering variance statistic. Needs an additional full pass over the data set.");
+
+  /**
    * Run the clustering algorithm.
    *
    * @param database Database to run on.

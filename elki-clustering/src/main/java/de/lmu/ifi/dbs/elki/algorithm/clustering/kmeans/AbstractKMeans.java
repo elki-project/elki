@@ -31,11 +31,9 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.data.*;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -49,11 +47,16 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for k-means implementations.
@@ -370,6 +373,195 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     return true;
   }
 
+  /**
+   * Recompute the separation of cluster means.
+   * <p>
+   * Used by Hamerly.
+   *
+   * @param means Means
+   * @param sep Output array of separation (half-sqrt scaled)
+   * @param diststat Distance counting statistic
+   */
+  protected void recomputeSeperation(double[][] means, double[] sep, LongStatistic diststat) {
+    final int k = means.length;
+    final boolean issquared = distanceFunction.isSquared();
+    assert (sep.length == k);
+    Arrays.fill(sep, Double.POSITIVE_INFINITY);
+    for(int i = 1; i < k; i++) {
+      DoubleVector m1 = DoubleVector.wrap(means[i]);
+      for(int j = 0; j < i; j++) {
+        double d = distanceFunction.distance(m1, DoubleVector.wrap(means[j]));
+        sep[i] = (d < sep[i]) ? d : sep[i];
+        sep[j] = (d < sep[j]) ? d : sep[j];
+      }
+    }
+    // We need half the Euclidean distance
+    for(int i = 0; i < k; i++) {
+      sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
+    }
+    if(diststat != null) {
+      diststat.increment((k * (k - 1)) >> 1);
+    }
+  }
+
+  /**
+   * Recompute the separation of cluster means.
+   * <p>
+   * Used by Elkan's variant and Exponion.
+   *
+   * @param means Means
+   * @param sep Output array of separation
+   * @param cdist Center-to-Center distances (half-sqrt scaled)
+   * @param diststat Distance counting statistic
+   */
+  protected void recomputeSeperation(double[][] means, double[] sep, double[][] cdist, LongStatistic diststat) {
+    final int k = means.length;
+    final boolean issquared = distanceFunction.isSquared();
+    assert (sep.length == k);
+    Arrays.fill(sep, Double.POSITIVE_INFINITY);
+    for(int i = 1; i < k; i++) {
+      DoubleVector mi = DoubleVector.wrap(means[i]);
+      for(int j = 0; j < i; j++) {
+        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
+        d = .5 * (issquared ? FastMath.sqrt(d) : d);
+        cdist[i][j] = cdist[j][i] = d;
+        sep[i] = (d < sep[i]) ? d : sep[i];
+        sep[j] = (d < sep[j]) ? d : sep[j];
+      }
+    }
+    if(diststat != null) {
+      diststat.increment((k * (k - 1)) >> 1);
+    }
+  }
+
+  /**
+   * Recompute the separation of cluster means.
+   * <p>
+   * Used by Sort and Compare variants.
+   *
+   * @param means Means
+   * @param cdist Center-to-Center distances (half-sqrt scaled)
+   * @param diststat Distance counting statistic
+   */
+  protected void recomputeSeperation(double[][] means, double[][] cdist, LongStatistic diststat) {
+    final int k = means.length;
+    final boolean issquared = distanceFunction.isSquared();
+    for(int i = 1; i < k; i++) {
+      DoubleVector mi = DoubleVector.wrap(means[i]);
+      for(int j = 0; j < i; j++) {
+        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
+        cdist[i][j] = cdist[j][i] = .5 * (issquared ? FastMath.sqrt(d) : d);
+      }
+    }
+    if(diststat != null) {
+      diststat.increment((k * (k - 1)) >> 1);
+    }
+  }
+
+  /**
+   * Maximum distance moved.
+   * <p>
+   * Used by Hamerly, Elkan (not using the maximum).
+   *
+   * @param means Old means
+   * @param newmeans New means
+   * @param dists Distances moved (output)
+   * @return Maximum distance moved
+   */
+  protected double movedDistance(double[][] means, double[][] newmeans, double[] dists) {
+    assert (means.length == k);
+    assert (newmeans.length == k);
+    assert (dists.length == k);
+    boolean issquared = distanceFunction.isSquared();
+    double max = 0.;
+    for(int i = 0; i < k; i++) {
+      double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
+      dists[i] = d = issquared ? FastMath.sqrt(d) : d;
+      max = (d > max) ? d : max;
+    }
+    return max;
+  }
+
+  /**
+   * Recompute the separation of cluster means.
+   * <p>
+   * Used by sort, and our exponion implementation.
+   *
+   * @param cdist Center-to-Center distances
+   * @param cnum Center numbers
+   */
+  protected static void nearestMeans(double[][] cdist, int[][] cnum) {
+    final int k = cdist.length;
+    double[] buf = new double[k - 1];
+    for(int i = 0; i < k; i++) {
+      System.arraycopy(cdist[i], 0, buf, 0, i);
+      System.arraycopy(cdist[i], i + 1, buf, i, k - i - 1);
+      for(int j = 0; j < buf.length; j++) {
+        cnum[i][j] = j < i ? j : (j + 1);
+      }
+      DoubleIntegerArrayQuickSort.sort(buf, cnum[i], k - 1);
+    }
+  }
+
+  /**
+   * Build a standard k-means result, with known cluster variance sums.
+   *
+   * @param clusters Cluster assignment
+   * @param means Cluster means
+   * @param varsum Variance sums
+   * @return
+   */
+  protected Clustering<KMeansModel> buildResult(List<ModifiableDBIDs> clusters, double[][] means, double[] varsum) {
+    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    for(int i = 0; i < clusters.size(); i++) {
+      DBIDs ids = clusters.get(i);
+      if(ids.isEmpty()) {
+        continue;
+      }
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
+    }
+    return result;
+  }
+
+  /**
+   * Build the result, recomputing the cluster variance if {@code varstat} is
+   * set to true.
+   * 
+   * @param clusters Cluster assignments
+   * @param means Cluster means
+   * @param varstat Recompute cluster variance
+   * @param relation Data relation (only needed if varstat is set)
+   * @param diststat Distance computations counter (only needed for varstat)
+   * @return Clustering result
+   */
+  protected Clustering<KMeansModel> buildResult(List<ModifiableDBIDs> clusters, double[][] means, boolean varstat, Relation<V> relation, LongStatistic diststat) {
+    double totalvariance = 0.;
+    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    for(int i = 0; i < clusters.size(); i++) {
+      DBIDs ids = clusters.get(i);
+      if(ids.isEmpty()) {
+        continue;
+      }
+      double varsum = 0;
+      if(varstat) {
+        DoubleVector mvec = DoubleVector.wrap(means[i]);
+        for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+          varsum += distanceFunction.distance(mvec, relation.get(it));
+        }
+        if(diststat != null) {
+          diststat.increment(ids.size());
+        }
+        totalvariance += varsum;
+      }
+      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum)));
+    }
+    if(varstat && getLogger().isStatistics()) {
+      getLogger().statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
+      getLogger().statistics(diststat);
+    }
+    return result;
+  }
+
   @Override
   public void setK(int k) {
     this.k = k;
@@ -423,6 +615,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * Initialization method.
      */
     protected KMeansInitialization<V> initializer;
+
+    /**
+     * Compute the final variance statistic (not used by all).
+     */
+    protected boolean varstat = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -485,6 +682,16 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
+    }
+
+    /**
+     * Get the variance statistics parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void getParameterVarstat(Parameterization config) {
+      Flag varF = new Flag(VARSTAT_ID);
+      varstat = config.grab(varF) && varF.isTrue();
     }
 
     /**

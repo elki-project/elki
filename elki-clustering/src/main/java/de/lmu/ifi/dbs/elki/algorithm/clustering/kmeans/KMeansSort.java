@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -36,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -47,7 +45,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -125,7 +122,8 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      recomputeSeperation(means, cdist, cnum, diststat);
+      recomputeSeperation(means, cdist, diststat);
+      nearestMeans(cdist, cnum);
       boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, cdist, cnum, diststat);
       logVarstat(varstat, varsum);
       LOG.statistics(diststat);
@@ -138,52 +136,12 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     }
     LOG.setCompleted(prog);
     LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-
-    // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
-    }
-    return result;
+    LOG.statistics(diststat);
+    return buildResult(clusters, means, varsum);
   }
 
   /**
-   * Recompute the separation of cluster means.
-   *
-   * @param means Means
-   * @param cdist Center-to-Center distances
-   * @param cnum Center numbers
-   * @param diststat Distance counting statistic
-   */
-  private void recomputeSeperation(double[][] means, double[][] cdist, int[][] cnum, LongStatistic diststat) {
-    final int k = means.length;
-    for(int i = 1; i < k; i++) {
-      DoubleVector mi = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        cdist[i][j] = cdist[j][i] = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-      }
-    }
-    double[] buf = new double[k - 1];
-    for(int i = 0; i < k; i++) {
-      System.arraycopy(cdist[i], 0, buf, 0, i);
-      System.arraycopy(cdist[i], i + 1, buf, i, k - i - 1);
-      for(int j = 0; j < buf.length; j++) {
-        cnum[i][j] = j < i ? j : (j + 1);
-      }
-      DoubleIntegerArrayQuickSort.sort(buf, cnum[i], k - 1);
-    }
-    if(diststat != null) {
-      diststat.increment((k * (k - 1)) >> 1);
-    }
-  }
-
-  /**
-   * Reassign objects, but only if their bounds indicate it is necessary to do
-   * so.
+   * Reassign objects, but avoid unnecessary computations based on their bounds.
    *
    * @param relation Data
    * @param means Current means
