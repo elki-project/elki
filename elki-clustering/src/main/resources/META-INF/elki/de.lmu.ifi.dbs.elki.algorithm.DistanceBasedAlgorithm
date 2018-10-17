@@ -32,8 +32,6 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARANS
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.XMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.Leader
