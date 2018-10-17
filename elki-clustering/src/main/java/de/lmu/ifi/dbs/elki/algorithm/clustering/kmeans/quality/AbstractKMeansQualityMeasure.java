@@ -128,8 +128,6 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       bibkey = "DBLP:conf/icml/PellegM00")
   public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
-    // dimensionality of data points
-    final int dim = RelationUtil.dimensionality(relation);
     // number of clusters
     final int m = clusters.size();
 
@@ -156,20 +154,20 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
 
     // Total variance (corrected for bias)
-    final double v = d / (n - m), logv = FastMath.log(v);
+    final double logv = FastMath.log(d / (n - m));
+
+    final int dim = RelationUtil.dimensionality(relation);
     // log likelihood of this clustering
     double logLikelihood = 0.;
 
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Posterior entropy, Rn
-                                                     // log Rn
+      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Post. entropy Rn log Rn
           - n_i[i] * .5 * MathUtil.LOGTWOPI // Rn/2 log2pi
           - n_i[i] * dim * .5 * logv // Rn M/2 log sigma^2
           - (d_i[i] - m) * .5; // (Rn-K)/2
     }
     logLikelihood -= n * FastMath.log(n); // Prior entropy, sum_i Rn log R
-
     return logLikelihood;
   }
 
@@ -191,8 +189,6 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       bibkey = "DBLP:conf/ictai/ZhaoXF08")
   public static <V extends NumberVector> double logLikelihoodAlternate(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
-    // dimensionality of data points
-    final int dim = RelationUtil.dimensionality(relation);
     // number of clusters
     final int m = clusters.size();
 
@@ -211,9 +207,10 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       d_i[i] = varianceOfCluster(cluster, distanceFunction, relation);
     }
 
+    final int dim = RelationUtil.dimensionality(relation);
+
     // log likelihood of this clustering
     double logLikelihood = 0.;
-
     // Aggregate
     for(int i = 0; i < m; i++) {
       logLikelihood += n_i[i] * FastMath.log(n_i[i] / (double) n) // ni log ni/n

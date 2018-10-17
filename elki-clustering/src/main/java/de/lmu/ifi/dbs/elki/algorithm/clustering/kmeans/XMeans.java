@@ -217,12 +217,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     // Transform parent cluster into a clustering
     ArrayList<Cluster<M>> parentClusterList = new ArrayList<Cluster<M>>(1);
     parentClusterList.add(parentCluster);
-    Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
-
-    if(parentCluster.size() < 2) {
+    if(parentCluster.size() <= 1) {
       // Split is not possbile
       return parentClusterList;
     }
+    Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
 
     ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
 

@@ -75,17 +75,17 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
   @Override
   public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+    DBIDs ids = relation.getDBIDs();
+    if(ids.size() <= k) {
+      throw new AbortException("Don't use k-means with k >= data set size.");
+    }
+    
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
-    DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
     List<NumberVector> means = new ArrayList<>(k);
-
-    if(ids.size() <= k) {
-      throw new AbortException("Don't use k-means with k >= data set size.");
-    }
 
     Random random = rnd.getSingleThreadedRandom();
     DBIDRef first = DBIDUtil.randomSample(ids, random);

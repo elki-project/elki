@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -90,10 +90,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
    * @param initialMeans initial means.
    */
   public void setInitialMeans(double[][] initialMeans) {
-    double[][] vecs = new double[initialMeans.length][];
-    for(int i = 0; i < initialMeans.length; ++i) {
-      vecs[i] = initialMeans[i]; // TODO: clone?
-    }
+    double[][] vecs = initialMeans.clone(); // TODO: deep copy?
     this.initialMeans = vecs;
   }
 
@@ -101,7 +98,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
   public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     if(k != initialMeans.length) {
       throw new AbortException("Predefined initial means contained " + initialMeans.length //
-      + " means, algorithm requested " + k + " means instead.");
+          + " means, algorithm requested " + k + " means instead.");
     }
     return initialMeans;
   }

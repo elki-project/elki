@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Some constants and options shared among kmeans family algorithms.
  *
  * @author Erich Schubert
- * @since 0.1
  *
  * @param <V> Number vector type
  * @param <M> Actual model type
@@ -67,7 +66,7 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
    * Flag to compute the final clustering variance statistic (for methods that
    * employ bounds to avoid computing all distances).
    */
-  public static final OptionID VARSTAT_ID = new OptionID("kmeans.varstat", "Compute the final clustering variance statistic. Needs an additional full pass over the data set.");
+  OptionID VARSTAT_ID = new OptionID("kmeans.varstat", "Compute the final clustering variance statistic. Needs an additional full pass over the data set.");
 
   /**
    * Run the clustering algorithm.
