@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
@@ -368,7 +369,10 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
             .addParameter(KMeans.K_ID, k_min) //
             .addParameter(KMeans.INIT_ID, new PredefinedInitialMeans((double[][]) null)) //
             .addParameter(KMeans.MAXITER_ID, maxiter) //
-            .addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction), config);
+            // Setting the distance to null if undefined at this point will
+            // cause validation errors later. So fall back to the default.
+            .addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction != null ? //
+                distanceFunction : SquaredEuclideanDistanceFunction.STATIC), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }

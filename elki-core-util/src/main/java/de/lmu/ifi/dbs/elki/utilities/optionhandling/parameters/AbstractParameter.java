@@ -230,7 +230,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
         return;
       }
     }
-    throw new InvalidParameterException("Value for option \"" + getOptionID().getName() + "\" did not validate: " + obj.toString());
+    throw new InvalidParameterException("Value for option \"" + getOptionID().getName() + "\" did not validate: " + obj);
   }
 
   /**

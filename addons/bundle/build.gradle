@@ -19,6 +19,7 @@ dependencies {
     testRuntime files(it.sourceSets.main.java.outputDir)
   }
   testCompile project(':elki-docutil')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
 
 jar {
