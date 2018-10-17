@@ -140,11 +140,6 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMediansLloyd<V> makeInstance() {
       return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
     }

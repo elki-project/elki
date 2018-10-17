@@ -357,11 +357,6 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansHamerly.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMeansAnnulus<V> makeInstance() {
       return new KMeansAnnulus<>(distanceFunction, k, maxiter, initializer, varstat);
     }

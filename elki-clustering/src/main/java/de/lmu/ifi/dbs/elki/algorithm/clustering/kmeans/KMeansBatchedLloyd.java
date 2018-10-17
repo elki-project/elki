@@ -301,11 +301,6 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     }
 
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMeansBatchedLloyd<V> makeInstance() {
       return new KMeansBatchedLloyd<>(distanceFunction, k, maxiter, initializer, blocks, random);
     }

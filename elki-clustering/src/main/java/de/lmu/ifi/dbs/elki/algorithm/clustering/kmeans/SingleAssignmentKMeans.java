@@ -112,11 +112,6 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected void makeOptions(Parameterization config) {
       // Do NOT invoke super.makeOptions, as we don't want to have the maxiter
       // parameter, nor a warning for other distance functions.

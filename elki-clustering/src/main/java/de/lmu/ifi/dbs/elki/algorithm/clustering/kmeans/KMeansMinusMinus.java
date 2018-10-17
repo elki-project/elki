@@ -319,11 +319,6 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     private boolean noiseFlag;
 
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05) //

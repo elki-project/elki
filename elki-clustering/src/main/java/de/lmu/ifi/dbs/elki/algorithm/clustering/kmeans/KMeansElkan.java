@@ -312,11 +312,6 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected void getParameterDistanceFunction(Parameterization config) {
       super.getParameterDistanceFunction(config);
       if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {

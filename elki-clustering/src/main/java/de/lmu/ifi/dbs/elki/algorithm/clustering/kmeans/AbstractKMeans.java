@@ -26,6 +26,8 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 import java.util.Arrays;
 import java.util.List;
 
+import com.sun.istack.internal.logging.Logger;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -45,7 +47,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
@@ -654,7 +655,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
         if(distanceFunction != null //
             && !(distanceFunction instanceof SquaredEuclideanDistanceFunction) //
             && !(distanceFunction instanceof EuclideanDistanceFunction)) {
-          getLogger().warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
+          Logger.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
     }
@@ -693,13 +694,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       Flag varF = new Flag(VARSTAT_ID);
       varstat = config.grab(varF) && varF.isTrue();
     }
-
-    /**
-     * Get class logger.
-     *
-     * @return Logger
-     */
-    abstract protected Logging getLogger();
 
     @Override
     abstract protected AbstractKMeans<V, ?> makeInstance();

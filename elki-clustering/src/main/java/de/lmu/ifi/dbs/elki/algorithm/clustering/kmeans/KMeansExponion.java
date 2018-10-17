@@ -247,11 +247,6 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansHamerly.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMeansExponion<V> makeInstance() {
       return new KMeansExponion<>(distanceFunction, k, maxiter, initializer, varstat);
     }

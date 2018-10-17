@@ -136,11 +136,6 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMeansHybridLloydMacQueen<V> makeInstance() {
       return new KMeansHybridLloydMacQueen<>(distanceFunction, k, maxiter, initializer);
     }

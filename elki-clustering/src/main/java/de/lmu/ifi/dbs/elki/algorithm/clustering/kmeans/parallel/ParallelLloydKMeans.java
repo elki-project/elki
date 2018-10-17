@@ -128,11 +128,6 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected ParallelLloydKMeans<V> makeInstance() {
       return new ParallelLloydKMeans<>(distanceFunction, k, maxiter, initializer);
     }

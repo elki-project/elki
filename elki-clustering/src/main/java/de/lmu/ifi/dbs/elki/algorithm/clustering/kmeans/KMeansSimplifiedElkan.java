@@ -231,11 +231,6 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends KMeansElkan<V
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansElkan.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected KMeansSimplifiedElkan<V> makeInstance() {
       return new KMeansSimplifiedElkan<>(distanceFunction, k, maxiter, initializer, varstat);
     }

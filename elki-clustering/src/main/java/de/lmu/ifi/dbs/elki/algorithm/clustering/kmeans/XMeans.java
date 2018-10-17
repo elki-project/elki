@@ -380,11 +380,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected XMeans<V, M> makeInstance() {
       return new XMeans<V, M>(distanceFunction, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }

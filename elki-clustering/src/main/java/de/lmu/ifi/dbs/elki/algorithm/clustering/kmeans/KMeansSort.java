@@ -207,11 +207,6 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected Logging getLogger() {
-      return LOG;
-    }
-
-    @Override
     protected void getParameterDistanceFunction(Parameterization config) {
       super.getParameterDistanceFunction(config);
       if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
