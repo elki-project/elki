@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Sort-Means: Accelerated k-means by exploiting the triangle inequality and
@@ -207,14 +206,8 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected void getParameterDistanceFunction(Parameterization config) {
-      super.getParameterDistanceFunction(config);
-      if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
-        return; // Proper choice.
-      }
-      if(distanceFunction != null && !distanceFunction.isMetric()) {
-        LOG.warning("Compare k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
-      }
+    protected boolean needsMetric() {
+      return true;
     }
 
     @Override

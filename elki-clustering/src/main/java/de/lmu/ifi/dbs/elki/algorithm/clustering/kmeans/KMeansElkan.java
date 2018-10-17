@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -312,14 +311,8 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
-    protected void getParameterDistanceFunction(Parameterization config) {
-      super.getParameterDistanceFunction(config);
-      if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
-        return; // Proper choice.
-      }
-      if(distanceFunction != null && !distanceFunction.isMetric()) {
-        LOG.warning("Elkan k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
-      }
+    protected boolean needsMetric() {
+      return true;
     }
 
     @Override

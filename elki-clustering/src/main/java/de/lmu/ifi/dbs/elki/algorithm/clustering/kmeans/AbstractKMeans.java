@@ -652,12 +652,29 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(distanceFunction != null //
-            && !(distanceFunction instanceof SquaredEuclideanDistanceFunction) //
-            && !(distanceFunction instanceof EuclideanDistanceFunction)) {
+        if(distanceFunction == null //
+            || distanceFunction instanceof SquaredEuclideanDistanceFunction //
+            || distanceFunction instanceof EuclideanDistanceFunction) {
+          return;
+        }
+        if(needsMetric() && !distanceFunction.isMetric()) {
+          Logger.getLogger(this.getClass()).warning("This k-means variants requires the triangle inequality, and thus should only be used with squared Euclidean distance!");
+        }
+        else {
           Logger.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
+    }
+
+    /**
+     * Users could use other non-metric distances at their own risk; but some
+     * k-means variants make explicit use of the triangle inequality, we emit
+     * extra warnings then.
+     *
+     * @return {@code true} if the algorithm uses triangle inequality
+     */
+    protected boolean needsMetric() {
+      return false;
     }
 
     /**
