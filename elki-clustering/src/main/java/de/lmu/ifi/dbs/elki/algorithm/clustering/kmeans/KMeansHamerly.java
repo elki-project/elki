@@ -20,9 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -32,17 +29,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -76,11 +66,6 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private static final Logging LOG = Logging.getLogger(KMeansHamerly.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMeansHamerly.class.getName();
-
-  /**
    * Flag whether to compute the final variance statistic.
    */
   protected boolean varstat = false;
@@ -104,192 +89,178 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    // Hamerly bounds
-    WritableDoubleDataStore upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
-    WritableDoubleDataStore lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
-    // Storage for updated means:
-    final int dim = means[0].length;
-    double[][] sums = new double[k][dim], newmeans = new double[k][dim];
-    // Separation of means / distance moved.
-    double[] sep = new double[k];
-
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    LongStatistic rstat = LOG.isStatistics() ? new LongStatistic(KEY + ".reassignments") : null;
-    LongStatistic diststat = LOG.isStatistics() ? new LongStatistic(KEY + ".distance-computations") : null;
-    int iteration = 0;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
-      LOG.incrementProcessed(prog);
-      int changed;
-      if(iteration == 0) {
-        changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower, diststat);
-      }
-      else {
-        recomputeSeperation(means, sep, diststat);
-        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower, diststat);
-      }
-      LOG.statistics(rstat != null ? rstat.setLong(changed) : null);
-      // Stop if no cluster assignment changed.
-      if(changed == 0) {
-        break;
-      }
-      // Recompute means.
-      for(int i = 0; i < k; i++) {
-        VMath.overwriteTimes(newmeans[i], sums[i], 1. / clusters.get(i).size());
-      }
-      double delta = movedDistance(means, newmeans, sep);
-      updateBounds(relation, assignment, upper, lower, sep, delta);
-      for(int i = 0; i < k; i++) {
-        System.arraycopy(newmeans[i], 0, means[i], 0, dim);
-      }
-    }
-    LOG.setCompleted(prog);
-    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    LOG.statistics(diststat);
-    upper.destroy();
-    lower.destroy();
-
-    return buildResult(clusters, means, varstat, relation, diststat);
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(maxiter);
+    return instance.buildResult(varstat, relation);
   }
 
   /**
-   * Perform initial cluster assignment.
+   * Inner instance, storing state for a single data set.
    *
-   * @param relation Data
-   * @param means Current means
-   * @param sums Running sums of the new means
-   * @param clusters Current clusters
-   * @param assignment Cluster assignment
-   * @param upper Upper bounds
-   * @param lower Lower boundsO
-   * @return Number of changes (i.e. relation size)
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
-  protected int initialAssignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower, LongStatistic diststat) {
-    assert (k == means.length);
-    boolean issquared = distanceFunction.isSquared();
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      V fv = relation.get(it);
-      // Find closest center, and distance to two closest centers
-      double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
-      int minIndex = -1;
-      for(int i = 0; i < k; i++) {
-        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
-        if(dist < min1) {
-          minIndex = i;
-          min2 = min1;
-          min1 = dist;
-        }
-        else if(dist < min2) {
-          min2 = dist;
-        }
-      }
-      // Assign to nearest cluster.
-      clusters.get(minIndex).add(it);
-      assignment.putInt(it, minIndex);
-      plusEquals(sums[minIndex], fv);
-      upper.putDouble(it, issquared ? FastMath.sqrt(min1) : min1);
-      lower.putDouble(it, issquared ? FastMath.sqrt(min2) : min2);
-    }
-    if(diststat != null) {
-      diststat.increment(k * relation.size());
-    }
-    return relation.size();
-  }
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Sum aggregate for the new mean.
+     */
+    double[][] sums;
 
-  /**
-   * Reassign objects, but avoid unnecessary computations based on their bounds.
-   *
-   * @param relation Data
-   * @param means Current means
-   * @param sums New means as running sums
-   * @param clusters Current clusters
-   * @param assignment Cluster assignment
-   * @param sep Separation of means
-   * @param upper Upper bounds
-   * @param lower Lower bounds
-   * @param diststat Distance statistics
-   * @return true when the object was reassigned
-   */
-  protected int assignToNearestCluster(Relation<V> relation, double[][] means, double[][] sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower, LongStatistic diststat) {
-    assert (k == means.length);
-    final boolean issquared = distanceFunction.isSquared();
-    int changed = 0, dists = 0;
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      final int cur = assignment.intValue(it);
-      // Compute the current bound:
-      final double z = lower.doubleValue(it);
-      final double sa = sep[cur];
-      double u = upper.doubleValue(it);
-      if(u <= z || u <= sa) {
-        continue;
+    /**
+     * Temporary storage for the new means.
+     */
+    double[][] newmeans;
+
+    /**
+     * Separation of means / distance moved.
+     */
+    double[] sep;
+
+    /**
+     * Upper bounding distance
+     */
+    WritableDoubleDataStore upper;
+
+    /**
+     * Lower bounding distance
+     */
+    WritableDoubleDataStore lower;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
+      upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
+      lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
+      final int dim = means[0].length;
+      sums = new double[k][dim];
+      newmeans = new double[k][dim];
+      sep = new double[k];
+    }
+
+    @Override
+    protected int iterate(int iteration) {
+      int changed = iteration == 1 ? initialAssignToNearestCluster() : assignToNearestCluster();
+      if(changed > 0) {
+        meansFromSums(newmeans, sums);
+        updateBounds(sep, movedDistance(means, newmeans, sep));
+        copyMeans(newmeans, means);
       }
-      // Update the upper bound
-      V fv = relation.get(it);
-      double curd2 = distanceFunction.distance(fv, DoubleVector.wrap(means[cur]));
-      ++dists;
-      u = issquared ? FastMath.sqrt(curd2) : curd2;
-      upper.putDouble(it, u);
-      if(u <= z || u <= sa) {
-        continue;
+      return changed;
+    }
+
+    /**
+     * Perform initial cluster assignment.
+     *
+     * @return Number of changes (i.e. relation size)
+     */
+    protected int initialAssignToNearestCluster() {
+      assert (k == means.length);
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        NumberVector fv = relation.get(it);
+        // Find closest center, and distance to two closest centers
+        double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
+        int minIndex = -1;
+        for(int i = 0; i < k; i++) {
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < min1) {
+            minIndex = i;
+            min2 = min1;
+            min1 = dist;
+          }
+          else if(dist < min2) {
+            min2 = dist;
+          }
+        }
+        // Assign to nearest cluster.
+        clusters.get(minIndex).add(it);
+        assignment.putInt(it, minIndex);
+        plusEquals(sums[minIndex], fv);
+        upper.putDouble(it, isSquared ? FastMath.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? FastMath.sqrt(min2) : min2);
       }
-      // Find closest center, and distance to two closest centers
-      double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
-      int minIndex = cur;
-      --dists; // i == cur will increment below.
-      for(int i = 0; i < k; i++) {
-        if(i == cur) {
+      return relation.size();
+    }
+
+    /**
+     * Reassign objects, but avoid unnecessary computations based on their
+     * bounds.
+     *
+     * @return number of objects reassigned
+     */
+    protected int assignToNearestCluster() {
+      assert (k == means.length);
+      recomputeSeperation(means, sep);
+      int changed = 0;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        final int cur = assignment.intValue(it);
+        // Compute the current bound:
+        final double z = lower.doubleValue(it);
+        final double sa = sep[cur];
+        double u = upper.doubleValue(it);
+        if(u <= z || u <= sa) {
           continue;
         }
-        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
-        ++dists;
-        if(dist < min1) {
-          minIndex = i;
-          min2 = min1;
-          min1 = dist;
+        // Update the upper bound
+        NumberVector fv = relation.get(it);
+        double curd2 = distance(fv, DoubleVector.wrap(means[cur]));
+        u = isSquared ? FastMath.sqrt(curd2) : curd2;
+        upper.putDouble(it, u);
+        if(u <= z || u <= sa) {
+          continue;
         }
-        else if(dist < min2) {
-          min2 = dist;
+        // Find closest center, and distance to two closest centers
+        double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
+        int minIndex = cur;
+        for(int i = 0; i < k; i++) {
+          if(i == cur) {
+            continue;
+          }
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < min1) {
+            minIndex = i;
+            min2 = min1;
+            min1 = dist;
+          }
+          else if(dist < min2) {
+            min2 = dist;
+          }
         }
+        if(minIndex != cur) {
+          clusters.get(minIndex).add(it);
+          clusters.get(cur).remove(it);
+          assignment.putInt(it, minIndex);
+          plusMinusEquals(sums[minIndex], sums[cur], fv);
+          ++changed;
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+        }
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
       }
-      if(minIndex != cur) {
-        clusters.get(minIndex).add(it);
-        clusters.get(cur).remove(it);
-        assignment.putInt(it, minIndex);
-        plusMinusEquals(sums[minIndex], sums[cur], fv);
-        ++changed;
-        upper.putDouble(it, min1 == curd2 ? u : issquared ? FastMath.sqrt(min1) : min1);
-      }
-      lower.putDouble(it, min2 == curd2 ? u : issquared ? FastMath.sqrt(min2) : min2);
+      return changed;
     }
-    if(diststat != null) {
-      diststat.increment(dists);
-    }
-    return changed;
-  }
 
-  /**
-   * Update the bounds for k-means.
-   *
-   * @param relation Relation
-   * @param assignment Cluster assignment
-   * @param upper Upper bounds
-   * @param lower Lower bounds
-   * @param move Movement of centers
-   * @param delta Maximum center movement.
-   */
-  protected void updateBounds(Relation<V> relation, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower, double[] move, double delta) {
-    delta = -delta;
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      upper.increment(it, move[assignment.intValue(it)]);
-      lower.increment(it, delta);
+    /**
+     * Update the bounds for k-means.
+     *
+     * @param move Movement of centers
+     * @param delta Maximum center movement.
+     */
+    protected void updateBounds(double[] move, double delta) {
+      delta = -delta;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        upper.increment(it, move[assignment.intValue(it)]);
+        lower.increment(it, delta);
+      }
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
     }
   }
 

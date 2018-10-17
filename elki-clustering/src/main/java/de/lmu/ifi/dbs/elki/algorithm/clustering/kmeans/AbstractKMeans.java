@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.sum;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.sun.istack.internal.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -34,20 +33,28 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.*;
-import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
@@ -97,51 +104,27 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   public AbstractKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction);
     this.k = k;
-    this.maxiter = maxiter;
+    this.maxiter = maxiter > 0 ? maxiter : Integer.MAX_VALUE;
     this.initializer = initializer;
-  }
-
-  /**
-   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
-   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   *
-   * @param relation the database to cluster
-   * @param means a list of k means
-   * @param clusters cluster assignment
-   * @param assignment Current cluster assignment
-   * @param varsum Variance sum output
-   * @return true when the object was reassigned
-   */
-  protected boolean assignToNearestCluster(Relation<? extends NumberVector> relation, double[][] means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
-    assert (k == means.length);
-    boolean changed = false;
-    // Reset all clusters
-    Arrays.fill(varsum, 0.);
-    for(ModifiableDBIDs cluster : clusters) {
-      cluster.clear();
-    }
-    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY;
-      NumberVector fv = relation.get(iditer);
-      int minIndex = 0;
-      for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
-        }
-      }
-      varsum[minIndex] += mindist;
-      clusters.get(minIndex).add(iditer);
-      changed |= assignment.putInt(iditer, minIndex) != minIndex;
-    }
-    return changed;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistanceFunction().getInputTypeRestriction()));
+  }
+
+  /**
+   * Choose the initial means.
+   *
+   * @param database Database
+   * @param relation Relation
+   * @return Means
+   */
+  protected double[][] initialMeans(Database database, Relation<V> relation) {
+    Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    getLogger().statistics(inittime.end());
+    return means;
   }
 
   /**
@@ -176,6 +159,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       DBIDs list = clusters.get(i);
       if(list.isEmpty()) {
         // Keep degenerated means as-is for now.
+        // TODO: allow the user to choose the behavior.
         newMeans[i] = means[i];
         continue;
       }
@@ -264,226 +248,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   /**
-   * Returns the median vectors of the given clusters in the given database.
-   *
-   * @param clusters the clusters to compute the means
-   * @param medians the recent medians
-   * @param database the database containing the vectors
-   * @return the mean vectors of the given clusters in the given database
-   */
-  protected double[][] medians(List<? extends DBIDs> clusters, double[][] medians, Relation<? extends NumberVector> database) {
-    final int dim = medians[0].length;
-    final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    double[][] newMedians = new double[k][];
-    for(int i = 0; i < k; i++) {
-      DBIDs clu = clusters.get(i);
-      if(clu.size() <= 0) {
-        newMedians[i] = medians[i];
-        continue;
-      }
-      ArrayModifiableDBIDs list = DBIDUtil.newArray(clu);
-      DBIDArrayIter it = list.iter();
-      double[] mean = new double[dim];
-      for(int d = 0; d < dim; d++) {
-        sorter.setDimension(d);
-        mean[d] = database.get(it.seek(QuickSelectDBIDs.median(list, sorter))).doubleValue(d);
-      }
-      newMedians[i] = mean;
-    }
-    return newMedians;
-  }
-
-  /**
-   * Compute an incremental update for the mean.
-   *
-   * @param mean Mean to update
-   * @param vec Object vector
-   * @param newsize (New) size of cluster
-   * @param op Cluster size change / Weight change
-   */
-  protected static void incrementalUpdateMean(double[] mean, NumberVector vec, int newsize, double op) {
-    if(newsize == 0) {
-      return; // Keep old mean
-    }
-    // Note: numerically stabilized version:
-    VMath.plusTimesEquals(mean, VMath.minusEquals(vec.toArray(), mean), op / newsize);
-  }
-
-  /**
-   * Perform a MacQueen style iteration.
-   *
-   * @param relation Relation
-   * @param means Means
-   * @param clusters Clusters
-   * @param assignment Current cluster assignment
-   * @param varsum Variance sum output
-   * @return true when the means have changed
-   */
-  protected boolean macQueenIterate(Relation<? extends NumberVector> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
-    boolean changed = false;
-    Arrays.fill(varsum, 0.);
-
-    // Raw distance function
-    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
-
-    // Incremental update
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY;
-      NumberVector fv = relation.get(iditer);
-      int minIndex = 0;
-      for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
-        }
-      }
-      varsum[minIndex] += mindist;
-      changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer, assignment);
-    }
-    return changed;
-  }
-
-  /**
-   * Try to update the cluster assignment.
-   *
-   * @param clusters Current clusters
-   * @param means Means to update
-   * @param minIndex Cluster to assign to
-   * @param fv Vector
-   * @param iditer Object ID
-   * @param assignment Current cluster assignment
-   * @return {@code true} when assignment changed
-   */
-  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, double[][] means, int minIndex, NumberVector fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
-    int cur = assignment.intValue(iditer);
-    if(cur == minIndex) {
-      return false;
-    }
-    final ModifiableDBIDs curclus = clusters.get(minIndex);
-    curclus.add(iditer);
-    incrementalUpdateMean(means[minIndex], fv, curclus.size(), +1);
-
-    if(cur >= 0) {
-      ModifiableDBIDs ci = clusters.get(cur);
-      ci.remove(iditer);
-      incrementalUpdateMean(means[cur], fv, ci.size() + 1, -1);
-    }
-
-    assignment.putInt(iditer, minIndex);
-    return true;
-  }
-
-  /**
-   * Recompute the separation of cluster means.
-   * <p>
-   * Used by Hamerly.
-   *
-   * @param means Means
-   * @param sep Output array of separation (half-sqrt scaled)
-   * @param diststat Distance counting statistic
-   */
-  protected void recomputeSeperation(double[][] means, double[] sep, LongStatistic diststat) {
-    final int k = means.length;
-    final boolean issquared = distanceFunction.isSquared();
-    assert (sep.length == k);
-    Arrays.fill(sep, Double.POSITIVE_INFINITY);
-    for(int i = 1; i < k; i++) {
-      DoubleVector m1 = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(m1, DoubleVector.wrap(means[j]));
-        sep[i] = (d < sep[i]) ? d : sep[i];
-        sep[j] = (d < sep[j]) ? d : sep[j];
-      }
-    }
-    // We need half the Euclidean distance
-    for(int i = 0; i < k; i++) {
-      sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
-    }
-    if(diststat != null) {
-      diststat.increment((k * (k - 1)) >> 1);
-    }
-  }
-
-  /**
-   * Recompute the separation of cluster means.
-   * <p>
-   * Used by Elkan's variant and Exponion.
-   *
-   * @param means Means
-   * @param sep Output array of separation
-   * @param cdist Center-to-Center distances (half-sqrt scaled)
-   * @param diststat Distance counting statistic
-   */
-  protected void recomputeSeperation(double[][] means, double[] sep, double[][] cdist, LongStatistic diststat) {
-    final int k = means.length;
-    final boolean issquared = distanceFunction.isSquared();
-    assert (sep.length == k);
-    Arrays.fill(sep, Double.POSITIVE_INFINITY);
-    for(int i = 1; i < k; i++) {
-      DoubleVector mi = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-        d = .5 * (issquared ? FastMath.sqrt(d) : d);
-        cdist[i][j] = cdist[j][i] = d;
-        sep[i] = (d < sep[i]) ? d : sep[i];
-        sep[j] = (d < sep[j]) ? d : sep[j];
-      }
-    }
-    if(diststat != null) {
-      diststat.increment((k * (k - 1)) >> 1);
-    }
-  }
-
-  /**
-   * Recompute the separation of cluster means.
-   * <p>
-   * Used by Sort and Compare variants.
-   *
-   * @param means Means
-   * @param cdist Center-to-Center distances (half-sqrt scaled)
-   * @param diststat Distance counting statistic
-   */
-  protected void recomputeSeperation(double[][] means, double[][] cdist, LongStatistic diststat) {
-    final int k = means.length;
-    final boolean issquared = distanceFunction.isSquared();
-    for(int i = 1; i < k; i++) {
-      DoubleVector mi = DoubleVector.wrap(means[i]);
-      for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-        cdist[i][j] = cdist[j][i] = .5 * (issquared ? FastMath.sqrt(d) : d);
-      }
-    }
-    if(diststat != null) {
-      diststat.increment((k * (k - 1)) >> 1);
-    }
-  }
-
-  /**
-   * Maximum distance moved.
-   * <p>
-   * Used by Hamerly, Elkan (not using the maximum).
-   *
-   * @param means Old means
-   * @param newmeans New means
-   * @param dists Distances moved (output)
-   * @return Maximum distance moved
-   */
-  protected double movedDistance(double[][] means, double[][] newmeans, double[] dists) {
-    assert (means.length == k);
-    assert (newmeans.length == k);
-    assert (dists.length == k);
-    boolean issquared = distanceFunction.isSquared();
-    double max = 0.;
-    for(int i = 0; i < k; i++) {
-      double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
-      dists[i] = d = issquared ? FastMath.sqrt(d) : d;
-      max = (d > max) ? d : max;
-    }
-    return max;
-  }
-
-  /**
    * Recompute the separation of cluster means.
    * <p>
    * Used by sort, and our exponion implementation.
@@ -505,62 +269,19 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   /**
-   * Build a standard k-means result, with known cluster variance sums.
+   * Compute an incremental update for the mean.
    *
-   * @param clusters Cluster assignment
-   * @param means Cluster means
-   * @param varsum Variance sums
-   * @return
+   * @param mean Mean to update
+   * @param vec Object vector
+   * @param newsize (New) size of cluster
+   * @param op Cluster size change / Weight change
    */
-  protected Clustering<KMeansModel> buildResult(List<ModifiableDBIDs> clusters, double[][] means, double[] varsum) {
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
+  protected static void incrementalUpdateMean(double[] mean, NumberVector vec, int newsize, double op) {
+    if(newsize == 0) {
+      return; // Keep old mean
     }
-    return result;
-  }
-
-  /**
-   * Build the result, recomputing the cluster variance if {@code varstat} is
-   * set to true.
-   * 
-   * @param clusters Cluster assignments
-   * @param means Cluster means
-   * @param varstat Recompute cluster variance
-   * @param relation Data relation (only needed if varstat is set)
-   * @param diststat Distance computations counter (only needed for varstat)
-   * @return Clustering result
-   */
-  protected Clustering<KMeansModel> buildResult(List<ModifiableDBIDs> clusters, double[][] means, boolean varstat, Relation<V> relation, LongStatistic diststat) {
-    double totalvariance = 0.;
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      double varsum = 0;
-      if(varstat) {
-        DoubleVector mvec = DoubleVector.wrap(means[i]);
-        for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-          varsum += distanceFunction.distance(mvec, relation.get(it));
-        }
-        if(diststat != null) {
-          diststat.increment(ids.size());
-        }
-        totalvariance += varsum;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum)));
-    }
-    if(varstat && getLogger().isStatistics()) {
-      getLogger().statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
-      getLogger().statistics(diststat);
-    }
-    return result;
+    // Note: numerically stabilized version:
+    VMath.plusTimesEquals(mean, VMath.minusEquals(vec.toArray(), mean), op / newsize);
   }
 
   @Override
@@ -579,19 +300,339 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   /**
-   * Log statistics on the variance sum.
+   * Inner instance for a run, for better encapsulation, that encapsulates the
+   * standard flow of most (but not all) k-means variations.
    *
-   * @param varstat Statistics log instance
-   * @param varsum Variance sum per cluster
-   * @return Total varsum (or {@code Double.NaN}, if {@code varstat == null})
+   * @author Erich Schubert
    */
-  protected double logVarstat(DoubleStatistic varstat, double[] varsum) {
-    if(varstat == null) {
-      return Double.NaN;
+  protected abstract static class Instance {
+    /**
+     * Cluster means.
+     */
+    double[][] means;
+
+    /**
+     * Store the elements per cluster.
+     */
+    protected List<ModifiableDBIDs> clusters;
+
+    /**
+     * A mapping of elements to cluster ids.
+     */
+    protected WritableIntegerDataStore assignment;
+
+    /**
+     * Sum of squared deviations in each cluster.
+     */
+    protected double[] varsum;
+
+    /**
+     * Data relation.
+     */
+    protected Relation<? extends NumberVector> relation;
+
+    /**
+     * Number of distance computations
+     */
+    private long diststat = 0;
+
+    /**
+     * Distance function.
+     */
+    private final NumberVectorDistanceFunction<?> df;
+
+    /**
+     * Number of clusters.
+     */
+    protected final int k;
+
+    /**
+     * Indicates whether the distance function is squared.
+     */
+    protected final boolean isSquared;
+
+    /**
+     * Key for statistics logging.
+     */
+    protected String key;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Relation to process
+     * @param means Initial mean
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      this.relation = relation;
+      this.df = df;
+      this.isSquared = df.isSquared();
+      this.means = means;
+      this.k = means.length;
+      final int guessedsize = (int) (relation.size() * 2. / k);
+      this.clusters = new ArrayList<>(k);
+      for(int i = 0; i < k; i++) {
+        this.clusters.add(DBIDUtil.newHashSet(guessedsize));
+      }
+      this.assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
+      this.varsum = new double[k];
+      this.key = this.getClass().getName().replace("$Instance", "");
     }
-    double s = sum(varsum);
-    getLogger().statistics(varstat.setDouble(s));
-    return s;
+
+    /**
+     * Compute a distance (and count the distance computations).
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double distance(NumberVector x, NumberVector y) {
+      ++diststat;
+      return df.distance(x, y);
+    }
+
+    /**
+     * Run the clustering.
+     *
+     * @param maxiter Maximum number of iterations
+     */
+    protected void run(int maxiter) {
+      final Logging log = getLogger();
+      IndefiniteProgress prog = log.isVerbose() ? new IndefiniteProgress("Iteration") : null;
+      int iteration = 0;
+      while(++iteration <= maxiter) {
+        log.incrementProcessed(prog);
+        int changed = iterate(iteration);
+        if(changed == 0) {
+          break;
+        }
+        if(log.isStatistics()) {
+          log.statistics(new LongStatistic(key + "." + iteration + ".reassignments", Math.abs(changed)));
+          final double s = sum(varsum);
+          if(s > 0) {
+            log.statistics(new DoubleStatistic(key + "." + iteration + ".variance-sum", s));
+          }
+        }
+      }
+      log.setCompleted(prog);
+      log.statistics(new LongStatistic(key + ".iterations", iteration));
+      log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+    }
+
+    /**
+     * Main loop function.
+     *
+     * @param iteration Iteration number (beginning at 1)
+     * @return Number of reassigned points
+     */
+    protected abstract int iterate(int iteration);
+
+    /**
+     * Compute means from cluster sums by averaging.
+     * 
+     * @param dst Output means
+     * @param sums Input sums
+     */
+    protected void meansFromSums(double[][] dst, double[][] sums) {
+      for(int i = 0; i < k; i++) {
+        VMath.overwriteTimes(dst[i], sums[i], 1. / clusters.get(i).size());
+      }
+    }
+
+    /**
+     * Copy means
+     *
+     * @param src Source values
+     * @param dst Destination values
+     */
+    protected void copyMeans(double[][] src, double[][] dst) {
+      for(int i = 0; i < k; i++) {
+        System.arraycopy(src[i], 0, dst[i], 0, src[i].length);
+      }
+    }
+
+    /**
+     * Assign each object to the nearest cluster.
+     *
+     * @return number of objects reassigned
+     */
+    protected int assignToNearestCluster() {
+      assert (k == means.length);
+      int changed = 0;
+      // Reset all clusters
+      Arrays.fill(varsum, 0.);
+      for(ModifiableDBIDs cluster : clusters) {
+        cluster.clear();
+      }
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        double mindist = Double.POSITIVE_INFINITY;
+        NumberVector fv = relation.get(iditer);
+        int minIndex = 0;
+        for(int i = 0; i < k; i++) {
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < mindist) {
+            minIndex = i;
+            mindist = dist;
+          }
+        }
+        varsum[minIndex] += mindist;
+        clusters.get(minIndex).add(iditer);
+        if(assignment.putInt(iditer, minIndex) != minIndex) {
+          ++changed;
+        }
+      }
+      return changed;
+    }
+
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Hamerly.
+     *
+     * @param means Means
+     * @param sep Output array of separation (half-sqrt scaled)
+     */
+    protected void recomputeSeperation(double[][] means, double[] sep) {
+      final int k = means.length;
+      final boolean issquared = df.isSquared();
+      assert (sep.length == k);
+      Arrays.fill(sep, Double.POSITIVE_INFINITY);
+      for(int i = 1; i < k; i++) {
+        DoubleVector m1 = DoubleVector.wrap(means[i]);
+        for(int j = 0; j < i; j++) {
+          double d = distance(m1, DoubleVector.wrap(means[j]));
+          sep[i] = (d < sep[i]) ? d : sep[i];
+          sep[j] = (d < sep[j]) ? d : sep[j];
+        }
+      }
+      // We need half the Euclidean distance
+      for(int i = 0; i < k; i++) {
+        sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
+      }
+      diststat += (k * (k - 1)) >> 1;
+    }
+
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Elkan's variant and Exponion.
+     *
+     * @param sep Output array of separation
+     * @param cdist Center-to-Center distances (half-sqrt scaled)
+     */
+    protected void recomputeSeperation(double[] sep, double[][] cdist) {
+      final int k = means.length;
+      final boolean issquared = df.isSquared();
+      assert (sep.length == k);
+      Arrays.fill(sep, Double.POSITIVE_INFINITY);
+      for(int i = 1; i < k; i++) {
+        DoubleVector mi = DoubleVector.wrap(means[i]);
+        for(int j = 0; j < i; j++) {
+          double d = distance(mi, DoubleVector.wrap(means[j]));
+          d = .5 * (issquared ? FastMath.sqrt(d) : d);
+          cdist[i][j] = cdist[j][i] = d;
+          sep[i] = (d < sep[i]) ? d : sep[i];
+          sep[j] = (d < sep[j]) ? d : sep[j];
+        }
+      }
+      diststat += (k * (k - 1)) >> 1;
+    }
+
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Sort and Compare variants.
+     *
+     * @param means Means
+     * @param cdist Center-to-Center distances (half-sqrt scaled)
+     */
+    protected void recomputeSeperation(double[][] means, double[][] cdist) {
+      final int k = means.length;
+      final boolean issquared = df.isSquared();
+      for(int i = 1; i < k; i++) {
+        DoubleVector mi = DoubleVector.wrap(means[i]);
+        for(int j = 0; j < i; j++) {
+          double d = distance(mi, DoubleVector.wrap(means[j]));
+          cdist[i][j] = cdist[j][i] = .5 * (issquared ? FastMath.sqrt(d) : d);
+        }
+      }
+      diststat += (k * (k - 1)) >> 1;
+    }
+
+    /**
+     * Maximum distance moved.
+     * <p>
+     * Used by Hamerly, Elkan (not using the maximum).
+     *
+     * @param means Old means
+     * @param newmeans New means
+     * @param dists Distances moved (output)
+     * @return Maximum distance moved
+     */
+    protected double movedDistance(double[][] means, double[][] newmeans, double[] dists) {
+      assert (newmeans.length == means.length);
+      assert (dists.length == means.length);
+      boolean issquared = df.isSquared();
+      double max = 0.;
+      for(int i = 0; i < means.length; i++) {
+        double d = distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
+        dists[i] = d = issquared ? FastMath.sqrt(d) : d;
+        max = (d > max) ? d : max;
+      }
+      return max;
+    }
+
+    /**
+     * Build a standard k-means result, with known cluster variance sums.
+     *
+     * @return Clustering result
+     */
+    protected Clustering<KMeansModel> buildResult() {
+      Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+      for(int i = 0; i < clusters.size(); i++) {
+        DBIDs ids = clusters.get(i);
+        if(ids.isEmpty()) {
+          getLogger().warning("K-Means produced an empty cluster - bad initialization?");
+        }
+        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
+      }
+      return result;
+    }
+
+    /**
+     * Build the result, recomputing the cluster variance if {@code varstat} is
+     * set to true.
+     * 
+     * @param varstat Recompute cluster variance
+     * @param relation Data relation (only needed if varstat is set)
+     * @return Clustering result
+     */
+    protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
+      double totalvariance = 0.;
+      Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+      for(int i = 0; i < clusters.size(); i++) {
+        DBIDs ids = clusters.get(i);
+        if(ids.isEmpty()) {
+          continue;
+        }
+        double varsum = 0;
+        if(varstat) {
+          DoubleVector mvec = DoubleVector.wrap(means[i]);
+          for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+            varsum += distance(mvec, relation.get(it));
+          }
+          totalvariance += varsum;
+        }
+        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum)));
+      }
+      Logging log = getLogger();
+      if(varstat && log.isStatistics()) {
+        log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
+        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+      }
+      return result;
+    }
+
+    abstract Logging getLogger();
   }
 
   /**
@@ -658,10 +699,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           return;
         }
         if(needsMetric() && !distanceFunction.isMetric()) {
-          Logger.getLogger(this.getClass()).warning("This k-means variants requires the triangle inequality, and thus should only be used with squared Euclidean distance!");
+          Logging.getLogger(this.getClass()).warning("This k-means variants requires the triangle inequality, and thus should only be used with squared Euclidean distance!");
         }
         else {
-          Logger.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
+          Logging.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
     }

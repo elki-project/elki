@@ -36,12 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  */
 public class RandomNormalGeneratedInitialMeansTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMeans with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
-  public void testRandomlyGeneratedInitialMeans() {
+  public void testRandomNormalGeneratedInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //

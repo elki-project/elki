@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,12 +75,10 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-
-    // Choose initial means
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    double[][] means = initialMeans(database, relation);
 
     // Store for current cluster assignment.
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
     KMeansProcessor<V> kmm = new KMeansProcessor<>(relation, distanceFunction, assignment, varsum);
 
@@ -106,8 +104,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
       if(cids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<>(cids, model));
+      result.addToplevelCluster(new Cluster<>(cids, new KMeansModel(means[i], varsum[i])));
     }
     return result;
   }

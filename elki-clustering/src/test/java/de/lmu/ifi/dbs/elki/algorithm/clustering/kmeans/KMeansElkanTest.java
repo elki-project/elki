@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,10 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class KMeansElkanTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMeans with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testKMeansElkan() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);

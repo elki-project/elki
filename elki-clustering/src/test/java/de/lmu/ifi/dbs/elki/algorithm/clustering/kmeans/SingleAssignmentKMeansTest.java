@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,19 +29,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Performs a full KMeans run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that KMeans's performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
+ * Performs a single-assignment kMeans run, and compares the result with a
+ * clustering derived from the data set labels. This test ensures that KMeans's
+ * performance doesn't unexpectedly drop on this data set (and also ensures that
+ * the algorithms work, as a side effect).
  *
  * @author Erich Schubert
  * @since 0.7.5
  */
 public class SingleAssignmentKMeansTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMeans with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testSingleAssignmentKMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);

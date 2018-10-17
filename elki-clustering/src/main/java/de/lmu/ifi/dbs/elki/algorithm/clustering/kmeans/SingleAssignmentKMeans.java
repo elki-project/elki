@@ -20,24 +20,14 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -57,11 +47,6 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   private static final Logging LOG = Logging.getLogger(SingleAssignmentKMeans.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = SingleAssignmentKMeans.class.getName();
-
-  /**
    * Constructor.
    *
    * @param distanceFunction distance function
@@ -69,7 +54,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    * @param initializer Initialization method
    */
   public SingleAssignmentKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, KMeansInitialization<? super V> initializer) {
-    super(distanceFunction, k, -1, initializer);
+    super(distanceFunction, k, 1, initializer);
   }
 
   @Override
@@ -77,25 +62,39 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    double[] varsum = new double[k];
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(1);
+    return instance.buildResult();
+  }
 
-    assignToNearestCluster(relation, means, clusters, assignment, varsum);
-
-    // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), new KMeansModel(means[i], varsum[i])));
+  /**
+   * Inner instance, storing state for a single data set.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
     }
-    return result;
+
+    @Override
+    protected int iterate(int iteration) {
+      assert (iteration == 1);
+      return -assignToNearestCluster();
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
   }
 
   @Override

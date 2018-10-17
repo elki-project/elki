@@ -29,11 +29,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Regression test for Annular k-means.
+ * Regression test for Annulus k-means.
  *
  * @author Erich Schubert
  */
-public class KMeansAnnularTest extends AbstractClusterAlgorithmTest {
+public class KMeansAnnulusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansAnnulus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);

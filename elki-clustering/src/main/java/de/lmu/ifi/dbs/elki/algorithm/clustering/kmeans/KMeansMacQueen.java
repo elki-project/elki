@@ -20,26 +20,19 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -76,11 +69,6 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
   private static final Logging LOG = Logging.getLogger(KMeansMacQueen.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMeansMacQueen.class.getName();
-
-  /**
    * Constructor.
    *
    * @param distanceFunction distance function
@@ -97,31 +85,85 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    double[] varsum = new double[k];
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(maxiter);
+    return instance.buildResult();
+  }
 
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    // Iterate MacQueen
-    int iteration = 0;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
-      LOG.incrementProcessed(prog);
-      boolean changed = macQueenIterate(relation, means, clusters, assignment, varsum);
-      logVarstat(varstat, varsum);
-      if(!changed) {
-        break;
-      }
+  /**
+   * Inner instance, storing state for a single data set.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
     }
-    LOG.setCompleted(prog);
-    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    return buildResult(clusters, means, varsum);
+
+    @Override
+    protected int iterate(int iteration) {
+      int changed = 0;
+      Arrays.fill(varsum, 0.);
+
+      // Incremental update
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        double mindist = Double.POSITIVE_INFINITY;
+        NumberVector fv = relation.get(iditer);
+        int minIndex = 0;
+        for(int i = 0; i < k; i++) {
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < mindist) {
+            minIndex = i;
+            mindist = dist;
+          }
+        }
+        varsum[minIndex] += mindist;
+        if(updateMeanAndAssignment(minIndex, fv, iditer)) {
+          ++changed;
+        }
+      }
+      return changed;
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
+
+    /**
+     * Try to update the cluster assignment.
+     *
+     * @param minIndex Cluster to assign to
+     * @param fv Vector
+     * @param iditer Object ID
+     * @return {@code true} when assignment changed
+     */
+    private boolean updateMeanAndAssignment(int minIndex, NumberVector fv, DBIDIter iditer) {
+      int cur = assignment.intValue(iditer);
+      if(cur == minIndex) {
+        return false;
+      }
+      final ModifiableDBIDs curclus = clusters.get(minIndex);
+      curclus.add(iditer);
+      incrementalUpdateMean(means[minIndex], fv, curclus.size(), +1);
+
+      if(cur >= 0) {
+        ModifiableDBIDs ci = clusters.get(cur);
+        ci.remove(iditer);
+        incrementalUpdateMean(means[cur], fv, ci.size() + 1, -1);
+      }
+
+      assignment.putInt(iditer, minIndex);
+      return true;
+    }
   }
 
   @Override

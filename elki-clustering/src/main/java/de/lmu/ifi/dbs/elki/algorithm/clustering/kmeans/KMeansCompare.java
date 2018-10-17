@@ -20,9 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -30,20 +28,11 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -79,11 +68,6 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
   private static final Logging LOG = Logging.getLogger(KMeansCompare.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMeansCompare.class.getName();
-
-  /**
    * Constructor.
    *
    * @param distanceFunction distance function
@@ -100,93 +84,85 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    double[] varsum = new double[k];
-
-    // Cluster distances
-    double[][] cdist = new double[k][k];
-
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    LongStatistic diststat = LOG.isStatistics() ? new LongStatistic(KEY + ".distance-computations") : null;
-    int iteration = 0;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
-      LOG.incrementProcessed(prog);
-      recomputeSeperation(means, cdist, diststat);
-      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, cdist, diststat);
-      logVarstat(varstat, varsum);
-      LOG.statistics(diststat);
-      // Stop if no cluster assignment changed.
-      if(!changed) {
-        break;
-      }
-      // Recompute means.
-      means = means(clusters, means, relation);
-    }
-    LOG.setCompleted(prog);
-    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    LOG.statistics(diststat);
-    return buildResult(clusters, means, varsum);
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(maxiter);
+    return instance.buildResult();
   }
 
   /**
-   * Reassign objects, but avoid unnecessary computations based on their bounds.
+   * Inner instance, storing state for a single data set.
    *
-   * @param relation Data
-   * @param means Current means
-   * @param clusters Current clusters
-   * @param assignment Cluster assignment
-   * @param varsum Variance sum counter
-   * @param cdist Centroid distances
-   * @param diststat Distance statistics
-   * @return true when the object was reassigned
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
-  private boolean assignToNearestCluster(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum, double[][] cdist, LongStatistic diststat) {
-    assert (k == means.length);
-    long dists = 0;
-    boolean changed = false;
-    // Reset all clusters
-    Arrays.fill(varsum, 0.);
-    for(ModifiableDBIDs cluster : clusters) {
-      cluster.clear();
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Cluster center distances.
+     */
+    double[][] cdist;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param df Distance function
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
+      cdist = new double[k][k];
     }
-    double mult = (distanceFunction instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
-      // Distance to current mean:
-      V fv = relation.get(iditer);
-      double mindist = distanceFunction.distance(fv, DoubleVector.wrap(means[ini]));
-      ++dists;
-      final double thresh = mult * mindist;
-      int minIndex = ini;
-      for(int i = 0; i < k; i++) {
-        if(i == ini || cdist[minIndex][i] >= thresh) { // Compare pruning
-          continue;
+
+    @Override
+    protected int iterate(int iteration) {
+      recomputeSeperation(means, cdist);
+      int changed = assignToNearestCluster();
+      if(changed > 0) {
+        means = means(clusters, means, relation);
+      }
+      return changed;
+    }
+
+    @Override
+    protected int assignToNearestCluster() {
+      int changed = 0;
+      // Reset all clusters
+      Arrays.fill(varsum, 0.);
+      for(ModifiableDBIDs cluster : clusters) {
+        cluster.clear();
+      }
+      final double mult = isSquared ? 4 : 2;
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
+        // Distance to current mean:
+        NumberVector fv = relation.get(iditer);
+        double mindist = distance(fv, DoubleVector.wrap(means[ini]));
+        final double threshold = mult * mindist;
+        int minIndex = ini;
+        for(int i = 0; i < k; i++) {
+          if(i == ini || cdist[minIndex][i] >= threshold) { // Compare pruning
+            continue;
+          }
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < mindist) {
+            minIndex = i;
+            mindist = dist;
+          }
         }
-        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
-        ++dists;
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
+        varsum[minIndex] += mindist;
+        clusters.get(minIndex).add(iditer);
+        if(assignment.putInt(iditer, minIndex) != minIndex) {
+          ++changed;
         }
       }
-      varsum[minIndex] += mindist;
-      clusters.get(minIndex).add(iditer);
-      changed |= assignment.putInt(iditer, minIndex) != minIndex;
+      return changed;
     }
-    // Increment distance computations counter.
-    if(diststat != null) {
-      diststat.increment(dists);
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
     }
-    return changed;
   }
 
   @Override

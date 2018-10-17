@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,26 +20,14 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -88,11 +76,6 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
   private static final Logging LOG = Logging.getLogger(KMeansLloyd.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMeansLloyd.class.getName();
-
-  /**
    * Constructor.
    *
    * @param distanceFunction distance function
@@ -109,34 +92,42 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    double[] varsum = new double[k];
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(maxiter);
+    return instance.buildResult();
+  }
 
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    int iteration = 0;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
-      LOG.incrementProcessed(prog);
-      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum);
-      logVarstat(varstat, varsum);
-      // Stop if no cluster assignment changed.
-      if(!changed) {
-        break;
-      }
-      // Recompute means.
-      means = means(clusters, means, relation);
+  /**
+   * Inner instance, storing state for a single data set.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
     }
-    LOG.setCompleted(prog);
-    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
-    return buildResult(clusters, means, varsum);
+
+    @Override
+    protected int iterate(int iteration) {
+      int changed = assignToNearestCluster();
+      if(changed > 0) {
+        means = means(clusters, means, relation);
+      }
+      return changed;
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
   }
 
   @Override

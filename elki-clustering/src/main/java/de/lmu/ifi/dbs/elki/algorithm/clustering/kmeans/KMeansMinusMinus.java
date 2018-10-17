@@ -31,23 +31,10 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -90,11 +77,6 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
   private static final Logging LOG = Logging.getLogger(KMeansMinusMinus.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = KMeansMinusMinus.class.getName();
-
-  /**
    * Outlier rate.
    */
   public double rate;
@@ -125,163 +107,189 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial means
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    instance.run(maxiter);
+    return instance.buildResultWithNoise();
+  }
 
-    // Intialisieren der means
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+  /**
+   * Inner instance, storing state for a single data set.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  protected class Instance extends AbstractKMeans.Instance {
+    /**
+     * Heap of the noise candidates.
+     */
+    DoubleMinHeap minHeap;
 
-    // initialisieren vom Heap
-    final int heapsize = (int) (rate < 1. ? Math.ceil(relation.size() * rate) : rate);
-    DoubleMinHeap minHeap = new DoubleMinHeap(heapsize);
+    /**
+     * Desired size of the heap.
+     */
+    int heapsize;
 
-    // Setup cluster assignment store
-    List<ModifiableDoubleDBIDList> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
+    /**
+     * Variance of the previous iteration
+     */
+    double prevvartotal = Double.POSITIVE_INFINITY;
+
+    /**
+     * Cluster storage.
+     */
+    List<ModifiableDoubleDBIDList> clusters;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param df Distance function
+     * @param means Initial means
+     */
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+      super(relation, df, means);
+      heapsize = (int) (rate < 1. ? Math.ceil(relation.size() * rate) : rate);
+      minHeap = new DoubleMinHeap(heapsize);
+      // Setup cluster assignment store
+      clusters = new ArrayList<>();
+      for(int i = 0; i < k; i++) {
+        clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
+      }
+      ((AbstractKMeans.Instance) this).clusters = null; // Invalidate
     }
 
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    double[] varsum = new double[k];
-
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".variance-sum");
-
-    int iteration = 0;
-    double prevvartotal = Double.POSITIVE_INFINITY;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
+    @Override
+    protected int iterate(int iteration) {
       minHeap.clear();
       for(int i = 0; i < k; i++) {
         clusters.get(i).clear();
       }
-      LOG.incrementProcessed(prog);
-      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, minHeap, heapsize);
-      double vartotal = logVarstat(varstat, varsum);
-      // Stop if no cluster assignment changed, or the new varsum is higher
-      // than the previous value.
-      if(!changed || vartotal > prevvartotal) {
-        break;
+      int changed = assignToNearestCluster();
+      if(changed > 0) {
+        double vartotal = VMath.sum(varsum);
+        // Stop if no cluster assignment changed, or the new varsum is higher
+        // than the previous value.
+        if(vartotal > prevvartotal) {
+          return -changed;
+        }
+        prevvartotal = vartotal;
+        means = meansWithTreshhold(heapsize == 0 || minHeap.size() < heapsize ? Double.POSITIVE_INFINITY : minHeap.peek());
       }
-      prevvartotal = vartotal;
-
-      // Recompute means.
-      means = meansWithTreshhold(clusters, means, relation, heapsize > 0 ? minHeap.peek() : Double.POSITIVE_INFINITY);
+      return changed;
     }
 
-    // create noisecluster if wanted
-    ModifiableDoubleDBIDList noiseids = null;
-    if(noiseFlag && heapsize > 0) {
-      clusters.add(noiseids = DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
-      double tresh = minHeap.peek();
-      for(int i = 0; i < k; i++) {
-        for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance()) {
-          final double dist = it.doubleValue();
-          // Add to the noise cluster:
-          if(dist >= tresh) {
-            noiseids.add(dist, it);
-            assignment.putInt(it, k);
-            it.remove();
+    protected Clustering<KMeansModel> buildResultWithNoise() {
+      // create noisecluster if wanted
+      ModifiableDoubleDBIDList noiseids = null;
+      if(noiseFlag && heapsize > 0) {
+        clusters.add(noiseids = DBIDUtil.newDistanceDBIDList((minHeap.size())));
+        double tresh = minHeap.peek();
+        for(int i = 0; i < k; i++) {
+          for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance()) {
+            final double dist = it.doubleValue();
+            // Add to the noise cluster:
+            if(dist >= tresh) {
+              noiseids.add(dist, it);
+              assignment.putInt(it, k);
+              it.remove();
+            }
           }
         }
       }
-    }
-    LOG.setCompleted(prog);
-    LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
 
-    // Wrap result
-    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < k; i++) {
-      DBIDs ids = clusters.get(i);
-      if(ids.isEmpty()) {
-        continue;
-      }
-      result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
-    }
-
-    // Noise Cluster
-    if(noiseFlag) {
-      if(noiseids.isEmpty()) {
-        return result;
-      }
-      result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(null, 0)));
-    }
-    return result;
-  }
-
-  /**
-   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
-   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean. And
-   * saves the distance in a MinHeap
-   *
-   * @param relation the database to cluster
-   * @param means a list of k means
-   * @param clusters cluster assignment
-   * @param assignment Current cluster assignment
-   * @param varsum Variance sum output
-   * @param minHeap Heap for minimum values
-   * @param heapsize the size of the minheap
-   * @return true when the object was reassigned
-   */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, double[][] means, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, double[] varsum, DoubleMinHeap minHeap, int heapsize) {
-    assert (k == means.length);
-    boolean changed = false;
-    Arrays.fill(varsum, 0.);
-    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      V fv = relation.get(iditer);
-      double mindist = Double.POSITIVE_INFINITY;
-      int minIndex = 0;
+      // Wrap result
+      Clustering<KMeansModel> result = new Clustering<>("k-Means-- Clustering", "kmeans-minus-minus-clustering");
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
-        }
-      }
-
-      if(heapsize > 0) {
-        minHeap.add(mindist, heapsize);
-      }
-
-      varsum[minIndex] += mindist;
-      clusters.get(minIndex).add(mindist, iditer);
-      changed |= assignment.putInt(iditer, minIndex) != minIndex;
-    }
-    return changed;
-  }
-
-  /**
-   * Returns the mean vectors of the given clusters in the given database.
-   *
-   * @param clusters the clusters to compute the means
-   * @param means the recent means
-   * @param database the database containing the vectors
-   * @return the mean vectors of the given clusters in the given database
-   */
-  protected double[][] meansWithTreshhold(List<? extends ModifiableDoubleDBIDList> clusters, double[][] means, Relation<V> database, Double tresh) {
-    // TODO: use Kahan summation for better numerical precision?
-    double[][] newMeans = new double[k][];
-    for(int i = 0; i < k; i++) {
-      DoubleDBIDList list = clusters.get(i);
-      double[] raw = null;
-      int count = 0;
-      // Update with remaining instances
-      for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
-        if(iter.doubleValue() >= tresh) {
+        DBIDs ids = clusters.get(i);
+        if(ids.isEmpty()) {
           continue;
         }
-        NumberVector vec = database.get(iter);
-        if(raw == null) {
-          raw = vec.toArray();
-        }
-        else {
-          plusEquals(raw, vec);
-        }
-        count++;
+        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
       }
-      newMeans[i] = (raw != null) ? VMath.timesEquals(raw, 1. / count) : means[i];
+
+      // Noise Cluster
+      if(noiseFlag) {
+        if(noiseids.isEmpty()) {
+          return result;
+        }
+        result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(null, 0)));
+      }
+      return result;
     }
-    return newMeans;
+
+    /**
+     * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids
+     * of
+     * those FeatureVectors, that are nearest to the k<sup>th</sup> mean. And
+     * saves the distance in a MinHeap
+     *
+     * @return the number of reassigned objects
+     */
+    protected int assignToNearestCluster() {
+      assert (k == means.length);
+      int changed = 0;
+      Arrays.fill(varsum, 0.);
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        NumberVector fv = relation.get(iditer);
+        double mindist = Double.POSITIVE_INFINITY;
+        int minIndex = 0;
+        for(int i = 0; i < k; i++) {
+          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < mindist) {
+            minIndex = i;
+            mindist = dist;
+          }
+        }
+
+        if(heapsize > 0) {
+          minHeap.add(mindist, heapsize);
+        }
+
+        varsum[minIndex] += mindist;
+        clusters.get(minIndex).add(mindist, iditer);
+        if(assignment.putInt(iditer, minIndex) != minIndex) {
+          ++changed;
+        }
+      }
+      return changed;
+    }
+
+    /**
+     * Returns the mean vectors of the given clusters in the given database.
+     *
+     * @param tresh Threshold
+     * @return the mean vectors of the given clusters in the given database
+     */
+    protected double[][] meansWithTreshhold(double tresh) {
+      double[][] newMeans = new double[k][];
+      for(int i = 0; i < k; i++) {
+        DoubleDBIDList list = clusters.get(i);
+        double[] raw = null;
+        int count = 0;
+        // Update with remaining instances
+        for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
+          if(iter.doubleValue() >= tresh) {
+            continue;
+          }
+          NumberVector vec = relation.get(iter);
+          if(raw == null) {
+            raw = vec.toArray();
+          }
+          else {
+            plusEquals(raw, vec);
+          }
+          count++;
+        }
+        newMeans[i] = (raw != null) ? VMath.timesEquals(raw, 1. / count) : means[i];
+      }
+      return newMeans;
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
   }
 
   @Override
