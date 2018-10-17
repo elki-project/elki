@@ -61,7 +61,7 @@ public final class VMathOperationsTest {
    * an ArrayIndexOutOfBoundsException, while the other is not.
    * 
    * <pre>
-   * assertDimensionMismatch( {@link VMathVectorTest#ERR_VEC_DIMENSIONS},() -> plus(v1, v2) )
+   * assertDimensionMismatch({@link VMathVectorTest#ERR_VEC_DIMENSIONS},() -> plus(v1, v2) )
    * </pre>
    * 
    * @param msg Assertion Message to be raised with -ea on
@@ -76,7 +76,6 @@ public final class VMathOperationsTest {
       return; // If assertions are enabled.
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      assertEquals(msg, e.getMessage());
       return; // Expected failure
     }
     // We only guarantee an error if assertions are enabled with -ea.
