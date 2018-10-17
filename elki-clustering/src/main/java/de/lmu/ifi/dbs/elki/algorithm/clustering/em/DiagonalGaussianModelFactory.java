@@ -54,7 +54,7 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
    *
    * @param initializer Class for choosing the inital seeds.
    */
-  public DiagonalGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public DiagonalGaussianModelFactory(KMeansInitialization initializer) {
     super(initializer);
   }
 

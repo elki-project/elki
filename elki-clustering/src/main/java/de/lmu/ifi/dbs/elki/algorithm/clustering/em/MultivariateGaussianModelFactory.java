@@ -56,7 +56,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
    *
    * @param initializer Class for choosing the initial seeds.
    */
-  public MultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public MultivariateGaussianModelFactory(KMeansInitialization initializer) {
     super(initializer);
   }
 

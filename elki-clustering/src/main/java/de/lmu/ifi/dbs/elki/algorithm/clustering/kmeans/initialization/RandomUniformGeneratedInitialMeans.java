@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "Australian Journal of Botany 14(1)", //
     url = "https://doi.org/10.1071/BT9660127", //
     bibkey = "doi:10.1071/BT9660127")
-public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
+public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitialization {
   /**
    * Constructor.
    *
@@ -71,7 +71,7 @@ public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitializa
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     double[][] minmax = RelationUtil.computeMinMax(relation);
     final int dim = minmax[0].length;
     double[] min = minmax[0], scale = minmax[1];

@@ -91,7 +91,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public SameSizeKMeansAlgorithm(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -467,7 +467,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Initialization method.
      */
-    protected KMeansInitialization<V> initializer;
+    protected KMeansInitialization initializer;
 
     /**
      * Distance function
@@ -491,7 +491,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

@@ -83,7 +83,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

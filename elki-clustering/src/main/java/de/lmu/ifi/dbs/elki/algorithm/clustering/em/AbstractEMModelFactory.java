@@ -42,14 +42,14 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
   /**
    * Class to choose the initial means
    */
-  protected KMeansInitialization<V> initializer;
+  protected KMeansInitialization initializer;
 
   /**
    * Constructor.
    * 
    * @param initializer Class for choosing the initial seeds.
    */
-  public AbstractEMModelFactory(KMeansInitialization<V> initializer) {
+  public AbstractEMModelFactory(KMeansInitialization initializer) {
     super();
     this.initializer = initializer;
   }
@@ -73,12 +73,12 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
     /**
      * Initialization method
      */
-    protected KMeansInitialization<V> initializer;
+    protected KMeansInitialization initializer;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

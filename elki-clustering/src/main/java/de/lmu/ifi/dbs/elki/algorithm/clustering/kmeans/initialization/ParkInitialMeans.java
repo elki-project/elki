@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     booktitle = "Expert Systems with Applications 36(2)", //
     url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
     bibkey = "DBLP:journals/eswa/ParkJ09")
-public class ParkInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
+public class ParkInitialMeans<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   /**
    * Class logger.
    */
@@ -75,7 +75,7 @@ public class ParkInitialMeans<O> implements KMeansInitialization<NumberVector>, 
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     if(relation.size() < k) {
       throw new AbortException("Database has less than k objects.");
     }

@@ -87,7 +87,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    * @param maxiter Maximum number of iterations
    * @param initializer Initializer
    */
-  public CKMeans(NumberVectorDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super NumberVector> initializer) {
+  public CKMeans(NumberVectorDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(new KMeansLloyd<>(distanceFunction, k, maxiter, initializer));
   }
 

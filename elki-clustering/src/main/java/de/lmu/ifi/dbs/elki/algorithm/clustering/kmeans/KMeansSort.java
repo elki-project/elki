@@ -75,7 +75,7 @@ public class KMeansSort<V extends NumberVector> extends KMeansCompare<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansSort(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansSort(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

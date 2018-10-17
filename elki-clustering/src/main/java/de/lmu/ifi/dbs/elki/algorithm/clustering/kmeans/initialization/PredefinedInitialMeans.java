@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleArrayListPa
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
+public class PredefinedInitialMeans extends AbstractKMeansInitialization {
   /**
    * Initial means to return.
    */
@@ -95,7 +95,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     if(k != initialMeans.length) {
       throw new AbortException("Predefined initial means contained " + initialMeans.length //
           + " means, algorithm requested " + k + " means instead.");

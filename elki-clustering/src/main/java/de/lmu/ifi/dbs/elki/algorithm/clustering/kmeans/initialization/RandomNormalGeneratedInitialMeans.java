@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "Australian Journal of Botany 14(1)", //
     url = "https://doi.org/10.1071/BT9660127", //
     bibkey = "doi:10.1071/BT9660127")
-public class RandomNormalGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
+public class RandomNormalGeneratedInitialMeans extends AbstractKMeansInitialization {
   /**
    * Constructor.
    *
@@ -75,7 +75,7 @@ public class RandomNormalGeneratedInitialMeans extends AbstractKMeansInitializat
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     url = "https://doi.org/10.1002/9780470316801.ch2", //
     bibkey = "doi:10.1002/9780470316801.ch2")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans")
-public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
+public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   /**
    * Class logger.
    */
@@ -80,7 +80,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     if(relation.size() < k) {
       throw new AbortException("Database has less than k objects.");
     }

@@ -133,7 +133,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization<? super V> initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
     super(distanceFunction, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;

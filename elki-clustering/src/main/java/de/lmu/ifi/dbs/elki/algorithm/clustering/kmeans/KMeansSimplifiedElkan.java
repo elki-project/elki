@@ -83,7 +83,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends AbstractKMean
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansSimplifiedElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
+  public KMeansSimplifiedElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer);
     this.varstat = varstat;
   }

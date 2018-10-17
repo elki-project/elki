@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,10 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * @since 0.5.0
  *
  * @apiviz.landmark
- *
- * @param <V> Vector type
  */
-public interface KMeansInitialization<V extends NumberVector> {
+public interface KMeansInitialization {
   /**
    * Choose initial means
    *
@@ -43,8 +41,7 @@ public interface KMeansInitialization<V extends NumberVector> {
    * @param relation Relation
    * @param k Parameter k
    * @param distanceFunction Distance function
-   * @param <T> Input vector type
    * @return List of chosen means for k-means
    */
-  <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction);
+  double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction);
 }

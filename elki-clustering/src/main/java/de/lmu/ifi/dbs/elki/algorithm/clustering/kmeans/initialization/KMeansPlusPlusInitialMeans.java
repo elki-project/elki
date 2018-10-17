@@ -29,18 +29,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
@@ -63,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     url = "http://dl.acm.org/citation.cfm?id=1283383.1283494", //
     bibkey = "DBLP:conf/soda/ArthurV07")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans")
-public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
+public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization implements KMedoidsInitialization<O> {
   /**
    * Constructor.
    *
@@ -74,13 +69,13 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     DBIDs ids = relation.getDBIDs();
     if(ids.size() <= k) {
-      throw new AbortException("Don't use k-means with k >= data set size.");
+      throw new IllegalStateException("Don't use k-means with k >= data set size.");
     }
-    
-    DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
+    @SuppressWarnings("unchecked")
+    DistanceQuery<NumberVector> distQ = database.getDistanceQuery((Relation<NumberVector>) relation, (NumberVectorDistanceFunction<NumberVector>) distanceFunction);
 
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
@@ -89,7 +84,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
     Random random = rnd.getSingleThreadedRandom();
     DBIDRef first = DBIDUtil.randomSample(ids, random);
-    T firstvec = relation.get(first);
+    NumberVector firstvec = relation.get(first);
     means.add(firstvec);
 
     // Initialize weights
@@ -114,7 +109,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
         continue; // Retry
       }
       // Add new mean:
-      final T newmean = relation.get(it);
+      final NumberVector newmean = relation.get(it);
       means.add(newmean);
       if(means.size() >= k) {
         break;

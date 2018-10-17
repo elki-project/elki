@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     booktitle = "5th Berkeley Symp. Math. Statist. Prob.", //
     url = "http://projecteuclid.org/euclid.bsmsp/1200512992", //
     bibkey = "conf/bsmsp/MacQueen67")
-public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
+public class FirstKInitialMeans<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   /**
    * Constructor.
    */
@@ -62,7 +62,7 @@ public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
     double[][] means = new double[k][];
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

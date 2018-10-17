@@ -75,7 +75,7 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansExponion(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
+  public KMeansExponion(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer, varstat);
   }
 

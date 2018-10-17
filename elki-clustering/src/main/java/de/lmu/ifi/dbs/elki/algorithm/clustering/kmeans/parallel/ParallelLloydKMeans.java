@@ -58,7 +58,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLloydKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public ParallelLloydKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

@@ -75,7 +75,7 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
+  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer, varstat);
   }
 

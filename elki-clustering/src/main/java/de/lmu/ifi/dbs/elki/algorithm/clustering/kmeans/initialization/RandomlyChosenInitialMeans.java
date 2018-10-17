@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch7")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans")
-public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
+public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization implements KMedoidsInitialization<O> {
   /**
    * Constructor.
    *
@@ -86,7 +86,7 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     if(ids.size() < k) {
       throw new AbortException("Could not choose k means.");

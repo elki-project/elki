@@ -75,7 +75,7 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansCompare(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansCompare(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

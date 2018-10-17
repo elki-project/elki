@@ -96,7 +96,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    * @param noiseFlag Create a noise cluster instead of assigning to the nearest
    *        cluster
    */
-  public KMeansMinusMinus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
+  public KMeansMinusMinus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
     super(distanceFunction, k, maxiter, initializer);
     this.rate = rate;
     this.noiseFlag = noiseFlag;

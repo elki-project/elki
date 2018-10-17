@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * @author Erich Schubert
  * @since 0.5.0
- * 
- * @param <V> Vector type
  */
-public abstract class AbstractKMeansInitialization<V extends NumberVector> implements KMeansInitialization<V> {
+public abstract class AbstractKMeansInitialization implements KMeansInitialization {
   /**
    * Random number generator
    */
@@ -81,7 +79,6 @@ public abstract class AbstractKMeansInitialization<V extends NumberVector> imple
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
       RandomParameter rndP = new RandomParameter(KMeans.SEED_ID);
       if(config.grab(rndP)) {
         rnd = rndP.getValue();

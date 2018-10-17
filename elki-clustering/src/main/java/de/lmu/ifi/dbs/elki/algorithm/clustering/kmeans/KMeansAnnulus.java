@@ -62,7 +62,6 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  *
  * @apiviz.has KMeansModel
- *
  * @param <V> vector datatype
  */
 @Reference(authors = "J. Drake", //
@@ -90,7 +89,7 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansAnnulus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
+  public KMeansAnnulus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer, varstat);
   }
 

@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <O> Object type for kMedoids and kMedians
  */
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FarthestPointsInitialMeans")
-public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
+public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization implements KMedoidsInitialization<O> {
   /**
    * Discard the first vector.
    */
@@ -71,10 +71,7 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
-    // Get a distance query
-    DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
-
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
@@ -82,7 +79,7 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
     double[][] means = new double[k][];
 
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
-    T prevmean = relation.get(first);
+    NumberVector prevmean = relation.get(first);
     means[0] = prevmean.toArray();
 
     // Find farthest object each.
@@ -94,7 +91,7 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double val = Math.min(prev, distQ.distance(prevmean, it));
+        double val = Math.min(prev, distanceFunction.distance(prevmean, relation.get(it)));
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
           store.putDouble(it, val);

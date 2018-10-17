@@ -96,5 +96,5 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
    *
    * @param init Initialization method
    */
-  void setInitializer(KMeansInitialization<? super V> init);
+  void setInitializer(KMeansInitialization init);
 }

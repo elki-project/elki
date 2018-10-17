@@ -163,7 +163,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
   }
 
   @Override
-  public void setInitializer(KMeansInitialization<? super V> init) {
+  public void setInitializer(KMeansInitialization init) {
     innerkMeans.setInitializer(init);
   }
 

@@ -134,7 +134,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public void setInitializer(KMeansInitialization<? super V> init) {
+  public void setInitializer(KMeansInitialization init) {
     innerkMeans.setInitializer(init);
   }
 

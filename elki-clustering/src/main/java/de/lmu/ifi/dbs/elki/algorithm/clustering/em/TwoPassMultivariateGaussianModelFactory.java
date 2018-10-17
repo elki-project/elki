@@ -55,7 +55,7 @@ public class TwoPassMultivariateGaussianModelFactory<V extends NumberVector> ext
    *
    * @param initializer Class for choosing the initial seeds.
    */
-  public TwoPassMultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public TwoPassMultivariateGaussianModelFactory(KMeansInitialization initializer) {
     super(initializer);
   }
 

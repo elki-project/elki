@@ -91,7 +91,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   /**
    * Method to choose initial means.
    */
-  protected KMeansInitialization<? super V> initializer;
+  protected KMeansInitialization initializer;
 
   /**
    * Constructor.
@@ -101,7 +101,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public AbstractKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter > 0 ? maxiter : Integer.MAX_VALUE;
@@ -295,7 +295,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   @Override
-  public void setInitializer(KMeansInitialization<? super V> init) {
+  public void setInitializer(KMeansInitialization init) {
     this.initializer = init;
   }
 
@@ -656,7 +656,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     /**
      * Initialization method.
      */
-    protected KMeansInitialization<V> initializer;
+    protected KMeansInitialization initializer;
 
     /**
      * Compute the final variance statistic (not used by all).
@@ -724,7 +724,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterInitialization(Parameterization config) {
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

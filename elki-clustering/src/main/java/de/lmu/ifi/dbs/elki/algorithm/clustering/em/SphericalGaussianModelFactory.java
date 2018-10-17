@@ -54,7 +54,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
    *
    * @param initializer Class for choosing the inital seeds.
    */
-  public SphericalGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public SphericalGaussianModelFactory(KMeansInitialization initializer) {
     super(initializer);
   }
 

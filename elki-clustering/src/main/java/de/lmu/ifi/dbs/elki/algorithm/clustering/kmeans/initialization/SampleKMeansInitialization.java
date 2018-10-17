@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     title = "Refining Initial Points for K-Means Clustering", //
     booktitle = "Proc. 15th Int. Conf. on Machine Learning (ICML 1998)", //
     bibkey = "DBLP:conf/icml/BradleyF98")
-public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
+public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization {
   /**
    * Variant of kMeans to use for initialization.
    */
@@ -94,7 +94,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
   }
 
   @Override
-  public <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), rate, rnd);
 
     // Ugly cast, sorry

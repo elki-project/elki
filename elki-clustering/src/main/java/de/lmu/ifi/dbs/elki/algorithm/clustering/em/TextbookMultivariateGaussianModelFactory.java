@@ -58,7 +58,7 @@ public class TextbookMultivariateGaussianModelFactory<V extends NumberVector> ex
    *
    * @param initializer Class for choosing the initial seeds.
    */
-  public TextbookMultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public TextbookMultivariateGaussianModelFactory(KMeansInitialization initializer) {
     super(initializer);
   }
 
