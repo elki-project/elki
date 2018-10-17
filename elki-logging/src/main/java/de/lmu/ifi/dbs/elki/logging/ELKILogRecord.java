@@ -116,7 +116,7 @@ public class ELKILogRecord extends LogRecord {
   /**
    * Infer a caller, ignoring logging-related classes.
    */
-  private final void inferCallerELKI() {
+  private void inferCallerELKI() {
     needToInferCaller = false;
     StackTraceElement[] stack = (new Throwable()).getStackTrace();
     int ix = 0;

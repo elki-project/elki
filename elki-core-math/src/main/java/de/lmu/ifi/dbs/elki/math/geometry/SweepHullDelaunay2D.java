@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -65,7 +64,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * The current set of points.
-   *
+   * <p>
    * Note: this list should not be changed after running the algorithm, since we
    * use it for object indexing, and the ids should not change
    */
@@ -310,8 +309,6 @@ public class SweepHullDelaunay2D {
         }
       }
       else {
-        // System.err.println("Case #2 "+pointId+" "+hstart+" "+hend+"
-        // "+hullsize);
         ListIterator<IntIntPair> iter = hull.listIterator();
         // Remove end
         int p = hullsize;
@@ -447,7 +444,7 @@ public class SweepHullDelaunay2D {
    * Debug helper
    */
   void debugHull() {
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(hull.size() * 20);
     for(IntIntPair p : hull) {
       buf.append(p.first).append(" (").append(p.second).append(") ");
     }
@@ -652,7 +649,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * Get the convex hull only.
-   *
+   * <p>
    * Note: if you also want the Delaunay Triangulation, you should get that
    * first!
    *
@@ -914,16 +911,16 @@ public class SweepHullDelaunay2D {
 
     /**
      * Recompute the location and squared radius of circumcircle.
-     *
+     * <p>
      * Note: numerical stability is important; and this is not entirely robust
      * to degenerate cases.
-     *
+     * <p>
      * Careful: the midpoint of the circumcircle is <i>not</i> the average of
      * the corners!
      *
      * @return success
      */
-    private final boolean updateCircumcircle(List<double[]> points) {
+    private boolean updateCircumcircle(List<double[]> points) {
       double[] pa = points.get(a), pb = points.get(b), pc = points.get(c);
 
       // Compute vectors from A: AB, AC:
@@ -956,18 +953,5 @@ public class SweepHullDelaunay2D {
     public String toString() {
       return "Triangle [a=" + a + ", b=" + b + ", c=" + c + ", ab=" + ab + ", bc=" + bc + ", ca=" + ca + "]";
     }
-  }
-
-  public static void main(String[] args) {
-    SweepHullDelaunay2D d = new SweepHullDelaunay2D();
-
-    Random r = new Random(1);
-    final int num = 100000;
-    for(int i = 0; i < num; i++) {
-      final double[] v = new double[] { r.nextDouble(), r.nextDouble() };
-      // System.err.println(i + ": " + FormatUtil.format(v.getArrayRef(), " "));
-      d.add(v);
-    }
-    d.run(false);
   }
 }

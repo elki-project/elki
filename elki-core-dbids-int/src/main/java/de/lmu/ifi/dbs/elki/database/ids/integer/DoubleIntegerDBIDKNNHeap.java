@@ -142,7 +142,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    * @param iid
    *        Object id
    */
-  private final void updateHeap(final double distance, final int iid) {
+  private void updateHeap(final double distance, final int iid) {
     final double prevdist = kdist;
     final int previd = heap.peekValue();
     heap.replaceTopElement(distance, iid);
@@ -162,7 +162,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    * @param id
    *        Id to add
    */
-  private final void addToTies(int id) {
+  private void addToTies(int id) {
     if(ties.length == numties) {
       ties = Arrays.copyOf(ties, (ties.length << 1) + 1); // grow.
     }

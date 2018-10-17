@@ -48,7 +48,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     super(2.0, weights);
   }
 
-  private final double preDistance(NumberVector v1, NumberVector v2, final int start, final int end) {
+  private double preDistance(NumberVector v1, NumberVector v2, final int start, final int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
@@ -58,7 +58,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     return agg;
   }
 
-  private final double preDistanceVM(NumberVector v, SpatialComparable mbr, final int start, final int end) {
+  private double preDistanceVM(NumberVector v, SpatialComparable mbr, final int start, final int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
@@ -71,7 +71,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     return agg;
   }
 
-  private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end) {
+  private double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
@@ -83,7 +83,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     return agg;
   }
 
-  private final double preNorm(NumberVector v, final int start, final int end) {
+  private double preNorm(NumberVector v, final int start, final int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
@@ -92,7 +92,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     return agg;
   }
 
-  private final double preNormMBR(SpatialComparable mbr, final int start, final int end) {
+  private double preNormMBR(SpatialComparable mbr, final int start, final int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);

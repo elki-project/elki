@@ -167,7 +167,7 @@ public class GrahamScanConvexHull2D {
    * @param origin origin double[]
    * @return relative X coordinate
    */
-  private final double getRX(double[] a, double[] origin) {
+  private double getRX(double[] a, double[] origin) {
     return (a[0] - origin[0]) * factor;
   }
 
@@ -178,7 +178,7 @@ public class GrahamScanConvexHull2D {
    * @param origin origin double[]
    * @return relative Y coordinate
    */
-  private final double getRY(double[] a, double[] origin) {
+  private double getRY(double[] a, double[] origin) {
     return (a[1] - origin[1]) * factor;
   }
 
@@ -220,7 +220,7 @@ public class GrahamScanConvexHull2D {
    * @param c double[] C
    * @return convexity
    */
-  private final boolean isConvex(double[] a, double[] b, double[] c) {
+  private boolean isConvex(double[] a, double[] b, double[] c) {
     // We're using factor to improve numerical contrast for small polygons.
     double area = (b[0] - a[0]) * factor * (c[1] - a[1]) - (c[0] - a[0]) * factor * (b[1] - a[1]);
     return (-1e-13 < area && area < 1e-13) ? (mdist(b, c) > mdist(a, b) + mdist(a, c)) : (area < 0);

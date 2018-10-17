@@ -55,7 +55,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     super(2);
   }
 
-  private final double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
+  private double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double delta = v1.doubleValue(d) - v2.doubleValue(d);
@@ -64,7 +64,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     return agg;
   }
 
-  private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
+  private double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d);
@@ -77,7 +77,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     return agg;
   }
 
-  private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end) {
+  private double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
@@ -89,7 +89,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     return agg;
   }
 
-  private final double preNorm(NumberVector v, int start, int end) {
+  private double preNorm(NumberVector v, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
@@ -98,7 +98,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     return agg;
   }
 
-  private final double preNormMBR(SpatialComparable mbr, int start, int end) {
+  private double preNormMBR(SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);

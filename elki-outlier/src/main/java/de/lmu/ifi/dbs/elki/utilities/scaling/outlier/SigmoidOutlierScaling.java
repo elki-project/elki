@@ -37,14 +37,13 @@ import net.jafama.FastMath;
 /**
  * Tries to fit a sigmoid to the outlier scores and use it to convert the values
  * to probability estimates in the range of 0.0 to 1.0
- * 
+ * <p>
  * Reference:
  * <p>
- * J. Gao, P.-N. Tan<br />
+ * J. Gao, P.-N. Tan<br>
  * Converting Output Scores from Outlier Detection Algorithms into Probability
- * Estimates<br />
+ * Estimates<br>
  * Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -111,11 +110,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
       if(!changing) {
         break;
       }
-      // logger.debugFine("Number of outliers in sigmoid: " + t.cardinality());
       // M-Step
-      // Implementation based on:<br />
-      // H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
-      // A Note on Platt’s Probabilistic Outputs for Support Vector Machines
       {
         double[] newab = MStepLevenbergMarquardt(a, b, ids, t, or.getScores());
         a = newab[0];
@@ -172,11 +167,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
       if(!changing) {
         break;
       }
-      // logger.debugFine("Number of outliers in sigmoid: " + t.cardinality());
       // M-Step
-      // Implementation based on:<br />
-      // H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
-      // A Note on Platt’s Probabilistic Outputs for Support Vector Machines
       {
         double[] newab = MStepLevenbergMarquardt(a, b, t, array, adapter);
         a = newab[0];
@@ -196,12 +187,10 @@ public class SigmoidOutlierScaling implements OutlierScaling {
 
   /**
    * M-Step using a modified Levenberg-Marquardt method.
-   * 
    * <p>
-   * Implementation based on:<br />
-   * H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
+   * Implementation based on:<br>
+   * H.-T. Lin, C.-J. Lin, R. C. Weng:<br>
    * A Note on Platt’s Probabilistic Outputs for Support Vector Machines
-   * </p>
    * 
    * @param a A parameter
    * @param b B parameter
@@ -210,7 +199,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
    * @param scores Scores
    * @return new values for A and B.
    */
-  private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, long[] t, DoubleRelation scores) {
+  private double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, long[] t, DoubleRelation scores) {
     final int prior1 = BitsUtil.cardinality(t);
     final int prior0 = ids.size() - prior1;
     DBIDArrayIter iter = ids.iter();
@@ -241,7 +230,6 @@ public class SigmoidOutlierScaling implements OutlierScaling {
       }
     }
     for(int it = 0; it < maxiter; it++) {
-      // logger.debugFinest("Iter: " + it + "a: " + a + " b: " + b);
       // Update Gradient and Hessian (use H’ = H + sigma I)
       double h11 = sigma;
       double h22 = sigma;
@@ -320,13 +308,12 @@ public class SigmoidOutlierScaling implements OutlierScaling {
 
   /**
    * M-Step using a modified Levenberg-Marquardt method.
-   * 
    * <p>
-   * Implementation based on:<br />
-   * H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
+   * Implementation based on:
+   * <p>
+   * H.-T. Lin, C.-J. Lin, R. C. Weng:<br>
    * A Note on Platt’s Probabilistic Outputs for Support Vector Machines
-   * </p>
-   * 
+   *
    * @param a A parameter
    * @param b B parameter
    * @param t Bitset containing the assignment
@@ -334,7 +321,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
    * @param adapter Array adapter
    * @return new values for A and B.
    */
-  private final <A> double[] MStepLevenbergMarquardt(double a, double b, long[] t, A array, NumberArrayAdapter<?, A> adapter) {
+  private <A> double[] MStepLevenbergMarquardt(double a, double b, long[] t, A array, NumberArrayAdapter<?, A> adapter) {
     final int size = adapter.size(array);
     final int prior1 = BitsUtil.cardinality(t);
     final int prior0 = size - prior1;
@@ -364,7 +351,6 @@ public class SigmoidOutlierScaling implements OutlierScaling {
       }
     }
     for(int it = 0; it < maxiter; it++) {
-      // logger.debugFinest("Iter: " + it + "a: " + a + " b: " + b);
       // Update Gradient and Hessian (use H’ = H + sigma I)
       double h11 = sigma;
       double h22 = sigma;

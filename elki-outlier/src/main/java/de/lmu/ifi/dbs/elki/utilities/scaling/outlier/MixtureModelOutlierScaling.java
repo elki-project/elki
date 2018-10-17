@@ -36,18 +36,17 @@ import net.jafama.FastMath;
 /**
  * Tries to fit a mixture model (exponential for inliers and gaussian for
  * outliers) to the outlier score distribution.
- * 
+ * <p>
  * Note: we found this method to often fail, and fit the normal distribution to
  * the inliers instead of the outliers, yielding reversed results.
- * 
+ * <p>
  * Reference:
  * <p>
- * J. Gao, P.-N. Tan<br />
+ * J. Gao, P.-N. Tan<br>
  * Converting Output Scores from Outlier Detection Algorithms into Probability
- * Estimates<br />
+ * Estimates<br>
  * Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.
- * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -155,8 +154,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
     DBIDs ids = scores.getDBIDs();
     // TODO: stop condition!
     int iter = 0;
-    // LOG.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
-    // " lambda = " + curLambda + " alpha = " + curAlpha);
     while(true) {
       // E and M-Steps
       // Sum of weights for both distributions
@@ -195,8 +192,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      // LOG.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
-      // newSigma + " lambda = " + newLambda + " alpha = " + newAlpha);
       curMu = newMu;
       curSigma = newSigma;
       curLambda = newLambda;
@@ -212,8 +207,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
     sigma = curSigma;
     lambda = curLambda;
     alpha = curAlpha;
-    // LOG.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
-    // lambda + " alpha = " + alpha);
   }
 
   @Override
@@ -237,8 +230,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
 
     // TODO: stop condition!
     int iter = 0;
-    // LOG.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
-    // " lambda = " + curLambda + " alpha = " + curAlpha);
     while(true) {
       // E and M-Steps
       // Sum of weights for both distributions
@@ -277,8 +268,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      // LOG.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
-      // newSigma + " lambda = " + newLambda + " alpha = " + newAlpha);
       curMu = newMu;
       curSigma = newSigma;
       curLambda = newLambda;
@@ -294,8 +283,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
     sigma = curSigma;
     lambda = curLambda;
     alpha = curAlpha;
-    // LOG.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
-    // lambda + " alpha = " + alpha);
   }
 
   @Override
@@ -312,9 +299,6 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
   public double getScaled(double value) {
     final double val = calcPosterior(value, alpha, mu, sigma, lambda);
     // Work around issues with unstable convergence.
-    if(Double.isNaN(val)) {
-      return 0.0;
-    }
-    return val;
+    return val > 0 ? val : 0;
   }
 }
