@@ -67,7 +67,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
         .with(DiSH.Parameterizer.MU_ID, 40) //
         .with(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI) //
         .build().run(db);
-    testFMeasure(db, result, 0.653797548);
-    testClusterSizes(result, new int[] { 61, 84, 148, 188, 289, 330 });
+    testFMeasure(db, result, 0.656432);
+    testClusterSizes(result, new int[] { 61, 84, 153, 187, 283, 332 });
   }
 }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -82,15 +82,12 @@ import net.jafama.FastMath;
 
 /**
  * Algorithm for detecting subspace hierarchies.
- *
+ * <p>
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A.
- * Zimek:<br />
- * Detection and Visualization of Subspace Cluster Hierarchies. <br />
- * In Proc. 12th International Conference on Database Systems for Advanced
- * Applications (DASFAA), Bangkok, Thailand, 2007.
- * </p>
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek<br>
+ * Detection and Visualization of Subspace Cluster Hierarchies<br>
+ * Proc. 12th Int. Conf. on Database Systems for Advanced Applications (DASFAA).
  *
  * @author Elke Achtert
  * @since 0.1
@@ -105,7 +102,7 @@ import net.jafama.FastMath;
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", //
     title = "Detection and Visualization of Subspace Cluster Hierarchies", //
-    booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", //
+    booktitle = "Proc. 12th Int. Conf. on Database Systems for Advanced Applications (DASFAA)", //
     url = "https://doi.org/10.1007/978-3-540-71703-4_15", //
     bibkey = "DBLP:conf/dasfaa/AchtertBKKMZ07")
 public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
@@ -345,15 +342,11 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
         Cluster<SubspaceModel> cluster = new Cluster<>(c);
         cluster.setModel(new SubspaceModel(new Subspace(pv), Centroid.make(relation, c).getArrayRef()));
         String subspace = BitsUtil.toStringLow(cluster.getModel().getSubspace().getDimensions(), db_dim);
-        if(parallelClusters.size() > 1) {
-          cluster.setName("Cluster_" + subspace + "_" + i);
-        }
-        else {
-          cluster.setName("Cluster_" + subspace);
-        }
+        cluster.setName(parallelClusters.size() > 1 ? ("Cluster_" + subspace + "_" + i) : ("Cluster_" + subspace));
         clusters.add(cluster);
       }
     }
+
     // sort the clusters w.r.t. lambda
     Comparator<Cluster<SubspaceModel>> comparator = new Comparator<Cluster<SubspaceModel>>() {
       @Override
@@ -411,12 +404,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
         continue;
       }
       Pair<long[], ArrayModifiableDBIDs> parent = findParent(relation, c, clustersMap);
-      if(parent != null) {
-        parent.second.addDBIDs(c.second);
-      }
-      else {
-        noise.second.addDBIDs(c.second);
-      }
+      (parent != null ? parent : noise).second.addDBIDs(c.second);
     }
 
     List<ArrayModifiableDBIDs> noiseList = new ArrayList<>(1);
@@ -442,10 +430,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     int childCardinality = BitsUtil.cardinality(childPV);
     for(long[] parentPV : clustersMap.keySet()) {
       int parentCardinality = BitsUtil.cardinality(parentPV);
-      if(parentCardinality >= childCardinality) {
-        continue;
-      }
-      if(resultCardinality != -1 && parentCardinality <= resultCardinality) {
+      if(parentCardinality >= childCardinality || (resultCardinality != -1 && parentCardinality <= resultCardinality)) {
         continue;
       }
 
@@ -494,8 +479,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
         if(subspaceDim_i < subspaceDim_j) {
           if(msg != null) {
-            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']');
-            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)).append(']');
+            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']') //
+                .append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)).append(']');
           }
 
           // noise level reached
@@ -504,9 +489,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
             if(hier.numParents(c_i) == 0) {
               clustering.addChildCluster(c_j, c_i);
               if(msg != null) {
-                msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim));
-                msg.append("] is parent of [").append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim));
-                msg.append(']');
+                msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)) //
+                    .append("] is parent of [").append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']');
               }
             }
           }
@@ -531,10 +515,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
                 if(hier.numParents(c_i) == 0 || !isParent(database, c_j, hier.iterParents(c_i), db_dim)) {
                   clustering.addChildCluster(c_j, c_i);
                   if(msg != null) {
-                    msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim));
-                    msg.append("] is parent of [");
-                    msg.append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim));
-                    msg.append(']');
+                    msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)) //
+                        .append("] is parent of [") //
+                        .append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']');
                   }
                 }
               }
@@ -781,7 +764,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
         }
         int prevcorr = correlationValue.intValue(iter);
         int curcorr = tmpCorrelation.intValue(iter);
-        if(prevcorr <= curcorr) {
+        if(prevcorr < curcorr) {
           continue; // No improvement.
         }
         double currdist = MathUtil.max(tmpDistance.doubleValue(iter), coredist);
