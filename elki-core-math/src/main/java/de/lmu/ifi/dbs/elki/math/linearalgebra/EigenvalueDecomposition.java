@@ -459,10 +459,8 @@ public class EigenvalueDecomposition {
     // Store roots isolated by balanc and compute matrix norm
     double norm = 0.;
     for(int i = 0; i < nn; i++) {
-      if(i < low || i > high) {
-        d[i] = H[i][i];
-        e[i] = 0.;
-      }
+      // If eventually allowing low,high to be set, use this:
+      // if(i < low || i > high) { d[i] = H[i][i]; e[i] = 0.; }
       for(int j = (i > 0 ? i - 1 : 0); j < nn; j++) {
         norm += abs(H[i][j]);
       }
@@ -544,10 +542,8 @@ public class EigenvalueDecomposition {
 
         // Form shift
         double x = Hn[n], y = 0., w = 0.;
-        if(l < n) {
-          y = Hnm1[n - 1];
-          w = Hn[n - 1] * Hnm1[n];
-        }
+        y = Hnm1[n - 1];
+        w = Hn[n - 1] * Hnm1[n];
 
         // Wilkinson's original ad hoc shift
         if(iter == 10) {
@@ -679,11 +675,10 @@ public class EigenvalueDecomposition {
     }
 
     // Vectors of isolated roots
-    for(int i = 0; i < nn; i++) {
-      if(i < low || i > high) {
-        System.arraycopy(H[i], i, V[i], i, nn - i);
-      }
-    }
+    // Only matters if the user can modify low, high:
+    // for(int i = 0; i < nn; i++) {
+    // if(i < low || i > high) { System.arraycopy(H[i], i, V[i], i, nn - i); }
+    // }
 
     // Back transformation to get eigenvectors of original matrix
     hqr2BackTransformation(nn, low, high);
