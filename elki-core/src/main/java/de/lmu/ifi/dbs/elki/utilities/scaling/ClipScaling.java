@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,17 +36,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 public class ClipScaling implements StaticScalingFunction {
   /**
    * Parameter to specify a fixed minimum to use.
-   * <p>
-   * Key: {@code -clipscale.min}
-   * </p>
    */
   public static final OptionID MIN_ID = new OptionID("clipscale.min", "Minimum value to allow.");
 
   /**
    * Parameter to specify the maximum value
-   * <p>
-   * Key: {@code -clipscale.max}
-   * </p>
    */
   public static final OptionID MAX_ID = new OptionID("clipscale.max", "Maximum value to allow.");
 
@@ -92,7 +86,7 @@ public class ClipScaling implements StaticScalingFunction {
   public double getMax() {
     return (max != null) ? max : Double.POSITIVE_INFINITY;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -102,8 +96,9 @@ public class ClipScaling implements StaticScalingFunction {
    */
   public static class Parameterizer extends AbstractParameterizer {
     protected Double min = null;
+
     protected Double max = null;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -114,7 +109,7 @@ public class ClipScaling implements StaticScalingFunction {
       }
       DoubleParameter maxP = new DoubleParameter(MAX_ID) //
           .setOptional(true);
-      if (config.grab(maxP)) {
+      if(config.grab(maxP)) {
         max = maxP.getValue();
       }
     }

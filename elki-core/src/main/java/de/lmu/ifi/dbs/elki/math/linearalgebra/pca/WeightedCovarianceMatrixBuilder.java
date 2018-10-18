@@ -190,9 +190,6 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the weight function to use in weighted PCA.
-     * <p>
-     * Key: {@code -pca.weight}
-     * </p>
      */
     public static final OptionID WEIGHT_ID = new OptionID("pca.weight", "Weight function to use in weighted PCA.");
 

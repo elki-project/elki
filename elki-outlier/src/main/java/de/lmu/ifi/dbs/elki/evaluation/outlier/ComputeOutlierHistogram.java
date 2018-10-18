@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -236,36 +235,21 @@ public class ComputeOutlierHistogram implements Evaluator {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * The object pattern to identify positive classes
-     * <p>
-     * Key: {@code -comphist.positive}
-     * </p>
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
 
     /**
      * number of bins for the histogram
-     * <p>
-     * Default value: {@link EuclideanDistanceFunction}
-     * </p>
-     * <p>
-     * Key: {@code -comphist.bins}
-     * </p>
      */
     public static final OptionID BINS_ID = new OptionID("comphist.bins", "number of bins");
 
     /**
      * Parameter to specify a scaling function to use.
-     * <p>
-     * Key: {@code -comphist.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
 
     /**
      * Flag to count frequencies of outliers and non-outliers separately
-     * <p>
-     * Key: {@code -histogram.splitfreq}
-     * </p>
      */
     public static final OptionID SPLITFREQ_ID = new OptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 

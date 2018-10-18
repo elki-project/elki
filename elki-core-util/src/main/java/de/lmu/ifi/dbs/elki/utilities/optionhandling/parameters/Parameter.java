@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -103,7 +103,7 @@ public interface Parameter<T> {
 
   /**
    * Returns the default value of the parameter.
-   * <p/>
+   * <p>
    * If the parameter has no default value, the method returns <b>null</b>.
    *
    * @return the default value of the parameter, <b>null</b> if the parameter
@@ -194,7 +194,7 @@ public interface Parameter<T> {
    * @return Buffer
    */
   StringBuilder describeValues(StringBuilder description);
-  
+
   /**
    * Add an additional constraint.
    *

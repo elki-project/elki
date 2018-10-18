@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -201,19 +201,17 @@ public class Polygon implements SpatialComparable {
 
   /**
    * Simple polygon intersection test.
-   * 
    * <p>
    * FIXME: while this is found on some web pages as "solution" and satisfies or
    * needs, it clearly is not correct; not even for convex polygons: Consider a
    * cross where the two bars are made out of four vertices each. No vertex is
    * inside the other polygon, yet they intersect.
-   * 
+   * <p>
    * I knew this before writing this code, but this O(n) code was the simplest
    * thing to come up with, and it would work for our current data sets. A way
    * to fix this is to augment it with the obvious O(n*n) segment intersection
    * test. (Note that you will still need to test for point containment, since
    * the whole polygon could be contained in the other!)
-   * </p>
    * 
    * @param other Other polygon
    * @return True when the polygons intersect

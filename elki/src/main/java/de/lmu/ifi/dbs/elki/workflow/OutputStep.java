@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,14 +45,14 @@ public class OutputStep implements WorkflowStep {
   /**
    * Output handler.
    */
-  private List<ResultHandler> resulthandlers = null;
+  private List<? extends ResultHandler> resulthandlers = null;
 
   /**
    * Constructor.
    *
    * @param resulthandlers Result handlers to use
    */
-  public OutputStep(List<ResultHandler> resulthandlers) {
+  public OutputStep(List<? extends ResultHandler> resulthandlers) {
     super();
     this.resulthandlers = resulthandlers;
   }
@@ -88,7 +88,7 @@ public class OutputStep implements WorkflowStep {
     Class<? extends ResultHandler> clz;
     try {
       clz = (Class<? extends ResultHandler>) Thread.currentThread().getContextClassLoader().loadClass(//
-      "de.lmu.ifi.dbs.elki.result.AutomaticVisualization");
+          "de.lmu.ifi.dbs.elki.result.AutomaticVisualization");
     }
     catch(ClassNotFoundException e) {
       clz = ResultWriter.class;
@@ -109,29 +109,19 @@ public class OutputStep implements WorkflowStep {
     /**
      * Output handlers.
      */
-    private List<ResultHandler> resulthandlers = null;
+    private List<? extends ResultHandler> resulthandlers = null;
 
     /**
      * Parameter to specify the result handler classes.
-     *
-     * Key:
-     * <p>
-     * {@code -resulthandler}
-     * </p>
      */
     public static final OptionID RESULT_HANDLER_ID = new OptionID("resulthandler", "Result handler class.");
 
     /**
      * OptionID for the application output file/folder.
-     *
-     * Key:
-     * <p>
-     * {@code -out}
-     * </p>
      */
     public static final OptionID OUTPUT_ID = new OptionID("out", //
-    "Directory name (or name of an existing file) to write the obtained results in. " + //
-    "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
+        "Directory name (or name of an existing file) to write the obtained results in. " + //
+            "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
 
     @Override
     protected void makeOptions(Parameterization config) {

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,14 +38,14 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Add Jitter, preserving the histogram properties (same sum, nonnegative).
- * 
- * For each vector, the total sum of all dimensions is computed.<br />
+ * <p>
+ * For each vector, the total sum of all dimensions is computed.<br>
  * Then a random vector of the average length <code>jitter * scale</code> is
  * added and the result normalized to the original vectors sum. The individual
  * dimensions are drawn from an exponential distribution with scale
  * <code>jitter / dimensionality</code>, so it is expected that the error in
  * most dimensions will be low, and higher in few.
- * 
+ * <p>
  * This is designed to degrade the quality of a histogram, while preserving the
  * total sum (e.g. to keep the normalization). The factor "jitter" can be used
  * to control the degradation amount.
@@ -148,7 +148,7 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(jitterP)) {
         jitter = jitterP.getValue().doubleValue();
       }

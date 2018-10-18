@@ -1,5 +1,6 @@
 /**
- * <p>Scaling of Outlier scores, that require a statistical analysis of the occurring values</p>
+ * Scaling of outlier scores, that require a statistical analysis of the
+ * occurring values
  */
 /*
  * This file is part of ELKI:

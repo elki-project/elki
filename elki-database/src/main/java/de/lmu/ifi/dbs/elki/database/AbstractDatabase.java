@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Abstract base class for database API implementations. Provides default
  * management of relations, indexes and events as well as default query
  * matching.
- *
+ * <p>
  * Note: when debugging index usage, set logging for this package to FINEST via
  * <tt>-enableDebug de.lmu.ifi.dbs.elki.database=FINEST</tt>
  *
@@ -208,19 +208,11 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Option to specify the data source for the database.
-     *
-     * Key:
-     * <p>
-     * {@code -dbc}
-     * </p>
      */
     public static final OptionID DATABASE_CONNECTION_ID = new OptionID("dbc", "Database connection class.");
 
     /**
      * Parameter to specify the indexes to use.
-     * <p>
-     * Key: {@code -db.index}
-     * </p>
      */
     public static final OptionID INDEX_ID = new OptionID("db.index", "Database indexes to add.");
 

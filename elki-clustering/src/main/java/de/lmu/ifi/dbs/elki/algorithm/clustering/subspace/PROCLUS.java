@@ -819,12 +819,6 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     /**
      * Parameter to specify the multiplier for the initial number of medoids,
      * must be an integer greater than 0.
-     * <p>
-     * Default value: {@code 10}
-     * </p>
-     * <p>
-     * Key: {@code -proclus.mi}
-     * </p>
      */
     public static final OptionID M_I_ID = new OptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 

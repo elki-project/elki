@@ -1,6 +1,6 @@
 /**
- * <p>Visualizers based on scatterplots.</p>
- * 
+ * Visualizers based on scatterplots
+ *
  * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.batikutil.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.svg.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.result.*
@@ -12,7 +12,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

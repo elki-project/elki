@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -135,21 +135,11 @@ public class AutomaticVisualization implements ResultHandler {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the window title
-     * <p>
-     * Key: {@code -vis.window.title}
-     * </p>
-     * <p>
-     * Default value: "ELKI Result Visualization"
-     * </p>
      */
     public static final OptionID WINDOW_TITLE_ID = new OptionID("vis.window.title", "Title to use for visualization window.");
 
     /**
      * Flag to set single display
-     *
-     * <p>
-     * Key: -vis.single
-     * </p>
      */
     public static final OptionID SINGLE_ID = new OptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
 

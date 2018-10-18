@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -119,9 +119,6 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the name of the distance matrix file.
-     * <p>
-     * Key: {@code -distance.matrix}
-     * </p>
      */
     public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
         "The name of the file containing the distance matrix.");

@@ -1,13 +1,13 @@
 /**
- * <p>Package containing strategies to obtain reference points</p>
- * 
- * <p>Shared code for various algorithms that use reference points.</p>
+ * Package containing strategies to obtain reference points
+ * <p>
+ * Shared code for various algorithms that use reference points
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 public class ScatterPlotFactory implements ProjectorFactory {
   /**
    * Maximum number of dimensions to visualize.
-   *
+   * <p>
    * FIXME: add scrolling function for higher dimensionality!
    */
   public static final int MAX_DIMENSIONS_DEFAULT = 10;
@@ -113,10 +113,6 @@ public class ScatterPlotFactory implements ProjectorFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for the maximum number of dimensions.
-     *
-     * <p>
-     * Code: -vis.maxdim
-     * </p>
      */
     public static final OptionID MAXDIM_ID = new OptionID("vis.maxdim", "Maximum number of dimensions to display.");
 

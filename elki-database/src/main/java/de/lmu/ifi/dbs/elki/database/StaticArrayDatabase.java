@@ -86,7 +86,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
    * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
-  public StaticArrayDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?>> indexFactories) {
+  public StaticArrayDatabase(DatabaseConnection databaseConnection, Collection<? extends IndexFactory<?>> indexFactories) {
     super();
     this.databaseConnection = databaseConnection;
     this.ids = null;
@@ -197,7 +197,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
     /**
      * Indexes to add.
      */
-    private Collection<IndexFactory<?>> indexFactories;
+    private Collection<? extends IndexFactory<?>> indexFactories;
 
     @Override
     protected void makeOptions(Parameterization config) {

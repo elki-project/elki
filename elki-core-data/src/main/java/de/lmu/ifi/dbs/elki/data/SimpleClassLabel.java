@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,61 +61,29 @@ public class SimpleClassLabel extends ClassLabel {
     this.label = label;
   }
 
-  /**
-   * The ordering of two SimpleClassLabels is given by the ordering on the
-   * Strings they represent.
-   * <p/>
-   * That is, the result equals <code>this.label.compareTo(o.label)</code>.
-   * 
-   * {@inheritDoc}
-   */
   @Override
   public int compareTo(ClassLabel o) {
     SimpleClassLabel other = (SimpleClassLabel) o;
     return this.label.compareTo(other.label);
   }
 
-  /**
-   * The hash code of a simple class label is the hash code of the String
-   * represented by the ClassLabel.
-   * 
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode() {
     return label.hashCode();
   }
 
-  /**
-   * Any ClassLabel should ensure a natural ordering that is consistent with
-   * equals. Thus, if <code>this.compareTo(o)==0</code>, then
-   * <code>this.equals(o)</code> should be <code>true</code>.
-   * 
-   * @param o an object to test for equality w.r.t. this ClassLabel
-   * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
-   *         otherwise
-   */
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
+    if(this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
+    if(o == null || getClass() != o.getClass() || !super.equals(o)) {
       return false;
     }
     final SimpleClassLabel that = (SimpleClassLabel) o;
-
     return label.equals(that.label);
   }
 
-  /**
-   * Returns a new instance of the String covered by this SimpleClassLabel.
-   * 
-   * @return a new instance of the String covered by this SimpleClassLabel
-   */
   @Override
   public String toString() {
     return label;
@@ -158,7 +126,7 @@ public class SimpleClassLabel extends ClassLabel {
     public SimpleClassLabel makeFromString(String lbl) {
       lbl = lbl.intern();
       SimpleClassLabel l = existing.get(lbl);
-      if (l == null) {
+      if(l == null) {
         l = new SimpleClassLabel(lbl);
         existing.put(lbl, l);
       }

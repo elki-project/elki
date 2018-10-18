@@ -98,7 +98,6 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
 
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
-   * <p/>
    * 
    * @param solution the linear equation system describing the solution
    *        equations

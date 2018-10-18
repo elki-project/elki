@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -85,9 +85,6 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
   public static class Parameterizer<I, O> extends AbstractParameterizer {
     /**
      * Parameter to specify the projection to use
-     * <p>
-     * Key: {@code -projection}
-     * </p>
      */
     public static final OptionID PROJ_ID = new OptionID("projection", "Projection to use.");
 
@@ -100,7 +97,7 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<Projection<I, O>> projP = new ObjectParameter<>(PROJ_ID, Projection.class);
-      if (config.grab(projP)) {
+      if(config.grab(projP)) {
         projection = projP.instantiateClass(config);
       }
     }

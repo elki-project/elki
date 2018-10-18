@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,12 +68,6 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     /**
      * Parameter to specify the size of a page in bytes, must be an integer
      * greater than 0.
-     * <p>
-     * Default value: {@code 4000}
-     * </p>
-     * <p>
-     * Key: {@code -pagefile.pagesize}
-     * </p>
      */
     public static final OptionID PAGE_SIZE_ID = new OptionID("pagefile.pagesize", "The size of a page in bytes.");
 

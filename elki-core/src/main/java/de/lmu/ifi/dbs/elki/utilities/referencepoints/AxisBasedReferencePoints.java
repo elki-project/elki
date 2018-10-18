@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -110,9 +110,6 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
     /**
      * Parameter to specify the extra scaling of the space, to allow
      * out-of-data-space reference points.
-     * <p>
-     * Key: {@code -axisref.scale}
-     * </p>
      */
     public static final OptionID SPACE_SCALE_ID = new OptionID("axisref.scale", "Scale the data space extension by the given factor.");
 
@@ -125,7 +122,7 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, 1.0)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(spacescaleP)) {
         spacescale = spacescaleP.getValue();
       }

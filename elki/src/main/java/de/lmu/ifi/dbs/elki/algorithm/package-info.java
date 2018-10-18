@@ -1,10 +1,13 @@
 /**
- * <p>Algorithms suitable as a task for the {@link de.lmu.ifi.dbs.elki.KDDTask} main routine.</p>
- * 
- *  The {@link de.lmu.ifi.dbs.elki.KDDTask} main routine expects an algorithm to implement
- *  the {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}-Interface.
- *  Basic functions are already provided within {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm},
- *  see there for basic instructions of how to implement an algorithm suitable to the framework.
+ * Algorithms suitable as a task for the {@link de.lmu.ifi.dbs.elki.KDDTask}
+ * main routine.
+ * <p>
+ * The {@link de.lmu.ifi.dbs.elki.KDDTask} main routine expects an algorithm to
+ * implement the {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}-Interface.
+ * Basic functions are already provided within
+ * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm},
+ * see there for basic instructions of how to implement an algorithm suitable to
+ * the framework.
  *
  * @apiviz.exclude workflow.AlgorithmStep
  * @apiviz.exclude database.query.knn.KNNQuery
@@ -13,7 +16,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

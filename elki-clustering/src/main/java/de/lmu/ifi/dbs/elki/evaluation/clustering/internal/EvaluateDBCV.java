@@ -54,14 +54,13 @@ import net.jafama.FastMath;
 
 /**
  * Compute the Density-Based Clustering Validation Index.
- *
+ * <p>
  * Reference:
  * <p>
  * Davoud Moulavi, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur Zimek,
- * Jörg Sander<br />
- * Density-Based Clustering Validation<br />
+ * Jörg Sander<br>
+ * Density-Based Clustering Validation<br>
  * In: Proc. 14th SIAM International Conference on Data Mining (SDM).
- * </p>
  *
  * @author Stephan Baier
  *

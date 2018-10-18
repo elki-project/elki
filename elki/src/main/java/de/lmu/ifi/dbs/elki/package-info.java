@@ -1,10 +1,13 @@
 /**
- * ELKI framework "Environment for Developing KDD-Applications Supported by Index-Structures".
- * 
- * <p>{@link de.lmu.ifi.dbs.elki.KDDTask} is the basic work-flow for unsupervised knowledge discovery.
- * It will setup a {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection},
- * run an {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm} on it and pass the
- * result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.</p>
+ * ELKI framework "Environment for Developing KDD-Applications Supported by
+ * Index-Structures".
+ * <p>
+ * {@link de.lmu.ifi.dbs.elki.KDDTask} is the basic work-flow for unsupervised
+ * knowledge discovery. It will setup a
+ * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection},
+ * run an {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm} on it and
+ * pass the result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler
+ * ResultHandler}.
  *
  * @apiviz.exclude ^experimentalcode\.
  */
@@ -12,7 +15,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

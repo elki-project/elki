@@ -635,28 +635,16 @@ public class KMLOutputHandler implements ResultHandler {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for scaling functions
-     * 
-     * <p>
-     * Key: {@code -kml.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("kml.scaling", "Additional scaling function for KML colorization.");
 
     /**
      * Parameter for compatibility mode.
-     * 
-     * <p>
-     * Key: {@code -kml.compat}
-     * </p>
      */
     public static final OptionID COMPAT_ID = new OptionID("kml.compat", "Use simpler KML objects, compatibility mode.");
 
     /**
      * Parameter for automatically opening the output file.
-     * 
-     * <p>
-     * Key: {@code -kml.autoopen}
-     * </p>
      */
     public static final OptionID AUTOOPEN_ID = new OptionID("kml.autoopen", "Automatically open the result file.");
 

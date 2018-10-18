@@ -676,9 +676,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     /**
      * Parameter to specify the number of solutions must be an integer greater
      * than 1.
-     * <p>
-     * Key: {@code -eafod.m}
-     * </p>
      */
     public static final OptionID M_ID = new OptionID("ay.m", "Population size for evolutionary algorithm.");
 

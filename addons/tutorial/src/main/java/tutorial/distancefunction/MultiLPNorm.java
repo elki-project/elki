@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 
 /**
  * Tutorial example for ELKI.
- * 
+ * <p>
  * See
  * <a href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/DistanceFunctions">Distance
  * function tutorial</a>
@@ -40,88 +40,85 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @since 0.5.0
  */
 public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
-	/**
-	 * The exponents
-	 */
-	double[] ps;
+  /**
+   * The exponents
+   */
+  double[] ps;
 
-	/**
-	 * Normalization factor (count(ps)/sum(ps))
-	 */
-	double pinv;
+  /**
+   * Normalization factor (count(ps)/sum(ps))
+   */
+  double pinv;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param ps
-	 *            The exponents
-	 */
-	public MultiLPNorm(double[] ps) {
-		super();
-		double sum = 0.0;
-		for (int dim = 0; dim < ps.length; dim++) {
-			assert (ps[dim] >= 0) : "Negative exponents are not allowed.";
-			sum += ps[dim];
-		}
-		assert (sum > 0) : "At least one exponent should be different from 0!";
+  /**
+   * Constructor.
+   * 
+   * @param ps
+   *        The exponents
+   */
+  public MultiLPNorm(double[] ps) {
+    super();
+    double sum = 0.0;
+    for(int dim = 0; dim < ps.length; dim++) {
+      assert (ps[dim] >= 0) : "Negative exponents are not allowed.";
+      sum += ps[dim];
+    }
+    assert (sum > 0) : "At least one exponent should be different from 0!";
 
-		this.ps = ps;
-		this.pinv = ps.length / sum;
-	}
+    this.ps = ps;
+    this.pinv = ps.length / sum;
+  }
 
-	@Override
-	public double distance(NumberVector o1, NumberVector o2) {
-		assert o1.getDimensionality() == ps.length : "Inappropriate dimensionality!";
-		assert o2.getDimensionality() == ps.length : "Inappropriate dimensionality!";
+  @Override
+  public double distance(NumberVector o1, NumberVector o2) {
+    assert o1.getDimensionality() == ps.length : "Inappropriate dimensionality!";
+    assert o2.getDimensionality() == ps.length : "Inappropriate dimensionality!";
 
-		double sum = 0.0;
-		for (int dim = 0; dim < ps.length; dim++) {
-			if (ps[dim] > 0) {
-				final double delta = Math.abs(o1.doubleValue(dim) - o2.doubleValue(dim));
-				sum += Math.pow(delta, ps[dim]);
-			}
-		}
-		return Math.pow(sum, pinv);
-	}
+    double sum = 0.0;
+    for(int dim = 0; dim < ps.length; dim++) {
+      if(ps[dim] > 0) {
+        final double delta = Math.abs(o1.doubleValue(dim) - o2.doubleValue(dim));
+        sum += Math.pow(delta, ps[dim]);
+      }
+    }
+    return Math.pow(sum, pinv);
+  }
 
-	@Override
-	public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-		return VectorFieldTypeInformation.typeRequest(NumberVector.class, ps.length, ps.length);
-	}
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, ps.length, ps.length);
+  }
 
-	/**
-	 * Parameterization class example
-	 * 
-	 * @author Erich Schubert
-	 *
-	 * @apiviz.exclude
-	 */
-	public static class Parameterizer extends AbstractParameterizer {
-		/**
-		 * Option ID for the exponents <code>
-		 *  -multinorm.ps
-		 * </code>
-		 */
-		public static final OptionID EXPONENTS_ID = new OptionID("multinorm.ps",
-				"The exponents to use for this distance function");
+  /**
+   * Parameterization class example
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option ID for the exponents
+     */
+    public static final OptionID EXPONENTS_ID = new OptionID("multinorm.ps", "The exponents to use for this distance function");
 
-		/**
-		 * P exponents
-		 */
-		double[] ps;
+    /**
+     * P exponents
+     */
+    double[] ps;
 
-		@Override
-		protected void makeOptions(Parameterization config) {
-			super.makeOptions(config);
-			DoubleListParameter ps_param = new DoubleListParameter(EXPONENTS_ID);
-			if (config.grab(ps_param)) {
-				ps = ps_param.getValue().clone();
-			}
-		}
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter ps_param = new DoubleListParameter(EXPONENTS_ID);
+      if(config.grab(ps_param)) {
+        ps = ps_param.getValue().clone();
+      }
+    }
 
-		@Override
-		protected MultiLPNorm makeInstance() {
-			return new MultiLPNorm(ps);
-		}
-	}
+    @Override
+    protected MultiLPNorm makeInstance() {
+      return new MultiLPNorm(ps);
+    }
+  }
 }

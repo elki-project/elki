@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Adapter from a similarity function to a distance function.
- * 
+ * <p>
  * Note: The derived distance function will usually not satisfy the triangle
  * equation.
  * 
@@ -148,9 +148,6 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
      * between database objects from. Must extend
      * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction}
      * .
-     * <p>
-     * Key: {@code -adapter.similarityfunction}
-     * </p>
      */
     public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", //
         "Similarity function to derive the distance between database objects from.");

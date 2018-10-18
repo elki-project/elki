@@ -157,12 +157,6 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     /**
      * Parameter to specify the holdout for evaluation, must extend
      * {@link de.lmu.ifi.dbs.elki.evaluation.classification.holdout.Holdout}.
-     * <p>
-     * Key: {@code -classifier.holdout}
-     * </p>
-     * <p>
-     * Default value: {@link StratifiedCrossValidation}
-     * </p>
      */
     public static final OptionID HOLDOUT_ID = new OptionID("evaluation.holdout", "Holdout class used in evaluation.");
 

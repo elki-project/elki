@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,25 +43,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * A filter to perturb the values by adding micro-noise.
- * 
+ * <p>
  * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a
  * specified standard deviation or by a uniform distribution with a specified
  * range. The standard deviation or the range can be scaled, attribute-wise, to
  * a given percentage of the original standard deviation in the data
  * distribution (assuming a Gaussian distribution there), or to a percentage of
  * the extension in each attribute ({@code maximumValue - minimumValue}).
- *
+ * <p>
  * This filter has a potentially wide use but has been implemented for the
  * following publication:
- * 
+ * <p>
  * Reference:
  * <p>
- * A. Zimek, R. J. G. B. Campello, J. Sander:</br>
- * Data Perturbation for Outlier
- * Detection Ensembles.<\br> In: Proc. 26th International Conference on
- * Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark,
- * 2014.
- * </p>
+ * A. Zimek, R. J. G. B. Campello, J. Sander<br>
+ * Data Perturbation for Outlier Detection Ensemble<br>
+ * Proc. 26th Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM 2014)
  * 
  * @author Arthur Zimek
  * @since 0.7.0
@@ -320,9 +318,6 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
     /**
      * Optional parameter to specify a seed for random Gaussian noise
      * generation. If unused, system time is used as seed.
-     * <p>
-     * Key: {@code -perturbationfilter.seed}
-     * </p>
      */
     public static final OptionID SEED_ID = new OptionID("perturbationfilter.seed", "Seed for random noise generation.");
 
@@ -337,40 +332,16 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
      * the random Gaussian noise generation, given the standard deviation of the
      * corresponding attribute in the original data distribution (assuming a
      * Gaussian there).
-     * 
-     * <p>
-     * Key: {@code -perturbationfilter.percentage}
-     * </p>
-     * <p>
-     * Default: <code>0.01</code>
-     * </p>
-     * <p>
-     * Constraint: 0 &lt; percentage &leq;1
-     * </p>
      */
     public static final OptionID PERCENTAGE_ID = new OptionID("perturbationfilter.percentage", "Percentage of the standard deviation of the random Gaussian noise generation per attribute, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian distribution there).");
 
     /**
      * Parameter for selecting scaling reference.
-     * <p>
-     * Key: {@code -perturbationfilter.scalingreference}
-     * </p>
-     * <p>
-     * Default: <code>ScalingReference.UNITCUBE</code>
-     * </p>
      */
     public static final OptionID SCALINGREFERENCE_ID = new OptionID("perturbationfilter.scalingreference", "The reference for scaling the Gaussian noise. Default is " + ScalingReference.UNITCUBE + ", parameter " + PERCENTAGE_ID.getName() + " will then directly define the standard deviation of all noise Gaussians. For options " + ScalingReference.STDDEV + " and  " + ScalingReference.MINMAX + ", the percentage of the attributewise standard deviation or extension, repectively, will define the attributewise standard deviation of the noise Gaussians.");
 
     /**
      * Parameter for selecting the noise distribution.
-     * 
-     * <p>
-     * Key: {@code -perturbationfilter.noisedistribution}
-     * </p>
-     * <p>
-     * Default: <code>NoiseDistribution.UNIFORM</code>
-     * </p>
-     * 
      */
     public static final OptionID NOISEDISTRIBUTION_ID = new OptionID("perturbationfilter.noisedistribution", "The nature of the noise distribution, default is " + NoiseDistribution.UNIFORM);
 

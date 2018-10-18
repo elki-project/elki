@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -209,10 +209,6 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * The pattern to identify positive classes.
-     *
-     * <p>
-     * Key: {@code -precision.positive}
-     * </p>
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
 

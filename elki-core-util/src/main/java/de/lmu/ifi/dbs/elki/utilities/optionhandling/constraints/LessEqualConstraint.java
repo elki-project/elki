@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 public class LessEqualConstraint extends AbstractNumberConstraint {
   /**
    * Creates a Less-Equal-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the appropriate number parameter has to be less equal
    * than the given constraint value.
    * 
@@ -47,7 +47,7 @@ public class LessEqualConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Less-Equal-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the appropriate number parameter has to be less equal
    * than the given constraint value.
    * 
@@ -59,7 +59,7 @@ public class LessEqualConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Less-Equal-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the appropriate number parameter has to be less equal
    * than the given constraint value.
    * 

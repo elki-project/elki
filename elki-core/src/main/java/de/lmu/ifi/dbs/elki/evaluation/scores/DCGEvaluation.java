@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,20 +28,19 @@ import net.jafama.FastMath;
 
 /**
  * Discounted Cumulative Gain.
- *
+ * <p>
  * This evaluation metric would be able to use relevance information, but the
  * current implementation is for binary labels only (it is easy to add, but
  * requires API additions or changes).
- * 
+ * <p>
  * Reference:
  * <p>
- * K. Järvelin, J. Kekäläinen<br />
- * Cumulated gain-based evaluation of IR techniques<br />
+ * K. Järvelin, J. Kekäläinen<br>
+ * Cumulated gain-based evaluation of IR techniques<br>
  * ACM Transactions on Information Systems (TOIS)
- * </p>
- *
+ * <p>
  * TODO: support weighted ground truth.
- * 
+ * <p>
  * TODO: allow using other logarithms than 2?
  *
  * @author Erich Schubert

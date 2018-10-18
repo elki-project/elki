@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -83,20 +83,11 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     /**
      * Parameter to specify the size of the cache in bytes, must be an integer
      * equal to or greater than 0.
-     * <p>
-     * Default value: {@link Integer#MAX_VALUE}
-     * </p>
-     * <p>
-     * Key: {@code -pagefile.cachesize}
-     * </p>
      */
     public static final OptionID CACHE_SIZE_ID = new OptionID("pagefile.cachesize", "The size of the cache in bytes.");
 
     /**
      * Parameter to specify the inner pagefile.
-     * <p>
-     * Key: {@code -pagefile.pagefile}
-     * </p>
      */
     public static final OptionID PAGEFILE_ID = new OptionID("pagefile.pagefile", "The backing pagefile for the cache.");
 

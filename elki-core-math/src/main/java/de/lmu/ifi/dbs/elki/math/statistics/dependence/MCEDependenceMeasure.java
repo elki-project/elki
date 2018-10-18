@@ -34,14 +34,13 @@ import net.jafama.FastMath;
  * Compute a mutual information based dependence measure using a nested means
  * discretization, originally proposed for ordering axes in parallel coordinate
  * plots.
- * 
+ * <p>
  * Reference:
  * <p>
- * D. Guo<br />
+ * D. Guo<br>
  * Coordinating computational and visual approaches for interactive feature
- * selection and multivariate clustering<br />
+ * selection and multivariate clustering<br>
  * Information Visualization, 2(4), 2003.
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.7.0

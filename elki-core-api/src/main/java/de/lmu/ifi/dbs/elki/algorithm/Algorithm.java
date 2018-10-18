@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,21 +25,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
- * <p>
  * Specifies the requirements for any algorithm that is to be executable by the
  * main class.
- * </p>
- * <p/>
  * <p>
  * Any implementation needs not to take care of input nor output, parsing and so
  * on. Those tasks are performed by the framework. An algorithm simply needs to
  * ask for parameters that are algorithm specific.
- * </p>
- * <p/>
  * <p>
  * <b>Note:</b> Any implementation is supposed to provide a constructor without
  * parameters (default constructor).
- * </p>
  * 
  * @author Arthur Zimek
  * @since 0.1

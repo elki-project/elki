@@ -84,22 +84,21 @@ import net.jafama.FastMath;
 
 /**
  * Representative clustering of uncertain data.
- *
+ * <p>
  * This algorithm clusters uncertain data by repeatedly sampling a possible
  * world, then running a traditional clustering algorithm on this sample.
- *
+ * <p>
  * The resulting "possible" clusterings are then clustered themselves, using a
  * clustering similarity measure. This yields a number of representatives for
  * the set of all possible worlds.
- *
+ * <p>
  * Reference:
  * <p>
- * Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur
- * Zimek, Mathias Renz<br />
- * Representative clustering of uncertain data<br />
+ * Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis,
+ * Arthur Zimek, Mathias Renz<br>
+ * Representative clustering of uncertain data<br>
  * In Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and
  * Data Mining
- * </p>
  *
  * @author Alexander Koos
  * @author Erich Schubert

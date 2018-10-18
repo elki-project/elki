@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -235,17 +235,15 @@ public class SparseByteVector implements SparseNumberVector {
    * Create a String representation of this SparseByteVector as suitable for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
-   *
+   * <p>
    * The returned String is a single line with entries separated by
    * {@link NumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Byte and
    * Byte where the Byte gives the index of the dimensionality and the Byte
    * gives the corresponding value.
-   *
    * <p>
    * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
-   * <code>2 2 1.2 3 1.3</code><br>
-   * </p>
+   * <code>2 2 1.2 3 1.3</code>
    *
    * @return a String representation of this SparseByteVector
    */

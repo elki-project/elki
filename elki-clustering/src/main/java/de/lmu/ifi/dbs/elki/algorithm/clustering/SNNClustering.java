@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * Reference:
  * <p>
- * L. Ertöz, M. Steinbach, V. Kumar<br/>
+ * L. Ertöz, M. Steinbach, V. Kumar<br>
  * Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High
- * Dimensional Data.<br>
+ * Dimensional Data<br>
  * Proc. of SIAM Data Mining (SDM'03)
  *
  * @author Arthur Zimek
@@ -197,8 +197,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
   /**
    * DBSCAN-function expandCluster adapted to SNN criterion.
-   * <p/>
-   * <p/>
+   * <p>
    * Border-Objects become members of the first possible cluster.
    *
    * @param snnInstance shared nearest neighbors

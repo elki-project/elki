@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -296,36 +296,21 @@ public class ExportVisualizations implements ResultHandler {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the canvas ratio
-     * <p>
-     * Key: {@code -vis.ratio}
-     * </p>
-     * <p>
-     * Default value: 1.33
-     * </p>
      */
     public static final OptionID RATIO_ID = new OptionID("vis.ratio", "The width/heigh ratio of the output.");
 
     /**
      * Parameter to specify the output folder
-     * <p>
-     * Key: {@code -vis.output}
-     * </p>
      */
     public static final OptionID FOLDER_ID = new OptionID("vis.output", "The output folder.");
 
     /**
      * Parameter to specify the output format
-     * <p>
-     * Key: {@code -vis.format}
-     * </p>
      */
     public static final OptionID FORMAT_ID = new OptionID("vis.format", "File format. Note that some formats requrie additional libraries, only SVG and PNG are default.");
 
     /**
      * Parameter to specify the image width of pixel formats
-     * <p>
-     * Key: {@code -vis.width}
-     * </p>
      */
     public static final OptionID IWIDTH_ID = new OptionID("vis.width", "Image width for pixel formats.");
 

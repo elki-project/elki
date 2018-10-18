@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,16 +48,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
- *
+ * <p>
  * This is probably the fastest exact single-link algorithm currently in use.
- *
+ * <p>
  * Reference:
  * <p>
- * R. Sibson:<br />
- * SLINK: An optimally efficient algorithm for the single-link cluster method.
- * <br/>
+ * R. Sibson:<br>
+ * SLINK: An optimally efficient algorithm for the single-link cluster
+ * method<br>
  * In: The Computer Journal 16 (1973), No. 1, p. 30-34.
- * </p>
  *
  * @author Elke Achtert
  * @author Erich Schubert

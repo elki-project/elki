@@ -82,29 +82,16 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend
      * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-     * <p>
-     * Key: {@code -mtree.distancefunction}
-     * </p>
-     * <p>
-     * Default value:
-     * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
-     * </p>
      */
     public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
 
     /**
      * Parameter to specify the splitting strategy to construct the tree.
-     * <p>
-     * Key: {@code -mtree.split}
-     * </p>
      */
     public static final OptionID SPLIT_STRATEGY_ID = new OptionID("mtree.split", "Split strategy to use for constructing the M-tree.");
 
     /**
      * Parameter to specify the insertion strategy to construct the tree.
-     * <p>
-     * Key: {@code -mtree.insert}
-     * </p>
      */
     public static final OptionID INSERT_STRATEGY_ID = new OptionID("mtree.insert", "Insertion strategy to use for constructing the M-tree.");
 

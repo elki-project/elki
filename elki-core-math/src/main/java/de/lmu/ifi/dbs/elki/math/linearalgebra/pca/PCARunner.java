@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,11 +32,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Class to run PCA on given data.
- * 
+ * <p>
  * The various methods will start PCA at different places (e.g. with database
  * IDs, database query results, a precomputed covariance matrix or eigenvalue
  * decomposition).
- * 
+ * <p>
  * The runner can be parameterized by setting a covariance matrix builder (e.g.
  * to a weighted covariance matrix builder)
  * 
@@ -135,22 +135,12 @@ public class PCARunner {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for the PCA variant to use.
-     * 
-     * <p>
-     * Key: {@code -pca.variant}
-     * </p>
      */
     public static final OptionID PCARUNNER_ID = new OptionID("pca.variant", "The class to compute (filtered) PCA.");
 
     /**
      * Parameter to specify the class to compute the covariance matrix, must be
      * a subclass of {@link CovarianceMatrixBuilder}.
-     * <p>
-     * Default value: {@link CovarianceMatrixBuilder}
-     * </p>
-     * <p>
-     * Key: {@code -pca.covariance}
-     * </p>
      */
     public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance", "Class used to compute the covariance matrix.");
 

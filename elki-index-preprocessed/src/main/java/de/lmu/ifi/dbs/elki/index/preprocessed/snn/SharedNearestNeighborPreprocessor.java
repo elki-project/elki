@@ -170,26 +170,12 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
     /**
      * Parameter to indicate the number of neighbors to be taken into account
      * for the shared-nearest-neighbor similarity.
-     * <p/>
-     * <p>
-     * Default value: 1
-     * </p>
-     * <p>
-     * Key: {@code sharedNearestNeighbors}
-     * </p>
      */
     public static final OptionID NUMBER_OF_NEIGHBORS_ID = new OptionID("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
      * nearest neighbors.
-     * <p/>
-     * <p>
-     * Default value: {@link EuclideanDistanceFunction}
-     * </p>
-     * <p>
-     * Key: {@code SNNDistanceFunction}
-     * </p>
      */
     public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
 

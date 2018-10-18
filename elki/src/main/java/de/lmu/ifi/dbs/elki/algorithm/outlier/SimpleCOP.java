@@ -190,20 +190,13 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its COP_SCORE, must be an integer greater than
-     * 0.
-     * <p/>
-     * Key: {@code -cop.k}
-     * </p>
+     * considered for computing its COP_SCORE, must be an integer greater
+     * than 0.
      */
     public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
     /**
      * Parameter for the PCA runner class.
-     * 
-     * <p>
-     * Key: {@code -cop.pcarunner}
-     * </p>
      */
     public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
 

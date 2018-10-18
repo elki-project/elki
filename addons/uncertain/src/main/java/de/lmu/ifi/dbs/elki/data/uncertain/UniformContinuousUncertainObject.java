@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,13 +31,12 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 /**
  * Continuous uncertain object model using a uniform distribution on the
  * bounding box.
- *
+ * <p>
  * This is a continuous version of the U-Model in:
  * <p>
- * L. Antova, T. Jansen, C. Koch, D. Olteanu<br />
- * Fast and simple relational processing of uncertain data<br />
+ * L. Antova, T. Jansen, C. Koch, D. Olteanu<br>
+ * Fast and simple relational processing of uncertain data<br>
  * In IEEE 24th International Conference on Data Engineering (ICDE) 2008.
- * </p>
  *
  * @author Alexander Koos
  * @author Erich Schubert
@@ -76,7 +75,7 @@ public class UniformContinuousUncertainObject extends AbstractUncertainObject {
 
     for(int i = 0; i < dim; i++) {
       double w = bounds.getMax(i) - bounds.getMin(i);
-      assert(w < Double.POSITIVE_INFINITY);
+      assert (w < Double.POSITIVE_INFINITY);
       values[i] = rand.nextDouble() * w + bounds.getMin(i);
     }
     return DoubleVector.wrap(values);

@@ -1,8 +1,6 @@
 /**
- * <p>
  * Minkowski space L<sub>p</sub> norms such as the popular Euclidean and
- * Manhattan distances.
- * </p>
+ * Manhattan distances
  */
 /*
  * This file is part of ELKI:

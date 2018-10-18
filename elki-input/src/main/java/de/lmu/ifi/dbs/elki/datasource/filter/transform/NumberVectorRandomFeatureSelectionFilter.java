@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -116,25 +116,12 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
     /**
      * Parameter for the desired cardinality of the subset of attributes
      * selected for projection.
-     * 
-     * <p>
-     * Key: <code>-randomprojection.numberselected</code>
-     * </p>
-     * <p>
-     * Default: <code>1</code>
-     * </p>
-     * <p>
-     * Constraint: &ge;1
-     * </p>
      */
     public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = new OptionID("randomprojection.numberselected", "number of selected attributes");
 
     /**
      * Optional parameter to specify a seed for random projection. If unused,
      * system time is used as seed.
-     * <p>
-     * Key: {@code -randomprojection.seed}
-     * </p>
      */
     public static final OptionID SEED_ID = new OptionID("randomprojection.seed", "Seed for random selection of projection attributes.");
 
@@ -152,7 +139,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, 1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }

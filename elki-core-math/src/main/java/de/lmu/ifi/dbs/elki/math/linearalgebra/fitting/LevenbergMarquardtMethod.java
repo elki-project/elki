@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,28 +20,29 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 
 /**
  * Function parameter fitting using Levenberg-Marquardt method.
- * 
+ * <p>
  * The Levenberg-Marquardt Algorithm (LMA) is a combination of the Gauss-Newton
  * Algorithm (GNA) and the method of steepest descent. As such it usually gives
  * more stable results and better convergence.
- * 
- * Implemented loosely based on the book: <br />
- * Numerical Recipes In C: The Art Of Scientific Computing <br/>
- * ISBN 0-521-43108-5 <br/>
- * Press, W.H. and Teukolsky, S.A. and Vetterling, W.T. and Flannery, B.P. <br/>
+ * <p>
+ * Implemented loosely based on the book:<br>
+ * Numerical Recipes In C: The Art Of Scientific Computing<br>
+ * Press, W.H. and Teukolsky, S.A. and Vetterling, W.T. and Flannery, B.P.<br>
  * Cambridge University Press, Cambridge, Mass, 1992
- * 
+ * <p>
  * Due to their license, we cannot use their code, but we have to implement the
  * mathematics ourselves. We hope the loss in precision isn't too big.
- * 
- * TODO: Replace implementation by one based on <br/>
- * M.I.A. Lourakis levmar:<br />
+ * <p>
+ * TODO: Replace implementation by one based on<br>
+ * M.I.A. Lourakis levmar<br>
  * Levenberg-Marquardt nonlinear least squares algorithms in C/C++
- * 
+ * <p>
  * Which supposedly offers increased robustness.
  * 
  * @author Erich Schubert
@@ -184,7 +185,7 @@ public class LevenbergMarquardtMethod {
 
   /**
    * Compute new chisquared error
-   * 
+   * <p>
    * This function also modifies the alpha and beta matrixes!
    * 
    * @param curparams Parameters to use in computation.
@@ -193,13 +194,9 @@ public class LevenbergMarquardtMethod {
   private double simulateParameters(double[] curparams) {
     // Initialize alpha, beta
     for(int i = 0; i < numfit; i++) {
-      for(int j = 0; j < numfit; j++) {
-        alpha[i][j] = 0.0;
-      }
+      Arrays.fill(alpha[i], 0.);
     }
-    for(int i = 0; i < numfit; i++) {
-      beta[i] = 0.0;
-    }
+    Arrays.fill(beta, 0.);
 
     double newchisq = 0.0;
 
@@ -210,24 +207,20 @@ public class LevenbergMarquardtMethod {
       double sigma2inv = 1.0 / (s[di] * s[di]);
       double deltay = y[di] - res.y;
       // i2 and j2 are the indices that only count the params with dofit true!
-      int i2 = 0;
-      for(int i = 0; i < numfit; i++) {
+      for(int i = 0, i2 = 0; i < numfit; i++) {
         if(dofit[i]) {
           double wt = res.gradients[i] * sigma2inv;
-          int j2 = 0;
           // fill only half of the matrix, use symmetry below to complete the
           // remainder.
-          for(int j = 0; j <= i; j++) {
+          for(int j = 0, j2 = 0; j <= i; j++) {
             if(dofit[j]) {
-              alpha[i2][j2] += wt * res.gradients[j];
-              j2++;
+              alpha[i2][j2++] += wt * res.gradients[j];
             }
           }
-          beta[i2] = beta[i2] + deltay * wt;
-          i2++;
+          beta[i2++] += deltay * wt;
         }
       }
-      newchisq = newchisq + deltay * deltay * sigma2inv;
+      newchisq += deltay * deltay * sigma2inv;
     }
     // fill symmetric side of matrix
     for(int i = 1; i < numfit; i++) {
@@ -249,12 +242,6 @@ public class LevenbergMarquardtMethod {
       System.arraycopy(alpha[i], 0, covmat[i], 0, numfit);
       covmat[i][i] *= (1.0 + lambda);
     }
-    // System.out.println("Chisq: " + chisq);
-    // System.out.println("Lambda: " + lambda);
-    // System.out.print("beta: ");
-    // for (double d : beta)
-    // System.out.print(d + " ");
-    // System.out.println();
     // Solve the equation system (Gauss-Jordan)
     LinearEquationSystem ls = new LinearEquationSystem(covmat, beta);
     ls.solveByTotalPivotSearch();
@@ -263,15 +250,9 @@ public class LevenbergMarquardtMethod {
     // and deltaparams with the solution vector
     deltaparams = ls.getRHS();
     // deltaparams = beta;
-    // System.out.print("deltaparams: ");
-    // for (double d : deltaparams)
-    // System.out.print(d + " ");
-    // System.out.println();
-    int i2 = 0;
-    for(int i = 0; i < numparams; i++) {
+    for(int i = 0, i2 = 0; i < numparams; i++) {
       if(dofit[i]) {
-        paramstry[i] = params[i] + deltaparams[i2];
-        i2++;
+        paramstry[i] = params[i] + deltaparams[i2++];
       }
     }
     double newchisq = simulateParameters(paramstry);
@@ -279,7 +260,7 @@ public class LevenbergMarquardtMethod {
     if(newchisq < chisq) {
       // TODO: Do we need a larger limit than MIN_NORMAL?
       if(lambda * 0.1 > Double.MIN_NORMAL) {
-        lambda = lambda * 0.1;
+        lambda *= 0.1;
       }
       chisq = newchisq;
       // keep modified covmat as new alpha matrix
@@ -295,33 +276,25 @@ public class LevenbergMarquardtMethod {
       // Does it ever make sense to go as far up?
       // Anyway, this should prevent overflows.
       if(lambda * 10 < Double.MAX_VALUE) {
-        lambda = lambda * 10;
+        lambda *= 10;
       }
     }
   }
 
   /**
    * Get the final covariance matrix.
-   * 
+   * <p>
    * Parameters that were not to be optimized are filled with zeros.
    * 
    * @return covariance matrix for all parameters
    */
   public double[][] getCovmat() {
     // Since we worked only on params with dofit=true, we need to expand the
-    // matrix to cover all
-    // parameters.
+    // matrix to cover all parameters.
     double[][] fullcov = new double[numparams][numparams];
-    int i2 = 0;
-    for(int i = 0; i < numparams; i++) {
-      int j2 = 0;
-      for(int j = 0; j < numparams; j++) {
-        if(dofit[i] && dofit[j]) {
-          fullcov[i][j] = covmat[i2][j2];
-        }
-        else {
-          fullcov[i][j] = 0.0;
-        }
+    for(int i = 0, i2 = 0; i < numparams; i++) {
+      for(int j = 0, j2 = 0; j < numparams; j++) {
+        fullcov[i][j] = (dofit[i] && dofit[j]) ? covmat[i2][j2] : 0;
         if(dofit[j]) {
           j2++;
         }
@@ -355,20 +328,15 @@ public class LevenbergMarquardtMethod {
    * Iterate until convergence, at most 100 times.
    */
   public void run() {
-    int maxruns = this.maxruns;
-    int maxsmall = this.maxsmall;
-    while(maxruns > 0) {
-      double oldchi = getChiSq();
+    int maxruns = this.maxruns, maxsmall = this.maxsmall;
+    double oldchi = getChiSq();
+    while(maxruns-- > 0) {
       iterate();
-      --maxruns;
-      double newchi = getChiSq();
+      double newchi = getChiSq(), deltachi = newchi - oldchi;
+      oldchi = newchi;
       // stop condition: only a small improvement in Chi.
-      double deltachi = newchi - oldchi;
-      if(deltachi < 0 && deltachi > -small) {
-        --maxsmall;
-        if(maxsmall < 0) {
-          break;
-        }
+      if(deltachi < 0 && deltachi > -small && --maxsmall < 0) {
+        break;
       }
     }
   }

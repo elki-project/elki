@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -106,7 +106,8 @@ public class StratifiedCrossValidation extends AbstractHoldout {
     MultipleObjectsBundle test = new MultipleObjectsBundle();
     // Process column-wise.
     for(int c = 0, cs = bundle.metaLength(); c < cs; ++c) {
-      ArrayList<Object> tr = new ArrayList<>(trsize), te = new ArrayList<>(tesize);
+      ArrayList<Object> tr = new ArrayList<>(trsize);
+      ArrayList<Object> te = new ArrayList<>(tesize);
       for(int i = 0; i < bundle.dataLength(); ++i) {
         ((assignment[i] != fold) ? tr : te).add(bundle.data(i, c));
       }
@@ -145,7 +146,7 @@ public class StratifiedCrossValidation extends AbstractHoldout {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter nfoldP = new IntParameter(NFOLD_ID, N_DEFAULT)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(nfoldP)) {
         nfold = nfoldP.intValue();
       }

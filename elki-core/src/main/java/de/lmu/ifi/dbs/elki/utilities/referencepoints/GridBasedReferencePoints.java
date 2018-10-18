@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -128,18 +128,12 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
 
     /**
      * Parameter to specify the grid resolution.
-     * <p>
-     * Key: {@code -grid.size}
-     * </p>
      */
     public static final OptionID GRID_ID = new OptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
 
     /**
      * Parameter to specify the extra scaling of the space, to allow
      * out-of-data-space reference points.
-     * <p>
-     * Key: {@code -grid.oversize}
-     * </p>
      */
     public static final OptionID GRID_SCALE_ID = new OptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 

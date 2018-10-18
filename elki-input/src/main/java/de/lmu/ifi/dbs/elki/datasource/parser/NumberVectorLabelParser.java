@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -374,18 +374,11 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
      * A comma separated list of the indices of labels (may be numeric),
      * counting whitespace separated entries in a line starting with 0. The
      * corresponding entries will be treated as a label.
-     * <p>
-     * Key: {@code -parser.labelIndices}
-     * </p>
      */
     public static final OptionID LABEL_INDICES_ID = new OptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
     /**
      * Parameter to specify the type of vectors to produce.
-     * <p>
-     * Key: {@code -parser.vector-type}<br />
-     * Default: DoubleVector
-     * </p>
      */
     public static final OptionID VECTOR_TYPE_ID = new OptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
 

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -229,14 +229,6 @@ public class TooltipScoreVisualization implements VisFactory {
 
     /**
      * Parameter for the gamma-correction.
-     *
-     * <p>
-     * Key: {@code -tooltip.digits}
-     * </p>
-     *
-     * <p>
-     * Default value: 4
-     * </p>
      */
     public static final OptionID DIGITS_ID = new OptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
 

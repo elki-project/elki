@@ -36,9 +36,6 @@ public interface EigenPairFilter {
   /**
    * Parameter to specify the filter for determination of the strong and weak
    * eigenvectors, must be a subclass of {@link EigenPairFilter}.
-   * <p>
-   * Key: {@code -pca.filter}
-   * </p>
    */
   OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
 

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -125,9 +125,6 @@ public class ExternalIDFilter implements ObjectFilter {
     /**
      * Parameter that specifies the index of the label to be used as external
      * Id, starting at 0. Negative numbers are counted from the end.
-     * <p>
-     * Key: {@code -dbc.externalIdIndex}
-     * </p>
      */
     public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id. The first label is 0; negative indexes are relative to the end.");
 

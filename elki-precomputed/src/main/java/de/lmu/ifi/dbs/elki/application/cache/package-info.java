@@ -1,17 +1,19 @@
 /**
- * <p>Utility applications for the persistence layer such as distance cache builders.
- * </p>
- * 
- * {@link de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix} and
+ * Utility applications for the persistence layer such as distance cache
+ * builders.
+ * <p>
+ * {@link de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix}
+ * and
  * {@link de.lmu.ifi.dbs.elki.application.cache.CacheFloatDistanceInOnDiskMatrix}
- * are conversion utilities that materialize an arbitrary distance into a binary distance
- * cache on the harddisk (using {@link de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix})
+ * are conversion utilities that materialize an arbitrary distance into a binary
+ * distance cache on the harddisk (using
+ * {@link de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix})
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

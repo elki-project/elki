@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 
 /**
  * Parameter class for a parameter specifying an enum type.
- * 
  * <p>
  * Usage:
  * 
@@ -54,10 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, true);
  * 
  * if(config.grab(param)) {
- * myEnumParameter = param.getValue();
+ *   myEnumParameter = param.getValue();
  * }
- * 
- * </p>
+ * </pre>
  * 
  * @author Florian Nuecke
  * @since 0.4.0
@@ -65,7 +63,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @param <E> Enum type
  */
 public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumParameter<E>, E> {
-
   /**
    * Reference to the actual enum type, for T.valueOf().
    */

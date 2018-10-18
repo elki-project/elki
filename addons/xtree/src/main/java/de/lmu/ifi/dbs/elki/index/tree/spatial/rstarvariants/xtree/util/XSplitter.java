@@ -383,7 +383,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    */
   private IntIterator getCommonSplitDimensions(N node) {
     Collection<SplitHistory> splitHistories = new ArrayList<>(node.getNumEntries());
-    for (int i = 0; i < node.getNumEntries(); i++) {
+    for(int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
       if(!(entry instanceof XTreeDirectoryEntry)) {
         throw new RuntimeException("Wrong entry type to derive split dimension from: " + entry.getClass().getName());
@@ -394,13 +394,10 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * <p>
    * Get the dimension with the minimum surface sum.
-   * </p>
    * <p>
    * This is done by calculating every possible split in each given dimension
    * and the sum of surfaces of all splits for every dimension.
-   * </p>
    * 
    * @param dimensionIterable The dimensions that should be tested
    * @param minEntries Minimum number of entries in each sub group; in case of a
@@ -698,13 +695,10 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * <p>
    * Perform a topological (R*-Tree) split of a list of node entries.
-   * </p>
    * <p>
    * Only distributions that have between <code>m</code> and <code>M-m+1</code>
    * entries in the first group will be tested.
-   * </p>
    * 
    * @see "Beckmann, Kriegel, Schneider, Seeger: The R*-tree: An Efficient and
    *      Robust Access Method for Points and Rectangles, ACM SIGMOD Int. Conf.

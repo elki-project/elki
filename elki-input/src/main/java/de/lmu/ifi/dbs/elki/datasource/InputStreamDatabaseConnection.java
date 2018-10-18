@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -165,9 +165,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
     /**
      * Input stream to read.
      * <p>
-     * Key: {@code -dbc.inputstream}
-     * </p>
-     * 
      * Note that this parameter is not used by the subclass
      * {@link FileBasedDatabaseConnection}. It is mostly useful with the
      * Parameterization API from java.

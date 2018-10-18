@@ -1,13 +1,13 @@
 /**
- * <p>Helper classes for the {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE CLIQUE} algorithm.</p>
- * 
- * 
+ * Helper classes for the
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE CLIQUE}
+ * algorithm.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

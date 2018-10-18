@@ -125,17 +125,11 @@ public class OutlierThresholdClustering implements Evaluator {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify a scaling function to use.
-     * <p>
-     * Key: {@code -thresholdclust.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("thresholdclust.scaling", "Class to use as scaling function.");
 
     /**
      * Parameter to specify the threshold
-     * <p>
-     * Key: {@code -thresholdclust.threshold}
-     * </p>
      */
     public static final OptionID THRESHOLD_ID = new OptionID("thresholdclust.threshold", "Threshold(s) to apply.");
 

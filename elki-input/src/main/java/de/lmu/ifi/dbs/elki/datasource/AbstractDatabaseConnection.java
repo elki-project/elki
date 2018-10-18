@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -133,17 +133,11 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Filters to apply to the input data.
-     * <p>
-     * Key: {@code -dbc.filter}
-     * </p>
      */
     public static final OptionID FILTERS_ID = new OptionID("dbc.filter", "The filters to apply to the input data.");
 
     /**
      * Parameter to specify the parser to provide a database.
-     * <p>
-     * Key: {@code -dbc.parser}
-     * </p>
      */
     public static final OptionID PARSER_ID = new OptionID("dbc.parser", "Parser to provide the database.");
 

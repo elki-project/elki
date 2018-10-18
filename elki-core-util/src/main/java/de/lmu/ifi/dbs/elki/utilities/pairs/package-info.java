@@ -1,19 +1,23 @@
 /**
- * <p>Pairs utility classes.</p>
- * 
+ * Pairs utility classes
+ * <p>
  * A number of commonly needed primitive pairs are the following:
  * <ul>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair IntIntPair} storing two <code>int</code> values</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair DoubleIntPair} storing one <code>double</code> and one <code>int</code> value.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair IntDoublePair} storing one <code>int</code> and one <code>double</code> value.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair DoubleDoublePair} storing two <code>double</code> values</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair IntIntPair} storing
+ * two <code>int</code> values</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair DoubleIntPair}
+ * storing one <code>double</code> and one <code>int</code> value.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair IntDoublePair}
+ * storing one <code>int</code> and one <code>double</code> value.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair
+ * DoubleDoublePair} storing two <code>double</code> values</li>
  * </ul>
- * 
  * Why no more {@code Pair<A,B>}?
  * <ul>
  * <li>Because such pairs are expensive in Java when using primitive types.</li>
- * <li>Because domain-specific code can often be optimized better by the HotSpot VM.</li>
- * </ul> 
+ * <li>Because domain-specific code can often be optimized better by the HotSpot
+ * VM.</li>
+ * </ul>
  * 
  * @apiviz.exclude java.lang.
  */
@@ -21,7 +25,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

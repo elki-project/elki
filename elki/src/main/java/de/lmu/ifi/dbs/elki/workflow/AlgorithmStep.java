@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * Holds the algorithm to run.
    */
-  private List<Algorithm> algorithms;
+  private List<? extends Algorithm> algorithms;
 
   /**
    * The algorithm output
@@ -70,7 +70,7 @@ public class AlgorithmStep implements WorkflowStep {
    *
    * @param algorithms
    */
-  public AlgorithmStep(List<Algorithm> algorithms) {
+  public AlgorithmStep(List<? extends Algorithm> algorithms) {
     super();
     this.algorithms = algorithms;
   }
@@ -144,21 +144,15 @@ public class AlgorithmStep implements WorkflowStep {
     /**
      * Holds the algorithm to run.
      */
-    protected List<Algorithm> algorithms;
+    protected List<? extends Algorithm> algorithms;
 
     /**
      * Flag to allow verbose messages while running the application.
-     * <p>
-     * Key: {@code -time}
-     * </p>
      */
     public static final OptionID TIME_ID = new OptionID("time", "Enable logging of runtime data. Do not combine with more verbose logging, since verbose logging can significantly impact performance.");
 
     /**
      * Parameter to specify the algorithm to run.
-     * <p>
-     * Key: {@code -algorithm}
-     * </p>
      */
     public static final OptionID ALGORITHM_ID = AbstractAlgorithm.ALGORITHM_ID;
 

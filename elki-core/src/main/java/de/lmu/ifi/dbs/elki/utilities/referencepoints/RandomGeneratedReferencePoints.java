@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -108,26 +108,17 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the number of requested reference points.
-     * <p>
-     * Key: {@code -generate.n}
-     * </p>
      */
     public static final OptionID N_ID = new OptionID("generate.n", "The number of reference points to be generated.");
 
     /**
      * Parameter for additional scaling of the space, to allow out-of-space
      * reference points.
-     * <p>
-     * Key: {@code -generate.scale}
-     * </p>
      */
     public static final OptionID SCALE_ID = new OptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
     /**
      * Parameter to specify the sample size.
-     * <p>
-     * Key: {@code -generate.random}
-     * </p>
      */
     public static final OptionID RANDOM_ID = new OptionID("generate.random", "Random generator seed.");
 
@@ -151,13 +142,13 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
       super.makeOptions(config);
 
       IntParameter samplesizeP = new IntParameter(N_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.getValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }

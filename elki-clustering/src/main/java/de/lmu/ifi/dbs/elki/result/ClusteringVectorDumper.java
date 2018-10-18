@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,11 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
- * <p>
- * Class to output a clustering result in a simple and compact ascii format:
+ * Output a clustering result in a simple and compact ascii format:
  * whitespace separated cluster indexes
- * </p>
- * 
+ * <p>
  * This format can be read using {@link ClusteringVectorParser} for meta
  * analysis, or read as clustering using
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering}.

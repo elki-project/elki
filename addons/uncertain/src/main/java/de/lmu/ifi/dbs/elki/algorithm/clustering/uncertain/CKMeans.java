@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * S. D. Lee, B. Kao, R. Cheng<br>
  * Reducing UK-means to K-means<br>
  * ICDM Data Mining Workshops, 2007
- * </p>
+ * <p>
  * and was shown to be equivalent to UK-Means.
  * <p>
  * In summary, the expected distance used by UK-Means can be decomposed using

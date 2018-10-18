@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,10 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
- * <p>
  * Parser to project the ParsingResult obtained by a suitable base parser onto a
  * selected subset of attributes.
- * </p>
  * 
  * @author Arthur Zimek
  * @since 0.5.5
@@ -81,10 +79,8 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
   }
 
   /**
-   * <p>
    * Sets the bits set to true in the given BitSet as selected attributes in
    * {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
-   * </p>
    * 
    * @param selectedAttributes the new selected attributes
    */
@@ -121,9 +117,6 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Selected attributes parameter.
-     * <p>
-     * Key: <code>-projectionfilter.selectedattributes</code>
-     * </p>
      */
     public static final OptionID SELECTED_ATTRIBUTES_ID = FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID;
 

@@ -351,19 +351,11 @@ public class ColoredHistogramVisualizer implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag to specify the "curves" rendering style.
-     *
-     * <p>
-     * Key: {@code -histogram.curves}
-     * </p>
      */
     public static final OptionID STYLE_CURVES_ID = new OptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
 
     /**
      * Parameter to specify the number of bins to use in histogram.
-     *
-     * <p>
-     * Key: {@code -projhistogram.bins} Default: 80
-     * </p>
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("projhistogram.bins", "Number of bins in the distribution histogram");
 

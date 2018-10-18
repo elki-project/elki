@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
- * Normalization designed for data with a <em>meaningful zero</em>:<br />
+ * Normalization designed for data with a <em>meaningful zero</em>:<br>
  * The 0 is retained, and the data is linearly scaled to have a mean of 1,
  * by projection with f(x) = x / mean(X).
- * 
+ * <p>
  * Each attribute is processed separately.
  * 
  * @author Erich Schubert

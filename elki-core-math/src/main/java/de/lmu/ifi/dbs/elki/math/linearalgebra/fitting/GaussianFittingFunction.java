@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ import net.jafama.FastMath;
 
 /**
  * Gaussian function for parameter fitting
- * 
- * Based loosely on fgauss in the book "Numerical Recipies". <br />
+ * <p>
+ * Based loosely on fgauss in the book "Numerical Recipies".<br>
  * We did not bother to implement all optimizations at the benefit of having
  * easier to use parameters. Instead of position, amplitude and width used in
  * the book, we use the traditional Gaussian parameters mean, standard deviation
@@ -34,24 +34,15 @@ import net.jafama.FastMath;
  * distributions) The cost are some additional computations such as a square
  * root and probably a slight loss in precision. This could of course have been
  * handled by an appropriate wrapper instead.
- * 
+ * <p>
  * Due to their license, we cannot use their code, but we have to implement the
  * mathematics ourselves. We hope the loss in precision isn't big.
- * 
+ * <p>
  * They are also arranged differently: the book uses
- * 
- * <pre>
- * amplitude, position, width
- * </pre>
- * 
- * whereas we use
- * 
- * <pre>
- * mean, stddev, scaling
- * </pre>
- * 
+ * <code>amplitude, position, width</code> whereas we use
+ * <code>mean, stddev, scaling</code>.<br>
  * But we're obviously using essentially the same mathematics.
- * 
+ * <p>
  * The function also can use a mixture of gaussians, just use an appropriate
  * number of parameters (which obviously needs to be a multiple of 3)
  * 
@@ -65,7 +56,7 @@ public class GaussianFittingFunction implements FittingFunction {
   public static final GaussianFittingFunction STATIC = new GaussianFittingFunction();
 
   /**
-   * compute the mixture of Gaussians at the given position
+   * Compute the mixture of Gaussians at the given position
    */
   @Override
   public FittingFunctionResult eval(double x, double[] params) {
@@ -81,7 +72,7 @@ public class GaussianFittingFunction implements FittingFunction {
     // Numerical Recipes in C: The Art of Scientific Computing
     // Due to their license, we cannot use their code, but we have to implement
     // the mathematics ourselves. We hope the loss in precision is not too big.
-    for (int i = 0; i < params.length; i += 3) {
+    for(int i = 0; i < params.length; i += 3) {
       // Standardized Gaussian parameter (centered, scaled by stddev)
       double stdpar = (x - params[i]) / params[i + 1];
       double e = FastMath.exp(-.5 * stdpar * stdpar);

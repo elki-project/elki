@@ -1,7 +1,6 @@
 /**
- * <p>
  * Greedy ensembles for outlier detection.
- * </p>
+ * <p>
  * This package contains code used for the greedy ensemble experiment in
  * <blockquote>
  * Erich Schubert, Remigius Wojdanowski, Arthur Zimek, Hans-Peter Kriegel<br>

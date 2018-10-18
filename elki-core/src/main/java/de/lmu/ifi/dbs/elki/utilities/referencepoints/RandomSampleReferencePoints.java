@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -92,17 +92,11 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the sample size.
-     * <p>
-     * Key: {@code -sample.n}
-     * </p>
      */
     public static final OptionID N_ID = new OptionID("sample.n", "The number of samples to draw.");
 
     /**
      * Parameter to specify the sample size.
-     * <p>
-     * Key: {@code -sample.random}
-     * </p>
      */
     public static final OptionID RANDOM_ID = new OptionID("sample.random", "Random generator seed.");
 
@@ -120,7 +114,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter samplesizeP = new IntParameter(N_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.intValue();
       }

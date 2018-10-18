@@ -53,8 +53,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * <p>
  * Reference:
  * <p>
- * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
- * Outlier Detection in Arbitrarily Oriented Subspaces<br />
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br>
+ * Outlier Detection in Arbitrarily Oriented Subspaces<br>
  * Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)
  *
  * @author Erich Schubert

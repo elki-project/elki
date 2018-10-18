@@ -33,19 +33,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Splitting algorithm using the minimum spanning tree (MST), as proposed by the
  * Slim-Tree variant.
- *
+ * <p>
  * Unfortunately, the slim-tree paper does not detail how to choose the "most
  * appropriate edge from the longest ones" (to find a more balanced split), so
  * we try to longest 50%, and keep the choice which yields the most balanced
  * split. This seems to work quite well.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Traina Jr., A. J. M. Traina, B. Seeger, C. Faloutsos<br/>
+ * C. Traina Jr., A. J. M. Traina, B. Seeger, C. Faloutsos<br>
  * Slim-Trees: High Performance Metric Trees Minimizing Overlap Between
- * Nodes<br/>
+ * Nodes<br>
  * Int. Conf. Extending Database Technology (EDBT'2000)
- * </p>
  *
  * @author Erich Schubert
  *

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,18 +64,16 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Uncertain K-Means clustering, using the average deviation from the center.
- *
+ * <p>
  * Note: this method is, essentially, superficial. It was shown to be equivalent
  * to doing regular K-means on the object centroids instead (see {@link CKMeans}
  * for the reference and an implementation). This is only for completeness.
- *
+ * <p>
  * Reference:
  * <p>
- * M. Chau, R. Cheng, B. Kao, J. Ng<br />
- * Uncertain data mining: An example in clustering location data<br />
- * Proc. of the 10th Pacific-Asia Conference on Knowledge Discovery and Data
- * Mining (PAKDD 2006)
- * </p>
+ * M. Chau, R. Cheng, B. Kao, J. Ng<br>
+ * Uncertain data mining: An example in clustering location data<br>
+ * Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD)
  *
  * @author Klaus Arthur Schmidt
  * @since 0.7.0

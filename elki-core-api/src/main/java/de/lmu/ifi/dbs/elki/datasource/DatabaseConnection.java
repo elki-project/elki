@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 
 /**
  * DatabaseConnection is used to load data into a database.
- * <p/>
+ * <p>
  * A database connection is to manage the input and for a database where
  * algorithms can run on. An implementation may either use a parser to parse a
  * sequential file or piped input and provide a file based database or provide

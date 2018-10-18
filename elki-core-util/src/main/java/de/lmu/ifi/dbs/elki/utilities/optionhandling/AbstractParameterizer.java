@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,10 +87,10 @@ public abstract class AbstractParameterizer implements Parameterizer {
   /**
    * Method to configure a class, then instantiate when the configuration step
    * was successful.
-   * 
-   * <b>Don't call this directly use unless you know what you are doing. <br />
+   * <p>
+   * <b>Don't call this directly use unless you know what you are doing.<br>
    * Instead, use {@link Parameterization#tryInstantiate(Class)}!</b>
-   * 
+   * <p>
    * Otherwise, {@code null} will be returned, and the resulting errors can be
    * retrieved from the {@link Parameterization} parameter object. In general,
    * you should be checking the {@link Parameterization} object for errors
@@ -107,10 +107,7 @@ public abstract class AbstractParameterizer implements Parameterizer {
     state = STATE_INIT;
 
     Object owner = this.getClass().getDeclaringClass();
-    if(owner == null) {
-      owner = this;
-    }
-    config = config.descend(owner);
+    config = config.descend(owner == null ? this : owner);
     makeOptions(config);
 
     if(!config.hasErrors()) {

@@ -550,10 +550,6 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
        * Random number generator seed.
-       *
-       * <p>
-       * Key: {@code -knngraph.seed}
-       * </p>
        */
       public static final OptionID SEED_ID = new OptionID("knngraph.seed", "The random number seed.");
 

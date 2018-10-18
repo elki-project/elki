@@ -26,17 +26,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Generalized hyperplane entry distribution strategy of the M-tree.
- *
+ * <p>
  * This strategy does not produce balanced trees, but often produces faster
  * access times, according to the original publication.
- *
+ * <p>
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br>
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br>
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
  *
  * @author Erich Schubert
  */

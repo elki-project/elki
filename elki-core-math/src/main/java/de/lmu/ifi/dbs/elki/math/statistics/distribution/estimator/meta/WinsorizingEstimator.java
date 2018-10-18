@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,13 +42,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * values, they are instead replaced with the cutoff value. This keeps the
  * quantity of the data the same, and will have a lower impact on variance and
  * similar measures.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. Hastings, F. Mosteller, J. W. Tukey, C. P. Winsor<br />
- * Low moments for small samples: a comparative study of order statistics.<br />
+ * C. Hastings, F. Mosteller, J. W. Tukey, C. P. Winsor<br>
+ * Low moments for small samples: a comparative study of order statistics.<br>
  * The Annals of Mathematical Statistics, 18(3) *
- * </p>
  * 
  * @author Erich Schubert
  * @since 0.6.0

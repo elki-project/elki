@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -104,7 +104,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       return run(database.getRelation(getInputTypeRestriction()[0]));
     }
   }
-  
+
   /**
    * Run the algorithm
    * 
@@ -138,15 +138,9 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * The pattern to match outliers with.
-     * 
-     * <p>
-     * Default value: .*(Outlier|Noise).*
-     * </p>
-     * <p>
-     * Key: {@code -outlier.pattern}
-     * </p>
      */
     public static final OptionID OUTLIER_PATTERN_ID = new OptionID("outlier.pattern", "Label pattern to match outliers.");
+
     /**
      * Stores the "outlier" class.
      */

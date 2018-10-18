@@ -259,25 +259,16 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the number of instances to use in the ensemble.
-     * <p>
-     * Key: {@code -fbagging.num}
-     * </p>
      */
     public static final OptionID NUM_ID = new OptionID("fbagging.num", "The number of instances to use in the ensemble.");
 
     /**
      * The flag for using the breadth first approach.
-     * <p>
-     * Key: {@code -fbagging.breadth}
-     * </p>
      */
     public static final OptionID BREADTH_ID = new OptionID("fbagging.breadth", "Use the breadth first combinations instead of the cumulative sum approach");
 
     /**
      * The parameter to specify the random seed.
-     * <p>
-     * Key: {@code -fbagging.seed}
-     * </p>
      */
     public static final OptionID SEED_ID = new OptionID("fbagging.seed", "Specify a particular random seed.");
 

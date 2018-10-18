@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -221,10 +221,6 @@ public class TreeMBRVisualization implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
-     *
-     * <p>
-     * Key: {@code -index.fill}
-     * </p>
      */
     public static final OptionID FILL_ID = new OptionID("index.fill", "Partially transparent filling of index pages.");
 

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -77,11 +77,6 @@ public class InputStep implements WorkflowStep {
 
     /**
      * Option ID to specify the database type
-     * 
-     * Key:
-     * <p>
-     * {@code -db}
-     * </p>
      */
     public static final OptionID DATABASE_ID = AbstractApplication.Parameterizer.DATABASE_ID;
 
@@ -89,7 +84,7 @@ public class InputStep implements WorkflowStep {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if (config.grab(dbP)) {
+      if(config.grab(dbP)) {
         database = dbP.instantiateClass(config);
       }
     }

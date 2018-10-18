@@ -1,24 +1,21 @@
 /**
  * 3DPC: 3D parallel coordinate plot visualization for ELKI.
- * 
+ * <p>
  * This is an add-on module. Details were published as:
- * 
+ * <p>
  * Reference:
  * <p>
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
- * Proceedings of the 2013 ACM International Conference on Management of Data (SIGMOD), New York City, NY, 2013.
- * </p>
- * 
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek<br>
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
+ * Proc. of the 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
+ * <p>
  * For further information, visit also: http://elki.dbs.ifi.lmu.de/wiki/3DPC
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

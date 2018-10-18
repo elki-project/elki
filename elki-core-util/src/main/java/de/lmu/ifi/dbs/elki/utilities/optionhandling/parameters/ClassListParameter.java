@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -198,7 +198,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    * Returns a list of new instances for the value (i.e., the class name) of
    * this class list parameter. The instances have the type of the restriction
    * class of this class list parameter.
-   * <p/>
+   * <p>
    * If the Class for the class names is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    *

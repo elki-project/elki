@@ -139,9 +139,6 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
   public static class Parameterizer<V extends FeatureVector<F>, F> extends AbstractParameterizer {
     /**
      * Selected attributes parameter.
-     * <p>
-     * Key: <code>-projectionfilter.selectedattributes</code>
-     * </p>
      */
     public static final OptionID SELECTED_ATTRIBUTES_ID = new OptionID("projectionfilter.selectedattributes", "a comma separated array of integer values d_i, where 0 <= d_i < the dimensionality of the feature space specifying the dimensions to be considered for projection. If this parameter is not set, no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
 

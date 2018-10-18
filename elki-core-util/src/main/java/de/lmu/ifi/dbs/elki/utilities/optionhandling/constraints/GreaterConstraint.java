@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 public class GreaterConstraint extends AbstractNumberConstraint {
   /**
    * Creates a Greater-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the number parameter has to be greater than the given
    * constraint value.
    * 
@@ -47,7 +47,7 @@ public class GreaterConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Greater-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the number parameter has to be greater than the given
    * constraint value.
    * 
@@ -59,7 +59,7 @@ public class GreaterConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Greater-Than-Number parameter constraint.
-   * <p/>
+   * <p>
    * That is, the value of the number parameter has to be greater than the given
    * constraint value.
    * 
@@ -76,7 +76,7 @@ public class GreaterConstraint extends AbstractNumberConstraint {
    */
   @Override
   public void test(Number t) throws ParameterException {
-    if (t.doubleValue() <= constraintValue.doubleValue()) {
+    if(t.doubleValue() <= constraintValue.doubleValue()) {
       throw new WrongParameterValueException("Parameter Constraint Error:\n" + "The parameter value specified has to be greater than " + constraintValue.toString() + ". (current value: " + t.doubleValue() + ")\n");
     }
   }

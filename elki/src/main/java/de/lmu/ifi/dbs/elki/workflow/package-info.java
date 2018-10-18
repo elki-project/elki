@@ -1,11 +1,11 @@
 /**
- * <p>Work flow packages, e.g. following the usual KDD model, closely related to CRISP-DM</p>
+ * Work flow packages, e.g., following the usual KDD model.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

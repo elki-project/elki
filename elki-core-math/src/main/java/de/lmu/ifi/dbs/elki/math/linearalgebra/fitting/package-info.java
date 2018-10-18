@@ -1,13 +1,13 @@
 /**
- * <p>Function to numerically fit a function (such as a
- * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction Gaussian distribution}
- * to given data.</p>
+ * Function to numerically fit a function (such as a
+ * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction
+ * Gaussian distribution}) to given data.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

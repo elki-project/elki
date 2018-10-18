@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,13 +55,12 @@ import net.jafama.FastMath;
 
 /**
  * DOC is a sampling based subspace clustering algorithm.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali<br />
- * A Monte Carlo algorithm for fast projective clustering. <br />
+ * C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali<br>
+ * A Monte Carlo algorithm for fast projective clustering<br>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02).
- * </p>
  * 
  * @author Florian Nuecke
  * @since 0.6.0
@@ -141,7 +140,8 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     int n = (int) (2. / alpha);
     // Inner loop count.
     int m = (int) (FastMath.pow(2. / alpha, r) * FastMath.log(4));
-    m = Math.min(m, Math.min(1000000, d * d)); // TODO: This should only apply for FastDOC.
+    m = Math.min(m, Math.min(1000000, d * d)); // TODO: This should only apply
+                                               // for FastDOC.
 
     // Minimum size for a cluster for it to be accepted.
     int minClusterSize = (int) (alpha * S.size());

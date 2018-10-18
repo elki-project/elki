@@ -1,5 +1,5 @@
 /**
- * <p>Data filtering, in particular for normalization and projection.</p> 
+ * Data filtering, in particular for normalization and projection
  *
  * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter\.(normalization|transform)\.*
@@ -8,7 +8,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

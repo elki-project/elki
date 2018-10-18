@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,18 +27,17 @@ import net.jafama.FastMath;
 
 /**
  * Normalized Discounted Cumulative Gain.
- *
+ * <p>
  * This evaluation metric would be able to use relevance information, but the
  * current implementation is for binary labels only (it is easy to add, but
  * requires API additions or changes).
- *
+ * <p>
  * Reference:
  * <p>
- * K. Järvelin, J. Kekäläinen<br />
- * Cumulated gain-based evaluation of IR techniques<br />
+ * K. Järvelin, J. Kekäläinen<br>
+ * Cumulated gain-based evaluation of IR techniques<br>
  * ACM Transactions on Information Systems (TOIS)
- * </p>
- * 
+ * <p>
  * TODO: support weighted ground truth.
  *
  * @author Erich Schubert
@@ -62,7 +61,7 @@ public class NDCGEvaluation implements ScoreEvaluation {
   @Override
   public double expected(int pos, int all) {
     // Expected value: every rank is positive with probability pos/all.
-    final double rdcg =  DCGEvaluation.sumInvLog1p(1, all) * pos / (double) all;
+    final double rdcg = DCGEvaluation.sumInvLog1p(1, all) * pos / (double) all;
     // Optimum value:
     final double idcg = DCGEvaluation.sumInvLog1p(1, pos);
     return rdcg / idcg; // log(2) base would disappear

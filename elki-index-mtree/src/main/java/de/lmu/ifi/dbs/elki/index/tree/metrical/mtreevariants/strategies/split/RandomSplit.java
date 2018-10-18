@@ -36,17 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
  * routing objects are chosen according to the RANDOM strategy.
- *
+ * <p>
  * Note: only the routing objects are chosen at random, this is not a random
  * assignment!
- *
+ * <p>
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br>
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br>
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
  *
  * @author Elke Achtert
  * @since 0.2

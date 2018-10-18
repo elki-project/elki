@@ -35,14 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * MTree is a metrical index structure based on the concepts of the M-Tree.
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure. Persistence is not yet ensured.
- * 
+ * <p>
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br>
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br>
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
  * 
  * @author Elke Achtert
  * @since 0.1

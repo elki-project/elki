@@ -198,9 +198,6 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the name of the distance matrix file.
-     * <p>
-     * Key: {@code -distance.matrix}
-     * </p>
      */
     public static final OptionID MATRIX_ID = FileBasedSparseDoubleDistanceFunction.Parameterizer.MATRIX_ID;
 
@@ -208,9 +205,6 @@ public class FileBasedSparseFloatDistanceFunction extends AbstractDBIDRangeDista
      * Optional parameter to specify the parsers to provide a database, must
      * extend {@link DistanceParser}. If this parameter is not set,
      * {@link AsciiDistanceParser} is used as parser for all input files.
-     * <p>
-     * Key: {@code -distance.parser}
-     * </p>
      */
     public static final OptionID PARSER_ID = FileBasedSparseDoubleDistanceFunction.Parameterizer.PARSER_ID;
 

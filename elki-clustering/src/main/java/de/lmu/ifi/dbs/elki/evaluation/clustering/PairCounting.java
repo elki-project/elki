@@ -236,7 +236,6 @@ public class PairCounting {
    * B. Mirkin<br>
    * Mathematical Classification and Clustering<br>
    * Nonconvex Optimization and Its Applications
-   * </p>
    *
    * @return The Mirkin index
    */

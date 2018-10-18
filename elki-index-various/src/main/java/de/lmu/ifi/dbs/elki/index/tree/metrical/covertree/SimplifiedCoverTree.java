@@ -54,18 +54,17 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * data structure that is similar to the M-tree, but not as balanced and
  * disk-oriented. However, by not having these requirements it does not require
  * the expensive splitting procedures of M-tree.
- *
+ * <p>
  * This version does not store the distance to the parent, so it needs only
  * about 40% of the memory of {@link CoverTree} but does more distance
  * computations for search.
- *
+ * <p>
  * Reference:
  * <p>
- * A. Beygelzimer, S. Kakade, J. Langford<br />
- * Cover trees for nearest neighbor<br />
+ * A. Beygelzimer, S. Kakade, J. Langford<br>
+ * Cover trees for nearest neighbor<br>
  * In Proc. 23rd International Conference on Machine Learning (ICML).
- * </p>
- *
+ * <p>
  * TODO: allow insertions and removals, as in the original publication.
  *
  * @author Erich Schubert
@@ -75,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * @apiviz.has CoverTreeKNNQuery
  */
 @Priority(Priority.RECOMMENDED)
-public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
+public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
@@ -142,7 +141,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
      * @param singletons Singletons.
      */
     public Node(DBIDRef r, double maxDist, DoubleDBIDList singletons) {
-      assert(!singletons.contains(r));
+      assert (!singletons.contains(r));
       this.singletons = DBIDUtil.newArray(singletons.size() + 1);
       this.singletons.add(r);
       this.singletons.addDBIDs(singletons);
@@ -183,7 +182,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     if(ids.size() == 0) {
       return;
     }
-    assert(root == null) : "Tree already initialized.";
+    assert (root == null) : "Tree already initialized.";
     DBIDIter it = ids.iter();
     DBID first = DBIDUtil.deref(it);
     // Compute distances to all neighbors:
@@ -196,7 +195,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Bulk-load the cover tree.
-   *
+   * <p>
    * This bulk-load is slightly simpler than the one used in the original
    * cover-tree source: We do not look back into the "far" set of candidates.
    *
@@ -206,7 +205,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    * @return Root node of subtree
    */
   protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
-    assert(!elems.contains(cur));
+    assert (!elems.contains(cur));
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
     final int nextScale = scale - 1;
@@ -234,11 +233,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     final double fmax = scaleToDist(nextScale);
     // Build additional cover nodes:
     for(DoubleDBIDListIter it = candidates.iter(); it.valid();) {
-      assert(it.getOffset() == 0);
+      assert (it.getOffset() == 0);
       DBID t = DBIDUtil.deref(it);
       elems.clear(); // Recycle.
       collectByCover(it, candidates, fmax, elems);
-      assert(DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
+      assert (DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
       if(elems.size() == 0) { // Singleton
         node.singletons.add(it);
       }
@@ -248,7 +247,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       }
       candidates.removeSwap(0);
     }
-    assert(candidates.size() == 0);
+    assert (candidates.size() == 0);
     // Routing object is not yet handled:
     if(curSingleton) {
       if(node.isLeaf()) {
@@ -280,7 +279,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert(!cur.children.isEmpty()) : "Empty childs list.";
+      assert (!cur.children.isEmpty()) : "Empty childs list.";
     }
   }
 
@@ -323,7 +322,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O>implements RangeQuery<O> {
+  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
     /**
      * Constructor.
      *
@@ -374,7 +373,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    *
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O>implements KNNQuery<O> {
+  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
     /**
      * Constructor.
      *

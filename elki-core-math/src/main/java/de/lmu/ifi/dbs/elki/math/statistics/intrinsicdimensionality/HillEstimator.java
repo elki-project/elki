@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,13 +28,12 @@ import net.jafama.FastMath;
 /**
  * Hill estimator of the intrinsic dimensionality (maximum likelihood estimator
  * for ID).
- *
+ * <p>
  * Reference:
  * <p>
- * B. M. Hill<br />
- * A simple general approach to inference about the tail of a distribution<br />
+ * B. M. Hill<br>
+ * A simple general approach to inference about the tail of a distribution<br>
  * The annals of statistics 3(5)
- * </p>
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert

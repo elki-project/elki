@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,10 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Abstract class as a convenience for different biclustering approaches.
- * <p/>
+ * <p>
  * The typically required values describing submatrices are computed using the
  * corresponding values within a database of NumberVectors.
- * <p/>
+ * <p>
  * The database is supposed to present a data matrix with a row representing an
  * entry ({@link NumberVector}), a column representing a dimension (attribute)
  * of the {@link NumberVector}s.
@@ -90,10 +90,10 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Prepares the algorithm for running on a specific database.
-   * <p/>
+   * <p>
    * Assigns the database, the row ids, and the col ids, then calls
    * {@link #biclustering()}.
-   * <p/>
+   * <p>
    * Any concrete algorithm should be implemented within method
    * {@link #biclustering()} by an inheriting biclustering approach.
    *
@@ -110,10 +110,8 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Run the actual biclustering algorithm.
-   * <p/>
-   * This method is supposed to be called only from the method
-   * {@link #run}.
-   * <p/>
+   * <p>
+   * This method is supposed to be called only from the method {@link #run}.
    */
   protected abstract Clustering<M> biclustering();
 
@@ -126,7 +124,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   protected int[] colsBitsetToIDs(BitSet cols) {
     int[] colIDs = new int[cols.cardinality()];
     int colsIndex = 0;
-    for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
+    for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
       colIDs[colsIndex] = i;
       colsIndex++;
     }
@@ -142,7 +140,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   protected ArrayDBIDs rowsBitsetToIDs(BitSet rows) {
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
     DBIDArrayIter iter = this.rowIDs.iter();
-    for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
       iter.seek(i);
       rowIDs.add(iter);
     }
@@ -214,14 +212,14 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   protected int[] colsBitsetToIDs(long[] cols) {
     int[] colIDs = new int[BitsUtil.cardinality(cols)];
     int colsIndex = 0;
-    for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+    for(int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
       long clong = cols[clpos];
-      if (clong == 0L) {
+      if(clong == 0L) {
         cpos += Long.SIZE;
         continue;
       }
-      for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
-        if ((clong & 1L) == 1L) {
+      for(int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
+        if((clong & 1L) == 1L) {
           colIDs[colsIndex] = cpos;
           ++colsIndex;
         }
@@ -239,18 +237,18 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   protected ArrayDBIDs rowsBitsetToIDs(long[] rows) {
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(BitsUtil.cardinality(rows));
     DBIDArrayIter iter = this.rowIDs.iter();
-    outer: for (int rlpos = 0; rlpos < rows.length; ++rlpos) {
+    outer: for(int rlpos = 0; rlpos < rows.length; ++rlpos) {
       long rlong = rows[rlpos];
       // Fast skip blocks of 64 masked values.
-      if (rlong == 0L) {
+      if(rlong == 0L) {
         iter.advance(Long.SIZE);
         continue;
       }
-      for (int i = 0; i < Long.SIZE; ++i, rlong >>>= 1, iter.advance()) {
-        if (!iter.valid()) {
+      for(int i = 0; i < Long.SIZE; ++i, rlong >>>= 1, iter.advance()) {
+        if(!iter.valid()) {
           break outer;
         }
-        if ((rlong & 1L) == 1L) {
+        if((rlong & 1L) == 1L) {
           rowIDs.add(iter);
         }
       }

@@ -1,13 +1,14 @@
 /**
- * <p>Trivial clustering algorithms: all in one, no clusters, label clusterings</p>
- * 
- * These methods are mostly useful for providing a reference result in evaluation.
+ * Trivial clustering algorithms: all in one, no clusters, label clusterings
+ * <p>
+ * These methods are mostly useful for providing a reference result in
+ * evaluation.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

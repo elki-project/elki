@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -224,7 +224,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    * Returns a new instance for the value (i.e., the class name) of this class
    * parameter. The instance has the type of the restriction class of this class
    * parameter.
-   * <p/>
+   * <p>
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    *

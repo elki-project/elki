@@ -28,14 +28,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Minimum enlargement insert - default insertion strategy for the M-tree.
- *
+ * <p>
  * Reference:
  * <p>
- * P. Ciaccia, M. Patella, P. Zezula<br />
- * M-tree: An Efficient Access Method for Similarity Search in Metric
- * Spaces<br />
+ * P. Ciaccia, M. Patella, P. Zezula<br>
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br>
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
- * </p>
  *
  * @author Erich Schubert
  * @since 0.6.0

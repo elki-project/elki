@@ -1,12 +1,11 @@
 /**
- * <p>Classes for performing queries (knn, range, ...) on metrical trees.</p>
+ * Classes for performing queries (knn, range, ...) on metrical trees
  */
-// TODO: add optimized versions for double distances - that improves speed a lot!
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

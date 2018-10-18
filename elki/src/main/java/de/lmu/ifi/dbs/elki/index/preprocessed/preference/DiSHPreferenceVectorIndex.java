@@ -416,13 +416,6 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * of the preference vector (default is {@link #DEFAULT_EPSILON} in each
      * dimension). If only one value is specified, this value will be used for
      * each dimension.
-     *
-     * <p>
-     * Key: {@code -dish.epsilon}
-     * </p>
-     * <p>
-     * Default value: {@link #DEFAULT_EPSILON}
-     * </p>
      */
     public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
 
@@ -440,10 +433,6 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * Positive threshold for minimum numbers of points in the
      * epsilon-neighborhood of a point, must satisfy following
      * {@link #CONDITION}.
-     *
-     * <p>
-     * Key: {@code -dish.minpts}
-     * </p>
      */
     public static final OptionID MINPTS_ID = new OptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
 
@@ -456,13 +445,6 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * The strategy for determination of the preference vector, available
      * strategies are: {@link Strategy#APRIORI } and
      * {@link Strategy#MAX_INTERSECTION}.
-     *
-     * <p>
-     * Key: {@code -dish.strategy}
-     * </p>
-     * <p>
-     * Default value: {@link #DEFAULT_STRATEGY}
-     * </p>
      */
     public static final OptionID STRATEGY_ID = new OptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
 

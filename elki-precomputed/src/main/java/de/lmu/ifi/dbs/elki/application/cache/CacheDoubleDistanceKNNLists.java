@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -176,25 +176,16 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
-     * <p>
-     * Key: {@code -loader.diskcache}
-     * </p>
      */
     public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
 
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
-     * <p>
-     * Key: {@code -loader.distance}
-     * </p>
      */
     public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
 
     /**
      * Parameter that specifies the number of neighbors to precompute.
-     * <p>
-     * Key: {@code -loader.k}
-     * </p>
      */
     public static final OptionID K_ID = new OptionID("loader.k", "Number of nearest neighbors to precompute.");
 
@@ -222,7 +213,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if (config.grab(dbP)) {
+      if(config.grab(dbP)) {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter

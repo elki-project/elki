@@ -91,7 +91,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
-  public HashmapDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?>> indexFactories) {
+  public HashmapDatabase(DatabaseConnection databaseConnection, Collection<? extends IndexFactory<?>> indexFactories) {
     super();
     this.databaseConnection = databaseConnection;
     this.ids = DBIDUtil.newHashSet();
@@ -309,7 +309,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     /**
      * Indexes to add.
      */
-    private Collection<IndexFactory<?>> indexFactories;
+    private Collection<? extends IndexFactory<?>> indexFactories;
 
     @Override
     protected void makeOptions(Parameterization config) {

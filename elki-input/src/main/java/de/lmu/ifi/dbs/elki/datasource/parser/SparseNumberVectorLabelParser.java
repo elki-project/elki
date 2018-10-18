@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,13 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
- * <p>
  * Parser for parsing one point per line, attributes separated by whitespace.
- * </p>
  * <p>
  * Several labels may be given per point. A label must not be parseable as
  * double. Lines starting with &quot;#&quot; will be ignored.
- * </p>
  * <p>
  * A line is expected in the following format: The first entry of each line is
  * the number of attributes with coordinate value not zero. Subsequent entries
@@ -61,11 +58,9 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
  * where <code>3</code> indicates there are three attributes set,
  * <code>7,8,11</code> are the attributes indexes and there is a non-numerical
  * object label.
- * </p>
  * <p>
  * An index can be specified to identify an entry to be treated as class label.
  * This index counts all entries (numeric and labels as well) starting with 0.
- * </p>
  *
  * @author Arthur Zimek
  * @since 0.2

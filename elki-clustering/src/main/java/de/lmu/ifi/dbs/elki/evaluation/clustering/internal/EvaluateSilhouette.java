@@ -56,15 +56,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the silhouette of a data set.
- *
+ * <p>
  * Reference:
  * <p>
- * P. J. Rousseeuw<br />
+ * P. J. Rousseeuw<br>
  * Silhouettes: A graphical aid to the interpretation and validation of cluster
- * analysis<br />
+ * analysis<br>
  * In: Journal of Computational and Applied Mathematics Volume 20, November 1987
- * </p>
- *
+ * <p>
  * TODO: keep all silhouette values, and allow visualization!
  *
  * @author Erich Schubert

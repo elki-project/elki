@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.uses LabelList oneway - - «reads»
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter", //
-"de.lmu.ifi.dbs.elki.datasource.filter.FilterByLabelFilter" })
+    "de.lmu.ifi.dbs.elki.datasource.filter.FilterByLabelFilter" })
 public class ByLabelFilter extends AbstractStreamFilter {
   /**
    * Class logger
@@ -152,17 +152,11 @@ public class ByLabelFilter extends AbstractStreamFilter {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the filter pattern (regular expression).
-     * <p>
-     * Key: {@code -patternfilter.pattern}
-     * </p>
      */
     public static final OptionID LABELFILTER_PATTERN_ID = new OptionID("patternfilter.pattern", "The filter pattern to use.");
 
     /**
      * Flag to use the pattern in inverted mode
-     * <p>
-     * Key: {@code -patternfilter.invert}
-     * </p>
      */
     public static final OptionID LABELFILTER_PATTERN_INVERT_ID = new OptionID("patternfilter.invert", "Flag to invert pattern.");
 

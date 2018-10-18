@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
  * supporting efficient processing of reverse k nearest neighbor queries. The
  * k-nn distance is stored in each entry of a node.
- * <p/>
+ * <p>
  * TODO: noch nicht fertig!!!
  *
  * @author Elke Achtert

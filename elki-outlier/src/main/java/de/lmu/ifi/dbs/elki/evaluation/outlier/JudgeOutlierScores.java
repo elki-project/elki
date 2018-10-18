@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
 
 /**
  * Compute a Histogram to evaluate a ranking algorithm.
- * 
+ * <p>
  * The parameter {@code -hist.positive} specifies the class label of "positive"
  * hits.
  * 
@@ -99,7 +98,7 @@ public class JudgeOutlierScores implements Evaluator {
    * @throws IllegalStateException
    */
   protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, OutlierResult or) throws IllegalStateException {
-    if (scaling instanceof OutlierScaling) {
+    if(scaling instanceof OutlierScaling) {
       OutlierScaling oscaling = (OutlierScaling) scaling;
       oscaling.prepare(or);
     }
@@ -108,14 +107,16 @@ public class JudgeOutlierScores implements Evaluator {
     // If we have useful (finite) min/max, use these for binning.
     double min = scaling.getMin();
     double max = scaling.getMax();
-    if (Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
+    if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
       innerScaling = new IdentityScaling();
       // TODO: does the outlier score give us this guarantee?
       LOG.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
-    } else {
-      if (min == 0.0 && max == 1.0) {
+    }
+    else {
+      if(min == 0.0 && max == 1.0) {
         innerScaling = new IdentityScaling();
-      } else {
+      }
+      else {
         innerScaling = new LinearScaling(1.0 / (max - min), -min);
       }
     }
@@ -123,12 +124,12 @@ public class JudgeOutlierScores implements Evaluator {
     double posscore = 0.0;
     double negscore = 0.0;
     // fill histogram with values of each object
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().doubleValue(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       posscore += (1.0 - result);
     }
-    for (DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().doubleValue(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       negscore += result;
@@ -147,8 +148,9 @@ public class JudgeOutlierScores implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result result) {
     Database db = ResultUtil.findDatabase(hier);
     List<OutlierResult> ors = ResultUtil.filterResults(hier, OutlierResult.class);
-    if (ors == null || ors.isEmpty()) {
-      // logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
+    if(ors == null || ors.isEmpty()) {
+      // logger.warning("No results found for
+      // "+JudgeOutlierScores.class.getSimpleName());
       return;
     }
 
@@ -156,7 +158,7 @@ public class JudgeOutlierScores implements Evaluator {
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 
-    for (OutlierResult or : ors) {
+    for(OutlierResult or : ors) {
       db.getHierarchy().add(or, computeScore(ids, outlierIds, or));
     }
   }
@@ -188,20 +190,11 @@ public class JudgeOutlierScores implements Evaluator {
     /**
      * The distance function to determine the reachability distance between
      * database objects.
-     * <p>
-     * Default value: {@link EuclideanDistanceFunction}
-     * </p>
-     * <p>
-     * Key: {@code -comphist.positive}
-     * </p>
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
 
     /**
      * Parameter to specify a scaling function to use.
-     * <p>
-     * Key: {@code -comphist.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
 
@@ -219,12 +212,12 @@ public class JudgeOutlierScores implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if (config.grab(positiveClassNameP)) {
+      if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
 
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if (config.grab(scalingP)) {
+      if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
     }

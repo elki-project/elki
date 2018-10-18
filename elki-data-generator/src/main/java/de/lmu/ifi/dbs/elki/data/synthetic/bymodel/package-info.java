@@ -1,19 +1,18 @@
 /**
- * <p>Generator using a distribution model specified in an XML configuration file.</p>
- * 
- * <p>{@link de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec} is a standalone application
- * that loads an XML specification file and generates a synthetic data set according to the
- * specifications given.</p>
- * 
- * <p>This package also contains an XML Schema file as specification of the configuration file
- * format.</p>
- * 
+ * Generator using a distribution model specified in an XML configuration file
+ * <p>
+ * {@link de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec} is a standalone
+ * application that loads an XML specification file and generates a synthetic
+ * data set according to the specifications given.
+ * <p>
+ * This package also contains an XML Schema file as specification of the
+ * configuration file format.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

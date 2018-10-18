@@ -86,9 +86,6 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
     /**
      * Optional parameter that specifies the factory type of pagefile to use
      * for the index.
-     * <p>
-     * Key: {@code -index.pagefile}
-     * </p>
      */
     public static final OptionID PAGEFILE_ID = new OptionID("index.pagefile", "The pagefile factory for storing the index.");
 

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Scaling that can map arbitrary values to a value in the range of [0:1].
- * 
+ * <p>
  * Transformation is done by linear mapping onto 0:1 using the minimum and
  * maximum values.
  * 
@@ -44,35 +44,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 public class OutlierLinearScaling implements OutlierScaling {
   /**
    * Parameter to specify a fixed minimum to use.
-   * <p>
-   * Key: {@code -linearscale.min}
-   * </p>
    */
   public static final OptionID MIN_ID = new OptionID("linearscale.min", "Fixed minimum to use in linear scaling.");
 
   /**
    * Parameter to specify the maximum value.
-   * <p>
-   * Key: {@code -linearscale.max}
-   * </p>
    */
   public static final OptionID MAX_ID = new OptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
 
   /**
    * Flag to use the mean as minimum for scaling.
-   * 
-   * <p>
-   * Key: {@code -linearscale.usemean}
-   * </p>
    */
   public static final OptionID MEAN_ID = new OptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
 
   /**
    * Flag to use ignore zeros when computing the min and max.
-   * 
-   * <p>
-   * Key: {@code -linearscale.ignorezero}
-   * </p>
    */
   public static final OptionID NOZEROS_ID = new OptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
 

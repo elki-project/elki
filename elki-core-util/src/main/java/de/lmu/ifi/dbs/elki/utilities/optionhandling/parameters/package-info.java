@@ -1,8 +1,9 @@
 /**
- * <p>Classes for various typed parameters.</p> 
- * 
- * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
- * 
+ * Classes for various typed parameters
+ * <p>
+ * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
+ * documentation!
+ *
  * @apiviz.exclude elki.utilities.*
  * @apiviz.exclude gui.configurator.*
  * @apiviz.exclude AbstractParameterizer
@@ -12,7 +13,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

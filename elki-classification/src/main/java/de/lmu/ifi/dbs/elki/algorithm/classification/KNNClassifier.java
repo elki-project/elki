@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -186,12 +186,6 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
     /**
      * Parameter to specify the number of neighbors to take into account for
      * classification, must be an integer greater than 0.
-     * <p>
-     * Default value: {@code 1}
-     * </p>
-     * <p>
-     * Key: {@code -knnclassifier.k}
-     * </p>
      */
     public static final OptionID K_ID = new OptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
 

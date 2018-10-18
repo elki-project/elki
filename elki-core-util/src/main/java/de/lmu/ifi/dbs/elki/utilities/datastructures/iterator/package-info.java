@@ -1,25 +1,28 @@
 /**
- * <p>ELKI Iterator API.</p>
- * 
- * <p>ELKI uses a custom iterator API instead of the usual {@link java.util.Iterator} classes (the "Java Collections API").
- * The reason for this is largely efficiency. Benchmarking showed that the Java Iterator API can be quite expensive when dealing
- * with primitive types, as {@link java.util.Iterator#next} is meant to always return an object.</p>
- * 
- * <p>However, the benefits become more apparent when considering multi-valued iterators.
- * For example an iterator over a k nearest neighbor set in ELKI both represents an object by its DBID,
- * and a distance value. For double-valued distances, it can be retrieved using a primitive value getter
- * (saving an extra object copy), and since the iterator can be used as a DBIDRef, it can also represent
- * the current object without creating additional objects.</p>
- * 
- * <p>While it may seem odd to depart from Java conventions such as the collections API,
- * note that these iterators are very close to the standard C++ conventions, so nothing entirely unusual.
- * Also the GNU trove libraries - used by ELKI in various places - use the same kind of iterators.</p> 
+ * ELKI Iterator API
+ * <p>
+ * ELKI uses a custom iterator API instead of the usual
+ * {@link java.util.Iterator} classes (the "Java Collections API").
+ * The reason for this is largely efficiency. Benchmarking showed that the Java
+ * Iterator API can be quite expensive when dealing with primitive types, as
+ * {@link java.util.Iterator#next} is meant to always return an object.
+ * <p>
+ * However, the benefits become more apparent when considering multi-valued
+ * iterators. For example an iterator over a k nearest neighbor set in ELKI both
+ * represents an object by its DBID, and a distance value. For double-valued
+ * distances, it can be retrieved using a primitive value getter (saving an
+ * extra object copy), and since the iterator can be used as a DBIDRef, it can
+ * also represent the current object without creating additional objects.
+ * <p>
+ * While it may seem odd to depart from Java conventions such as the collections
+ * API, note that these iterators are very close to the standard C++
+ * conventions, so nothing entirely unusual.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

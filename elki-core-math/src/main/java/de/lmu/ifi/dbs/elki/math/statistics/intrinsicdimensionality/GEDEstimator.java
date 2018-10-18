@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,12 @@ import net.jafama.FastMath;
 
 /**
  * Generalized Expansion Dimension for estimating the intrinsic dimensionality.
- *
+ * <p>
  * Reference:
  * <p>
- * M. E. Houle, H. Kashima, M. Nett<br />
- * Generalized expansion dimension<br />
+ * M. E. Houle, H. Kashima, M. Nett<br>
+ * Generalized expansion dimension<br>
  * In: 12th International Conference on Data Mining Workshops (ICDMW)
- * </p>
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert

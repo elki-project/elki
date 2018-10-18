@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * more explanatory variables and a response variable by fitting a linear
  * equation to observed data. Every value of the independent variable x is
  * associated with a value of the dependent variable y.
- * <p/>
+ * <p>
  * The population regression line for p explanatory variables x1, x2, ... , xp
  * is defined to be y = b0 + b1*x1 + b2*x2 + ... + bp*xp + e.
  * 

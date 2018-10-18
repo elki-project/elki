@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * Adapter to use a primitive number-distance as similarity measure, by computing
- * 1/distance.
+ * Adapter to use a primitive number-distance as similarity measure, by
+ * computing 1/distance.
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -38,13 +38,6 @@ public class InvertedDistanceSimilarityFunction<O> implements PrimitiveSimilarit
    * Parameter to specify the similarity function to derive the distance between
    * database objects from. Must extend
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction} .
-   * <p>
-   * Key: {@code -adapter.distancefunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
-   * </p>
    */
   public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("adapter.distancefunction", "Distance function to derive the similarity between database objects from.");
 

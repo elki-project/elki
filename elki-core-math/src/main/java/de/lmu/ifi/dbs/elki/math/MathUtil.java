@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -197,7 +197,6 @@ public final class MathUtil {
    * mathematics.
    * <p>
    * Use this method if for large values of <code>n</code>.
-   * </p>
    *
    * @param n Note: n &gt;= 0. This {@link BigInteger} <code>n</code> will be 0
    *        after this method finishes.
@@ -228,9 +227,7 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
    * Binomial coefficient, also known as "n choose k".
-   * </p>
    *
    * @param n Total number of samples. n &gt; 0
    * @param k Number of elements to choose. <code>n &gt;= k</code>,
@@ -305,7 +302,7 @@ public final class MathUtil {
 
   /**
    * Convert Degree to Radians.
-   *
+   * <p>
    * This is essentially the same as {@link Math#toRadians}, but we keep it for
    * now, it might be marginally faster, but certainly not slower.
    *
@@ -318,7 +315,7 @@ public final class MathUtil {
 
   /**
    * Radians to Degree.
-   *
+   * <p>
    * This is essentially the same as {@link Math#toRadians}, but we keep it for
    * now, it might be marginally faster, but certainly not slower.
    *
@@ -342,7 +339,7 @@ public final class MathUtil {
 
   /**
    * Find the next power of 2.
-   *
+   * <p>
    * Classic bit operation, for signed 32-bit. Valid for positive integers only
    * (0 otherwise).
    *
@@ -361,7 +358,7 @@ public final class MathUtil {
 
   /**
    * Find the next power of 2.
-   *
+   * <p>
    * Classic bit operation, for signed 64-bit. Valid for positive integers only
    * (0 otherwise).
    *
@@ -380,7 +377,7 @@ public final class MathUtil {
 
   /**
    * Find the next larger number with all ones.
-   *
+   * <p>
    * Classic bit operation, for signed 32-bit. Valid for positive integers only
    * (-1 otherwise).
    *
@@ -398,7 +395,7 @@ public final class MathUtil {
 
   /**
    * Find the next larger number with all ones.
-   *
+   * <p>
    * Classic bit operation, for signed 64-bit. Valid for positive integers only
    * (-1 otherwise).
    *
@@ -416,7 +413,7 @@ public final class MathUtil {
 
   /**
    * Return the largest double that rounds down to this float.
-   *
+   * <p>
    * Note: Probably not always correct - subnormal values are quite tricky. So
    * some of the bounds might not be tight.
    *
@@ -428,12 +425,7 @@ public final class MathUtil {
       return Double.NaN;
     }
     if(Float.isInfinite(f)) {
-      if(f > 0) {
-        return Double.POSITIVE_INFINITY;
-      }
-      else {
-        return Double.longBitsToDouble(0xc7efffffffffffffL);
-      }
+      return f > 0 ? Double.POSITIVE_INFINITY : Double.longBitsToDouble(0xc7efffffffffffffL);
     }
     long bits = Double.doubleToRawLongBits((double) f);
     if((bits & 0x8000000000000000L) == 0) { // Positive
@@ -478,7 +470,7 @@ public final class MathUtil {
 
   /**
    * Return the largest double that rounds up to this float.
-   *
+   * <p>
    * Note: Probably not always correct - subnormal values are quite tricky. So
    * some of the bounds might not be tight.
    *
@@ -490,12 +482,7 @@ public final class MathUtil {
       return Double.NaN;
     }
     if(Float.isInfinite(f)) {
-      if(f < 0) {
-        return Double.NEGATIVE_INFINITY;
-      }
-      else {
-        return Double.longBitsToDouble(0x47efffffffffffffL);
-      }
+      return f < 0 ? Double.NEGATIVE_INFINITY : Double.longBitsToDouble(0x47efffffffffffffL);
     }
     long bits = Double.doubleToRawLongBits((double) f);
     if((bits & 0x8000000000000000L) == 0) { // Positive
@@ -619,13 +606,13 @@ public final class MathUtil {
 
   /**
    * Binary max, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline as
-   * {@code (a >= b) ? a : b}
-   *
-   * The result is asymmetric in case of {@code Double.NaN}:<br />
-   * {@code MathUtil.max(Double.NaN, 1.)} is 1, but <br />
+   * {@c<ode (a >= b) ? a : b}
+   * <p>
+   * The result is asymmetric in case of {@code Double.NaN}:<br>
+   * {@code MathUtil.max(Double.NaN, 1.)} is 1, but <br>
    * {@code MathUtil.max(1., Double.NaN)} is {@code Double.NaN}.
    *
    * @param a First value
@@ -638,7 +625,7 @@ public final class MathUtil {
 
   /**
    * Ternary max, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline.
    *
@@ -665,8 +652,7 @@ public final class MathUtil {
    */
   public static double max(double a, double b, double c, double d) {
     return a >= b ? //
-        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
-        : //
+        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) : //
         b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
   }
 
@@ -707,20 +693,19 @@ public final class MathUtil {
    */
   public static int max(int a, int b, int c, int d) {
     return a >= b ? //
-        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
-        : //
+        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) : //
         b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
   }
 
   /**
    * Binary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline as
    * {@code (a <= b) ? a : b}
-   *
-   * The result is asymmetric in case of {@code Double.NaN}:<br />
-   * {@code MathUtil.min(Double.NaN, 1.)} is 1, but <br />
+   * <p>
+   * The result is asymmetric in case of {@code Double.NaN}:<br>
+   * {@code MathUtil.min(Double.NaN, 1.)} is 1, but <br>
    * {@code MathUtil.min(1., Double.NaN)} is {@code Double.NaN}.
    *
    * @param a First value
@@ -733,7 +718,7 @@ public final class MathUtil {
 
   /**
    * Ternary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -748,7 +733,7 @@ public final class MathUtil {
 
   /**
    * Quadrary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -760,14 +745,13 @@ public final class MathUtil {
    */
   public static double min(double a, double b, double c, double d) {
     return a <= b ? //
-        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
-        : //
+        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) : //
         b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
 
   /**
    * Binary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -781,7 +765,7 @@ public final class MathUtil {
 
   /**
    * Ternary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -796,7 +780,7 @@ public final class MathUtil {
 
   /**
    * Quadrary min, <i>without</i> handling of special values.
-   *
+   * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -808,8 +792,7 @@ public final class MathUtil {
    */
   public static int min(int a, int b, int c, int d) {
     return a <= b ? //
-        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
-        : //
+        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) : //
         b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
 }

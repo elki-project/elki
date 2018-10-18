@@ -357,10 +357,6 @@ public class ClusterHullVisualization implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Alpha-Value for alpha-shapes
-     *
-     * <p>
-     * Key: {@code -hull.alpha}
-     * </p>
      */
     public static final OptionID ALPHA_ID = new OptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
 

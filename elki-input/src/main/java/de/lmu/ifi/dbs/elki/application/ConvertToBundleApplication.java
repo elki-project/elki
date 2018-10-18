@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -101,11 +101,6 @@ public class ConvertToBundleApplication extends AbstractApplication {
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
      * Option to specify the data source for the database.
-     *
-     * Key:
-     * <p>
-     * {@code -dbc}
-     * </p>
      */
     public static final OptionID DATABASE_CONNECTION_ID = new OptionID("dbc", "Database connection class.");
 

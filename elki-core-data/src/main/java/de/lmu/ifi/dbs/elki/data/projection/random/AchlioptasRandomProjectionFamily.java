@@ -30,16 +30,14 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Random projections as suggested by Dimitris Achlioptas.
- *
+ * <p>
  * Reference:
  * <p>
- * D. Achlioptas:<br />
+ * D. Achlioptas<br>
  * Database-friendly random projections: Johnson-Lindenstrauss with binary coins
- * <br />
- * Proc. 20th ACM SIGMOD-SIGACT-SIGART symposium on Principles of database
- * systems
- * </p>
- *
+ * <br>
+ * Proc. 20th ACM SIGMOD-SIGACT-SIGART Symp. on Principles of database systems
+ * <p>
  * TODO: faster implementation exploiting sparsity.
  *
  * @author Erich Schubert

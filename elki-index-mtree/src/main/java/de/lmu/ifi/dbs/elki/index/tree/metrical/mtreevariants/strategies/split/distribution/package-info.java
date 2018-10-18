@@ -1,7 +1,5 @@
 /**
- * <p>
  * Entry distsribution strategies of nodes in an M-Tree (and variants).
- * </p>
  */
 /*
  * This file is part of ELKI:

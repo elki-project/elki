@@ -1,14 +1,14 @@
 /**
- * <p>Statistical analysis algorithms.</p>
- * 
- *  The algorithms in this package perform statistical analysis of the data
- *  (e.g. compute distributions, distance distributions etc.)
+ * Statistical analysis algorithms.
+ * <p>
+ * The algorithms in this package perform statistical analysis of the data
+ * (e.g. compute distributions, distance distributions etc.)
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

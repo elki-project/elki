@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -108,9 +108,6 @@ public class ShuffleObjectsFilter implements ObjectFilter {
      * Optional parameter to specify a seed for randomly shuffling the rows of
      * the database. If not set, a random seed will be used. Shuffling takes
      * time linearly dependent from the size of the database.
-     * <p>
-     * Key: {@code -shuffle.seed}
-     * </p>
      */
     public static final OptionID SEED_ID = new OptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
 

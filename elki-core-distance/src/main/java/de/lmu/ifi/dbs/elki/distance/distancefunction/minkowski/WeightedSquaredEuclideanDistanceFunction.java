@@ -34,8 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Weighted squared Euclidean distance for {@link NumberVector}s. This results in the
- * same rankings as weighted Euclidean distance, but saves computing the square root.
+ * Weighted squared Euclidean distance for {@link NumberVector}s. This results
+ * in the same rankings as weighted Euclidean distance, but saves computing the
+ * square root.
  * <p>
  * Weighted squared Euclidean is defined as:
  * \[ \text{Euclidean}^2_{\vec{w}}(\vec{x},\vec{y}) := \sum_i w_i (x_i-y_i)^2 \]

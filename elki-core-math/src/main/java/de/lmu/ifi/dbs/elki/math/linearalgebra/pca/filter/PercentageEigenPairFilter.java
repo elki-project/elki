@@ -89,10 +89,11 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
-     * a portion of at least alpha of the total variance.
+     * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors
+     * explain a portion of at least alpha of the total variance.
      */
     public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors. The filter class will choose the number of strong eigenvectors by this share.");
+
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.

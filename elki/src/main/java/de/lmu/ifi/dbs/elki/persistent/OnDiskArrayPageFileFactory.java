@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
 
   @Override
   public PageFile<P> newPageFile(Class<P> cls) {
-    if (fileName == null) {
+    if(fileName == null) {
       throw new AbortException("Disk-backed page file may only be instantiated once!");
     }
     OnDiskArrayPageFile<P> pfile = new OnDiskArrayPageFile<>(pageSize, fileName);
@@ -76,9 +76,6 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
 
     /**
      * Optional parameter that specifies the name of the file storing the index.
-     * <p>
-     * Key: {@code -pagefile.file}
-     * </p>
      */
     public static final OptionID FILE_ID = new OptionID("pagefile.file", "The name of the file storing the page file.");
 
@@ -86,7 +83,7 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter fileNameP = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if (config.grab(fileNameP)) {
+      if(config.grab(fileNameP)) {
         fileName = fileNameP.getValue().getPath();
       }
     }

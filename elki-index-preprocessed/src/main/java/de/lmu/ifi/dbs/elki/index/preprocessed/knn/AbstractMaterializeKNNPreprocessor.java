@@ -167,22 +167,12 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * materialized. must be an integer greater than 1.
-     * <p>
-     * Key: {@code -materialize.k}
-     * </p>
      */
     public static final OptionID K_ID = new OptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
      * nearest neighbors.
-     * <p/>
-     * <p>
-     * Default value: {@link EuclideanDistanceFunction}
-     * </p>
-     * <p>
-     * Key: {@code materialize.distance}
-     * </p>
      */
     public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
 

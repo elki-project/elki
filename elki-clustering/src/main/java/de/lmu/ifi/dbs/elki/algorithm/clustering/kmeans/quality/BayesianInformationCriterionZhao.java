@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,12 @@ import net.jafama.FastMath;
 
 /**
  * Different version of the BIC criterion.
- *
+ * <p>
  * Reference:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti:<br />
- * Knee Point Detection on Bayesian Information Criterion<br />
+ * Q. Zhao, M. Xu, P. Fränti<br>
+ * Knee Point Detection on Bayesian Information Criterion<b/>
  * 20th IEEE International Conference on Tools with Artificial Intelligence
- * </p>
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert

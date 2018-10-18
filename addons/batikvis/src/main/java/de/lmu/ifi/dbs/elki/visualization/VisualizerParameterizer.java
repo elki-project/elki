@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -220,12 +220,8 @@ public class VisualizerParameterizer {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to get the style properties file.
-     *
      * <p>
-     * Key: -visualizer.stylesheet
-     *
-     * Default: default properties file <br>
-     * included stylesheets:
+     * Included stylesheets:
      * <ul>
      * <li>classic</li>
      * <li>default</li>
@@ -236,27 +232,16 @@ public class VisualizerParameterizer {
      * </ul>
      * These are {@code *.properties} files in the package
      * {@code de.lmu.ifi.dbs.elki.visualization.style}.
-     * </p>
      */
     public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
 
     /**
      * Parameter to enable visualizers
-     *
-     * <p>
-     * Key: -vis.enable
-     *
-     * Default: ELKI core
-     * </p>
      */
     public static final OptionID ENABLEVIS_ID = new OptionID("vis.enable", "Visualizers to enable by default.");
 
     /**
      * Parameter to set the sampling level
-     *
-     * <p>
-     * Key: -vis.sampling
-     * </p>
      */
     public static final OptionID SAMPLING_ID = new OptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
 
@@ -284,7 +269,7 @@ public class VisualizerParameterizer {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter samplingP = new IntParameter(SAMPLING_ID, DEFAULT_SAMPLE_SIZE) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
       if(config.grab(samplingP)) {
         samplesize = samplingP.intValue();
       }
@@ -299,7 +284,7 @@ public class VisualizerParameterizer {
         }
       }
       PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(enablevisP) && !"all".equals(enablevisP.getValueAsString())) {
         enableVisualizers = enablevisP.getValue();
       }

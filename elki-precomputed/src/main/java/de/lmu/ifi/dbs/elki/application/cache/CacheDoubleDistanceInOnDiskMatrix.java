@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -145,17 +145,11 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
-     * <p>
-     * Key: {@code -loader.diskcache}
-     * </p>
      */
     public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
 
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
-     * <p>
-     * Key: {@code -loader.distance}
-     * </p>
      */
     public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
 

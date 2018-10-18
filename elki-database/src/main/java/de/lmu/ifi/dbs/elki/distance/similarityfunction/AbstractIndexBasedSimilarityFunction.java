@@ -44,9 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFactory<O>> implements IndexBasedSimilarityFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
-   * <p>
-   * Key: {@code -similarityfunction.preprocessor}
-   * </p>
    */
   protected F indexFactory;
 
@@ -127,9 +124,6 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFac
   public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
     /**
      * Parameter to specify the preprocessor to be used.
-     * <p>
-     * Key: {@code -similarityfunction.preprocessor}
-     * </p>
      */
     public static final OptionID INDEX_ID = new OptionID("similarityfunction.preprocessor", "Preprocessor to use.");
 

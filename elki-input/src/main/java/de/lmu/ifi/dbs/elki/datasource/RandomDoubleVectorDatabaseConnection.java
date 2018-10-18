@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -109,25 +109,16 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**
      * Random generator seed.
-     * <p>
-     * Key: {@code -dbc.seed}
-     * </p>
      */
     public static final OptionID SEED_ID = new OptionID("dbc.genseed", "Seed for randomly generating vectors");
 
     /**
      * Database to specify the random vector dimensionality.
-     * <p>
-     * Key: {@code -dbc.dim}
-     * </p>
      */
     public static final OptionID DIM_ID = new OptionID("dbc.dim", "Dimensionality of the vectors to generate.");
 
     /**
      * Parameter to specify the database size to generate.
-     * <p>
-     * Key: {@code -dbc.size}
-     * </p>
      */
     public static final OptionID SIZE_ID = new OptionID("dbc.size", "Database size to generate.");
 

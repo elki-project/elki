@@ -1,11 +1,12 @@
 /**
- * <p>Common API for accessing objects that are "array-like", including lists, numerical vectors, database vectors and arrays.</p>
+ * Common API for accessing objects that are "array-like", including lists,
+ * numerical vectors, database vectors and arrays.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

@@ -1,19 +1,21 @@
 /**
- * <p>Classes for computing histograms.</p>
- * 
- * This package contains two families of histograms. Static histograms have a fixed initial number of bins.
- * When encountering values outside of their range, they will grow similar to an ArrayList by adding additional bins.
- * 
- * "Dynamic" histograms are more useful when you do not know the value range of the data:
- * they start by collecting a number of sample data, then use this to estimate the initial histogram range.
- * If they grow to twice their initial size they will downsample, to keep the histogram size in the bounds n to 2n-1,
- * which effectively limits the memory use and histogram complexity.
+ * Classes for computing histograms
+ * <p>
+ * This package contains two families of histograms. Static histograms have a
+ * fixed initial number of bins. When encountering values outside of their
+ * range, they will grow similar to an ArrayList by adding additional bins.
+ * <p>
+ * "Dynamic" histograms are more useful when you do not know the value range of
+ * the data: they start by collecting a number of sample data, then use this to
+ * estimate the initial histogram range. If they grow to twice their initial
+ * size they will downsample, to keep the histogram size in the bounds n to
+ * 2n-1, which effectively limits the memory use and histogram complexity.
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

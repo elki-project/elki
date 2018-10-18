@@ -65,9 +65,6 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
     /**
      * Parameter specifying the maximal number k of reverse k nearest neighbors
      * to be supported, must be an integer greater than 0.
-     * <p>
-     * Key: {@code -mktree.kmax}
-     * </p>
      */
     public static final OptionID K_MAX_ID = new OptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
 

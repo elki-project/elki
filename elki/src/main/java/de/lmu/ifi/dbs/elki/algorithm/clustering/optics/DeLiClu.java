@@ -244,9 +244,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
           continue;
         }
         double distance = distFunction.minDist(entry1, entry2);
-
-        SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
-        heap.add(nodePair);
+        heap.add(new SpatialObjectPair(distance, entry1, entry2, true));
       }
     }
   }
@@ -281,8 +279,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
 
         double distance = distFunction.minDist(entry1, entry2);
         double reach = MathUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
-        SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
-        heap.add(dataPair);
+        heap.add(new SpatialObjectPair(reach, entry1, entry2, false));
       }
     }
   }
@@ -324,8 +321,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
         }
         double distance = distFunction.minDist(entry1, entry2);
         double reach = MathUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
-        SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
-        heap.add(dataPair);
+        heap.add(new SpatialObjectPair(reach, entry1, entry2, false));
       }
       return;
     }
@@ -336,10 +332,8 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
       // not yet expanded
       if(!expanded.contains(entry1.getPageID())) {
         double distance = distFunction.minDist(entry1, entry2);
-        SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
-        heap.add(nodePair);
+        heap.add(new SpatialObjectPair(distance, entry1, entry2, true));
       }
-
       // already expanded
       else {
         reinsertExpanded(distFunction, index, path, pos - 1, entry1, knns);
@@ -407,7 +401,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
      * Compares this object with the specified object for order. Returns a
      * negative integer, zero, or a positive integer as this object is less
      * than, equal to, or greater than the specified object.
-     * <p/>
      *
      * @param other the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this object is
@@ -436,10 +429,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
      */
     @Override
     public String toString() {
-      if(!isExpandable) {
-        return entry1 + " - " + entry2;
-      }
-      return "n_" + entry1 + " - n_" + entry2;
+      return !isExpandable ? (entry1 + " - " + entry2) : ("n_" + entry1 + " - n_" + entry2);
     }
 
     /** equals is used in updating the heap! */
@@ -450,25 +440,16 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
         return false;
       }
       SpatialObjectPair other = (SpatialObjectPair) obj;
-      if(!isExpandable) {
-        return this.entry1.equals(other.entry1);
-      }
-      else {
-        return this.entry1.equals(other.entry1) && this.entry2.equals(other.entry2);
-      }
+      return this.entry1.equals(other.entry1) && (!isExpandable || this.entry2.equals(other.entry2));
     }
 
     /** hashCode is used in updating the heap! */
     @Override
     public int hashCode() {
-      final long prime = 2654435761L;
       if(!isExpandable) {
         return entry1.hashCode();
       }
-      long result = 0;
-      result = prime * result + ((entry1 == null) ? 0 : entry1.hashCode());
-      result = prime * result + ((entry2 == null) ? 0 : entry2.hashCode());
-      return (int) result;
+      return (int) (2654435761L * ((entry1 == null) ? 0 : entry1.hashCode()) + ((entry2 == null) ? 0 : entry2.hashCode()));
     }
   }
 

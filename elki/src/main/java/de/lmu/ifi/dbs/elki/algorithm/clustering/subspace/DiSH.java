@@ -868,12 +868,6 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
      * Parameter that specifies the maximum radius of the neighborhood to be
      * considered in each dimension for determination of the preference vector,
      * must be a double equal to or greater than 0.
-     * <p>
-     * Default value: {@code 0.001}
-     * </p>
-     * <p>
-     * Key: {@code -dish.epsilon}
-     * </p>
      */
     public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", //
         "The maximum radius of the neighborhood to be considered in each " //
@@ -881,14 +875,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
-     * factor to avoid the single-link-effect, must be an integer greater than
-     * 0.
-     * <p>
-     * Default value: {@code 1}
-     * </p>
-     * <p>
-     * Key: {@code -dish.mu}
-     * </p>
+     * factor to avoid the single-link-effect, must be an integer greater
+     * than 0.
      */
     public static final OptionID MU_ID = new OptionID("dish.mu", //
         "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");

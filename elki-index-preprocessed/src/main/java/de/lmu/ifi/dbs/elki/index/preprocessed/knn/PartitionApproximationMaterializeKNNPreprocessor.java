@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -211,17 +211,11 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
       /**
        * Parameter to specify the number of partitions to use for materializing
        * the kNN. Must be an integer greater than 1.
-       * <p>
-       * Key: {@code -partknn.p}
-       * </p>
        */
       public static final OptionID PARTITIONS_ID = new OptionID("partknn.p", "The number of partitions to use for approximate kNN.");
 
       /**
        * Parameter to specify the random number generator.
-       * <p>
-       * Key: {@code -partknn.seed}
-       * </p>
        */
       public static final OptionID SEED_ID = new OptionID("partknn.seed", "The random number generator seed.");
 

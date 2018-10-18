@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -221,10 +221,6 @@ public class SelectionCubeVisualization implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of selection cubes.
-     *
-     * <p>
-     * Key: {@code -selectionrange.nofill}
-     * </p>
      */
     public static final OptionID NOFILL_ID = new OptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
 

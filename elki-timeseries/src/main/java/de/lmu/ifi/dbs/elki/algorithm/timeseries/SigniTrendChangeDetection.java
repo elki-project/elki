@@ -52,25 +52,24 @@ import net.jafama.FastMath;
 
 /**
  * Signi-Trend detection algorithm applies to a single time-series.
- *
+ * <p>
  * This is not a complete implementation of the method, but a modified
  * (two-sided) version of the significance score use in Signi-Trend for change
  * detection. The hashing and scalability parts of Signi-Trend are not
  * applicable here.
- * 
+ * <p>
  * This implementation currently does not use timestamps, and thus only works
  * for fixed-interval measurements. It could be extended to allow dynamic data
  * windows by adjusting the alpha parameter based on time deltas.
- * 
+ * <p>
  * Reference:
  * <p>
- * Erich Schubert, Michael Weiler, Hans-Peter Kriegel<br />
+ * Erich Schubert, Michael Weiler, Hans-Peter Kriegel<br>
  * Signi-Trend: scalable detection of emerging topics in textual streams by
- * hashed significance thresholds<br />
+ * hashed significance thresholds<br>
  * Proc. 20th ACM SIGKDD international conference on Knowledge discovery and
  * data mining
- * </p>
- * 
+ * <p>
  * TODO: add support for dynamic time, and optimize for sparse vectors.
  *
  * @author Erich Schubert

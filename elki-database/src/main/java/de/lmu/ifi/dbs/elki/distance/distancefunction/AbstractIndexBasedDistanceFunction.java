@@ -44,9 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractIndexBasedDistanceFunction<O, F extends IndexFactory<O>> extends AbstractDatabaseDistanceFunction<O> implements IndexBasedDistanceFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
-   * <p>
-   * Key: {@code -distancefunction.preprocessor}
-   * </p>
    */
   protected F indexFactory;
 
@@ -74,7 +71,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, F extends IndexFacto
   final public TypeInformation getInputTypeRestriction() {
     return indexFactory.getInputTypeRestriction();
   }
-  
+
   /**
    * The actual instance bound to a particular database.
    * 
@@ -113,7 +110,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, F extends IndexFacto
       this.index = index;
       this.parent = parent;
     }
-    
+
     @Override
     public Relation<? extends O> getRelation() {
       return relation;

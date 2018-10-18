@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 
 /**
  * Option class specifying a flag object.
- * <p/>
+ * <p>
  * A flag object is optional parameter which can be set (value &quot;true&quot;)
  * or not (value &quot;false&quot;).
  * 
@@ -48,7 +48,7 @@ public class Flag extends AbstractParameter<Flag, Boolean> {
 
   /**
    * Constructs a flag object with the given optionID.
-   * <p/>
+   * <p>
    * If the flag is not set its value is &quot;false&quot;.
    * 
    * @param optionID the unique id of the option

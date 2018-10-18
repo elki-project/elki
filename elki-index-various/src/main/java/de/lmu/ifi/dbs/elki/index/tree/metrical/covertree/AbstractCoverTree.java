@@ -21,11 +21,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.covertree;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -41,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -194,10 +191,10 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @param collect Output list
    */
   protected void collectByCover(DBIDRef cur, ModifiableDoubleDBIDList candidates, double fmax, ModifiableDoubleDBIDList collect) {
-    assert(collect.size() == 0) : "Not empty";
+    assert (collect.size() == 0) : "Not empty";
     DoubleDBIDListIter it = candidates.iter().advance(); // Except first = cur!
     while(it.valid()) {
-      assert(!DBIDUtil.equal(cur, it));
+      assert (!DBIDUtil.equal(cur, it));
       final double dist = distance(cur, it);
       if(dist <= fmax) { // Collect
         collect.add(dist, it);
@@ -288,26 +285,16 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
        * Parameter to specify the distance function to determine the distance
        * between database objects, must extend
        * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-       * <p>
-       * Key: {@code -covertree.distancefunction}
-       * </p>
        */
       public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("covertree.distancefunction", "Distance function to determine the distance between objects.");
 
       /**
        * Truncate branches when they have less than this number of instances.
-       * <p>
-       * Key: {@code -covertree.truncate}
-       * </p>
        */
       public static final OptionID TRUNCATE_ID = new OptionID("covertree.truncate", "Truncate tree when branches have less than this number of instances.");
 
       /**
        * Expansion rate of the tree (going upward).
-       * <p>
-       * Key: {@code -covertree.expansionrate}<br />
-       * Default: 1.3
-       * </p>
        */
       public static final OptionID EXPANSION_ID = new OptionID("covertree.expansionrate", "Expansion rate of the tree (Default: 1.3).");
 
@@ -337,12 +324,12 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
           }
         }
         IntParameter truncateP = new IntParameter(TRUNCATE_ID, 10)//
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(truncateP)) {
           truncate = truncateP.intValue();
         }
         DoubleParameter expansionP = new DoubleParameter(EXPANSION_ID, 1.3)//
-        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
         if(config.grab(expansionP)) {
           expansion = expansionP.doubleValue();
         }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,13 +41,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * The heuristic variant of the DOC algorithm, FastDOC
- * 
+ * <p>
  * Reference:
  * <p>
- * C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali<br />
- * A Monte Carlo algorithm for fast projective clustering. <br />
+ * C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali<br>
+ * A Monte Carlo algorithm for fast projective clustering<br>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02).
- * </p>
  * 
  * @author Florian Nuecke
  * 

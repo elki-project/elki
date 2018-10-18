@@ -331,10 +331,6 @@ public class VoronoiVisualization implements VisFactory {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Mode for drawing: Voronoi, Delaunay, both.
-     *
-     * <p>
-     * Key: {@code -voronoi.mode}
-     * </p>
      */
     public static final OptionID MODE_ID = new OptionID("voronoi.mode", "Mode for drawing the voronoi cells (and/or delaunay triangulation)");
 

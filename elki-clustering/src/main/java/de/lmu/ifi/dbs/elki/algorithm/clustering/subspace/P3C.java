@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -76,14 +76,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * P3C: A Robust Projected Clustering Algorithm.
- * 
  * <p>
- * Reference: <br/>
- * Gabriela Moise, Jörg Sander, Martin Ester<br />
- * P3C: A Robust Projected Clustering Algorithm.<br/>
+ * Reference:<br>
+ * Gabriela Moise, Jörg Sander, Martin Ester<br>
+ * P3C: A Robust Projected Clustering Algorithm<br>
  * In: Proc. Sixth International Conference on Data Mining (ICDM '06)
- * </p>
- * 
+ * <p>
  * This is not a complete implementation of P3C, but good enough for most users.
  * Improvements are welcome. The most obviously missing step is section 3.5 of
  * P3C, where the cluster subspaces are refined.

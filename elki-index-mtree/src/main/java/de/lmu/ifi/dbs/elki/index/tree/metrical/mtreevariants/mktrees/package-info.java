@@ -1,13 +1,13 @@
 /**
- * <p>Metrical index structures based on the concepts of the M-Tree
+ * Metrical index structures based on the concepts of the M-Tree
  * supporting processing of reverse k nearest neighbor queries by
- * using the k-nn distances of the entries.</p>
+ * using the k-nn distances of the entries
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

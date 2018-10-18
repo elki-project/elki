@@ -64,9 +64,6 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
   /**
    * Parameter to specify a scaling function to use.
-   * <p>
-   * Key: {@code -comphist.scaling}
-   * </p>
    */
   public static final OptionID SCALING_ID = new OptionID("metaoutlier.scaling", "Class to use as scaling function.");
 

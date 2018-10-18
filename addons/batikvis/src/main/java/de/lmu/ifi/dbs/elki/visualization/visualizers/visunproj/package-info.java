@@ -1,12 +1,11 @@
 /**
- * <p>Visualizers that do not use a particular projection.</p>
- * 
+ * Visualizers that do not use a particular projection
  */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

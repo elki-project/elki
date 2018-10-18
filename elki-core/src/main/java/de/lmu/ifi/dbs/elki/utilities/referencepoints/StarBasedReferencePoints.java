@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -120,18 +120,12 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the grid resolution.
-     * <p>
-     * Key: {@code -star.nocenter}
-     * </p>
      */
     public static final OptionID NOCENTER_ID = new OptionID("star.nocenter", "Do not use the center as extra reference point.");
 
     /**
      * Parameter to specify the extra scaling of the space, to allow
      * out-of-data-space reference points.
-     * <p>
-     * Key: {@code -star.scale}
-     * </p>
      */
     public static final OptionID SCALE_ID = new OptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
 
@@ -154,7 +148,7 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }

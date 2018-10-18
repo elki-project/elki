@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,13 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * A polynomial fit is a specific type of multiple regression. The simple
  * regression model (a first-order polynomial) can be trivially extended to
  * higher orders.
- * <p/>
+ * <p>
  * The regression model y = b0 + b1*x + b2*x^2 + ... + bp*x^p + e is a system of
  * polynomial equations of order p with polynomial coefficients { b0 ... bp}.
  * The model can be expressed using data matrix x, target double[] y and parameter
  * double[] ?. The ith row of X and Y will contain the x and y value for the ith
  * data sample.
- * <p/>
+ * <p>
  * The variables will be transformed in the following way: x => x1, ..., x^p =>
  * xp Then the model can be written as a multiple linear equation model: y = b0
  * + b1*x1 + b2*x2 + ... + bp*xp + e

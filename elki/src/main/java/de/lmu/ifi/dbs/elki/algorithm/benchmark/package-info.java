@@ -1,6 +1,6 @@
 /**
- * <p>Benchmarking pseudo algorithms.</p>
- * 
+ * Benchmarking pseudo algorithms.
+ * <p>
  * The algorithms in this package are meant to be used in run time benchmarks,
  * to evalute e.g. the performance of an index structure.
  */
@@ -8,7 +8,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

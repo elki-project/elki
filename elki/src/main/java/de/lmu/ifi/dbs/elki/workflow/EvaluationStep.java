@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ public class EvaluationStep implements WorkflowStep {
   /**
    * Evaluators to run.
    */
-  private List<Evaluator> evaluators = null;
+  private List<? extends Evaluator> evaluators = null;
 
   /**
    * Result.
@@ -60,7 +60,7 @@ public class EvaluationStep implements WorkflowStep {
    *
    * @param evaluators
    */
-  public EvaluationStep(List<Evaluator> evaluators) {
+  public EvaluationStep(List<? extends Evaluator> evaluators) {
     super();
     this.evaluators = evaluators;
   }
@@ -85,7 +85,7 @@ public class EvaluationStep implements WorkflowStep {
     /**
      * Evaluators to run.
      */
-    private List<Evaluator> evaluators;
+    private List<? extends Evaluator> evaluators;
 
     /**
      * Result hierarchy
@@ -98,7 +98,7 @@ public class EvaluationStep implements WorkflowStep {
      * @param hier Result hierarchy
      * @param evaluators Evaluators
      */
-    public Evaluation(ResultHierarchy hier, List<Evaluator> evaluators) {
+    public Evaluation(ResultHierarchy hier, List<? extends Evaluator> evaluators) {
       this.hier = hier;
       this.evaluators = evaluators;
 
@@ -149,11 +149,6 @@ public class EvaluationStep implements WorkflowStep {
 
     /**
      * Parameter ID to specify the evaluators to run.
-     *
-     * Key:
-     * <p>
-     * {@code -evaluator}
-     * </p>
      */
     public static final OptionID EVALUATOR_ID = new OptionID("evaluator", "Class to evaluate the results with.");
 

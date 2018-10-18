@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,17 +24,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Compute the mean using a numerically stable online algorithm.
- *
+ * <p>
  * This class can repeatedly be fed with data using the put() methods, the
  * resulting values for mean can be queried at any time using getMean().
- *
+ * <p>
  * The high-precision function is based on:
  * <p>
- * P. M. Neely<br />
+ * P. M. Neely<br>
  * Comparison of Several Algorithms for Computation of Means, Standard
- * Deviations and Correlation Coefficients<br />
+ * Deviations and Correlation Coefficients<br>
  * Communications of the ACM 9(7), 1966
- * </p>
  *
  * @author Erich Schubert
  * @since 0.2

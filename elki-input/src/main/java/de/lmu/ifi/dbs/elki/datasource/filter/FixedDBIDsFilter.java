@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -78,9 +78,6 @@ public class FixedDBIDsFilter implements ObjectFilter {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Optional parameter to specify the first object ID to use.
-     * <p>
-     * Key: {@code -dbc.startid}
-     * </p>
      */
     public static final OptionID IDSTART_ID = new OptionID("dbc.startid", "Object ID to start counting with");
 
@@ -93,7 +90,7 @@ public class FixedDBIDsFilter implements ObjectFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter startidParam = new IntParameter(IDSTART_ID, 0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(startidParam)) {
         startid = startidParam.intValue();
       }

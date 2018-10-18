@@ -1,12 +1,13 @@
 /**
- * <p>Vector Approximation File</p>
+ * Vector Approximation File
  */
-// TODO: add projected VA files, allow different binning and projection strategies.
+// TODO: add projected VA files
+// TODO: allow different binning and projection strategies.
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

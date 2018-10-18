@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -140,17 +140,11 @@ public class ClassLabelFilter implements ObjectFilter {
     /**
      * Optional parameter that specifies the index of the label to be used as
      * class label, must be an integer equal to or greater than 0.
-     * <p>
-     * Key: {@code -dbc.classLabelIndex}
-     * </p>
      */
     public static final OptionID CLASS_LABEL_INDEX_ID = new OptionID("dbc.classLabelIndex", "The index of the label to be used as class label. The first label is 0, negative indexes are relative to the end.");
 
     /**
      * Parameter to specify the class of occurring class labels.
-     * <p>
-     * Key: {@code -dbc.classLabelClass}
-     * </p>
      */
     public static final OptionID CLASS_LABEL_CLASS_ID = new OptionID("dbc.classLabelClass", "Class label class to use.");
 
