@@ -30,21 +30,21 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Regression test for CLARANSFast
+ * Regression test for CLARANS+
  *
  * @author Erich Schubert
  */
-public class CLARANSFastTest extends AbstractClusterAlgorithmTest {
+public class CLARANSPlusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCLARANS() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<CLARANSFast<DoubleVector>>(CLARANSFast.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<CLARANSPlus<DoubleVector>>(CLARANSPlus.class) //
         .with(KMeans.K_ID, 5) //
         .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
         .with(CLARANS.Parameterizer.NEIGHBORS_ID, 3) //
         .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
         .build().run(db);
-    // CLARANSFast finds better solution than CLARANS in this unit test!
+    // CLARANSPlus finds better solution than CLARANS in this unit test!
     testFMeasure(db, result, .998);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -52,7 +52,7 @@ public class CLARANSFastTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCLARANSNoise() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<MedoidModel> result = new ELKIBuilder<CLARANSFast<DoubleVector>>(CLARANSFast.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<CLARANSPlus<DoubleVector>>(CLARANSPlus.class) //
         .with(KMeans.K_ID, 3) //
         .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
         .with(CLARANS.Parameterizer.NEIGHBORS_ID, .1) //

@@ -35,21 +35,39 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Faster variation of CLARANS
+ * A faster variation of CLARANS, that can explore O(k) as many swaps at a
+ * similar cost by considering all medoids for each candidate non-medoid. Since
+ * this means sampling fewer non-medoids, we suggest to increase the subsampling
+ * rate slightly to get higher quality than CLARANS, at better runtime.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Peter J. Rousseeuw<br>
+ * Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS
+ * Algorithms<br>
+ * preprint, to appear
  *
  * @author Erich Schubert
  *
  * @param <V> Vector type
  */
-public class CLARANSFast<V> extends CLARANS<V> {
+@Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
+    title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "preprint, to appear", //
+    url = "https://arxiv.org/abs/1810.05691", //
+    bibkey = "DBLP:journals/corr/abs-1810-05691")
+@Priority(Priority.IMPORTANT + 1)
+public class CLARANSPlus<V> extends CLARANS<V> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(CLARANSFast.class);
+  private static final Logging LOG = Logging.getLogger(CLARANSPlus.class);
 
   /**
    * Constructor.
@@ -60,7 +78,7 @@ public class CLARANSFast<V> extends CLARANS<V> {
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
    */
-  public CLARANSFast(DistanceFunction<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
+  public CLARANSPlus(DistanceFunction<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
     super(distanceFunction, k, numlocal, maxneighbor, random);
   }
 
@@ -79,7 +97,9 @@ public class CLARANSFast<V> extends CLARANS<V> {
     // Number of retries, relative rate, or absolute count:
     final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * (ids.size() - k) : maxneighbor);
     Random rnd = random.getSingleThreadedRandom();
-    DBIDArrayIter cand = DBIDUtil.ensureArray(ids).iter(); // Might copy!
+    // We will be using this to avoid sampling the same points twice.
+    ArrayModifiableDBIDs subsampler = DBIDUtil.newArray(ids);
+    DBIDArrayIter cand = subsampler.iter();
 
     // Setup cluster assignment store
     Assignment best = new Assignment(distQ, ids, k);
@@ -99,8 +119,10 @@ public class CLARANSFast<V> extends CLARANS<V> {
       int j = 1;
       step: while(j < retries) {
         // 4 part a. choose a random non-medoid (~ neighbor in G):
-        for(int r = 0;; r++) {
-          cand.seek(rnd.nextInt(ids.size())); // Random point
+        for(int r = 0; r < ids.size(); r++) {
+          // Fisher-Yates shuffle to avoid sampling the same points twice!
+          subsampler.swap(r, rnd.nextInt(ids.size() - r) + r); // Random point
+          cand.seek(r); // Random point
           if(curr.nearest.doubleValue(cand) > 0) {
             break; // Good: not a medoid.
           }
@@ -148,7 +170,6 @@ public class CLARANSFast<V> extends CLARANS<V> {
     }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, best.assignment, k);
-
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("CLARANS Clustering", "clarans-clustering");
     for(DBIDArrayIter it = best.medoids.iter(); it.valid(); it.advance()) {
@@ -308,8 +329,13 @@ public class CLARANSFast<V> extends CLARANS<V> {
    */
   public static class Parameterizer<V> extends CLARANS.Parameterizer<V> {
     @Override
-    protected CLARANSFast<V> makeInstance() {
-      return new CLARANSFast<>(distanceFunction, k, numlocal, maxneighbor, random);
+    protected double defaultRate() {
+      return 2 * super.defaultRate();
+    }
+
+    @Override
+    protected CLARANSPlus<V> makeInstance() {
+      return new CLARANSPlus<>(distanceFunction, k, numlocal, maxneighbor, random);
     }
   }
 }

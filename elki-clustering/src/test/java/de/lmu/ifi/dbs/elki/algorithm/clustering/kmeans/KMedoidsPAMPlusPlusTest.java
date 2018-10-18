@@ -35,20 +35,15 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  *
- * @author Katharina Rausch
  * @author Erich Schubert
- * @since 0.4.0
  */
-public class KMedoidsPAMFastTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMedians PAM with fixed parameters and compare the result to a golden
-   * standard.
-   */
+public class KMedoidsPAMPlusPlusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsPAM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMFast<DoubleVector>>(KMedoidsPAMFast.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMPlusPlus<DoubleVector>>(KMedoidsPAMPlusPlus.class) //
         .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 0) //
         .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });

@@ -31,14 +31,25 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * A slightly faster version of PAM (but in the same overall complexity). The
- * change here is fairly trivial - we just aggregate the costs of all possible
- * medoids in an array, rather than doing one at a time. This reduces the number
- * of distance computations and lookups in the nearest / second nearest lists by
- * a factor of k, at the cost of k doubles.
+ * PAM+: A version of PAM that is O(k) times faster, i.e., now in O((n-k)²).
+ * The change here feels pretty small - we handle all k medoids in parallel
+ * using an array. But this means the innermost loop only gets executed in
+ * O(1/k) of all iterations, and thus we benefit on average.
+ * <p>
+ * This acceleration gives <em>exactly</em> (assuming perfect numerical
+ * accuracy) the same results as the original PAM. For further improvements that
+ * can affect the result, see also {@link KMedoidsPAMPlusPlus}.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Peter J. Rousseeuw<br>
+ * Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS
+ * Algorithms<br>
+ * preprint, to appear
  *
  * @author Erich Schubert
  *
@@ -47,16 +58,21 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @param <V> vector datatype
  */
-public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
+@Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
+    title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "preprint, to appear", //
+    url = "https://arxiv.org/abs/1810.05691", //
+    bibkey = "DBLP:journals/corr/abs-1810-05691")
+public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsPAMFast.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsPAMPlus.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsPAMFast.class.getName();
+  private static final String KEY = KMedoidsPAMPlus.class.getName();
 
   /**
    * Constructor.
@@ -66,7 +82,7 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAMFast(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPAMPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -343,8 +359,8 @@ public class KMedoidsPAMFast<V> extends KMedoidsPAM<V> {
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
     @Override
-    protected KMedoidsPAMFast<V> makeInstance() {
-      return new KMedoidsPAMFast<>(distanceFunction, k, maxiter, initializer);
+    protected KMedoidsPAMPlus<V> makeInstance() {
+      return new KMedoidsPAMPlus<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

@@ -430,7 +430,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         k = kP.intValue();
       }
 
-      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
+      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<>(KMeans.INIT_ID, KMedoidsInitialization.class, defaultInitializer());
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -440,6 +440,16 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
+    }
+
+    /**
+     * Default initialization method.
+     *
+     * @return Initialization method
+     */
+    @SuppressWarnings("rawtypes")
+    protected Class<? extends KMedoidsInitialization> defaultInitializer() {
+      return PAMInitialMeans.class;
     }
 
     @Override

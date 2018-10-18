@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
@@ -32,18 +33,36 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * A slightly faster version of PAM (but in the same overall complexity). The
- * change here is fairly trivial - we just aggregate the costs of all possible
- * medoids in an array, rather than doing one at a time. This reduces the number
- * of distance computations and lookups in the nearest / second nearest lists by
- * a factor of k, at the cost of k doubles. Furthermore, this version tries to
- * perform the best update for each cluster, and thus may need fewer iterations.
+ * An improved version of PAM, that is usually O(k) times faster. This class
+ * incorporates the benefits of {@link KMedoidsPAMPlus}, but in addition it
+ * tries to perform multiple swaps in each iteration, which can reduce the total
+ * number of iterations needed substantially for large k, if some areas of the
+ * data are largely independent.
+ * <p>
+ * There is a tolerance parameter, which controls how many additional swaps are
+ * performed. When set to 0, it will only execute an additional swap if it
+ * appears to be independent (i.e., the improvements resulting from the swap
+ * have not decreased when the first swap was executed). We suggest to rather
+ * leave it at the default of 1, which means to perform any additional swap
+ * that gives an improvement. We could not observe a tendency to find worse
+ * results when doing these additional swaps, but a reduced runtime.
+ * <p>
+ * Because of the speed benefits, we also suggest to use KMeans++
+ * initialization, and try multiple times if the runtime permits.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Peter J. Rousseeuw<br>
+ * Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS
+ * Algorithms<br>
+ * preprint, to appear
  *
  * @author Erich Schubert
  *
@@ -53,16 +72,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> vector datatype
  */
 @Priority(Priority.IMPORTANT + 2)
-public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
+@Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
+    title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "preprint, to appear", //
+    url = "https://arxiv.org/abs/1810.05691", //
+    bibkey = "DBLP:journals/corr/abs-1810-05691")
+public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsPAMFaster.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsPAMPlusPlus.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsPAMFaster.class.getName();
+  private static final String KEY = KMedoidsPAMPlusPlus.class.getName();
 
   /**
    * Tolerance for fast swapping behavior (may perform worse swaps).
@@ -77,7 +101,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAMFaster(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPAMPlusPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     this(distanceFunction, k, maxiter, initializer, 1.);
   }
 
@@ -90,7 +114,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
    * @param initializer Function to generate the initial means
    * @param fastswap Tolerance for fast swapping
    */
-  public KMedoidsPAMFaster(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+  public KMedoidsPAMPlusPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
     super(distanceFunction, k, maxiter, initializer);
     this.fasttol = fasttol;
   }
@@ -105,7 +129,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
    *
    * @author Erich Schubert
    */
-  protected static class Instance extends KMedoidsPAMFast.Instance {
+  protected static class Instance extends KMedoidsPAMPlus.Instance {
     /**
      * Tolerance for fast swapping behavior (may perform worse swaps).
      */
@@ -292,7 +316,7 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V> extends KMedoidsPAMFast.Parameterizer<V> {
+  public static class Parameterizer<V> extends KMedoidsPAMPlus.Parameterizer<V> {
     /**
      * Tolerance for performing additional swaps.
      */
@@ -302,6 +326,12 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
      * Tolerance for fast swapping behavior (may perform worse swaps).
      */
     protected double fasttol = 0.;
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    protected Class<? extends KMedoidsInitialization> defaultInitializer() {
+      return KMeansPlusPlusInitialMeans.class;
+    }
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -316,8 +346,8 @@ public class KMedoidsPAMFaster<V> extends KMedoidsPAMFast<V> {
     }
 
     @Override
-    protected KMedoidsPAMFaster<V> makeInstance() {
-      return new KMedoidsPAMFaster<>(distanceFunction, k, maxiter, initializer, fasttol);
+    protected KMedoidsPAMPlusPlus<V> makeInstance() {
+      return new KMedoidsPAMPlusPlus<>(distanceFunction, k, maxiter, initializer, fasttol);
     }
   }
 }

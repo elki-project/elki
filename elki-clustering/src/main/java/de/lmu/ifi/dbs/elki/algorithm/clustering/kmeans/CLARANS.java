@@ -471,6 +471,15 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
      */
     RandomFactory random;
 
+    /**
+     * Default sampling rate.
+     *
+     * @return Default sampling rate.
+     */
+    protected double defaultRate() {
+      return 0.0125;
+    }
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -487,7 +496,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
         numlocal = numlocalP.intValue();
       }
 
-      DoubleParameter maxneighborP = new DoubleParameter(NEIGHBORS_ID, 0.0125) //
+      DoubleParameter maxneighborP = new DoubleParameter(NEIGHBORS_ID, defaultRate()) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(maxneighborP)) {
         maxneighbor = maxneighborP.doubleValue();
