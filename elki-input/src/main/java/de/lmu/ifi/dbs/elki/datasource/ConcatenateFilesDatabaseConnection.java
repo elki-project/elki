@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 201
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -86,8 +86,8 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     objects.appendColumn(TypeUtil.STRING, new ArrayList<>());
     for(File file : files) {
       String filestr = file.getPath();
-      try (InputStream inputStream = FileUtil.tryGzipInput(//
-          new BufferedInputStream(new FileInputStream(file)))) {
+      try (FileInputStream fis = new FileInputStream(file); //
+          InputStream inputStream = FileUtil.tryGzipInput(new BufferedInputStream(fis))) {
         final BundleStreamSource source;
         if(parser instanceof StreamingParser) {
           final StreamingParser streamParser = (StreamingParser) parser;
@@ -156,9 +156,6 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**
      * Parameter that specifies the name of the input files to be parsed.
-     * <p>
-     * Key: {@code -dbc.in}
-     * </p>
      */
     public static final OptionID INPUT_ID = FileBasedDatabaseConnection.Parameterizer.INPUT_ID;
 

@@ -46,7 +46,7 @@ public class SingleStreamOutput implements StreamFactory {
    * @throws IOException on IO error
    */
   public SingleStreamOutput() throws IOException {
-    this(FileDescriptor.out);
+    this(System.out);
   }
 
   /**
@@ -120,11 +120,20 @@ public class SingleStreamOutput implements StreamFactory {
    */
   public SingleStreamOutput(FileOutputStream out, boolean gzip) throws IOException {
     OutputStream os = out;
-    if (gzip) {
+    if(gzip) {
       // wrap into gzip stream.
       os = new GZIPOutputStream(os);
     }
     this.stream = new PrintStream(os);
+  }
+
+  /**
+   * Constructor with a print stream.
+   *
+   * @param os Output stream
+   */
+  public SingleStreamOutput(PrintStream os) {
+    this.stream = os;
   }
 
   /**
@@ -141,5 +150,14 @@ public class SingleStreamOutput implements StreamFactory {
   @Override
   public void closeStream(PrintStream stream) {
     // Do NOT close. We may still need it.
+  }
+
+  @Override
+  public void close() throws IOException {
+    if(stream == System.out) {
+      stream.flush();
+      return;
+    }
+    stream.close();
   }
 }

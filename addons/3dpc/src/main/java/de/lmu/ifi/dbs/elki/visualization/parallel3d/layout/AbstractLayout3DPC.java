@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,8 +67,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   @Override
   public Layout layout(Relation<? extends NumberVector> rel) {
-    final int dim = RelationUtil.dimensionality(rel);
-    return layout(dim, computeSimilarityMatrix(sim, rel));
+    return layout(RelationUtil.dimensionality(rel), computeSimilarityMatrix(sim, rel));
   }
 
   /**
@@ -80,10 +79,9 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    */
   public static double[] computeSimilarityMatrix(DependenceMeasure sim, Relation<? extends NumberVector> rel) {
     final int dim = RelationUtil.dimensionality(rel);
-    final int size = rel.size();
     // TODO: we could use less memory (no copy), but this would likely be
     // slower. Maybe as a fallback option?
-    double[][] data = new double[dim][size];
+    double[][] data = new double[dim][rel.size()];
     int r = 0;
     for(DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), r++) {
       NumberVector v = rel.get(it);
@@ -100,6 +98,8 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   /**
    * Class to use a lower-triangular similarity matrix for distance-based Prim's
    * spanning tree.
+   * <p>
+   * Implementation note: the edges are given as an array of 2*e values.
    * 
    * @author Erich Schubert
    */
@@ -137,8 +137,8 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
     // Convert edges:
     ArrayList<Edge> edges = new ArrayList<>(iedges.length >> 1);
-    for(int i = 0; i < iedges.length; i += 2) {
-      edges.add(new Edge(iedges[i], iedges[i + 1]));
+    for(int i = 1; i < iedges.length; i += 2) {
+      edges.add(new Edge(iedges[i - 1], iedges[i]));
     }
     layout.edges = edges;
 
@@ -167,33 +167,24 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   protected N buildTree(int[] msg, int cur, int parent, ArrayList<N> nodes) {
     // Count the number of children:
     int c = 0;
-    for(int i = 0; i < msg.length; i += 2) {
-      if(msg[i] == cur && msg[i + 1] != parent) {
-        c++;
-      }
-      if(msg[i + 1] == cur && msg[i] != parent) {
+    for(int i = 1; i < msg.length; i += 2) {
+      if((msg[i - 1] == cur && msg[i] != parent) || (msg[i] == cur && msg[i - 1] != parent)) {
         c++;
       }
     }
     // Build children:
-    List<N> children;
+    List<N> children = Collections.emptyList();
     if(c > 0) {
       children = new ArrayList<>(c);
-    }
-    else {
-      children = Collections.emptyList();
-    }
-    for(int i = 0; i < msg.length; i += 2) {
-      if(msg[i] == cur && msg[i + 1] != parent) {
-        c--;
-        children.add(buildTree(msg, msg[i + 1], cur, nodes));
-      }
-      if(msg[i + 1] == cur && msg[i] != parent) {
-        c--;
-        children.add(buildTree(msg, msg[i], cur, nodes));
+      for(int i = 1; i < msg.length; i += 2) {
+        if(msg[i - 1] == cur && msg[i] != parent) {
+          children.add(buildTree(msg, msg[i], cur, nodes));
+        }
+        else if(msg[i] == cur && msg[i - 1] != parent) {
+          children.add(buildTree(msg, msg[i - 1], cur, nodes));
+        }
       }
     }
-    assert (c == 0);
     N node = makeNode(cur, children);
     nodes.set(cur, node);
     return node;
@@ -208,8 +199,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   protected int maxDepth(Layout.Node node) {
     int depth = 0;
     for(int i = 0; i < node.numChildren(); i++) {
-      Layout.Node child = node.getChild(i);
-      depth = Math.max(depth, maxDepth(child));
+      depth = Math.max(depth, maxDepth(node.getChild(i)));
     }
     return depth + 1;
   }
@@ -287,20 +277,18 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    */
   public static int findOptimalRoot(int[] msg) {
     final int size = (msg.length >> 1) + 1;
-
-    int[] depth = new int[size];
-    int[] missing = new int[size];
+    int[] depth = new int[size], missing = new int[size];
 
     // We shouldn't need more iterations in any case ever.
     int root = -1;
     for(int i = 1; i < size; i++) {
       boolean active = false;
-      for(int e = 0; e < msg.length; e += 2) {
-        if(depth[msg[e]] == 0) {
-          missing[msg[e + 1]]++;
-        }
-        if(depth[msg[e + 1]] == 0) {
+      for(int e = 1; e < msg.length; e += 2) {
+        if(depth[msg[e - 1]] == 0) {
           missing[msg[e]]++;
+        }
+        if(depth[msg[e]] == 0) {
+          missing[msg[e - 1]]++;
         }
       }
       for(int n = 0; n < size; n++) {

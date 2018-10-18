@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ import java.io.PrintStream;
 
 /**
  * Interface for output handling (single file, multiple files, ...)
- * 
+ * <p>
  * Note: these classes need to be rewritten. Contributions welcome!
  * 
  * @author Erich Schubert
  * @since 0.2
  */
-public interface StreamFactory {
+public interface StreamFactory extends AutoCloseable {
   /**
    * Retrieve a print stream for output using the given label. Note that
    * multiple labels MAY result in the same PrintStream, so you should be
@@ -50,4 +50,10 @@ public interface StreamFactory {
    * @param stream Stream to close
    */
   void closeStream(PrintStream stream);
+
+  /**
+   * Close stream factory.
+   */
+  @Override
+  void close() throws IOException;
 }

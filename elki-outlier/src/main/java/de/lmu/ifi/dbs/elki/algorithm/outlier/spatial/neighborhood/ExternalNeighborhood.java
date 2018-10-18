@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,11 +63,6 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
    * Logger
    */
   private static final Logging LOG = Logging.getLogger(ExternalNeighborhood.class);
-
-  /**
-   * Parameter to specify the neighborhood file
-   */
-  public static final OptionID NEIGHBORHOOD_FILE_ID = new OptionID("externalneighbors.file", "The file listing the neighbors.");
 
   /**
    * Constructor.
@@ -170,8 +165,9 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       if(LOG.isDebugging()) {
         LOG.verbose("Loading neighborhood file.");
       }
-      try(InputStream in = FileUtil.tryGzipInput(new FileInputStream(file));
-        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+      try (FileInputStream fis = new FileInputStream(file);
+          InputStream in = FileUtil.tryGzipInput(fis);
+          BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
         for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
           String[] entries = line.split(" ");
@@ -211,6 +207,11 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * Parameter to specify the neighborhood file
+       */
+      public static final OptionID NEIGHBORHOOD_FILE_ID = new OptionID("externalneighbors.file", "The file listing the neighbors.");
+
       /**
        * The input file.
        */

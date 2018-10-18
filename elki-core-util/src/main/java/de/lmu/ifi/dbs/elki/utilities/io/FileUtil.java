@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,10 +72,7 @@ public final class FileUtil {
       return null;
     }
     int index = name.lastIndexOf('.');
-    if(index >= name.length() - 1) {
-      return null;
-    }
-    return name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+    return index < 0 ? null : name.substring(index + 1).toLowerCase();
   }
 
   /**
@@ -106,8 +103,7 @@ public final class FileUtil {
       try {
         URLConnection conn = u.openConnection();
         conn.setUseCaches(false);
-        result = conn.getInputStream();
-        if(result != null) {
+        if((result = conn.getInputStream()) != null) {
           return result;
         }
       }
@@ -121,8 +117,6 @@ public final class FileUtil {
   /**
    * Try to open a stream as gzip, if it starts with the gzip magic.
    * 
-   * TODO: move to utils package.
-   * 
    * @param in original input stream
    * @return old input stream or a {@link GZIPInputStream} if appropriate.
    * @throws IOException on IO error
@@ -131,24 +125,17 @@ public final class FileUtil {
     // try autodetecting gzip compression.
     if(!in.markSupported()) {
       PushbackInputStream pb = new PushbackInputStream(in, 16);
-      in = pb;
-      // read a magic from the file header
+      // read a magic from the file header, and push it back
       byte[] magic = { 0, 0 };
-      pb.read(magic);
-      pb.unread(magic);
-      if(magic[0] == 31 && magic[1] == -117) {
-        return new GZIPInputStream(pb);
-      }
-      return in;
+      int r = pb.read(magic);
+      pb.unread(magic, 0, r);
+      return (magic[0] == 31 && magic[1] == -117) ? new GZIPInputStream(pb) : pb;
     }
     // Mark is supported.
     in.mark(16);
-    boolean isgzip = (in.read() == 31 && in.read() == -117);
+    boolean isgzip = ((in.read() << 8) | in.read()) == GZIPInputStream.GZIP_MAGIC;
     in.reset(); // Rewind
-    if(isgzip) {
-      in = new GZIPInputStream(in);
-    }
-    return in;
+    return isgzip ? new GZIPInputStream(in) : in;
   }
 
   /**
@@ -166,47 +153,31 @@ public final class FileUtil {
     }
     // Try with base directory
     if(basedir != null) {
-      f = new File(basedir, name);
-      // logger.warning("Trying: "+f.getAbsolutePath());
-      if(f.exists()) {
+      if((f = new File(basedir, name)).exists()) {
         return f;
       }
     }
     // try stripping whitespace
-    {
-      String name2 = name.trim();
-      if(!name.equals(name2)) {
-        // logger.warning("Trying without whitespace.");
-        f = locateFile(name2, basedir);
-        if(f != null) {
-          return f;
-        }
+    String name2;
+    if(!name.equals(name2 = name.trim())) {
+      if((f = locateFile(name2, basedir)) != null) {
+        return f;
       }
     }
     // try substituting path separators
-    {
-      String name2 = name.replace('/', File.separatorChar);
-      if(!name.equals(name2)) {
-        // logger.warning("Trying with replaced separators.");
-        f = locateFile(name2, basedir);
-        if(f != null) {
-          return f;
-        }
+    if(!name.equals(name2 = name.replace('/', File.separatorChar))) {
+      if((f = locateFile(name2, basedir)) != null) {
+        return f;
       }
-      name2 = name.replace('\\', File.separatorChar);
-      if(!name.equals(name2)) {
-        // logger.warning("Trying with replaced separators.");
-        f = locateFile(name2, basedir);
-        if(f != null) {
-          return f;
-        }
+    }
+    if(!name.equals(name2 = name.replace('\\', File.separatorChar))) {
+      if((f = locateFile(name2, basedir)) != null) {
+        return f;
       }
     }
     // try stripping extra characters, such as quotes.
     if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
-      // logger.warning("Trying without quotes.");
-      f = locateFile(name.substring(1, name.length() - 1), basedir);
-      if(f != null) {
+      if((f = locateFile(name.substring(1, name.length() - 1), basedir)) != null) {
         return f;
       }
     }
@@ -214,7 +185,7 @@ public final class FileUtil {
   }
 
   /**
-   * Load an input stream (e.g. a Java resource) into a String buffer. The
+   * Load an input stream (e.g., a Java resource) into a String buffer. The
    * stream is closed afterwards.
    * 
    * @param is Input stream

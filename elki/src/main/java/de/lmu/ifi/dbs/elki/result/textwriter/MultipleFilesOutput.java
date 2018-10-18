@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -89,25 +89,22 @@ public class MultipleFilesOutput implements StreamFactory {
    * @throws IOException
    */
   private PrintStream newStream(String name) throws IOException {
-    if (LOG.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       LOG.debugFiner("Requested stream: " + name);
     }
     // Ensure the directory exists:
-    if (!basename.exists()) {
+    if(!basename.exists()) {
       basename.mkdirs();
     }
     String fn = basename.getAbsolutePath() + File.separator + name + EXTENSION;
-    if (usegzip) {
-      fn = fn + GZIP_EXTENSION;
-    }
-    File n = new File(fn);
-    OutputStream os = new FileOutputStream(n);
-    if (usegzip) {
+    fn = usegzip ? fn + GZIP_EXTENSION : fn;
+    OutputStream os = new FileOutputStream(fn);
+    if(usegzip) {
       // wrap into gzip stream.
       os = new GZIPOutputStream(os);
     }
     PrintStream res = new PrintStream(os);
-    if (LOG.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       LOG.debugFiner("Opened new output stream:" + fn);
     }
     // cache.
@@ -127,21 +124,8 @@ public class MultipleFilesOutput implements StreamFactory {
     stream.close();
   }
 
-  /**
-   * Get GZIP compression flag.
-   * 
-   * @return if GZIP compression is enabled
-   */
-  protected boolean isGzipCompression() {
-    return usegzip;
-  }
-
-  /**
-   * Set GZIP compression flag.
-   * 
-   * @param usegzip use GZIP compression
-   */
-  protected void setGzipCompression(boolean usegzip) {
-    this.usegzip = usegzip;
+  @Override
+  public void close() throws IOException {
+    // TODO: should we keep track of all streams, and force close them?
   }
 }

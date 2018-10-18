@@ -193,19 +193,18 @@ public class PrimsMinimumSpanningTree {
     }
     // Count nodes to be retained:
     int keep = 0;
-    for(int i = 0; i < tree.length; i += 2) {
-      if(deg[tree[i]] >= minDegree && deg[tree[i + 1]] >= minDegree) {
+    for(int i = 1; i < tree.length; i += 2) {
+      if(deg[tree[i - 1]] >= minDegree && deg[tree[i]] >= minDegree) {
         keep++;
       }
     }
     // Build reduced tree
     int j = 0;
     int[] ret = new int[keep];
-    for(int i = 0; i < tree.length; i += 2) {
-      if(deg[tree[i]] >= minDegree && deg[tree[i + 1]] >= minDegree) {
-        ret[j] = tree[i];
-        ret[j + 1] = tree[i + 1];
-        j += 2;
+    for(int i = 1; i < tree.length; i += 2) {
+      if(deg[tree[i - 1]] >= minDegree && deg[tree[i]] >= minDegree) {
+        ret[j++] = tree[i - 1];
+        ret[j++] = tree[i];
       }
     }
     assert (j == ret.length);

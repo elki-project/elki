@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,13 +58,14 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param infile File to load the data from
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, File infile) {
-    super(null, filters, parser);
-    try {
-      this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
-    }
-    catch(IOException e) {
-      throw new AbortException("Could not load input file: " + infile, e);
-    }
+    super(() -> {
+      try {
+        return new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
+      }
+      catch(IOException e) {
+        throw new AbortException("Could not load input file: " + infile, e);
+      }
+    }, filters, parser);
   }
 
   /**
@@ -75,13 +76,14 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param infile File to load the data from
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, String infile) {
-    super(null, filters, parser);
-    try {
-      this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
-    }
-    catch(IOException e) {
-      throw new AbortException("Could not load input file: " + infile, e);
-    }
+    super(() -> {
+      try {
+        return new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
+      }
+      catch(IOException e) {
+        throw new AbortException("Could not load input file: " + infile, e);
+      }
+    }, filters, parser);
   }
 
   /**
@@ -105,9 +107,6 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
   public static class Parameterizer extends InputStreamDatabaseConnection.Parameterizer {
     /**
      * Parameter that specifies the name of the input file to be parsed.
-     * <p>
-     * Key: {@code -dbc.in}
-     * </p>
      */
     public static final OptionID INPUT_ID = new OptionID("dbc.in", "The name of the input file to be parsed.");
 

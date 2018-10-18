@@ -147,7 +147,8 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
 
     DoubleMinMax minmax = new DoubleMinMax();
 
-    try (InputStream in = FileUtil.tryGzipInput(new FileInputStream(file));//
+    try (FileInputStream fis = new FileInputStream(file); //
+        InputStream in = FileUtil.tryGzipInput(fis); //
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       CharSequence buf = reader.getBuffer();
@@ -159,8 +160,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
         for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
           mi.region(tokenizer.getStart(), tokenizer.getEnd());
           ms.region(tokenizer.getStart(), tokenizer.getEnd());
-          final boolean mif = mi.find();
-          final boolean msf = ms.find();
+          final boolean mif = mi.find(), msf = ms.find();
           if(mif && msf) {
             throw new AbortException("ID pattern and score pattern both match value: " + tokenizer.getSubstring());
           }
@@ -193,13 +193,9 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
       throw new AbortException("Could not load outlier scores: " + e.getMessage() + " when loading " + file, e);
     }
 
-    OutlierScoreMeta meta;
-    if(inverted) {
-      meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    }
-    else {
-      meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    }
+    OutlierScoreMeta meta = inverted //
+        ? new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax()) //
+        : new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     DoubleRelation scoresult = new MaterializedDoubleRelation("External Outlier", "external-outlier", scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
@@ -215,8 +211,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
       mm.put(val);
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());
-    or = new OutlierResult(meta, scoresult);
-    return or;
+    return new OutlierResult(meta, scoresult);
   }
 
   @Override
@@ -239,34 +234,21 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the name of the file to be re-parsed.
-     * <p>
-     * Key: {@code -externaloutlier.file}
-     * </p>
      */
     public static final OptionID FILE_ID = new OptionID("externaloutlier.file", "The file name containing the (external) outlier scores.");
 
     /**
      * Parameter that specifies the object ID pattern
-     * <p>
-     * Key: {@code -externaloutlier.idpattern}<br />
-     * Default: ^ID=
-     * </p>
      */
     public static final OptionID ID_ID = new OptionID("externaloutlier.idpattern", "The pattern to match object ID prefix");
 
     /**
      * Parameter that specifies the object score pattern
-     * <p>
-     * Key: {@code -externaloutlier.scorepattern}<br />
-     * </p>
      */
     public static final OptionID SCORE_ID = new OptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
 
     /**
      * Parameter to specify a scaling function to use.
-     * <p>
-     * Key: {@code -externaloutlier.scaling}
-     * </p>
      */
     public static final OptionID SCALING_ID = new OptionID("externaloutlier.scaling", "Class to use as scaling function.");
 

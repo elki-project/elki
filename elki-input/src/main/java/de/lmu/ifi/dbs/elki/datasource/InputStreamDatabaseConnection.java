@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.function.Supplier;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
@@ -61,18 +62,36 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
   /**
    * The input stream to parse from.
    */
-  InputStream in = System.in;
+  Supplier<InputStream> in = () -> System.in;
+
+  /**
+   * The stream that we are processing.
+   */
+  InputStream ins;
 
   /**
    * Constructor.
    * 
-   * @param in Input stream to process
+   * @param in Input stream opener
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(InputStream in, List<ObjectFilter> filters, Parser parser) {
+  public InputStreamDatabaseConnection(Supplier<InputStream> in, List<ObjectFilter> filters, Parser parser) {
     super(filters);
     this.in = in;
+    this.parser = parser;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param ins Input stream to process
+   * @param filters Filters to use
+   * @param parser the parser to provide a database
+   */
+  public InputStreamDatabaseConnection(InputStream ins, List<ObjectFilter> filters, Parser parser) {
+    super(filters);
+    this.ins = ins;
     this.parser = parser;
   }
 
@@ -85,7 +104,8 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
     // Streaming parsers may yield to stream filters immediately.
     if(parser instanceof StreamingParser) {
       final StreamingParser streamParser = (StreamingParser) parser;
-      streamParser.initStream(in);
+      ins = ins != null ? ins : in.get();
+      streamParser.initStream(ins);
       // normalize objects and transform labels
       if(LOG.isDebugging()) {
         LOG.debugFine("Parsing as stream.");
@@ -101,7 +121,8 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
     else {
       // For non-streaming parsers, we first parse, then filter
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse").begin() : null;
-      MultipleObjectsBundle parsingResult = parser.parse(in);
+      ins = ins != null ? ins : in.get();
+      MultipleObjectsBundle parsingResult = parser.parse(ins);
       parser.cleanup();
       if(duration != null) {
         LOG.statistics(duration.end());
@@ -122,7 +143,10 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
 
   @Override
   public void close() throws IOException {
-    in.close();
+    if(ins != null) {
+      ins.close();
+      ins = null;
+    }
   }
 
   @Override

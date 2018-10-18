@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,9 +64,9 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 /**
  * Read an external clustering result from a file, such as produced by
  * {@link de.lmu.ifi.dbs.elki.result.ClusteringVectorDumper}.
- *
+ * <p>
  * The input format of this parser is text-based:
- *
+ * 
  * <pre>
  * # Optional comment
  * 1 1 1 2 2 2 -1 Example label
@@ -82,8 +82,8 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * @apiviz.has Clustering
  */
 @Description("Load clustering results from an external file. "//
-+ "Each line is expected to consists of one clustering, one integer per point "//
-+ "and an (optional) non-numeric label.")
+    + "Each line is expected to consists of one clustering, one integer per point "//
+    + "and an (optional) non-numeric label.")
 public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends Model>> implements ClusteringAlgorithm<Clustering<? extends Model>> {
   /**
    * The logger for this class.
@@ -119,7 +119,8 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
   @Override
   public Clustering<? extends Model> run(Database database) {
     Clustering<? extends Model> m = null;
-    try (InputStream in = FileUtil.tryGzipInput(new FileInputStream(file)); //
+    try (FileInputStream fis = new FileInputStream(file); //
+        InputStream in = FileUtil.tryGzipInput(fis); //
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       reader.reset(in);
@@ -213,9 +214,6 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter that specifies the name of the file to be re-parsed.
-     * <p>
-     * Key: {@code -externalcluster.file}
-     * </p>
      */
     public static final OptionID FILE_ID = new OptionID("externalcluster.file", "The file name containing the (external) cluster vector.");
 
@@ -227,7 +225,6 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       FileParameter fileP = new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(fileP)) {
         file = fileP.getValue();
