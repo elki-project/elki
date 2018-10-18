@@ -844,30 +844,39 @@ public final class ByteArrayUtil {
       return;
     }
     map.force();
-    // This is an ugly hack, but all that Java currently offers.
-    // See also: http://bugs.sun.com/view_bug.do?bug_id=4724038
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        try {
-          Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
-          if(getCleanerMethod == null) {
-            return null;
+    try {
+      if(Runtime.class.getDeclaredMethod("version") != null)
+        return; // At later Java, the hack below will not work anymore.
+    }
+    catch(NoSuchMethodException e) {
+      // This is an ugly hack, but all that Java <8 offers to help freeing
+      // memory allocated using such buffers.
+      // See also: http://bugs.sun.com/view_bug.do?bug_id=4724038
+      AccessController.doPrivileged(new PrivilegedAction<Object>() {
+        @Override
+        public Object run() {
+          try {
+            Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
+            if(getCleanerMethod == null) {
+              return null;
+            }
+            getCleanerMethod.setAccessible(true);
+            Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
+            Method cleanMethod = cleaner.getClass().getMethod("clean");
+            if(cleanMethod == null) {
+              return null;
+            }
+            cleanMethod.invoke(cleaner);
           }
-
-          getCleanerMethod.setAccessible(true);
-          Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
-          Method cleanMethod = cleaner.getClass().getMethod("clean");
-          if(cleanMethod == null) {
-            return null;
+          catch(Exception e) {
+            LoggingUtil.exception(e);
           }
-          cleanMethod.invoke(cleaner);
+          return null;
         }
-        catch(Exception e) {
-          LoggingUtil.exception(e);
-        }
-        return null;
-      }
-    });
+      });
+    }
+    catch(SecurityException e1) {
+      // Ignore.
+    }
   }
 }
