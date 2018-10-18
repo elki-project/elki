@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -75,13 +76,12 @@ import net.jafama.FastMath;
 /**
  * The PROCLUS algorithm, an algorithm to find subspace clusters in high
  * dimensional spaces.
- * 
+ * <p>
  * Reference:
  * <p>
- * C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park:<br>
- * Fast Algorithms for Projected Clustering. <br>
- * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
- * </p>
+ * C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park<br>
+ * Fast Algorithms for Projected Clustering<br>
+ * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  *
  * @author Elke Achtert
  * @since 0.1
@@ -795,7 +795,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         notFirst = true;
         result.append(d);
       }
-      return result.append("]\nCentroid: ").append(centroid).toString();
+      return FormatUtil.formatTo(result.append("]\nCentroid: "), centroid, ",").toString();
     }
 
     /**

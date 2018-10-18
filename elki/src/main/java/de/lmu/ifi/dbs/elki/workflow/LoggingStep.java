@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public class LoggingStep implements WorkflowStep {
       LoggingConfiguration.setVerbose(Level.WARNING);
     } else if (verbose == 1) {
       LoggingConfiguration.setVerbose(Level.VERBOSE);
-    } else if (verbose > 1) {
+    } else {
       // Extra verbosity - do not call with "false" to not undo!
       LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
     }

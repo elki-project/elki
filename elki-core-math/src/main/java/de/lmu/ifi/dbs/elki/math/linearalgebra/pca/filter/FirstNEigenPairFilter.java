@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,9 +68,9 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Paremeter n
+     * Parameter n
      */
-    public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
+    public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest eigenvalues are marked as strong eigenvectors.");
 
     /**
      * The number of eigenpairs to keep.

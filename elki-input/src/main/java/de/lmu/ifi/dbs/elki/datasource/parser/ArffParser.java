@@ -253,7 +253,7 @@ public class ArffParser implements Parser {
       // Find the first index
       int s = -1;
       for(int i = 0; i < targ.length; i++) {
-        if(targ[i] == out && s < 0) {
+        if(targ[i] == out) {
           s = i;
           break;
         }

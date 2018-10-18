@@ -43,18 +43,18 @@ public class ParameterizationFunction {
    * @apiviz.exclude
    */
   public enum ExtremumType {
-    /**
-     * Minimum.
-     */
-    MINIMUM,
-    /**
-     * Maximum.
-     */
-    MAXIMUM,
-    /**
-     * Constant.
-     */
-    CONSTANT
+  /**
+   * Minimum.
+   */
+  MINIMUM,
+  /**
+   * Maximum.
+   */
+  MAXIMUM,
+  /**
+   * Constant.
+   */
+  CONSTANT
   }
 
   /**
@@ -71,7 +71,7 @@ public class ParameterizationFunction {
    * Holds the type of the global extremum.
    */
   private ExtremumType extremumType;
-  
+
   /**
    * The actual vector.
    */
@@ -98,7 +98,7 @@ public class ParameterizationFunction {
   public double function(double[] alpha) {
     final int d = vec.getDimensionality();
     if(alpha.length != d - 1) {
-      throw new IllegalArgumentException("Parameter alpha must have a " + "dimensionality of " + (d - 1) + ", read: " + alpha.length);
+      throw new IllegalArgumentException("Parameter alpha must have a dimensionality of " + (d - 1) + ", read: " + alpha.length);
     }
 
     double result = 0;
@@ -220,7 +220,11 @@ public class ParameterizationFunction {
       return ExtremumType.CONSTANT;
     }
 
-    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + vec.toArray() + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
+    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + //
+        "\nf_l " + f_l + "\nf_c " + f_c + "\nf_r " + f_r + "\np " + vec + //
+        "\nalpha   " + FormatUtil.format(alpha_extreme_c) + //
+        "\nalpha_l " + FormatUtil.format(alpha_extreme_l) + //
+        "\nalpha_r " + FormatUtil.format(alpha_extreme_r) + "\nn " + n);
     // + "box min " + FormatUtil.format(interval.getMin()) + "\n"
     // + "box max " + FormatUtil.format(interval.getMax()) + "\n"
   }
@@ -439,7 +443,7 @@ public class ParameterizationFunction {
     for(int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
       if(Double.isNaN(alphaExtremum[n])) {
-        throw new IllegalStateException("Houston, we have a problem!" + "\n" + this + "\n" + vec.toArray() + "\n" + FormatUtil.format(alphaExtremum));
+        throw new IllegalStateException("Houston, we have a problem!\n" + this + "\n" + vec + "\n" + FormatUtil.format(alphaExtremum));
       }
     }
 

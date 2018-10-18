@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,29 +64,28 @@ import net.jafama.FastMath;
 /**
  * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify
  * dense clusters in subspaces of maximum dimensionality.
- * 
- * The implementation consists of two steps: <br>
+ * <p>
+ * The implementation consists of two steps:<br>
  * 1. Identification of subspaces that contain clusters <br>
  * 2. Identification of clusters
- * 
+ * <p>
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
- * 
+ * <p>
  * Reference:
  * <p>
- * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan:<br>
+ * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan<br>
  * Automatic Subspace Clustering of High Dimensional Data for Data Mining
- * Applications. <br>
+ * Applications<br>
  * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
- * </p>
- * 
+ *
  * @author Elke Achtert
  * @since 0.1
- * 
+ *
  * @apiviz.has SubspaceModel
  * @apiviz.has CLIQUESubspace
  * @apiviz.uses CLIQUEUnit
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
@@ -103,25 +102,25 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
   private static final Logging LOG = Logging.getLogger(CLIQUE.class);
 
   /**
-   * Holds the value of {@link Parameterizer#XSI_ID}.
+   * Number of intervals in each dimension.
    */
-  private int xsi;
+  protected int xsi;
 
   /**
-   * Holds the value of {@link Parameterizer#TAU_ID}.
+   * Density threshold / selectivity.
    */
-  private double tau;
+  protected double tau;
 
   /**
-   * Holds the value of {@link Parameterizer#PRUNE_ID}.
+   * Pruning flag.
    */
-  private boolean prune;
+  protected boolean prune;
 
   /**
    * Constructor.
    * 
-   * @param xsi Xsi value
-   * @param tau Tau value
+   * @param xsi Xsi interval number
+   * @param tau Tau density threshold
    * @param prune Prune flag
    */
   public CLIQUE(int xsi, double tau, boolean prune) {
@@ -516,39 +515,36 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     /**
      * Parameter to specify the number of intervals (units) in each dimension,
      * must be an integer greater than 0.
-     * <p>
-     * Key: {@code -clique.xsi}
-     * </p>
      */
     public static final OptionID XSI_ID = new OptionID("clique.xsi", "The number of intervals (units) in each dimension.");
 
     /**
      * Parameter to specify the density threshold for the selectivity of a unit,
      * where the selectivity is the fraction of total feature vectors contained
-     * in
-     * this unit, must be a double greater than 0 and less than 1.
-     * <p>
-     * Key: {@code -clique.tau}
-     * </p>
+     * in this unit, must be a double greater than 0 and less than 1.
      */
-    public static final OptionID TAU_ID = new OptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
+    public static final OptionID TAU_ID = new OptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is the fraction of total feature vectors contained in this unit.");
 
     /**
      * Flag to indicate that only subspaces with large coverage (i.e. the
-     * fraction
-     * of the database that is covered by the dense units) are selected, the
-     * rest
-     * will be pruned.
-     * <p>
-     * Key: {@code -clique.prune}
-     * </p>
+     * fraction of the database that is covered by the dense units) are
+     * selected, the rest will be pruned.
      */
-    public static final OptionID PRUNE_ID = new OptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
+    public static final OptionID PRUNE_ID = new OptionID("clique.prune", "Flag to indicate that only subspaces with large coverage (i.e. the fraction of the database that is covered by the dense units) are selected, the rest will be pruned.");
 
+    /**
+     * Number of intervals in each dimension.
+     */
     protected int xsi;
 
+    /**
+     * Density threshold / selectivity.
+     */
     protected double tau;
 
+    /**
+     * Pruning flag.
+     */
     protected boolean prune;
 
     @Override

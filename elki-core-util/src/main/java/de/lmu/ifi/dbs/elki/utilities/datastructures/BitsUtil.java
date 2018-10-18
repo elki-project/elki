@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,10 @@ import it.unimi.dsi.fastutil.Hash.Strategy;
 
 /**
  * Utilities for bit operations.
- *
+ * <p>
  * Implementation note: words are stored in little-endian word order. This can
  * be a bit confusing, because a shift-right means "left" on the word level.
- *
+ * <p>
  * Naming: methods with a <code>C</code> return a copy, methods with
  * <code>I</code> modify in-place.
  *
@@ -79,7 +79,7 @@ public final class BitsUtil {
 
     @Override
     public boolean equals(long[] a, long[] b) {
-      return equal(a,b );
+      return equal(a, b);
     }
   };
 
@@ -1658,9 +1658,7 @@ public final class BitsUtil {
     for(; p >= 0; p--) {
       final long xp = x[p], yp = y[p];
       if(xp != yp) {
-        return (xp < 0) //
-            ? (yp < 0) ? (yp < xp) ? -1 : ((yp == xp) ? 0 : 1) : +1 //
-            : (yp < 0) ? -1 : (xp < yp) ? -1 : ((xp == yp) ? 0 : 1);
+        return xp < 0 ? (yp < 0 && yp < xp) ? -1 : +1 : (yp < 0 || xp < yp) ? -1 : +1;
       }
     }
     return 0;

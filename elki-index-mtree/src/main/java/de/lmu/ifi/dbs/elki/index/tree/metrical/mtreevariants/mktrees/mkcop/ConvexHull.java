@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,7 +62,30 @@ public class ConvexHull {
 
     lowerHull = new int[x.length];
     upperHull = new int[x.length];
-    determineLowerAndUpperHull(x, y);
+    // first point, 0, is always in lowerHull and upperHull
+    l = u = 1;
+
+    // Determine the convex hulls (using point stack)
+    for(int i = 1; i < x.length; i++) {
+      // lower hull
+      lowerHull[l] = i;
+      while(l >= 2 && (y[lowerHull[l]] - y[lowerHull[l - 1]]) / (x[lowerHull[l]] - x[lowerHull[l - 1]]) <= (y[lowerHull[l - 1]] - y[lowerHull[l - 2]]) / (x[lowerHull[l - 1]] - x[lowerHull[l - 2]])) {
+        // right curved
+        lowerHull[l - 1] = lowerHull[l];
+        this.l--;
+      }
+      this.l++;
+
+      // upper hull
+      upperHull[u] = i;
+      while(u >= 2 && (y[upperHull[u]] - y[upperHull[u - 1]]) / (x[upperHull[u]] - x[upperHull[u - 1]]) >= (y[upperHull[u - 1]] - y[upperHull[u - 2]]) / (x[upperHull[u - 1]] - x[upperHull[u - 2]])) {
+        // left curved
+        upperHull[u - 1] = upperHull[u];
+        u--;
+      }
+      u++;
+    }
+    // TODO: shrink memory usage!
   }
 
   /**
@@ -99,51 +122,5 @@ public class ConvexHull {
    */
   public int getNumberOfPointsInUpperHull() {
     return u;
-  }
-
-  /**
-   * Computes the lower and upper hull of the specified distances.
-   * 
-   * @param x the x-values of the points for which the lower and upper hull
-   *        should be computed
-   * @param y the y-values of the points for which the lower and upper hull
-   *        should be computed
-   */
-  private void determineLowerAndUpperHull(double[] x, double[] y) {
-    StringBuilder msg = new StringBuilder(5000);
-    // first point is always in lowerHull and upperHull
-    lowerHull[0] = 0;
-    l = 1;
-    upperHull[0] = 0;
-    u = 1;
-
-    // Determine the convex hulls (using point stack)
-    for(int i = 1; i < x.length; i++) {
-      // lower hull
-      lowerHull[l] = i;
-      while(l >= 2 && (y[lowerHull[l]] - y[lowerHull[l - 1]]) / (x[lowerHull[l]] - x[lowerHull[l - 1]]) <= (y[lowerHull[l - 1]] - y[lowerHull[l - 2]]) / (x[lowerHull[l - 1]] - x[lowerHull[l - 2]])) {
-        // right curved
-        lowerHull[l - 1] = lowerHull[l];
-        this.l--;
-      }
-      this.l++;
-
-      // upper hull
-      upperHull[u] = i;
-      while(u >= 2 && (y[upperHull[u]] - y[upperHull[u - 1]]) / (x[upperHull[u]] - x[upperHull[u - 1]]) >= (y[upperHull[u - 1]] - y[upperHull[u - 2]]) / (x[upperHull[u - 1]] - x[upperHull[u - 2]])) {
-        // left curved
-        upperHull[u - 1] = upperHull[u];
-        u--;
-      }
-      u++;
-    }
-
-    msg.append("lower and upper hull\n");
-    for(int i = 0; i < i; i++) {
-      msg.append("  uhull ").append(i).append('=').append(upperHull[i])//
-          .append(" y=").append(y[upperHull[i]]).append('\n') //
-          .append("  lhull ").append(i).append('=').append(lowerHull[i])//
-          .append(" y=").append(y[lowerHull[i]]).append('\n');
-    }
   }
 }

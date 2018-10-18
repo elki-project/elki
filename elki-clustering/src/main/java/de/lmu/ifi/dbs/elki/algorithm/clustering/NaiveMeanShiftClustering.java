@@ -138,7 +138,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       // Initial position:
       V position = relation.get(iter);
-      iterations: for(int j = 1; j <= MAXITER; j++) {
+      iterations: for(int j = 1; ; j++) {
         // Compute new position:
         V newvec = null;
         {
@@ -171,21 +171,22 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
         // Check for convergence:
         double delta = distq.distance(position, newvec);
         if(bestd < 10 * threshold || bestd * 2 < delta) {
+          assert(bestp != null);
           bestp.second.add(iter);
           break iterations;
-        }
-        if(j == MAXITER) {
-          LOG.warning("No convergence after " + MAXITER + " iterations. Distance: " + delta);
         }
         if(Double.isNaN(delta)) {
           LOG.warning("Encountered NaN distance. Invalid center vector? " + newvec.toString());
           break iterations;
         }
         if(j == MAXITER || delta < threshold) {
+          if(j == MAXITER) {
+            LOG.warning("No convergence after " + MAXITER + " iterations. Distance: " + delta);
+          }
           if(LOG.isDebuggingFine()) {
             LOG.debugFine("New cluster:" + newvec + " delta: " + delta + " threshold: " + threshold + " bestd: " + bestd);
           }
-          ArrayModifiableDBIDs cids = DBIDUtil.newArray();
+          ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
           cids.add(iter);
           clusters.add(new Pair<V, ModifiableDBIDs>(newvec, cids));
           break iterations;
@@ -203,8 +204,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     if(noise.size() > 0) {
       cs.add(new Cluster<MeanModel>(noise, true));
     }
-    Clustering<MeanModel> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
-    return c;
+    return new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
   }
 
   @Override

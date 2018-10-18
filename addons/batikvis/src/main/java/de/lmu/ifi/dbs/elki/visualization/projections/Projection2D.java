@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -82,16 +82,6 @@ public interface Projection2D extends Projection {
    * @return vector in data space
    */
   double[] fastProjectRenderToDataSpace(double x, double y);
-
-  /**
-   * Project a data vector from rendering space to data space.
-   *
-   * @param data vector in rendering space
-   * @param prototype Prototype to create vector from
-   * @return vector in data space
-   */
-  // public <V extends NumberVector> V fastProjectRenderToDataSpace(double[]
-  // data, V prototype);
 
   /**
    * Project a vector from rendering space to scaled space.

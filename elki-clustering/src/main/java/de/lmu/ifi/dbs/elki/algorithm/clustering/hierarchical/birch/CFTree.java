@@ -137,7 +137,6 @@ public class CFTree {
   /**
    * Insert a data point into the tree.
    *
-   * @param id Object ID
    * @param nv Object data
    */
   public void insert(NumberVector nv) {
@@ -298,10 +297,9 @@ public class CFTree {
 
   /**
    * Find the leaf of a cluster, to get the final cluster assignment.
-   *
+   * <p>
    * In contrast to {@link #insert}, this does not modify the tree.
    *
-   * @param node Current node
    * @param nv Object data
    * @return Leaf this vector should be assigned to
    */
@@ -314,9 +312,9 @@ public class CFTree {
 
   /**
    * Find the leaf of a cluster, to get the final cluster assignment.
-   *
+   * <p>
    * In contrast to {@link #insert}, this does not modify the tree.
-   *
+   * <p>
    * TODO: allow "outliers"?
    *
    * @param node Current node

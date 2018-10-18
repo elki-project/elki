@@ -449,8 +449,6 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
   /**
    * Depth-sort the axes.
-   * 
-   * @param axes Sorted list of (depth, axis)
    */
   private void sortAxes() {
     for(int d = 0; d < shared.dim; d++) {

@@ -93,7 +93,7 @@ public class EMClusterVisualization implements VisFactory {
   /**
    * Constants for quantiles of standard deviation
    */
-  final static double[] sigma = new double[] { 0.41, 0.223, 0.047 };
+  final static double[] SIGMA = new double[] { 0.41, 0.223, 0.047 };
 
   /**
    * Constructor
@@ -146,11 +146,6 @@ public class EMClusterVisualization implements VisFactory {
      * Minus Kappa constant.
      */
     private static final double MKAPPA = -KAPPA;
-
-    /**
-     * StyleParameter:
-     */
-    private int times = 3;
 
     /**
      * Opacity
@@ -263,7 +258,7 @@ public class EMClusterVisualization implements VisFactory {
           p4 = new double[2], tmp1 = new double[2], tmp2 = new double[2];
       for(int dim1 = 0; dim1 < pc.length - 1; dim1++) {
         for(int dim2 = dim1 + 1; dim2 < pc.length; dim2++) {
-          for(int i = 1; i <= times; i++) {
+          for(int i = 1; i <= SIGMA.length; i++) {
             equalsPlusTimes(p1, cent, pc[dim1], i);
             equalsPlusTimes(p2, cent, pc[dim2], i);
             equalsPlusTimes(p3, cent, pc[dim1], -i);
@@ -291,8 +286,7 @@ public class EMClusterVisualization implements VisFactory {
 
             Element ellipse = path.makeElement(svgp, sname);
             if(cls != null) {
-              double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
-              cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
+              cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, SIGMA[i - 1]);
               SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
             }
             layer.appendChild(ellipse);
@@ -328,7 +322,7 @@ public class EMClusterVisualization implements VisFactory {
         return;
       }
       CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
-      for(int i = 1; i <= times; i++) {
+      for(int i = 1; i <= SIGMA.length; i++) {
         SVGPath path = new SVGPath();
         for(int p = 0; p < chres.size(); p++) {
           path.drawTo(plusTimes(cent, chres.get(p), i));
@@ -336,8 +330,7 @@ public class EMClusterVisualization implements VisFactory {
         path.close();
         Element ellipse = path.makeElement(svgp, sname);
         if(cls != null) {
-          double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, SIGMA[i - 1]);
           SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
         }
         layer.appendChild(ellipse);
@@ -432,7 +425,7 @@ public class EMClusterVisualization implements VisFactory {
         return;
       }
       CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
-      for(int i = 1; i <= times; i++) {
+      for(int i = 1; i <= SIGMA.length; i++) {
         SVGPath path = new SVGPath();
 
         ArrayList<double[]> delta = new ArrayList<>(chres.size());
@@ -457,8 +450,7 @@ public class EMClusterVisualization implements VisFactory {
 
         Element ellipse = path.makeElement(svgp, sname);
         if(cls != null) {
-          double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, SIGMA[i - 1]);
           SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
         }
         layer.appendChild(ellipse);

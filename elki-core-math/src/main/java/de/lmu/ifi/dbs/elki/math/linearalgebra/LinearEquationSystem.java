@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -624,9 +624,9 @@ public class LinearEquationSystem {
 
     StringBuilder msg = new StringBuilder();
     if(LOG.isDebugging()) {
-      msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']');
-      msg.append("\nbound Indices ").append(boundIndices);
-      msg.append("\nfree Indices ").append(freeIndices);
+      msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']') //
+          .append("\nbound Indices ").append(FormatUtil.format(boundIndices, ",")) //
+          .append("\nfree Indices ").append(FormatUtil.format(freeIndices, ","));
     }
 
     // compute solution space of homogeneous linear equation system

@@ -69,7 +69,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.*;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.AbstractLayout3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layouter3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimilarityBasedLayouter3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimpleCircularMSTLayout3DPC;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Arcball1DOFAdapter;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera.CameraListener;
@@ -127,7 +131,6 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
-    boolean nonefound = true;
     List<Relation<?>> rels = ResultUtil.getRelations(newResult);
     for(Relation<?> rel : rels) {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -140,10 +143,6 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
       StylingPolicy stylepol = getStylePolicy(hier, stylelib);
       new Instance<>(vrel, proj, settings, stylepol, stylelib).run();
-      nonefound = false;
-    }
-    if(nonefound && hier.equals(newResult)) {
-      LOG.warning("3DPC did not find a number vector field relation to visualize!");
     }
   }
 
@@ -156,12 +155,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     Database db = ResultUtil.findDatabase(hier);
     AutomaticEvaluation.ensureClusteringResult(db, db);
     List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
-    if(clusterings.size() > 0) {
-      return new ClusterStylingPolicy(clusterings.get(0), stylelib);
-    }
-    else {
+    if(clusterings.isEmpty()) {
       throw new AbortException("No clustering result generated?!?");
     }
+    return new ClusterStylingPolicy(clusterings.get(0), stylelib);
   }
 
   /**
@@ -346,7 +343,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      * @param rel Relation
      * @param proj Projection
      * @param settings Settings
-     * @param style Style result
+     * @param stylepol Styling policy
+     * @param stylelib Style library
      */
     public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StylingPolicy stylepol, StyleLibrary stylelib) {
       super();

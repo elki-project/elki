@@ -76,11 +76,12 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     MeanVariance mv = new MeanVariance();
     DoubleRelation scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double val = scores.doubleValue(id);
-      mv.put(val);
+      final double val = scores.doubleValue(id);
+      if(Double.isFinite(val)) {
+        mv.put(val);
+      }
     }
-    double a = 1.0;
-    double b = -mv.getMean();
+    double a = 1.0, b = -mv.getMean();
     int iter = 0;
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(or.getScores().getDBIDs());
@@ -135,12 +136,11 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     final int size = adapter.size(array);
     for(int i = 0; i < size; i++) {
       double val = adapter.getDouble(array, i);
-      if(!Double.isInfinite(val)) {
+      if(Double.isFinite(val)) {
         mv.put(val);
       }
     }
-    double a = 1.0;
-    double b = -mv.getMean();
+    double a = 1.0, b = -mv.getMean();
     int iter = 0;
 
     long[] t = BitsUtil.zero(size);
@@ -202,11 +202,9 @@ public class SigmoidOutlierScaling implements OutlierScaling {
   private double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, long[] t, DoubleRelation scores) {
     final int prior1 = BitsUtil.cardinality(t);
     final int prior0 = ids.size() - prior1;
-    DBIDArrayIter iter = ids.iter();
 
     final int maxiter = 10;
-    final double minstep = 1e-8;
-    final double sigma = 1e-12;
+    final double minstep = 1e-8, sigma = 1e-12;
     // target value for "set" objects
     final double loTarget = (prior1 + 1.0) / (prior1 + 2.0);
     // target value for "unset" objects
@@ -217,7 +215,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     // a = 0.0;
     // b = FastMath.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
-    iter.seek(0);
+    DBIDArrayIter iter = ids.iter();
     for(int i = 0; i < ids.size(); i++, iter.advance()) {
       final double val = scores.doubleValue(iter);
       final double fApB = val * a + b;
@@ -231,17 +229,13 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     }
     for(int it = 0; it < maxiter; it++) {
       // Update Gradient and Hessian (use H’ = H + sigma I)
-      double h11 = sigma;
-      double h22 = sigma;
-      double h21 = 0.0;
-      double g1 = 0.0;
-      double g2 = 0.0;
+      double h11 = sigma, h22 = sigma, h21 = 0.0;
+      double g1 = 0.0, g2 = 0.0;
       iter.seek(0);
       for(int i = 0; i < ids.size(); i++, iter.advance()) {
         final double val = scores.doubleValue(iter);
         final double fApB = val * a + b;
-        final double p;
-        final double q;
+        final double p, q;
         if(fApB >= 0) {
           p = FastMath.exp(-fApB) / (1.0 + FastMath.exp(-fApB));
           q = 1.0 / (1.0 + FastMath.exp(-fApB));
@@ -298,10 +292,6 @@ public class SigmoidOutlierScaling implements OutlierScaling {
           break;
         }
       }
-      if(it + 1 >= maxiter) {
-        LOG.debug("Maximum iterations hit.");
-        break;
-      }
     }
     return new double[] { a, b };
   }
@@ -327,8 +317,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     final int prior0 = size - prior1;
 
     final int maxiter = 10;
-    final double minstep = 1e-8;
-    final double sigma = 1e-12;
+    final double minstep = 1e-8, sigma = 1e-12;
     // target value for "set" objects
     final double loTarget = (prior1 + 1.0) / (prior1 + 2.0);
     // target value for "unset" objects
@@ -352,16 +341,12 @@ public class SigmoidOutlierScaling implements OutlierScaling {
     }
     for(int it = 0; it < maxiter; it++) {
       // Update Gradient and Hessian (use H’ = H + sigma I)
-      double h11 = sigma;
-      double h22 = sigma;
-      double h21 = 0.0;
-      double g1 = 0.0;
-      double g2 = 0.0;
+      double h11 = sigma, h22 = sigma, h21 = 0.0;
+      double g1 = 0.0, g2 = 0.0;
       for(int i = 0; i < size; i++) {
         final double val = adapter.getDouble(array, i);
         final double fApB = val * a + b;
-        final double p;
-        final double q;
+        final double p, q;
         if(fApB >= 0) {
           p = FastMath.exp(-fApB) / (1.0 + FastMath.exp(-fApB));
           q = 1.0 / (1.0 + FastMath.exp(-fApB));
@@ -416,10 +401,6 @@ public class SigmoidOutlierScaling implements OutlierScaling {
           LOG.debug("Minstep hit.");
           break;
         }
-      }
-      if(it + 1 >= maxiter) {
-        LOG.debug("Maximum iterations hit.");
-        break;
       }
     }
     return new double[] { a, b };

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,23 +47,15 @@ public class MutableProgress extends AbstractProgress {
     logger.progress(this);
   }
 
-  /**
-   * Serialize 'indefinite' progress.
-   */
   @Override
   public StringBuilder appendToBuffer(StringBuilder buf) {
     int percentage = (int) (getProcessed() * 100.0 / total);
     return buf.append(getTask()).append(": ")//
         .append(getProcessed()).append('/').append(total).append(" [") //
-        .append(percentage < 100 ? "  " : percentage < 10 ? " " : "") //
+        .append(percentage < 10 ? "  " : percentage < 100 ? " " : "") //
         .append(percentage).append("%]");
   }
 
-  /**
-   * Return whether the progress is complete
-   * 
-   * @return Completion status.
-   */
   @Override
   public boolean isComplete() {
     return getProcessed() == total;

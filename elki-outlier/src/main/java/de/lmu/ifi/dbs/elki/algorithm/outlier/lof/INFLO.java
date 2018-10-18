@@ -169,7 +169,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Compute the reverse kNN minus the kNN.
-   *
+   * <p>
    * This is based on algorithm 2 (two-way search) from the INFLO paper, but
    * unfortunately this algorithm does not compute the RkNN correctly, but
    * rather \( RkNN \cap kNN \), which is quite useless given that we will use
@@ -178,7 +178,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * included.
    *
    * @param relation Data relation
-   * @param knnQuery kNN query function
+   * @param knns Stored nearest neighbors
    * @param pruned Pruned objects: with too many neighbors
    * @param rNNminuskNNs reverse kNN storage
    */
@@ -217,7 +217,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @param relation Data relation
    * @param pruned Pruned objects
-   * @param knn kNN query
+   * @param knnq kNN query
    * @param rNNminuskNNs reverse kNN storage
    * @param inflos INFLO score storage
    * @param inflominmax Output of minimum and maximum
@@ -288,7 +288,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     /**
      * Parameter to specify if any object is a Core Object must be a double
      * greater than 0.0
-     *
+     * <p>
      * see paper "Two-way search method" 3.2
      */
     public static final OptionID M_ID = new OptionID("inflo.m", "The pruning threshold");

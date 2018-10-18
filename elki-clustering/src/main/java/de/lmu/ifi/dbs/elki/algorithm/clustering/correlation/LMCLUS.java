@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.TooManyRetriesException;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -69,15 +70,14 @@ import net.jafama.FastMath;
 
 /**
  * Linear manifold clustering in high dimensional spaces by stochastic search.
- *
+ * <p>
  * Reference:
  * <p>
  * R. Haralick, R. Harpaz<br>
  * Linear manifold clustering in high dimensional spaces by stochastic
  * search<br>
  * In: Pattern Recognition volume 40, Issue 10
- * </p>
- *
+ * <p>
  * Implementation note: the LMCLUS algorithm seems to lack good stopping
  * criterions. We can't entirely reproduce the good results from the original
  * publication, in particular not on noisy data. But the questionable parts are
@@ -360,7 +360,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         double f = transposeTimes(v_i, v_j); // / transposeTimes(v_j, v_j);
         if(Double.isNaN(f)) {
           if(LOG.isDebuggingFine()) {
-            LOG.debugFine("Zero vector encountered? " + v_j);
+            LOG.debugFine("Zero vector encountered? " + FormatUtil.format(v_j));
           }
           return null;
         }

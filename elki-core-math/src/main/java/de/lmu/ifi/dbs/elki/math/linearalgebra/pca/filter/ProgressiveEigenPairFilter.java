@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,31 +38,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * gives better results when clusters of different dimensionality exist, since
  * different percentage alpha levels might be appropriate for different
  * dimensionalities.
- *
+ * <p>
  * Example calculations of alpha levels:
- *
+ * <p>
  * In a 3D space, a progressive alpha value of 0.5 equals:
- *
+ * <br>
  * - 1D subspace: 50 % + 1/3 of remainder = 0.667
- *
+ * <br>
  * - 2D subspace: 50 % + 2/3 of remainder = 0.833
- *
+ * <br>
  * In a 4D space, a progressive alpha value of 0.5 equals:
- *
+ * <br>
  * - 1D subspace: 50% + 1/4 of remainder = 0.625
- *
+ * <br>
  * - 2D subspace: 50% + 2/4 of remainder = 0.750
- *
+ * <br>
  * - 3D subspace: 50% + 3/4 of remainder = 0.875
- *
+ * <p>
  * Reasoning why this improves over PercentageEigenPairFilter:
- *
+ * <p>
  * In a 100 dimensional space, a single Eigenvector representing over 85% of the
  * total variance is highly significant, whereas the strongest 85 Eigenvectors
  * together will by definition always represent at least 85% of the variance.
  * PercentageEigenPairFilter can thus not be used with these parameters and
  * detect both dimensionalities correctly.
- *
+ * <p>
  * The second parameter introduced here, walpha, serves a different function: It
  * prevents the eigenpair filter to use a statistically weak Eigenvalue just to
  * reach the intended level, e.g. 84% + 1% >= 85% when 1% is statistically very
@@ -151,7 +151,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     /**
      * Parameter progressive alpha.
      */
-    public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
+    public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors. The filter class will choose the number of strong eigenvectors by this share.");
 
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a

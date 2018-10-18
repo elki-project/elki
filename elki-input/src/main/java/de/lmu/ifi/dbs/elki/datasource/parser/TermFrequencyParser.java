@@ -156,9 +156,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
           getLogger().warning("Too many digits in what looked like a double number - treating as string: " + tokenizer.getSubstring());
           warnedPrecision = true;
         }
-        if(curterm != null) {
-          labels.add(curterm);
-        }
+        labels.add(curterm);
         curterm = tokenizer.getSubstring();
       }
     }

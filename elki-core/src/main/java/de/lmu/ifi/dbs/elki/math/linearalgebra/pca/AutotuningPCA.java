@@ -214,7 +214,7 @@ public class AutotuningPCA extends PCARunner {
   /**
    * Compute the explained variance for a filtered EigenPairs.
    * 
-   * @param eigenPairs Eigenpairs
+   * @param eigenValues Eigen values
    * @param filteredEigenPairs Filtered eigenpairs
    * @return explained variance by the strong eigenvectors.
    */

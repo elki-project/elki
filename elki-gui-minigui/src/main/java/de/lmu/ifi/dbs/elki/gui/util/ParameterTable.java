@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -481,12 +481,8 @@ public class ParameterTable extends JTable {
         Parameter<?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
-          File f = null;
           mode = FileParameter.FileType.INPUT_FILE.equals(fp.getFileType()) ? FileDialog.LOAD : FileDialog.SAVE;
-          if(fp.isDefined()) {
-            f = fp.getValue();
-          }
-          textfield.setText(f != null ? f.getPath() : "");
+          textfield.setText(fp.isDefined() ? fp.getValue().getPath() : "");
         }
       }
       textfield.requestFocus();
@@ -578,16 +574,15 @@ public class ParameterTable extends JTable {
         TreePath path = popup.getTree().getSelectionPath();
         final Object comp = (path != null) ? path.getLastPathComponent() : null;
         if(comp instanceof ClassNode) {
-          ClassNode sel = (path != null) ? (ClassNode) comp : null;
-          String newClass = (sel != null) ? sel.getClassName() : null;
-          if(newClass != null && newClass.length() > 0) {
+          String newClass = ((ClassNode) comp).getClassName();
+          if(newClass != null && !newClass.isEmpty()) {
             if(option instanceof ClassListParameter) {
               String val = textfield.getText();
               if(val.equals(DynamicParameters.STRING_OPTIONAL) //
                   || val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
                 val = "";
               }
-              val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
+              val = val.isEmpty() ? newClass : val + ClassListParameter.LIST_SEP + newClass;
               textfield.setText(val);
             }
             else {

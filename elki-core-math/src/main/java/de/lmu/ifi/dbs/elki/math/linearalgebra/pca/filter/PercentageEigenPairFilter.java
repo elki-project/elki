@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -91,14 +91,8 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     /**
      * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
      * a portion of at least alpha of the total variance.
-     * <p>
-     * Default value: {@link #DEFAULT_ALPHA}
-     * </p>
-     * <p>
-     * Key: {@code -pca.filter.alpha}
-     * </p>
      */
-    public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
+    public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors. The filter class will choose the number of strong eigenvectors by this share.");
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.

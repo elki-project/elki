@@ -138,8 +138,8 @@ public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNod
     double[] knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        MkTabEntry leafEntry = node.getEntry(i);
-        KNNList knns = knnLists.get(getPageID(leafEntry));
+        MkTabLeafEntry leafEntry = (MkTabLeafEntry) node.getEntry(i);
+        KNNList knns = knnLists.get(leafEntry.getDBID());
         double[] distances = new double[knns.size()];
         int j = 0;
         for(DoubleDBIDListIter iter = knns.iter(); iter.valid(); iter.advance(), j++) {

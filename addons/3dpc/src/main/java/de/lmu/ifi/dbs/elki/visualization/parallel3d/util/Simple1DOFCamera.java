@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import net.jafama.FastMath;
 /**
  * Class for a simple camera. Restricted: always looks at 0,0,0 from a position
  * defined by rotationX, distance and height.
- * 
+ * <p>
  * For rotationX = 0, the camera will be at y=distance, x=0, so that the default
  * view will have the usual X/Y plane on the ground.
  * 
@@ -248,6 +248,7 @@ public class Simple1DOFCamera {
    * 
    * @param x X
    * @param y Y
+   * @param z Z
    * @return model coordinates
    */
   public double[] unproject(double x, double y, double z) {
@@ -261,7 +262,8 @@ public class Simple1DOFCamera {
    * 
    * @param x X
    * @param y Y
-   * @param Out output buffer
+   * @param z Z
+   * @param out output buffer
    */
   public void unproject(double x, double y, double z, double[] out) {
     glu.gluUnProject(x, y, z, modelview, 0, projection, 0, viewp, 0, out, 0);
@@ -270,8 +272,10 @@ public class Simple1DOFCamera {
   /**
    * Project a coordinate
    * 
-   * @param vec Input vector buffer
-   * @param Out output buffer
+   * @param x X
+   * @param y Y
+   * @param z Z
+   * @param out output buffer
    */
   public void project(double x, double y, double z, double[] out) {
     glu.gluProject(x, y, z, modelview, 0, projection, 0, viewp, 0, out, 0);
@@ -345,6 +349,7 @@ public class Simple1DOFCamera {
    * 
    * @author Erich Schubert
    */
+  @FunctionalInterface
   public interface CameraListener {
     /**
      * Camera changed.

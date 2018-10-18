@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -185,14 +185,14 @@ public interface Database extends HierarchicalResult {
    */
   SingleObjectBundle getBundle(DBIDRef id);
 
-  /**
+  // TODO: add
+  /*
    * Returns the DatabaseObject represented by the specified id.
    *
    * @param id the id of the Object to be obtained from the Database
    * @return Bundle containing the object data
    * @throws ObjectNotFoundException when the DBID was not found.
    */
-  // TODO: add
   // MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
 
   /**

@@ -186,14 +186,8 @@ public class DendrogramVisualization implements VisFactory {
         break;
       case TRIANGULAR:
         style = DrawingStyle.RECTANGULAR;
-        switch(style2){
-        case HALF_POS:
-          style2 = PositionStyle.HALF_WIDTH;
-          break;
-        case HALF_WIDTH:
-          style2 = PositionStyle.HALF_POS;
-          break;
-        }
+        // Switch position style
+        style2 = style2 == PositionStyle.HALF_POS ? PositionStyle.HALF_WIDTH : PositionStyle.HALF_POS;
         break;
       }
       context.visChanged(task);
@@ -462,7 +456,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  private static interface Positions {
+  private interface Positions {
     /**
      * Set the initial position
      *
@@ -470,7 +464,7 @@ public class DendrogramVisualization implements VisFactory {
      * @param x X coordinate
      * @param height Y coordinate
      */
-    void set(int off, double d, double height);
+    void set(int off, double x, double height);
 
     /**
      * Get the X coordinate of an object.

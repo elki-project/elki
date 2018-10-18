@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,13 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public class CorrelationClusterOrder extends ClusterOrder {
   /**
-   * The component separator used by correlation distances.
-   * 
-   * Note: Do NOT use regular expression syntax characters!
-   */
-  public static final String SEPARATOR = "x";
-
-  /**
    * The correlation dimension.
    */
   protected WritableIntegerDataStore correlationValue;
@@ -62,32 +55,6 @@ public class CorrelationClusterOrder extends ClusterOrder {
   }
 
   /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * NOTE: for the use in an UpdatableHeap, only the ID is used! This is
-   * important, otherwise OPTICS will not work.
-   * 
-   * @param o the reference object with which to compare.
-   * @return <code>true</code> if this object has the same attribute values as
-   *         the o argument; <code>false</code> otherwise.
-   */
-  /*
-   * @Override public final boolean equals(Object o) { if(this == o) { return
-   * true; } if(!(o instanceof ClusterOrderEntry)) { return false; }
-   * 
-   * final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o; // Compare by
-   * ID only, for UpdatableHeap! return DBIDUtil.equal(objectID, that.getID());
-   * }
-   */
-
-  /*
-   * @Override public int compareTo(SELF other) { if(this.correlationValue <
-   * other.correlationValue) { return -1; } if(this.correlationValue >
-   * other.correlationValue) { return +1; } return
-   * Double.compare(this.euclideanValue, other.euclideanValue); }
-   */
-
-  /**
    * Get the correlation dimensionality.
    * 
    * @return Correlation dimensionality
@@ -104,11 +71,4 @@ public class CorrelationClusterOrder extends ClusterOrder {
   public double getEuclideanValue(DBIDRef id) {
     return reachability.doubleValue(id);
   }
-
-  /*
-   * @Override public void writeToText(TextWriterStream out, String label) {
-   * out.inlinePrint("predecessor=" + DBIDUtil.toString((DBIDRef)
-   * predecessorID)); out.inlinePrint("reach-dim=" + correlationValue);
-   * out.inlinePrint("reachability=" + euclideanValue); }
-   */
 }

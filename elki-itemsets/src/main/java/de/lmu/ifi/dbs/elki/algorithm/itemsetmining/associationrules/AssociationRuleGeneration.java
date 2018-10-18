@@ -172,14 +172,17 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
      * @return Association rules
      */
     public AssociationRuleResult run(FrequentItemsetsResult frequentResult) {
-      // Itemsets (sorted, so it really should already be an arraylist)
-      ArrayList<Itemset> itemsets = (frequentResult.getItemsets() instanceof ArrayList) ? (ArrayList<Itemset>) frequentResult.getItemsets() : new ArrayList<>(frequentResult.getItemsets());
+      // Itemsets
+      List<Itemset> itemsets = frequentResult.getItemsets();
 
       // Shortcut.
-      if(frequentResult.getItemsets().size() == 0) {
+      if(itemsets.isEmpty()) {
         LOG.warning("No frequent itemsets found.");
         return new AssociationRuleResult("association rules", "arules", Collections.emptyList(), frequentResult.getMeta());
       }
+
+      // Ensure it is an array list for efficiency:
+      itemsets = itemsets instanceof ArrayList ? itemsets : new ArrayList<>(itemsets);
 
       // Meta data for item tags
       this.meta = frequentResult.getMeta();
@@ -350,7 +353,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
     /**
      * Itemsets to search.
      */
-    ArrayList<Itemset> itemsets;
+    List<Itemset> itemsets;
 
     /**
      * Offsets into above array, based on length.
@@ -362,7 +365,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
      *
      * @param itemsets Itemsets
      */
-    public ItemsetSearcher(ArrayList<Itemset> itemsets) {
+    public ItemsetSearcher(List<Itemset> itemsets) {
       this.itemsets = itemsets;
       this.offsets = new IntegerArray();
       offsets.add(0); // Offset for length 0.

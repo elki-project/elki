@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -179,9 +179,8 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       TreePath path = popup.getTree().getSelectionPath();
       final Object comp = path != null ? path.getLastPathComponent() : null;
       if(comp instanceof ClassNode) {
-        ClassNode sel = (path != null) ? (ClassNode) comp : null;
-        String newClass = (sel != null) ? sel.getClassName() : null;
-        if(newClass != null && newClass.length() > 0) {
+        String newClass = ((ClassNode) comp).getClassName();
+        if(newClass != null && !newClass.isEmpty()) {
           textfield.setText(newClass);
           popup.setVisible(false);
           fireValueChanged();
