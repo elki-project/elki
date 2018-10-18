@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.Iterator;
@@ -34,7 +35,7 @@ import java.util.Locale;
 
 /**
  * Utility methods for output formatting of various number objects
- * 
+ * <p>
  * FIXME: Handle formatting of infinity and NaN better.
  * 
  * @author Arthur Zimek
@@ -245,19 +246,13 @@ public final class FormatUtil {
     format.setGroupingUsed(false);
 
     int width = w + 1;
-    StringBuilder msg = new StringBuilder();
-    msg.append('\n'); // start on new line.
+    StringBuilder msg = new StringBuilder() //
+        .append('\n'); // start on new line.
     for(int i = 0; i < v.length; i++) {
       String s = format.format(v[i]); // format the number
-      int padding = Math.max(1, width - s.length()); // At _least_ 1
-      // space
-      for(int k = 0; k < padding; k++) {
-        msg.append(' ');
-      }
-      msg.append(s);
+      // At _least_ 1 whitespace is added
+      whitespace(msg, Math.max(1, width - s.length())).append(s);
     }
-    // msg.append("\n");
-
     return msg.toString();
   }
 
@@ -278,8 +273,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -302,8 +296,7 @@ public final class FormatUtil {
     }
     buf.append(nf.format(d[0]));
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(nf.format(d[i]));
+      buf.append(sep).append(nf.format(d[i]));
     }
     return buf;
   }
@@ -325,8 +318,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -349,8 +341,7 @@ public final class FormatUtil {
     }
     buf.append(nf.format(d[0]));
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(nf.format(d[i]));
+      buf.append(sep).append(nf.format(d[i]));
     }
     return buf;
   }
@@ -372,8 +363,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -395,8 +385,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -418,8 +407,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -441,8 +429,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(d[i]);
+      buf.append(sep).append(d[i]);
     }
     return buf;
   }
@@ -464,8 +451,7 @@ public final class FormatUtil {
     }
     buf.append(d[0]);
     for(int i = 1; i < d.length; i++) {
-      buf.append(sep);
-      buf.append(format(d[i]));
+      buf.append(sep).append(format(d[i]));
     }
     return buf;
   }
@@ -615,9 +601,7 @@ public final class FormatUtil {
       return buf;
     }
     for(int i = 0; i < d.length; i++) {
-      buf.append(pre);
-      formatTo(buf, d[i], csep, nf);
-      buf.append(pos);
+      formatTo(buf.append(pre), d[i], csep, nf).append(pos);
     }
     return buf;
   }
@@ -676,8 +660,7 @@ public final class FormatUtil {
           msg.append(csep);
         }
         String s = format.format(row[j]); // format the number
-        whitespace(msg, w - s.length());
-        msg.append(s);
+        whitespace(msg, w - s.length()).append(s);
       }
       msg.append(pos);
     }
@@ -692,16 +675,12 @@ public final class FormatUtil {
    * @return a string representation of this matrix
    */
   public static String format(double[][] m, String pre) {
-    StringBuilder output = new StringBuilder();
-    output.append(pre).append("[\n").append(pre);
+    StringBuilder output = new StringBuilder() //
+        .append(pre).append("[\n").append(pre);
     for(int i = 0; i < m.length; i++) {
-      double[] row = m[i];
-      output.append(" [");
-      formatTo(output, row, ", ");
-      output.append("]\n").append(pre);
+      formatTo(output.append(" ["), m[i], ", ").append("]\n").append(pre);
     }
-    output.append("]\n");
-    return output.toString();
+    return output.append("]\n").toString();
   }
 
   /**
@@ -736,12 +715,11 @@ public final class FormatUtil {
     for(String s : d) {
       len += s.length();
     }
-    StringBuilder buffer = new StringBuilder(len);
     Iterator<String> it = d.iterator();
-    buffer.append(it.next());
+    StringBuilder buffer = new StringBuilder(len) //
+        .append(it.next());
     while(it.hasNext()) {
-      buffer.append(sep);
-      buffer.append(it.next());
+      buffer.append(sep).append(it.next());
     }
     return buffer.toString();
   }
@@ -767,7 +745,8 @@ public final class FormatUtil {
     for(String s : d) {
       len += s.length();
     }
-    StringBuilder buffer = new StringBuilder(len).append(d[0]);
+    StringBuilder buffer = new StringBuilder(len)//
+        .append(d[0]);
     for(int i = 1; i < d.length; i++) {
       buffer.append(sep).append(d[i]);
     }
@@ -785,9 +764,7 @@ public final class FormatUtil {
   public static int findSplitpoint(String s, int width) {
     // the newline (or EOS) is the fallback split position.
     int in = s.indexOf(NEWLINE);
-    if(in < 0) {
-      in = s.length();
-    }
+    in = in < 0 ? s.length() : in;
     // Good enough?
     if(in < width) {
       return in;
@@ -814,16 +791,10 @@ public final class FormatUtil {
    * @param a String position
    * @param b String position
    * @return {@code Math.min(a,b)} if {@code a >= 0} and {@code b >= 0},
-   *         otherwise whichever is positive.
+   *         otherwise whichever is not negative.
    */
   private static int nextPosition(int a, int b) {
-    if(a < 0) {
-      return b;
-    }
-    if(b < 0) {
-      return a;
-    }
-    return Math.min(a, b);
+    return a < 0 ? b : b < 0 ? a : a < b ? a : b;
   }
 
   /**
@@ -870,9 +841,7 @@ public final class FormatUtil {
       return WHITESPACE_BUFFER.substring(0, n);
     }
     char[] buf = new char[n];
-    for(int i = 0; i < n; i++) {
-      buf[i] = WHITESPACE_BUFFER.charAt(0);
-    }
+    Arrays.fill(buf, WHITESPACE_BUFFER.charAt(0));
     return new String(buf);
   }
 
@@ -898,10 +867,7 @@ public final class FormatUtil {
    * @return padded string of at least length len (and o otherwise)
    */
   public static String pad(String o, int len) {
-    if(o.length() >= len) {
-      return o;
-    }
-    return o + whitespace(len - o.length());
+    return o.length() >= len ? o : (o + whitespace(len - o.length()));
   }
 
   /**
@@ -912,10 +878,7 @@ public final class FormatUtil {
    * @return padded string of at least length len (and o otherwise)
    */
   public static String padRightAligned(String o, int len) {
-    if(o.length() >= len) {
-      return o;
-    }
-    return whitespace(len - o.length()) + o;
+    return o.length() >= len ? o : (whitespace(len - o.length()) + o);
   }
 
   /**
@@ -1089,7 +1052,7 @@ public final class FormatUtil {
    *
    * @param buf Buffer
    * @param end End
-   * @return
+   * @return {@code true} if the buffer ends with the given sequence
    */
   public static boolean endsWith(CharSequence buf, CharSequence end) {
     int len = end.length(), start = buf.length() - len;
@@ -1101,6 +1064,6 @@ public final class FormatUtil {
         return false;
       }
     }
-    return false;
+    return true;
   }
 }
