@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract factory for various Mk-Trees
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  * 
@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
- * @param <I> Index type
  */
 public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory<O, N, E, S> {
   /**

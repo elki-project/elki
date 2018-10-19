@@ -41,10 +41,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Extract clusters from a hierarchical clustering, during the evaluation phase.
- *
- * Usually, it is more elegant to use {@link ExtractFlatClusteringFromHierarchy}
- * as primary algorithm. But in order to extract <em>multiple</em> partitionings
- * from the same clustering, this can be useful.
+ * <p>
+ * Usually, it is more elegant to use
+ * {@link CutDendrogramByNumberOfClustersExtractor} as primary algorithm. But
+ * in order to extract <em>multiple</em> partitionings from the same
+ * clustering, this can be useful.
  *
  * @author Erich Schubert
  * @since 0.7.0

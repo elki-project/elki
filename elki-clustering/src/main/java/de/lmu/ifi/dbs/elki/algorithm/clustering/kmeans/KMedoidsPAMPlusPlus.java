@@ -112,7 +112,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
-   * @param fastswap Tolerance for fast swapping
+   * @param fasttol Tolerance for fast swapping
    */
   public KMedoidsPAMPlusPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
     super(distanceFunction, k, maxiter, initializer);

@@ -23,22 +23,22 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
 /**
  * Interface for scaling functions used e.g. by outlier evaluation such as
  * Histograms and visualization.
- * 
+ * <p>
  * When using outlier scaling functions, make sure to invoke
- * {@link de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction#prepare
+ * {@link de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling#prepare
  * prepare} to invoke the preprocessing step!
- * 
+ * <p>
  * Outside of an outlier context, you probably want to use
  * {@link StaticScalingFunction} instead, which may not require a
  * {@code prepare} statement.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
 public interface ScalingFunction {
   /**
    * Transform a given value using the scaling function.
-   * 
+   *
    * @param value Original value
    * @return Scaled value
    */
@@ -47,7 +47,7 @@ public interface ScalingFunction {
   /**
    * Get minimum resulting value. May be {@link Double#NaN} or
    * {@link Double#NEGATIVE_INFINITY}.
-   * 
+   *
    * @return Minimum resulting value.
    */
   double getMin();
@@ -55,7 +55,7 @@ public interface ScalingFunction {
   /**
    * Get maximum resulting value. May be {@link Double#NaN} or
    * {@link Double#POSITIVE_INFINITY}.
-   * 
+   *
    * @return Maximum resulting value.
    */
   double getMax();

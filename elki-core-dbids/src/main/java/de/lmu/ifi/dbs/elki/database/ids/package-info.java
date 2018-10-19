@@ -55,11 +55,6 @@
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#ensureModifiable DBIDUtil.ensureModifiable} to ensure {@link de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs ModifiableDBIDS}</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#makeUnmodifiable DBIDUtil.makeUnmodifiable} to wrap DBIDs unmodifiable</li>
  * </ul>
- * <p>
- * <h2>Generic utility classes:</h2>
- * <p>
- * {@link de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs MaskedDBIDs}
- * allows masking an ArrayDBIDs with a BitSet.
  *
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*

@@ -40,11 +40,11 @@ import net.jafama.FastMath;
  * Factory for EM with multivariate Gaussian model, using the textbook
  * algorithm. There is no reason to use this in practice, it is only useful to
  * study the reliability of the textbook approach.
- * 
+ * <p>
  * "Textbook" refers to the E[XY]-E[X]E[Y] equation for covariance, that is
  * numerically not reliable with floating point math, but popular in textbooks.
- *
- * Again, do not use this. Always prefer {@link #MultivariateGaussianModelFactory}.
+ * <p>
+ * Again, do not use this. Always prefer {@link MultivariateGaussianModelFactory}.
  *
  * @author Erich Schubert
  *

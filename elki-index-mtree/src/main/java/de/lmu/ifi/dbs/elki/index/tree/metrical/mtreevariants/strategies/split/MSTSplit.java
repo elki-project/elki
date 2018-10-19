@@ -121,7 +121,7 @@ public class MSTSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>
    * Partition the data using the minimu spanning tree.
    *
    * @param matrix
-   * @return
+   * @return partition assignments
    */
   private static int[] mstPartition(double[][] matrix) {
     final int n = matrix.length;

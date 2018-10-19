@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
- * @param <I> Index type
  */
 public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory<O> {
   /**

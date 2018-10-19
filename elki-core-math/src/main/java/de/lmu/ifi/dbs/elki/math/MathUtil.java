@@ -609,7 +609,7 @@ public final class MathUtil {
    * <p>
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline as
-   * {@c<ode (a >= b) ? a : b}
+   * {@code (a >= b) ? a : b}
    * <p>
    * The result is asymmetric in case of {@code Double.NaN}:<br>
    * {@code MathUtil.max(Double.NaN, 1.)} is 1, but <br>

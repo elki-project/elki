@@ -77,8 +77,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   protected final OptionID optionid;
 
   /**
-   * The short description of the option. An extended description is provided by
-   * the method {@link #getFullDescription()}
+   * The short description of the option.
    */
   protected String shortDescription;
 

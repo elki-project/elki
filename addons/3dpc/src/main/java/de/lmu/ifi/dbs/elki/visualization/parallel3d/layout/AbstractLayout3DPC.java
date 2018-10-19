@@ -267,13 +267,13 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   /**
    * Find the "optimal" root of a spanning tree. Optimal in the sense of: one of
    * the most central nodes.
-   *
+   * <p>
    * This uses a simple message passing approach. Every node that has only one
    * unset neighbor will emit a message to this neighbor. The node last to emit
    * wins.
    *
    * @param msg Minimum spanning graph.
-   * @return
+   * @return optimal root node.
    */
   public static int findOptimalRoot(int[] msg) {
     final int size = (msg.length >> 1) + 1;

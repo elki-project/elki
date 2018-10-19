@@ -29,10 +29,12 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * The pointer representation of a hierarchical clustering. Each object is
  * represented by a parent object and the distance at which it joins the parent
  * objects cluster. This is a rather compact and bottom-up representation of
- * clusters, the class
- * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy}
+ * clusters, the classes
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters}
+ * and
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight}.
  * can be used to extract partitions from this graph.
- *
+ * <p>
  * This class can also compute dendrogram positions, but using a faster
  * algorithm than the one proposed by Sibson 1971, using only O(n log n) time
  * due to sorting, but using an additional temporary array.

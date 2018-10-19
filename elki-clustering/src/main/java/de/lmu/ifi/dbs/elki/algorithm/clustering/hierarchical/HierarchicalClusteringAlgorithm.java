@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
  * Interface for hierarchical clustering algorithms.
- * 
- * This interface allows the algorithms to be used by e.g.
- * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy}.
- * 
+ * <p>
+ * This interface allows the algorithms to be used by, e.g.,
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters}
+ * and
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight}.
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has PointerHierarchyRepresentationResult
  */
 public interface HierarchicalClusteringAlgorithm extends Algorithm {

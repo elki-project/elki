@@ -21,8 +21,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
- * Immutable pair of two DBIDs. This can be stored more efficiently than when
- * using {@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair}
+ * Immutable pair of two DBIDs, more memory efficient than two DBIDs.
  *
  * @author Erich Schubert
  * @since 0.4.0

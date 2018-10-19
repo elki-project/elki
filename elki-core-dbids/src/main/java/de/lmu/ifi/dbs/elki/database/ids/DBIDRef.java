@@ -67,7 +67,7 @@ public interface DBIDRef {
    *
    * @param obj Object to compare with
    * @return True when they are the same object
-   * @deprecated Use {@link DBIDUtil.equal} instead.
+   * @deprecated Use {@link DBIDUtil#equal} instead.
    */
   @Override
   @Deprecated
