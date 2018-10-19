@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 
 /**
- * APRIORI itemset, dense representation for up to 64 items.
- * 
+ * Frequent itemset, dense representation for up to 64 items.
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
@@ -45,7 +45,7 @@ public class SmallDenseItemset extends Itemset {
 
   /**
    * Constructor.
-   * 
+   *
    * @param items Items
    * @param length Length (Cardinality of itemset)
    */

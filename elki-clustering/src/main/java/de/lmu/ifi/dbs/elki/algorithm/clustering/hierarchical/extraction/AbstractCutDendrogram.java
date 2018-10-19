@@ -58,8 +58,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for extracting clusters from dendrograms.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @composed - runs - HierarchicalClusteringAlgorithm
+ * @navassoc - processes - PointerHierarchyRepresentationResult
+ * @has - produces - Clustering
+ * @assoc - produces - DendrogramModel
  */
 public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**

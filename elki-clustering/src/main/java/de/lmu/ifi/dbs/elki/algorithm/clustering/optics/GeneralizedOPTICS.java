@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @composed - - - Instance
+ * @navassoc - produces - ClusterOrder
  *
  * @param <O> the type of objects handled by the algorithm
  * @param <R> the type of results in the cluster order
@@ -75,6 +75,8 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
    * Instance for processing a single data set.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   public abstract static class Instance<O, R> implements Comparator<DBIDRef> {
     /**

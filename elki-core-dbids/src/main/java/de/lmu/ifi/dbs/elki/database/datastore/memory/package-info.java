@@ -1,5 +1,10 @@
 /**
  * Memory data store <em>implementation</em> for ELKI.
+ *
+ * @opt include .*elki.database.datastore.WritableDataStore
+ * @opt include .*elki.database.datastore.WritableIntegerDataStore
+ * @opt include .*elki.database.datastore.WritableDoubleDataStore
+ * @opt include .*elki.database.datastore.WritableDBIDDataStore
  */
 /*
  * This file is part of ELKI:

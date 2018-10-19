@@ -17,6 +17,8 @@
  * <p>
  * To make things worse, the "support" is sometimes in absolute (integer)
  * counts, and sometimes used in a relative share.
+ *
+ * @opt include .*elki.algorithm.itemsetmining.associationrules.AssociationRuleGeneration
  */
 /*
  * This file is part of ELKI:

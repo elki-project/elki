@@ -2,6 +2,8 @@
  * Helper classes for the
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH CASH}
  * algorithm.
+ *
+ * @opt include .*elki.algorithm.clustering.correlation.CASH
  */
 /*
  * This file is part of ELKI:

@@ -17,7 +17,11 @@
  * The Algorithm GDBSCAN and Its Applications<br>
  * Data Mining and Knowledge Discovery, 1998.
  *
- * @opt hide .*\.Instance$
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
+ * @opt include .*elki.algorithm.clustering.correlation.FourC
+ * @opt include .*elki.algorithm.clustering.correlation.COPAC
+ * @opt include .*elki.algorithm.clustering.correlation.ERiC
+ * @opt include .*elki.algorithm.clustering.subspace.PreDeCon
  */
 /*
  * This file is part of ELKI:

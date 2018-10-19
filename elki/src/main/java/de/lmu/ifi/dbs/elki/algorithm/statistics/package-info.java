@@ -3,6 +3,10 @@
  * <p>
  * The algorithms in this package perform statistical analysis of the data
  * (e.g. compute distributions, distance distributions etc.)
+ *
+ * @opt include .*elki.algorithm.Algorithm
+ * @opt include .*elki.algorithm.AbstractDistanceBasedAlgorithm
+ * @opt include .*elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm
  */
 /*
  * This file is part of ELKI:

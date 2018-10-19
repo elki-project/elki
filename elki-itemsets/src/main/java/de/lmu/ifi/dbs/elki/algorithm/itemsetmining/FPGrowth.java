@@ -74,6 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.7.0
  *
  * @composed - - - FPTree
+ * @has - - - Itemset
+ * @has - produces - FrequentItemsetsResult
  */
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
     title = "Mining frequent patterns without candidate generation", //

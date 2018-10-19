@@ -60,8 +60,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * G. Hinton, S. Roweis<br>
  * Stochastic Neighbor Embedding<br>
  * Advances in Neural Information Processing Systems 15
- * 
+ *
  * @author Erich Schubert
+ *
+ * @composed - - - AffinityMatrixBuilder
  *
  * @param <O> Object type
  */

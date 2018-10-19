@@ -22,10 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util;
 
 /**
  * Core point assignment.
- * 
- * @author Erich Schubert
  *
- * @hidden
+ * @author Erich Schubert
  */
 public class Core implements Assignment {
   /**
@@ -44,7 +42,7 @@ public class Core implements Assignment {
 
   /**
    * Merge two cores.
-   * 
+   *
    * @param o Other core
    */
   public void mergeWith(Core o) {

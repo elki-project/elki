@@ -1,5 +1,8 @@
 /**
  * Evaluation of clustering results
+ *
+ * @opt include .*elki.evaluation.Evaluator
+ * @opt include .*elki.data.Clustering
  */
 /*
  * This file is part of ELKI:

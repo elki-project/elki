@@ -10,6 +10,8 @@
  * Local Outlier Detection Reconsidered: a Generalized View on Locality with
  * Applications to Spatial, Video, and Network Outlier Detection<br>
  * Data Mining and Knowledge Discovery 28(1)
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
  */
 /*
  * This file is part of ELKI:

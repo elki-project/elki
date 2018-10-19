@@ -1,5 +1,9 @@
 /**
  * Filters for selecting and sorting data to process.
+ *
+ * @opt include .*elki.datasource.filter.ObjectFilter
+ * @opt include .*elki.datasource.filter.StreamFilter
+ * @opt include .*elki.datasource.filter.AbstractStreamFilter
  */
 /*
  * This file is part of ELKI:

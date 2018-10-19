@@ -22,10 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util;
 
 /**
  * Border point assignment.
- * 
- * @author Erich Schubert
  *
- * @hidden
+ * @author Erich Schubert
  */
 public class Border implements Assignment, Comparable<Border> {
   /**

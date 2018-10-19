@@ -55,6 +55,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  *
  * @author Julian Erhard
  * @author Erich Schubert
+ *
+ * @has - - - PointerPrototypeHierarchyRepresentationResult
  */
 @Reference(authors = "M. R. Anderberg", //
     title = "Hierarchical Clustering Methods", //

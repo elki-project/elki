@@ -3,6 +3,8 @@
  * <p>
  * These methods are mostly useful for providing a reference result in
  * evaluation.
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

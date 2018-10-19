@@ -1,5 +1,7 @@
 /**
  * Classes to extract clusterings from hierarchical clustering.
+ *
+ * @opt include .*elki.evaluation.Evaluator
  */
 /*
  * This file is part of ELKI:

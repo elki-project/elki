@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - ClusterOrder
+ * @navassoc - produces - ClusterOrder
  */
 public interface OPTICSTypeAlgorithm extends Algorithm {
   @Override

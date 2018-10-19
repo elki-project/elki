@@ -52,6 +52,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * @author Julian Erhard
  * @author Erich Schubert
  *
+ * @has - - - PointerPrototypeHierarchyRepresentationResult
+ *
  * @param <O> Object type
  */
 @Reference(authors = "F. Murtagh", //

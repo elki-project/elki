@@ -30,8 +30,10 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Result class for association rule mining
- * 
+ *
  * @author Frederic Sautter
+ *
+ * @has - - - AssociationRule
  */
 public class AssociationRuleResult extends BasicResult implements TextWriteable {
   /**
@@ -58,7 +60,7 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
 
   /**
    * Returns the rules.
-   * 
+   *
    * @return the rules.
    */
   public List<AssociationRule> getRules() {
@@ -67,7 +69,7 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
 
   /**
    * Returns Metadata of the data relation, for item labels.
-   * 
+   *
    * @return meta
    */
   public VectorFieldTypeInformation<BitVector> getMeta() {

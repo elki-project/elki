@@ -30,11 +30,11 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Provides a unique interval represented by its id, a hyper bounding box
  * representing the alpha intervals, an interval of the corresponding distance,
  * and a set of objects ids associated with this interval.
- * 
+ *
  * @author Elke Achtert
  * @since 0.1
- *        O
- * @has - - - de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit
+ *
+ * @has - - - CASHIntervalSplit
  */
 public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInterval> {
   /**

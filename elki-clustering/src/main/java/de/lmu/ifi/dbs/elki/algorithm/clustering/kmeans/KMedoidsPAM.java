@@ -70,8 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @has - - - MedoidModel
- * @composed - - - KMedoidsInitialization
+ * @navassoc - - - MedoidModel
+ * @has - - - KMedoidsInitialization
  *
  * @param <V> vector datatype
  */

@@ -34,17 +34,16 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 
 /**
  * Instance of this query for a particular database.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @opt nodefillcolor LemonChiffon
+ *
  * @has - - - DistanceQuery
  */
 public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> implements LinearScanQuery {
   /**
    * Constructor.
-   * 
+   *
    * @param distanceQuery Distance function to use
    */
   public LinearScanDistanceKNNQuery(DistanceQuery<O> distanceQuery) {

@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 /**
  * Abstract superclass for projected clustering algorithms, like {@link PROCLUS}
  * and {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS}.
- * 
+ *
  * @author Elke Achtert
  * @since 0.1
- * 
+ *
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
@@ -55,7 +55,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
 
   /**
    * Internal constructor.
-   * 
+   *
    * @param k K parameter
    * @param k_i K_i parameter
    * @param l L parameter
@@ -69,9 +69,9 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {

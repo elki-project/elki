@@ -30,11 +30,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDRangeDistanceFunction;
 
 /**
  * Run a distance query based on DBIDRanges
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
- * @opt nodefillcolor LemonChiffon
+ *
  * @assoc - - - DBIDRangeDistanceFunction
  */
 public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
@@ -50,7 +49,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Database to use.
    * @param distanceFunction Our distance function
    */

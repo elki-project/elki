@@ -551,9 +551,9 @@ public class CFTree {
 
   /**
    * Inner node.
-   * 
+   *
    * @hidden
-   * 
+   *
    * @author Erich Schubert
    */
   public static class TreeNode extends ClusteringFeature {
@@ -578,8 +578,7 @@ public class CFTree {
     for(int i = 0; i < n.getDimensionality(); i++) {
       buf.append(' ').append(n.centroid(i));
     }
-    buf.append(" - ").append(n.n);
-    buf.append('\n');
+    buf.append(" - ").append(n.n).append('\n');
     if(n instanceof TreeNode) {
       ClusteringFeature[] children = ((TreeNode) n).children;
       for(int i = 0; i < children.length; i++) {
@@ -594,8 +593,10 @@ public class CFTree {
 
   /**
    * CF-Tree Factory.
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   public static class Factory {
     /**

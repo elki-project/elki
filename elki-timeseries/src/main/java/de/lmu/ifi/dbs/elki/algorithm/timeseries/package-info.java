@@ -1,9 +1,7 @@
 /**
- * Helper classes for the
- * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE CLIQUE}
- * algorithm.
+ * Algorithms for change point detection in time series.
  *
- * @opt include .*elki.algorithm.clustering.subspace.CLIQUE
+ * @opt include .*elki.algorithm.AbstractAlgorithm
  */
 /*
  * This file is part of ELKI:
@@ -25,4 +23,4 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
+package de.lmu.ifi.dbs.elki.algorithm.timeseries;

@@ -1,5 +1,8 @@
 /**
  * Quality measures for k-Means results.
+ *
+ * @opt include .*elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
+ * @opt include .*elki.algorithm.clustering.kmeans.XMeans
  */
 /*
  * This file is part of ELKI:

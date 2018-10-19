@@ -26,8 +26,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 
 /**
- * APRIORI itemset.
- * 
+ * Frequent itemset with one element.
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
@@ -39,7 +39,7 @@ public class OneItemset extends Itemset {
 
   /**
    * Constructor of 1-itemset.
-   * 
+   *
    * @param item Item
    */
   public OneItemset(int item) {
@@ -48,7 +48,7 @@ public class OneItemset extends Itemset {
 
   /**
    * Constructor with initial support.
-   * 
+   *
    * @param item Item
    * @param support Support
    */

@@ -65,6 +65,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
 @Reference(authors = "M. K. Pakhira, S. Bandyopadhyay, U. Maulik", //

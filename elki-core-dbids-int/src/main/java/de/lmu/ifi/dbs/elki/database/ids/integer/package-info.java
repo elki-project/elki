@@ -1,10 +1,8 @@
 /** 
  * Integer-based DBID <em>implementation</em> --
  * <b>do not use directly - always use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil}</b>.
- * 
- * @opt hide java.*
- * @opt hide de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
- * @opt hide de.lmu.ifi.dbs.elki.persistent.*
+ *
+ * @opt hide .*Serializer
  */
 /*
  * This file is part of ELKI:

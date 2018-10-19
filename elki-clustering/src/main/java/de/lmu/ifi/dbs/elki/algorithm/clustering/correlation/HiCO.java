@@ -73,6 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.1
  *
  * @composed - - - HiCO.Instance
+ * @composed - - - KNNQueryFilteredPCAIndex
+ * @navhas - produces - CorrelationClusterOrder
  *
  * @param <V> the type of NumberVector handled by the algorithm
  */

@@ -56,8 +56,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * M. J. Zaki, W. Meira Jr<br>
  * Data mining and analysis: fundamental concepts and algorithms<br>
  * Cambridge University Press, 2014
- * 
+ *
  * @author Erich Schubert
+ *
+ * @composed - - - AbstractFrequentItemsetAlgorithm
+ * @composed - - - InterestingnessMeasure
+ * @assoc - - - FrequentItemsetsResult
+ * @navassoc - - - AssociationRuleResult
+ * @navassoc - - - AssociationRule
  */
 @Reference(authors = "M. J. Zaki, W. Meira Jr.", //
     title = "Data mining and analysis: fundamental concepts and algorithms", //

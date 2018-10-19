@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.1
  *
- * @composed - - - Instance
+ * @navassoc - produces - ClusterOrder
  *
  * @param <O> the type of objects handled by the algorithm
  */
@@ -90,6 +90,8 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
    * Instance for processing a single data set.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   private class Instance {
     /**

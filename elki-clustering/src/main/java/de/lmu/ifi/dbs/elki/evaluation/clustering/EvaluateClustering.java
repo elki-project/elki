@@ -55,7 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.4.0
  *
  * @opt nodefillcolor LemonChiffon
- * @assoc - - - ClusterContingencyTable
+ * @assoc - evaluates - Clustering
+ * @composed - - - ClusterContingencyTable
  * @navhas - create - EvaluateClustering.ScoreResult
  */
 @Alias("de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure")

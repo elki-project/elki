@@ -24,10 +24,8 @@ import java.util.Arrays;
 
 /**
  * Multiple border point assignment.
- * 
- * @author Erich Schubert
  *
- * @hidden
+ * @author Erich Schubert
  */
 public class MultiBorder implements Assignment {
   /**
@@ -48,7 +46,7 @@ public class MultiBorder implements Assignment {
 
   /**
    * Add a new border to the existing borders.
-   * 
+   *
    * @param border New border.
    */
   public Assignment update(Border border) {
@@ -81,7 +79,7 @@ public class MultiBorder implements Assignment {
 
   /**
    * Get the core this is assigned to.
-   * 
+   *
    * @return Core
    */
   public Core getCore() {

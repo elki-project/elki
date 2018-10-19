@@ -80,6 +80,9 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  *
  * @author Elke Achtert
  * @since 0.1
+ *
+ * @navassoc - produces - ClusterOrder
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")

@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * APRIORI itemset.
- * 
+ * Frequent itemset, sparse representation.
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
@@ -36,7 +36,7 @@ public class SparseItemset extends Itemset {
 
   /**
    * Constructor.
-   * 
+   *
    * @param indices Items
    */
   public SparseItemset(int[] indices) {
@@ -44,8 +44,8 @@ public class SparseItemset extends Itemset {
   }
 
   /**
-   * Constructor.
-   * 
+   * Constructor with initial support.
+   *
    * @param indices Items
    * @param support Support
    */

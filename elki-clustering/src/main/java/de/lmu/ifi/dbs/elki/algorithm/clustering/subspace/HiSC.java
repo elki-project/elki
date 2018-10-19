@@ -56,13 +56,14 @@ import net.jafama.FastMath;
  * Ina Müller-Gorman, Arthur Zimek<br>
  * Finding Hierarchies of Subspace Clusters<br>
  * Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in
- * Databases (PKDD'06)F
- * 
+ * Databases (PKDD'06)
+ *
  * @author Elke Achtert
  * @since 0.1
- * 
- * @assoc - - - HiSCPreferenceVectorIndex
- * 
+ *
+ * @composed - - - HiSCPreferenceVectorIndex
+ * @navhas - produces - CorrelationClusterOrder
+ *
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Finding Hierarchies of Subspace Clusters")
@@ -106,7 +107,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   /**
    * Algorithm instance for a single data set.
-   * 
+   *
    * @author Erich Schubert
    *
    * @hidden
@@ -281,9 +282,9 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

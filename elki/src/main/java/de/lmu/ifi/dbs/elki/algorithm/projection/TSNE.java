@@ -66,6 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @author Dominik Acker
  *
+ * @composed - - - AffinityMatrixBuilder
+ *
  * @param <O> Object type
  */
 @Title("t-SNE")

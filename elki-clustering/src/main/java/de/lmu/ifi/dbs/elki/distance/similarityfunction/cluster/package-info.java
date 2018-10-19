@@ -1,5 +1,8 @@
 /**
  * Similarity measures for comparing clusters.
+ *
+ * @opt include .*elki.distance.distancefunction.PrimitiveDistanceFunction
+ * @opt include .*elki.distance.similarityfunction.PrimitiveSimilarityFunction
  */
 /*
  * This file is part of ELKI:

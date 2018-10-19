@@ -65,6 +65,8 @@ import net.jafama.FastMath;
  * @author Stephan Baier
  *
  * @param <O> Object type
+ *
+ * @assoc - analyzes - Clustering
  */
 @Reference(authors = "Davoud Moulavi, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur Zimek, Jörg Sander", //
     title = "Density-Based Clustering Validation", //

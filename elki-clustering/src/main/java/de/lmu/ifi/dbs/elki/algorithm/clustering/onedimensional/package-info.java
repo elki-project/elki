@@ -1,5 +1,7 @@
 /**
  * Clustering algorithms for one-dimensional data.
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

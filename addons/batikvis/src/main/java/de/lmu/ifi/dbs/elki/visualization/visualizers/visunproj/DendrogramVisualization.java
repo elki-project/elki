@@ -71,6 +71,8 @@ import net.jafama.FastMath;
  *
  * @stereotype factory
  * @navassoc - create - Instance
+ * @composed - - - DrawingStyle
+ * @composed - - - PositionStyle
  */
 public class DendrogramVisualization implements VisFactory {
   /**
@@ -146,6 +148,8 @@ public class DendrogramVisualization implements VisFactory {
    * Menu item to change visualization styles.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   public class SwitchStyleAction implements VisualizationMenuAction {
     /**

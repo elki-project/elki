@@ -34,14 +34,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * partitioning of the database. More relaxed clustering algorithms are allowed
  * to provide a result that is a fuzzy clustering, does not partition the
  * database complete or is in any other sense a relaxed clustering result.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.1
- * 
+ *
  * @opt operations
- * @assoc - - - Clustering
+ * @assoc - produces - Clustering
  * @assoc - - - Model
- * 
+ *
  * @param <C> Clustering type
  */
 public interface ClusteringAlgorithm<C extends Clustering<? extends Model>> extends Algorithm {

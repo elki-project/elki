@@ -29,10 +29,12 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Result class for Apriori Algorithm.
- * 
+ * Result class for frequent itemset mining algorithms.
+ *
  * @author Erich Schubert
  * @since 0.2
+ *
+ * @has - - - Itemset
  */
 public class FrequentItemsetsResult extends BasicResult implements TextWriteable {
   /**
@@ -52,7 +54,7 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
 
   /**
    * Constructor.
-   * 
+   *
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    * @param itemsets Frequent itemsets (sorted, by size then lexicographically)
@@ -68,7 +70,7 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
 
   /**
    * Returns the frequent item sets.
-   * 
+   *
    * @return the frequent item sets.
    */
   public List<Itemset> getItemsets() {
@@ -87,7 +89,7 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
 
   /**
    * Get the metadata used for serialization.
-   * 
+   *
    * @return Metadata
    */
   public VectorFieldTypeInformation<BitVector> getMeta() {
@@ -96,7 +98,7 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
 
   /**
    * Get the total number of transactions.
-   * 
+   *
    * @return Total transactions
    */
   public int getTotal() {

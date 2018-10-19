@@ -1,5 +1,10 @@
 /**
  * Clustering based outlier detection.
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
+ * @opt include .*elki.algorithm.clustering.em.EM
+ * @opt include .*elki.algorithm.clustering.kmeans.KMeans
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

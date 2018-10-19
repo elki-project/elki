@@ -30,13 +30,12 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 
 /**
  * Default linear scan RKNN query class.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @opt nodefillcolor LemonChiffon
+ *
  * @has - - - KNNQuery
- * 
+ *
  * @param <O> Database object type
  */
 // FIXME: Validate this works correctly.

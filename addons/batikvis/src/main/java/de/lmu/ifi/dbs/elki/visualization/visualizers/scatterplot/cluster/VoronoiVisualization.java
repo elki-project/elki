@@ -141,6 +141,8 @@ public class VoronoiVisualization implements VisFactory {
    * Menu item to change visualization styles.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   public class SwitchModeAction implements VisualizationMenuAction {
     /**

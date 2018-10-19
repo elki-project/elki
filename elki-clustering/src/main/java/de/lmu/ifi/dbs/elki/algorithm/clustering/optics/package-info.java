@@ -1,12 +1,10 @@
 /**
  * OPTICS family of clustering algorithms.
- * 
+ * <p>
  * Note that some OPTICS based algorithms (HiCO, DiSH) are in the
  * subspace and correlation packages, which better describes their use case.
- * 
- * @opt hide ^java\.lang\.
- * @opt hide ^de.lmu.ifi.dbs.elki.result.textwriter
- * @opt hide ^de.lmu.ifi.dbs.elki.algorithm.Abstract
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

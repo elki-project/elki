@@ -70,9 +70,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @assoc - runs - OPTICSTypeAlgorithm
- * @assoc - reads - ClusterOrder
- * @assoc - produces - SteepAreaResult
+ * @composed - runs - OPTICSTypeAlgorithm
+ * @navassoc - reads - ClusterOrder
+ * @navassoc - produces - SteepAreaResult
+ * @navassoc - produces - Clustering
  */
 @Title("OPTICS Xi Cluster Extraction")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //

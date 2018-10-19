@@ -49,6 +49,8 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
    * Customized table.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   private static class IntOpenHashSet extends it.unimi.dsi.fastutil.ints.IntOpenHashSet {
     /**

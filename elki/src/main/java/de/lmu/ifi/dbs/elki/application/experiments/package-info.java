@@ -1,5 +1,7 @@
 /**
  * Packaged experiments to make them easy to reproduce.
+ *
+ * @opt include .*elki.application.AbstractApplication
  */
 /*
  * This file is part of ELKI:

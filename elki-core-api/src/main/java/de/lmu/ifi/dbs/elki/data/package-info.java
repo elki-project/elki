@@ -1,17 +1,8 @@
 /**
  * Basic classes for different data types, database object types and label types
  *
- * @opt hide de.lmu.ifi.dbs.elki.(algorithm|evaluation).*
- * @opt hide de.lmu.ifi.dbs.elki.result.textwriter.*
- * @opt hide de.lmu.ifi.dbs.elki.visualization.*
- * @opt hide de.lmu.ifi.dbs.elki.datasource.(parser|filter).*
- * @opt hide de.lmu.ifi.dbs.elki.math.linearalgebra.*
- * @opt hide de.lmu.ifi.dbs.elki.data.model.ModelUtil
- * @opt hide java.io.*
- * @opt hide java.util.*
- * @opt hide java.lang.*
- * @opt hide .*\.Factory$
- * @opt hide ByteBufferSerializer$
+ * @opt hide .*Serializer
+ * @opt hide .*(Float|Double|Integer|Long|Short|Byte|Bit)Vector\.Factory
  */
 /*
  * This file is part of ELKI:

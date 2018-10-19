@@ -3,6 +3,8 @@
  * 
  * For methods based on <em>local</em> density, see package
  * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof} instead. 
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
  */
 /*
  * This file is part of ELKI:

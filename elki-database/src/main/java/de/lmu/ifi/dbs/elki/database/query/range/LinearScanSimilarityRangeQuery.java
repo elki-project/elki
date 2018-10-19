@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @opt nodefillcolor LemonChiffon
  * @has - - - SimilarityQuery
  *
  * @param <O> Database object type

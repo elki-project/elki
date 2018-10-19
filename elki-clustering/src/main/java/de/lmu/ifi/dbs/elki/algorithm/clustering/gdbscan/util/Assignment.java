@@ -22,10 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util;
 
 /**
  * Point assignment.
- * 
- * @author Erich Schubert
  *
- * @hidden
+ * @author Erich Schubert
  */
 public interface Assignment {
   // Empty

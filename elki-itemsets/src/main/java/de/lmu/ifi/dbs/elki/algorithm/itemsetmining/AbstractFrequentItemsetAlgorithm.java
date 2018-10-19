@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Erich Schubert
  * @since 0.7.0
+ *
+ * @has - produces - FrequentItemsetsResult
  */
 public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm<FrequentItemsetsResult> {
   /**

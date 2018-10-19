@@ -1,5 +1,8 @@
 /**
  * Linkages for hierarchical clustering.
+ *
+ * @opt include .*elki.algorithm.clustering.hierarchical.AGNES
+ * @opt include .*elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
  */
 /*
  * This file is part of ELKI:

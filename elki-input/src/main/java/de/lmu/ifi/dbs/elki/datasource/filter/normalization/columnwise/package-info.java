@@ -1,5 +1,8 @@
 /**
  * Normalizations operating on columns / variates; where each column is treated independently.
+ *
+ * @opt include .*elki.datasource.filter.ObjectFilter
+ * @opt include .*elki.datasource.filter.normalization.Normalization
  */
 /*
  * This file is part of ELKI:

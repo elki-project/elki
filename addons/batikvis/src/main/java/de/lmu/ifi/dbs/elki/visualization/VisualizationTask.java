@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @opt nodefillcolor LemonChiffon
  * @has - - - VisualizerContext
  * @has - - - VisFactory
+ * @composed - - - RenderFlag
+ * @composed - - - UpdateFlag
  */
 public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**

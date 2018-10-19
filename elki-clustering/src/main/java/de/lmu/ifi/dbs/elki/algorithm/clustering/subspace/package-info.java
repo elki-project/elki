@@ -5,10 +5,10 @@
  * clustering algorithms or subspace clustering algorithms according to the
  * classical but somewhat obsolete classification schema of clustering
  * algorithms for axis-parallel subspaces.
- * 
- * @opt hide ^de.lmu.ifi.dbs.elki.algorithm.Abstract
- * @opt hide ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.P3C\.(ClusterCandidate|Signature)
- * @opt hide ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.clique\.
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
+ * @opt include .*elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
+ * @opt include .*elki.algorithm.clustering.optics.GeneralizedOPTICS
  */
 /*
  * This file is part of ELKI:

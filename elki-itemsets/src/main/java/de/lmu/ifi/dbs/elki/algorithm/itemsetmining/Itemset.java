@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 
 /**
- * APRIORI itemset.
- * 
+ * Frequent itemset.
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
@@ -40,7 +40,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Increase the support of the itemset.
-   * 
+   *
    * @return New support.
    */
   public int increaseSupport() {
@@ -49,7 +49,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Get item support.
-   * 
+   *
    * @return Support
    */
   public int getSupport() {
@@ -58,7 +58,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Test whether the itemset is contained in a bit vector.
-   * 
+   *
    * @param bv Bit vector
    * @return {@code true} when the itemset is contained in this vector.
    */
@@ -85,7 +85,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Itemset length.
-   * 
+   *
    * @return Itemset length
    */
   abstract public int length();
@@ -106,9 +106,9 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Get an iterator over items, usually the position within an array.
-   * 
+   *
    * Intended usage:
-   * 
+   *
    * <pre>
    * {@code
    * for (int iter = v.iter(); v.iterValid(iter); iter = v.iterAdvance(iter)) {
@@ -117,14 +117,14 @@ public abstract class Itemset implements Comparable<Itemset> {
    * }
    * }
    * </pre>
-   * 
+   *
    * @return Iterator
    */
   public abstract int iter();
 
   /**
    * Advance the iterator to the next position.
-   * 
+   *
    * @param iter Iterator
    * @return New iterator position
    */
@@ -132,7 +132,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Check if the iterator position is valid.
-   * 
+   *
    * @param iter Iterator
    * @return {@code true} if the position is valid.
    */
@@ -140,7 +140,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Item at the iterator position.
-   * 
+   *
    * @param iter Iterator
    * @return Current item
    */
@@ -186,9 +186,9 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Robust compare using the iterators, lexicographical only!
-   * 
+   *
    * Note: This does NOT take length into account.
-   * 
+   *
    * @param o Other itemset.
    * @return Comparison result.
    */
@@ -215,7 +215,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Append items and support to a string buffer.
-   * 
+   *
    * @param buf Buffer
    * @param meta Relation metadata (for labels)
    * @return String buffer for chaining.
@@ -227,7 +227,7 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Only append the items to a string buffer.
-   * 
+   *
    * @param buf Buffer
    * @param meta Relation metadata (for labels)
    * @return String buffer for chaining.

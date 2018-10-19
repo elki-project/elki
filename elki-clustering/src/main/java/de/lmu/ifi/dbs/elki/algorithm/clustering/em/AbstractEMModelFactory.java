@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for initializing EM.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @param <V> Vector type
  * @param <M> Model type
  */
@@ -46,7 +46,7 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
 
   /**
    * Constructor.
-   * 
+   *
    * @param initializer Class for choosing the initial seeds.
    */
   public AbstractEMModelFactory(KMeansInitialization initializer) {
@@ -56,11 +56,11 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @hidden
-   * 
+   *
    * @param <V> vector type
    */
   public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

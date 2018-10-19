@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Erich Schubert
  *
- * @has - - - MedoidModel
- * @composed - - - KMedoidsInitialization
+ * @navassoc - - - MedoidModel
+ * @has - - - KMedoidsInitialization
  *
  * @param <V> vector datatype
  */

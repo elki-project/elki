@@ -304,6 +304,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * standard flow of most (but not all) k-means variations.
    *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   protected abstract static class Instance {
     /**

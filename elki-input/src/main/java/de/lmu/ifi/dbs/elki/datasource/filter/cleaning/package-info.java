@@ -1,5 +1,9 @@
 /**
  * Filters for data cleaning.
+ *
+ * @opt include .*elki.datasource.filter.AbstractStreamFilter
+ * @opt include .*elki.datasource.filter.ObjectFilter
+ * @opt include .*elki.datasource.filter.StreamFilter
  */
 /*
  * This file is part of ELKI:

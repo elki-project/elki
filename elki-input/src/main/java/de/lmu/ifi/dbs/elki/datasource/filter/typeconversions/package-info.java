@@ -1,5 +1,11 @@
 /**
  * Filters to perform data type conversions.
+ *
+ * @opt include .*elki.datasource.filter.ObjectFilter
+ * @opt include .*elki.datasource.filter.StreamFilter
+ * @opt include .*elki.datasource.filter.AbstractStreamFilter
+ * @opt include .*elki.datasource.filter.AbstractConversionFilter
+ * @opt include .*elki.datasource.filter.AbstractStreamConversionFilter
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,7 @@
 /**
  * Affinity Propagation (AP) clustering.
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

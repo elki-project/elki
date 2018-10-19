@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @since 0.5.0
  * 
  * @opt nodefillcolor LemonChiffon
- * 
- * @assoc - - - Clustering
+ *
+ * @assoc - evaluates - Clustering
  * @composed - - - PairCounting
  * @composed - - - Entropy
  * @composed - - - EditDistance

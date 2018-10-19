@@ -1,5 +1,9 @@
 /**
  * Hierarchical agglomerative clustering (HAC).
+ *
+ * @opt include .*elki.algorithm.clustering.hierarchical.*Extraction
+ * @opt include .*elki.algorithm.clustering.hierarchical.linkage.Linkage
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
  */
 /*
  * This file is part of ELKI:

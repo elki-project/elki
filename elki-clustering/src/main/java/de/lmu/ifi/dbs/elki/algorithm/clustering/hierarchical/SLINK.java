@@ -62,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @has - - - SingleLinkageMethod
+ * @composed - implicitly - SingleLinkageMethod
+ * @navassoc - generates - PointerHierarchyRepresentationResult
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */

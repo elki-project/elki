@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @navassoc - creates - EMClusterModel
+ *
  * @param <V> Vector type
  */
 public interface EMClusterModelFactory<V extends NumberVector, M extends MeanModel> {

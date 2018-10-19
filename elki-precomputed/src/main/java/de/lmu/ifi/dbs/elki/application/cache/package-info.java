@@ -8,6 +8,8 @@
  * are conversion utilities that materialize an arbitrary distance into a binary
  * distance cache on the harddisk (using
  * {@link de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix})
+ *
+ * @opt include .*elki.application.AbstractApplication
  */
 /*
  * This file is part of ELKI:

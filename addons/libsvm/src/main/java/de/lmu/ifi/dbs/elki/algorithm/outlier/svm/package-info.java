@@ -1,7 +1,7 @@
 /**
  * Support-Vector-Machines for outlier detection.
- * 
- * @author Erich Schubert
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
  */
 /*
  * This file is part of ELKI:

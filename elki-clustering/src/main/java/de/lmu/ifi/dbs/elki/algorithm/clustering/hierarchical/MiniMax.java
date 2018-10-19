@@ -47,9 +47,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * J. Bien and R. Tibshirani<br>
  * Hierarchical Clustering with Prototypes via Minimax Linkage<br>
  * Journal of the American Statistical Association 106(495)
- * 
+ *
  * @author Julian Erhard
  * @author Erich Schubert
+ *
+ * @has - - - PointerPrototypeHierarchyRepresentationResult
  *
  * @param <O> Object type
  */

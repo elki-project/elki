@@ -99,8 +99,10 @@ public interface DoubleDBIDList extends DBIDs {
 
   /**
    * Consumer for (DBIDRef, double) pairs.
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @hidden
    */
   @FunctionalInterface
   interface Consumer {

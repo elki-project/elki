@@ -75,6 +75,7 @@ import net.jafama.FastMath;
  *
  * @has - - - Itemset
  * @assoc - - - BitVector
+ * @has - produces - FrequentItemsetsResult
  */
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")

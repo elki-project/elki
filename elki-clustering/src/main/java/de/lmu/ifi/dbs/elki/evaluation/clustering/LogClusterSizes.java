@@ -37,9 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 /**
  * This class will log simple statistics on the clusters detected, such as the
  * cluster sizes and the number of clusters.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
+ *
+ * @assoc - evaluates - Clustering
  */
 public class LogClusterSizes implements Evaluator {
   /**
@@ -54,7 +56,7 @@ public class LogClusterSizes implements Evaluator {
 
   /**
    * Log the cluster sizes of a clustering.
-   * 
+   *
    * @param c Clustering ot analyze
    */
   public static <C extends Model> void logClusterSizes(Clustering<C> c) {

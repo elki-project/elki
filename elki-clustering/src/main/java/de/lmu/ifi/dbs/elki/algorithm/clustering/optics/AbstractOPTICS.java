@@ -44,10 +44,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander<br>
  * OPTICS: Ordering Points to Identify the Clustering Structure<br>
  * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
  * @since 0.7.0
+ *
+ * @navassoc - produces - ClusterOrder
  *
  * @param <O> the type of DatabaseObjects handled by the algorithm
  */

@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Stephan Baier
  * @since 0.7.0
  *
+ * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
 @Reference(authors = "D. L. Davies, D. W. Bouldin", //

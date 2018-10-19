@@ -1,5 +1,10 @@
 /**
  * Correlation clustering algorithms
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
+ * @opt include .*elki.algorithm.clustering.Abstract.*Clustering
+ * @opt include .*elki.algorithm.clustering.optics.GeneralizedOPTICS
+ * @opt include .*elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
  */
 /*
  * This file is part of ELKI:

@@ -68,6 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Erich Schubert
  * @since 0.7.0
+ *
+ * @has - - - Itemset
+ * @has - produces - FrequentItemsetsResult
  */
 @Reference(authors = "M. J. Zaki, S. Parthasarathy, M. Ogihara, W. Li", //
     title = "New Algorithms for Fast Discovery of Association Rules", //

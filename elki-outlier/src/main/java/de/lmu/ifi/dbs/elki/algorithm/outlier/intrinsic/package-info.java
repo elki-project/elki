@@ -1,5 +1,8 @@
 /**
  * Outlier detection algorithms based on intrinsic dimensionality.
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
+ * @opt include .*elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator	
  */
 /*
  * This file is part of ELKI:

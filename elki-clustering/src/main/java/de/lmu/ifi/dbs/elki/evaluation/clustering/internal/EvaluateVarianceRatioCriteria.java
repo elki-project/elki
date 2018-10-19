@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
 @Reference(authors = "R. B. Calinski, J. Harabasz", //

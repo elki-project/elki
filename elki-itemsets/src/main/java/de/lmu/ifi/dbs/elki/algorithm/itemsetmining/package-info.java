@@ -1,5 +1,7 @@
 /**
  * Algorithms for frequent itemset mining such as APRIORI.
+ *
+ * @opt include .*elki.result.FrequentItemsetsResult
  */
 /*
  * This file is part of ELKI:

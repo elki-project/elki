@@ -1,5 +1,7 @@
 /**
  * Initialization strategies for k-means.
+ *
+ * @opt include .*elki.algorithm.clustering.kmeans.AbstractKMeans
  */
 /*
  * This file is part of ELKI:

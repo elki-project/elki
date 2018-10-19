@@ -1,5 +1,11 @@
 /**
  * K-means clustering and variations
+ *
+ * @opt include .*elki.algorithm.clustering.ClusteringAlgorithm
+ * @opt include .*elki.algorithm.clustering.kmeans.initialization.KMeansInitialization
+ * @opt include .*elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization
+ * @opt include .*elki.data.model.KMeansModel
+ * @opt include .*elki.data.model.MedoidModel
  */
 /*
  * This file is part of ELKI:

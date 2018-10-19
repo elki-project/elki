@@ -1,5 +1,7 @@
 /**
  * Data normalization
+ *
+ * @opt include .*elki.datasource.filter.ObjectFilter
  */
 /*
  * This file is part of ELKI:

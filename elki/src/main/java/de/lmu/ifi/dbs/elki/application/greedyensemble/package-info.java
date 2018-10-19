@@ -7,6 +7,8 @@
  * On Evaluation of Outlier Rankings and Outlier Scores<br>
  * Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)
  * </blockquote>
+ *
+ * @opt include .*elki.application.AbstractApplication
  */
 /*
  * This file is part of ELKI:

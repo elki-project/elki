@@ -1,5 +1,9 @@
 /**
  * Association rule mining.
+ *
+ * @opt include .*elki.algorithm.itemsetmining.Itemset
+ * @opt include .*elki.result.FrequentItemsetsResult
+ * @opt include .*elki.algorithm.itemsetmining.associationrules.interest.InterestingnessMeasure
  */
 /*
  * This file is part of ELKI:

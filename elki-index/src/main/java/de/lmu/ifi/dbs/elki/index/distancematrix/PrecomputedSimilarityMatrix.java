@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.0
  *
  * @has - - - PrecomputedSimilarityQuery
+ * @has - - - PrecomputedSimilarityRangeQuery
  *
  * @param <O> Object type
  */

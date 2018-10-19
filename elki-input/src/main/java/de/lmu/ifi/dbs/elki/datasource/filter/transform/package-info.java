@@ -1,5 +1,13 @@
 /**
  * Data space transformations
+ *
+ * @opt include .*elki.datasource.filter.ObjectFilter
+ * @opt include .*elki.datasource.filter.StreamFilter
+ * @opt include .*elki.datasource.filter.AbstractStreamFilter
+ * @opt include .*elki.datasource.filter.AbstractConversionFilter
+ * @opt include .*elki.datasource.filter.AbstractStreamConversionFilter
+ * @opt include .*elki.datasource.filter.AbstractVectorConversionFilter
+ * @opt include .*elki.datasource.filter.AbstractVectorStreamConversionFilter
  */
 /*
  * This file is part of ELKI:

@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @author Erich Schubert
  *
- * @has - - - MedoidModel
+ * @navassoc - - - MedoidModel
  * @has - - - KMedoidsInitialization
  *
  * @param <V> vector datatype

@@ -91,9 +91,12 @@
  *   knnQuery.getKNNForDBID(id, 10);
  * }
  * </pre>
- * 
- * @opt hide java.util.*
- * @opt hide de.lmu.ifi.dbs.elki.utilities.*
+ *
+ * @opt include .*elki.database.query.distance.DistanceQuery
+ * @opt include .*elki.database.query.similarity.SimilarityQuery
+ * @opt include .*elki.database.query.knn.KNNQuery
+ * @opt include .*elki.database.query.rknn.RKNNQuery
+ * @opt include .*elki.database.query.range.RangeQuery
  */
 /*
  * This file is part of ELKI:

@@ -2,6 +2,8 @@
  * Subspace outlier detection methods
  * <p>
  * Methods that detect outliers in subspaces (projections) of the data set.
+ *
+ * @opt include .*elki.algorithm.outlier.OutlierAlgorithm
  */
 /*
  * This file is part of ELKI:

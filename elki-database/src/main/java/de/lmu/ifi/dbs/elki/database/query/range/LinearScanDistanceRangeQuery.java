@@ -31,19 +31,18 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Default linear scan range query class.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @opt nodefillcolor LemonChiffon
+ *
  * @has - - - DistanceQuery
- * 
+ *
  * @param <O> Database object type
  */
 public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<O> implements LinearScanQuery {
   /**
    * Constructor.
-   * 
+   *
    * @param distanceQuery Distance function to use
    */
   public LinearScanDistanceRangeQuery(DistanceQuery<O> distanceQuery) {

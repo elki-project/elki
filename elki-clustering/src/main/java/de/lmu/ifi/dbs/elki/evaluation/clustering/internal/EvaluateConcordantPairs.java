@@ -72,6 +72,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
 @Reference(authors = "F. B. Baker, L. J. Hubert", //
