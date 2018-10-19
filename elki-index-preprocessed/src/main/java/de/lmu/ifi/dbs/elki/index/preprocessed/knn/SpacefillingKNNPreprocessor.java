@@ -193,7 +193,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       final double[] mms = SpatialSorter.computeMinMax(curves.get(0));
       // Find maximum extend.
       double extend = 0;
-      for(int d2 = 0; d2 < mms.length; d2 += 2) {
+      for(int d2 = 0, e = mms.length - 1; d2 < e; d2 += 2) {
         extend = Math.max(extend, mms[d2 + 1] - mms[d2]);
       }
       final double[] mmscratch = new double[mms.length];
@@ -205,7 +205,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
         final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
         // Scale all axes by the same factor:
         final double scale = 1. + random.nextDouble();
-        for(int d2 = 0; d2 < mms.length; d2 += 2) {
+        for(int d2 = 0, e = mms.length - 1; d2 < e; d2 += 2) {
           // Note: use global extend, to be unbiased against different scales.
           mmscratch[d2] = mms[d2] - extend * random.nextDouble();
           mmscratch[d2 + 1] = mmscratch[d2] + extend * scale;

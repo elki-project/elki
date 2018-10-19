@@ -786,8 +786,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
      * @return {@code true} when this is a superset.
      */
     public boolean isSuperset(Signature other) {
-      for(int i = 0; i < spec.length; i += 2) {
-        if((spec[i] != other.spec[i] || spec[i + 1] != other.spec[i]) && other.spec[i] != -1) {
+      for(int i = 1; i < spec.length; i += 2) {
+        if((spec[i - 1] != other.spec[i - 1] || spec[i] != other.spec[i - 1]) && other.spec[i - 1] != -1) {
           return false;
         }
       }
@@ -818,10 +818,9 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       }
       StringBuilder buf = new StringBuilder(1000) //
           .append(p).append("-signature: ");
-      for(int i = 0; i < spec.length; i += 2) {
-        if(spec[i] >= 0) {
-          buf.append(i >>> 1).append(':') //
-              .append(spec[i]).append('-').append(spec[i + 1]).append(' ');
+      for(int i = 1; i < spec.length; i += 2) {
+        if(spec[i - 1] >= 0) {
+          buf.append(i >>> 1).append(':').append(spec[i - 1]).append('-').append(spec[i]).append(' ');
         }
       }
       return buf.append(" size: ").append(ids.size()).toString();

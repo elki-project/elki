@@ -176,7 +176,7 @@ public class EvaluateDBCV<O> implements Evaluator {
         degree[nodes[i]]++;
       }
       // check if cluster contains any internal edges
-      for(int i = 0; i < nodes.length; i += 2) {
+      for(int i = 0, e = nodes.length - 1; i < e; i += 2) {
         if(degree[nodes[i]] > 1 && degree[nodes[i + 1]] > 1) {
           internalEdges[c] = true;
         }
@@ -185,7 +185,7 @@ public class EvaluateDBCV<O> implements Evaluator {
       clusterDegrees[c] = degree;
 
       // find maximum sparseness in the Minimum Spanning Tree
-      for(int i = 0; i < nodes.length; i = i + 2) {
+      for(int i = 0, e = nodes.length - 1; i < e; i += 2) {
         final int n1 = nodes[i], n2 = nodes[i + 1];
         // We only consider edges where both vertices are internal nodes.
         // If a cluster has no internal nodes we consider all edges.

@@ -548,8 +548,8 @@ public class CircleSegmentsVisualizer implements VisFactory {
       String[] colorShades = new String[shades];
 
       for(int s = 0; s < shades; s++) {
-        final int ppos = Math.min((int) Math.floor(increment * s), cols.length);
-        final int npos = Math.min((int) Math.ceil(increment * s), cols.length);
+        final int ppos = Math.min((int) Math.floor(increment * s), cols.length - 1);
+        final int npos = Math.min((int) Math.ceil(increment * s), cols.length - 1);
         if(ppos == npos) {
           colorShades[s] = colors[ppos];
         }

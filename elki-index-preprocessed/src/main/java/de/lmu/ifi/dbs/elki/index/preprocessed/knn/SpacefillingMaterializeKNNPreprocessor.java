@@ -152,7 +152,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
     final int numdim = mms.length >>> 1;
     final int[] permutation = new int[numdim];
     for(int j = 0; j < variants; j++) {
-      for(int i = 0; i < mms.length; i += 2) {
+      for(int i = 0, e = mms.length - 1; i < e; i += 2) {
         double len = mms[i + 1] - mms[i];
         mmscratch[i] = mms[i] - len * random.nextDouble();
         mmscratch[i + 1] = mms[i + 1] + len * random.nextDouble();

@@ -60,8 +60,7 @@ public class GaussianFittingFunction implements FittingFunction {
    */
   @Override
   public FittingFunctionResult eval(double x, double[] params) {
-    int len = params.length;
-
+    final int len = params.length;
     // We always need triples: (mean, stddev, scaling)
     assert (len % 3) == 0;
 
@@ -72,19 +71,19 @@ public class GaussianFittingFunction implements FittingFunction {
     // Numerical Recipes in C: The Art of Scientific Computing
     // Due to their license, we cannot use their code, but we have to implement
     // the mathematics ourselves. We hope the loss in precision is not too big.
-    for(int i = 0; i < params.length; i += 3) {
+    for(int i = 2; i < params.length; i += 3) {
       // Standardized Gaussian parameter (centered, scaled by stddev)
-      double stdpar = (x - params[i]) / params[i + 1];
+      double stdpar = (x - params[i - 2]) / params[i - 1];
       double e = FastMath.exp(-.5 * stdpar * stdpar);
-      double localy = params[i + 2] / (params[i + 1] * MathUtil.SQRTTWOPI) * e;
+      double localy = params[i] / (params[i - 1] * MathUtil.SQRTTWOPI) * e;
 
       y += localy;
       // mean gradient
-      gradients[i] = localy * stdpar;
+      gradients[i - 2] = localy * stdpar;
       // stddev gradient
-      gradients[i + 1] = (stdpar * stdpar - 1.0) * localy;
+      gradients[i - 1] = (stdpar * stdpar - 1.0) * localy;
       // amplitude gradient
-      gradients[i + 2] = e / (params[i + 1] * MathUtil.SQRTTWOPI);
+      gradients[i] = e / (params[i - 1] * MathUtil.SQRTTWOPI);
     }
 
     return new FittingFunctionResult(y, gradients);

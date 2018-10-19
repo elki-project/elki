@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2017
+ * Copyright (C) 2018
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ public class SVGCheckbox {
   public Element renderCheckBox(SVGPlot svgp, double x, double y, double size) {
     // create check
     final Element checkmark = SVGEffects.makeCheckmark(svgp);
-    checkmark.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + (size / 11) + ") translate(" + x + " " + y + ")");
+    checkmark.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + (size / 12) + ") translate(" + x + " " + y + ")");
     if(!checked) {
       checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
     }
@@ -110,35 +110,17 @@ public class SVGCheckbox {
     // add click event listener
     EventTarget targ = (EventTarget) checkbox;
     targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
-      /**
-       * Set the checkmark, and fire the event.
-       */
-      protected void check() {
-        checkmark.removeAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE);
-        checked = true;
-        fireSwitchEvent(new ChangeEvent(SVGCheckbox.this));
-      }
-
-      /**
-       * Remove the checkmark and fire the event.
-       */
-      protected void uncheck() {
-        checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
-        checked = false;
-        fireSwitchEvent(new ChangeEvent(SVGCheckbox.this));
-      }
-
       @Override
       public void handleEvent(Event evt) {
-        if(checked) {
-          uncheck();
+        if(checked ^= true) {
+          checkmark.removeAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE);
         }
         else {
-          check();
+          checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
         }
+        fireSwitchEvent(new ChangeEvent(SVGCheckbox.this));
       }
     }, false);
-
     return checkbox;
   }
 
@@ -176,9 +158,9 @@ public class SVGCheckbox {
    */
   protected void fireSwitchEvent(ChangeEvent evt) {
     Object[] listeners = listenerList.getListenerList();
-    for(int i = 0; i < listeners.length; i += 2) {
-      if(listeners[i] == ChangeListener.class) {
-        ((ChangeListener) listeners[i + 1]).stateChanged(evt);
+    for(int i = 1; i < listeners.length; i += 2) {
+      if(listeners[i - 1] == ChangeListener.class) {
+        ((ChangeListener) listeners[i]).stateChanged(evt);
       }
     }
   }

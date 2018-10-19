@@ -163,7 +163,7 @@ public class MSTSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>
    */
   private static double thresholdLength(double[][] matrix, int[] edges) {
     double[] lengths = new double[edges.length >> 1];
-    for(int i = 0; i < edges.length; i += 2) {
+    for(int i = 0, e = edges.length - 1; i < e; i += 2) {
       lengths[i >> 1] = matrix[edges[i]][edges[i + 1]];
     }
     Arrays.sort(lengths);
@@ -197,7 +197,7 @@ public class MSTSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>
       idx[i] = i;
     }
     Arrays.fill(sizes, 1);
-    for(int i = 0, j = 0; j < edges.length; i++, j += 2) {
+    for(int i = 0, j = 0, e = edges.length - 1; j < e; i++, j += 2) {
       if(i == omit) {
         continue;
       }

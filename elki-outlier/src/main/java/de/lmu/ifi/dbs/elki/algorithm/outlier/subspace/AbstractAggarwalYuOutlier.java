@@ -158,10 +158,10 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
   protected DBIDs computeSubspace(int[] subspace, ArrayList<ArrayList<DBIDs>> ranges) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace[0]).get(subspace[1]));
     // intersect all selected dimensions
-    for(int i = 2; i < subspace.length; i += 2) {
+    for(int i = 2, e = subspace.length - 1; i < e; i += 2) {
       DBIDs current = ranges.get(subspace[i]).get(subspace[i + 1] - GENE_OFFSET);
       ids.retainAll(current);
-      if(ids.size() == 0) {
+      if(ids.isEmpty()) {
         break;
       }
     }

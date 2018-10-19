@@ -512,7 +512,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
      */
     private static double computeSquareSize(double[] minmax) {
       double max = 0;
-      for(int d = 0; d < minmax.length; d += 2) {
+      for(int d = 0, e = minmax.length - 1; d < e; d += 2) {
         double width = minmax[d + 1] - minmax[d];
         // Diagonal would be:
         max += width * width;
