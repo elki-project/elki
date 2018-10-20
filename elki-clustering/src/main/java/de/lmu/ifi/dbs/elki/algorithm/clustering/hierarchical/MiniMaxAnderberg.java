@@ -200,8 +200,8 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param dq the range query
    * @param bestd the distances to the nearest neighboring cluster
    * @param besti the nearest neighboring cluster
-   * @param x first cluster to merge, with x > y
-   * @param y second cluster to merge, with y < x
+   * @param x first cluster to merge, with {@code x > y}
+   * @param y second cluster to merge, with {@code y < x}
    */
   protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
@@ -252,8 +252,8 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param dq the range query
    * @param bestd the distances to the nearest neighboring cluster
    * @param besti the nearest neighboring cluster
-   * @param x first cluster to merge, with x > y
-   * @param y second cluster to merge, with y < x
+   * @param x first cluster to merge, with {@code x > y}
+   * @param y second cluster to merge, with {@code y < x}
    */
   private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;

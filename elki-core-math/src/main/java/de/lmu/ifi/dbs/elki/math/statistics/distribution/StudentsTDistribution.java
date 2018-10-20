@@ -127,7 +127,7 @@ public class StudentsTDistribution extends AbstractDistribution {
   }
 
   /**
-   * Static version of the CDF of the t-distribution for t > 0
+   * Static version of the CDF of the t-distribution for t &gt; 0
    *
    * @param val value to evaluate
    * @param v degrees of freedom

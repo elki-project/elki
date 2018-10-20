@@ -114,7 +114,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    *
    * @param distanceFunction Distance function
    * @param k k Parameter
-   * @param sample Sampling rate, or sample size (when > 1)
+   * @param sample Sampling rate, or sample size (when &gt; 1)
    * @param rnd Random source.
    */
   public KNNDistancesSampler(DistanceFunction<? super O> distanceFunction, int k, double sample, RandomFactory rnd) {

@@ -541,7 +541,7 @@ public class SVGPath {
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param x new coordinates
    * @param y new coordinates
@@ -556,7 +556,7 @@ public class SVGPath {
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */
@@ -569,7 +569,7 @@ public class SVGPath {
    *
    * @param rxy radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */
@@ -583,7 +583,7 @@ public class SVGPath {
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param x new coordinates
    * @param y new coordinates
@@ -598,7 +598,7 @@ public class SVGPath {
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */
@@ -611,7 +611,7 @@ public class SVGPath {
    *
    * @param rxy radius
    * @param ar x-axis-rotation
-   * @param la large arc flag, if angle >= 180 deg
+   * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */

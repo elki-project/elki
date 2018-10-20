@@ -31,7 +31,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  */
 public final class CommonConstraints {
   /**
-   * Integer constraint: >= -1
+   * Integer constraint: &gt;= -1
    */
   public static final AbstractNumberConstraint GREATER_EQUAL_MINUSONE_INT = new GreaterEqualConstraint(-1);
 
@@ -91,12 +91,12 @@ public final class CommonConstraints {
   public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ZERO_INT);
 
   /**
-   * List constraint: >= 1
+   * List constraint: &gt;= 1
    */
   public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ONE_INT);
 
   /**
-   * List constraint: > 1
+   * List constraint: &gt; 1
    */
   public static final ParameterConstraint<int[]> GREATER_THAN_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_THAN_ONE_INT);
 
@@ -106,12 +106,12 @@ public final class CommonConstraints {
   public static final ParameterConstraint<double[]> GREATER_EQUAL_ZERO_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ZERO_DOUBLE);
 
   /**
-   * List constraint: >= 1
+   * List constraint: &gt;= 1
    */
   public static final ParameterConstraint<double[]> GREATER_EQUAL_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ONE_DOUBLE);
 
   /**
-   * List constraint: > 1
+   * List constraint: &gt; 1
    */
   public static final ParameterConstraint<double[]> GREATER_THAN_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_THAN_ONE_DOUBLE);
 }

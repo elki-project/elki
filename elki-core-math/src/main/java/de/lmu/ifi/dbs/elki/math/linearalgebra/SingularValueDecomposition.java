@@ -25,12 +25,12 @@ import net.jafama.FastMath;
 /**
  * Singular Value Decomposition.
  * <p>
- * For an m-by-n matrix A with m >= n, the singular value decomposition is an
+ * For an m-by-n matrix A with m &gt;= n, the singular value decomposition is an
  * m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and an n-by-n
  * ozthogonal matrix V so that A = U*S*V'.
  * <p>
- * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >=
- * sigma[1] >= ... >= sigma[n-1].
+ * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] &gt;=
+ * sigma[1] &gt;= ... &gt;= sigma[n-1].
  * <p>
  * The singular value decomposition always exists, so the constructor will never
  * fail. The matrix condition number and the effective numerical rank can be

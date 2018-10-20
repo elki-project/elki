@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
- * parameter k < kmax. All knn distances for k <= kmax are stored in each entry
+ * parameter k &lt; kmax. All knn distances for k &lt;= kmax are stored in each entry
  * of a node.
  *
  * @author Elke Achtert

@@ -417,7 +417,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
 
     /**
      * Parameter to specify the termination criterion for maximization of E(M):
-     * E(M) - E(M') < em.delta, must be a double equal to or greater than 0.
+     * E(M) - E(M') &lt; em.delta, must be a double equal to or greater than 0.
      */
     public static final OptionID DELTA_ID = new OptionID("em.delta", //
         "The termination criterion for maximization of E(M): " + //

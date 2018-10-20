@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Abstract parameter class defining a parameter for a list of objects.
- * 
+ *
  * @author Steffi Wanka
  * @author Erich Schubert
  * @since 0.1
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  */
 public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> extends AbstractParameter<THIS, T> {
   /**
-   * A pattern defining a &quot,&quot.
+   * A pattern defining a &quot;,&quot;.
    */
   public static final Pattern SPLIT = Pattern.compile(",");
 
@@ -46,7 +46,7 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
   public static final String LIST_SEP = ",";
 
   /**
-   * A pattern defining a &quot:&quot or &quot;;&quot;.
+   * A pattern defining a &quot;:&quot; or &quot;;&quot;.
    */
   public static final Pattern VECTOR_SPLIT = Pattern.compile("[:;]");
 

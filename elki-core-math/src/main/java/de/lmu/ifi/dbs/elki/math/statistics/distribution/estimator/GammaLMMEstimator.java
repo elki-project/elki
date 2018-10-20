@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Estimate the parameters of a Gamma Distribution, using the methods of
  * L-Moments (LMM).
- * <p<
+ * <p>
  * Reference:
  * <p>
  * J. R. M. Hosking<br>

@@ -88,7 +88,7 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Compute bivariate ranks.
    * <p>
-   * q[i] is the number of objects such that x[j] < x[i] and y[j] < y[i]
+   * q[i] is the number of objects such that x[j] &lt; x[i] and y[j] &lt; y[i]
    *
    * @param adapter1 First adapter
    * @param data1 First data set

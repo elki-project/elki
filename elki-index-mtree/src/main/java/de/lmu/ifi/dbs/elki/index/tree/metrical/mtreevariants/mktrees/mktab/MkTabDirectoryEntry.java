@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
 /**
  * Represents an entry in a directory node of a MkTab-Tree. Additionally to a
  * MTreeLeafEntry a MkTabDirectoryEntry holds a list of its knn distances for
- * parameters k <= k_max.
+ * parameters k &lt;= k_max.
  * 
  * @author Elke Achtert
  * @since 0.1

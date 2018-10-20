@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * double[] ?. The ith row of X and Y will contain the x and y value for the ith
  * data sample.
  * <p>
- * The variables will be transformed in the following way: x => x1, ..., x^p =>
- * xp Then the model can be written as a multiple linear equation model: y = b0
- * + b1*x1 + b2*x2 + ... + bp*xp + e
- * 
+ * The variables will be transformed in the following way: x =&gt; x1, ..., x^p
+ * =&gt; xp Then the model can be written as a multiple linear equation model:
+ * y = b0 + b1*x1 + b2*x2 + ... + bp*xp + e
+ *
  * @author Elke Achtert
  * @since 0.1
  */

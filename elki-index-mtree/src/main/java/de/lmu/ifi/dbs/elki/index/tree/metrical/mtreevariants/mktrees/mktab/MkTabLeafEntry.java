@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 /**
  * Represents an entry in a leaf node of a MkTab-Tree. Additionally to a
  * MTreeLeafEntry a MkTabLeafEntry holds a list of its knn distances for
- * parameters k <= k_max.
+ * parameters k &lt;= k_max.
  * 
  * @author Elke Achtert
  * @since 0.1

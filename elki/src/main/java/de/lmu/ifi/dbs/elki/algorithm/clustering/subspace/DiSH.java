@@ -359,7 +359,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   }
 
   /**
-   * Removes the clusters with size < minpts from the cluster map and adds them
+   * Removes the clusters with size &lt; minpts from the cluster map and adds them
    * to their parents.
    *
    * @param relation the relation storing the objects

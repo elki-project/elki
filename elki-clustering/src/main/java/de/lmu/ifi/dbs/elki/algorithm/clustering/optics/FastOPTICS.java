@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * J. Schneider, M. Vlachos<br>
  * Fast parameterless density-based clustering via random projections<br>
- * Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)
+ * Proc. 22nd ACM Int. Conf. on Information and Knowledge Management (CIKM 2013)
  * <p>
  * This is based on the original code provided by Johannes Schneider, with
  * ELKIfications and optimizations by Erich Schubert.

@@ -231,14 +231,17 @@ public class LinearEquationSystem {
   /**
    * Solves this linear equation system by total pivot search. "Total pivot
    * search" takes as pivot element the element in the current column having the
-   * biggest value. If we have: <br>
-   * <code>
-   * ( a_11 &nbsp;&nbsp;&nbsp;&nbsp; ... &nbsp;&nbsp;&nbsp;&nbsp; a_1n      ) <br>
-   * (  0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  ...   &nbsp;&nbsp;&nbsp;&nbsp; a_2n      ) <br>
-   * (  0 ... a_ii     &nbsp;&nbsp;&nbsp; ... a_in      )<br>
-   * (  0 ... a_(i+1)i ... a_(i+1)n  ) <br>
-   * (  0 ... a_ni     &nbsp;&nbsp;&nbsp; ... a_nn      ) <br>
-   * </code> Then we search for x,y in {i,...n}, so that |a_xy| > |a_ij|
+   * biggest value. If we have:
+   *
+   * <pre>
+   * ( a_11   ...          a_1n      )
+   * (  0     ...          a_2n      )
+   * (  0 ... a_ii     ... a_in      )
+   * (  0 ... a_(i+1)i ... a_(i+1)n  )
+   * (  0 ... a_ni     ... a_nn      )
+   * </pre>
+   *
+   * Then we search for x,y in {i,...n}, so that {@code |a_xy| > |a_ij|}
    */
   public void solveByTotalPivotSearch() {
     solve(TOTAL_PIVOT_SEARCH);
@@ -460,8 +463,8 @@ public class LinearEquationSystem {
   }
 
   /**
-   * Method for total pivot search, searches for x,y in {k,...n}, so that |a_xy|
-   * > |a_ij|
+   * Method for total pivot search, searches for x,y in {k,...n}, so that
+   * {@code |a_xy| > |a_ij|}
    *
    * @param k search starts at entry (k,k)
    * @return the position of the found pivot element

@@ -43,7 +43,7 @@ import net.jafama.FastMath;
  * The L<sub>p</sub> distance is defined as:
  * \[ L_p(\vec{x},\vec{y}) := \left(\sum\nolimits_i (x_i-y_i)\right)^{1/p} \]
  * <p>
- * For p >= 1 this is a metric. For p=1, this yields the well known
+ * For p &gt;= 1 this is a metric. For p=1, this yields the well known
  * {@link ManhattanDistanceFunction}, for p = 2 the standard
  * {@link EuclideanDistanceFunction}.
  *

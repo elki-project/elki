@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
- * parameter k <= k_max. The k-nearest neighbor distance for k = k_max is stored
+ * parameter k &lt;= k_max. The k-nearest neighbor distance for k = k_max is stored
  * in each entry of a node.
  *
  * @author Elke Achtert

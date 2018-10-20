@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * <p>
  * R. Huisman, K. G. Koedijk, C. J. M. Kool, F. Palm<br>
  * Tail-Index Estimates in Small Samples<br>
- * Journal of Business & Economic Statistics
+ * Journal of Business and Economic Statistics
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert

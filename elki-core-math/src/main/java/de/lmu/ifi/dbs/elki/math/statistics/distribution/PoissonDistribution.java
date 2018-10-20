@@ -73,7 +73,7 @@ public class PoissonDistribution extends AbstractDistribution {
   private static final double S4 = 0.00084175084175084175084175084175d;
 
   /**
-   * Exact table values for n <= 15 in steps of 0.5
+   * Exact table values for n &lt;= 15 in steps of 0.5
    * <p>
    * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
    */

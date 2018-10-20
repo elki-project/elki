@@ -190,8 +190,7 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
   /**
    * Returns a string representation of the parameter's type.
    *
-   * @return &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&
-   *         quot ;
+   * @return Syntax string
    */
   @Override
   public String getSyntax() {

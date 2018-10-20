@@ -557,8 +557,8 @@ public final class MathUtil {
   }
 
   /**
-   * Fast loop for computing {@code pow(x, p)} for p >= 0 integer and x
-   * integer.
+   * Fast loop for computing {@code pow(x, p)}
+   * for {@code p >= 0} integer and x integer.
    *
    * @param x Base
    * @param p Exponent

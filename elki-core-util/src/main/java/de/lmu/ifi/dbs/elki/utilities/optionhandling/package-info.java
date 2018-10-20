@@ -52,7 +52,7 @@
  * 
  * <pre>
  * // Defining Parameters
- * final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+ * final ObjectParameter&lt;DistanceFunction&lt;O, D&gt;&gt; DISTANCE_FUNCTION_PARAM = new ObjectParameter&lt;DistanceFunction&lt;O, D&gt;&gt;(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
  * </pre>
  * 
  * (This example is from
@@ -134,7 +134,7 @@
  * // Compound parameter dependency
  * config.grab(FIRST_OPTION);
  * config.grab(SECOND_OPTION);
- * if(FIRST_OPTION.isDefined() && SECOND_OPTION.isDefined()) {
+ * if(FIRST_OPTION.isDefined() &amp;&amp; SECOND_OPTION.isDefined()) {
  *   // Now we have validated values for both available.
  * }
  * </pre>
@@ -200,7 +200,7 @@
  * // ... more parameters ...
  * ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
  * chain.errorsTo(opticsParameters);
- * optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
+ * optics = new OPTICS&lt;V, PreferenceVectorBasedCorrelationDistance&gt;(chain);
  * opticsParameters.failOnErrors();
  * </pre>
  * 
@@ -228,9 +228,9 @@
  * // config is an existing parameterization
  * TrackParameters trackpar = new TrackParameters(config);
  * 
- * Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
+ * Database&lt;V&gt; tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
  * 
- * Collection<Pair<OptionID, Object>> dbpars = trackpar.getGivenParameters();
+ * Collection&lt;Pair&lt;OptionID, Object&gt;&gt; dbpars = trackpar.getGivenParameters();
  * </pre>
  * 
  * (This is an example from

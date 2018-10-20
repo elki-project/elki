@@ -65,8 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * <p>
  * The second parameter introduced here, walpha, serves a different function: It
  * prevents the eigenpair filter to use a statistically weak Eigenvalue just to
- * reach the intended level, e.g. 84% + 1% >= 85% when 1% is statistically very
- * weak.
+ * reach the intended level, e.g. 84% + 1% &gt;= 85% when 1% is statistically
+ * very weak.
  *
  * @author Erich Schubert
  * @since 0.2

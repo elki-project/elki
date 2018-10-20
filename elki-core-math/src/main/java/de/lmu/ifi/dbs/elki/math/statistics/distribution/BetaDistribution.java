@@ -366,8 +366,8 @@ public class BetaDistribution extends AbstractDistribution {
 
   /**
    * Raw quantile function
-   * 
-   * @param p P, must be 0 < p <= .5
+   *
+   * @param p P, must be 0 &lt; p &lt;= .5
    * @param alpha Alpha
    * @param beta Beta
    * @param logbeta log Beta(alpha, beta)

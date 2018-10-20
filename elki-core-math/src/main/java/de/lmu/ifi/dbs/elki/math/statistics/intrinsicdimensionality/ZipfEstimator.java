@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * <p>
  * J. Schultze, J. Steinebach<br>
  * On Least Squares Estimates of an Exponential Tail Coefficient<br>
- * Statistics & Risk Modeling 14(4)
+ * Statistics and Risk Modeling 14(4)
  * <p>
  * J. Beirlant, G. Dierckx, A. Guillou<br>
  * Estimation of the extreme-value index and generalized quantile plots<br>

@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * distance of a point to the nearest neighbor distance of the nearest neighbor.
  * <p>
  * The initial description used k=1, where this equation makes most sense.
- * For k > 1, one may want to use averaging similar to LOF.
+ * For k &gt; 1, one may want to use averaging similar to LOF.
  * <p>
  * Reference ("1-Nearest-Neighbor method"):
  * <p>

@@ -69,7 +69,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   private double densitycorrection = 1.0;
 
   /**
-   * Number of points in the cluster (-> density)
+   * Number of points in the cluster (~density)
    */
   private int size;
 
@@ -127,8 +127,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Apply a rotation to the generator
    *
-   * @param axis1 First axis (0 <= axis1 < dim)
-   * @param axis2 Second axis (0 <= axis2 < dim)
+   * @param axis1 First axis (0 &lt;= axis1 &lt; dim)
+   * @param axis2 Second axis (0 &lt;= axis2 &lt; dim)
    * @param angle Angle in Radians
    */
   public void addRotation(int axis1, int axis2, double angle) {

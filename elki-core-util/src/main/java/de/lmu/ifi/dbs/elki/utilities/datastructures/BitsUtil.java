@@ -225,7 +225,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute corresponding gray code as v XOR (v >>> 1)
+   * Compute corresponding gray code as v XOR (v &gt;&gt;&gt; 1)
    *
    * @param v Value
    * @return Gray code
@@ -235,7 +235,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute corresponding gray code as v XOR (v >>> 1)
+   * Compute corresponding gray code as v XOR (v &gt;&gt;&gt; 1)
    *
    * @param v Value
    * @return Gray code
@@ -246,7 +246,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute the inverted gray code, v XOR (v >>> 1) XOR (v >>> 2) ...
+   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v &gt;&gt;&gt; 2) ...
    *
    * @param v Value
    * @return Inverted gray code
@@ -262,7 +262,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute the inverted gray code, v XOR (v >>> 1) XOR (v >>> 2) ...
+   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v &gt;&gt;&gt; 2) ...
    *
    * @param v Value
    * @return Inverted gray code
@@ -481,7 +481,7 @@ public final class BitsUtil {
   }
 
   /**
-   * XOR o onto v inplace, i.e. v ^= (o << off)
+   * XOR o onto v inplace, i.e. v ^= (o &lt;&lt; off)
    *
    * @param v Primary object
    * @param o data to or
@@ -538,7 +538,7 @@ public final class BitsUtil {
   }
 
   /**
-   * OR o onto v inplace, i.e. v |= (o << off)
+   * OR o onto v inplace, i.e. v |= (o &lt;&lt; off)
    *
    * Note: Bits that are shifted outside of the size of v are discarded.
    *
@@ -581,7 +581,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v inplace, i.e. v &= o
+   * AND o onto v inplace, i.e. v &amp;= o
    *
    * @param v Primary object
    * @param o data to and
@@ -598,7 +598,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v inplace, i.e. v &= (o << off)
+   * AND o onto v inplace, i.e. v &amp;= (o &lt;&lt; off)
    *
    * @param v Primary object
    * @param o data to or
@@ -644,7 +644,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v in a copy, i.e. v & o
+   * AND o onto v in a copy, i.e. v &amp; o
    *
    * The resulting array will have the shorter length of the two.
    *
@@ -663,7 +663,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v in a copy, i.e. v & o
+   * AND o onto v in a copy, i.e. v &amp; o
    *
    * The resulting array will have the shorter length of the two.
    *
@@ -690,7 +690,7 @@ public final class BitsUtil {
   }
 
   /**
-   * NOTAND o onto v inplace, i.e. v &= ~o
+   * NOTAND o onto v inplace, i.e. v &amp;= ~o
    *
    * @param v Primary object
    * @param o data to and

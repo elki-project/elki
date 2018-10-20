@@ -64,7 +64,7 @@ public final class VMath {
   protected static final String ERR_DIMENSIONS = "Dimensionalities do not agree.";
 
   /**
-   * Error message when min > max is given as a range.
+   * Error message when min &gt; max is given as a range.
    */
   protected static final String ERR_INVALID_RANGE = "Invalid range parameters.";
 

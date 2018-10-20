@@ -49,7 +49,7 @@ import net.jafama.FastMath;
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
- * parameter k < kmax.
+ * parameter k &lt; kmax.
  *
  * @author Elke Achtert
  * @since 0.1
