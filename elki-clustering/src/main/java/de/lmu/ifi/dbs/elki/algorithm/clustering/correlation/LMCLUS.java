@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -93,7 +94,7 @@ import net.jafama.FastMath;
     booktitle = "Pattern Recognition volume 40, Issue 10", //
     url = "https://doi.org/10.1016/j.patcog.2007.01.020", //
     bibkey = "DBLP:journals/pr/HaralickH07")
-public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
+public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
