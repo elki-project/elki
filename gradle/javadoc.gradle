@@ -20,9 +20,10 @@ def useumlgraph = file('/usr/bin/dot').exists() && !JavaVersion.current().isJava
 
 subprojects {
   if (useumlgraph) {
-    repositories { maven { url 'https://jitpack.io' } } // for UMLgraph only
     configurations { umlgraph }
-    dependencies { umlgraph 'com.github.dspinellis:UMLGraph:132f389bcf' } // Via jitpack
+    // repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.dspinellis:UMLGraph:master-SNAPSHOT' } // Via jitpack
+    repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.kno10:UMLGraph:java8-SNAPSHOT' } // jitpack
+    // repositories { mavenLocal() }; dependencies { umlgraph 'org.umlgraph:umlgraph:5.7.3-SNAPSHOT' }
   }
 
   // Javadoc options
@@ -69,28 +70,27 @@ subprojects {
       if (useumlgraph) {
         doclet = 'org.umlgraph.doclet.UmlGraphDoc'
         docletpath = configurations.umlgraph.files.asType(List)
-          // addBooleanOption('inferrel', true) // Generates too many multi-edges
-          addBooleanOption('inferdep', true) // Generates too many multi-edges
+          addBooleanOption('inferrel', true) // Generates many multi-edges
+          addBooleanOption('inferdep', true) // Generates many multi-edges
           addStringOption('inferdepvis', 'public')
-          // addBooleanOption('qualify', true) // too big with generics
+          addBooleanOption('qualify', true)
           addBooleanOption('postfixpackage', true)
+          addBooleanOption('hideGenerics', true)
           addBooleanOption('horizontal', true)
-          addBooleanOption('compact', true)
-          addStringOption('hide', 'java.*|fastutil.*|org.apache.*')
+          addBooleanOption('compact', false)
+          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|de.lmu.ifi.dbs.elki.*\\.(Instance|Parameterizer)')
           addStringOption('collpackages', 'java.util.*|fastutil.*|de.lmu.ifi.dbs.elki.utilities.datastructures.*')
-          addStringOption('edgefontsize', '6')
+          addStringOption('edgefontsize', '7')
           addStringOption('edgefontname', 'sans')
           addStringOption('nodefontsize', '8')
           addStringOption('nodefontname', 'sans')
           addStringOption('nodefontclassname', 'sans')
-          addStringOption('nodefontabstractname', 'sans')
-          addStringOption('nodefontclassabstractname', 'sans')
-          addStringOption('nodefontpackagesize', '6')
+          addStringOption('nodefontpackagesize', '7')
           addStringOption('nodefontpackagename', 'sans')
           addStringOption('nodefonttagname', 'sans')
-          addStringOption('nodefonttagsize', '6')
-          addStringOption('nodesep', '0.1')
-          addStringOption('ranksep', '0.2')
+          addStringOption('nodefonttagsize', '7')
+          addStringOption('nodesep', '0.15')
+          addStringOption('ranksep', '0.20')
           addStringOption('outputencoding', 'UTF-8')
       }
       tags("hidden:X", "opt:X", "has:X", "navhas:X", "assoc:X", "navassoc:X", "composed:X", "navcomposed:X", "stereotype:X", "depend:X")
