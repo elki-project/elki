@@ -2,7 +2,7 @@ description = 'ELKI - Core Utilities'
 
 def templateDir = new File(projectDir, "src/templates/java")
 def generatedSrcDir = new File(buildDir, "src/generated/java")
- 
+
 sourceSets.main.java.srcDirs += generatedSrcDir
 
 // Simple code generator 
@@ -43,7 +43,7 @@ task generateCodeArrays(description: "Generate code from templates") {
       }
       gen() // For eclipse buildship until supported: https://github.com/eclipse/buildship/issues/266
       doLast gen
-      inputs.files fileTree(inp)        
+      inputs.files fileTree(inp)
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeArrays
@@ -95,7 +95,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
             [classname: "ComparableMaxHeap", extra: null] + kcom)
         generate(tpl, new File(out, "ComparatorMaxHeap.java"),
             [classname: "ComparatorMaxHeap", extra: ecmp] + kobj)
-        
+
         //// Important: The use of non-primitive keys in KV heaps is currently outdated
         //// Because it usually makes more sense to use a ObjectHeap instead.
 
@@ -133,7 +133,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
       gen() // For eclipse buildship until supported: https://github.com/eclipse/buildship/issues/266
       doLast gen
 
-      inputs.files fileTree(inp)        
+      inputs.files fileTree(inp)
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeHeaps

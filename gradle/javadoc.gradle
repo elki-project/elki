@@ -70,24 +70,29 @@ subprojects {
     from("$projectDir/src/main/javadoc") {
       exclude "overview.html"
     }
+    inputs.files fileTree("$rootDir/elki/src/main/javadoc")
     into "$project.buildDir/docs/javadoc"
   }
   javadoc.dependsOn copyDocResources
   // Additional documentation: parameters
-  task documentParameters(type: JavaExec) {
+  task documentParameters(type: JavaExec, dependsOn: classes) {
     description "Generate parameter documentation"
     group = "Documentation"
     classpath = sourceSets.test.runtimeClasspath
+    inputs.files classpath
+    outputs.file "$project.buildDir/docs/javadoc/parameters-byclass.html"
     main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentParameters'
     args "$project.buildDir/docs/javadoc/parameters-byclass.html"
     args "$project.buildDir/docs/javadoc/parameters-byopt.html"
   }
   // To use, add javadoc.dependsOn documentParameters
   // Additional documentation: references
-  task documentReferences(type: JavaExec) {
+  task documentReferences(type: JavaExec, dependsOn: classes) {
     description "Generate references list"
     group = "Documentation"
     classpath = sourceSets.test.runtimeClasspath
+    inputs.files classpath
+    outputs.file "$project.buildDir/docs/javadoc/references.html"
     main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentReferences'
     args "$project.buildDir/docs/javadoc/references.html"
     args "$project.buildDir/docs/references.md"
