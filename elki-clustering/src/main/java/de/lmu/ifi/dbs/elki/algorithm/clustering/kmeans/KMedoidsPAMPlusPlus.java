@@ -66,9 +66,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  *
  * @author Erich Schubert
  *
- * @navassoc - - - MedoidModel
- * @has - - - KMedoidsInitialization
- *
  * @param <V> vector datatype
  */
 @Priority(Priority.IMPORTANT + 2)

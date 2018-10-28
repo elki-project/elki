@@ -47,12 +47,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Cluster analysis of multivariate data: efficiency versus interpretability of
  * classifications<br>
  * Abstract published in Biometrics 21(3)
- * 
+ *
  * @author Arthur Zimek
  * @since 0.5.0
  *
- * @opt nodefillcolor LemonChiffon
- * @has - - - KMeansModel
+ * @navassoc - - - KMeansModel
  *
  * @param <V> vector datatype
  */

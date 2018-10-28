@@ -76,6 +76,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  *
+ * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
+ *
  * @param <V> Vector type
  */
 @Reference(authors = "R. T. Ng, J. Han", //

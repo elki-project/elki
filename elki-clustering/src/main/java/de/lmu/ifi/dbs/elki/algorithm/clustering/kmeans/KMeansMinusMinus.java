@@ -59,8 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  *
  * @author Jonas Steinke
  *
- * @opt nodefillcolor LemonChiffon
- * @has - - - KMeansModel
+ * @navassoc - - - KMeansModel
  *
  * @param <V> vector datatype
  */

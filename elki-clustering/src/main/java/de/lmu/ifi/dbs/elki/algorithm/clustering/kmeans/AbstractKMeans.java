@@ -77,7 +77,7 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractNumberVectorDistanceBasedAlgorithm<V, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractNumberVectorDistanceBasedAlgorithm<V, Clustering<M>> implements KMeans<V, M> {
   /**
    * Number of cluster centers to initialize.
    */

@@ -66,6 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
+ *
  * @param <V> Data type
  */
 @Reference(authors = "L. Kaufman, P. J. Rousseeuw", //

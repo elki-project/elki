@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  *
  * @author Erich Schubert
  *
+ * @opt nodefillcolor LemonChiffon
+ *
  * @param <V> Number vector type
  * @param <M> Actual model type
  */

@@ -51,9 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Erich Schubert
  *
- * @navassoc - - - MedoidModel
- * @has - - - KMedoidsInitialization
- *
  * @param <V> vector datatype
  */
 @Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //

@@ -51,7 +51,7 @@ import net.jafama.FastMath;
  *
  * @author Erich Schubert
  *
- * @has - - - KMeansModel
+ * @navassoc - - - KMeansModel
  *
  * @param <V> vector datatype
  */

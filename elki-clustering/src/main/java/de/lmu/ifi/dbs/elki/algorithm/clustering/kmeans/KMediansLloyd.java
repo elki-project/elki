@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @has - - - MeanModel
+ * @navassoc - - - MeanModel
  *
  * @param <V> vector datatype
  */

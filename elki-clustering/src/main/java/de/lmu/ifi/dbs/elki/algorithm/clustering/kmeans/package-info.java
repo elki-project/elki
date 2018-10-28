@@ -5,6 +5,7 @@
  * @opt include .*elki.algorithm.clustering.kmeans.initialization.KMeansInitialization
  * @opt include .*elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization
  * @opt include .*elki.data.model.KMeansModel
+ * @opt include .*elki.data.model.MeanModel
  * @opt include .*elki.data.model.MedoidModel
  */
 /*

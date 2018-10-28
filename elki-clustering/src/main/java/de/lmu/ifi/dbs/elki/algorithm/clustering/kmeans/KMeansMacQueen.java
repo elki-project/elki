@@ -52,7 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @author Erich Schubert
  * @since 0.1
- * @has - - - KMeansModel
+ *
+ * @navassoc - - - KMeansModel
  *
  * @param <V> vector type to use
  */

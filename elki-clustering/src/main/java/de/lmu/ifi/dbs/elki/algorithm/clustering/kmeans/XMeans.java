@@ -78,6 +78,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @has - - - KMeans
+ * @has - - - KMeansQualityMeasure
+ *
  * @param <V> Vector type
  * @param <M> Model type
  */
