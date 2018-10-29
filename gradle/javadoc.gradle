@@ -60,6 +60,7 @@ subprojects {
       } catch (ignored) {}
       if(JavaVersion.current().isJava9Compatible()) addBooleanOption('html4', true)
     }
+    inputs.property("options.footer","") // Ignore: depends on build time.
   }
   // Resources to copy to every javadoc
   task copyDocResources(type: Copy) {
