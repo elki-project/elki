@@ -486,34 +486,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     /**
      * Recompute the separation of cluster means.
      * <p>
-     * Used by Hamerly.
-     *
-     * @param means Means
-     * @param sep Output array of separation (half-sqrt scaled)
-     */
-    protected void recomputeSeperation(double[][] means, double[] sep) {
-      final int k = means.length;
-      final boolean issquared = df.isSquared();
-      assert (sep.length == k);
-      Arrays.fill(sep, Double.POSITIVE_INFINITY);
-      for(int i = 1; i < k; i++) {
-        DoubleVector m1 = DoubleVector.wrap(means[i]);
-        for(int j = 0; j < i; j++) {
-          double d = distance(m1, DoubleVector.wrap(means[j]));
-          sep[i] = (d < sep[i]) ? d : sep[i];
-          sep[j] = (d < sep[j]) ? d : sep[j];
-        }
-      }
-      // We need half the Euclidean distance
-      for(int i = 0; i < k; i++) {
-        sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
-      }
-      diststat += (k * (k - 1)) >> 1;
-    }
-
-    /**
-     * Recompute the separation of cluster means.
-     * <p>
      * Used by Elkan's variant and Exponion.
      *
      * @param sep Output array of separation
@@ -534,28 +506,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           sep[j] = (d < sep[j]) ? d : sep[j];
         }
       }
-      diststat += (k * (k - 1)) >> 1;
-    }
-
-    /**
-     * Recompute the separation of cluster means.
-     * <p>
-     * Used by Sort and Compare variants.
-     *
-     * @param means Means
-     * @param cdist Center-to-Center distances (half-sqrt scaled)
-     */
-    protected void recomputeSeperation(double[][] means, double[][] cdist) {
-      final int k = means.length;
-      final boolean issquared = df.isSquared();
-      for(int i = 1; i < k; i++) {
-        DoubleVector mi = DoubleVector.wrap(means[i]);
-        for(int j = 0; j < i; j++) {
-          double d = distance(mi, DoubleVector.wrap(means[j]));
-          cdist[i][j] = cdist[j][i] = .5 * (issquared ? FastMath.sqrt(d) : d);
-        }
-      }
-      diststat += (k * (k - 1)) >> 1;
     }
 
     /**
@@ -632,6 +582,20 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       return result;
     }
 
+    /**
+     * Get if the distance function is squared.
+     *
+     * @return {@code true} when squared
+     */
+    protected boolean isSquared() {
+      return df.isSquared();
+    }
+
+    /**
+     * Get the class logger.
+     *
+     * @return Logger
+     */
     abstract Logging getLogger();
   }
 

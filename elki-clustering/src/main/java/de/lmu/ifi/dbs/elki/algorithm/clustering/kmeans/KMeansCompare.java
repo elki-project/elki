@@ -124,6 +124,25 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
       return changed;
     }
 
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Sort and Compare variants.
+     *
+     * @param means Means
+     * @param cdist Center-to-Center distances (half-sqrt scaled)
+     */
+    protected void recomputeSeperation(double[][] means, double[][] cdist) {
+      final int k = means.length;
+      for(int i = 1; i < k; i++) {
+        DoubleVector mi = DoubleVector.wrap(means[i]);
+        for(int j = 0; j < i; j++) {
+          double d = distance(mi, DoubleVector.wrap(means[j]));
+          cdist[i][j] = cdist[j][i] = .5 * d;
+        }
+      }
+    }
+
     @Override
     protected int assignToNearestCluster() {
       int changed = 0;

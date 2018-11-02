@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -241,6 +243,33 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
       }
       return changed;
+    }
+
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Hamerly.
+     *
+     * @param means Means
+     * @param sep Output array of separation (half-sqrt scaled)
+     */
+    protected void recomputeSeperation(double[][] means, double[] sep) {
+      final int k = means.length;
+      assert (sep.length == k);
+      Arrays.fill(sep, Double.POSITIVE_INFINITY);
+      for(int i = 1; i < k; i++) {
+        DoubleVector m1 = DoubleVector.wrap(means[i]);
+        for(int j = 0; j < i; j++) {
+          double d = distance(m1, DoubleVector.wrap(means[j]));
+          sep[i] = (d < sep[i]) ? d : sep[i];
+          sep[j] = (d < sep[j]) ? d : sep[j];
+        }
+      }
+      // We need half the Euclidean distance
+      final boolean issquared = isSquared();
+      for(int i = 0; i < k; i++) {
+        sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
+      }
     }
 
     /**
