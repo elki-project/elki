@@ -106,11 +106,10 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
 
     @Override
     protected int iterate(int iteration) {
-      int changed = assignToNearestCluster();
-      if(changed > 0) {
+      if(iteration > 1) {
         means = medians(clusters, means, relation);
       }
-      return changed;
+      return assignToNearestCluster();
     }
 
     protected Clustering<MeanModel> buildMediansResult() {

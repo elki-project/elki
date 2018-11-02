@@ -152,14 +152,14 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends AbstractKMean
 
     @Override
     protected int iterate(int iteration) {
-      int changed = iteration == 1 ? initialAssignToNearestCluster() : assignToNearestCluster();
-      if(changed > 0) {
-        meansFromSums(newmeans, sums);
-        movedDistance(means, newmeans, sep);
-        updateBounds(sep);
-        copyMeans(newmeans, means);
+      if(iteration == 1) {
+        return initialAssignToNearestCluster();
       }
-      return changed;
+      meansFromSums(newmeans, sums);
+      movedDistance(means, newmeans, sep);
+      updateBounds(sep);
+      copyMeans(newmeans, means);
+      return assignToNearestCluster();
     }
 
     /**

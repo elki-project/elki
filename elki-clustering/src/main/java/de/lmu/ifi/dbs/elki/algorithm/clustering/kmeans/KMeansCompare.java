@@ -116,12 +116,11 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     @Override
     protected int iterate(int iteration) {
-      recomputeSeperation(means, cdist);
-      int changed = assignToNearestCluster();
-      if(changed > 0) {
+      if(iteration > 1) {
         means = means(clusters, means, relation);
       }
-      return changed;
+      recomputeSeperation(means, cdist);
+      return assignToNearestCluster();
     }
 
     /**

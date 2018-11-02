@@ -146,13 +146,13 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     @Override
     protected int iterate(int iteration) {
-      int changed = iteration == 1 ? initialAssignToNearestCluster() : assignToNearestCluster();
-      if(changed > 0) {
-        meansFromSums(newmeans, sums);
-        updateBounds(sep, movedDistance(means, newmeans, sep));
-        copyMeans(newmeans, means);
+      if(iteration == 1) {
+        return initialAssignToNearestCluster();
       }
-      return changed;
+      meansFromSums(newmeans, sums);
+      updateBounds(sep, movedDistance(means, newmeans, sep));
+      copyMeans(newmeans, means);
+      return assignToNearestCluster();
     }
 
     /**

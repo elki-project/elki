@@ -161,21 +161,20 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
     @Override
     protected int iterate(int iteration) {
+      if(iteration > 1) {
+        means = meansWithTreshhold(heapsize == 0 || minHeap.size() < heapsize ? Double.POSITIVE_INFINITY : minHeap.peek());
+      }
       minHeap.clear();
       for(int i = 0; i < k; i++) {
         clusters.get(i).clear();
       }
       int changed = assignToNearestCluster();
-      if(changed > 0) {
-        double vartotal = VMath.sum(varsum);
-        // Stop if no cluster assignment changed, or the new varsum is higher
-        // than the previous value.
-        if(vartotal > prevvartotal) {
-          return -changed;
-        }
-        prevvartotal = vartotal;
-        means = meansWithTreshhold(heapsize == 0 || minHeap.size() < heapsize ? Double.POSITIVE_INFINITY : minHeap.peek());
+      double vartotal = VMath.sum(varsum);
+      // Stop if nothing changed, or the new varsum is higher than the previous
+      if(vartotal > prevvartotal) {
+        return -changed;
       }
+      prevvartotal = vartotal;
       return changed;
     }
 

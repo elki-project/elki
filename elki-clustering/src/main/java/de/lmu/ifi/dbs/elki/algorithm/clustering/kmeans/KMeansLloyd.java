@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Cluster analysis of multivariate data: efficiency versus interpretability of
  * classifications<br>
  * Abstract published in Biometrics 21(3)
- * F *
  * 
  * @author Arthur Zimek
  * @since 0.5.0
@@ -117,11 +116,8 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
 
     @Override
     protected int iterate(int iteration) {
-      int changed = assignToNearestCluster();
-      if(changed > 0) {
-        means = means(clusters, means, relation);
-      }
-      return changed;
+      means = iteration == 1 ? means : means(clusters, means, relation);
+      return assignToNearestCluster();
     }
 
     @Override
