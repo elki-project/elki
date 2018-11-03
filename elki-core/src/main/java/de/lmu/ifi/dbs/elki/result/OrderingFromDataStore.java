@@ -117,48 +117,25 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
   public ArrayModifiableDBIDs order(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     if(comparator != null) {
-      sorted.sort(new DerivedComparator());
+      sorted.sort(new Comparator<DBIDRef>() {
+        @Override
+        public int compare(DBIDRef id1, DBIDRef id2) {
+          T k1 = map.get(id1), k2 = map.get(id2);
+          assert k1 != null && k2 != null;
+          return ascending * comparator.compare(k1, k2);
+        }
+      });
     }
     else {
-      sorted.sort(new ImpliedComparator());
+      sorted.sort(new Comparator<DBIDRef>() {
+        @Override
+        public int compare(DBIDRef id1, DBIDRef id2) {
+          T k1 = map.get(id1), k2 = map.get(id2);
+          assert k1 != null && k2 != null;
+          return ascending * k1.compareTo(k2);
+        }
+      });
     }
     return sorted;
-  }
-
-  /**
-   * Internal comparator, accessing the map to sort objects
-   * 
-   * @author Erich Schubert
-   * 
-   * @hidden
-   */
-  protected final class ImpliedComparator implements Comparator<DBIDRef> {
-    @Override
-    public int compare(DBIDRef id1, DBIDRef id2) {
-      T k1 = map.get(id1);
-      T k2 = map.get(id2);
-      assert (k1 != null);
-      assert (k2 != null);
-      return ascending * k1.compareTo(k2);
-    }
-  }
-
-  /**
-   * Internal comparator, accessing the map but then using the provided
-   * comparator to sort objects
-   * 
-   * @author Erich Schubert
-   * 
-   * @hidden
-   */
-  protected final class DerivedComparator implements Comparator<DBIDRef> {
-    @Override
-    public int compare(DBIDRef id1, DBIDRef id2) {
-      T k1 = map.get(id1);
-      T k2 = map.get(id2);
-      assert (k1 != null);
-      assert (k2 != null);
-      return ascending * comparator.compare(k1, k2);
-    }
   }
 }
