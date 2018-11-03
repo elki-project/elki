@@ -70,10 +70,10 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization 
 
   @Override
   public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
-    DBIDs ids = relation.getDBIDs();
-    if(ids.size() <= k) {
-      throw new IllegalStateException("Don't use k-means with k >= data set size.");
+    if(relation.size() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
+    DBIDs ids = relation.getDBIDs();
     @SuppressWarnings("unchecked")
     DistanceQuery<NumberVector> distQ = database.getDistanceQuery((Relation<NumberVector>) relation, (NumberVectorDistanceFunction<NumberVector>) distanceFunction);
 

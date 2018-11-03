@@ -95,7 +95,13 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
   @Override
   public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+    if(relation.size() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
+    }
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), rate, rnd);
+    if(sample.size() < k) {
+      throw new IllegalArgumentException("Sampling rate=" + rate + " from N=" + relation.size() + " yields only " + sample.size() + " < k objects.");
+    }
 
     // Ugly cast, sorry
     @SuppressWarnings("unchecked")

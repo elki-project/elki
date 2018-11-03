@@ -59,9 +59,6 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("k-Means Assignment", "kmeans-assignment");
-    }
     Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
     instance.run(1);
     return instance.buildResult();

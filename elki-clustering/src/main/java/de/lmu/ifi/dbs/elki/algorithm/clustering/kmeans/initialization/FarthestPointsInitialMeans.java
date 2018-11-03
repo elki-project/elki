@@ -72,6 +72,9 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization 
 
   @Override
   public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+    if(relation.size() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
+    }
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 

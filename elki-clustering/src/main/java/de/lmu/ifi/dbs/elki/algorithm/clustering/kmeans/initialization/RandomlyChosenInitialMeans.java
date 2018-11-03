@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
@@ -87,10 +86,10 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization 
 
   @Override
   public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
-    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
-    if(ids.size() < k) {
-      throw new AbortException("Could not choose k means.");
+    if(relation.size() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
+    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     double[][] means = new double[k][];
     DBIDIter iter = ids.iter();
     for(int i = 0; i < k; i++, iter.advance()) {

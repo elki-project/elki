@@ -130,9 +130,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @return result
    */
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("PAM Clustering", "pam-clustering");
-    }
     if(k > 0x7FFF) {
       throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
     }

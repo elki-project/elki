@@ -146,9 +146,6 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clusterin
    * @return result
    */
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
-    }
     DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
     // Choose initial medoids
     if(LOG.isStatistics()) {

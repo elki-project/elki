@@ -88,9 +88,6 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
-      return new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    }
     Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult();
