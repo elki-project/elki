@@ -3,6 +3,8 @@
  *
  * @opt hide .*Serializer
  * @opt hide .*(Float|Double|Integer|Long|Short|Byte|Bit)Vector\.Factory
+ * @opt include .*elki.data.spatial.SpatialComparable
+ * @opt include .*elki.data.model.Model
  */
 /*
  * This file is part of ELKI:

@@ -82,6 +82,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  * @since 0.1
  *
  * @navassoc - produces - ClusterOrder
+ * @has - - - SpatialObjectPair
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -361,10 +362,8 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
 
   /**
    * Encapsulates an entry in the cluster order.
-   *
-   * @hidden
    */
-  public class SpatialObjectPair implements Comparable<SpatialObjectPair> {
+  public static class SpatialObjectPair implements Comparable<SpatialObjectPair> {
     /**
      * The first entry of this pair.
      */
@@ -436,7 +435,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
 
     /** equals is used in updating the heap! */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
       if(!(SpatialObjectPair.class.isInstance(obj))) {

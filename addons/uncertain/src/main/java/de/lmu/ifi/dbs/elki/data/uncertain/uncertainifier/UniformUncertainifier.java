@@ -96,8 +96,6 @@ public class UniformUncertainifier implements Uncertainifier<UniformContinuousUn
    *
    * @author Alexander Koos
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public final static class Parameterizer extends AbstractParameterizer {
     /**

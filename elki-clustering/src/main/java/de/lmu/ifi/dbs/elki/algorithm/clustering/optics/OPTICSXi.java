@@ -71,9 +71,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @since 0.7.0
  *
  * @composed - runs - OPTICSTypeAlgorithm
- * @navassoc - reads - ClusterOrder
+ * @assoc - reads - ClusterOrder
  * @navassoc - produces - SteepAreaResult
  * @navassoc - produces - Clustering
+ * @composed - - - SteepScanPosition
  */
 @Title("OPTICS Xi Cluster Extraction")
 @Reference(authors = "Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Jörg Sander", //
@@ -406,8 +407,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * Position when scanning for steep areas
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class SteepScanPosition {
     /**
@@ -514,8 +513,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * Data structure to represent a steep-down-area for the xi method.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class SteepArea {
     /**
@@ -580,8 +577,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * Data structure to represent a steep-down-area for the xi method.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class SteepDownArea extends SteepArea {
     /**
@@ -630,8 +625,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * Data structure to represent a steep-down-area for the xi method.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class SteepUpArea extends SteepArea {
     /**

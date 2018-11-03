@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @param <O> Object type
  */
-public class MetricalIndexRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
+public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
   /**
    * The index to use
    */
@@ -51,7 +51,7 @@ public class MetricalIndexRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
+  public MTreeRangeQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }

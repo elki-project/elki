@@ -261,8 +261,6 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
    * List iterator.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Itr implements DoubleIntegerDBIDListMIter {
     /**

@@ -298,8 +298,6 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
    * Iterator class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Itr implements IntegerDBIDArrayMIter {
     /**
@@ -373,8 +371,6 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
    * Slice of an array.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Slice implements IntegerArrayDBIDs {
     /**
@@ -445,8 +441,6 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
      * Iterator class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private class SliceItr implements IntegerDBIDArrayIter {
       /**

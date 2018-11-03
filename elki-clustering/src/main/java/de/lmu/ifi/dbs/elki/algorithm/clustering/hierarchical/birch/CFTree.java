@@ -595,8 +595,6 @@ public class CFTree {
    * CF-Tree Factory.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Factory {
     /**

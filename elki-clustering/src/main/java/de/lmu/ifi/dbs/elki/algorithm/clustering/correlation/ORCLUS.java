@@ -71,6 +71,7 @@ import net.jafama.FastMath;
  * @since 0.1
  *
  * @has - - - PCARunner
+ * @composed - - - ProjectedEnergy
  *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -404,8 +405,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
 
   /**
    * Encapsulates the attributes of a cluster.
-   * 
-   * @hidden
    */
   private final class ORCLUSCluster {
     // TODO: reuse/derive from existing cluster classes?
@@ -449,8 +448,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
 
   /**
    * Encapsulates the projected energy for a cluster.
-   * 
-   * @hidden
    */
   private final class ProjectedEnergy implements Comparable<ProjectedEnergy> {
     int i, j;

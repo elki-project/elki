@@ -178,10 +178,8 @@ public class ELKIServiceScanner {
    * Class to iterate over a directory tree.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  static class DirClassIterator implements Iterator<String> {
+  private static class DirClassIterator implements Iterator<String> {
     private static final String CLASS_EXT = ".class";
 
     private static final String FACTORY_FILE_EXT = FACTORY_POSTFIX + CLASS_EXT;

@@ -88,6 +88,8 @@ import net.jafama.FastMath;
  * @author Ernst Waas
  * @author Erich Schubert
  * @since 0.5.0
+ * 
+ * @composed - - - Separation
  */
 @Reference(authors = "R. Haralick, R. Harpaz", //
     title = "Linear manifold clustering in high dimensional spaces by stochastic search", //
@@ -480,8 +482,6 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    * Class to represent a linear manifold separation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class Separation {
     /**

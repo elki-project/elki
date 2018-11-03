@@ -3,6 +3,8 @@
  * <b>do not use directly - always use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil}</b>.
  *
  * @opt hide .*Serializer
+ * @opt hide .*\.Itr
+ * @opt hide .*\.SliceItr
  */
 /*
  * This file is part of ELKI:

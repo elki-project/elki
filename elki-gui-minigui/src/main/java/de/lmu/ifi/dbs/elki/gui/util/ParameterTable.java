@@ -72,11 +72,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @since 0.3
  *
  * @composed - - - ParametersModel
- * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
- * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
- * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.FileNameEditor
- * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ClassListEditor
- * @composed - - - de.lmu.ifi.dbs.elki.gui.util.ParameterTable.AdjustingEditor
+ * @composed - - - ColorfulRenderer
+ * @composed - - - DropdownEditor
+ * @composed - - - FileNameEditor
+ * @composed - - - ClassListEditor
+ * @composed - - - AdjustingEditor
+ * @assoc - - - Handler
  */
 public class ParameterTable extends JTable {
   /**
@@ -148,8 +149,6 @@ public class ParameterTable extends JTable {
    * Internal key listener.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Handler implements KeyListener {
     @Override
@@ -494,6 +493,8 @@ public class ParameterTable extends JTable {
    * Editor for choosing classes.
    *
    * @author Erich Schubert
+   * 
+   * @composed - - - ClassTree
    */
   private class ClassListEditor extends AbstractCellEditor implements TableCellEditor, ActionListener, KeyListener {
     /**
@@ -776,8 +777,6 @@ public class ParameterTable extends JTable {
    * This makes the tabular GUI much more user friendly.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class DispatchingPanel extends JPanel {
     /**

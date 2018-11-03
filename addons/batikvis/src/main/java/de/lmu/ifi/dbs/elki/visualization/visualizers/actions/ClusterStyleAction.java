@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @author Erich Schubert
  * @since 0.7.0
+ * 
+ * @has - - - SetStyleAction
  */
 public class ClusterStyleAction implements VisFactory {
   /**
@@ -66,8 +68,6 @@ public class ClusterStyleAction implements VisFactory {
    * Action to use a clustering as {@link ClusterStylingPolicy}.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static final class SetStyleAction implements VisualizationMenuAction {
     /**

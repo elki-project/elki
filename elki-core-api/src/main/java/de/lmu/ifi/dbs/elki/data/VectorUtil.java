@@ -43,6 +43,8 @@ import net.jafama.FastMath;
  * @since 0.3
  *
  * @assoc - - - NumberVector
+ * @has - - - SortDBIDsBySingleDimension
+ * @has - - - SortVectorsBySingleDimension
  */
 public final class VectorUtil {
   /**
@@ -451,8 +453,6 @@ public final class VectorUtil {
    * Compare number vectors by a single dimension.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class SortDBIDsBySingleDimension implements Comparator<DBIDRef> {
     /**
@@ -517,8 +517,6 @@ public final class VectorUtil {
    * Compare number vectors by a single dimension.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class SortVectorsBySingleDimension implements Comparator<NumberVector> {
     /**

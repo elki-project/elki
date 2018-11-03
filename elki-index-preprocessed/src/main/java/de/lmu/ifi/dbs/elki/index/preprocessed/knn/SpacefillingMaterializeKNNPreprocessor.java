@@ -69,6 +69,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  * @since 0.7.0
+ *
+ * @has - - - SpatialPair
+ *
+ * @param <O> Vector type indexed
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //

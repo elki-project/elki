@@ -28,8 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * 
  * @author Elke Achtert
  * @since 0.1
- * 
- * @hidden
  */
 public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
   /**

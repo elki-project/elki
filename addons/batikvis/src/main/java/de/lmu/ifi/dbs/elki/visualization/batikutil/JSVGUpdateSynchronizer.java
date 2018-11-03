@@ -155,8 +155,6 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * Adapter that will track the component for UpdateManager changes.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class UMAdapter extends UpdateManagerAdapter {
     /**

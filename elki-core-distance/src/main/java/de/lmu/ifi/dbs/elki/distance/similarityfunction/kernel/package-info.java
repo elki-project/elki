@@ -1,5 +1,7 @@
 /**
- * Kernel functions
+ * Kernel functions.
+ *
+ * @opt include .*elki.distance.similarityfunction.AbstractVectorSimilarityFunction
  */
 /*
  * This file is part of ELKI:

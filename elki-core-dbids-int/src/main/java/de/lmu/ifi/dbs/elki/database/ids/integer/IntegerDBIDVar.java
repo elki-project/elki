@@ -147,8 +147,6 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
    * Pseudo iterator for DBIDs interface.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Itr implements IntegerDBIDArrayIter, IntegerDBIDRef {
     /**

@@ -65,8 +65,6 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
 
   /**
    * Estimation mode.
-   * 
-   * @hidden
    */
   public enum Mode {
     BALLOON, // Balloon estimator

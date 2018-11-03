@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * These are used by many split strategies to distribute the remaining entries.
  *
  * @author Erich Schubert
+ * 
+ * @assoc - - - Assignments
  */
 public interface DistributionStrategy {
   /**

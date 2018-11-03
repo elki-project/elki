@@ -363,10 +363,8 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * Temporary cluster.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  protected static class TempCluster {
+  private static class TempCluster {
     /**
      * New ids, not yet in child clusters.
      */

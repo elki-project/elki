@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  *
  * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
+ * @has - - - Assignment
  *
  * @param <V> Vector type
  */
@@ -230,8 +231,6 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    * Assignment state.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Assignment {
     /**

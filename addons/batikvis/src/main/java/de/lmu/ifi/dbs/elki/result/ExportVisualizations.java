@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @since 0.5.0
  *
  * @composed - - - VisualizerParameterizer
+ * @composed - - - Format
  */
 @Alias("de.lmu.ifi.dbs.elki.visualization.ExportVisualizations")
 public class ExportVisualizations implements ResultHandler {

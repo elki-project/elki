@@ -115,8 +115,6 @@ public class IntegerRankTieNormalization implements ObjectFilter {
    * Class to sort an index array by a particular dimension.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class Sorter implements IntComparator {
     /**

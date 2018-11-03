@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -41,7 +37,8 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
@@ -206,7 +203,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
       return null;
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getKNNQuery(this, dq, hints);
+    return new MTreeKNNQuery<>(this, dq);
   }
 
   @Override
@@ -221,7 +218,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
       return null;
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getRangeQuery(this, dq);
+    return new MTreeRangeQuery<>(this, dq);
   }
 
   @Override

@@ -62,18 +62,21 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
  * K-means variation that produces equally sized clusters.
- *
+ * <p>
  * Note that this is a rather obvious variation, and one cannot expect very good
  * results from this algorithm. K-means already is quite primitive, and putting
  * in the size constraint will likely not make the results much better (in
  * particular, it will even less be able to make sense of outliers!)
- *
+ * <p>
  * There is no reference for this algorithm. If you want to cite it, please cite
  * the latest ELKI release as given on the ELKI web page:
- * http://elki.dbs.ifi.lmu.de/wiki/Releases
+ * https://elki-project.github.io/publications
  *
  * @author Erich Schubert
  * @since 0.5.5
+ * 
+ * @has - - - Meta
+ * @has - - - PreferenceComparator
  *
  * @param <V> Vector type
  */
@@ -362,8 +365,6 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * Object metadata.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Meta {
     /**
@@ -415,8 +416,6 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * Sort a list of integers (= cluster numbers) by the distances.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public class PreferenceComparator implements IntComparator {
     /**

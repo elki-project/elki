@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.1
  */
 @Alias({ "squaredeuclidean", "de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction" })
-public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, Norm<NumberVector> {
+public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * Static instance. Use this!
    */

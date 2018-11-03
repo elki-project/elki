@@ -71,8 +71,6 @@ public abstract class SinCosTable {
    * by 2.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class FullTable extends SinCosTable {
     /**
@@ -136,8 +134,6 @@ public abstract class SinCosTable {
    * by two.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class HalfTable extends SinCosTable {
     /**
@@ -216,8 +212,6 @@ public abstract class SinCosTable {
    * four.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class QuarterTable extends SinCosTable {
     /**

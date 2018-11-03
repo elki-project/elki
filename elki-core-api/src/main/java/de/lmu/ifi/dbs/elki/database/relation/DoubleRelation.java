@@ -78,8 +78,8 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
    * Consumer for (DBIDRef, double) pairs.
    *
    * @author Erich Schubert
-   *
-   * @hidden
+   * 
+   * @assoc - iterates - DoubleRelation
    */
   @FunctionalInterface
   interface Consumer {

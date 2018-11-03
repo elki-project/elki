@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * @since 0.2
+ * 
+ * @navassoc - - - InvalidCSS
  */
 public class CSSClass {
   /**
@@ -276,10 +278,8 @@ public class CSSClass {
   
   /**
    * Exception class thrown when encountering invalid CSS.
-   * 
-   * @hidden
    */
-  public class InvalidCSS extends RuntimeException {
+  public static class InvalidCSS extends RuntimeException {
     /**
      * Constructor. See {@link RuntimeException}.
      * 

@@ -402,8 +402,6 @@ public class DocumentParameters {
    * HTML output format.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class HTMLFormat implements Format<Element> {
     Class<?> base = getBaseClass();

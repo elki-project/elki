@@ -39,8 +39,6 @@ import net.jafama.FastMath;
 public class ParameterizationFunction {
   /**
    * Available types for the global extremum.
-   * 
-   * @hidden
    */
   public enum ExtremumType {
   /**

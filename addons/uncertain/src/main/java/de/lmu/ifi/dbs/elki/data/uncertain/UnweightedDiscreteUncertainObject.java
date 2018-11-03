@@ -133,8 +133,6 @@ public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject i
    * TODO: provide serialization functionality.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class Factory implements FeatureVector.Factory<UnweightedDiscreteUncertainObject, Number> {
     @Override

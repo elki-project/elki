@@ -795,8 +795,6 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
      * Sort new candidates by their distance, for determining the core size.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private final class Sorter implements Comparator<DBIDRef> {
       @Override

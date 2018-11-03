@@ -83,8 +83,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
   /**
    * Dynamic menu.
-   *
-   * @hidden
    */
   public class DynamicMenu {
     /**

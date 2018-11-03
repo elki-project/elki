@@ -333,8 +333,6 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * Representativeness evaluation result.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class RepresentativenessEvaluation extends EvaluationResult {
     /**

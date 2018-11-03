@@ -102,8 +102,6 @@ public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainOb
    * TODO: provide serialization functionality.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class Factory implements FeatureVector.Factory<SimpleGaussianContinuousUncertainObject, Number> {
     @Override

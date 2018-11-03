@@ -65,6 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @since 0.2
  *
  * @has - - - GeneratorInterface
+ * @has - - - Model
+ * @composed - - - AssignPoint
  */
 public class GeneratorMain {
   /**
@@ -199,8 +201,6 @@ public class GeneratorMain {
    * Reject objects with a higher density in another generator.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class TestModel extends AssignPoint {
     @Override
@@ -228,8 +228,6 @@ public class GeneratorMain {
    * Reassign objects in certain labels; but also always test against the model.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class AssignLabelsByDensity extends AssignPoint {
     /**
@@ -287,8 +285,6 @@ public class GeneratorMain {
    * Reassign objects in certain labels; but also always test against the model.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class AssignLabelsByDistance extends AssignPoint {
     /**

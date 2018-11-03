@@ -54,6 +54,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * preprint, to appear
  *
  * @author Erich Schubert
+ * 
+ * @has - - - Assignment
  *
  * @param <V> Vector type
  */
@@ -182,8 +184,6 @@ public class CLARANSPlus<V> extends CLARANS<V> {
    * Assignment state.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Assignment extends CLARANS.Assignment {
     /**

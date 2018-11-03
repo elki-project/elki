@@ -3,6 +3,7 @@
  *
  * @opt include .*elki.algorithm.itemsetmining.Itemset
  * @opt include .*elki.result.FrequentItemsetsResult
+ * @opt include .*elki.result.AssociationRuleResult
  * @opt include .*elki.algorithm.itemsetmining.associationrules.interest.InterestingnessMeasure
  */
 /*

@@ -141,8 +141,6 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Distance modes.
-   *
-   * @hidden
    */
   public enum Distance {
     PEARSON, //

@@ -72,6 +72,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @since 0.5.0
  *
  * @stereotype factory
+ * @composed - - - Mode
+ * @has - - - SwitchModeAction
  * @navassoc - create - Instance
  */
 public class VoronoiVisualization implements VisFactory {
@@ -89,8 +91,6 @@ public class VoronoiVisualization implements VisFactory {
    * Visualization mode.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public enum Mode {
     /**
@@ -141,8 +141,6 @@ public class VoronoiVisualization implements VisFactory {
    * Menu item to change visualization styles.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public class SwitchModeAction implements VisualizationMenuAction {
     /**

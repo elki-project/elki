@@ -254,8 +254,6 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * equals.
    * 
    * @author Elke Achtert
-   * 
-   * @hidden
    */
   public static class CoverageComparator implements Comparator<CLIQUESubspace<?>> {
     /**

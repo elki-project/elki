@@ -103,8 +103,6 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    * DBID iterator in ELKI/C style.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Itr implements IntegerDBIDArrayIter {
     /**
@@ -169,8 +167,6 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    * Slice of an array.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Slice implements IntegerArrayDBIDs {
     /**
@@ -241,8 +237,6 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
      * Iterator class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private class SliceItr implements IntegerDBIDArrayIter {
       /**

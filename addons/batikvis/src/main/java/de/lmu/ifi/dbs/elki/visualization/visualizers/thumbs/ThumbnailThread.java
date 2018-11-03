@@ -98,8 +98,6 @@ public class ThumbnailThread extends Thread {
    * A single thumbnailer task.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Task {
     /**

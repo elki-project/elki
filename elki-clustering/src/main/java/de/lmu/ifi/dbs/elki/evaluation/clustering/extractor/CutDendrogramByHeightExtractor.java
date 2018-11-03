@@ -76,7 +76,7 @@ public class CutDendrogramByHeightExtractor implements Evaluator {
    * Dummy instance.
    *
    * @author Erich Schubert
-   *
+   * 
    * @hidden
    */
   protected static class DummyHierarchicalClusteringAlgorithm implements HierarchicalClusteringAlgorithm {

@@ -23,13 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -37,7 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -74,7 +68,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
     super(pagefile, settings);
     // TODO: any way to un-tie MkTrees from relations?
     this.distanceQuery = getDistanceFunction().instantiate(relation);
-    this.knnq = MTreeQueryUtil.getKNNQuery(this, distanceQuery);
+    this.knnq = new MTreeKNNQuery<>(this, distanceQuery);
   }
 
   @Override

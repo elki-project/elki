@@ -2,7 +2,8 @@
  * Distance from probability theory, mostly divergences such as K-L-divergence,
  * J-divergence, F-divergence, χ²-divergence, etc.
  * 
- * @author Erich Schubert
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
  */
 /*
  * This file is part of ELKI:

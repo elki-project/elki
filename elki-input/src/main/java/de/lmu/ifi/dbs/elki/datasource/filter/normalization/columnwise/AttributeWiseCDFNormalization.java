@@ -239,7 +239,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    *
    * @hidden
    */
-  static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
+  protected static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
     /**
      * Dimension to process.
      */

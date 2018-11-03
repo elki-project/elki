@@ -102,8 +102,6 @@ public class ZCurveSpatialSorterTest {
    * we do not have access to our usual DoubleVector here!
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class V implements SpatialComparable {
     double[] data;

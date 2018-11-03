@@ -1,5 +1,8 @@
 /**
- * Indexes providing KNN and rKNN data
+ * Indexes providing KNN and rKNN data.
+ *
+ * @opt include .*elki.index.IndexFactory
+ * @opt include .*elki.index.KNNIndex
  */
 /*
  * This file is part of ELKI:

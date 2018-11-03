@@ -80,8 +80,6 @@ public class DynamicParameters {
    * Node in the option tree (well, actually list)
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public class Node {
     protected Parameter<?> param;

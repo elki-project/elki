@@ -38,6 +38,8 @@ import net.jafama.FastMath;
  *
  * @author Erich Schubert
  * @since 0.6.0
+ *
+ * @has - - - Node
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //

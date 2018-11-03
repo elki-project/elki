@@ -50,6 +50,8 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
    * Curve on this plot.
    *
    * @author Erich Schubert
+   * 
+   * @has - - - Itr
    */
   public class Curve {
     /**
@@ -188,8 +190,6 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
      * </blockquote>
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public class Itr {
       /**

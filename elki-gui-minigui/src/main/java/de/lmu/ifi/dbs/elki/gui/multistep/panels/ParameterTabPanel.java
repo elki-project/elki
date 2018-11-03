@@ -49,6 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParame
  * 
  * @author Erich Schubert
  * @since 0.4.0
+ *
+ * @has - - - Status
  */
 public abstract class ParameterTabPanel extends JPanel implements ChangeListener {
   /**
@@ -60,8 +62,6 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * Status code enumeration
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public enum Status {
     /** Status to signal the step has been configured properly. */

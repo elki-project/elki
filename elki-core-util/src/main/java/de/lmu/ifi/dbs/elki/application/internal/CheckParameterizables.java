@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @opt nodefillcolor LemonChiffon
  * @assoc - - - AbstractParameterizer
+ * @has - - - State
  */
 public class CheckParameterizables {
   /**
@@ -167,8 +168,6 @@ public class CheckParameterizables {
    * Current verification state.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   enum State {
     NO_CONSTRUCTOR, //

@@ -1,5 +1,7 @@
 /**
  * Distance functions for strings
+ *
+ * @opt include .*elki.distance.distancefunction.PrimitiveDistanceFunction
  */
 /*
  * This file is part of ELKI:

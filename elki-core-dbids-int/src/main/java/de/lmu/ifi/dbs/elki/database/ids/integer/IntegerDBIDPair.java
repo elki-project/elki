@@ -179,8 +179,6 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
    * Iterator.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class Itr implements IntegerDBIDArrayIter {
     /**
@@ -245,8 +243,6 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
    * Slice of an array.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Slice implements IntegerArrayDBIDs {
     /**
@@ -312,8 +308,6 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
      * Iterator class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private class SliceItr implements IntegerDBIDArrayIter {
       /**

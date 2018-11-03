@@ -342,10 +342,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * Temporary cluster.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  protected static class TempCluster {
+  private static class TempCluster {
     /**
      * New ids, not yet in child clusters.
      */
@@ -370,15 +368,6 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * (Finished) child clusters
      */
     protected Collection<TempCluster> children = new ArrayList<>();
-
-    /**
-     * Constructor.
-     *
-     * @param dist Distance
-     */
-    public TempCluster(double dist) {
-      this.dist = dist;
-    }
 
     /**
      * Constructor.
@@ -440,20 +429,6 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         other.members = null; // Invalidate
         other.children = null; // Invalidate
       }
-      return this;
-    }
-
-    /**
-     * Add new objects to the cluster.
-     *
-     * @param dist Distance
-     * @param id Object to add
-     * @return {@code this}
-     */
-    public TempCluster grow(double dist, DBIDRef id) {
-      this.dist = dist;
-      this.members.add(id);
-      this.aggregate += 1. / dist;
       return this;
     }
 

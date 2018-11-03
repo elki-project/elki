@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  *
  * @author Erich Schubert
  * @since 0.4.0
+ * 
+ * @has - - - DataStoreIDMap
  *
  * @param <T> Data type
  */

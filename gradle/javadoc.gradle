@@ -21,9 +21,9 @@ def useumlgraph = file('/usr/bin/dot').exists() && !JavaVersion.current().isJava
 subprojects {
   if (useumlgraph) {
     configurations { umlgraph }
-    // repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.dspinellis:UMLGraph:master-SNAPSHOT' } // Via jitpack
-    repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.kno10:UMLGraph:java8-SNAPSHOT' } // jitpack
-    // repositories { mavenLocal() }; dependencies { umlgraph 'org.umlgraph:umlgraph:5.7.3-SNAPSHOT' }
+    repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.dspinellis:UMLGraph:master-SNAPSHOT' } // Via jitpack
+    // repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.kno10:UMLGraph:java8-SNAPSHOT' } // jitpack
+    // repositories { mavenLocal() }; dependencies { umlgraph 'org.umlgraph:umlgraph:5.7.3-SNAPSHOT' } // local installation
   }
 
   // Javadoc options
@@ -77,20 +77,20 @@ subprojects {
           addBooleanOption('postfixpackage', true)
           addBooleanOption('hideGenerics', true)
           addBooleanOption('horizontal', true)
-          addBooleanOption('compact', false)
-          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|de.lmu.ifi.dbs.elki.*\\.(Instance|Parameterizer)')
+          addBooleanOption('hideprivateinner', true)
+          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|de.lmu.ifi.dbs.elki.*\\.(Instance(\\..*)?|Parameterizer)')
           addStringOption('collpackages', 'java.util.*|fastutil.*|de.lmu.ifi.dbs.elki.utilities.datastructures.*')
           addStringOption('edgefontsize', '7')
-          addStringOption('edgefontname', 'sans')
+          addStringOption('edgefontname', 'Roboto')
           addStringOption('nodefontsize', '8')
-          addStringOption('nodefontname', 'sans')
-          addStringOption('nodefontclassname', 'sans')
+          addStringOption('nodefontname', 'Roboto')
+          addStringOption('nodefontclassname', 'Roboto')
           addStringOption('nodefontpackagesize', '7')
-          addStringOption('nodefontpackagename', 'sans')
-          addStringOption('nodefonttagname', 'sans')
+          addStringOption('nodefontpackagename', 'Roboto')
+          addStringOption('nodefonttagname', 'Roboto')
           addStringOption('nodefonttagsize', '7')
           addStringOption('nodesep', '0.15')
-          addStringOption('ranksep', '0.20')
+          addStringOption('ranksep', '0.25')
           addStringOption('outputencoding', 'UTF-8')
       }
       tags("hidden:X", "opt:X", "has:X", "navhas:X", "assoc:X", "navassoc:X", "composed:X", "navcomposed:X", "stereotype:X", "depend:X")

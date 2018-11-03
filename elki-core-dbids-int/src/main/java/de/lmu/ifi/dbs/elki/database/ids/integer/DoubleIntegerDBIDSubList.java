@@ -111,8 +111,6 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
    * Iterator for the sublist.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Itr implements DoubleIntegerDBIDListIter {
     /**

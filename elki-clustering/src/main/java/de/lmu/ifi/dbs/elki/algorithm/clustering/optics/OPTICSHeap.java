@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @since 0.1
  *
  * @navassoc - produces - ClusterOrder
+ * @has - - - OPTICSHeapEntry
  *
  * @param <O> the type of objects handled by the algorithm
  */

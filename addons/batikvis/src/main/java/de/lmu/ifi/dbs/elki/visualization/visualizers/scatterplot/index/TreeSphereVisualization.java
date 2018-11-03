@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @since 0.5.0
  *
  * @stereotype factory
+ * @composed - - - Mode
  * @navassoc - create - Instance
  */
 public class TreeSphereVisualization implements VisFactory {
@@ -80,10 +81,8 @@ public class TreeSphereVisualization implements VisFactory {
 
   /**
    * Drawing modes.
-   *
-   * @hidden
    */
-  private enum Modus {
+  private enum Mode {
     MANHATTAN, EUCLIDEAN, LPCROSS
   }
 
@@ -169,7 +168,7 @@ public class TreeSphereVisualization implements VisFactory {
     /**
      * Drawing mode (distance) to use
      */
-    protected Modus dist = Modus.LPCROSS;
+    protected Mode dist = Mode.LPCROSS;
 
     /**
      * The tree we visualize
@@ -204,13 +203,13 @@ public class TreeSphereVisualization implements VisFactory {
       p = getLPNormP(tree);
       if(tree != null) {
         if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
-          dist = Modus.MANHATTAN;
+          dist = Mode.MANHATTAN;
         }
         else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
-          dist = Modus.EUCLIDEAN;
+          dist = Mode.EUCLIDEAN;
         }
         else {
-          dist = Modus.LPCROSS;
+          dist = Mode.LPCROSS;
         }
         E root = tree.getRootEntry();
         final int mtheight = tree.getHeight();
@@ -256,10 +255,10 @@ public class TreeSphereVisualization implements VisFactory {
         double rad = entry.getCoveringRadius();
 
         final Element r;
-        if(dist == Modus.MANHATTAN) {
+        if(dist == Mode.MANHATTAN) {
           r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
         }
-        else if(dist == Modus.EUCLIDEAN) {
+        else if(dist == Mode.EUCLIDEAN) {
           r = SVGHyperSphere.drawEuclidean(svgp, proj, ro, rad);
         }
         // TODO: add visualizer for infinity norm?

@@ -277,6 +277,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    * @author Erich Schubert
    *
    * @composed - - - FPNode
+   * @assoc - - - Collector
    */
   public static class FPTree extends FPNode {
     /**
@@ -478,8 +479,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * Interface for collecting frequent itemsets found.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     interface Collector {
       /**
@@ -507,6 +506,8 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    * A single node of the FP tree.
    *
    * @author Erich Schubert
+   * 
+   * @assoc - - - Translator
    */
   // FIXME: keep children sorted, and use binary search for faster construction?
   // Or even use a hashset?
@@ -646,8 +647,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * Translator class for tree printing.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     interface Translator {
       /**

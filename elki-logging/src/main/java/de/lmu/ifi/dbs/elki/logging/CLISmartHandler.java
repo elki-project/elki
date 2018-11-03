@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
  * 
  * @composed - - - ProgressTracker
  * @navassoc - processes - LogRecord
- * @has - - - Formatter
+ * @has - - - MessageFormatter
+ * @has - - - ErrorFormatter
  * @has - - - OutputStreamLogger
  */
 public class CLISmartHandler extends Handler {

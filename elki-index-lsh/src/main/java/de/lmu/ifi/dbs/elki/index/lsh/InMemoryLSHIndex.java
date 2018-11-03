@@ -273,8 +273,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      * Class for handling kNN queries against the LSH index.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     protected class LSHKNNQuery extends AbstractKNNQuery {
       /**
@@ -304,8 +302,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      * Class for handling kNN queries against the LSH index.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     protected class LSHRangeQuery extends AbstractRangeQuery {
       /**

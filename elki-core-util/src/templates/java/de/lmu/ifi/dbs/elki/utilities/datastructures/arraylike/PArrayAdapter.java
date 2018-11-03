@@ -27,8 +27,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  *
  * @author Erich Schubert
  * @since 0.5.0
- *
- * @hidden
  */
 public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${type}[]> {
   /**

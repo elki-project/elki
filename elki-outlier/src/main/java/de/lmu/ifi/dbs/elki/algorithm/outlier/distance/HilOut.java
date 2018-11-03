@@ -83,6 +83,7 @@ import net.jafama.FastMath;
  * @since 0.5.0
  *
  * @composed - - - HilbertFeatures
+ * @composed - - - ScoreType
  * @assoc - - - HilFeature
  *
  * @param <O> Object type
@@ -145,8 +146,6 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * Type of output: all scores (upper bounds) or top n only
    * 
    * @author Jonathan von Brünken
-   * 
-   * @hidden
    */
   public enum ScoreType {
     All, TopN

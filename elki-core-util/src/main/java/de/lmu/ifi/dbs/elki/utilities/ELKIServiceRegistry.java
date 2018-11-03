@@ -68,8 +68,6 @@ public class ELKIServiceRegistry {
    * Entry in the service registry.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class Entry {
     /**

@@ -124,8 +124,6 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
    * Iterator for the sublist.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Itr implements DoubleIntegerDBIDListIter {
     /**

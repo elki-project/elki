@@ -128,8 +128,6 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * Score type.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public enum DistanceDist {
     /**

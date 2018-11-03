@@ -45,6 +45,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * @navassoc - - - Relation
  * @has - - - CollectionFromRelation
  * @has - - - RelationObjectIterator
+ * @has - - - AscendingByDoubleRelation
+ * @has - - - DescendingByDoubleRelation
  */
 public final class RelationUtil {
   /**
@@ -268,8 +270,6 @@ public final class RelationUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class AscendingByDoubleRelation implements Comparator<DBIDRef> {
     /**
@@ -297,8 +297,6 @@ public final class RelationUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class DescendingByDoubleRelation implements Comparator<DBIDRef> {
     /**

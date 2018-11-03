@@ -362,8 +362,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * Class to wrap the ERiC settings.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Settings {
     /**

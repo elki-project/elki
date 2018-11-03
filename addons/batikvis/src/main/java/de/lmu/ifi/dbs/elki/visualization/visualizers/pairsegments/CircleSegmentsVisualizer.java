@@ -669,8 +669,6 @@ public class CircleSegmentsVisualizer implements VisFactory {
      * Proxy element to connect signals.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private class SegmentListenerProxy implements EventListener {
       /**

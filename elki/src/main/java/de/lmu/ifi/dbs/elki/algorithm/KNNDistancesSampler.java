@@ -72,6 +72,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Arthur Zimek
  * @since 0.1
+ * 
+ * @navassoc - produces - KNNDistanceOrderResult
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -166,8 +168,6 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    * Curve result for a list containing the knn distances.
    *
    * @author Arthur Zimek
-   *
-   * @hidden
    */
   public static class KNNDistanceOrderResult extends XYCurve {
     /**

@@ -434,7 +434,20 @@ public class SVGPlot {
    * @return cloned document
    */
   protected SVGDocument cloneDocument() {
-    return (SVGDocument) new CloneNoExport().cloneDocument(getDomImpl(), document);
+    return (SVGDocument) new CloneInlineImages() {
+      @Override
+      public Node cloneNode(Document doc, Node eold) {
+        // Skip elements with noexport attribute set
+        if(eold instanceof Element) {
+          Element eeold = (Element) eold;
+          String vis = eeold.getAttribute(NO_EXPORT_ATTRIBUTE);
+          if(vis != null && vis.length() > 0) {
+            return null;
+          }
+        }
+        return super.cloneNode(doc, eold);
+      }
+    }.cloneDocument(getDomImpl(), document);
   }
 
   /**
@@ -681,27 +694,5 @@ public class SVGPlot {
    */
   public void setDisableInteractions(boolean disable) {
     disableInteractions = disable;
-  }
-
-  /**
-   * Class to skip nodes during cloning that have the "noexport" attribute set.
-   *
-   * @author Erich Schubert
-   *
-   * @hidden
-   */
-  protected class CloneNoExport extends CloneInlineImages {
-    @Override
-    public Node cloneNode(Document doc, Node eold) {
-      // Skip elements with noexport attribute set
-      if(eold instanceof Element) {
-        Element eeold = (Element) eold;
-        String vis = eeold.getAttribute(NO_EXPORT_ATTRIBUTE);
-        if(vis != null && vis.length() > 0) {
-          return null;
-        }
-      }
-      return super.cloneNode(doc, eold);
-    }
   }
 }

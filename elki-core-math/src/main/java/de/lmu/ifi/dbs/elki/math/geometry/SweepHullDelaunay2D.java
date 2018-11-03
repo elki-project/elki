@@ -715,8 +715,6 @@ public class SweepHullDelaunay2D {
    * edges must have different directions!)
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private enum Orientation {
     ORIENT_AB_BA, ORIENT_AB_CB, ORIENT_AB_AC, ORIENT_BC_BA, ORIENT_BC_CB, ORIENT_BC_AC, ORIENT_CA_BA, ORIENT_CA_CB, ORIENT_CA_AC
@@ -726,8 +724,6 @@ public class SweepHullDelaunay2D {
    * Class representing a triangle, by referencing points in a list.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Triangle {
     /**

@@ -25,8 +25,8 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
@@ -43,7 +43,7 @@ public class RandomSplitTest extends AbstractIndexStructureTest {
         .with(MTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RandomSplit.class) //
         .with(RandomSplit.Parameterizer.RANDOM_ID, 0) //
         .build();
-    testExactEuclidean(factory, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
-    testSinglePoint(factory, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
+    testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
   }
 }

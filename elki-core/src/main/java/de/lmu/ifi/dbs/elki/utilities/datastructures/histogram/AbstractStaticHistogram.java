@@ -160,8 +160,6 @@ public abstract class AbstractStaticHistogram implements Histogram {
    * Iterator class to iterate over all bins.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract class Iter implements Histogram.Iter {
     /**

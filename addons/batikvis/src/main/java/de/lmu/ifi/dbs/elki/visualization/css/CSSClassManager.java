@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @has - - - de.lmu.ifi.dbs.elki.visualization.css.CSSClass
+ * @has - - - CSSClass
+ * @navassoc - - - CSSNamingConflict
  */
 public class CSSClassManager {
   /**
@@ -165,10 +166,8 @@ public class CSSClassManager {
   
   /**
    * Class to signal a CSS naming conflict.
-   * 
-   * @hidden
    */
-  public class CSSNamingConflict extends Exception {
+  public static class CSSNamingConflict extends Exception {
     /**
      * Serial version UID
      */

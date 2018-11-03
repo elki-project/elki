@@ -195,8 +195,6 @@ public class ListParameterization extends AbstractParameterization {
    * Parameter pair, package-private.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static final class ParameterPair {
     /**

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 
 /**
- * Utility class for RStar trees
+ * Utility class for RStar trees.
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * @assoc - - - AbstractRStarTree
  * @assoc - - - EuclideanRStarTreeKNNQuery
  * @assoc - - - EuclideanRStarTreeRangeQuery
+ * @assoc - - - RStarTreeKNNQuery
+ * @assoc - - - RStarTreeRangeQuery
  * @has - - - RangeQuery
  * @has - - - KNNQuery
  */

@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -102,7 +103,7 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
-    return MTreeQueryUtil.getKNNQuery(this, distanceQuery, hints);
+    return new MTreeKNNQuery<>(this, distanceQuery);
   }
 
   @Override
@@ -116,7 +117,7 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
-    return MTreeQueryUtil.getRangeQuery(this, distanceQuery, hints);
+    return new MTreeRangeQuery<>(this, distanceQuery);
   }
 
   @Override

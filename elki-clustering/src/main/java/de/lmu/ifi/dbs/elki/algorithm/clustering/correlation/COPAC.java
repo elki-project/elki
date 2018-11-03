@@ -141,8 +141,6 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
    * Class to wrap the COPAC settings.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Settings {
     /**

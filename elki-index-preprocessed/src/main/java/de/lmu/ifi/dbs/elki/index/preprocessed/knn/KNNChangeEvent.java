@@ -44,8 +44,6 @@ public class KNNChangeEvent extends EventObject {
 
   /**
    * Available event types.
-   * 
-   * @hidden
    */
   public enum Type {
     /**

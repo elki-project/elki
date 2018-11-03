@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @since 0.4.0
  *
  * @stereotype factory
+ * @composed - - - Mode
  * @navassoc - create - Instance
  */
 public class OPTICSPlotSelectionVisualization implements VisFactory {
@@ -70,8 +71,6 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
 
   /**
    * Input modes
-   *
-   * @hidden
    */
   // TODO: Refactor all Mode copies into a shared class?
   private enum Mode {

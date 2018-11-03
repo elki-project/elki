@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @since 0.4.0
  *
  * @navhas - updates - FlexibleLOF.LOFResult
+ * @composed - - - LOFKNNListener
  */
 // TODO: related to publication?
 @Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF")
@@ -168,8 +169,6 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    * algorithm.
    *
    * @author Elke Achtert
-   *
-   * @hidden
    */
   private class LOFKNNListener implements KNNListener {
     /**

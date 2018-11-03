@@ -190,8 +190,6 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
    * URL representation for internal URLs.
    *
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class InternalParsedURLData extends ParsedURLData {
     /**

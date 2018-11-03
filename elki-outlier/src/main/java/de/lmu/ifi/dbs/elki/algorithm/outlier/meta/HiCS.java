@@ -94,6 +94,7 @@ import net.jafama.FastMath;
  *
  * @composed - - - GoodnessOfFitTest
  * @composed - - - OutlierAlgorithm
+ * @has - - - HiCSSubspace
  *
  * @param <V> vector type
  */
@@ -423,8 +424,6 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * a subspace in HiCS
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class HiCSSubspace extends BitSet {
     /**

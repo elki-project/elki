@@ -40,8 +40,6 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
   /**
    * Available types of the files: {@link #INPUT_FILES} denotes input files,
    * {@link #OUTPUT_FILES} denotes output files.
-   * 
-   * @hidden
    */
   public enum FilesType {
     /**

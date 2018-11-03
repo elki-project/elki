@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
     url = "https://doi.org/10.1007/978-3-642-00234-2", //
     bibkey = "doi:10.1007/978-3-642-00234-2")
 @Alias({ "de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction" })
-public class Kulczynski1SimilarityFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, PrimitiveSimilarityFunction<NumberVector> {
+public class Kulczynski1SimilarityFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, PrimitiveSimilarityFunction<NumberVector> {
   /**
    * Static instance.
    */

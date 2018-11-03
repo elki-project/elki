@@ -63,8 +63,6 @@ public class DatabaseEventManager {
 
   /**
    * Types for aggregation.
-   *
-   * @hidden
    */
   private enum Type {
     INSERT, REMOVE, UPDATE

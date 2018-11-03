@@ -1,5 +1,7 @@
 /**
  * Distance functions deriving distances from, e.g., similarity measures
+ *
+ * @opt include .*elki.distance.distancefunction.AbstractDatabaseDistanceFunction
  */
 /*
  * This file is part of ELKI:

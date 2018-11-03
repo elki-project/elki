@@ -82,7 +82,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
+ * @has - - - IDistanceKNNQuery
+ * @has - - - IDistanceRangeQuery
+ *
  * @param <O> Object type
  */
 @Reference(authors = "C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish", //
@@ -298,8 +301,6 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * kNN query implementation.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractKNNQuery {
     /**
@@ -373,8 +374,6 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * Exact Range query implementation.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRangeQuery {
     /**

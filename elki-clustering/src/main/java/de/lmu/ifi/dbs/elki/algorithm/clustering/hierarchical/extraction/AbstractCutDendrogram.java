@@ -62,9 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  *
  * @composed - runs - HierarchicalClusteringAlgorithm
- * @navassoc - processes - PointerHierarchyRepresentationResult
- * @has - produces - Clustering
- * @assoc - produces - DendrogramModel
+ * @assoc - processes - PointerHierarchyRepresentationResult
+ * @navassoc - produces - Clustering
+ * @navassoc - produces - DendrogramModel
  */
 public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
@@ -420,8 +420,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   abstract public static class Parameterizer extends AbstractParameterizer {
     /**

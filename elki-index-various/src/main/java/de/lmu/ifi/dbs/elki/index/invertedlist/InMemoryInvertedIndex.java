@@ -50,11 +50,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import net.jafama.FastMath;
 
 /**
- * Simple index using inverted lists.
+ * Simple index using inverted lists, for cosine distance only.
+ * <p>
+ * TODO: support additional distances.
  * 
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
+ * @has - - - ArcCosineKNNQuery
+ * @has - - - ArcCosineRangeQuery
+ * @has - - - CosineKNNQuery
+ * @has - - - CosineRangeQuery
+ *
  * @param <V> Vector type
  */
 public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex<V> implements KNNIndex<V>, RangeIndex<V> {
@@ -286,8 +293,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * kNN query object, for cosine distance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class CosineKNNQuery extends AbstractDistanceKNNQuery<V> {
     /**
@@ -322,8 +327,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * kNN query object, for arc cosine distance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class ArcCosineKNNQuery extends AbstractDistanceKNNQuery<V> {
     /**
@@ -358,8 +361,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * kNN query object, for cosine distance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class CosineRangeQuery extends AbstractDistanceRangeQuery<V> {
     /**
@@ -392,8 +393,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * kNN query object, for cosine distance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class ArcCosineRangeQuery extends AbstractDistanceRangeQuery<V> {
     /**

@@ -34,7 +34,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @since 0.4.0
  *
  * @opt nodefillcolor LemonChiffon
- * @composed - - - de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
+ * @composed - - - DataStoreFactory
+ * @has - - - AscendingByDoubleDataStoreAndId
+ * @has - - - DescendingByDoubleDataStoreAndId
+ * @has - - - AscendingByDoubleDataStore
+ * @has - - - DescendingByDoubleDataStore
+ * @has - - - AscendingByIntegerDataStore
+ * @has - - - DescendingByIntegerDataStore
  */
 public final class DataStoreUtil {
   /**
@@ -137,8 +143,6 @@ public final class DataStoreUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class AscendingByDoubleDataStore implements Comparator<DBIDRef> {
     /**
@@ -166,8 +170,6 @@ public final class DataStoreUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class DescendingByDoubleDataStore implements Comparator<DBIDRef> {
     /**
@@ -195,8 +197,6 @@ public final class DataStoreUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class AscendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
     /**
@@ -225,8 +225,6 @@ public final class DataStoreUtil {
    * Sort objects by a double relation
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class DescendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
     /**
@@ -256,8 +254,6 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    * @author Julian Erhard
-   *
-   * @hidden
    */
   public static class AscendingByIntegerDataStore implements Comparator<DBIDRef> {
     /**
@@ -286,8 +282,6 @@ public final class DataStoreUtil {
    *
    * @author Erich Schubert
    * @author Julian Erhard
-   *
-   * @hidden
    */
   public static class DescendingByIntegerDataStore implements Comparator<DBIDRef> {
     /**

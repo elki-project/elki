@@ -49,6 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * generics) into a {@code RStarTreeFactory<DoubleVector>} here.
  *
  * @author Erich Schubert
+ * 
+ * @has - - - ClassGenericsUtil
  *
  * @param <T> Class to build.
  */

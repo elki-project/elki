@@ -441,10 +441,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Parent iterator.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
-    class ItrParents implements It<O> {
+    private class ItrParents implements It<O> {
       int pos = 0;
 
       @Override
@@ -469,10 +467,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Parent iterator.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
-    class ItrParentsReverse implements It<O> {
+    private class ItrParentsReverse implements It<O> {
       int pos = nump - 1;
 
       @Override
@@ -497,10 +493,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Child iterator.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
-    class ItrChildren implements It<O> {
+    private class ItrChildren implements It<O> {
       int pos = 0;
 
       @Override
@@ -525,10 +519,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Child iterator.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
-    class ItrChildrenReverse implements It<O> {
+    private class ItrChildrenReverse implements It<O> {
       int pos = numc - 1;
 
       @Override
@@ -554,8 +546,6 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * Iterator over all descendants.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class ItrDesc implements It<O> {
     /**
@@ -638,8 +628,6 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * Iterator over all Ancestors.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class ItrAnc implements It<O> {
     /**
@@ -722,8 +710,6 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * Iterator over all known elements, by insertion order.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class ItrAll implements It<O> {
     int pos;

@@ -29,7 +29,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.*;

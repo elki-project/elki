@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * @assoc - - - LoggingConfiguration
  * @assoc - - - de.lmu.ifi.dbs.elki.logging.ELKILogRecord
  * @assoc - - - ProgressLogRecord
+ * @assoc - - - LogPaneHandler
  */
 public class LogPane extends JTextPane {
   /**
@@ -227,8 +228,6 @@ public class LogPane extends JTextPane {
    * Internal {@link java.util.logging.Handler}
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private class LogPaneHandler extends Handler {
     /**

@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @composed - - - AbstractFrequentItemsetAlgorithm
  * @composed - - - InterestingnessMeasure
+ * @composed - - - ItemsetSearcher
  * @assoc - - - FrequentItemsetsResult
  * @navassoc - - - AssociationRuleResult
  * @navassoc - - - AssociationRule
@@ -294,8 +295,6 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * <b>Do not use this for storage.</b>
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class PartialItemset extends Itemset {
     /**
@@ -350,8 +349,6 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * TODO: optimize case of length 1.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class ItemsetSearcher {
     /**

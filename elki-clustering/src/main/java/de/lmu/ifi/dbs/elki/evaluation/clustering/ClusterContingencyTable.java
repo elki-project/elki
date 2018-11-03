@@ -277,7 +277,7 @@ public class ClusterContingencyTable {
    * Utility class.
    * 
    * @author Erich Schubert
-   * 
+   *
    * @hidden
    */
   public static final class Util {

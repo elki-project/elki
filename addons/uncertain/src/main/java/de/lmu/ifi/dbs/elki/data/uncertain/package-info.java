@@ -1,5 +1,8 @@
 /**
  * Uncertain data objects.
+ * 
+ * @opt hide .*UncertainObject\.Factory
+ * @opt include .*elki.data.uncertain.uncertainifier..*Uncertainifier
  */
 /*
  * This file is part of ELKI:

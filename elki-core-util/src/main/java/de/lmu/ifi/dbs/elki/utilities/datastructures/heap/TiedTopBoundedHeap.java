@@ -31,6 +31,8 @@ import java.util.List;
  * 
  * @author Erich Schubert
  * @since 0.4.0
+ *
+ * @has - - - UnorderedIter
  * 
  * @param <E> Object type
  */

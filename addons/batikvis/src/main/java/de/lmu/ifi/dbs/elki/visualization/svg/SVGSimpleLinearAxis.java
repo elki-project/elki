@@ -36,6 +36,8 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  * 
+ * @composed - - - Alignment
+ * @composed - - - LabelStyle
  * @assoc - - - CSSClass
  * @assoc - - - CSSClassManager
  * @assoc - - - LinearScale
@@ -53,8 +55,6 @@ public final class SVGSimpleLinearAxis {
   /**
    * Flag for axis label position. First char: right-hand or left-hand side of
    * line. Second char: text alignment
-   * 
-   * @hidden
    */
   private enum Alignment {
     LL, RL, LC, RC, LR, RR
@@ -62,8 +62,6 @@ public final class SVGSimpleLinearAxis {
 
   /**
    * Labeling style: left-handed, right-handed, no ticks, labels at ends
-   * 
-   * @hidden
    */
   public enum LabelStyle {
     LEFTHAND, RIGHTHAND, NOLABELS, NOTHING, ENDLABEL

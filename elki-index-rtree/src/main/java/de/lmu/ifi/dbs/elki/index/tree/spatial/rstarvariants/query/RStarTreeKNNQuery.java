@@ -233,10 +233,8 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
    * Optimized double distance entry implementation.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  static class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
+  private static class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
     /**
      * Referenced entry
      */

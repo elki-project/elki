@@ -60,6 +60,9 @@ import javax.swing.tree.TreeModel;
  * 
  * @author Erich Schubert
  * @since 0.7.0
+ * 
+ * @composed - - - Handler
+ * @composed - - - Renderer
  */
 public class TreePopup extends JPopupMenu {
   /**
@@ -269,8 +272,6 @@ public class TreePopup extends JPopupMenu {
    * Tree cell render.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public class Renderer extends JPanel implements TreeCellRenderer {
     /**
@@ -339,8 +340,6 @@ public class TreePopup extends JPopupMenu {
    * Event handler class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   protected class Handler implements MouseListener, KeyListener, FocusListener {
     @Override

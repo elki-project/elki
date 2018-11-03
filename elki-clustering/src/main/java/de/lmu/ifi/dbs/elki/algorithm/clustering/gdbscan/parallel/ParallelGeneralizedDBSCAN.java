@@ -375,8 +375,6 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
      * Instance to process part of the data set, for a single iteration.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     private class Mapper implements Processor.Instance {
       /**

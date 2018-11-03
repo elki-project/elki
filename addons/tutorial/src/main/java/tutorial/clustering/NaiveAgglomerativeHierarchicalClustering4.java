@@ -86,8 +86,6 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * R. M. Cormack, A Review of Classification
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public enum Linkage {//
     SINGLE {

@@ -62,17 +62,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Joins in a given spatial database to each object its k-nearest neighbors.
  * This algorithm only supports spatial databases based on a spatial index
  * structure.
- *
+ * <p>
  * Since this method compares the MBR of every single leaf with every other
  * leaf, it is essentially quadratic in the number of leaves, which may not be
  * appropriate for large trees. It does currently not yet use the tree structure
  * for pruning.
- *
+ * <p>
  * TODO: exploit the tree structure.
  *
  * @author Elke Achtert
  * @author Erich Schubert
  * @since 0.1
+ *
+ * @composed - - - Task
  *
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <N> the type of node used in the spatial index structure
@@ -317,8 +319,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * Task in the processing queue.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Task implements Comparable<Task> {
     /**

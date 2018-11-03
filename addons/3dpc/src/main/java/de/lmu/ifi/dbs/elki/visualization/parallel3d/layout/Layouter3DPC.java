@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  *
  * @author Erich Schubert
  * @since 0.6.0
+ * 
+ * @navassoc - - - Layout
  *
  * @param <V> Object type
  */

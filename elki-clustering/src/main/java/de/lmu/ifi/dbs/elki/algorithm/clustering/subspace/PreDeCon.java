@@ -88,8 +88,6 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * Class containing all the PreDeCon settings.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Settings {
     /**

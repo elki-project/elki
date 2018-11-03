@@ -51,6 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @since 0.7.0
  *
+ * @navassoc - - - PreDeConModel
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
@@ -183,8 +185,6 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * Model used by PreDeCon for core point property.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class PreDeConModel {
     /**

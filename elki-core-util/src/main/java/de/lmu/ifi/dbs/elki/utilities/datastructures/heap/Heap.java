@@ -35,6 +35,8 @@ import java.util.Comparator;
  * @author Erich Schubert
  * @since 0.4.0
  * 
+ * @has - - - UnorderedIter
+ * 
  * @param <E> Element type. Should be {@link java.lang.Comparable} or a
  *        {@link java.util.Comparator} needs to be given.
  */

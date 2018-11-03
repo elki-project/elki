@@ -48,8 +48,6 @@ public class MarkdownDocStream implements AutoCloseable {
 
   /**
    * Possible newline states
-   *
-   * @hidden
    */
   private enum Newline {
     NONE, BREAK, NEWLINE, PAR

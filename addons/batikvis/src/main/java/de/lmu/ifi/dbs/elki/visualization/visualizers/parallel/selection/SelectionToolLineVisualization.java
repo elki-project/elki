@@ -70,8 +70,6 @@ public class SelectionToolLineVisualization implements VisFactory {
 
   /**
    * Input modes
-   *
-   * @hidden
    */
   private enum Mode {
     REPLACE, ADD, INVERT

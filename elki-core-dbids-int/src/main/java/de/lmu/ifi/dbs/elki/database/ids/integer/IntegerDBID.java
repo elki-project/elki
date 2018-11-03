@@ -176,8 +176,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
    * Pseudo iterator for DBIDs interface.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Itr implements DBIDArrayIter, IntegerDBIDRef {
     /**

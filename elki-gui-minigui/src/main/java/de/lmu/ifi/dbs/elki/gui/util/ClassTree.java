@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
  * @since 0.7.0
  *
  * @has - - - TreeNode
+ * @composed - - - PackageNode
+ * @composed - - - ClassNode
  */
 public final class ClassTree {
   /**
@@ -147,8 +149,6 @@ public final class ClassTree {
    * Tree node representing a single class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class PackageNode extends DefaultMutableTreeNode {
     /**
@@ -186,8 +186,6 @@ public final class ClassTree {
    * Tree node representing a single class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class ClassNode extends DefaultMutableTreeNode {
     /**

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -86,7 +85,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1109/TIT.2003.813506", //
     bibkey = "DBLP:journals/tit/EndresS03")
 @Alias({ "j-divergence" })
-public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
+public class JeffreyDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!
    */

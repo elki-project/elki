@@ -143,8 +143,6 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
    * Iterator in ELKI/C++ style.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private final static class Itr implements IntegerDBIDArrayIter {
     /**

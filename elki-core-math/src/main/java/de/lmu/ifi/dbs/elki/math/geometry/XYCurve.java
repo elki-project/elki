@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  *
  * @author Erich Schubert
  * @since 0.5.0
+ * 
+ * @has - - - Itr
  */
 public class XYCurve implements Result {
   /**
@@ -370,8 +372,6 @@ public class XYCurve implements Result {
    * </blockquote>
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public class Itr {
     /**

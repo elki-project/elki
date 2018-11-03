@@ -206,8 +206,6 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    * Output format
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   enum OutputFormat {
     TABULAR, TSV
@@ -217,8 +215,6 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    * Aggregation methods.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   enum Aggregate {
     /**

@@ -58,6 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Erich Schubert
  * @since 0.6.0
+ *
+ * @composed - - - BiclusterCandidate
+ *
  * @param <V> Vector type.
  */
 @Reference(authors = "Y. Cheng, G. M. Church", //
@@ -142,8 +145,6 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    * Visitor pattern for processing cells.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected interface CellVisitor {
     /** Different modes of operation. */
@@ -166,8 +167,6 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    * Bicluster candidate.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class BiclusterCandidate {
     /**

@@ -75,8 +75,6 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * Visualization mode.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public enum Mode {
     /** Cross track distance */

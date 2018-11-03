@@ -154,8 +154,6 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    * Class to count object accesses during construnction.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static class CountSortAccesses extends VectorUtil.SortDBIDsBySingleDimension {
     /**

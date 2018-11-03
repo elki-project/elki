@@ -27,6 +27,9 @@ import java.util.List;
  * 
  * @author Erich Schubert
  * @since 0.6.0
+ * 
+ * @composed - - - Node
+ * @composed - - - Edge
  */
 public class Layout {
   /**

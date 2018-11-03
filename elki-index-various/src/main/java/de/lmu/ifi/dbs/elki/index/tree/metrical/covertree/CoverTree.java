@@ -103,8 +103,6 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
    * Node object.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private static final class Node {
     /**

@@ -324,8 +324,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * Class for tracking Partial VA file statistics.
    * 
    * TODO: refactor into a common statistics API
-   * 
-   * @hidden
    */
   public static class Statistics {
     private Counter scannedBytes;
@@ -741,8 +739,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
 
   /**
    * Compare DAfiles by their worst case distance.
-   * 
-   * @hidden
    */
   protected static class WorstCaseDistComparator implements Comparator<DAFile> {
     private VALPNormDistance dist;

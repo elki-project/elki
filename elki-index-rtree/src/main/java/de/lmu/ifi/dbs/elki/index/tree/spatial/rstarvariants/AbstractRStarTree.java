@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @opt nodefillcolor LemonChiffon
  * @navhas - contains - AbstractRStarTreeNode
- * @composed - - - AbstractRTreeSettings
+ * @composed - - - RTreeSettings
  * @composed - - - Statistics
  *
  * @param <N> Node type

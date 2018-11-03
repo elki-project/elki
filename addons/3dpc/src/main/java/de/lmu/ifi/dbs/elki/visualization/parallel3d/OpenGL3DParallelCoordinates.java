@@ -262,8 +262,6 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      * States of the UI.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     protected enum State { //
       PREPARATION, // Preparation phase

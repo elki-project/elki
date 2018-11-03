@@ -284,8 +284,6 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
    * Class for generating / optimizing the merge order.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private final class Sorter implements Comparator<DBIDRef> {
     /**

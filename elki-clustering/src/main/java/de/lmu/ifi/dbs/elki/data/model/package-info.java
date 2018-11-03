@@ -1,9 +1,8 @@
 /**
  * Cluster models classes for various algorithms
  *
- * @opt hide result.textwriter
- * @opt hide visualization
- * @opt hide de.lmu.ifi.dbs.elki.algorithm\..*
+ * @opt include .*elki.data.Cluster
+ * @opt include .*elki.data.Clustering
  */
 /*
  * This file is part of ELKI:

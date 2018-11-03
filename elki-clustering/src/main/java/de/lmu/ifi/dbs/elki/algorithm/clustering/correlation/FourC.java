@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * @since 0.1
  *
+ * @composed - - - Settings
  * @composed - - - FourCNeighborPredicate
  * @composed - - - FourCCorePredicate
  *
@@ -96,8 +97,6 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    * Class wrapping the 4C parameter settings.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Settings {
     /**

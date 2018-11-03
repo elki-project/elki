@@ -233,8 +233,6 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
    * View onto the database
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   class DatabaseTableModel extends AbstractTableModel {
     /**

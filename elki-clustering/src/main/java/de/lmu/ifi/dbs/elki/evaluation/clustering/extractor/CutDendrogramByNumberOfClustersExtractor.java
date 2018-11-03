@@ -23,17 +23,12 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.extractor;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -74,32 +69,6 @@ public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
   }
 
   /**
-   * Dummy instance.
-   *
-   * @author Erich Schubert
-   *
-   * @hidden
-   */
-  protected static class DummyHierarchicalClusteringAlgorithm implements HierarchicalClusteringAlgorithm {
-    /**
-     * Constructor.
-     */
-    public DummyHierarchicalClusteringAlgorithm() {
-      super();
-    }
-
-    @Override
-    public TypeInformation[] getInputTypeRestriction() {
-      return TypeUtil.array();
-    }
-
-    @Override
-    public PointerHierarchyRepresentationResult run(Database db) {
-      throw new AbortException("This must not be called");
-    }
-  }
-
-  /**
    * Parameterization class.
    *
    * @author Erich Schubert
@@ -114,7 +83,7 @@ public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ListParameterization overrides = new ListParameterization();
-      overrides.addParameter(AbstractAlgorithm.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
+      overrides.addParameter(AbstractAlgorithm.ALGORITHM_ID, CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
       list.errorsTo(config);
       inner = list.tryInstantiate(CutDendrogramByNumberOfClusters.class);

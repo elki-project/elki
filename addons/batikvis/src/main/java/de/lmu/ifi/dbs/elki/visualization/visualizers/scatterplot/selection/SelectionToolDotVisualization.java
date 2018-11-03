@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @since 0.4.0
  *
  * @stereotype factory
+ * @composed - - - Mode
  * @assoc - create - Instance
  */
 public class SelectionToolDotVisualization implements VisFactory {
@@ -66,8 +67,6 @@ public class SelectionToolDotVisualization implements VisFactory {
 
   /**
    * Input modes
-   *
-   * @hidden
    */
   private enum Mode {
     REPLACE, ADD, INVERT

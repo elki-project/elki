@@ -39,11 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @since 0.4.0
  * 
  * @assoc - - - AbstractMTree
- * @assoc - - - DoubleMTreeDistanceSearchCandidate
+ * @assoc - - - MTreeSearchCandidate
  * 
  * @param <O> Object type
  */
-public class MetricalIndexKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
+public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
   /**
    * The index to use
    */
@@ -55,7 +55,7 @@ public class MetricalIndexKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
+  public MTreeKNNQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }

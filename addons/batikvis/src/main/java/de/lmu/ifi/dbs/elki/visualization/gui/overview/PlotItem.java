@@ -172,8 +172,6 @@ public class PlotItem {
    * Recursive iterator
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class ItmItr implements Iterator<PlotItem> {
     PlotItem next;

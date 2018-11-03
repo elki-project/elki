@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
@@ -321,7 +320,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
           targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(it), false);
+          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, (evt) -> triggerSubplotSelectEvent(it), false);
 
           hoverlayer.appendChild(hover);
         }
@@ -526,35 +525,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     // forward event to all listeners.
     for(ActionListener actionListener : actionListeners) {
       actionListener.actionPerformed(new DetailViewSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, it));
-    }
-  }
-
-  /**
-   * Event when a plot was selected.
-   *
-   * @author Erich Schubert
-   *
-   * @hidden
-   */
-  public class SelectPlotEvent implements EventListener {
-    /**
-     * Plot item clicked
-     */
-    PlotItem it;
-
-    /**
-     * Constructor.
-     *
-     * @param it Item that was clicked
-     */
-    public SelectPlotEvent(PlotItem it) {
-      super();
-      this.it = it;
-    }
-
-    @Override
-    public void handleEvent(Event evt) {
-      triggerSubplotSelectEvent(it);
     }
   }
 

@@ -81,8 +81,6 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * Scaling reference options.
    * 
    * @author Arthur Zimek
-   * 
-   * @hidden
    */
   public enum ScalingReference {
     UNITCUBE, STDDEV, MINMAX
@@ -92,8 +90,6 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * Nature of the noise distribution.
    * 
    * @author Arthur Zimek
-   * 
-   * @hidden
    */
   public enum NoiseDistribution {
     GAUSSIAN, UNIFORM

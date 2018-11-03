@@ -77,8 +77,6 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Available strategies for determination of the preference vector.
-   *
-   * @hidden
    */
   public enum Strategy {
     /**

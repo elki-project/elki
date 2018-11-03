@@ -1,5 +1,7 @@
 /**
  * Classes to generate uncertain objects from existing certain data.
+ *
+ * @opt include .*elki.data.uncertain..*UncertainObject
  */
 /*
  * This file is part of ELKI:

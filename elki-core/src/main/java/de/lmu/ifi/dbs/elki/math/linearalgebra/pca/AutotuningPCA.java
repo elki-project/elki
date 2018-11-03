@@ -96,8 +96,6 @@ public class AutotuningPCA extends PCARunner {
    * Candidate
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class Cand {
     /** Candidate matrix */

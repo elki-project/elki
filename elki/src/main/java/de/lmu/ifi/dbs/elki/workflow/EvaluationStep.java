@@ -78,10 +78,8 @@ public class EvaluationStep implements WorkflowStep {
    * Class to handle running the evaluators on a database instance.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  public class Evaluation implements ResultListener {
+  private static class Evaluation implements ResultListener {
     /**
      * Evaluators to run.
      */

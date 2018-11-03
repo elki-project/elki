@@ -59,11 +59,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * <p>
  * TODO: improve performance by allowing index support for finding neighbors
  * and/or exploiting the data partitioning better.
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
+ * @navassoc - - - COPACNeighborPredicate.COPACModel
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
@@ -169,8 +171,6 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * Model used by COPAC for core point property.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class COPACModel implements SetDBIDs {
     /**

@@ -1,5 +1,7 @@
 /**
  * Random number generation.
+ *
+ * @opt include java.util.Random
  */
 /*
  * This file is part of ELKI:
