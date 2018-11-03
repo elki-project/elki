@@ -303,8 +303,6 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * Parameterization class
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

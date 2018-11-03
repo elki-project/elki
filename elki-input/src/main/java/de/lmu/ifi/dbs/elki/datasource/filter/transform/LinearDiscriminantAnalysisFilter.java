@@ -150,8 +150,6 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
    * Parameterization class.
    *
    * @author Angela Peng
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter.Parameterizer<V> {
     @Override

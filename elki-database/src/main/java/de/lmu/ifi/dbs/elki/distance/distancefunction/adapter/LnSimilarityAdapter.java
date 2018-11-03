@@ -85,8 +85,6 @@ public class LnSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O, NormalizedSimilarityFunction<? super O>> {
     @Override

@@ -81,8 +81,6 @@ public class FDBSCAN extends GeneralizedDBSCAN {
    *
    * @author Alexander Koos
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

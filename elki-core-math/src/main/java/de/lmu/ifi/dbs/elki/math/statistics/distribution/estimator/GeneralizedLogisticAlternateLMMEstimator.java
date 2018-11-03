@@ -92,8 +92,6 @@ public class GeneralizedLogisticAlternateLMMEstimator implements LMMDistribution
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

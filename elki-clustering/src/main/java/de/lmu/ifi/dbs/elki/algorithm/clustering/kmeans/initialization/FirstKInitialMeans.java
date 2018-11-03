@@ -85,8 +85,6 @@ public class FirstKInitialMeans<O> implements KMeansInitialization, KMedoidsInit
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     @Override

@@ -162,8 +162,6 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

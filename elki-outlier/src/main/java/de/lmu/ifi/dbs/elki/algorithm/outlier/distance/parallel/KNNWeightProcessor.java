@@ -76,8 +76,6 @@ public class KNNWeightProcessor extends AbstractDoubleProcessor {
    * Instance for precomputing the kNN.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   private static class Instance extends AbstractDoubleProcessor.Instance {
     /**

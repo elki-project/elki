@@ -110,8 +110,6 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

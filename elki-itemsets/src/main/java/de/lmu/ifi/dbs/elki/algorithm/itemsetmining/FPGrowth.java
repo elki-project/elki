@@ -675,8 +675,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override

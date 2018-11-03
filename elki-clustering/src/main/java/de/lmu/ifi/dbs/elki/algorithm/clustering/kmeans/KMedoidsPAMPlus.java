@@ -92,8 +92,6 @@ public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
    * Instance for a single dataset.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends KMedoidsPAM.Instance {
     /**
@@ -351,8 +349,6 @@ public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
     @Override

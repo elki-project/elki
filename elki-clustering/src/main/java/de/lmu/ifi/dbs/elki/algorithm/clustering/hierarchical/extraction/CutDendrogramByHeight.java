@@ -73,8 +73,6 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance extends AbstractCutDendrogram.Instance {
     /**
@@ -107,8 +105,6 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractCutDendrogram.Parameterizer {
     /**

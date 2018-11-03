@@ -505,8 +505,6 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
       /**

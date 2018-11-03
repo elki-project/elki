@@ -70,8 +70,6 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extend
    * Parameterization helper class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

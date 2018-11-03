@@ -103,8 +103,6 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

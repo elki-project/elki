@@ -121,8 +121,6 @@ public class CompleteLinkage implements Linkage {
    * Returns the static instance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

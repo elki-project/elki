@@ -92,8 +92,6 @@ public final class BiweightKernelDensityFunction implements KernelDensityFunctio
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

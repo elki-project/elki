@@ -460,8 +460,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

@@ -79,8 +79,6 @@ public class LogGammaLogMOMEstimator implements LogMOMDistributionEstimator<LogG
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

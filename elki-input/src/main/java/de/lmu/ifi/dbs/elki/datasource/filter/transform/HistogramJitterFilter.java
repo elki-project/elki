@@ -120,8 +120,6 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

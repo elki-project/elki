@@ -66,8 +66,6 @@ public class Clarke1858SpheroidEarthModel extends AbstractEarthModel {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

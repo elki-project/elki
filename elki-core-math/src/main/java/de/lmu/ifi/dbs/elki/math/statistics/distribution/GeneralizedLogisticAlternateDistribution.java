@@ -230,8 +230,6 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /** Parameters. */

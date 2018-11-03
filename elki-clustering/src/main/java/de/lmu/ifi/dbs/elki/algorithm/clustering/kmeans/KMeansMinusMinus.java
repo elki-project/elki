@@ -112,8 +112,6 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance extends AbstractKMeans.Instance {
     /**
@@ -296,8 +294,6 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    * Parameterization class.
    *
    * @author Jonas Steinke
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     /**

@@ -158,8 +158,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

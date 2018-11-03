@@ -104,8 +104,6 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends StandardDeviationScaling.Parameterizer {
     @Override

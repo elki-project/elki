@@ -149,8 +149,6 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

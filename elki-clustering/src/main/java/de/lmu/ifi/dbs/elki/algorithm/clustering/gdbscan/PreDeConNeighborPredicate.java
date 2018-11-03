@@ -254,8 +254,6 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

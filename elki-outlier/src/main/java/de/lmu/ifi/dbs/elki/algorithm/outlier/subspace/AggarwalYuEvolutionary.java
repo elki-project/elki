@@ -669,8 +669,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
     /**

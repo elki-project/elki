@@ -732,8 +732,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -127,8 +127,6 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

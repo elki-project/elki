@@ -297,8 +297,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {
     /**

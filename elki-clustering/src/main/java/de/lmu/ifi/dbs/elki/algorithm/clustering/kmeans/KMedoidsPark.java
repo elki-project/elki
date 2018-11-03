@@ -306,8 +306,6 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clusterin
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     protected int k;

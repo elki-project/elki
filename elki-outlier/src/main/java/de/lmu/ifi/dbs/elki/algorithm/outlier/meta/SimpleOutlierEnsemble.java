@@ -167,8 +167,6 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

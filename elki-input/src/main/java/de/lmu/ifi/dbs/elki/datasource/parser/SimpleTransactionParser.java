@@ -184,8 +184,6 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override

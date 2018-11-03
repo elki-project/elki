@@ -253,8 +253,6 @@ public abstract class AbstractApplication {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

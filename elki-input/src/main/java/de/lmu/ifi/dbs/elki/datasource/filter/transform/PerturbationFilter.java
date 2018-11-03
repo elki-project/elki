@@ -291,8 +291,6 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * Parameterization class.
    * 
    * @author Arthur Zimek
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

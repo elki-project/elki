@@ -93,8 +93,6 @@ public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
    * Parameterization class example
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

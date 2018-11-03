@@ -83,8 +83,6 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

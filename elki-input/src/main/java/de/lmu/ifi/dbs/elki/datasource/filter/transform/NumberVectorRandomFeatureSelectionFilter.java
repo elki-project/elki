@@ -109,8 +109,6 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

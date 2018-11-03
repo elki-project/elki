@@ -132,8 +132,6 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance {
     /**
@@ -302,8 +300,6 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

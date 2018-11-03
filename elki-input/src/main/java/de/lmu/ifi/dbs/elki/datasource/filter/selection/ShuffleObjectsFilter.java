@@ -100,8 +100,6 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -116,8 +116,6 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

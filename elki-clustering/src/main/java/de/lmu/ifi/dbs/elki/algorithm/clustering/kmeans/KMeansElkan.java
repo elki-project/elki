@@ -90,8 +90,6 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends KMeansSimplifiedElkan.Instance {
     /**
@@ -176,8 +174,6 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansSimplifiedElkan.Parameterizer<V> {
     @Override

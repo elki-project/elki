@@ -133,8 +133,6 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends FeatureVector<F>, F> extends AbstractParameterizer {
     /**

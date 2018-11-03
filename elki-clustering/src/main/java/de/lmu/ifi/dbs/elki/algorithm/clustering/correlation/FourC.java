@@ -135,8 +135,6 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
      * Parameterization class for 4C settings.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
@@ -265,8 +263,6 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

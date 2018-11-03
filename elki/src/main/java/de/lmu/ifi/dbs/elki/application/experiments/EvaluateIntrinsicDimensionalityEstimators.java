@@ -427,8 +427,6 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

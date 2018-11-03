@@ -472,8 +472,6 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override

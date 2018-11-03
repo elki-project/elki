@@ -101,8 +101,6 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     private double walpha;

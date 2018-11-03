@@ -107,8 +107,6 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

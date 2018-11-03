@@ -74,8 +74,6 @@ public class UniformMADEstimator implements MADDistributionEstimator<UniformDist
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

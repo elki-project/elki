@@ -247,8 +247,6 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**

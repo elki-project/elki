@@ -117,8 +117,6 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
    * Parameterization class
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

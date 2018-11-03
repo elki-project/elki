@@ -188,8 +188,6 @@ public class StaticArrayDatabase extends AbstractDatabase {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {
     /**

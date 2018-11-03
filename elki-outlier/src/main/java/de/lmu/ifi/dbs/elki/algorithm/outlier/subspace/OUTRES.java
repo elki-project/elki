@@ -381,8 +381,6 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    * Parameterization class.
    * 
    * @author Viktoria Pleintinger
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

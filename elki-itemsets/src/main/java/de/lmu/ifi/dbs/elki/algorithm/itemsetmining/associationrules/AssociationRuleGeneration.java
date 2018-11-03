@@ -137,8 +137,6 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * Class to run
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public class Instance {
     /**
@@ -473,8 +471,6 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * Parameterization class.
    *
    * @author Frederic Sautter
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

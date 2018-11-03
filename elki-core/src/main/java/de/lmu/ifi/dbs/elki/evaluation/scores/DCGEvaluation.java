@@ -131,8 +131,6 @@ public class DCGEvaluation implements ScoreEvaluation {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

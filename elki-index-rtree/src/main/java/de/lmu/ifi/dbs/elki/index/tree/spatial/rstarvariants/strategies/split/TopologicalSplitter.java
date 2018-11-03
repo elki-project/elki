@@ -323,8 +323,6 @@ public class TopologicalSplitter implements SplitStrategy {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

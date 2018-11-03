@@ -139,8 +139,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**

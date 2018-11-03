@@ -86,8 +86,6 @@ public class FlexibleBetaLinkage implements Linkage {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

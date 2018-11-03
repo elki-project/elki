@@ -125,8 +125,6 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

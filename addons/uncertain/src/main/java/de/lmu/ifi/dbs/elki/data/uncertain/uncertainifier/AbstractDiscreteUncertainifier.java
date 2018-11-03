@@ -65,10 +65,8 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
    * Parameterizer.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Default sample size for generating finite representations.
      */

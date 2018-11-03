@@ -82,8 +82,6 @@ public final class TriangularKernelDensityFunction implements KernelDensityFunct
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

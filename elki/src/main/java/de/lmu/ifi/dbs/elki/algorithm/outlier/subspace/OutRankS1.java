@@ -155,8 +155,6 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

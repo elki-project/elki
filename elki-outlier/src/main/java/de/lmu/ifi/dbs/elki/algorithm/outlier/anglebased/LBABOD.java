@@ -255,8 +255,6 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends FastABOD.Parameterizer<V> {
     /**

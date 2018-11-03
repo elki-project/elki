@@ -94,8 +94,6 @@ public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitializa
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
     @Override

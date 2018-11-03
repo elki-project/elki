@@ -154,8 +154,6 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

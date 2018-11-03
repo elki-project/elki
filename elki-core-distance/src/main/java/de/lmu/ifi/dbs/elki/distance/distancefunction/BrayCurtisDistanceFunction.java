@@ -134,8 +134,6 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

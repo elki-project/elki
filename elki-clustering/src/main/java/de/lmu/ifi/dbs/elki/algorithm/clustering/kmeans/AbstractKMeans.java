@@ -304,8 +304,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * standard flow of most (but not all) k-means variations.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected abstract static class Instance {
     /**
@@ -605,8 +603,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
     /**

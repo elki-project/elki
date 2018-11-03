@@ -184,8 +184,6 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public abstract static class Parameterizer<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**

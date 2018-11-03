@@ -89,8 +89,6 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

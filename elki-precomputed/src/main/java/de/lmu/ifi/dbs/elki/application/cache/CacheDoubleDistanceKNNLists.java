@@ -170,8 +170,6 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**

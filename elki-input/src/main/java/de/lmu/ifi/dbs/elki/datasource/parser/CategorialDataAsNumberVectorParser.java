@@ -147,8 +147,6 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override

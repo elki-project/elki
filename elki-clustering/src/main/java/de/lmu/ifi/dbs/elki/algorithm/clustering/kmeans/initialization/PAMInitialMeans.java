@@ -181,8 +181,6 @@ public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends AbstractParameterizer {
     @Override

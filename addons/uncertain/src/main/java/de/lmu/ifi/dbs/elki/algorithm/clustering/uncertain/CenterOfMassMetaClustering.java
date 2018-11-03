@@ -148,8 +148,6 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<C extends Clustering<?>> extends AbstractParameterizer {
     /**

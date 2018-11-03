@@ -334,8 +334,6 @@ public class HaltonUniformDistribution implements Distribution {
    * TODO: allow manual parameterization of sequence parameters!
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /** Parameters. */

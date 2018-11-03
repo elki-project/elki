@@ -950,8 +950,6 @@ public class GammaDistribution extends AbstractDistribution {
    * TODO: allow alternate parameterization, with alpha+beta?
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /**

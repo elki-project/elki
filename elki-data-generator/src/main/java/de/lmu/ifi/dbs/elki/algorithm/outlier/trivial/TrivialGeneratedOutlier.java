@@ -191,8 +191,6 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

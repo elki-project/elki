@@ -259,8 +259,6 @@ public class AutotuningPCA extends PCARunner {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends PCARunner.Parameterizer {
     /**

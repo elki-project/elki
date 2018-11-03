@@ -220,8 +220,6 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @author Jonathan von Brünken
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

@@ -111,8 +111,6 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

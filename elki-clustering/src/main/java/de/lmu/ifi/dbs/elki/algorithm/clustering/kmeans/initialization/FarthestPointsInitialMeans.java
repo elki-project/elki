@@ -163,8 +163,6 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization 
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractKMeansInitialization.Parameterizer {
     /**

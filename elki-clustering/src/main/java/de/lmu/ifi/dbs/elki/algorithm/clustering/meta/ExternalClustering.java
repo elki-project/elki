@@ -208,8 +208,6 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
    * Parameterization class
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

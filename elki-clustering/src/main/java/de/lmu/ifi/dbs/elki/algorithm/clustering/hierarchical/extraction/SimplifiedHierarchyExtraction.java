@@ -123,8 +123,6 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance {
     /**
@@ -440,8 +438,6 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -131,8 +131,6 @@ public class KDDTask {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     InputStep inputStep = null;

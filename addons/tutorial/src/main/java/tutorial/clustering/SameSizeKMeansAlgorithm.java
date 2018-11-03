@@ -450,8 +450,6 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

@@ -184,8 +184,6 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

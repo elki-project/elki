@@ -336,8 +336,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends AbstractParameterizer {
     /**

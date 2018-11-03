@@ -93,8 +93,6 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    * Instance for processing a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Instance {
     /**
@@ -248,8 +246,6 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
     @Override

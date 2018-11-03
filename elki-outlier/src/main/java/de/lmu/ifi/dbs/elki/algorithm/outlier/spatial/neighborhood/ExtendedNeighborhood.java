@@ -166,8 +166,6 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

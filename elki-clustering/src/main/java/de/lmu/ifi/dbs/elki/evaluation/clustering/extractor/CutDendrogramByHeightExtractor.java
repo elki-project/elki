@@ -102,8 +102,6 @@ public class CutDendrogramByHeightExtractor implements Evaluator {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

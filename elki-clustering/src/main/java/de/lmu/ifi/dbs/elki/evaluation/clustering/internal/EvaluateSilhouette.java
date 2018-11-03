@@ -245,8 +245,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

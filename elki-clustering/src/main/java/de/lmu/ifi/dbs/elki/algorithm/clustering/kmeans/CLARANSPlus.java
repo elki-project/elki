@@ -324,8 +324,6 @@ public class CLARANSPlus<V> extends CLARANS<V> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends CLARANS.Parameterizer<V> {
     @Override

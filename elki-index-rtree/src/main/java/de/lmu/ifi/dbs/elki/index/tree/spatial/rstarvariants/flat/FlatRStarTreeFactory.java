@@ -65,8 +65,6 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override

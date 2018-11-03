@@ -203,8 +203,6 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**

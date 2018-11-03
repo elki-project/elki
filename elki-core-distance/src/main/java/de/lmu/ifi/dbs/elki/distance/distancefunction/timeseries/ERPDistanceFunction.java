@@ -157,8 +157,6 @@ public class ERPDistanceFunction extends DTWDistanceFunction {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractEditDistanceFunction.Parameterizer {
     /**

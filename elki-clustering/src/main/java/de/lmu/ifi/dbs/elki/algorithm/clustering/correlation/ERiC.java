@@ -408,8 +408,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

@@ -109,8 +109,6 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
    * Parameterizer
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

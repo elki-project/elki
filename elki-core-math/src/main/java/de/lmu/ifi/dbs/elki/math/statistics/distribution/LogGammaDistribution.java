@@ -228,8 +228,6 @@ public class LogGammaDistribution extends AbstractDistribution {
    * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /**

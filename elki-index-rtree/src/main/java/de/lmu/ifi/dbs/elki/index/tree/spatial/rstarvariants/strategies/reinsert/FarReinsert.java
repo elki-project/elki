@@ -81,8 +81,6 @@ public class FarReinsert extends AbstractPartialReinsert {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
     @Override

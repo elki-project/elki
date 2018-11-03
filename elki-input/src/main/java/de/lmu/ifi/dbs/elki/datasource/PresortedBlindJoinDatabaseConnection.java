@@ -93,8 +93,6 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

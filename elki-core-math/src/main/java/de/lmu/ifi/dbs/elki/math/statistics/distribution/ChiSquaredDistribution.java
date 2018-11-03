@@ -147,8 +147,6 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {
     /**

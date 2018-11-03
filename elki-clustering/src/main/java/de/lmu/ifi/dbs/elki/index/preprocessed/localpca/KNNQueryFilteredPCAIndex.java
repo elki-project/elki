@@ -153,8 +153,6 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
       /**

@@ -228,8 +228,6 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**

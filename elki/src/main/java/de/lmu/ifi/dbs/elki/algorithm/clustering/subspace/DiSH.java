@@ -621,8 +621,6 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * OPTICS variant used by DiSH internally.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, DiSHClusterOrder> {
     /**
@@ -860,8 +858,6 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

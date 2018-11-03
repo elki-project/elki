@@ -63,8 +63,6 @@ public class MkTabTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkTabTr
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
     @Override

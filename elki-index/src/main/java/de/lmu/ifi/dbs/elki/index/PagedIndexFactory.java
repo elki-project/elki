@@ -78,8 +78,6 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

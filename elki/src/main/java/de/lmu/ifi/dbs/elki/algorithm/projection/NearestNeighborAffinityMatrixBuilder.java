@@ -298,8 +298,6 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @author Erich Schubert
    *
    * @param <O> Object type
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends PerplexityAffinityMatrixBuilder.Parameterizer<O> {
     @Override

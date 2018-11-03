@@ -410,8 +410,6 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override

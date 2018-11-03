@@ -135,8 +135,6 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance {
     /**
@@ -521,8 +519,6 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

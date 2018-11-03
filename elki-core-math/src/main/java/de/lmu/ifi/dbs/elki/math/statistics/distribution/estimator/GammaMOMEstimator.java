@@ -88,8 +88,6 @@ public class GammaMOMEstimator implements MeanVarianceDistributionEstimator<Gamm
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

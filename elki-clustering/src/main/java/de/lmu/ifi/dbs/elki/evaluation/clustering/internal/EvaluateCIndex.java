@@ -267,8 +267,6 @@ public class EvaluateCIndex<O> implements Evaluator {
    *
    * @author Stephan Baier
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

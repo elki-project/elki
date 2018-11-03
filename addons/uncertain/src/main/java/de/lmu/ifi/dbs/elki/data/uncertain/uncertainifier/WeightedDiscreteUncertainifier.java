@@ -85,8 +85,6 @@ public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifi
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractDiscreteUncertainifier.Parameterizer {
     @Override

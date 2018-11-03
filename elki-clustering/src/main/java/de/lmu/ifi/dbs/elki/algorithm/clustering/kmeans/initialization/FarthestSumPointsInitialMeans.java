@@ -158,8 +158,6 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends FarthestPointsInitialMeans.Parameterizer<V> {
     /**

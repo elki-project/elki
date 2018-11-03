@@ -405,8 +405,6 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
     /**

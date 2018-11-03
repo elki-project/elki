@@ -360,8 +360,6 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * Parameterization class.
    * 
    * @author Florian Nuecke
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

@@ -165,8 +165,6 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
    * Parameterization class.
    * 
    * @author Florian Nuecke
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends DOC.Parameterizer<V> {
     /**

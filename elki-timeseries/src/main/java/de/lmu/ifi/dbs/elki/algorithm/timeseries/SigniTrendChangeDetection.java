@@ -133,8 +133,6 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * Instance for one data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance {
     /**
@@ -248,8 +246,6 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

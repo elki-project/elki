@@ -196,8 +196,6 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

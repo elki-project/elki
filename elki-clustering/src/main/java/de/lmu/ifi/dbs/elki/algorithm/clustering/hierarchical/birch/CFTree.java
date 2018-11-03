@@ -670,8 +670,6 @@ public class CFTree {
      * Parameterization class for CFTrees.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

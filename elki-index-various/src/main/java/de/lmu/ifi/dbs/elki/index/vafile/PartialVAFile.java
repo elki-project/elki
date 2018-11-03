@@ -813,8 +813,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

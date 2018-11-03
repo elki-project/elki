@@ -95,8 +95,6 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
    * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

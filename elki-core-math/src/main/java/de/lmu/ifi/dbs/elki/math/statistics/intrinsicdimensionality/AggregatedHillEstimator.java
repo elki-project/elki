@@ -83,8 +83,6 @@ public class AggregatedHillEstimator implements IntrinsicDimensionalityEstimator
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

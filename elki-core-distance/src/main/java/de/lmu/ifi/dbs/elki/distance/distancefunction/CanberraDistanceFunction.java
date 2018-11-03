@@ -150,8 +150,6 @@ public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunctio
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

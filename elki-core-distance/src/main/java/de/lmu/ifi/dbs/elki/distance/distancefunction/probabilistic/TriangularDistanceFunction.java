@@ -109,8 +109,6 @@ public class TriangularDistanceFunction extends TriangularDiscriminationDistance
    * Parameterization class, using the static instance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

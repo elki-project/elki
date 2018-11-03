@@ -100,8 +100,6 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    * Parameterization class, based on k-means.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

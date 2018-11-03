@@ -409,8 +409,6 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends FlexibleLOF.Parameterizer<O> {
     @Override

@@ -76,8 +76,6 @@ public class LaplaceMADEstimator implements MADDistributionEstimator<LaplaceDist
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -225,8 +225,6 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

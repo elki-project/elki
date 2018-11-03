@@ -131,8 +131,6 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
    * Parameteriation class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override

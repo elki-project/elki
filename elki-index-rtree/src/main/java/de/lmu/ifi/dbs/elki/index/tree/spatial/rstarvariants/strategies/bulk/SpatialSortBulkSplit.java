@@ -76,8 +76,6 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
    * Parametization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

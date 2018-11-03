@@ -91,8 +91,6 @@ public class LeastEnlargementWithAreaInsertionStrategy implements InsertionStrat
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

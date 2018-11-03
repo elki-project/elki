@@ -87,8 +87,6 @@ public class InstanceRankNormalization<V extends NumberVector> extends AbstractV
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

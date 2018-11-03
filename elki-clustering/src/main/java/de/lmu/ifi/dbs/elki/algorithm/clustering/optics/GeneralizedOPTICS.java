@@ -75,8 +75,6 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
    * Instance for processing a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Instance<O, R> implements Comparator<DBIDRef> {
     /**

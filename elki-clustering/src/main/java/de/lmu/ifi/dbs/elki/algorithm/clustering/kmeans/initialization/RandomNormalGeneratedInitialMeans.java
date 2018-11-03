@@ -106,8 +106,6 @@ public class RandomNormalGeneratedInitialMeans extends AbstractKMeansInitializat
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
     @Override

@@ -160,8 +160,6 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     /**

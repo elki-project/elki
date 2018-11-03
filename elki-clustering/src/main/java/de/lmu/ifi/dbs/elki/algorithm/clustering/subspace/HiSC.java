@@ -109,8 +109,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * Algorithm instance for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
     /**
@@ -284,8 +282,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

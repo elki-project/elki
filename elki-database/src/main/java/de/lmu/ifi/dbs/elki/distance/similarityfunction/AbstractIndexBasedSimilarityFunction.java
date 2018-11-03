@@ -118,8 +118,6 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, F extends IndexFac
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
     /**

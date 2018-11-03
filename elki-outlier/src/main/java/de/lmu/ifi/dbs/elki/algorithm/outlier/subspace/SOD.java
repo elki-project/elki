@@ -317,8 +317,6 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

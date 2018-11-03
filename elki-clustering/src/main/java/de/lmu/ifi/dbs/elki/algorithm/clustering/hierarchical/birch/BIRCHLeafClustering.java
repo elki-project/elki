@@ -137,8 +137,6 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

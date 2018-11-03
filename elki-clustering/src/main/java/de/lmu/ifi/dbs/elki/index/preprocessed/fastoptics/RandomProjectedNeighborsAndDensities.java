@@ -452,8 +452,6 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

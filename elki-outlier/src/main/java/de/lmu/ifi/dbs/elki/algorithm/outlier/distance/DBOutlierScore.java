@@ -110,8 +110,6 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     @Override

@@ -226,8 +226,6 @@ public class EvaluatePBMIndex implements Evaluator {
    *
    * @author Stephan Baier
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

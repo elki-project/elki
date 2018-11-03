@@ -114,8 +114,6 @@ public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGen
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

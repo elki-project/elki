@@ -65,8 +65,6 @@ public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeas
    * Parameterization class
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

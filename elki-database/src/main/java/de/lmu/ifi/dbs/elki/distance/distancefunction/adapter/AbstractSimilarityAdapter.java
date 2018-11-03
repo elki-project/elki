@@ -139,8 +139,6 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer<O, S extends SimilarityFunction<? super O>> extends AbstractParameterizer {
     /**

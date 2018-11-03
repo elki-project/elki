@@ -74,8 +74,6 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected class Instance extends AbstractCutDendrogram.Instance {
     /**
@@ -111,8 +109,6 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractCutDendrogram.Parameterizer {
     /**

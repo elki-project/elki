@@ -152,8 +152,6 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

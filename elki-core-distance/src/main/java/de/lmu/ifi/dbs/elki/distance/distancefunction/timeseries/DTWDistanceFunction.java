@@ -165,8 +165,6 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractEditDistanceFunction.Parameterizer {
     @Override

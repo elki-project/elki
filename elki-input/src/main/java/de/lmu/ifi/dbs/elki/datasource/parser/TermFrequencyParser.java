@@ -198,8 +198,6 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     /**

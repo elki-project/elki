@@ -66,8 +66,6 @@ public class LogNormalLogMOMEstimator implements LogMeanVarianceEstimator<LogNor
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -142,8 +142,6 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     @Override

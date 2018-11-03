@@ -63,8 +63,6 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

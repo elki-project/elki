@@ -100,8 +100,6 @@ public class ClusterJaccardSimilarityFunction implements PrimitiveDistanceFuncti
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

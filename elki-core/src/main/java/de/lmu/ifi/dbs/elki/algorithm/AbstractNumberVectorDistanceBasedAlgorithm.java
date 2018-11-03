@@ -70,8 +70,6 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R extends Re
    * Parameterization helper class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**

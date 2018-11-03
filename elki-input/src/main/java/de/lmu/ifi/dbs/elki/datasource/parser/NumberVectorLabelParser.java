@@ -366,8 +366,6 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractStreamingParser.Parameterizer {
     /**

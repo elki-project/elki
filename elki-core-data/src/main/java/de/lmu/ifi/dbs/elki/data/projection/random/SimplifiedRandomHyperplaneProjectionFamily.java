@@ -177,8 +177,6 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
    * Parameterization class.
    *
    * @author Evgeniy Faerman
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
     @Override

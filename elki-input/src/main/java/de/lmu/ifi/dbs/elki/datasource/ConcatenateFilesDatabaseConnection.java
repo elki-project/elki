@@ -150,8 +150,6 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**

@@ -133,8 +133,6 @@ public class SlopeDependenceMeasure extends AbstractDependenceMeasure {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

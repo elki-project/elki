@@ -310,8 +310,6 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

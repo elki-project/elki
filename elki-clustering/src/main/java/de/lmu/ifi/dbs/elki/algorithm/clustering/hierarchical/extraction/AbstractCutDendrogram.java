@@ -107,8 +107,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    * Instance for a single data set.
    * 
    * @author Erich Schubert
-   *
-   * @hidden
    */
   abstract public class Instance {
     /**

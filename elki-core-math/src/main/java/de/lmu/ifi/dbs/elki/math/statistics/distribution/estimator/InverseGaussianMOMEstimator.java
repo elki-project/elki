@@ -60,8 +60,6 @@ public class InverseGaussianMOMEstimator implements MeanVarianceDistributionEsti
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

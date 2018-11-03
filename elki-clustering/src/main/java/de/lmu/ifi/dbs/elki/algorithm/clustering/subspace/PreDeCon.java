@@ -121,8 +121,6 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
@@ -238,8 +236,6 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

@@ -147,8 +147,6 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
    * Parameterization interface (with the shared parameters)
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

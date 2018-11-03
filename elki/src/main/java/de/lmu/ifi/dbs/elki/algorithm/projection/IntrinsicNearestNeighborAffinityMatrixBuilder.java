@@ -247,8 +247,6 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @author Erich Schubert
    *
    * @param <O> Object type
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends NearestNeighborAffinityMatrixBuilder.Parameterizer<O> {
     /**

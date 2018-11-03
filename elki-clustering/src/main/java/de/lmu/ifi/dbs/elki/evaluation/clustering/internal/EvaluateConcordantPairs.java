@@ -305,8 +305,6 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    * Parameterization class.
    *
    * @author Stephan Baier
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

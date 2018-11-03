@@ -360,8 +360,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

@@ -170,8 +170,6 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
    * @author Erich Schubert
    *
    * @param <O> Object type
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

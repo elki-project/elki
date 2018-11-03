@@ -101,8 +101,6 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends InputStreamDatabaseConnection.Parameterizer {
     /**

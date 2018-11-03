@@ -90,8 +90,6 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -189,8 +187,6 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

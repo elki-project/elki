@@ -148,8 +148,6 @@ public class ClarkDistanceFunction implements SpatialPrimitiveDistanceFunction<N
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -93,8 +93,6 @@ public class ClusteringFowlkesMallowsSimilarityFunction implements ClusteringDis
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

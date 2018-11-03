@@ -224,8 +224,6 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

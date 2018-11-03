@@ -483,8 +483,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
     /**

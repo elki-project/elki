@@ -276,8 +276,6 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
     /**

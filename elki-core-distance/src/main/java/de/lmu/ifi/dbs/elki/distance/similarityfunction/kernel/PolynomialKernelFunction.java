@@ -109,8 +109,6 @@ public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction i
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

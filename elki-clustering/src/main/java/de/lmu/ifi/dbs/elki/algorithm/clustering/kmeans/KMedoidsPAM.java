@@ -194,8 +194,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * this is probably worth the 2*n doubles in storage.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance {
     /**
@@ -399,8 +397,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**

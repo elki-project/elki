@@ -50,10 +50,8 @@ public abstract class RandomizedHoldout extends AbstractHoldout {
    * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Random seeding for holdout evaluation.
      */

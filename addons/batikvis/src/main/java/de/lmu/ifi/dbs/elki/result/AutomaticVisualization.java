@@ -129,8 +129,6 @@ public class AutomaticVisualization implements ResultHandler {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

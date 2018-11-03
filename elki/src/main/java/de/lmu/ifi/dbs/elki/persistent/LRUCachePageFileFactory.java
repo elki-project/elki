@@ -76,8 +76,6 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -502,8 +502,6 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override

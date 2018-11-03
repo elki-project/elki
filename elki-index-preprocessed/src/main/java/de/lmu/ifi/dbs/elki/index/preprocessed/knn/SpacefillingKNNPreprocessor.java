@@ -477,8 +477,6 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

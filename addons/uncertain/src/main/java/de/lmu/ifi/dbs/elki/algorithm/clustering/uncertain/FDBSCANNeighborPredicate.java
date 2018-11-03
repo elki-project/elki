@@ -137,8 +137,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    *
    * @author Alexander Koos
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Instance implements NeighborPredicate.Instance<DBIDs> {
     /**
@@ -294,8 +292,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    *
    * @author Alexander Koos
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

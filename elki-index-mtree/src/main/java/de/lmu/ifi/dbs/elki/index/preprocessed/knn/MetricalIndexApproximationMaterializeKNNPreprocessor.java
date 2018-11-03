@@ -218,8 +218,6 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override

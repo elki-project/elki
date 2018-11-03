@@ -111,8 +111,6 @@ public class StringParser implements Parser {
    * 
    * @author Felix Stahlberg
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

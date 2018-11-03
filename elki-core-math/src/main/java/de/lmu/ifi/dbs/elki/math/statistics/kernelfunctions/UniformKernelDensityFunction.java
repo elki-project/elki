@@ -86,8 +86,6 @@ public final class UniformKernelDensityFunction implements KernelDensityFunction
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

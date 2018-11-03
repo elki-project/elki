@@ -162,8 +162,6 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     /**

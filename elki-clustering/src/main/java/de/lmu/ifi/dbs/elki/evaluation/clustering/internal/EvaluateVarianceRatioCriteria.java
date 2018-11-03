@@ -233,8 +233,6 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * Parameterization class.
    *
    * @author Stephan Baier
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**

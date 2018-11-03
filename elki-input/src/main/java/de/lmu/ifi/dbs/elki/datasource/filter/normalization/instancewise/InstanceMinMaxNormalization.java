@@ -141,8 +141,6 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

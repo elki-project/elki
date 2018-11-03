@@ -49,8 +49,6 @@ public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFacto
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
     @Override

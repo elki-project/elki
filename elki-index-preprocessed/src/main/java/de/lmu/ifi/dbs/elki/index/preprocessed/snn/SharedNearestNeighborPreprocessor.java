@@ -225,8 +225,6 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

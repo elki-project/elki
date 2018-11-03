@@ -147,8 +147,6 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

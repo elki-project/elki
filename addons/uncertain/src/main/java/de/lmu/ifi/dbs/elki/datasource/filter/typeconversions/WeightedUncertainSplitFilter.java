@@ -133,8 +133,6 @@ public class WeightedUncertainSplitFilter extends AbstractConversionFilter<Numbe
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

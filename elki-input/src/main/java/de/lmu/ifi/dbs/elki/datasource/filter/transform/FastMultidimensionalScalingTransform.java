@@ -323,8 +323,6 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<I, O extends NumberVector> extends AbstractParameterizer {
     /**

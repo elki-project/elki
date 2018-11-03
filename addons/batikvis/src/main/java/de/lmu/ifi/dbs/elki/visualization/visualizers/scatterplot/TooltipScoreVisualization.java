@@ -218,8 +218,6 @@ public class TooltipScoreVisualization implements VisFactory {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

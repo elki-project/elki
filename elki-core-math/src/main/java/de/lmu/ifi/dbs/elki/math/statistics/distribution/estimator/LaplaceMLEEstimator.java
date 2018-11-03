@@ -88,8 +88,6 @@ public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistrib
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

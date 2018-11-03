@@ -124,8 +124,6 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override

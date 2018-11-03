@@ -127,8 +127,6 @@ public class MinimumDistanceFunction extends AbstractNumberVectorDistanceFunctio
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

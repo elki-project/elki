@@ -120,8 +120,6 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     // TODO: add "grid sampling" option.

@@ -216,8 +216,6 @@ public class EvaluateDaviesBouldin implements Evaluator {
    * Parameterization class.
    *
    * @author Stephan Baier
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -72,8 +72,6 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory.Parameterizer<O> {
     /**

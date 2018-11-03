@@ -388,8 +388,6 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

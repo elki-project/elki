@@ -137,8 +137,6 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**

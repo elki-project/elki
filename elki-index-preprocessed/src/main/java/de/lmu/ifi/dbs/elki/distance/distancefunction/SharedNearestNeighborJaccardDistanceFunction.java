@@ -129,8 +129,6 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<O> extends AbstractIndexBasedDistanceFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
     @Override

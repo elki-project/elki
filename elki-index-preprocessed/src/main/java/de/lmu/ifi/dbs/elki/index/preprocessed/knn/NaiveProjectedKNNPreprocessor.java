@@ -387,8 +387,6 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
      * Parameterization class.
      *
      * @author Erich Schubert
-     *
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

@@ -87,8 +87,6 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -164,8 +162,6 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

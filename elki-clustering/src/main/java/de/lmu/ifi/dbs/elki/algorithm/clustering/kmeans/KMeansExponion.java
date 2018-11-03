@@ -90,8 +90,6 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends KMeansHamerly.Instance {
     /**
@@ -191,8 +189,6 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends KMeansHamerly.Parameterizer<V> {
     @Override

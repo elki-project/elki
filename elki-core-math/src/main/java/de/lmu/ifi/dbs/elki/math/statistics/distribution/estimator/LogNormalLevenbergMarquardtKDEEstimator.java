@@ -110,8 +110,6 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

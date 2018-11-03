@@ -134,8 +134,6 @@ public class ParkInitialMeans<O> implements KMeansInitialization, KMedoidsInitia
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V> extends AbstractParameterizer {
     @Override

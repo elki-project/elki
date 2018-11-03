@@ -68,8 +68,6 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    * Inner instance, storing state for a single data set.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   protected static class Instance extends AbstractKMeans.Instance {
     /**
@@ -103,8 +101,6 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override

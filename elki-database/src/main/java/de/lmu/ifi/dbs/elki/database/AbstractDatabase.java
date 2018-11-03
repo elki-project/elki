@@ -202,8 +202,6 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

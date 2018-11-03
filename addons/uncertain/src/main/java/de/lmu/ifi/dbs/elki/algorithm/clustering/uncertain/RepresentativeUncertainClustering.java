@@ -363,8 +363,6 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    *
    * @author Alexander Koos
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -509,8 +509,6 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    * Parameterization class
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -87,8 +87,6 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

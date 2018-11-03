@@ -107,8 +107,6 @@ public class ScatterPlotFactory implements ProjectorFactory {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

@@ -206,8 +206,6 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**

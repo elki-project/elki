@@ -106,8 +106,6 @@ public class GEDEstimator implements IntrinsicDimensionalityEstimator {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

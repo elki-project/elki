@@ -457,8 +457,6 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
      * Parameterization class.
      * 
      * @author Erich Schubert
-     * 
-     * @hidden
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

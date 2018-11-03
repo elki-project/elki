@@ -93,8 +93,6 @@ public class ClusteringBCubedF1SimilarityFunction implements ClusteringDistanceS
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

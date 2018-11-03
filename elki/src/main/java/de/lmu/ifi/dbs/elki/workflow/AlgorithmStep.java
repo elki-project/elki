@@ -132,8 +132,6 @@ public class AlgorithmStep implements WorkflowStep {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

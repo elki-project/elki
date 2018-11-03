@@ -98,8 +98,6 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
    * Parameterizer class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

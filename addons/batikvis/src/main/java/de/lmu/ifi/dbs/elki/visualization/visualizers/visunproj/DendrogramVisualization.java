@@ -601,8 +601,6 @@ public class DendrogramVisualization implements VisFactory {
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

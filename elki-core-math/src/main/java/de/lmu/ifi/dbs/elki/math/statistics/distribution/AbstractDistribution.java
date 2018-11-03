@@ -69,8 +69,6 @@ public abstract class AbstractDistribution implements Distribution {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

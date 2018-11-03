@@ -120,8 +120,6 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

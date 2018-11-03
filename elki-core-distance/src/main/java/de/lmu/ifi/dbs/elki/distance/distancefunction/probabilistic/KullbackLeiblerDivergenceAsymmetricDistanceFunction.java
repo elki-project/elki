@@ -106,8 +106,6 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
    * Parameterization class, using the static instance.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

@@ -91,8 +91,6 @@ public class ClipScaling implements StaticScalingFunction {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     protected Double min = null;

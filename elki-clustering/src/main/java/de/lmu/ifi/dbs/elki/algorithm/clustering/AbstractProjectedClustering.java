@@ -71,8 +71,6 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    * Parameterization class.
    *
    * @author Erich Schubert
-   *
-   * @hidden
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

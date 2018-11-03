@@ -132,8 +132,6 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
    * Parameterization class.
    * 
    * @author Erich Schubert
-   * 
-   * @hidden
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
