@@ -48,7 +48,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
     "(Thus, any label must not be parseable as Bit.) " + //
     "Empty lines and lines beginning with \"#\" will be ignored.")
 @Alias("de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser")
-public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> implements Parser {
+public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> {
   /**
    * Class logger
    */
