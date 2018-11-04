@@ -33,10 +33,11 @@ import org.apache.lucene.util.Version;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -82,15 +83,13 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID> {
       Query query = mlt.like(range.getOffset(id));
       TopDocs topDocs = is.search(query, k);
 
-      int rk = topDocs.scoreDocs.length;
-      DoubleIntegerDBIDKNNList res = new DoubleIntegerDBIDKNNList(k, rk);
+      KNNHeap res = DBIDFactory.FACTORY.newHeap(k);
       DBIDArrayIter it = range.iter();
       for(ScoreDoc scoreDoc : topDocs.scoreDocs) {
         double dist = (scoreDoc.score > 0.) ? (1. / scoreDoc.score) : Double.POSITIVE_INFINITY;
-        it.seek(scoreDoc.doc);
-        res.add(dist, it);
+        res.insert(dist, it.seek(scoreDoc.doc));
       }
-      return res;
+      return res.toKNNList();
     }
     catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
