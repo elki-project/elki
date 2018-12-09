@@ -108,23 +108,9 @@ public class CLIQUEInterval implements Comparable<CLIQUEInterval> {
    */
   @Override
   public int compareTo(CLIQUEInterval other) {
-    if(dimension < other.dimension) {
-      return -1;
-    }
-    if(dimension > other.dimension) {
-      return 1;
-    }
-
-    if(min < other.min) {
-      return -1;
-    }
-    if(min > other.min) {
-      return 1;
-    }
-
-    if(max != other.max) {
-      throw new RuntimeException("Should never happen!");
-    }
-    return 0;
+    int c = Integer.compare(dimension,  other.dimension);
+    c = c != 0 ? c : Double.compare(min, other.min);
+    assert c != 0 || max == other.max : "We should not encounter identical CLIQUEIntervals.";
+    return c;
   }
 }

@@ -38,10 +38,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * 
  * @composed - - - CLIQUEInterval
  * @composed - - - ModifiableDBIDs
- * 
- * @param <V> the type of NumberVector this unit contains
  */
-public class CLIQUEUnit<V extends NumberVector> {
+public class CLIQUEUnit {
   /**
    * The one-dimensional intervals of which this unit is build.
    */
@@ -89,7 +87,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @return true, if the intervals of this unit contain the specified feature
    *         vector, false otherwise
    */
-  public boolean contains(V vector) {
+  public boolean contains(NumberVector vector) {
     for(CLIQUEInterval interval : intervals) {
       final double value = vector.doubleValue(interval.getDimension());
       if(interval.getMin() > value || value >= interval.getMax()) {
@@ -108,7 +106,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @return true, if this unit contains the specified feature vector, false
    *         otherwise
    */
-  public boolean addFeatureVector(DBIDRef id, V vector) {
+  public boolean addFeatureVector(DBIDRef id, NumberVector vector) {
     if(contains(vector)) {
       ids.add(id);
       return true;
@@ -222,7 +220,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @return the joined unit if the selectivity of the join result is equal or
    *         greater than tau, null otherwise
    */
-  public CLIQUEUnit<V> join(CLIQUEUnit<V> other, double all, double tau) {
+  public CLIQUEUnit join(CLIQUEUnit other, double all, double tau) {
     CLIQUEInterval i1 = this.intervals.get(this.intervals.size() - 1);
     CLIQUEInterval i2 = other.intervals.get(other.intervals.size() - 1);
     if(i1.getDimension() >= i2.getDimension()) {
@@ -247,7 +245,7 @@ public class CLIQUEUnit<V extends NumberVector> {
     resultIDs.retainAll(other.ids);
 
     if(resultIDs.size() / all >= tau) {
-      return new CLIQUEUnit<>(resultIntervals, resultIDs);
+      return new CLIQUEUnit(resultIntervals, resultIDs);
     }
 
     return null;

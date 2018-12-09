@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -40,14 +39,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @has - - - CoverageComparator
  * @composed - - - CLIQUEUnit
- * 
- * @param <V> the type of NumberVector this subspace contains
  */
-public class CLIQUESubspace<V extends NumberVector> extends Subspace {
+public class CLIQUESubspace extends Subspace {
   /**
    * The dense units belonging to this subspace.
    */
-  private List<CLIQUEUnit<V>> denseUnits;
+  private List<CLIQUEUnit> denseUnits;
 
   /**
    * The coverage of this subspace, which is the number of all feature vectors
@@ -82,7 +79,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * 
    * @param unit the unit to be added.
    */
-  public void addDenseUnit(CLIQUEUnit<V> unit) {
+  public void addDenseUnit(CLIQUEUnit unit) {
     Collection<CLIQUEInterval> intervals = unit.getIntervals();
     for(CLIQUEInterval interval : intervals) {
       if(!BitsUtil.get(getDimensions(), interval.getDimension())) {
@@ -103,10 +100,10 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
   public List<Pair<Subspace, ModifiableDBIDs>> determineClusters() {
     List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<>();
 
-    for(CLIQUEUnit<V> unit : getDenseUnits()) {
+    for(CLIQUEUnit unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
         ModifiableDBIDs cluster = DBIDUtil.newHashSet();
-        CLIQUESubspace<V> model = new CLIQUESubspace<>(getDimensions());
+        CLIQUESubspace model = new CLIQUESubspace(getDimensions());
         clusters.add(new Pair<Subspace, ModifiableDBIDs>(model, cluster));
         dfs(unit, cluster, model);
       }
@@ -123,19 +120,19 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @param cluster the IDs of the feature vectors of the current cluster
    * @param model the model of the cluster
    */
-  public void dfs(CLIQUEUnit<V> unit, ModifiableDBIDs cluster, CLIQUESubspace<V> model) {
+  public void dfs(CLIQUEUnit unit, ModifiableDBIDs cluster, CLIQUESubspace model) {
     cluster.addDBIDs(unit.getIds());
     unit.markAsAssigned();
     model.addDenseUnit(unit);
 
     final long[] dims = getDimensions();
     for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
-      CLIQUEUnit<V> left = leftNeighbor(unit, dim);
+      CLIQUEUnit left = leftNeighbor(unit, dim);
       if(left != null && !left.isAssigned()) {
         dfs(left, cluster, model);
       }
 
-      CLIQUEUnit<V> right = rightNeighbor(unit, dim);
+      CLIQUEUnit right = rightNeighbor(unit, dim);
       if(right != null && !right.isAssigned()) {
         dfs(right, cluster, model);
       }
@@ -149,10 +146,10 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @param dim the dimension
    * @return the left neighbor of the given unit in the specified dimension
    */
-  public CLIQUEUnit<V> leftNeighbor(CLIQUEUnit<V> unit, int dim) {
+  public CLIQUEUnit leftNeighbor(CLIQUEUnit unit, int dim) {
     CLIQUEInterval i = unit.getInterval(dim);
 
-    for(CLIQUEUnit<V> u : getDenseUnits()) {
+    for(CLIQUEUnit u : getDenseUnits()) {
       if(u.containsLeftNeighbor(i)) {
         return u;
       }
@@ -167,10 +164,10 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @param dim the dimension
    * @return the right neighbor of the given unit in the specified dimension
    */
-  public CLIQUEUnit<V> rightNeighbor(CLIQUEUnit<V> unit, Integer dim) {
+  public CLIQUEUnit rightNeighbor(CLIQUEUnit unit, Integer dim) {
     CLIQUEInterval i = unit.getInterval(dim);
 
-    for(CLIQUEUnit<V> u : getDenseUnits()) {
+    for(CLIQUEUnit u : getDenseUnits()) {
       if(u.containsRightNeighbor(i)) {
         return u;
       }
@@ -191,7 +188,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
   /**
    * @return the denseUnits
    */
-  public List<CLIQUEUnit<V>> getDenseUnits() {
+  public List<CLIQUEUnit> getDenseUnits() {
     return denseUnits;
   }
 
@@ -209,16 +206,16 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    *         condition is fulfilled, null otherwise.
    * @see de.lmu.ifi.dbs.elki.data.Subspace#joinLastDimensions
    */
-  public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
+  public CLIQUESubspace join(CLIQUESubspace other, double all, double tau) {
     long[] dimensions = joinLastDimensions(other);
     if(dimensions == null) {
       return null;
     }
 
-    CLIQUESubspace<V> s = new CLIQUESubspace<>(dimensions);
-    for(CLIQUEUnit<V> u1 : this.getDenseUnits()) {
-      for(CLIQUEUnit<V> u2 : other.getDenseUnits()) {
-        CLIQUEUnit<V> u = u1.join(u2, all, tau);
+    CLIQUESubspace s = new CLIQUESubspace(dimensions);
+    for(CLIQUEUnit u1 : this.getDenseUnits()) {
+      for(CLIQUEUnit u2 : other.getDenseUnits()) {
+        CLIQUEUnit u = u1.join(u2, all, tau);
         if(u != null) {
           s.addDenseUnit(u);
         }
@@ -240,7 +237,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
         .append(super.toString(pre)) //
         .append('\n').append(pre).append("Coverage: ").append(coverage) //
         .append('\n').append(pre).append("Units: \n");
-    for(CLIQUEUnit<V> denseUnit : getDenseUnits()) {
+    for(CLIQUEUnit denseUnit : getDenseUnits()) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }
     return result.toString();
@@ -249,32 +246,20 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
   /**
    * A partial comparator for CLIQUESubspaces based on their coverage. The
    * CLIQUESubspaces are reverse ordered by the values of their coverage.
-   * 
+   * <p>
+   * Compares the two specified CLIQUESubspaces for order. Returns a negative
+   * integer, zero, or a positive integer if the coverage of the first
+   * subspace is greater than, equal to, or less than the coverage of the
+   * second subspace. I.e. the subspaces are reverse ordered by the values of
+   * their coverage.
+   * <p>
    * Note: this comparator provides an ordering that is inconsistent with
    * equals.
-   * 
-   * @author Elke Achtert
    */
-  public static class CoverageComparator implements Comparator<CLIQUESubspace<?>> {
-    /**
-     * Compares the two specified CLIQUESubspaces for order. Returns a negative
-     * integer, zero, or a positive integer if the coverage of the first
-     * subspace is greater than, equal to, or less than the coverage of the
-     * second subspace. I.e. the subspaces are reverse ordered by the values of
-     * their coverage.
-     * 
-     * Note: this comparator provides an ordering that is inconsistent with
-     * equals.
-     * 
-     * @param s1 the first subspace to compare
-     * @param s2 the second subspace to compare
-     * @return a negative integer, zero, or a positive integer if the coverage
-     *         of the first subspace is greater than, equal to, or less than the
-     *         coverage of the second subspace
-     */
+  public static Comparator<CLIQUESubspace> BY_COVERAGE = new Comparator<CLIQUESubspace>() {
     @Override
-    public int compare(CLIQUESubspace<?> s1, CLIQUESubspace<?> s2) {
+    public int compare(CLIQUESubspace s1, CLIQUESubspace s2) {
       return Integer.compare(s2.getCoverage(), s1.getCoverage());
     }
-  }
+  };
 }
