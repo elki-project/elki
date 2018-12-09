@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Comparator;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
@@ -96,39 +95,17 @@ public class Subspace {
    */
   public Subspace join(Subspace other) {
     long[] newDimensions = joinLastDimensions(other);
-    if(newDimensions == null) {
-      return null;
-    }
-
-    return new Subspace(newDimensions);
+    return newDimensions == null ? new Subspace(newDimensions) : null;
   }
 
-  /**
-   * Returns a string representation of this subspace by calling
-   * {@link #toString} with an empty prefix.
-   *
-   * @return a string representation of this subspace
-   */
   @Override
   public String toString() {
-    return toString("");
-  }
-
-  /**
-   * Returns a string representation of this subspace that contains the given
-   * string prefix and the dimensions of this subspace.
-   *
-   * @param pre a string prefix for each row of this string representation
-   * @return a string representation of this subspace
-   */
-  public String toString(String pre) {
-    StringBuilder result = new StringBuilder(100).append(pre).append("Dimensions: [");
-    int start = BitsUtil.nextSetBit(dimensions, 0);
-    for(int d = start; d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      if(d != start) {
-        result.append(", ");
-      }
-      result.append(d + 1);
+    StringBuilder result = new StringBuilder(100 + 5 * dimensionality).append("Dimensions: [");
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
+      result.append(d + 1).append(", ");
+    }
+    if(result.length() >= 2) { // Un-append ", "
+      result.setLength(result.length() - 2);
     }
     return result.append(']').toString();
   }
@@ -152,12 +129,10 @@ public class Subspace {
   public String dimensonsToString(String sep) {
     StringBuilder result = new StringBuilder(100).append('[');
     for(int dim = BitsUtil.nextSetBit(dimensions, 0); dim >= 0; dim = BitsUtil.nextSetBit(dimensions, dim + 1)) {
-      if(result.length() == 1) {
-        result.append(dim + 1);
-      }
-      else {
-        result.append(sep).append(dim + 1);
-      }
+      result.append(dim + 1).append(sep);
+    }
+    if(result.length() > sep.length()) { // Un-append last separator
+      result.setLength(result.length() - sep.length());
     }
     return result.append(']').toString();
   }
@@ -201,28 +176,13 @@ public class Subspace {
       return null;
     }
 
-    int alloc = MathUtil.max(dimensions.length, other.dimensions.length);
-    long[] resultDimensions = new long[alloc];
-    int last1 = -1, last2 = -1;
-
-    for(int d1 = BitsUtil.nextSetBit(this.dimensions, 0), d2 = BitsUtil.nextSetBit(other.dimensions, 0); //
-        d1 >= 0 && d2 >= 0; //
-        d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
-      if(d1 == d2) {
-        BitsUtil.setI(resultDimensions, d1);
-      }
-      last1 = d1;
-      last2 = d2;
-    }
-
-    if(last1 >= 0 && last2 >= 0 && last1 < last2) {
-      BitsUtil.setI(resultDimensions, last1);
-      BitsUtil.setI(resultDimensions, last2);
-      return resultDimensions;
-    }
-    else {
+    int last1 = BitsUtil.capacity(this.dimensions) - BitsUtil.numberOfLeadingZeros(this.dimensions) - 1;
+    int last2 = BitsUtil.capacity(other.dimensions) - BitsUtil.numberOfLeadingZeros(other.dimensions) - 1;
+    if(last2 < 0 || last1 >= last2) {
       return null;
     }
+    long[] result = BitsUtil.orI(BitsUtil.copy(other.dimensions), this.dimensions);
+    return BitsUtil.cardinality(result) == dimensionality + 1 ? result : null;
   }
 
   /**

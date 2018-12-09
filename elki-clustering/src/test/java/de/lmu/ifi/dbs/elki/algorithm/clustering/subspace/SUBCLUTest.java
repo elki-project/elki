@@ -69,7 +69,7 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINPTS_ID, 70) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    // testFMeasure(db, result, 0.49279033);
-    testClusterSizes(result, new int[] { 99, 247, 303, 323, 437, 459 });
+    // testFMeasure(db, result, 0.9977257761);
+    testClusterSizes(result, new int[] { 99, 247, 303, 437, 459 });
   }
 }
