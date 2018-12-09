@@ -20,16 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEInterval;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUESubspace;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -59,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 import net.jafama.FastMath;
 
 /**
@@ -71,6 +65,9 @@ import net.jafama.FastMath;
  * <p>
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
+ * <p>
+ * Note: this is fairly old code, and not well optimized.
+ * Do not use this for runtime benchmarking!
  * <p>
  * Reference:
  * <p>
@@ -148,7 +145,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     }
     if(LOG.isDebugging()) {
       for(CLIQUESubspace s : denseSubspaces) {
-        LOG.debug(s.toString(" "));
+        LOG.debug(s.toString());
       }
     }
 
@@ -161,7 +158,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
       }
       if(LOG.isDebugging()) {
         for(CLIQUESubspace s : denseSubspaces) {
-          LOG.debug(s.toString(" "));
+          LOG.debug(s.toString());
         }
       }
     }
@@ -285,7 +282,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     List<CLIQUEUnit> units = new ArrayList<>(xsi * dimensionality);
     for(int x = 0; x < xsi; x++) {
       for(int d = 0; d < dimensionality; d++) {
-        units.add(new CLIQUEUnit(new CLIQUEInterval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
+        units.add(new CLIQUEUnit(d, unit_bounds[x][d], unit_bounds[x + 1][d]));
       }
     }
 
@@ -329,34 +326,41 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     double total = database.size();
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       NumberVector featureVector = database.get(it);
+      // FIXME: rather than repeatedly testing, use a clever data structure?
       for(CLIQUEUnit unit : units) {
         unit.addFeatureVector(it, featureVector);
       }
     }
 
+    int dimensionality = RelationUtil.dimensionality(database);
     Collection<CLIQUEUnit> denseUnits = new ArrayList<>();
-    Map<Integer, CLIQUESubspace> denseSubspaces = new HashMap<>();
+    CLIQUESubspace[] denseSubspaces = new CLIQUESubspace[dimensionality];
     for(CLIQUEUnit unit : units) {
       // unit is a dense unit
       if(unit.selectivity(total) >= tau) {
         denseUnits.add(unit);
-        // add the dense unit to its subspace
-        int dim = unit.getIntervals().iterator().next().getDimension();
-        CLIQUESubspace subspace_d = denseSubspaces.get(Integer.valueOf(dim));
+        // add the one-dimensional dense unit to its subspace
+        int dim = unit.getDimension(0);
+        CLIQUESubspace subspace_d = denseSubspaces[dim];
         if(subspace_d == null) {
-          denseSubspaces.put(Integer.valueOf(dim), subspace_d = new CLIQUESubspace(dim));
+          denseSubspaces[dim] = subspace_d = new CLIQUESubspace(dim);
         }
         subspace_d.addDenseUnit(unit);
       }
     }
+    // Omit null values where no dense unit was found:
+    List<CLIQUESubspace> subspaceCandidates = new ArrayList<>(dimensionality);
+    for(CLIQUESubspace s : denseSubspaces) {
+      if(s != null) {
+        subspaceCandidates.add(s);
+      }
+    }
+    Collections.sort(subspaceCandidates, CLIQUESubspace.BY_COVERAGE);
 
     if(LOG.isDebugging()) {
       LOG.debugFine(new StringBuilder().append("   number of 1-dim dense units: ").append(denseUnits.size()) //
-          .append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size()).toString());
+          .append("\n   number of 1-dim dense subspace candidates: ").append(subspaceCandidates.size()).toString());
     }
-
-    List<CLIQUESubspace> subspaceCandidates = new ArrayList<>(denseSubspaces.values());
-    Collections.sort(subspaceCandidates, CLIQUESubspace.BY_COVERAGE);
     return subspaceCandidates;
   }
 

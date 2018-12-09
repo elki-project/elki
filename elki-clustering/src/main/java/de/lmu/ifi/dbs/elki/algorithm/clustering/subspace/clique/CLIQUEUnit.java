@@ -20,15 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Represents a unit in the CLIQUE algorithm.
@@ -41,9 +37,14 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  */
 public class CLIQUEUnit {
   /**
-   * The one-dimensional intervals of which this unit is build.
+   * The dimensions involved in this subspace.
    */
-  private ArrayList<CLIQUEInterval> intervals;
+  private int[] dims;
+
+  /**
+   * The bounding values (min, max) for each dimension.
+   */
+  private double[] bounds;
 
   /**
    * The ids of the feature vectors this unit contains.
@@ -58,11 +59,19 @@ public class CLIQUEUnit {
   /**
    * Creates a new k-dimensional unit for the given intervals.
    * 
-   * @param intervals the intervals belonging to this unit
+   * @param prefix Prefix unit that will be extended by one dimension
+   * @param newdim Additional dimension
+   * @param min Minimum bound
+   * @param max Maximum bound
    * @param ids the ids of the feature vectors belonging to this unit
    */
-  private CLIQUEUnit(ArrayList<CLIQUEInterval> intervals, ModifiableDBIDs ids) {
-    this.intervals = intervals;
+  private CLIQUEUnit(CLIQUEUnit prefix, int newdim, double min, double max, ModifiableDBIDs ids) {
+    int dimensionality = prefix.dims.length + 1;
+    this.dims = Arrays.copyOf(prefix.dims, dimensionality);
+    dims[dimensionality - 1] = newdim;
+    this.bounds = Arrays.copyOf(prefix.bounds, dimensionality << 1);
+    bounds[(dimensionality - 1) << 1] = min;
+    bounds[(dimensionality << 1) - 1] = max;
     this.ids = ids;
     assigned = false;
   }
@@ -70,13 +79,34 @@ public class CLIQUEUnit {
   /**
    * Creates a new one-dimensional unit for the given interval.
    * 
-   * @param interval the interval belonging to this unit
+   * @param dim Dimension
+   * @param min Minimum
+   * @param max MAximum
    */
-  public CLIQUEUnit(CLIQUEInterval interval) {
-    intervals = new ArrayList<>();
-    intervals.add(interval);
+  public CLIQUEUnit(int dim, double min, double max) {
+    dims = new int[] { dim };
+    bounds = new double[] { min, max };
     ids = DBIDUtil.newHashSet();
     assigned = false;
+  }
+
+  /**
+   * Get the dimensionality of this unit.
+   *
+   * @return Number of dimensions constrained.
+   */
+  public int dimensionality() {
+    return dims.length;
+  }
+
+  /**
+   * Get the ith dimension constrained.
+   *
+   * @param i Index
+   * @return dimension
+   */
+  public int getDimension(int i) {
+    return dims[i];
   }
 
   /**
@@ -88,9 +118,9 @@ public class CLIQUEUnit {
    *         vector, false otherwise
    */
   public boolean contains(NumberVector vector) {
-    for(CLIQUEInterval interval : intervals) {
-      final double value = vector.doubleValue(interval.getDimension());
-      if(interval.getMin() > value || value >= interval.getMax()) {
+    for(int i = 0; i < dims.length; i++) {
+      final double value = vector.doubleValue(dims[i]);
+      if(bounds[i << 1] > value || value >= bounds[(i << 1) + 1]) {
         return false;
       }
     }
@@ -135,54 +165,27 @@ public class CLIQUEUnit {
   }
 
   /**
-   * Returns a sorted set of the intervals of which this unit is build.
+   * Returns true if this unit is the left neighbor of the given unit.
    * 
-   * @return a sorted set of the intervals of which this unit is build
+   * @param unit Reference unit
+   * @param d Current dimension
+   * @return true if this unit is the left neighbor of the given unit
    */
-  public ArrayList<CLIQUEInterval> getIntervals() {
-    return intervals;
+  protected boolean containsLeftNeighbor(CLIQUEUnit unit, int d) {
+    final int e = dims.length - 1;
+    return checkDimensions(unit, e) && bounds[(e << 1) + 1] == unit.bounds[e << 1];
   }
 
   /**
-   * Returns the interval of the specified dimension.
+   * Returns true if this unit is the right neighbor of the given unit.
    * 
-   * @param dimension the dimension of the interval to be returned
-   * @return the interval of the specified dimension
+   * @param unit Reference unit
+   * @param d Current dimension
+   * @return true if this unit is the right neighbor of the given unit
    */
-  public CLIQUEInterval getInterval(int dimension) {
-    // TODO: use binary search instead?
-    for(CLIQUEInterval i : intervals) {
-      if(i.getDimension() == dimension) {
-        return i;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns true if this unit contains the left neighbor of the specified
-   * interval.
-   * 
-   * @param i the interval
-   * @return true if this unit contains the left neighbor of the specified
-   *         interval, false otherwise
-   */
-  public boolean containsLeftNeighbor(CLIQUEInterval i) {
-    CLIQUEInterval interval = getInterval(i.getDimension());
-    return (interval != null) && (interval.getMax() == i.getMin());
-  }
-
-  /**
-   * Returns true if this unit contains the right neighbor of the specified
-   * interval.
-   * 
-   * @param i the interval
-   * @return true if this unit contains the right neighbor of the specified
-   *         interval, false otherwise
-   */
-  public boolean containsRightNeighbor(CLIQUEInterval i) {
-    CLIQUEInterval interval = getInterval(i.getDimension());
-    return (interval != null) && (interval.getMin() == i.getMax());
+  protected boolean containsRightNeighbor(CLIQUEUnit unit, int d) {
+    final int e = dims.length - 1;
+    return checkDimensions(unit, e) && bounds[e << 1] == unit.bounds[(e << 1) + 1];
   }
 
   /**
@@ -220,35 +223,43 @@ public class CLIQUEUnit {
    * @return the joined unit if the selectivity of the join result is equal or
    *         greater than tau, null otherwise
    */
-  public CLIQUEUnit join(CLIQUEUnit other, double all, double tau) {
-    CLIQUEInterval i1 = this.intervals.get(this.intervals.size() - 1);
-    CLIQUEInterval i2 = other.intervals.get(other.intervals.size() - 1);
-    if(i1.getDimension() >= i2.getDimension()) {
+  protected CLIQUEUnit join(CLIQUEUnit other, double all, double tau) {
+    if(other.dimensionality() != this.dimensionality()) {
       return null;
     }
-
-    Iterator<CLIQUEInterval> it1 = this.intervals.iterator();
-    Iterator<CLIQUEInterval> it2 = other.intervals.iterator();
-    ArrayList<CLIQUEInterval> resultIntervals = new ArrayList<>();
-    for(int i = 0; i < this.intervals.size() - 1; i++) {
-      i1 = it1.next();
-      i2 = it2.next();
-      if(!i1.equals(i2)) {
-        return null;
-      }
-      resultIntervals.add(i1);
+    // n-1 dimensions must be the same:
+    int e = dims.length - 1;
+    if(!checkDimensions(other, e)) {
+      return null;
     }
-    resultIntervals.add(this.intervals.get(this.intervals.size() - 1));
-    resultIntervals.add(other.intervals.get(other.intervals.size() - 1));
+    if(dims[e] >= other.dims[e]) {
+      return null;
+    }
 
     HashSetModifiableDBIDs resultIDs = DBIDUtil.newHashSet(this.ids);
     resultIDs.retainAll(other.ids);
 
-    if(resultIDs.size() / all >= tau) {
-      return new CLIQUEUnit(resultIntervals, resultIDs);
+    if(resultIDs.size() / all < tau) {
+      return null;
     }
+    return new CLIQUEUnit(this, other.dims[e], other.bounds[e << 1], other.bounds[(e << 1) + 1], resultIDs);
+  }
 
-    return null;
+  /**
+   * Check that the first e dimensions agree.
+   *
+   * @param other Other unit
+   * @param e Number of dimensions to check
+   * @return {@code true} if the first e dimensions are the same (index and
+   *         bounds)
+   */
+  private boolean checkDimensions(CLIQUEUnit other, int e) {
+    for(int i = 0, j = 0; i < e; i++, j += 2) {
+      if(dims[i] != other.dims[i] || bounds[j] != other.bounds[j] || bounds[j + 1] != bounds[j + 1]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -259,11 +270,15 @@ public class CLIQUEUnit {
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    for(CLIQUEInterval interval : intervals) {
-      result.append(interval).append(' ');
+    StringBuilder result = new StringBuilder(dims.length * 100);
+    for(int i = 0; i < dims.length; i++) {
+      result.append('d').append(dims[i]) //
+          .append(":[").append(FormatUtil.NF4.format(bounds[i << 1])) //
+          .append("; ").append(FormatUtil.NF4.format(bounds[(i << 1) + 1])).append(") ");
     }
-
+    if(result.length() > 1) {
+      result.setLength(result.length() - 1);
+    }
     return result.toString();
   }
 }

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -80,14 +79,12 @@ public class CLIQUESubspace extends Subspace {
    * @param unit the unit to be added.
    */
   public void addDenseUnit(CLIQUEUnit unit) {
-    Collection<CLIQUEInterval> intervals = unit.getIntervals();
-    for(CLIQUEInterval interval : intervals) {
-      if(!BitsUtil.get(getDimensions(), interval.getDimension())) {
-        throw new IllegalArgumentException("Unit " + unit + "cannot be added to this subspace, because of wrong dimensions!");
-      }
+    int numdim = unit.dimensionality();
+    for(int i = 0; i < numdim; i++) {
+      BitsUtil.setI(getDimensions(), unit.getDimension(i));
     }
 
-    getDenseUnits().add(unit);
+    denseUnits.add(unit);
     coverage += unit.numberOfFeatureVectors();
   }
 
@@ -100,7 +97,7 @@ public class CLIQUESubspace extends Subspace {
   public List<Pair<Subspace, ModifiableDBIDs>> determineClusters() {
     List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<>();
 
-    for(CLIQUEUnit unit : getDenseUnits()) {
+    for(CLIQUEUnit unit : denseUnits) {
       if(!unit.isAssigned()) {
         ModifiableDBIDs cluster = DBIDUtil.newHashSet();
         CLIQUESubspace model = new CLIQUESubspace(getDimensions());
@@ -146,11 +143,9 @@ public class CLIQUESubspace extends Subspace {
    * @param dim the dimension
    * @return the left neighbor of the given unit in the specified dimension
    */
-  public CLIQUEUnit leftNeighbor(CLIQUEUnit unit, int dim) {
-    CLIQUEInterval i = unit.getInterval(dim);
-
-    for(CLIQUEUnit u : getDenseUnits()) {
-      if(u.containsLeftNeighbor(i)) {
+  protected CLIQUEUnit leftNeighbor(CLIQUEUnit unit, int dim) {
+    for(CLIQUEUnit u : denseUnits) {
+      if(u.containsLeftNeighbor(unit, dim)) {
         return u;
       }
     }
@@ -164,11 +159,9 @@ public class CLIQUESubspace extends Subspace {
    * @param dim the dimension
    * @return the right neighbor of the given unit in the specified dimension
    */
-  public CLIQUEUnit rightNeighbor(CLIQUEUnit unit, Integer dim) {
-    CLIQUEInterval i = unit.getInterval(dim);
-
-    for(CLIQUEUnit u : getDenseUnits()) {
-      if(u.containsRightNeighbor(i)) {
+  protected CLIQUEUnit rightNeighbor(CLIQUEUnit unit, int dim) {
+    for(CLIQUEUnit u : denseUnits) {
+      if(u.containsRightNeighbor(unit, dim)) {
         return u;
       }
     }
@@ -183,13 +176,6 @@ public class CLIQUESubspace extends Subspace {
    */
   public int getCoverage() {
     return coverage;
-  }
-
-  /**
-   * @return the denseUnits
-   */
-  public List<CLIQUEUnit> getDenseUnits() {
-    return denseUnits;
   }
 
   /**
@@ -213,15 +199,15 @@ public class CLIQUESubspace extends Subspace {
     }
 
     CLIQUESubspace s = new CLIQUESubspace(dimensions);
-    for(CLIQUEUnit u1 : this.getDenseUnits()) {
-      for(CLIQUEUnit u2 : other.getDenseUnits()) {
+    for(CLIQUEUnit u1 : this.denseUnits) {
+      for(CLIQUEUnit u2 : other.denseUnits) {
         CLIQUEUnit u = u1.join(u2, all, tau);
         if(u != null) {
           s.addDenseUnit(u);
         }
       }
     }
-    if(s.getDenseUnits().isEmpty()) {
+    if(s.denseUnits.isEmpty()) {
       return null;
     }
     return s;
@@ -232,13 +218,13 @@ public class CLIQUESubspace extends Subspace {
    * units of this subspace.
    */
   @Override
-  public String toString(String pre) {
+  public String toString() {
     StringBuilder result = new StringBuilder() //
-        .append(super.toString(pre)) //
-        .append('\n').append(pre).append("Coverage: ").append(coverage) //
-        .append('\n').append(pre).append("Units: \n");
-    for(CLIQUEUnit denseUnit : getDenseUnits()) {
-      result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
+        .append(super.toString()) //
+        .append("\nCoverage: ").append(coverage) //
+        .append("\nUnits: \n");
+    for(CLIQUEUnit denseUnit : denseUnits) {
+      result.append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }
     return result.toString();
   }
