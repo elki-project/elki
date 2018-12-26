@@ -248,6 +248,15 @@ public class MeanVariance extends Mean {
   }
 
   /**
+   * Get the sum of squares.
+   *
+   * @return sum of squared deviations
+   */
+  public double getSumOfSquares() {
+    return m2;
+  }
+
+  /**
    * Return standard deviation using the non-sample variance
    * 
    * Note: usually, you should be using {@link #getSampleStddev} instead!
