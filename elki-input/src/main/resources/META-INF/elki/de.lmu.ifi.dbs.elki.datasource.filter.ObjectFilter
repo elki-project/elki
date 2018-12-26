@@ -7,6 +7,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.MultivariateTimeSeriesFilt
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SparseVectorFieldFilter de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SplitNumberVectorFilter de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.FilterByLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.selection.FirstNStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.ShuffleObjectsFilter de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.SortByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter
