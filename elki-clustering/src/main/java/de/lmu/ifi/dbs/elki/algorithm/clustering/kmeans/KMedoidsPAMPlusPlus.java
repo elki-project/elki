@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.LinearBUILDInitialMeans;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -325,7 +325,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
     @SuppressWarnings("rawtypes")
     @Override
     protected Class<? extends KMedoidsInitialization> defaultInitializer() {
-      return KMeansPlusPlusInitialMeans.class;
+      return LinearBUILDInitialMeans.class;
     }
 
     @Override

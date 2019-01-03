@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
@@ -141,40 +140,8 @@ public class OstrovskyInitialMeans<O> extends AbstractKMeansInitialization {
     // Initialize weights
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
     double weightsum = initialWeights(weights, relation, ids, firstvec, secondvec, distQ);
-    while(true) {
-      if(weightsum > Double.MAX_VALUE) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
-      }
-      if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
-      }
-      double rn = random.nextDouble() * weightsum;
-      DBIDIter it = ids.iter();
-      while(it.valid()) {
-        if((rn -= weights.doubleValue(it)) < 0) {
-          break;
-        }
-        it.advance();
-      }
-      if(!it.valid()) { // Rare case, but happens due to floating math
-        weightsum -= rn; // Decrease
-        continue; // Retry
-      }
-      // Add new mean:
-      final NumberVector newmean = relation.get(it);
-      means.add(newmean);
-      if(means.size() >= k) {
-        break;
-      }
-      // Update weights:
-      weights.putDouble(it, 0.);
-      // Choose optimized version for double distances, if applicable.
-      weightsum = updateWeights(weights, ids, newmean, distQ);
-    }
-
-    // Explicitly destroy temporary data.
+    KMeansPlusPlusInitialMeans.chooseRemaining(relation, ids, distQ, k, means, weights, weightsum, random);
     weights.destroy();
-
     return unboxVectors(means);
   }
 
@@ -190,40 +157,13 @@ public class OstrovskyInitialMeans<O> extends AbstractKMeansInitialization {
    * @return Weight sum
    * @param <T> Object type
    */
-  protected <T> double initialWeights(WritableDoubleDataStore weights, Relation<? extends T> relation, DBIDs ids, T first, T second, DistanceQuery<? super T> distQ) {
+  protected static <T> double initialWeights(WritableDoubleDataStore weights, Relation<? extends T> relation, DBIDs ids, T first, T second, DistanceQuery<? super T> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      // Distance will usually already be squared
+      // distance will usually already be squared
       T v = relation.get(it);
       double weight = Math.min(distQ.distance(first, v), distQ.distance(second, v));
       weights.putDouble(it, weight);
-      weightsum += weight;
-    }
-    return weightsum;
-  }
-
-  /**
-   * Update the weight list.
-   *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param latest Added ID
-   * @param distQ Distance query
-   * @return Weight sum
-   * @param <T> Object type
-   */
-  protected <T> double updateWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      double weight = weights.doubleValue(it);
-      if(weight <= 0.) {
-        continue; // Duplicate, or already chosen.
-      }
-      double newweight = distQ.distance(latest, it);
-      if(newweight < weight) {
-        weights.putDouble(it, newweight);
-        weight = newweight;
-      }
       weightsum += weight;
     }
     return weightsum;

@@ -77,26 +77,100 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization 
     @SuppressWarnings("unchecked")
     DistanceQuery<NumberVector> distQ = database.getDistanceQuery((Relation<NumberVector>) relation, (NumberVectorDistanceFunction<NumberVector>) distanceFunction);
 
-    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
-
     // Chose first mean
-    List<NumberVector> means = new ArrayList<>(k);
-
     Random random = rnd.getSingleThreadedRandom();
     DBIDRef first = DBIDUtil.randomSample(ids, random);
     NumberVector firstvec = relation.get(first);
+    List<NumberVector> means = new ArrayList<>(k);
     means.add(firstvec);
 
     // Initialize weights
+    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
     double weightsum = initialWeights(weights, ids, firstvec, distQ);
+    chooseRemaining(relation, ids, distQ, k, means, weights, weightsum, random);
+    weights.destroy();
+    return unboxVectors(means);
+  }
+
+  @Override
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
+    Random random = rnd.getSingleThreadedRandom();
+    DBIDRef first = DBIDUtil.randomSample(ids, random);
+    ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
+    means.add(first);
+
+    // Initialize weights
+    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
+    double weightsum = initialWeights(weights, ids, first, distQ);
+    chooseRemaining(ids, distQ, k, means, weights, weightsum, random);
+    weights.destroy();
+    return means;
+  }
+
+  /**
+   * Initialize the weight list.
+   *
+   * @param weights Weight list
+   * @param ids IDs
+   * @param first Added ID
+   * @param distQ Distance query
+   * @return Weight sum
+   */
+  static double initialWeights(WritableDoubleDataStore weights, DBIDs ids, NumberVector first, DistanceQuery<? super NumberVector> distQ) {
+    double weightsum = 0.;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      // Distance will usually already be squared
+      double weight = distQ.distance(first, it);
+      weights.putDouble(it, weight);
+      weightsum += weight;
+    }
+    return weightsum;
+  }
+
+  /**
+   * Initialize the weight list.
+   *
+   * @param weights Weight list
+   * @param ids IDs
+   * @param latest Added ID
+   * @param distQ Distance query
+   * @return Weight sum
+   */
+  static double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
+    double weightsum = 0.;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      // Distance will usually already be squared
+      double weight = distQ.distance(latest, it);
+      weights.putDouble(it, weight);
+      weightsum += weight;
+    }
+    return weightsum;
+  }
+
+  /**
+   * Choose remaining means, weighted by distance.
+   *
+   * @param relation Data relation
+   * @param ids IDs
+   * @param distQ Distance function
+   * @param k Number of means to choose
+   * @param means Means storage
+   * @param weights Weights (initialized!)
+   * @param weightsum Sum of weights
+   * @param random Random generator
+   */
+  static void chooseRemaining(Relation<? extends NumberVector> relation, DBIDs ids, DistanceQuery<NumberVector> distQ, int k, List<NumberVector> means, WritableDoubleDataStore weights, double weightsum, Random random) {
     while(true) {
       if(weightsum > Double.MAX_VALUE) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
+        throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
       }
       if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
+        LoggingUtil.warning("Could not choose a reasonable mean - to few data points?");
       }
       double r = random.nextDouble() * weightsum;
+      while(r <= 0 && weightsum > Double.MIN_NORMAL) {
+        r = random.nextDouble() * weightsum; // Try harder to not choose 0.
+      }
       DBIDIter it = ids.iter();
       while(it.valid()) {
         if((r -= weights.doubleValue(it)) < 0) {
@@ -116,37 +190,28 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization 
       }
       // Update weights:
       weights.putDouble(it, 0.);
-      // Choose optimized version for double distances, if applicable.
       weightsum = updateWeights(weights, ids, newmean, distQ);
     }
-
-    // Explicitly destroy temporary data.
-    weights.destroy();
-
-    return unboxVectors(means);
   }
 
-  @Override
-  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> rel = (Relation<O>) distQ.getRelation();
-
-    ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
-
-    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
-
-    Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(ids, random);
-    means.add(first);
-
-    // Initialize weights
-    double weightsum = initialWeights(weights, ids, rel.get(first), distQ);
+  /**
+   * Choose remaining means, weighted by distance.
+   *
+   * @param ids IDs
+   * @param distQ Distance function
+   * @param k Number of means to choose
+   * @param means Means storage
+   * @param weights Weights (initialized!)
+   * @param weightsum Sum of weights
+   * @param random Random generator
+   */
+  static void chooseRemaining(DBIDs ids, DistanceQuery<?> distQ, int k, ArrayModifiableDBIDs means, WritableDoubleDataStore weights, double weightsum, Random random) {
     while(true) {
       if(weightsum > Double.MAX_VALUE) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
+        throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
       }
       if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few unique data points?");
+        LoggingUtil.warning("Could not choose a reasonable mean - to few data points?");
       }
       double r = random.nextDouble() * weightsum;
       while(r <= 0 && weightsum > Double.MIN_NORMAL) {
@@ -170,29 +235,31 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization 
       }
       // Update weights:
       weights.putDouble(it, 0.);
-      weightsum = updateWeights(weights, ids, rel.get(it), distQ);
+      weightsum = updateWeights(weights, ids, it, distQ);
     }
-
-    return means;
-
   }
 
   /**
-   * Initialize the weight list.
+   * Update the weight list.
    *
    * @param weights Weight list
    * @param ids IDs
    * @param latest Added ID
    * @param distQ Distance query
    * @return Weight sum
-   * @param <T> Object type
    */
-  protected <T> double initialWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
+  private static double updateWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      // Distance will usually already be squared
-      double weight = distQ.distance(latest, it);
-      weights.putDouble(it, weight);
+      double weight = weights.doubleValue(it);
+      if(weight <= 0.) {
+        continue; // Duplicate, or already chosen.
+      }
+      double newweight = distQ.distance(latest, it);
+      if(newweight < weight) {
+        weights.putDouble(it, newweight);
+        weight = newweight;
+      }
       weightsum += weight;
     }
     return weightsum;
@@ -206,9 +273,8 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization 
    * @param latest Added ID
    * @param distQ Distance query
    * @return Weight sum
-   * @param <T> Object type
    */
-  protected <T> double updateWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
+  private static double updateWeights(WritableDoubleDataStore weights, DBIDs ids, NumberVector latest, DistanceQuery<? super NumberVector> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       double weight = weights.doubleValue(it);
