@@ -133,7 +133,6 @@ public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
       LOG.ensureCompleted(prog);
       medids.add(bestid);
     }
-    assert (mindist != null);
 
     // Subsequent means optimize the full criterion.
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial centers", k, LOG) : null;
@@ -160,7 +159,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
         }
       }
       if(!bestid.isSet()) {
-        throw new AbortException("No median found that improves the criterion function?!? Too many infinite distances.");
+        throw new AbortException("No medoid found that improves the criterion function?!? Too many infinite distances.");
       }
       medids.add(bestid);
       // Swap bestd and mindist:
