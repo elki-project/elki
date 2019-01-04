@@ -45,8 +45,8 @@ public class LinearBUILDInitialMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 5) //
         .with(KMeans.INIT_ID, LinearBUILDInitialMeans.class) //
         .build().run(db);
-    testFMeasure(db, result, 0.973);
-    testClusterSizes(result, new int[] { 186, 200, 200, 200, 214 });
+    testFMeasure(db, result, 0.9901);
+    testClusterSizes(result, new int[] { 195, 200, 200, 200, 205 });
   }
 
   @Test

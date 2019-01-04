@@ -106,32 +106,36 @@ public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoid
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
+    DBIDArrayIter mi = medids.iter();
     Random rand = rnd.getSingleThreadedRandom();
     // O(sqrt(n)) sample if k^2 < n.
     int ssize = Math.min(ids.size(), 10 + (int) Math.ceil(Math.sqrt(ids.size())));
 
-    DBIDVar bestid = DBIDUtil.newVar();
     // We need three temporary storage arrays:
     WritableDoubleDataStore mindist, bestd, tempd;
-    mindist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    bestd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    tempd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    mindist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.NaN);
+    bestd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.NaN);
+    tempd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.NaN);
 
-    ArrayDBIDs sample = DBIDUtil.ensureArray(DBIDUtil.randomSample(ids, ssize, rand));
+    ArrayModifiableDBIDs sample = DBIDUtil.newArray(ids);
     DBIDArrayIter i = sample.iter(), j = sample.iter();
+    int range = sample.size();
+    shuffle(sample, ssize, range, rand);
     // First mean is chosen by having the smallest distance sum to all others.
     {
       double best = Double.POSITIVE_INFINITY;
-      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial mean", sample.size(), LOG) : null;
-      for(i.seek(0); i.valid(); i.advance()) {
+      int bestoff = -1;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial mean", ssize, LOG) : null;
+      for(i.seek(0); i.getOffset() < ssize; i.advance()) {
         double sum = 0, d;
-        for(j.seek(0); j.valid(); j.advance()) {
+        tempd.clear();
+        for(j.seek(0); j.getOffset() < ssize; j.advance()) {
           sum += d = distQ.distance(i, j);
           tempd.putDouble(j, d);
         }
         if(sum < best) {
           best = sum;
-          bestid.set(i);
+          bestoff = i.getOffset();
           // Swap mindist and newd:
           WritableDoubleDataStore temp = mindist;
           mindist = tempd;
@@ -140,37 +144,47 @@ public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoid
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      medids.add(bestid);
+      medids.add(i.seek(bestoff));
+      sample.swap(bestoff, --range);
     }
 
     // Subsequent means optimize the full criterion.
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial centers", k, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial medoids", k, LOG) : null;
     LOG.incrementProcessed(prog); // First one was just chosen.
     while(medids.size() < k) {
+      // New sample
+      ssize = range < ssize ? range : ssize;
+      shuffle(sample, ssize, range, rand);
       double best = Double.POSITIVE_INFINITY;
-      bestid.unset();
-      for(i.seek(0); i.valid(); i.advance()) {
+      int bestoff = -1;
+      for(i.seek(0); i.getOffset() < ssize; i.advance()) {
         if(medids.contains(i)) {
           continue;
         }
         double sum = 0., v;
-        for(j.seek(0); j.valid(); j.advance()) {
-          sum += v = MathUtil.min(distQ.distance(i, j), mindist.doubleValue(j));
+        tempd.clear();
+        for(j.seek(0); j.getOffset() < ssize; j.advance()) {
+          double prev = getMinDist(j, distQ, mi, mindist);
+          if(prev == 0) {
+            continue;
+          }
+          sum += v = MathUtil.min(distQ.distance(i, j), prev);
           tempd.put(j, v);
         }
         if(sum < best) {
           best = sum;
-          bestid.set(i);
+          bestoff = i.getOffset();
           // Swap bestd and newd:
           WritableDoubleDataStore temp = bestd;
           bestd = tempd;
           tempd = temp;
         }
       }
-      if(!bestid.isSet()) {
+      if(bestoff < 0) {
         throw new AbortException("No medoid found that improves the criterion function?!? Too many infinite distances.");
       }
-      medids.add(bestid);
+      medids.add(i.seek(bestoff));
+      sample.swap(bestoff, --range);
       // Swap bestd and mindist:
       WritableDoubleDataStore temp = bestd;
       bestd = mindist;
@@ -183,6 +197,43 @@ public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoid
     bestd.destroy();
     tempd.destroy();
     return medids;
+  }
+
+  /**
+   * Get the minimum distance to previous medoids.
+   *
+   * @param j current object
+   * @param distQ distance query
+   * @param mi medoid iterator
+   * @param mindist distance storage
+   * @return minimum distance
+   */
+  protected static double getMinDist(DBIDArrayIter j, DistanceQuery<?> distQ, DBIDArrayIter mi, WritableDoubleDataStore mindist) {
+    double prev = mindist.doubleValue(j);
+    if(prev != prev) { // NaN = unknown
+      prev = Double.POSITIVE_INFINITY;
+      for(mi.seek(0); mi.valid(); mi.advance()) {
+        double d = distQ.distance(j, mi);
+        prev = d < prev ? d : prev;
+      }
+      mindist.putDouble(j, prev);
+    }
+    return prev;
+  }
+
+  /**
+   * Partial Fisher-Yates shuffle.
+   *
+   * @param sample Sample array
+   * @param ssize sample size to generate
+   * @param end Valid range
+   * @param random Random generator
+   */
+  private static void shuffle(ArrayModifiableDBIDs ids, int ssize, int end, Random random) {
+    ssize = ssize < end ? ssize : end; // Guard for choosing from tiny sets
+    for(int i = 1; i < ssize; i++) {
+      ids.swap(i - 1, i + random.nextInt(end - i));
+    }
   }
 
   /**
