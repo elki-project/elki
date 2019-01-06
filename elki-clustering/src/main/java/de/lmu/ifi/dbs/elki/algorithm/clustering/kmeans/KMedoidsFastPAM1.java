@@ -31,18 +31,20 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * PAM+: A version of PAM that is O(k) times faster, i.e., now in O((n-k)²).
+ * FastPAM1: A version of PAM that is O(k) times faster, i.e., now in O((n-k)²).
  * The change here feels pretty small - we handle all k medoids in parallel
  * using an array. But this means the innermost loop only gets executed in
  * O(1/k) of all iterations, and thus we benefit on average.
  * <p>
  * This acceleration gives <em>exactly</em> (assuming perfect numerical
  * accuracy) the same results as the original PAM. For further improvements that
- * can affect the result, see also {@link KMedoidsPAMPlusPlus}.
+ * can affect the result, see also {@link KMedoidsFastPAM}, which is recommended
+ * for usage in practice.
  * <p>
  * Reference:
  * <p>
@@ -60,16 +62,17 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
     booktitle = "preprint, to appear", //
     url = "https://arxiv.org/abs/1810.05691", //
     bibkey = "DBLP:journals/corr/abs-1810-05691")
-public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
+@Priority(Priority.SUPPLEMENTARY) // Use FastPAM instead
+public class KMedoidsFastPAM1<V> extends KMedoidsPAM<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsPAMPlus.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsFastPAM1.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsPAMPlus.class.getName();
+  private static final String KEY = KMedoidsFastPAM1.class.getName();
 
   /**
    * Constructor.
@@ -79,7 +82,7 @@ public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAMPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsFastPAM1(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -352,8 +355,8 @@ public class KMedoidsPAMPlus<V> extends KMedoidsPAM<V> {
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
     @Override
-    protected KMedoidsPAMPlus<V> makeInstance() {
-      return new KMedoidsPAMPlus<>(distanceFunction, k, maxiter, initializer);
+    protected KMedoidsFastPAM1<V> makeInstance() {
+      return new KMedoidsFastPAM1<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

@@ -30,21 +30,35 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Performs a full PAM run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that PAM's performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
+ * Regression test for CLARANS+
  *
  * @author Erich Schubert
  */
-public class KMedoidsPAMPlusTest extends AbstractClusterAlgorithmTest {
+public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testKMedoidsPAM() {
+  public void testCLARANS() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMPlus<DoubleVector>>(KMedoidsPAMPlus.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 5) //
+        .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
+        .with(CLARANS.Parameterizer.NEIGHBORS_ID, 3) //
+        .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
         .build().run(db);
-    testFMeasure(db, result, 0.998005);
+    // FastCLARANS finds better solution than CLARANS in this unit test!
+    testFMeasure(db, result, .998);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  @Test
+  public void testCLARANSNoise() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
+        .with(KMeans.K_ID, 3) //
+        .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
+        .with(CLARANS.Parameterizer.NEIGHBORS_ID, .1) //
+        .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
+        .build().run(db);
+    testFMeasure(db, result, 0.913858);
+    testClusterSizes(result, new int[] { 57, 115, 158 });
   }
 }

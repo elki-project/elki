@@ -37,11 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class KMedoidsPAMPlusPlusTest extends AbstractClusterAlgorithmTest {
+public class KMedoidsFastPAMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsPAM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPAMPlusPlus<DoubleVector>>(KMedoidsPAMPlusPlus.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsFastPAM<DoubleVector>>(KMedoidsFastPAM.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 0) //
         .build().run(db);

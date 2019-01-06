@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Clustering Large Applications (CLARA) with the {@link KMedoidsPAMPlusPlus}
+ * Clustering Large Applications (CLARA) with the {@link KMedoidsFastPAM}
  * improvements, to increase scalability in the number of clusters. This variant
  * will also default to twice the sample size, to improve quality.
  * <p>
@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "preprint, to appear", //
     url = "https://arxiv.org/abs/1810.05691", //
     bibkey = "DBLP:journals/corr/abs-1810-05691")
-public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
+public class FastCLARA<V> extends KMedoidsFastPAM<V> {
   /**
    * Class logger.
    */
@@ -184,7 +184,7 @@ public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends KMedoidsPAMPlusPlus.Parameterizer<V> {
+  public static class Parameterizer<V> extends KMedoidsFastPAM.Parameterizer<V> {
     /**
      * The number of samples to run.
      */

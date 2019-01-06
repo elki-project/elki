@@ -40,10 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Linear BUILD initialization for PAM (and k-means).
+ * Linear approximative BUILD (LAB) initialization for FastPAM (and k-means).
  * <p>
  * This is a O(nk) aproximation of the original PAM BUILD. For performance, it
- * uses an O(sqrt(n)) sample to achieve linear run time.
+ * uses an O(sqrt(n)) sample to achieve linear run time. The results will be
+ * worse than those of BUILD, but provide a good starting point for FastPAM
+ * optimization.
  * <p>
  * Reference:
  * <p>
@@ -61,11 +63,11 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     booktitle = "preprint, to appear", //
     url = "https://arxiv.org/abs/1810.05691", //
     bibkey = "DBLP:journals/corr/abs-1810-05691")
-public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoidsInitialization<O> {
+public class LABInitialMeans<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(LinearBUILDInitialMeans.class);
+  private static final Logging LOG = Logging.getLogger(LABInitialMeans.class);
 
   /**
    * Random generator
@@ -77,7 +79,7 @@ public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoid
    * 
    * @param rnd Random generator
    */
-  public LinearBUILDInitialMeans(RandomFactory rnd) {
+  public LABInitialMeans(RandomFactory rnd) {
     super();
     this.rnd = rnd;
   }
@@ -243,8 +245,8 @@ public class LinearBUILDInitialMeans<O> implements KMeansInitialization, KMedoid
    */
   public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
     @Override
-    protected LinearBUILDInitialMeans<V> makeInstance() {
-      return new LinearBUILDInitialMeans<>(rnd);
+    protected LABInitialMeans<V> makeInstance() {
+      return new LABInitialMeans<>(rnd);
     }
   }
 }

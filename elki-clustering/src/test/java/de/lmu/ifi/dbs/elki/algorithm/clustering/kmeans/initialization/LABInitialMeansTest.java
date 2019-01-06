@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class LinearBUILDInitialMeansTest extends AbstractClusterAlgorithmTest {
+public class LABInitialMeansTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testLinearBUILDInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 5) //
-        .with(KMeans.INIT_ID, LinearBUILDInitialMeans.class) //
+        .with(KMeans.INIT_ID, LABInitialMeans.class) //
         .build().run(db);
     testFMeasure(db, result, 0.9901);
     testClusterSizes(result, new int[] { 195, 200, 200, 200, 205 });
@@ -55,7 +55,7 @@ public class LinearBUILDInitialMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 5) //
-        .with(KMeans.INIT_ID, LinearBUILDInitialMeans.class) //
+        .with(KMeans.INIT_ID, LABInitialMeans.class) //
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Parameterizer.NOKEEPMED_ID) //
         .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //

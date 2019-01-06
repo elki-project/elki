@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.LinearBUILDInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.LABInitialMeans;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -40,11 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * An improved version of PAM, that is usually O(k) times faster. This class
- * incorporates the benefits of {@link KMedoidsPAMPlus}, but in addition it
- * tries to perform multiple swaps in each iteration, which can reduce the total
- * number of iterations needed substantially for large k, if some areas of the
- * data are largely independent.
+ * FastPAM: An improved version of PAM, that is usually O(k) times faster. This
+ * class incorporates the benefits of {@link KMedoidsFastPAM1}, but in addition
+ * it tries to perform multiple swaps in each iteration (FastPAM2), which can
+ * reduce the total number of iterations needed substantially for large k, if
+ * some areas of the data are largely independent.
  * <p>
  * There is a tolerance parameter, which controls how many additional swaps are
  * performed. When set to 0, it will only execute an additional swap if it
@@ -56,8 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * <p>
  * Because of the speed benefits, we also suggest to use a linear-time
  * initialization, such as the k-means++ initialization or the proposed
- * LinearBUILD ("FastPAM3", default) initialization, and try multiple times if
- * the runtime permits.
+ * LAB (linear approximative BUILD, the third component of FastPAM)
+ * initialization, and try multiple times if the runtime permits.
  * <p>
  * Reference:
  * <p>
@@ -76,16 +76,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "preprint, to appear", //
     url = "https://arxiv.org/abs/1810.05691", //
     bibkey = "DBLP:journals/corr/abs-1810-05691")
-public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
+public class KMedoidsFastPAM<V> extends KMedoidsFastPAM1<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsPAMPlusPlus.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsFastPAM.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsPAMPlusPlus.class.getName();
+  private static final String KEY = KMedoidsFastPAM.class.getName();
 
   /**
    * Tolerance for fast swapping behavior (may perform worse swaps).
@@ -100,7 +100,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAMPlusPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsFastPAM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     this(distanceFunction, k, maxiter, initializer, 1.);
   }
 
@@ -113,7 +113,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
-  public KMedoidsPAMPlusPlus(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+  public KMedoidsFastPAM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
     super(distanceFunction, k, maxiter, initializer);
     this.fasttol = fasttol;
   }
@@ -128,7 +128,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    *
    * @author Erich Schubert
    */
-  protected static class Instance extends KMedoidsPAMPlus.Instance {
+  protected static class Instance extends KMedoidsFastPAM1.Instance {
     /**
      * Tolerance for fast swapping behavior (may perform worse swaps).
      */
@@ -313,7 +313,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends KMedoidsPAMPlus.Parameterizer<V> {
+  public static class Parameterizer<V> extends KMedoidsFastPAM1.Parameterizer<V> {
     /**
      * Tolerance for performing additional swaps.
      */
@@ -327,7 +327,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
     @SuppressWarnings("rawtypes")
     @Override
     protected Class<? extends KMedoidsInitialization> defaultInitializer() {
-      return LinearBUILDInitialMeans.class;
+      return LABInitialMeans.class;
     }
 
     @Override
@@ -342,8 +342,8 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
     }
 
     @Override
-    protected KMedoidsPAMPlusPlus<V> makeInstance() {
-      return new KMedoidsPAMPlusPlus<>(distanceFunction, k, maxiter, initializer, fasttol);
+    protected KMedoidsFastPAM<V> makeInstance() {
+      return new KMedoidsFastPAM<>(distanceFunction, k, maxiter, initializer, fasttol);
     }
   }
 }

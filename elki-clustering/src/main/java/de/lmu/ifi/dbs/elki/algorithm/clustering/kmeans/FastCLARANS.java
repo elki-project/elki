@@ -65,11 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
     url = "https://arxiv.org/abs/1810.05691", //
     bibkey = "DBLP:journals/corr/abs-1810-05691")
 @Priority(Priority.IMPORTANT + 1)
-public class CLARANSPlus<V> extends CLARANS<V> {
+public class FastCLARANS<V> extends CLARANS<V> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(CLARANSPlus.class);
+  private static final Logging LOG = Logging.getLogger(FastCLARANS.class);
 
   /**
    * Constructor.
@@ -80,7 +80,7 @@ public class CLARANSPlus<V> extends CLARANS<V> {
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
    */
-  public CLARANSPlus(DistanceFunction<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
+  public FastCLARANS(DistanceFunction<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
     super(distanceFunction, k, numlocal, maxneighbor, random);
   }
 
@@ -332,8 +332,8 @@ public class CLARANSPlus<V> extends CLARANS<V> {
     }
 
     @Override
-    protected CLARANSPlus<V> makeInstance() {
-      return new CLARANSPlus<>(distanceFunction, k, numlocal, maxneighbor, random);
+    protected FastCLARANS<V> makeInstance() {
+      return new FastCLARANS<>(distanceFunction, k, numlocal, maxneighbor, random);
     }
   }
 }
