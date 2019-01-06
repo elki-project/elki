@@ -49,44 +49,35 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Clustering Large Applications (CLARA) is a clustering method for large data
- * sets based on PAM, partitioning around medoids ({@link KMedoidsPAM}) based on
- * sampling.
+ * Clustering Large Applications (CLARA) with the {@link KMedoidsPAMPlusPlus}
+ * improvements, to increase scalability in the number of clusters. This variant
+ * will also default to twice the sample size, to improve quality.
  * <p>
  * Reference:
  * <p>
- * L. Kaufman, P. J. Rousseeuw<br>
- * Clustering Large Data Sets<br>
- * Pattern Recognition in Practice
- * <p>
- * L. Kaufman, P. J. Rousseeuw<br>
- * Clustering Large Applications (Program CLARA)<br>
- * Finding Groups in Data: An Introduction to Cluster Analysis
- *
+ * Erich Schubert, Peter J. Rousseeuw<br>
+ * Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS
+ * Algorithms<br>
+ * preprint, to appear
+ * 
  * FIXME: precompute distance matrixes for each sample, for better performance!
  *
  * @author Erich Schubert
- * @since 0.7.0
  *
  * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
  *
  * @param <V> Data type
  */
-@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
-    title = "Clustering Large Data Sets", //
-    booktitle = "Pattern Recognition in Practice", //
-    url = "https://doi.org/10.1016/B978-0-444-87877-9.50039-X", //
-    bibkey = "doi:10.1016/B978-0-444-87877-9.50039-X")
-@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
-    title = "Clustering Large Applications (Program CLARA)", //
-    booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
-    url = "https://doi.org/10.1002/9780470316801.ch3", //
-    bibkey = "doi:10.1002/9780470316801.ch3")
-public class CLARA<V> extends KMedoidsPAM<V> {
+@Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
+    title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "preprint, to appear", //
+    url = "https://arxiv.org/abs/1810.05691", //
+    bibkey = "DBLP:journals/corr/abs-1810-05691")
+public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(CLARA.class);
+  private static final Logging LOG = Logging.getLogger(FastCLARA.class);
 
   /**
    * Sampling rate. If less than 1, it is considered to be a relative value.
@@ -120,8 +111,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * @param keepmed Keep the previous medoids in the next sample
    * @param random Random generator
    */
-  public CLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
-    super(distanceFunction, k, maxiter, initializer);
+  public FastCLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
+    super(distanceFunction, k, maxiter, initializer, fasttol);
     this.numsamples = numsamples;
     this.sampling = sampling;
     this.random = random;
@@ -147,15 +138,15 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     Random rnd = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
-      DBIDs rids = randomSample(ids, samplesize, rnd, keepmed ? bestmedoids : null);
+      DBIDs rids = CLARA.randomSample(ids, samplesize, rnd, keepmed ? bestmedoids : null);
       // FIXME: precompute and use a distance matrix for this sample!
 
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store
       WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-      double score = new /* PAM */Instance(distQ, rids, assignment).run(medoids, maxiter) //
-          + assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
+      double score = new /* PAM */Instance(distQ, rids, assignment, fasttol).run(medoids, maxiter) //
+          + CLARA.assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".sample-" + j + ".cost", score));
       }
@@ -183,93 +174,30 @@ public class CLARA<V> extends KMedoidsPAM<V> {
   }
 
   /**
-   * Draw a random sample of the desired size.
-   * 
-   * @param ids IDs to sample from
-   * @param samplesize Sample size
-   * @param rnd Random generator
-   * @param previous Previous medoids to always include in the sample.
-   * @return Sample
-   */
-   static DBIDs randomSample(DBIDs ids, int samplesize, Random rnd, DBIDs previous) {
-    if(previous == null) {
-      return DBIDUtil.randomSample(ids, samplesize, rnd);
-    }
-    ModifiableDBIDs sample = DBIDUtil.newHashSet(samplesize);
-    sample.addDBIDs(previous);
-    sample.addDBIDs(DBIDUtil.randomSample(ids, samplesize - previous.size(), rnd));
-    // If these two were not disjoint, we can be short of the desired size!
-    if(sample.size() < samplesize) {
-      // Draw a large enough sample to make sure to be able to fill it now.
-      // This can be less random though, because the iterator may impose an
-      // order; but this is a rare code path.
-      for(DBIDIter it = DBIDUtil.randomSample(ids, samplesize, rnd).iter(); sample.size() < samplesize && it.valid(); it.advance()) {
-        sample.add(it);
-      }
-    }
-    return sample;
-  }
-
-  /**
-   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
-   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   *
-   * @param means Object centroids
-   * @param ids Object ids
-   * @param rids Sample that was already assigned
-   * @param assignment cluster assignment
-   * @param distQ distance query
-   * @return Sum of distances.
-   */
-  static double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, WritableIntegerDataStore assignment, DistanceQuery<?> distQ) {
-    rids = DBIDUtil.ensureSet(rids); // Ensure we have fast contains
-    double distsum = 0.;
-    DBIDArrayIter miter = means.iter();
-    for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(rids.contains(iditer)) {
-        continue;
-      }
-      double mindist = Double.POSITIVE_INFINITY;
-      int minIndex = 0;
-      miter.seek(0); // Reuse iterator.
-      for(int i = 0; miter.valid(); miter.advance(), i++) {
-        double dist = distQ.distance(iditer, miter);
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
-        }
-      }
-      distsum += mindist;
-      assignment.put(iditer, minIndex);
-    }
-    return distsum;
-  }
-
-  /**
    * Parameterization class.
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
+  public static class Parameterizer<V> extends KMedoidsPAMPlusPlus.Parameterizer<V> {
     /**
      * The number of samples to run.
      */
-    public static final OptionID NUMSAMPLES_ID = new OptionID("clara.samples", "Number of samples (iterations) to run.");
+    public static final OptionID NUMSAMPLES_ID = CLARA.Parameterizer.NUMSAMPLES_ID;
 
     /**
      * The sample size.
      */
-    public static final OptionID SAMPLESIZE_ID = new OptionID("clara.samplesize", "The size of the sample.");
+    public static final OptionID SAMPLESIZE_ID = CLARA.Parameterizer.SAMPLESIZE_ID;
 
     /**
      * Draw independent samples.
      */
-    public static final OptionID NOKEEPMED_ID = new OptionID("clara.independent", "Draw independent samples (default is to keep the previous best medoids in the sample).");
+    public static final OptionID NOKEEPMED_ID = CLARA.Parameterizer.NOKEEPMED_ID;
 
     /**
      * Random generator.
      */
-    public static final OptionID RANDOM_ID = new OptionID("clara.random", "Random generator seed.");
+    public static final OptionID RANDOM_ID = CLARA.Parameterizer.RANDOM_ID;
 
     /**
      * Sampling rate. If less than 1, it is considered to be a relative value.
@@ -300,8 +228,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         numsamples = numsamplesP.intValue();
       }
 
-      // Default sample size suggested by Kaufman and Rousseeuw
-      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 40 + 2 * k) //
+      // Larger sample size, used by Schubert and Rousseeuw, 2019
+      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 80 + 4 * k) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
@@ -319,8 +247,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     }
 
     @Override
-    protected CLARA<V> makeInstance() {
-      return new CLARA<>(distanceFunction, k, maxiter, initializer, numsamples, sampling, keepmed, random);
+    protected FastCLARA<V> makeInstance() {
+      return new FastCLARA<>(distanceFunction, k, maxiter, initializer, fasttol, numsamples, sampling, keepmed, random);
     }
   }
 }

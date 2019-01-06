@@ -30,21 +30,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
- * Unit test CLARA
+ * Unit test for FastCLARA
  *
- * @author Katharina Rausch
  * @author Erich Schubert
- * @since 0.7.0
  */
-public class CLARATest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run CLARA with fixed parameters and compare the result to a golden
-   * standard.
-   */
+public class FastCLARATest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCLARA() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<FastCLARA<DoubleVector>>(FastCLARA.class) //
         .with(KMeans.K_ID, 5) //
         .with(CLARA.Parameterizer.RANDOM_ID, 1) //
         .with(CLARA.Parameterizer.NUMSAMPLES_ID, 2) //

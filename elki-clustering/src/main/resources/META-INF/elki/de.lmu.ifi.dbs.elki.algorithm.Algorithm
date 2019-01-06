@@ -42,6 +42,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPark de.lmu.ifi.dbs.elki
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARANSPlus
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARANS
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FastCLARA
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
