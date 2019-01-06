@@ -54,8 +54,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * that gives an improvement. We could not observe a tendency to find worse
  * results when doing these additional swaps, but a reduced runtime.
  * <p>
- * Because of the speed benefits, we also suggest to use KMeans++
- * initialization, and try multiple times if the runtime permits.
+ * Because of the speed benefits, we also suggest to use a linear-time
+ * initialization, such as the k-means++ initialization or the proposed
+ * LinearBUILD ("FastPAM3", default) initialization, and try multiple times if
+ * the runtime permits.
  * <p>
  * Reference:
  * <p>
@@ -226,7 +228,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
      * @param best Storage for best cost
      * @param cost Scratch space for cost
      */
-    private void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost) {
+    protected void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost) {
       Arrays.fill(best, Double.POSITIVE_INFINITY);
       // Iterate over all non-medoids:
       for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
@@ -255,7 +257,7 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
      * @param best Best changes
      * @return Index of smallest value
      */
-    protected int argmin(double[] best) {
+    protected static int argmin(double[] best) {
       double min = Double.POSITIVE_INFINITY;
       int ret = -1;
       for(int i = 0; i < best.length; i++) {
@@ -331,7 +333,6 @@ public class KMedoidsPAMPlusPlus<V> extends KMedoidsPAMPlus<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       DoubleParameter fasttolP = new DoubleParameter(FASTTOL_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
