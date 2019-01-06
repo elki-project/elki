@@ -48,10 +48,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
+import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
+
 /**
  * Clustering Large Applications (CLARA) is a clustering method for large data
  * sets based on PAM, partitioning around medoids ({@link KMedoidsPAM}) based on
  * sampling.
+ * <p>
+ * TODO: use a triangular distance matrix, rather than a hash-map based cache,
+ * for a bit better performance and less memory.
  * <p>
  * Reference:
  * <p>
@@ -62,8 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * L. Kaufman, P. J. Rousseeuw<br>
  * Clustering Large Applications (Program CLARA)<br>
  * Finding Groups in Data: An Introduction to Cluster Analysis
- *
- * FIXME: precompute distance matrixes for each sample, for better performance!
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -140,6 +143,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
     }
 
+    CachedDistanceQuery<V> cachedQ = new CachedDistanceQuery<V>(distQ, (samplesize * (samplesize - 1)) >> 1);
+
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
@@ -148,13 +153,13 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
       DBIDs rids = randomSample(ids, samplesize, rnd, keepmed ? bestmedoids : null);
-      // FIXME: precompute and use a distance matrix for this sample!
+      cachedQ.clear(); // TODO: an actual matrix would be better.
 
       // Choose initial medoids
-      ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
+      ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, cachedQ));
       // Setup cluster assignment store
       WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-      double score = new /* PAM */Instance(distQ, rids, assignment).run(medoids, maxiter) //
+      double score = new /* PAM */Instance(cachedQ, rids, assignment).run(medoids, maxiter) //
           + assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".sample-" + j + ".cost", score));
@@ -163,6 +168,9 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         best = score;
         bestmedoids = medoids;
         bestclusters = assignment;
+      }
+      if(cachedQ.hasUncachedQueries()) {
+        LOG.warning("Some distance queries were not cached; maybe the initialization is not optimized for k-medoids.");
       }
       LOG.incrementProcessed(prog);
     }
@@ -191,7 +199,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * @param previous Previous medoids to always include in the sample.
    * @return Sample
    */
-   static DBIDs randomSample(DBIDs ids, int samplesize, Random rnd, DBIDs previous) {
+  static DBIDs randomSample(DBIDs ids, int samplesize, Random rnd, DBIDs previous) {
     if(previous == null) {
       return DBIDUtil.randomSample(ids, samplesize, rnd);
     }
@@ -243,6 +251,104 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       assignment.put(iditer, minIndex);
     }
     return distsum;
+  }
+
+  /**
+   * Cached distance query.
+   *
+   * @author Erich Schubert
+   *
+   * @param <V> Data type
+   */
+  static class CachedDistanceQuery<V> implements DistanceQuery<V> {
+    /**
+     * Inner distance query
+     */
+    DistanceQuery<V> inner;
+
+    /**
+     * Cache
+     */
+    Long2DoubleOpenHashMap cache;
+
+    /**
+     * Number of uncacheable queries
+     */
+    int bad;
+
+    /**
+     * Constructor.
+     *
+     * @param inner Inner query
+     * @param size Initial size of map
+     */
+    public CachedDistanceQuery(DistanceQuery<V> inner, int size) {
+      this.inner = inner;
+      this.cache = new Long2DoubleOpenHashMap(size);
+      this.cache.defaultReturnValue(Double.NaN);
+    }
+
+    /**
+     * Check if any queries were uncached (not using DBIDs).
+     *
+     * @return True if uncached distances were used
+     */
+    public boolean hasUncachedQueries() {
+      return bad > 0;
+    }
+
+    /**
+     * Clear the distance cache.
+     */
+    public void clear() {
+      cache.clear();
+      bad = 0;
+    }
+
+    @Override
+    public double distance(DBIDRef id1, DBIDRef id2) {
+      if(DBIDUtil.equal(id1, id2)) {
+        return 0.;
+      }
+      if(DBIDUtil.compare(id1, id2) > 0) {
+        return distance(id2, id1);
+      }
+      int i = id1.internalGetIndex(), j = id2.internalGetIndex();
+      long idx = (((long) i) << 32) | j;
+      double v = cache.get(idx);
+      if(v != v) {
+        cache.put(idx, v = inner.distance(id1, id2));
+      }
+      return v;
+    }
+
+    @Override
+    public double distance(V o1, DBIDRef id2) {
+      ++bad;
+      return inner.distance(o1, id2);
+    }
+
+    @Override
+    public double distance(DBIDRef id1, V o2) {
+      ++bad;
+      return inner.distance(id1, o2);
+    }
+
+    @Override
+    public double distance(V o1, V o2) {
+      ++bad;
+      return inner.distance(o1, o2);
+    }
+
+    @Override
+    public DistanceFunction<? super V> getDistanceFunction() {
+      return inner.getDistanceFunction();
+    }
+
+    @Override
+    public Relation<? extends V> getRelation() {
+      return inner.getRelation();
+    }
   }
 
   /**

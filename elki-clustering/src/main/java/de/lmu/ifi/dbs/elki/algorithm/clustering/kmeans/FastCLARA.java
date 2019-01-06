@@ -53,6 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * improvements, to increase scalability in the number of clusters. This variant
  * will also default to twice the sample size, to improve quality.
  * <p>
+ * TODO: use a triangular distance matrix, rather than a hash-map based cache,
+ * for a bit better performance and less memory.
+ * <p>
  * Reference:
  * <p>
  * Erich Schubert, Peter J. Rousseeuw<br>
@@ -60,8 +63,6 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Algorithms<br>
  * preprint, to appear
  * 
- * FIXME: precompute distance matrixes for each sample, for better performance!
- *
  * @author Erich Schubert
  *
  * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
@@ -131,6 +132,8 @@ public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
     }
 
+    CLARA.CachedDistanceQuery<V> cachedQ = new CLARA.CachedDistanceQuery<V>(distQ, (samplesize * (samplesize - 1)) >> 1);
+
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
@@ -139,13 +142,13 @@ public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
       DBIDs rids = CLARA.randomSample(ids, samplesize, rnd, keepmed ? bestmedoids : null);
-      // FIXME: precompute and use a distance matrix for this sample!
+      cachedQ.clear(); // TODO: an actual matrix would be better.
 
       // Choose initial medoids
-      ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
+      ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, cachedQ));
       // Setup cluster assignment store
       WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-      double score = new /* PAM */Instance(distQ, rids, assignment, fasttol).run(medoids, maxiter) //
+      double score = new /* PAM */Instance(cachedQ, rids, assignment, fasttol).run(medoids, maxiter) //
           + CLARA.assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".sample-" + j + ".cost", score));
@@ -154,6 +157,9 @@ public class FastCLARA<V> extends KMedoidsPAMPlusPlus<V> {
         best = score;
         bestmedoids = medoids;
         bestclusters = assignment;
+      }
+      if(cachedQ.hasUncachedQueries()) {
+        LOG.warning("Some distance queries were not cached; maybe the initialization is not optimized for k-medoids.");
       }
       LOG.incrementProcessed(prog);
     }
