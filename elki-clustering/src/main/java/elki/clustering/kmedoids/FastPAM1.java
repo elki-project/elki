@@ -343,7 +343,7 @@ public class FastPAM1<V> extends PAM<V> {
      * @param n Known nearest
      * @return Index of second nearest medoid, {@link #second} is updated.
      */
-    private int updateSecondNearest(DBIDRef j, DBIDArrayIter medoids, int h, double dist_h, int n) {
+    protected int updateSecondNearest(DBIDRef j, DBIDArrayIter medoids, int h, double dist_h, int n) {
       double sdist = dist_h;
       int sbest = h;
       for(medoids.seek(0); medoids.valid(); medoids.advance()) {

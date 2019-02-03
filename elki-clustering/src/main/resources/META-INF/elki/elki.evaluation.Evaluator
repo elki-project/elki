@@ -9,6 +9,7 @@ elki.evaluation.clustering.internal.PBMIndex
 elki.evaluation.clustering.internal.CIndex
 elki.evaluation.clustering.internal.DBCV
 elki.evaluation.clustering.internal.SquaredErrors
+elki.evaluation.clustering.internal.ClusterRadius
 elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 elki.evaluation.clustering.extractor.SimplifiedHierarchyExtractionEvaluator
 elki.evaluation.clustering.extractor.HDBSCANHierarchyExtractionEvaluator
