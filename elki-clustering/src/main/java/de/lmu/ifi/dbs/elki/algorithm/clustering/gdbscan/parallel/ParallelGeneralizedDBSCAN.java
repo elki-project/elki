@@ -86,6 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Analysis (SC)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @opt nodefillcolor LemonChiffon
  *

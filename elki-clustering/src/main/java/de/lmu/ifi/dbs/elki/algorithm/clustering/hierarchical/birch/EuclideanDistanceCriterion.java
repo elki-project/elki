@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * attempts: assign points if the Euclidean distances is below a threshold.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class EuclideanDistanceCriterion implements BIRCHAbsorptionCriterion {
   /**

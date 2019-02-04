@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Classification and Regression Trees
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //

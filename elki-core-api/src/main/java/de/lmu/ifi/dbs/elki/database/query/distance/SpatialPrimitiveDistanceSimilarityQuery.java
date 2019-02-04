@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * distances and similarities.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * @depend - - - PrimitiveSimilarityFunction
  * 

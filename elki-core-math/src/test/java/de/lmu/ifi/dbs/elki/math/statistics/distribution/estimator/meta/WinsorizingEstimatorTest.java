@@ -32,6 +32,12 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
+/**
+ * Test for Winsorizing estimators, to make them more robust.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
+ */
 public class WinsorizingEstimatorTest {
   @Test
   public void testNormalDistribution() {

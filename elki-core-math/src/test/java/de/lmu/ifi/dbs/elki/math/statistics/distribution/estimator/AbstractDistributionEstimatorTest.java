@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Abstract base class for estimator unit testing.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class AbstractDistributionEstimatorTest {
   HashMap<String, double[]> data;

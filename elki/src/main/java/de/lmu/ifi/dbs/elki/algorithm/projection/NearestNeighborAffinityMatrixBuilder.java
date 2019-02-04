@@ -56,6 +56,7 @@ import net.jafama.FastMath;
  * symmetrize the sparse \(p_{ij}\) matrix.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

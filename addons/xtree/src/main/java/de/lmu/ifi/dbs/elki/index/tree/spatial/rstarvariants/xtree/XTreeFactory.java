@@ -25,6 +25,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
+/**
+ * Factory for an xtree.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
+ */
 public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O, XTreeNode> {
   public XTreeFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
     super(pageFileFactory, settings);

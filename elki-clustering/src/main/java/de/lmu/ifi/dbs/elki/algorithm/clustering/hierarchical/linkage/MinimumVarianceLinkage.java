@@ -52,6 +52,7 @@ import net.jafama.FastMath;
  * Elements d'analyse de donnees
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "J. Podani", //
     title = "New Combinatorial Clustering Methods", //

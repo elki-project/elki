@@ -30,6 +30,7 @@ import java.util.RandomAccess;
  * {@link ArrayListIter} instead (less wrapping)!
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * 
  * @param <O> contained object type.

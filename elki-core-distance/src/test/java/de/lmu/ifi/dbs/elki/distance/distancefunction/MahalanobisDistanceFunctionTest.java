@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * Unit test for Mahalanobis distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MahalanobisDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

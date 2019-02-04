@@ -37,6 +37,7 @@ import net.jafama.FastMath;
  * Knowledge Discovery in Databases 1991
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "R. M. Goodman, P. Smyth", //
     title = "Rule induction using information theory", //

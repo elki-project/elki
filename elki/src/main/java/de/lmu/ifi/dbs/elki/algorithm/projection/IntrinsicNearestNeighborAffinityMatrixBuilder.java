@@ -69,6 +69,7 @@ import net.jafama.FastMath;
  * Proc. Int. Conf. Similarity Search and Applications, SISAP 2017
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

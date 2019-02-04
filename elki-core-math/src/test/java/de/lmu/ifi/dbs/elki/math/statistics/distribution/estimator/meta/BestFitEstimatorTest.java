@@ -34,6 +34,12 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.*;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
+/**
+ * Test for the best fit estimator.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
+ */
 public class BestFitEstimatorTest {
   private BestFitEstimator init() {
     BestFitEstimator est = new BestFitEstimator();

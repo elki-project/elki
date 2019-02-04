@@ -34,6 +34,12 @@ import de.lmu.ifi.dbs.elki.joglvis.ShaderUtil;
 import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlot;
 
+/**
+ * OpenGL4 version of the scatterplot renderer.
+ *
+ * @author Erich Schubert
+ * @since 0.7.0
+ */
 public class ScatterPlotOpenGL4 implements ScatterPlot {
   private int[] textures = new int[2];
 

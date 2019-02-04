@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * TODO: Also provide representatives and last merge height for clusters.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @assoc - - - HierarchicalClusteringAlgorithm
  * @assoc - - - PointerHierarchyRepresentationResult

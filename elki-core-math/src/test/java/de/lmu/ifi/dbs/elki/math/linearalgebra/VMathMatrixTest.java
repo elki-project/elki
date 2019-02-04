@@ -34,6 +34,7 @@ import org.junit.Test;
  * Two dimensional double arrays are interpreted as rows x columns matrixes.
  *
  * @author Merlin Dietrich
+ * @since 0.7.5
  */
 @SuppressWarnings("deprecation")
 public class VMathMatrixTest {

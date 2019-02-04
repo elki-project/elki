@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Keep only the first N elements of the data source.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class FirstNStreamFilter extends AbstractStreamFilter {
   /**

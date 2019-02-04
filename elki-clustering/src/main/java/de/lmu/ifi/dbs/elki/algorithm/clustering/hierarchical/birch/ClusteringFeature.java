@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * Clustering Feature of BIRCH
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ClusteringFeature {
   /**

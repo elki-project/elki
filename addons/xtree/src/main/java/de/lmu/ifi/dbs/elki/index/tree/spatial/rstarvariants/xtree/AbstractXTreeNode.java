@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * XTree node extension for testing on supernodes
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  * 
  * @param <N> Type of this node (for extendability)
  */

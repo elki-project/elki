@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
  * Container annotation to store multiple {@link Reference} annotations.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

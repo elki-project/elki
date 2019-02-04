@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * BIRCH absorption criterion.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * @depend - - - ClusteringFeature
  * @depend - - - NumberVector

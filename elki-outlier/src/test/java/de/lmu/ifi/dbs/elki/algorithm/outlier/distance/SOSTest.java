@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the SOS Outlier algorithm.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SOSTest extends AbstractOutlierAlgorithmTest {
   @Test

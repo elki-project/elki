@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the balanced distribution strategy.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class FarthestBalancedDistributionTest extends AbstractIndexStructureTest {
   @Test

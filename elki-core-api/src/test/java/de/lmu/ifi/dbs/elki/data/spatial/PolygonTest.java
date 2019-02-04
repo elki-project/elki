@@ -33,6 +33,7 @@ import org.junit.Test;
  * Unit tests for the polygon class.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PolygonTest {
   @Test

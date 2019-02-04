@@ -28,6 +28,7 @@ import org.junit.Test;
  * Test for KNNList.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class KNNListTest {
   /**

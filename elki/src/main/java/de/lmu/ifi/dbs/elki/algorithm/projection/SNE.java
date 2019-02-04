@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Advances in Neural Information Processing Systems 15
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @composed - - - AffinityMatrixBuilder
  *

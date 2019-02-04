@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * module, but these are not exported into the jar (which is correct).
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class XTreeTest extends AbstractIndexStructureTest {
   /**

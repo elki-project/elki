@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the CBLOF outlier detection algorithm.
  *
  * @author Patrick Kostjens
+ * @since 0.7.5
  */
 public class CBLOFTest extends AbstractOutlierAlgorithmTest {
   @Test

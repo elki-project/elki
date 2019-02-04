@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Hierarchical cluster, with prototype.
  * 
  * @author Julian Erhard
+ * @since 0.7.5
  */
 public class PrototypeDendrogramModel extends DendrogramModel implements PrototypeModel<DBID> {
   /**

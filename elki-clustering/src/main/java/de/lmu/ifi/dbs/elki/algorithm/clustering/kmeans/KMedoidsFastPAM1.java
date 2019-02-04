@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * preprint, to appear
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <V> vector datatype
  */

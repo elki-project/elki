@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * Parameter class for a parameter specifying ranges of integer values.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParameter, IntGenerator> {
   /**

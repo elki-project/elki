@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * One dimensional double arrays are interpreted column vectors.
  *
  * @author Merlin Dietrich
+ * @since 0.7.5
  */
 public final class VMathVectorTest {
   /**

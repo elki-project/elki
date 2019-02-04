@@ -58,6 +58,7 @@ import net.jafama.FastMath;
  * TiCC TR 2012–001
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

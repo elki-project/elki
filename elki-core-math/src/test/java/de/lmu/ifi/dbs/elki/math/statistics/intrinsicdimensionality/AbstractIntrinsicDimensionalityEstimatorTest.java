@@ -29,6 +29,7 @@ import java.util.Random;
  * Abstract base for testing intrinsic dimensionality estimators.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public abstract class AbstractIntrinsicDimensionalityEstimatorTest {
   /**

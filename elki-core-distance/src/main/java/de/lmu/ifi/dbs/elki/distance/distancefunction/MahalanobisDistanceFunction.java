@@ -46,6 +46,7 @@ import net.jafama.FastMath;
  * only be used from Java and from subclasses, not from command line or MiniGUI.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "P. C. Mahalanobis", //
     title = "On the generalized distance in statistics", //

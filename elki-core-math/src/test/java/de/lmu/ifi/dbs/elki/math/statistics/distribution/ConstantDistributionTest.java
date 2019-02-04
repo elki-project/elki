@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the constant distribution in ELKI.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ConstantDistributionTest extends AbstractDistributionTest {
   @Test

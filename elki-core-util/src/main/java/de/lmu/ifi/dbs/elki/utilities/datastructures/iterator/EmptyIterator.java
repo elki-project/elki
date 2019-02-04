@@ -27,6 +27,7 @@ import java.util.function.Predicate;
  * Empty object iterator.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object
  */

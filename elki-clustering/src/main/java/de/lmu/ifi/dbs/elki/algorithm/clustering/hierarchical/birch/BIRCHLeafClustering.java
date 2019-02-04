@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Data. Min. Knowl. Discovery
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @depend - - - CFTree
  */

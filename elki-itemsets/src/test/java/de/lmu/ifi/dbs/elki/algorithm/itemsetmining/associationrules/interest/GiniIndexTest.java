@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the Gini Index metric.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class GiniIndexTest extends AbstractFrequentItemsetAlgorithmTest {
   @Test

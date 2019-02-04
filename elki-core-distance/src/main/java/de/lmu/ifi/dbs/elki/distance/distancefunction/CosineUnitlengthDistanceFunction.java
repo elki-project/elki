@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * appropriate, but also more computationally expensive.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class CosineUnitlengthDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

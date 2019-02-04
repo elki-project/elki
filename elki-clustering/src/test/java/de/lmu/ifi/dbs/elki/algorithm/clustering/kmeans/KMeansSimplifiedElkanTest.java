@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for simplified Elkan k-means.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class KMeansSimplifiedElkanTest extends AbstractClusterAlgorithmTest {
   @Test

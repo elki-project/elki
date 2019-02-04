@@ -38,6 +38,7 @@ import java.util.stream.IntStream;
  * spliterators for parallel processing.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public interface IntGenerator {
   /**

@@ -33,6 +33,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameterization;
 
+/**
+ * Parameterization test of all classes supporting the parameterization API.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
+ */
 public class ParameterizationTest {
   @Test
   public void testParameterization() {

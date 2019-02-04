@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96).
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  */
 @Title("X-Tree")
 @Description("Index structure for High-Dimensional data")

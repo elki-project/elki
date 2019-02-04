@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for Aggregated Hill estimator.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class AggregatedHillEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test

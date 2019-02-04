@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Run a database query in a database context.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Database object type.
  */

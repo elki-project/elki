@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the estimation for the Laplace MAD estimation.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LaplaceMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

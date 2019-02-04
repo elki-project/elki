@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * IEEE Transactions on Knowledge and Data Engineering 14(5)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
  * @has - - - Assignment

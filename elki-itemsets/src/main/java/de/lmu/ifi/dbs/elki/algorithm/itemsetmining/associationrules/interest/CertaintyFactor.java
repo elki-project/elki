@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Intelligent Data Analysis, 6(3), 2002
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "F. Berzal, I. Blanco, D. Sánchez, M. Vila", //
     title = "Measuring the accuracy and interest of association rules: A new framework", //

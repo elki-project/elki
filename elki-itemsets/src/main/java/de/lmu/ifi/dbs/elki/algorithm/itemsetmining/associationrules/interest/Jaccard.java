@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Butterworths, London, 1979
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "P.-N. Tan, V. Kumar, J. Srivastava", // )
     title = "Selecting the right objective measure for association analysis", //

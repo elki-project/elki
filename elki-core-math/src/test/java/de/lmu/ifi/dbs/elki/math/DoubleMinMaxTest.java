@@ -29,6 +29,7 @@ import org.junit.Test;
  * Test the DoubleMinMax class.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class DoubleMinMaxTest {
   /**

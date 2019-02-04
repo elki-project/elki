@@ -26,6 +26,7 @@ import java.util.function.IntConsumer;
  * Generate a static set of integers.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class StaticIntGenerator implements IntGenerator {
   /**

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Alias("D")
 @Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //

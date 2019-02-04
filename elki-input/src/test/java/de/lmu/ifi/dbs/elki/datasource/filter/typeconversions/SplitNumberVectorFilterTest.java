@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the split number vector filter filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class SplitNumberVectorFilterTest extends AbstractDataSourceTest {
   /**

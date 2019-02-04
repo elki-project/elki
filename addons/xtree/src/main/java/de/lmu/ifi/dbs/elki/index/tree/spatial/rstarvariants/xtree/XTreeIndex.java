@@ -43,6 +43,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
+/**
+ * X-tree index.
+ *
+ * @author Marisa Thoma
+ * @since 0.7.5
+ */
 public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   private static final Logging LOG = Logging.getLogger(XTreeIndex.class);
 

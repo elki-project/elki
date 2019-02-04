@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * store arbitrary doubles.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MatrixParadigm {
   /**

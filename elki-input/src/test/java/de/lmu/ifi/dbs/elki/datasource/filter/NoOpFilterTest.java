@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the pass-through dummy filter.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class NoOpFilterTest extends AbstractDataSourceTest {
   @Test

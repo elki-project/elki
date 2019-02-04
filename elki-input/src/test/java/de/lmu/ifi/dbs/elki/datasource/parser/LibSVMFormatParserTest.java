@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the libSVM format parser filter.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LibSVMFormatParserTest extends AbstractDataSourceTest {
   @Test

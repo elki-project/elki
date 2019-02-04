@@ -31,6 +31,7 @@ import org.junit.Test;
  * Unit test for our Xoroshiro128+ RNG.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class Xoroshiro128NonThreadsafeRandomTest {
   @Test

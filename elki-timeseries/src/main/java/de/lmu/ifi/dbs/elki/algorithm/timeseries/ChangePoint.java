@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ChangePoint {
   /**

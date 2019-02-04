@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for simplified hierarchy extraction.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmTest {
   @Test

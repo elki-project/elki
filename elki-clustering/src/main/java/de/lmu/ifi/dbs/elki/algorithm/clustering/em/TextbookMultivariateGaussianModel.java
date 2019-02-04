@@ -41,6 +41,7 @@ import net.jafama.FastMath;
  * Again, do not use this. Always prefer {@link MultivariateGaussianModel}.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class TextbookMultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**

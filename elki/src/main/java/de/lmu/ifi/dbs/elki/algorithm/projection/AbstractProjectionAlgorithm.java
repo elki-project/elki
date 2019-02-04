@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Abstract base class for projection algorithms.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <R> Result type.
  */

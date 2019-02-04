@@ -38,6 +38,7 @@ import net.jafama.FastMath;
  * In Proc. Workshop on Postprocessing in Machine Learning and Data Mining
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "P. Tan, V. Kumar", //
     title = "Interestingness measures for association patterns: A perspective", //

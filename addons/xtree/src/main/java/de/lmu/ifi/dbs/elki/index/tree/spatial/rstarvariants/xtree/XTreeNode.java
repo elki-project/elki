@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
  * Represents a node in an X-Tree.
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  */
 public class XTreeNode extends AbstractXTreeNode<XTreeNode> {
   /**

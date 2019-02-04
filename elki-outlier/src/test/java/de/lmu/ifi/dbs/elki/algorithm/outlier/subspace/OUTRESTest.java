@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the OUTRES algorithm.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class OUTRESTest extends AbstractOutlierAlgorithmTest {
   @Test

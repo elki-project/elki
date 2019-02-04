@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Exception thrown when a database / relation is empty.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class EmptyDataException extends AbortException {
   /**

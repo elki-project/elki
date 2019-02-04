@@ -32,6 +32,7 @@ import org.junit.Test;
  * Test of combined iterator.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class CombinedIntGeneratorTest {
   @Test

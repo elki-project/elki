@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * Factory class for XTree.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * @param <O> object type
  * @param <N> node type

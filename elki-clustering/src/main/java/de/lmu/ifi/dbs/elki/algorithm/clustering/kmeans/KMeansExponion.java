@@ -50,6 +50,7 @@ import net.jafama.FastMath;
  * Proc. 33nd Int. Conf. on Machine Learning, ICML 2016
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @navassoc - - - KMeansModel
  *

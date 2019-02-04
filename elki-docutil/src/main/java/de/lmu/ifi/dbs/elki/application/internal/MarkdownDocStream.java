@@ -29,6 +29,7 @@ import java.io.PrintStream;
  * Helper to write documentation to a Markdown file.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MarkdownDocStream implements AutoCloseable {
   /**

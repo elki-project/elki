@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
  * TODO: allow using this with other bounding box agorithms, too.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - Polygon
  * @has - - - GrahamScanConvexHull2D

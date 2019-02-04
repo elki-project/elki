@@ -26,6 +26,7 @@ import org.junit.Test;
  * Ensure basic integrity.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MCEDependenceMeasureTest {
   @Test

@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * yield the same ranking of neighbors.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ArcCosineUnitlengthDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**

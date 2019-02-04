@@ -28,6 +28,12 @@ import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
 
+/**
+ * Directory entry of a x-tree.
+ *
+ * @author Marisa Thoma
+ * @since 0.7.5
+ */
 public class XTreeDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {
   /**
    * The split history of this entry. Should be set via {@link #splitHistory}

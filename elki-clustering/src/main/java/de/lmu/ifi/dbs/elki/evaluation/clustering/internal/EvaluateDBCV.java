@@ -63,6 +63,7 @@ import net.jafama.FastMath;
  * In: Proc. 14th SIAM International Conference on Data Mining (SDM).
  *
  * @author Stephan Baier
+ * @since 0.7.5
  *
  * @param <O> Object type
  *

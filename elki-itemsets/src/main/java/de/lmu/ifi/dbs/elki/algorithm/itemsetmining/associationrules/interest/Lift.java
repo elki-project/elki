@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In ACM SIGMOD Record 26
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "S. Brin, R. Motwani, C. Silverstein", //
     title = "Beyond market baskets: Generalizing association rules to correlations", //

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for Euclidean distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class WeightedLPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

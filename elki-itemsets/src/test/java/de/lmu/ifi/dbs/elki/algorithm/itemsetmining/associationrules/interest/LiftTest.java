@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the Life metric.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LiftTest extends AbstractFrequentItemsetAlgorithmTest {
   @Test

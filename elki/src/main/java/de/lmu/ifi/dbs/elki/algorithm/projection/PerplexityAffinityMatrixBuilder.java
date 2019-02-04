@@ -53,6 +53,7 @@ import net.jafama.FastMath;
  * Advances in Neural Information Processing Systems 15
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Vector type
  */

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * The reference values were computed using GNU R.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SkewGeneralizedNormalDistributionTest extends AbstractDistributionTest {
   @Test

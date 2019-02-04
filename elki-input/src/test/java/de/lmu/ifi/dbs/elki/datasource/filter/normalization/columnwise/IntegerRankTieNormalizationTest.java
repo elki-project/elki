@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
  * Test the integer rank tie normalization filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class IntegerRankTieNormalizationTest extends AbstractDataSourceTest {
   /**

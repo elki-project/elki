@@ -44,6 +44,7 @@ import net.jafama.FastMath;
  * TODO: allow using other logarithms than 2?
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "K. Järvelin, J. Kekäläinen", //
     title = "Cumulated gain-based evaluation of IR techniques", //

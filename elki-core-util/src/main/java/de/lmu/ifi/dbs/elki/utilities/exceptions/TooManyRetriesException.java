@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Exception thrown when too many retries were attempted.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class TooManyRetriesException extends AbortException {
   /**

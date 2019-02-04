@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.di
  * Interface for M-tree splitting strategies.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <E> the type of MTreeEntry used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree

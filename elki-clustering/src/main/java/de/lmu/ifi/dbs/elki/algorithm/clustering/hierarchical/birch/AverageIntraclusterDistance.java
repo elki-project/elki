@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Note: this distance did not work well in the original work, apparently.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Alias({ "D3" })
 @Reference(authors = "T. Zhang", //

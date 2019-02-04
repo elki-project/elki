@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
  * Interface to store double distance, integer DBID results.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 interface DoubleIntegerDBIDList extends DoubleDBIDList, IntegerDBIDs {
   @Override

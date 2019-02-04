@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for NNDescent
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
  */
 public class NNDescentTest {
   // the following values depend on the data set used!

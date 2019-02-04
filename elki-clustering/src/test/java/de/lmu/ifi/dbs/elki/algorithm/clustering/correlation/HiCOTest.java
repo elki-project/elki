@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for HiCO.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class HiCOTest extends AbstractClusterAlgorithmTest {
   @Test

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
  * FIXME: this should become part of relation metadata.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Description("Setup a scaling so that all dimensions have the same value range.")
 public class AddUniformScale implements Algorithm {

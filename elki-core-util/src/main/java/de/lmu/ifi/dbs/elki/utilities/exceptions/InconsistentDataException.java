@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Thrown when inconsistent data was detected e.g. in an index.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class InconsistentDataException extends RuntimeException {
   /**

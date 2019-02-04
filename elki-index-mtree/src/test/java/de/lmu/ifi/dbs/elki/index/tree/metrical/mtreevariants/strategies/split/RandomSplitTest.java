@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the random split.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class RandomSplitTest extends AbstractIndexStructureTest {
   @Test

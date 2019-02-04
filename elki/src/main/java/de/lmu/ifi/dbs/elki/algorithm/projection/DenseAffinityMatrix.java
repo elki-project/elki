@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * TODO: it is likely faster to store this in a 1-d array when possible.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class DenseAffinityMatrix implements AffinityMatrix {
   /**

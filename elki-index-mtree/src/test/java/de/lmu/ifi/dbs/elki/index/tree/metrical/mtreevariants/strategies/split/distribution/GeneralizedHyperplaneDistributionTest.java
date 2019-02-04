@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the generalized hyperplane distrbution strategy.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class GeneralizedHyperplaneDistributionTest extends AbstractIndexStructureTest {
   @Test

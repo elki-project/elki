@@ -49,6 +49,7 @@ import net.jafama.FastMath;
  * IEEE Transactions on Information Theory, 49(7)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Alias("chi")
 @Priority(Priority.IMPORTANT)

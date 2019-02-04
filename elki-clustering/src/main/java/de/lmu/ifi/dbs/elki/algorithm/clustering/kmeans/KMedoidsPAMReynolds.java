@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * J. Math. Model. Algorithms 5(4)
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <V> vector datatype
  */

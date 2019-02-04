@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Cambridge University Press, 2014
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @composed - - - AbstractFrequentItemsetAlgorithm
  * @composed - - - InterestingnessMeasure

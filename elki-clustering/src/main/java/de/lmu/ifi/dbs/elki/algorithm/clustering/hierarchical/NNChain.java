@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * arXiv preprint arXiv:1109.2378
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

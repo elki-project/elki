@@ -35,6 +35,12 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
+/**
+ * Find results to visualize using OpenGL Scatterplots.
+ *
+ * @author Erich Schubert
+ * @since 0.7.0
+ */
 public class JOGLScatterplotResultHandler implements ResultHandler {
   @Override
   public void processNewResult(ResultHierarchy baseResult, Result newResult) {

@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * preprint, to appear
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @navassoc - - - de.lmu.ifi.dbs.elki.data.model.MedoidModel
  *

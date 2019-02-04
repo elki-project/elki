@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Int. Conf. Extending Database Technology (EDBT'2000)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <E> Entry type
  * @param <N> Node type

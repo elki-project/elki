@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the sparse number vector format parser filter.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SparseNumberVectorLabelParserTest extends AbstractDataSourceTest {
   @Test

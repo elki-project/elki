@@ -51,6 +51,7 @@ import net.jafama.FastMath;
  * Dictionary of distances
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "C. R. Rao", //
     title = "Information and the Accuracy Attainable in the Estimation of Statistical Parameters", //

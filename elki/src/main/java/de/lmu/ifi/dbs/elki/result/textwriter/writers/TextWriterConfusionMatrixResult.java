@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * Write a classification evaluation to a text file.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class TextWriterConfusionMatrixResult extends TextWriterWriterInterface<ConfusionMatrixEvaluationResult> {
   @Override

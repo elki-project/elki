@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Extract a flat clustering from a full hierarchy, represented in pointer form.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @assoc - - - HierarchicalClusteringAlgorithm
  * @assoc - - - PointerHierarchyRepresentationResult

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for RV estimator.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class RVEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test

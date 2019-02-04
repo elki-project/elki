@@ -43,6 +43,7 @@ import net.jafama.FastMath;
  * Contributed to ELKI
  *
  * @author Jonathan von Brünken
+ * @since 0.7.5
  */
 @Reference(authors = "Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi", //
     title = "Enhanced Estimation of Local Intrinsic Dimensionality Using Auxiliary Distances", //

@@ -24,8 +24,16 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLProfile;
 
 import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
-public interface ScatterPlot {
 
+/**
+ * OpenGL Scatterplot interface.
+ * <p>
+ * Necessary to allow using drivers with different OpenGL levels.
+ *
+ * @author Erich Schubert
+ * @since 0.7.0
+ */
+public interface ScatterPlot {
   void initializeShaders(GL2 gl);
 
   void initializeTextures(GL2 gl, GLProfile profile);
@@ -35,5 +43,4 @@ public interface ScatterPlot {
   void setCamera(SimpleCamera3D camera);
 
   void free(GL2 gl);
-
 }

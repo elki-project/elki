@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Error thrown when a class cannot be instantiated.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ClassInstantiationException extends ReflectiveOperationException {
   /**

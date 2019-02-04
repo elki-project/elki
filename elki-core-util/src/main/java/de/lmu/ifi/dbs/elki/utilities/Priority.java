@@ -30,6 +30,7 @@ import java.lang.annotation.Target;
  * This annotation is used for sorting entries in the UIs.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

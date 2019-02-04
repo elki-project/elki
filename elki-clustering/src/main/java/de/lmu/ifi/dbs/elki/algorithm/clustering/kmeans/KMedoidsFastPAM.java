@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * preprint, to appear
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <V> vector datatype
  */

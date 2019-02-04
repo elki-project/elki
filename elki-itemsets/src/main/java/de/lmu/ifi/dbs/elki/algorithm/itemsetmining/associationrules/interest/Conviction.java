@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In Proc. 1997 ACM SIGMOD international conference on management of data
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "S. Brin, R. Motwani, J. D Ullman, S Tsur", //
     title = "Dynamic itemset counting and implication rules for market basket data", //

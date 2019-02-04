@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Proc. ACM SIGMOD International Conference on Management of Data
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "R. Agrawal, T. Imielinski, A. Swami", //
     title = "Mining association rules between sets of items in large databases", //

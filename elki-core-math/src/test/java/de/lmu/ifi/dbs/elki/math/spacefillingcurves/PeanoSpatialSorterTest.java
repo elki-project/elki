@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorterTest.V;
  * Note that it is not bit based, but it repeatedly subdivides [min;max].
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class PeanoSpatialSorterTest {
   @Test

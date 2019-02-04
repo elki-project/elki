@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96)
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  * 
  * @param <N> Node type
  */

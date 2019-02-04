@@ -73,6 +73,7 @@ import net.jafama.FastMath;
  * TODO: add support for dynamic time, and optimize for sparse vectors.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @composed - - - Instance
  * @assoc - - - ChangePoints

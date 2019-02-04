@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for BIRCH clustering.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test

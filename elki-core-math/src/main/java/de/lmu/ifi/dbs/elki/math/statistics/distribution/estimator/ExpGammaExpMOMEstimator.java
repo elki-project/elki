@@ -36,6 +36,7 @@ import net.jafama.FastMath;
  * transformation.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * @navassoc - estimates - ExpGammaDistribution
  */

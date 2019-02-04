@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test PAM with the Reynolds modifications.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class KMedoidsPAMReynoldsTest extends AbstractClusterAlgorithmTest {
   /**

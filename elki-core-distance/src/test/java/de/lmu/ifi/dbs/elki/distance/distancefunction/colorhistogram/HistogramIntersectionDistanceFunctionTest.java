@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for histogram intersection distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class HistogramIntersectionDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

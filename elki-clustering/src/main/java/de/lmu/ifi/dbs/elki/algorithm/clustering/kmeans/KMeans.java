@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Some constants and options shared among kmeans family algorithms.
  *
  * @author Erich Schubert
+ * @since 0.1
  *
  * @opt nodefillcolor LemonChiffon
  *

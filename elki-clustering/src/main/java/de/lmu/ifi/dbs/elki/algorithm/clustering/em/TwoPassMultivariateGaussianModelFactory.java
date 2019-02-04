@@ -44,6 +44,7 @@ import net.jafama.FastMath;
  * {@code 'VVV'} model in Mclust (R).
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - TwoPassMultivariateGaussianModel
  *

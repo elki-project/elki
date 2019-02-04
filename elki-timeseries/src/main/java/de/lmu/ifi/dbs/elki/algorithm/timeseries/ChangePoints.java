@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - ChangePoint
  */

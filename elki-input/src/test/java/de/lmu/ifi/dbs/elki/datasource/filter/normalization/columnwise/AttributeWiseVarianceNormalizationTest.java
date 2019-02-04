@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the variance-max normalization filter.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTest {
   /**

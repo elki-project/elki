@@ -32,6 +32,7 @@ import net.jafama.FastMath;
  * Unit test for Lp norms with integer p.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LPIntegerNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

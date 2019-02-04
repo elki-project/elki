@@ -70,6 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Sebastian Rühl
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - ChangePoints
  */

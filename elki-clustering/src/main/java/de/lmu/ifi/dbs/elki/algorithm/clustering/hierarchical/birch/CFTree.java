@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Data Min. Knowl. Discovery
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - ClusteringFeature
  * @has - - - LeafIterator

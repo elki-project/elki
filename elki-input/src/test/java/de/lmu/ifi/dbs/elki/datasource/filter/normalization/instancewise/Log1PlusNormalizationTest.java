@@ -39,6 +39,7 @@ import net.jafama.FastMath;
  * Test the log 1 plus normalization filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
   /**

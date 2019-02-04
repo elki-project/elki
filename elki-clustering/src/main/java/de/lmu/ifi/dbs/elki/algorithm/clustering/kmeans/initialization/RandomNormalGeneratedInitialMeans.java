@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Australian Journal of Botany 14(1)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Priority(Priority.SUPPLEMENTARY - 1)
 @Reference(authors = "R. C. Jancey", //

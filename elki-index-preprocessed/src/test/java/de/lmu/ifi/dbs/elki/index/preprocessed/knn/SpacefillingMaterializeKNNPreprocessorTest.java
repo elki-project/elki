@@ -43,6 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for space-filling curve NN search
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SpacefillingMaterializeKNNPreprocessorTest {
   // the following values depend on the data set used!

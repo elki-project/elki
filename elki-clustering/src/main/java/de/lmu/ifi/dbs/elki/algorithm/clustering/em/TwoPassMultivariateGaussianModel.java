@@ -38,6 +38,7 @@ import net.jafama.FastMath;
  * usually negligible, since we already use a very stable and fast approach.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class TwoPassMultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**

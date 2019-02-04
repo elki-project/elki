@@ -32,6 +32,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
  * Copied from Jama, please contribute a more complex test example!
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SingularValueDecompositionTest {
   @Test

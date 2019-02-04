@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * Association Rule
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 public class AssociationRule implements Comparable<AssociationRule> {
   /**

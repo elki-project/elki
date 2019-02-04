@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
  * Ensure basic integrity.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class HiCSDependenceMeasureTest {
   @Test

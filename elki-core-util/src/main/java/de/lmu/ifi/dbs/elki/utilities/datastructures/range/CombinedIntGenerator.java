@@ -28,6 +28,7 @@ import java.util.function.IntConsumer;
  * Combine multiple ranges.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class CombinedIntGenerator implements IntGenerator {
   /**

@@ -78,6 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * method use compatible data types and distances.
  *
  * @author Patrick Kostjens
+ * @since 0.7.5
  *
  * @param <O> the type of data objects handled by this algorithm
  */

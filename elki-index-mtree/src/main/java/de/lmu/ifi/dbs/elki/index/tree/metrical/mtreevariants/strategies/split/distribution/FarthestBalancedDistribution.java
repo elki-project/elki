@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort
  * difficult points first. This should produce smaller covers.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class FarthestBalancedDistribution implements DistributionStrategy {
   @Override

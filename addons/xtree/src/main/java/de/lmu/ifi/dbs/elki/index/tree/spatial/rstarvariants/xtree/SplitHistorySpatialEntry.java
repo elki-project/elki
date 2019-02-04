@@ -24,6 +24,12 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
 
+/**
+ * Spatial entry with split history.
+ *
+ * @author Marisa Thoma
+ * @since 0.7.5
+ */
 public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {
   /**
    * Get the split history of this entry's node.
@@ -34,14 +40,14 @@ public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {
 
   /**
    * Add a dimension to this entry's split history.
-   * 
+   *
    * @param dimension dimension to be added to split history
    */
   void addSplitDimension(int dimension);
 
   /**
    * Set the split history of this entry's node.
-   * 
+   *
    * @param splitHistory
    */
   void setSplitHistory(SplitHistory splitHistory);

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the estimation for the ExponentialMedian distribution.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ExponentialMedianEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

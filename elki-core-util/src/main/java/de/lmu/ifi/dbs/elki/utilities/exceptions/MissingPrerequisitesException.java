@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Exception thrown when prerequisites are not satisfied.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class MissingPrerequisitesException extends AbortException {
   /**

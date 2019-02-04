@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Includes code for cluster evaluation.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorithmTest {
   /**

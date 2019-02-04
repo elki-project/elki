@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the MAD estimation for the normal distribution.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class NormalMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

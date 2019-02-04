@@ -60,6 +60,7 @@ import net.jafama.FastMath;
  * Partitional Clustering Algorithms
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @navassoc - - - KMeansModel
  * @param <V> vector datatype

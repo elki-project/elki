@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * work, as a side effect).
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class KMedoidsFastPAMTest extends AbstractClusterAlgorithmTest {
   @Test

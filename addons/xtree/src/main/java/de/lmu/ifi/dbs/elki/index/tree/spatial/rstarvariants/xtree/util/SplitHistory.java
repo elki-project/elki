@@ -36,6 +36,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * 
  * @author Marisa Thoma
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public final class SplitHistory implements Serializable, Cloneable {
   /**

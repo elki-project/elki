@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
  * information is needed for persistent storage.
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  */
 public class XTreeHeader extends TreeIndexHeader {
   /**

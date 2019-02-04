@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the NaN-drop cleaning filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class DropNaNFilterTest extends AbstractDataSourceTest {
   /**

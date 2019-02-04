@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for the Leader algorithm.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LeaderTest extends AbstractClusterAlgorithmTest {
   /**

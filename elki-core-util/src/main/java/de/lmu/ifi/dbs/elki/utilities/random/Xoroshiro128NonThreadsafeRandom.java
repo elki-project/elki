@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * See http://creativecommons.org/publicdomain/zero/1.0/
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "D. Blackman, S. Vigna", //
     title = "xoroshiro+ / xorshift* / xorshift+ generators and the PRNG shootout", //

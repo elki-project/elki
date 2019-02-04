@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the MAD estimation for the LogLogistic distribution.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LogLogisticMADEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

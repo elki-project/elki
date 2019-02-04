@@ -50,6 +50,7 @@ import net.jafama.FastMath;
  * TODO: support sparse vectors, varying length
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti", //
     title = "Hilbert Exclusion: Improved Metric Search through Finite Isometric Embeddings", //

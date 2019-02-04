@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the mM_rad split.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MMRadSplitTest extends AbstractIndexStructureTest {
   @Test

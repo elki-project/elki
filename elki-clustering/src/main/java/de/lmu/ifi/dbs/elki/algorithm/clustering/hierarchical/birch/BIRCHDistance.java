@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * The exception to this rule is Manhattan.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @assoc - - - ClusteringFeature
  * @assoc - - - NumberVector

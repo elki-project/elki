@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * Example code for using the R-tree index of ELKI, with Haversine distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class GeoIndexing {
   public static void main(String[] args) {

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the trivial no-outlier algorithm.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class TrivialNoOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test

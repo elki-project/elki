@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for APRIORI.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class APRIORITest extends AbstractFrequentItemsetAlgorithmTest {
   @Test

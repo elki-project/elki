@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ensemble.*;
  * Tests the basic outlier ensemble and regression test different votings.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   @Test

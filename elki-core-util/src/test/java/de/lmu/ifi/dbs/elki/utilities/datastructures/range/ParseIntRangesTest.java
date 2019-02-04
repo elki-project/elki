@@ -28,8 +28,13 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 
+/**
+ * Test for the parser of integer ranges
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
+ */
 public class ParseIntRangesTest {
-
   @Test
   public void examples() {
     IntGenerator r;

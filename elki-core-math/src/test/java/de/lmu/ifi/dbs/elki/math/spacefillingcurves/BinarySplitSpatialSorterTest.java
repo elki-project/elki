@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorterTest.V;
  * use a stable sort, but also more expensive.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class BinarySplitSpatialSorterTest {
   @Test

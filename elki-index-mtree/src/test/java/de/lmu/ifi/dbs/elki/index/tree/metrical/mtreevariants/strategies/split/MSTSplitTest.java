@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the MST split.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MSTSplitTest extends AbstractIndexStructureTest {
   @Test

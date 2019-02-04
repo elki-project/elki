@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: support sparse vectors, varying length
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "F. Topsøe", //
     title = "Some inequalities for information divergence and related measures of discrimination", //

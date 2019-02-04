@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * Sublist of an existing result to contain only some of the elements.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
   /**

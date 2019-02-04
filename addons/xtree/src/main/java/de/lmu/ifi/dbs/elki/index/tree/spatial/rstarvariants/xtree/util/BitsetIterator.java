@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * Iterator over the set bits of a {@code long[]} bitset, using the trove API.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 class BitsetIterator implements IntIterator {
   private final long[] bits;

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the estimation for the Rayleigh MLE estimation.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class RayleighMLEEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

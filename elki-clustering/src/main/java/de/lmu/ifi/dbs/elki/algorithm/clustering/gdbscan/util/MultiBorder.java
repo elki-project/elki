@@ -26,6 +26,7 @@ import java.util.Arrays;
  * Multiple border point assignment.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MultiBorder implements Assignment {
   /**

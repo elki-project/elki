@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for Manhattan distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ManhattanDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

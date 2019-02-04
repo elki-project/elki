@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the min-max normalization filter.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class AttributeWiseMinMaxNormalizationTest extends AbstractDataSourceTest {
   /**

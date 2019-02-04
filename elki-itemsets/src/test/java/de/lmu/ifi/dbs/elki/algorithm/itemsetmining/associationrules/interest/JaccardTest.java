@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the Jaccard metric.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class JaccardTest extends AbstractFrequentItemsetAlgorithmTest {
   @Test

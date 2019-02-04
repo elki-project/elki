@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Doctoral Dissertation, 1997.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Alias({ "D2" })
 @Reference(authors = "T. Zhang", //

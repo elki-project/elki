@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Proc. 20th Int. Conf. on World Wide Web (WWW'11)
  *
  * @author Evelyn Kirner
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

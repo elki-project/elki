@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the M_LB_DIST split.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MLBDistSplitTest extends AbstractIndexStructureTest {
   @Test

@@ -51,6 +51,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  * Provides methods for splitting X-tree nodes.
  * 
  * @author Marisa Thoma
+ * @since 0.7.5
  */
 public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N>> {
   /** Logger object for the XSplitter. */

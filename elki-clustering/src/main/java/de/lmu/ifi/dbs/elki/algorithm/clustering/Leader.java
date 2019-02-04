@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * TODO: when no index is available, fall back to the original approach.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type
  */

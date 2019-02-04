@@ -34,6 +34,12 @@ import de.lmu.ifi.dbs.elki.joglvis.ShaderUtil;
 import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlot;
 
+/**
+ * OpenGL2 version for Intel 945 graphics boards of the scatterplot render.
+ *
+ * @author Erich Schubert
+ * @since 0.7.0
+ */
 public class ScatterPlotOpenGL2Intel945 implements ScatterPlot {
   private int[] textures = new int[2];
 

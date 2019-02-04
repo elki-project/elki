@@ -33,6 +33,7 @@ import org.junit.Test;
  * Unit test {@link MeanVarianceMinMax}.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MeanVarianceMinMaxTest {
   /**

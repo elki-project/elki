@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for PWM estimator.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class PWMEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test

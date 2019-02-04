@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the KNNSOS Outlier algorithm.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class KNNSOSTest extends AbstractOutlierAlgorithmTest {
   @Test

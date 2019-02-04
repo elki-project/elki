@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for Ensemble estimator.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class EnsembleEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test

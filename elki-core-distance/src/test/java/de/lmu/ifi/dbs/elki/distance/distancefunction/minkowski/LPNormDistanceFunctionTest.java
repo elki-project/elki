@@ -34,6 +34,7 @@ import net.jafama.FastMath;
  * Unit test for Euclidean distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

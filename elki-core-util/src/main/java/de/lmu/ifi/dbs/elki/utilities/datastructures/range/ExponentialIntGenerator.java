@@ -26,6 +26,7 @@ import java.util.function.IntConsumer;
  * Generate an exponential range.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ExponentialIntGenerator implements IntGenerator {
   /**

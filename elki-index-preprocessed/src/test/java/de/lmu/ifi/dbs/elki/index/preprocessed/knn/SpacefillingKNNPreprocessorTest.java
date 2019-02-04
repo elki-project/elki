@@ -49,6 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Note: as these are approximate indexes, there is a dependency on the random
  * generator, so we use fixed seeds. But this regression test may fail when,
  * e.g., the random generator is modified.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SpacefillingKNNPreprocessorTest {
   // the following values depend on the data set used!

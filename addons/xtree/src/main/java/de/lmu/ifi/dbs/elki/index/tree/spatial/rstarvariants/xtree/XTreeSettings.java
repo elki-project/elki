@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
  * XTree settings.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class XTreeSettings extends RTreeSettings {
   /**

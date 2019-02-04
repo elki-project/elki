@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test HiSC on a simple test data set.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class HiSCTest extends AbstractClusterAlgorithmTest {
   @Test

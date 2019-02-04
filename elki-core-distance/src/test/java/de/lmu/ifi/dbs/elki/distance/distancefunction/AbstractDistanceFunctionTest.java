@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
  * random objects.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public abstract class AbstractDistanceFunctionTest {
   /**

@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Journal of Machine Learning Research 15
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - QuadTree
  *

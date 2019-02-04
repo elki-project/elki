@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for unit-length cosine distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class CosineUnitlengthDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

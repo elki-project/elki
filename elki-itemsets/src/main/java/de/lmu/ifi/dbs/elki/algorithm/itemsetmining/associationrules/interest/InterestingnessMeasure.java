@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
  * Interface for interestingness measures.
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 public interface InterestingnessMeasure {
   /**

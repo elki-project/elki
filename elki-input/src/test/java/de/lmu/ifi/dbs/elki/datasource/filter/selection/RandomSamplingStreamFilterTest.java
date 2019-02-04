@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the random sampling filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
   /**

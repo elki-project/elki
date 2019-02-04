@@ -41,6 +41,7 @@ import net.jafama.FastMath;
  * TODO: support weighted ground truth.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "K. Järvelin, J. Kekäläinen", //
     title = "Cumulated gain-based evaluation of IR techniques", //

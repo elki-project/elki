@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Result class for association rule mining
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  *
  * @has - - - AssociationRule
  */

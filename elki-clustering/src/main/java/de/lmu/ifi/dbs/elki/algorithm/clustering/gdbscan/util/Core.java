@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util;
  * Core point assignment.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class Core implements Assignment {
   /**

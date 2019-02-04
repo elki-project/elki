@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * preprint, to appear
  *
  * @author Erich Schubert
+ * @since 0.7.5
  * 
  * @has - - - Assignment
  *

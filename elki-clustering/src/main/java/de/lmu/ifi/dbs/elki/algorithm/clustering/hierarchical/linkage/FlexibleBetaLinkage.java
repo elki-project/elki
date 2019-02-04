@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * The Computer Journal 9.4
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", //
     title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //

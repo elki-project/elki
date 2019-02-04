@@ -55,6 +55,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  *
  * @author Julian Erhard
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - PointerPrototypeHierarchyRepresentationResult
  */

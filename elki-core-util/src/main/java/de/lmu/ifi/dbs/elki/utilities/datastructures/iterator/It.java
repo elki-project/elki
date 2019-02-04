@@ -30,6 +30,7 @@ import java.util.function.Predicate;
  * lists (which have distance and objects), we cannot use this interface.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Object type.
  */

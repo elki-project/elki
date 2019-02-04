@@ -32,6 +32,7 @@ import org.junit.Test;
  * Test filtered convex hulls.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class FilteredConvexHull2DTest {
   @Test

@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  * @author Dominik Acker
+ * @since 0.7.5
  *
  * @composed - - - AffinityMatrixBuilder
  *

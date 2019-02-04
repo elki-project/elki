@@ -25,6 +25,9 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 /**
  * Iterator provider for an integer range from <code>from</code> to
  * <code>to</code>. Covers <code>[from,to[</code>.
+ *
+ * @author Marisa Thoma
+ * @since 0.7.5
  */
 public class IntegerRangeIterator implements IntIterator {
   protected int n, to;
@@ -49,7 +52,7 @@ public class IntegerRangeIterator implements IntIterator {
   public Integer next() {
     return nextInt();
   }
-  
+
   @Override
   public int skip(int n) {
     throw new UnsupportedOperationException();

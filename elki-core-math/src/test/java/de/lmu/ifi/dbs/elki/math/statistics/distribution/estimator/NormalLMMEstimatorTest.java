@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Regression test the l-moments estimation for the normal distribution.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class NormalLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

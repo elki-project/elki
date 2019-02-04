@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
  * Concatenate multiple iterators.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Data type
  */

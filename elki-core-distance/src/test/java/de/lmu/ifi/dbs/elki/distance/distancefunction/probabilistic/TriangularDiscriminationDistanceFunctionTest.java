@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for triangular discrimination distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class TriangularDiscriminationDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

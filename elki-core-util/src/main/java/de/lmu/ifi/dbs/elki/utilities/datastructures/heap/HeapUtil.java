@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * depending onto math from these data structures.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public final class HeapUtil {
   /**

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for ArcCosine distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ArcCosineDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

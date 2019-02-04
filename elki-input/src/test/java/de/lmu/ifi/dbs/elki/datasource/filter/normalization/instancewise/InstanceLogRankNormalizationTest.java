@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the log-rank normalization filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class InstanceLogRankNormalizationTest extends AbstractDataSourceTest {
   /**

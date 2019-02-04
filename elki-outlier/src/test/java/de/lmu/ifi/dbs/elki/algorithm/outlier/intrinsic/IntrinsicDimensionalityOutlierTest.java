@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Tests the Intrinsic Dimensionality outlier detection algorithm.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the O(kn) initialization "linear BUILD" from PAM++.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LABInitialMeansTest extends AbstractClusterAlgorithmTest {
   @Test

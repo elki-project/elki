@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * Helper functionality for parsing.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public final class ParseUtil {
   /**

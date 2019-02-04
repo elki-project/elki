@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
  * FIXME: return lines and points for degenerate cases?
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class AlphaShapeTest {
   @Test

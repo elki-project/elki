@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Hierarchical clustering with prototypes (used by {@link MiniMax}).
  * 
  * @author Julian Erhard
+ * @since 0.7.5
  */
 public class PointerPrototypeHierarchyRepresentationResult extends PointerHierarchyRepresentationResult {
   /**

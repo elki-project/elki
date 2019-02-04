@@ -35,6 +35,14 @@ import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlot;
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.opengl2intel945.ScatterPlotOpenGL2Intel945;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
+/**
+ * 3D scatter plot using OpenGL shaders for efficiency.
+ * <p>
+ * Not very portable yet to older intel graphics.
+ *
+ * @author Erich Schubert
+ * @since 0.7.0
+ */
 public class ScatterPlot3DVisualization implements GLEventListener {
   private static final Logging LOG = Logging.getLogger(ScatterPlot3DVisualization.class);
 

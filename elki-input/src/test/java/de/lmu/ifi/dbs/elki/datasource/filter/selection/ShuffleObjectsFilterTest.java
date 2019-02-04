@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the shuffle objects filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
   /**

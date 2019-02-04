@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Journal of the ACM 59(6)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @param <O> Vector type
  */

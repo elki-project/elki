@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
  * Abstract base class for testing data sources.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public abstract class AbstractDataSourceTest {
   /**

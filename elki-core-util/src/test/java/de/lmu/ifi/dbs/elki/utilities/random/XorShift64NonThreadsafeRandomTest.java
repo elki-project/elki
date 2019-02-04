@@ -31,6 +31,7 @@ import org.junit.Test;
  * Unit test for our XorShift64 RNG.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class XorShift64NonThreadsafeRandomTest {
   @Test

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Advances in Knowledge Discovery and Data Mining
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "W. Klösgen", //
     title = "Explora: A multipattern and multistrategy discovery assistant", //

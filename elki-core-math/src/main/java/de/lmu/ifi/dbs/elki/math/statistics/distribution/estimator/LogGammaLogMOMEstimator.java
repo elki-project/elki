@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * transformation.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @navassoc - estimates - LogGammaDistribution
  */

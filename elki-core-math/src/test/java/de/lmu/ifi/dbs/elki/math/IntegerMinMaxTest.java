@@ -29,6 +29,7 @@ import org.junit.Test;
  * Test the IntegerMinMax class.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class IntegerMinMaxTest {
   /**

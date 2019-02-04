@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
  * TODO: add tests for the other functions as well.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class VectorUtilTest {
   @Test

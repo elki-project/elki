@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * numerical attributes on non-numerical data.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class IncompatibleDataException extends AbortException {
   /**

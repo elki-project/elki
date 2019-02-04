@@ -26,6 +26,7 @@ import java.util.function.Predicate;
  * Filtered iterator.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @composed - - - It
  *

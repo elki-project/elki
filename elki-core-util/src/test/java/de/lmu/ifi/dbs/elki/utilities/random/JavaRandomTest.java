@@ -38,6 +38,7 @@ import org.junit.Test;
  * not be systematically worse than Javas.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class JavaRandomTest {
   @Test

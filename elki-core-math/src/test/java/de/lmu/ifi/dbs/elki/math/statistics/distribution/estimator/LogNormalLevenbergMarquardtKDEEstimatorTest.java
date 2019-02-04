@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * distribution.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class LogNormalLevenbergMarquardtKDEEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

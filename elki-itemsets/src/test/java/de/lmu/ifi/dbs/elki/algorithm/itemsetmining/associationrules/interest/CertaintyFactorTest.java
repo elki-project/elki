@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Unit test for the Certainty Factor metric.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class CertaintyFactorTest extends AbstractFrequentItemsetAlgorithmTest {
   @Test

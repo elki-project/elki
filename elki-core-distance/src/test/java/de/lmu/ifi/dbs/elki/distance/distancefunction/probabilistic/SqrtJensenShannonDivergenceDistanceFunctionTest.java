@@ -34,6 +34,7 @@ import net.jafama.FastMath;
  * Unit test for Sqrt(Jensen-Shannon) distance.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SqrtJensenShannonDivergenceDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

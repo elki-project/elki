@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * Unit tests for SphereUtil.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class SphereUtilTest {
   @Test

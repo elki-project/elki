@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Regression test for k clusters with minsize extraction.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class ClustersWithNoiseExtractionTest extends AbstractClusterAlgorithmTest {
   @Test

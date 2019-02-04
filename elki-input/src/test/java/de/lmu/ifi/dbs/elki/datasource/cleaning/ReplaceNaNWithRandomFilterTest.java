@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Test the random NaN-replacement cleaning filter.
  *
  * @author Matthew Arcifa
+ * @since 0.7.5
  */
 public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
   /**

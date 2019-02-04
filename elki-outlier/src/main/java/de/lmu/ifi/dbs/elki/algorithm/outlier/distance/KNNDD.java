@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - KNNQuery
  *

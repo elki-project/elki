@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * Performs a single assignment with Ostrovsky initializations.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class OstrovskyInitialMeansTest extends AbstractClusterAlgorithmTest {
   @Test

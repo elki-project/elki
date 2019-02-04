@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
  * Abstraction interface for an affinity matrix.
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public interface AffinityMatrix {
   /**

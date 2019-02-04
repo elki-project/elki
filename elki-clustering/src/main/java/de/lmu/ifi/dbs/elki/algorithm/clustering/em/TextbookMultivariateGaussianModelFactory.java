@@ -47,6 +47,7 @@ import net.jafama.FastMath;
  * Again, do not use this. Always prefer {@link MultivariateGaussianModelFactory}.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - TextbookMultivariateGaussianModel
  *

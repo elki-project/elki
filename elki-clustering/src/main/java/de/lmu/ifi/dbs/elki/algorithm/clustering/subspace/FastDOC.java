@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02).
  * 
  * @author Florian Nuecke
+ * @since 0.7.5
  * 
  * @has - - - SubspaceModel
  * 

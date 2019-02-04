@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * Simple unit test for eigenvalue decomposition.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class EigenvalueDecompositionTest {
   @Test

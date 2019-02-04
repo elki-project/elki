@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
  * Parse integer range syntaxes.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  *
  * @has - - - IntGenerator
  */

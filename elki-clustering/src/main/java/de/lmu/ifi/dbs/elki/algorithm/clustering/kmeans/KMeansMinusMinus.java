@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)
  *
  * @author Jonas Steinke
+ * @since 0.7.5
  *
  * @navassoc - - - KMeansModel
  *

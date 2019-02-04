@@ -37,6 +37,7 @@ import org.junit.Test;
  * or matrixes.
  *
  * @author Merlin Dietrich
+ * @since 0.7.5
  */
 public final class VMathOperationsTest {
   /**

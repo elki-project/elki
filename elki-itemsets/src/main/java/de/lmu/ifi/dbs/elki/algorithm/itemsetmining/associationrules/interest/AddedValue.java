@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Technology
  * 
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "S. Sahar, Sigal, Y. Mansour", //
     title = "Empirical evaluation of interest-level criteria", //

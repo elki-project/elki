@@ -33,6 +33,7 @@ import org.junit.Test;
  *
  * @author Erich Schubert
  * @author Merlin Dietrich
+ * @since 0.7.5
  */
 public final class CholeskyDecompositionTest {
   public static double[][] TESTMATRIX_L1 = { //

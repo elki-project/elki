@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * Unit test for matrix weighted distance.
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MatrixWeightedQuadraticDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test

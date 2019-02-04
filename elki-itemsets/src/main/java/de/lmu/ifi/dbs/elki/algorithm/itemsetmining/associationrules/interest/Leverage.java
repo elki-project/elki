@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In Knowledge Discovery in Databases 1991
  *
  * @author Frederic Sautter
+ * @since 0.7.5
  */
 @Reference(authors = "G. Piatetsky-Shapiro", //
     title = "Discovery, analysis, and presentation of strong rules", //

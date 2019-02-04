@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
  * Note: this estimator works only for positively skewed data?
  * 
  * @author Erich Schubert
+ * @since 0.7.5
  */
 public class EMGOlivierNorbergEstimatorTest extends AbstractDistributionEstimatorTest {
   @Test

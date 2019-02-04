@@ -28,6 +28,7 @@ import java.util.Arrays;
  * This class is generated from a template.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @has - - - UnsortedIter
 ${key.genu || val.genu ? " *\n" : ""}${key.genu ? " * @param "+key.genu+" Key type\n" : ""}${val.genu ? " * @param "+val.genu+" Value type\n" : ""} */

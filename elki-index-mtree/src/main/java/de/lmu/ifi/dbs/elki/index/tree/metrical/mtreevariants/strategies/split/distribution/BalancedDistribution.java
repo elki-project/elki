@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In Proc. Int. Conf. Very Large Data Bases (VLDB'97)
  *
  * @author Erich Schubert
+ * @since 0.7.5
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
     title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //

@@ -54,6 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Test case to validate the dynamic updates of materialized kNN preprocessors.
+ *
+ * @author Erich Schubert
+ * @since 0.7.5
  */
 public class MaterializedKNNPreprocessorTest {
   // the following values depend on the data set used!
