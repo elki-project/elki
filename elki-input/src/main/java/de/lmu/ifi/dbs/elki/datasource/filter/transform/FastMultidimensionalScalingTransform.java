@@ -192,9 +192,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
         }
         l = multiply(imat, cur, tmp);
       }
-      l = estimateEigenvalue(imat, cur);
-      lambda[d] = l;
-      d++; // Successful
+      lambda[d++] = l = estimateEigenvalue(imat, cur);
       LOG.incrementProcessed(prog);
       if(d == tdim) {
         break;
@@ -219,11 +217,6 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
         out[d] = val;
         l2 += val * val;
       }
-    }
-    // If zero, retry. This should barely ever happen.
-    if(!(l2 > 0)) {
-      randomInitialization(out, rnd);
-      return;
     }
     // Standardize:
     final double s = 1. / FastMath.sqrt(l2);
