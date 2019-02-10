@@ -120,26 +120,15 @@ public class UpdatableHeap<O> extends Heap<O> {
       heapModified();
       return;
     }
-    else {
-      assert (pos >= 0) : "Unexpected negative position.";
-      assert (queue[pos].equals(e));
-      // Did the value improve?
-      if(comparator == null) {
-        @SuppressWarnings("unchecked")
-        Comparable<Object> c = (Comparable<Object>) e;
-        if(c.compareTo(queue[pos]) >= 0) {
-          return;
-        }
-      }
-      else {
-        if(comparator.compare(e, queue[pos]) >= 0) {
-          return;
-        }
-      }
-      heapifyUp(pos, e);
-      heapModified();
+    assert (pos >= 0) : "Unexpected negative position.";
+    assert (queue[pos].equals(e));
+    // Did the value improve?
+    if(comparator.compare(e, queue[pos]) >= 0) {
       return;
     }
+    heapifyUp(pos, e);
+    heapModified();
+    return;
   }
 
   @Override
@@ -154,23 +143,11 @@ public class UpdatableHeap<O> extends Heap<O> {
     queue[size - 1] = null;
     // Keep heap in sync?
     size--;
-    if(comparator != null) {
-      if(comparator.compare(ret, reinsert) > 0) {
-        heapifyUpComparator(pos, reinsert);
-      }
-      else {
-        heapifyDownComparator(pos, reinsert);
-      }
+    if(comparator.compare(ret, reinsert) > 0) {
+      heapifyUp(pos, reinsert);
     }
     else {
-      @SuppressWarnings("unchecked")
-      Comparable<Object> comp = (Comparable<Object>) ret;
-      if(comp.compareTo(reinsert) > 0) {
-        heapifyUpComparable(pos, reinsert);
-      }
-      else {
-        heapifyDownComparable(pos, reinsert);
-      }
+      heapifyDown(pos, reinsert);
     }
     heapModified();
     // Keep index up to date
@@ -207,35 +184,10 @@ public class UpdatableHeap<O> extends Heap<O> {
    * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
    *
    * @param pos insertion position
-   * @param elem Element to insert
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  protected void heapifyUpComparable(int pos, Object elem) {
-    final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
-    while(pos > 0) {
-      final int parent = (pos - 1) >>> 1;
-      Object par = queue[parent];
-
-      if(cur.compareTo(par) >= 0) {
-        break;
-      }
-      queue[pos] = par;
-      index.put(par, pos);
-      pos = parent;
-    }
-    queue[pos] = cur;
-    index.put(cur, pos);
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   *
-   * @param pos insertion position
    * @param cur Element to insert
    */
   @Override
-  protected void heapifyUpComparator(int pos, Object cur) {
+  protected void heapifyUp(int pos, Object cur) {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
@@ -251,40 +203,8 @@ public class UpdatableHeap<O> extends Heap<O> {
     index.put(cur, pos);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected boolean heapifyDownComparable(final int ipos, Object reinsert) {
-    Comparable<Object> cur = (Comparable<Object>) reinsert;
-    int pos = ipos;
-    final int half = size >>> 1;
-    while(pos < half) {
-      // Get left child (must exist!)
-      int cpos = (pos << 1) + 1;
-      Object child = queue[cpos];
-      // Test right child, if present
-      final int rchild = cpos + 1;
-      if(rchild < size) {
-        Object right = queue[rchild];
-        if(((Comparable<Object>) child).compareTo(right) > 0) {
-          cpos = rchild;
-          child = right;
-        }
-      }
-
-      if(cur.compareTo(child) <= 0) {
-        break;
-      }
-      queue[pos] = child;
-      index.put(child, pos);
-      pos = cpos;
-    }
-    queue[pos] = cur;
-    index.put(cur, pos);
-    return (pos != ipos);
-  }
-
-  @Override
-  protected boolean heapifyDownComparator(final int ipos, Object cur) {
+  protected boolean heapifyDown(final int ipos, Object cur) {
     int pos = ipos;
     final int half = size >>> 1;
     while(pos < half) {

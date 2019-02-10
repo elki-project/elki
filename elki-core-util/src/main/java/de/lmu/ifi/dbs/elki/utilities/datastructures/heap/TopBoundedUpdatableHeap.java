@@ -62,33 +62,15 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
   @Override
   public void offerAt(int pos, E e) {
     // don't add if we hit maxsize and are worse
-    if (pos != NO_VALUE || super.size() < maxsize) {
+    if(pos != NO_VALUE || super.size() < maxsize) {
       super.offerAt(pos, e);
       return;
     }
-    if (compare(e, queue[0]) < 0) {
+    if(comparator.compare(e, queue[0]) < 0) {
       // while we did not change, this still was "successful".
       return;
     }
-    E prev = super.replaceTopElement(e);
-    handleOverflow(prev);
-  }
-
-  /**
-   * Test if the priority of an object is higher.
-   * 
-   * @param e New object
-   * @param object Reference object
-   * @return True when an update is needed
-   */
-  protected int compare(Object e, Object object) {
-    if (comparator == null) {
-      @SuppressWarnings("unchecked")
-      Comparable<Object> c = (Comparable<Object>) e;
-      return c.compareTo(queue[0]);
-    } else {
-      return comparator.compare(e, queue[0]);
-    }
+    handleOverflow(super.replaceTopElement(e));
   }
 
   /**

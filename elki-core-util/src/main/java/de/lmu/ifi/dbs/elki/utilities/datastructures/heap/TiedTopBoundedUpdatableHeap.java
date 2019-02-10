@@ -79,7 +79,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
       for(Iterator<E> i = ties.iterator(); i.hasNext();) {
         E e2 = i.next();
         if(e.equals(e2)) {
-          if(compare(e, e2) <= 0) {
+          if(comparator.compare(e, e2) <= 0) {
             i.remove();
             index.removeInt(e2);
           }
@@ -89,7 +89,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
       throw new AbortException("Heap corrupt - should not be reached");
     }
     // Updated object will be worse than the current ties
-    if(pos >= 0 && !ties.isEmpty() && compare(e, ties.get(0)) < 0) {
+    if(pos >= 0 && !ties.isEmpty() && comparator.compare(e, ties.get(0)) < 0) {
       removeAt(pos);
       index.removeInt(e);
       // assert(checkHeap() == null) : "removeObject broke heap: "+ checkHeap();
@@ -104,12 +104,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
 
   @Override
   public E peek() {
-    if(ties.isEmpty()) {
-      return super.peek();
-    }
-    else {
-      return ties.get(ties.size() - 1);
-    }
+    return ties.isEmpty() ? super.peek() : ties.get(ties.size() - 1);
   }
 
   @Override
@@ -117,29 +112,14 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
     if(ties.isEmpty()) {
       return super.poll();
     }
-    else {
-      E e = ties.remove(ties.size() - 1);
-      index.removeInt(e);
-      return e;
-    }
+    E e = ties.remove(ties.size() - 1);
+    index.removeInt(e);
+    return e;
   }
 
   @Override
   protected void handleOverflow(E e) {
-    boolean tied = false;
-    if(comparator == null) {
-      @SuppressWarnings("unchecked")
-      Comparable<Object> c = (Comparable<Object>) e;
-      if(c.compareTo(queue[0]) == 0) {
-        tied = true;
-      }
-    }
-    else {
-      if(comparator.compare(e, queue[0]) == 0) {
-        tied = true;
-      }
-    }
-    if(tied) {
+    if(comparator.compare(e, queue[0]) == 0) {
       ties.add(e);
       index.put(e, IN_TIES);
     }

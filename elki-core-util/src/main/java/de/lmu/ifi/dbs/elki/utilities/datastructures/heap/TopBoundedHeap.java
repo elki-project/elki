@@ -67,14 +67,7 @@ public class TopBoundedHeap<E> extends Heap<E> {
       return;
     }
     // Peek at the top element, return if we are worse.
-    final int comp;
-    if (comparator == null) {
-      @SuppressWarnings("unchecked")
-      Comparable<Object> c = (Comparable<Object>) e;
-      comp = c.compareTo(queue[0]);
-    } else {
-      comp = comparator.compare(e, queue[0]);
-    }
+    final int comp = comparator.compare(e, queue[0]);
     if (comp < 0) {
       return;
     }
@@ -82,8 +75,7 @@ public class TopBoundedHeap<E> extends Heap<E> {
       handleOverflow(e);
     } else {
       // Otherwise, replace and repair:
-      E prev = super.replaceTopElement(e);
-      handleOverflow(prev);
+      handleOverflow(super.replaceTopElement(e));
     }
   }
 

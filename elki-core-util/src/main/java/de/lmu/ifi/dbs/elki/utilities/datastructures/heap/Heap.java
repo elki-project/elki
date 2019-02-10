@@ -52,7 +52,7 @@ public class Heap<E> {
   protected int size = 0;
 
   /**
-   * The comparator or {@code null}.
+   * The comparator.
    */
   protected final Comparator<Object> comparator;
 
@@ -102,7 +102,7 @@ public class Heap<E> {
     super();
     this.size = 0;
     this.queue = new Object[size];
-    this.comparator = (Comparator<Object>) comparator;
+    this.comparator = (Comparator<Object>) (comparator != null ? comparator : Comparator.naturalOrder());
   }
 
   /**
@@ -112,7 +112,7 @@ public class Heap<E> {
    */
   public void add(E e) {
     // resize when needed
-    if (size + 1 > queue.length) {
+    if(size + 1 > queue.length) {
       resize(size + 1);
     }
     // final int pos = size;
@@ -143,10 +143,7 @@ public class Heap<E> {
    */
   @SuppressWarnings("unchecked")
   public E peek() {
-    if (size == 0) {
-      return null;
-    }
-    return (E) queue[0];
+    return size == 0 ? null : (E) queue[0];
   }
 
   /**
@@ -166,7 +163,7 @@ public class Heap<E> {
    */
   @SuppressWarnings("unchecked")
   protected E removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
+    if(pos < 0 || pos >= size) {
       return null;
     }
     final E ret = (E) queue[pos];
@@ -187,53 +184,17 @@ public class Heap<E> {
    */
   protected void heapifyUp(int pos, E elem) {
     assert (pos < size && pos >= 0);
-    if (comparator != null) {
-      heapifyUpComparator(pos, elem);
-    } else {
-      heapifyUpComparable(pos, elem);
-    }
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   * 
-   * @param pos insertion position
-   * @param elem Element to insert
-   */
-  @SuppressWarnings("unchecked")
-  protected void heapifyUpComparable(int pos, Object elem) {
-    final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
-    while (pos > 0) {
+    while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
 
-      if (cur.compareTo(par) >= 0) {
+      if(comparator.compare(elem, par) >= 0) {
         break;
       }
       queue[pos] = par;
       pos = parent;
     }
-    queue[pos] = cur;
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   * 
-   * @param pos insertion position
-   * @param cur Element to insert
-   */
-  protected void heapifyUpComparator(int pos, Object cur) {
-    while (pos > 0) {
-      final int parent = (pos - 1) >>> 1;
-      Object par = queue[parent];
-
-      if (comparator.compare(cur, par) >= 0) {
-        break;
-      }
-      queue[pos] = par;
-      pos = parent;
-    }
-    queue[pos] = cur;
+    queue[pos] = elem;
   }
 
   /**
@@ -243,80 +204,29 @@ public class Heap<E> {
    * @param reinsert Object to reinsert
    * @return true when the order was changed
    */
-  protected boolean heapifyDown(int pos, Object reinsert) {
-    assert (pos >= 0);
-    if (comparator != null) {
-      return heapifyDownComparator(pos, reinsert);
-    } else {
-      return heapifyDownComparable(pos, reinsert);
-    }
-  }
-
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param ipos re-insertion position
-   * @param reinsert Object to reinsert
-   * @return true when the order was changed
-   */
-  @SuppressWarnings("unchecked")
-  protected boolean heapifyDownComparable(final int ipos, Object reinsert) {
-    Comparable<Object> cur = (Comparable<Object>) reinsert;
+  protected boolean heapifyDown(final int ipos, Object cur) {
+    assert (ipos >= 0);
     int pos = ipos;
     final int half = size >>> 1;
-    while (pos < half) {
-      // Get left child (must exist!)
-      int cpos = (pos << 1) + 1;
-      Object child = queue[cpos];
-      // Test right child, if present
-      final int rchild = cpos + 1;
-      if (rchild < size) {
-        Object right = queue[rchild];
-        if (((Comparable<Object>) child).compareTo(right) > 0) {
-          cpos = rchild;
-          child = right;
-        }
-      }
-
-      if (cur.compareTo(child) <= 0) {
-        break;
-      }
-      queue[pos] = child;
-      pos = cpos;
-    }
-    queue[pos] = cur;
-    return (pos != ipos);
-  }
-
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param ipos re-insertion position
-   * @param cur Object to reinsert
-   * @return true when the order was changed
-   */
-  protected boolean heapifyDownComparator(final int ipos, Object cur) {
-    int pos = ipos;
-    final int half = size >>> 1;
-    while (pos < half) {
+    while(pos < half) {
       int min = pos;
       Object best = cur;
 
       final int lchild = (pos << 1) + 1;
       Object left = queue[lchild];
-      if (comparator.compare(best, left) > 0) {
+      if(comparator.compare(best, left) > 0) {
         min = lchild;
         best = left;
       }
       final int rchild = lchild + 1;
-      if (rchild < size) {
+      if(rchild < size) {
         Object right = queue[rchild];
-        if (comparator.compare(best, right) > 0) {
+        if(comparator.compare(best, right) > 0) {
           min = rchild;
           best = right;
         }
       }
-      if (min == pos) {
+      if(min == pos) {
         break;
       }
       queue[pos] = best;
@@ -353,10 +263,10 @@ public class Heap<E> {
     // Double until 64, then increase by 50% each time.
     int newCapacity = ((queue.length < 64) ? ((queue.length + 1) << 1) : ((queue.length >> 1) * 3));
     // overflow?
-    if (newCapacity < 0) {
+    if(newCapacity < 0) {
       throw new OutOfMemoryError();
     }
-    if (requiredSize > newCapacity) {
+    if(requiredSize > newCapacity) {
       newCapacity = requiredSize;
     }
     queue = Arrays.copyOf(queue, newCapacity);
@@ -367,7 +277,7 @@ public class Heap<E> {
    */
   public void clear() {
     // clean up references in the array for memory management
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       queue[i] = null;
     }
     this.size = 0;
@@ -398,21 +308,10 @@ public class Heap<E> {
    * @return {@code null} when the heap is correct
    */
   protected String checkHeap() {
-    if (comparator == null) {
-      for (int i = 1; i < size; i++) {
-        final int parent = (i - 1) >>> 1;
-        @SuppressWarnings("unchecked")
-        Comparable<Object> po = (Comparable<Object>) queue[parent];
-        if (po.compareTo(queue[i]) > 0) {
-          return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
-        }
-      }
-    } else {
-      for (int i = 1; i < size; i++) {
-        final int parent = (i - 1) >>> 1;
-        if (comparator.compare(queue[parent], queue[i]) > 0) {
-          return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
-        }
+    for(int i = 1; i < size; i++) {
+      final int parent = (i - 1) >>> 1;
+      if(comparator.compare(queue[parent], queue[i]) > 0) {
+        return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
       }
     }
     return null;

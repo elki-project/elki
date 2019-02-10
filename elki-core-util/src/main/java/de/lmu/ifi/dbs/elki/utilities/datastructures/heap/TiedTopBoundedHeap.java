@@ -74,25 +74,17 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
 
   @Override
   public E peek() {
-    if (ties.isEmpty()) {
-      return super.peek();
-    } else {
-      return ties.get(ties.size() - 1);
-    }
+    return ties.isEmpty() ? super.peek() : ties.get(ties.size() - 1);
   }
 
   @Override
   public E poll() {
-    if (ties.isEmpty()) {
-      return super.poll();
-    } else {
-      return ties.remove(ties.size() - 1);
-    }
+    return ties.isEmpty() ? super.poll() : ties.remove(ties.size() - 1);
   }
 
   @Override
   public E replaceTopElement(E e) {
-    if (ties.isEmpty()) {
+    if(ties.isEmpty()) {
       return super.replaceTopElement(e);
     }
     // Fall back to classic emulation via poll and offer:
@@ -103,21 +95,10 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
 
   @Override
   protected void handleOverflow(E e) {
-    boolean tied = false;
-    if (comparator == null) {
-      @SuppressWarnings("unchecked")
-      Comparable<Object> c = (Comparable<Object>) e;
-      if (c.compareTo(queue[0]) == 0) {
-        tied = true;
-      }
-    } else {
-      if (comparator.compare(e, queue[0]) == 0) {
-        tied = true;
-      }
-    }
-    if (tied) {
+    if(comparator.compare(e, queue[0]) == 0) {
       ties.add(e);
-    } else {
+    }
+    else {
       // Also remove old ties.
       ties.clear();
     }
@@ -155,11 +136,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
     @Override
     public E get() {
       final int ssize = TiedTopBoundedHeap.super.size();
-      if (pos < ssize) {
-        return super.get();
-      } else {
-        return ties.get(pos - ssize);
-      }
+      return pos < ssize ? super.get() : ties.get(pos - ssize);
     }
   }
 }
