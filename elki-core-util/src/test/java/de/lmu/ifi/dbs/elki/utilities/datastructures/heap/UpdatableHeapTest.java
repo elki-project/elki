@@ -41,19 +41,19 @@ public class UpdatableHeapTest {
     final int maxid = 5000;
     final int bsize = 100;
     final Random r = new Random(1);
-    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<>(1000);
-    UpdatableHeap<IntegerPriorityObject<Integer>> heap = new UpdatableHeap<>();
+    ArrayList<Entry> simulate = new ArrayList<>(1000);
+    UpdatableHeap<Entry> heap = new UpdatableHeap<>();
     for(int i = 0; i < iters; i++) {
       int batchsize = r.nextInt(bsize);
       for(int j = 0; j < batchsize; j++) {
         int id = r.nextInt(maxid);
         int score = r.nextInt(10000);
         // Update heap
-        heap.add(new IntegerPriorityObject<>(score, id));
+        heap.add(new Entry(score, id));
         // Update simulation
         boolean found = false;
-        for(IntegerPriorityObject<Integer> ent : simulate) {
-          if(ent.getObject().equals(id)) {
+        for(Entry ent : simulate) {
+          if(ent.key == id) {
             if(score > ent.priority) {
               // System.err.println("Updating in ArrayList: " + ent + " to " +
               // score);
@@ -64,7 +64,7 @@ public class UpdatableHeapTest {
           }
         }
         if(!found) {
-          simulate.add(new IntegerPriorityObject<>(score, id));
+          simulate.add(new Entry(score, id));
         }
       }
       // Keeping the simulation list reverse is a bit faster for removal
@@ -74,15 +74,56 @@ public class UpdatableHeapTest {
       int remove = r.nextInt(simulate.size());
       for(int j = 0; j < remove; j++) {
         // System.out.println(heap.toString());
-        IntegerPriorityObject<Integer> fromheap = heap.poll();
-        IntegerPriorityObject<Integer> fromsim = simulate.remove(simulate.size() - 1);
+        Entry fromheap = heap.poll();
+        Entry fromsim = simulate.remove(simulate.size() - 1);
         // System.out.println(fromheap+" <=> "+fromsim);
         assertEquals("Priority doesn't agree.", fromheap.priority, fromsim.priority);
         // Careful with ties!
-        if(fromheap.getObject() != fromsim.getObject() && j + 1 == remove && heap.size() > 0) {
+        if(fromheap.key != fromsim.key && j + 1 == remove && heap.size() > 0) {
           j++;
         }
       }
+    }
+  }
+
+  /**
+   * Heap entry.
+   */
+  static class Entry implements Comparable<Entry> {
+    /**
+     * Priority
+     */
+    int priority;
+
+    /**
+     * Key
+     */
+    int key;
+
+    /**
+     * Constructor.
+     *
+     * @param priority Priority
+     * @param key Key
+     */
+    public Entry(int priority, int key) {
+      this.priority = priority;
+      this.key = key;
+    }
+
+    @Override
+    public int hashCode() {
+      return key;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof Entry && key == ((Entry) obj).key;
+    }
+
+    @Override
+    public int compareTo(Entry o) {
+      return Integer.compare(o.priority, this.priority);
     }
   }
 }

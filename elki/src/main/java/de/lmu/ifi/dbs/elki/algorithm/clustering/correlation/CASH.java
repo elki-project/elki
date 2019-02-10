@@ -20,10 +20,19 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.scalarProduct;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
@@ -31,7 +40,11 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHInterval;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.data.*;
+import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
@@ -60,8 +73,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -74,7 +86,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-
 import net.jafama.FastMath;
 
 /**
@@ -232,7 +243,12 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     final int dim = dimensionality(relation);
 
     // init heap
-    ObjectHeap<IntegerPriorityObject<CASHInterval>> heap = new ComparableMinHeap<>();
+    ObjectHeap<CASHInterval> heap = new ComparatorMaxHeap<>(new Comparator<CASHInterval>() {
+      @Override
+      public int compare(CASHInterval o1, CASHInterval o2) {
+        return Integer.compare(o1.priority(), o2.priority());
+      }
+    });
     ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
     initHeap(heap, relation, dim, noiseIDs);
 
@@ -289,16 +305,15 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       }
 
       // Rebuild heap
-      ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<>(heap.size());
-      for(ObjectHeap.UnsortedIter<IntegerPriorityObject<CASHInterval>> iter = heap.unsortedIter(); iter.valid(); iter.advance()) {
+      ArrayList<CASHInterval> heapVector = new ArrayList<>(heap.size());
+      for(ObjectHeap.UnsortedIter<CASHInterval> iter = heap.unsortedIter(); iter.valid(); iter.advance()) {
         heapVector.add(iter.get());
       }
       heap.clear();
-      for(IntegerPriorityObject<CASHInterval> pair : heapVector) {
-        CASHInterval currentInterval = pair.getObject();
+      for(CASHInterval currentInterval : heapVector) {
         currentInterval.removeIDs(clusterIDs);
         if(currentInterval.getIDs().size() >= minPts) {
-          heap.add(new IntegerPriorityObject<>(currentInterval.priority(), currentInterval));
+          heap.add(currentInterval);
         }
       }
 
@@ -360,7 +375,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
+  private void initHeap(ObjectHeap<CASHInterval> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
     CASHIntervalSplit split = new CASHIntervalSplit(relation, minPts);
 
     // determine minimum and maximum function value of all functions
@@ -391,8 +406,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
       ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       if(intervalIDs != null && intervalIDs.size() >= minPts) {
-        CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, -1, 0, d_mins[i], d_maxs[i]);
-        heap.add(new IntegerPriorityObject<>(rootInterval.priority(), rootInterval));
+        heap.add(new CASHInterval(alphaMin, alphaMax, split, intervalIDs, -1, 0, d_mins[i], d_maxs[i]));
       }
     }
 
@@ -500,7 +514,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval determineNextIntervalAtMaxLevel(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap) {
+  private CASHInterval determineNextIntervalAtMaxLevel(ObjectHeap<CASHInterval> heap) {
     CASHInterval next = doDetermineNextIntervalAtMaxLevel(heap);
     // noise path was chosen
     while(next == null) {
@@ -519,8 +533,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval doDetermineNextIntervalAtMaxLevel(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap) {
-    CASHInterval interval = heap.poll().getObject();
+  private CASHInterval doDetermineNextIntervalAtMaxLevel(ObjectHeap<CASHInterval> heap) {
+    CASHInterval interval = heap.poll();
     int dim = interval.getDimensionality();
     while(true) {
       // max level is reached
@@ -553,11 +567,11 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
         int comp = interval.getLeftChild().compareTo(interval.getRightChild());
         if(comp < 0) {
           bestInterval = interval.getRightChild();
-          heap.add(new IntegerPriorityObject<>(interval.getLeftChild().priority(), interval.getLeftChild()));
+          heap.add(interval.getLeftChild());
         }
         else {
           bestInterval = interval.getLeftChild();
-          heap.add(new IntegerPriorityObject<>(interval.getRightChild().priority(), interval.getRightChild()));
+          heap.add(interval.getRightChild());
         }
       }
       else if(interval.getLeftChild() == null) {

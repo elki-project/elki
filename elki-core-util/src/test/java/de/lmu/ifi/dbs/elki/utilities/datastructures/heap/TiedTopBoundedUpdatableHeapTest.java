@@ -29,6 +29,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeapTest.Entry;
+
 /**
  * Test the specialized heap structures.
  * 
@@ -43,22 +45,22 @@ public class TiedTopBoundedUpdatableHeapTest {
     final int bsize = 1000;
     final int limit = 200;
     final Random r = new Random(1);
-    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<>(1000);
-    TiedTopBoundedUpdatableHeap<IntegerPriorityObject<Integer>> heap = new TiedTopBoundedUpdatableHeap<>(limit);
+    ArrayList<Entry> simulate = new ArrayList<>(1000);
+    TiedTopBoundedUpdatableHeap<Entry> heap = new TiedTopBoundedUpdatableHeap<>(limit);
     for(int i = 0; i < iters; i++) {
       int batchsize = r.nextInt(bsize);
       for(int j = 0; j < batchsize; j++) {
         int id = r.nextInt(maxid);
         int score = r.nextInt(10000);
-        IntegerPriorityObject<Integer> nobj = new IntegerPriorityObject<>(score, id);
+        Entry nobj = new Entry(score, id);
         // Update heap
         heap.add(nobj);
         // Enabling the followig assertion *hides* certain problems!
         // assertTrue("Heap not valid at i="+i, heap.checkHeap());
         // Update simulation
         boolean found = false;
-        for(IntegerPriorityObject<Integer> ent : simulate) {
-          if(ent.getObject().equals(id)) {
+        for(Entry ent : simulate) {
+          if(ent.key == id) {
             if(score > ent.priority) {
               ent.priority = score;
             }
@@ -94,8 +96,8 @@ public class TiedTopBoundedUpdatableHeapTest {
       int remove = r.nextInt(simulate.size());
       for(int j = 0; j < remove; j++) {
         // System.out.println(heap.toString());
-        IntegerPriorityObject<Integer> fromheap = heap.poll();
-        IntegerPriorityObject<Integer> fromsim = simulate.remove(simulate.size() - 1);
+        Entry fromheap = heap.poll();
+        Entry fromsim = simulate.remove(simulate.size() - 1);
         assertEquals("Priority doesn't agree.", fromheap.priority, fromsim.priority);
         if(j + 1 == remove) {
           while(heap.size() > 0) {
