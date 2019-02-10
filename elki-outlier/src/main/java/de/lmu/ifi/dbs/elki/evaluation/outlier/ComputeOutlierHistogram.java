@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -156,12 +155,9 @@ public class ComputeOutlierHistogram implements Evaluator {
       };
     }
     else {
-      hist = new AbstractObjStaticHistogram<double[]>(bins, min, max) {
-        @Override
-        protected double[] makeObject() {
-          return new double[2];
-        }
-      };
+      hist = new ObjHistogram<double[]>(bins, min, max, () -> {
+        return new double[2];
+      });
     }
 
     // first fill histogram only with values of outliers
@@ -187,7 +183,7 @@ public class ComputeOutlierHistogram implements Evaluator {
       }
     }
     Collection<double[]> collHist = new ArrayList<>(hist.getNumBins());
-    for(ObjHistogram.Iter<double[]> iter = hist.iter(); iter.valid(); iter.advance()) {
+    for(ObjHistogram<double[]>.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       double[] data = iter.getValue();
       collHist.add(new double[] { iter.getCenter(), data[0], data[1] });
     }

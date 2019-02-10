@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -106,7 +106,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     // Cluster by labels
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
-    DoubleStaticHistogram hist = new DoubleStaticHistogram(numbins, 0.0, 1.0);
+    DoubleHistogram hist = new DoubleHistogram(numbins, 0.0, 1.0);
 
     if(LOG.isVerbose()) {
       LOG.verbose("Processing points...");
@@ -131,7 +131,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
 
     // Transform Histogram into a Double Vector array.
     Collection<double[]> res = new ArrayList<>(relation.size());
-    for(DoubleStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
+    for(DoubleHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       res.add(new double[] { iter.getCenter(), iter.getValue() });
     }
     HistogramResult result = new HistogramResult("Ranking Quality Histogram", "ranking-histogram", res);

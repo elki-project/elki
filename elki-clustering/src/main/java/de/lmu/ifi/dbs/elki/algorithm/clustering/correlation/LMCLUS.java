@@ -20,15 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusTimesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalizeEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.TooManyRetriesException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -67,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**

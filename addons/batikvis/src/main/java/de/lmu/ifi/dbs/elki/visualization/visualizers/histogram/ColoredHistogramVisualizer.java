@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -186,12 +186,9 @@ public class ColoredHistogramVisualizer implements VisFactory {
       DoubleMinMax minmax = new DoubleMinMax();
       final double frac = 1. / relation.size(); // TODO: sampling?
       final int cols = numc + 1;
-      AbstractObjStaticHistogram<double[]> histogram = new AbstractObjStaticHistogram<double[]>(settings.bins, 0, 1) {
-        @Override
-        protected double[] makeObject() {
-          return new double[cols];
-        }
-      };
+      ObjHistogram<double[]> histogram = new ObjHistogram<double[]>(settings.bins, 0, 1, () -> {
+        return new double[cols];
+      });
 
       if(cspol != null) {
         for(int snum = 0; snum < numc; snum++) {
@@ -217,7 +214,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
         }
       }
       // for scaling, get the maximum occurring value in the bins:
-      for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+      for(ObjHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
         for(double val : iter.getValue()) {
           minmax.put(val);
         }
@@ -251,7 +248,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
 
       // Visualizing
       if(!settings.curves) {
-        for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+        for(ObjHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
           double lpos = iter.getLeft();
           double rpos = iter.getRight();
           double stack = 0.0;
@@ -277,7 +274,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
         }
 
         // draw histogram lines
-        for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+        for(ObjHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
           left = iter.getLeft();
           right = iter.getRight();
           for(int i = 0; i < cols; i++) {

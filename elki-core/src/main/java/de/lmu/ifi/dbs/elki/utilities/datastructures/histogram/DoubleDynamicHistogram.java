@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class DoubleDynamicHistogram extends DoubleStaticHistogram {
+public class DoubleDynamicHistogram extends DoubleHistogram {
   /**
    * Cache for data to be inserted.
    */

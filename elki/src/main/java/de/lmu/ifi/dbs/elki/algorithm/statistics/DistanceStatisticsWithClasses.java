@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -145,12 +144,9 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
       gminmax = sampleMinMax(relation, distFunc);
     }
     if(gminmax.isValid()) {
-      histogram = new AbstractObjStaticHistogram<long[]>(numbin, gminmax.getMin(), gminmax.getMax()) {
-        @Override
-        protected long[] makeObject() {
-          return new long[2];
-        }
-      };
+      histogram = new ObjHistogram<long[]>(numbin, gminmax.getMin(), gminmax.getMax(), () -> {
+        return new long[2];
+      });
     }
     else {
       histogram = new AbstractObjDynamicHistogram<long[]>(numbin) {
@@ -246,14 +242,14 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     // count the number of samples we have in the data
     long inum = 0;
     long onum = 0;
-    for(ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
+    for(ObjHistogram<long[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
       inum += iter.getValue()[0];
       onum += iter.getValue()[1];
     }
     long bnum = inum + onum;
 
     Collection<double[]> binstat = new ArrayList<>(numbin);
-    for(ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
+    for(ObjHistogram<long[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
       final long[] value = iter.getValue();
       final double icof = (inum == 0) ? 0 : ((double) value[0]) / inum / histogram.getBinsize();
       final double icaf = ((double) value[0]) / bnum / histogram.getBinsize();

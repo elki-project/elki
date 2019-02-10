@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -127,12 +126,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
       covmats.put(clus, covmat.destroyToPopulationMatrix());
     }
 
-    AbstractObjStaticHistogram<MeanVariance> hist = new AbstractObjStaticHistogram<MeanVariance>(numbins, 0.0, 1.0) {
-      @Override
-      protected MeanVariance makeObject() {
-        return new MeanVariance();
-      }
-    };
+    ObjHistogram<MeanVariance> hist = new ObjHistogram<MeanVariance>(numbins, 0.0, 1.0, MeanVariance::new);
 
     if(LOG.isVerbose()) {
       LOG.verbose("Processing points...");
@@ -165,7 +159,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
     // Transform Histogram into a Double Vector array.
     Collection<double[]> res = new ArrayList<>(relation.size());
-    for(ObjHistogram.Iter<MeanVariance> iter = hist.iter(); iter.valid(); iter.advance()) {
+    for(ObjHistogram<MeanVariance>.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       res.add(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
     }
     return new HistogramResult("Ranking Quality Histogram", "ranking-histogram", res);

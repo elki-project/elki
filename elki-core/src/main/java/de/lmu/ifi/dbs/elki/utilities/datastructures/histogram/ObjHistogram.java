@@ -21,23 +21,51 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
 
 /**
- * Basic interface for object based histograms (static and flexible).
+ * Histogram class storing double values.
+ * 
+ * The histogram will start with "bin" bins, but it can grow dynamicall to the
+ * left and right.
  * 
  * @author Erich Schubert
  * @since 0.5.5
  * 
- * @has - - - Iter
- * 
- * @param <T> data type
+ * @param <T> Data type
  */
-public interface ObjHistogram<T> extends Histogram {
+public class ObjHistogram<T> extends AbstractStaticHistogram {
   /**
-   * Get a histogram iterator.
-   * 
-   * @return Iterator
+   * Data store
    */
-  @Override
-  Iter<T> iter();
+  Object[] data;
+
+  /**
+   * Special value storage: infinity, NaN
+   */
+  Object[] special = null;
+
+  /**
+   * Supplier for empty bins.
+   */
+  BucketFactory<T> supplier;
+
+  /**
+   * Constructor.
+   * 
+   * @param bins Number of bins
+   * @param min Cover minimum
+   * @param max Cover maximum
+   * @param supplier Supplier to fill empty bins
+   */
+  public ObjHistogram(int bins, double min, double max, BucketFactory<T> supplier) {
+    super(bins, min, max);
+    if(bins >= 0) {
+      // -1 will be used by FlexiHistogram to delay initialization.
+      data = new Object[bins];
+      for(int i = 0; i < bins; i++) {
+        data[i] = supplier.make();
+      }
+    }
+    this.supplier = supplier;
+  }
 
   /**
    * Access the value of a bin with new data.
@@ -45,19 +73,104 @@ public interface ObjHistogram<T> extends Histogram {
    * @param coord Coordinate
    * @return bin contents
    */
-  T get(double coord);
+  @SuppressWarnings("unchecked")
+  public T get(double coord) {
+    if(coord == Double.NEGATIVE_INFINITY) {
+      return getSpecial(0);
+    }
+    if(coord == Double.POSITIVE_INFINITY) {
+      return getSpecial(1);
+    }
+    if(Double.isNaN(coord)) {
+      return getSpecial(2);
+    }
+    int bin = getBinNr(coord);
+    if(bin < 0) {
+      if(size - bin > data.length) {
+        // Reallocate. TODO: use an arraylist-like grow strategy!
+        Object[] tmpdata = new Object[growSize(data.length, size - bin)];
+        System.arraycopy(data, 0, tmpdata, -bin, size);
+        data = tmpdata;
+      }
+      else {
+        // Shift in place
+        System.arraycopy(data, 0, data, -bin, size);
+      }
+      for(int i = 0; i < -bin; i++) {
+        data[i] = supplier.make();
+      }
+      // Note that bin is negative, -bin is the shift offset!
+      offset -= bin;
+      size -= bin;
+      // TODO: modCounter++; and have iterators fast-fail
+      // Unset max value when resizing
+      max = Double.MAX_VALUE;
+      return (T) data[0];
+    }
+    else if(bin >= size) {
+      if(bin >= data.length) {
+        Object[] tmpdata = new Object[growSize(data.length, bin + 1)];
+        System.arraycopy(data, 0, tmpdata, 0, size);
+        data = tmpdata;
+      }
+      for(int i = size; i <= bin; i++) {
+        data[i] = supplier.make();
+      }
+      size = bin + 1;
+      // TODO: modCounter++; and have iterators fast-fail
+      // Unset max value when resizing
+      max = Double.MAX_VALUE;
+      return (T) data[bin];
+    }
+    else {
+      return (T) data[bin];
+    }
+  }
 
   /**
-   * Histogram iterator.
+   * Ensure that we have storage for special values (infinity, NaN)
+   * 
+   * @param idx Index to return.
+   */
+  @SuppressWarnings("unchecked")
+  protected T getSpecial(int idx) {
+    if(special == null) {
+      special = new Object[] { supplier.make(), supplier.make(), supplier.make() };
+    }
+    return (T) special[idx];
+  }
+
+  @Override
+  public Iter iter() {
+    return new Iter();
+  }
+
+  /**
+   * Iterator class.
    * 
    * @author Erich Schubert
    */
-  interface Iter<T> extends Histogram.Iter {
+  public class Iter extends AbstractStaticHistogram.Iter implements Histogram.Iter {
     /**
      * Get the value of the bin.
      * 
      * @return Bin value
      */
-    T getValue();
+    @SuppressWarnings("unchecked")
+    public T getValue() {
+      return (T) data[bin];
+    }
+  }
+
+  /**
+   * Function to make new buckets.
+   * 
+   * @author Erich Schubert
+   *
+   * @param <T> Data type
+   */
+  @FunctionalInterface
+  public interface BucketFactory<T> {
+    T make();
   }
 }

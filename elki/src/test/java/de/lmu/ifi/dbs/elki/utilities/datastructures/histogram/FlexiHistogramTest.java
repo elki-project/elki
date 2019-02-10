@@ -90,7 +90,7 @@ public class FlexiHistogramTest {
 
     // compare results via Iterator.
     int off = 0;
-    for (ObjHistogram.Iter<Double> iter = hist.iter(); iter.valid(); iter.advance()) {
+    for (ObjHistogram<Double>.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       assertEquals("Array iterator bin position", -0.1 + 0.2 * off, iter.getCenter(), 0.00001);
       assertEquals("Array iterator bin contents", resized[off], iter.getValue(), 0.00001);
       off++;

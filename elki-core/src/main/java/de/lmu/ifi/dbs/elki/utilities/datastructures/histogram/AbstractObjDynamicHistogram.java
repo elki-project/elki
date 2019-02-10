@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * 
  * @param <T> Data type
  */
-public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHistogram<T> {
+public abstract class AbstractObjDynamicHistogram<T> extends ObjHistogram<T> {
   /**
    * Cache for positions to be inserted.
    */
@@ -61,11 +61,12 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
    * @param bins Design number of bins - may become twice as large!
    */
   public AbstractObjDynamicHistogram(int bins) {
-    super(-1, 0.0, 1.0);
+    super(-1, 0.0, 1.0, null);
     this.destsize = bins;
     cacheposs = new double[this.destsize << 1];
     cachevals = new Object[this.destsize << 1];
     cachefill = 0;
+    this.supplier = this::makeObject;
   }
 
   /**
@@ -160,9 +161,9 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   }
 
   /**
-   * Test (and perform) downsampling when neede.
+   * Test (and perform) downsampling when needed.
    * 
-   * @param coord coordinate to accomodate.
+   * @param coord coordinate to accommodate.
    */
   private void testResample(double coord) {
     final int bin = getBinNr(coord);
@@ -180,7 +181,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
       return;
     }
     if(sizereq < data.length) {
-      // Accomodate by shifting. Let super do the job in {@link #get}
+      // Accommodate by shifting. Let super do the job in {@link #get}
       return;
     }
     // Resampling, eventually by multiple levels.
@@ -215,7 +216,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
         data[oup] = downsample(data, Math.max(0, inp), Math.min(size, inp + step), step);
       }
       for(; oup >= 0; oup--) {
-        data[oup] = makeObject();
+        data[oup] = supplier.make();
       }
     }
     // recalculate histogram base.
@@ -258,7 +259,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
 
   /**
    * Perform downsampling on a number of bins.
-   * 
+   *
    * @param data Data array (needs cast!)
    * @param start Interval start
    * @param end Interval end (exclusive)
@@ -270,10 +271,10 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
 
   /**
    * Rule to combine two bins or entries into one.
-   * 
+   * <p>
    * Note: first and second MAY be modified and returned, they will not be used
    * afterwards.
-   * 
+   *
    * @param first First bin value
    * @param second Second bin value
    * @return combined bin value
@@ -282,9 +283,16 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
 
   /**
    * Clone a data passed to the algorithm for computing the initial size.
-   * 
+   *
    * @param data Data to be cloned
    * @return cloned data
    */
   protected abstract T cloneForCache(T data);
+
+  /**
+   * Make a new empty bucket for the data store.
+   *
+   * @return New instance.
+   */
+  protected abstract T makeObject();
 }
