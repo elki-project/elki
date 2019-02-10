@@ -60,12 +60,7 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
     }
   }
 
-  /**
-   * Access the value of a bin with new data.
-   * 
-   * @param coord Coordinate
-   * @return bin contents
-   */
+  @Override
   @SuppressWarnings("unchecked")
   public T get(double coord) {
     if (coord == Double.NEGATIVE_INFINITY) {

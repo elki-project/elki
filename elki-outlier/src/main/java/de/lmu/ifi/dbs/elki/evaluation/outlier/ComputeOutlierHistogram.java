@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -49,7 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScaling;
@@ -116,44 +116,39 @@ public class ComputeOutlierHistogram implements Evaluator {
    */
   public HistogramResult evaluateOutlierResult(Database database, OutlierResult or) {
     if(scaling instanceof OutlierScaling) {
-      OutlierScaling oscaling = (OutlierScaling) scaling;
-      oscaling.prepare(or);
+      ((OutlierScaling) scaling).prepare(or);
     }
 
     ModifiableDBIDs ids = DBIDUtil.newHashSet(or.getScores().getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positiveClassName);
     // first value for outliers, second for each object
     // If we have useful (finite) min/max, use these for binning.
-    double min = scaling.getMin();
-    double max = scaling.getMax();
-    final ObjHistogram<DoubleDoublePair> hist;
+    double min = scaling.getMin(), max = scaling.getMax();
+    final ObjHistogram<double[]> hist;
     if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
-      hist = new AbstractObjDynamicHistogram<DoubleDoublePair>(bins) {
+      hist = new AbstractObjDynamicHistogram<double[]>(bins) {
         @Override
-        public DoubleDoublePair aggregate(DoubleDoublePair first, DoubleDoublePair second) {
-          first.first += second.first;
-          first.second += second.second;
-          return first;
+        public double[] aggregate(double[] first, double[] second) {
+          return VMath.plusEquals(first, second);
         }
 
         @Override
-        protected DoubleDoublePair makeObject() {
-          return new DoubleDoublePair(0., 0.);
+        protected double[] makeObject() {
+          return new double[2];
         }
 
         @Override
-        protected DoubleDoublePair cloneForCache(DoubleDoublePair data) {
-          return new DoubleDoublePair(data.first, data.second);
+        protected double[] cloneForCache(double[] data) {
+          return data.clone();
         }
 
         @Override
-        protected DoubleDoublePair downsample(Object[] data, int start, int end, int size) {
-          DoubleDoublePair sum = new DoubleDoublePair(0, 0);
+        protected double[] downsample(Object[] data, int start, int end, int size) {
+          double[] sum = new double[2];
           for(int i = start; i < end; i++) {
-            DoubleDoublePair p = (DoubleDoublePair) data[i];
+            Object p = data[i];
             if(p != null) {
-              sum.first += p.first;
-              sum.second += p.second;
+              VMath.plusEquals(sum, (double[]) p);
             }
           }
           return sum;
@@ -161,30 +156,19 @@ public class ComputeOutlierHistogram implements Evaluator {
       };
     }
     else {
-      hist = new AbstractObjStaticHistogram<DoubleDoublePair>(bins, min, max) {
+      hist = new AbstractObjStaticHistogram<double[]>(bins, min, max) {
         @Override
-        protected DoubleDoublePair makeObject() {
-          return new DoubleDoublePair(0., 0.);
-        }
-
-        @Override
-        public void putData(double coord, DoubleDoublePair data) {
-          DoubleDoublePair exist = get(coord);
-          exist.first += data.first;
-          exist.second += data.second;
+        protected double[] makeObject() {
+          return new double[2];
         }
       };
     }
 
     // first fill histogram only with values of outliers
-    DoubleDoublePair negative, positive;
-    if(!splitfreq) {
-      negative = new DoubleDoublePair(1. / ids.size(), 0);
-      positive = new DoubleDoublePair(0, 1. / ids.size());
-    }
-    else {
-      negative = new DoubleDoublePair(1. / (ids.size() - outlierIds.size()), 0);
-      positive = new DoubleDoublePair(0, 1. / outlierIds.size());
+    double negative = 1. / ids.size(), positive = negative;
+    if(splitfreq) {
+      negative = 1. / (ids.size() - outlierIds.size());
+      positive = 1. / outlierIds.size();
     }
     ids.removeDBIDs(outlierIds);
     // fill histogram with values of each object
@@ -192,20 +176,20 @@ public class ComputeOutlierHistogram implements Evaluator {
       double result = or.getScores().doubleValue(iter);
       result = scaling.getScaled(result);
       if(result > Double.NEGATIVE_INFINITY && result < Double.POSITIVE_INFINITY) {
-        hist.putData(result, negative);
+        hist.get(result)[0] += negative;
       }
     }
     for(DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().doubleValue(iter);
       result = scaling.getScaled(result);
       if(result > Double.NEGATIVE_INFINITY && result < Double.POSITIVE_INFINITY) {
-        hist.putData(result, positive);
+        hist.get(result)[1] += positive;
       }
     }
     Collection<double[]> collHist = new ArrayList<>(hist.getNumBins());
-    for(ObjHistogram.Iter<DoubleDoublePair> iter = hist.iter(); iter.valid(); iter.advance()) {
-      DoubleDoublePair data = iter.getValue();
-      collHist.add(new double[] { iter.getCenter(), data.first, data.second });
+    for(ObjHistogram.Iter<double[]> iter = hist.iter(); iter.valid(); iter.advance()) {
+      double[] data = iter.getValue();
+      collHist.add(new double[] { iter.getCenter(), data[0], data[1] });
     }
     return new HistogramResult("Outlier Score Histogram", "outlier-histogram", collHist);
   }
@@ -215,7 +199,7 @@ public class ComputeOutlierHistogram implements Evaluator {
     final Database db = ResultUtil.findDatabase(hier);
     List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     if(ors == null || ors.isEmpty()) {
-      // logger.warning("No outlier results found for
+      // LOG.warning("No outlier results found for
       // "+ComputeOutlierHistogram.class.getSimpleName());
       return;
     }

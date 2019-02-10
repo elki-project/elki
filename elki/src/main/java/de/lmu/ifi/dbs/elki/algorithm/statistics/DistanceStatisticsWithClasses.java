@@ -20,7 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
@@ -29,7 +34,12 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -41,7 +51,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.LongArrayStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -51,7 +61,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-
 import net.jafama.FastMath;
 
 /**
@@ -131,11 +140,17 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     LOG.beginStep(stepprog, 1, "Prepare histogram.");
     if(exact) {
       gminmax = exactMinMax(relation, distFunc);
-      histogram = new LongArrayStaticHistogram(numbin, gminmax.getMin(), gminmax.getMax(), 2);
     }
     else if(sampling) {
       gminmax = sampleMinMax(relation, distFunc);
-      histogram = new LongArrayStaticHistogram(numbin, gminmax.getMin(), gminmax.getMax(), 2);
+    }
+    if(gminmax.isValid()) {
+      histogram = new AbstractObjStaticHistogram<long[]>(numbin, gminmax.getMin(), gminmax.getMax()) {
+        @Override
+        protected long[] makeObject() {
+          return new long[2];
+        }
+      };
     }
     else {
       histogram = new AbstractObjDynamicHistogram<long[]>(numbin) {
@@ -175,9 +190,6 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
     LOG.beginStep(stepprog, 2, "Build histogram.");
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), LOG) : null;
-    // iterate per cluster
-    final long[] incFirst = new long[] { 1L, 0L };
-    final long[] incSecond = new long[] { 0L, 1L };
     for(Cluster<?> c1 : split) {
       for(DBIDIter id1 = c1.getIDs().iter(); id1.valid(); id1.advance()) {
         // in-cluster distances
@@ -188,9 +200,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
             continue;
           }
           double d = distFunc.distance(id1, iter2);
-
-          histogram.putData(d, incFirst);
-
+          histogram.get(d)[0]++;
           iminmax.put(d);
         }
         // aggregate
@@ -213,9 +223,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
               continue;
             }
             double d = distFunc.distance(id1, iter2);
-
-            histogram.putData(d, incSecond);
-
+            histogram.get(d)[1]++;
             ominmax.put(d);
           }
         }

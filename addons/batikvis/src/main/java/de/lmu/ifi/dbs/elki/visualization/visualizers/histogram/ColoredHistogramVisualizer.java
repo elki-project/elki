@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -186,20 +186,23 @@ public class ColoredHistogramVisualizer implements VisFactory {
       DoubleMinMax minmax = new DoubleMinMax();
       final double frac = 1. / relation.size(); // TODO: sampling?
       final int cols = numc + 1;
-      DoubleArrayStaticHistogram histogram = new DoubleArrayStaticHistogram(settings.bins, 0, 1, cols);
+      AbstractObjStaticHistogram<double[]> histogram = new AbstractObjStaticHistogram<double[]>(settings.bins, 0, 1) {
+        @Override
+        protected double[] makeObject() {
+          return new double[cols];
+        }
+      };
 
       if(cspol != null) {
         for(int snum = 0; snum < numc; snum++) {
-          double[] inc = new double[cols];
-          inc[0] = frac;
-          inc[snum + 1] = frac;
           for(DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
             if(!sample.getSample().contains(iter)) {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE + .5;
-              histogram.increment(pos, inc);
+              final double[] row = histogram.get(proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE + .5);
+              row[0] += frac;
+              row[snum + 1] += frac;
             }
             catch(ObjectNotFoundException e) {
               // Ignore. The object was probably deleted from the database
@@ -209,15 +212,12 @@ public class ColoredHistogramVisualizer implements VisFactory {
       }
       else {
         // Actual data distribution.
-        double[] inc = new double[cols];
-        inc[0] = frac;
         for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) * Projection.INVSCALE + .5;
-          histogram.increment(pos, inc);
+          histogram.get(proj.fastProjectDataToRenderSpace(relation.get(iditer)) * Projection.INVSCALE + .5)[0] += frac;
         }
       }
       // for scaling, get the maximum occurring value in the bins:
-      for(DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+      for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
         for(double val : iter.getValue()) {
           minmax.put(val);
         }
@@ -251,7 +251,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
 
       // Visualizing
       if(!settings.curves) {
-        for(DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+        for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
           double lpos = iter.getLeft();
           double rpos = iter.getRight();
           double stack = 0.0;
@@ -277,7 +277,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
         }
 
         // draw histogram lines
-        for(DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+        for(AbstractObjStaticHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
           left = iter.getLeft();
           right = iter.getRight();
           for(int i = 0; i < cols; i++) {

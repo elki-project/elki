@@ -40,16 +40,12 @@ public interface ObjHistogram<T> extends Histogram {
   Iter<T> iter();
 
   /**
-   * Aggregate new data into the histogram.
-   * 
-   * Note that the actual definition of "aggregate" depends on the application.
-   * While a static histogram will likely perform this immediately, a flexible
-   * histogram will cache a number of observations.
+   * Access the value of a bin with new data.
    * 
    * @param coord Coordinate
-   * @param data Data
+   * @return bin contents
    */
-  void putData(double coord, T data);
+  T get(double coord);
 
   /**
    * Histogram iterator.

@@ -117,12 +117,11 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   }
 
   /**
-   * Put fresh data into the histogram (or into the cache)
+   * Put fresh data into the histogram (or into the cache).
    * 
    * @param coord Coordinate
    * @param value Value
    */
-  @Override
   public void putData(double coord, T value) {
     // Store in cache
     if(cachefill >= 0 && cachefill < cacheposs.length) {
