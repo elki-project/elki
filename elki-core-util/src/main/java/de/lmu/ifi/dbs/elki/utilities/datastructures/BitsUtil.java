@@ -241,12 +241,12 @@ public final class BitsUtil {
    * @return Gray code
    */
   public static long[] grayI(long[] v) {
-    // TODO: copy less
-    return xorI(v, shiftRightI(copy(v), 1));
+    return xorI(v, v, -1);
   }
 
   /**
-   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v &gt;&gt;&gt; 2) ...
+   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v
+   * &gt;&gt;&gt; 2) ...
    *
    * @param v Value
    * @return Inverted gray code
@@ -262,7 +262,8 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v &gt;&gt;&gt; 2) ...
+   * Compute the inverted gray code, v XOR (v &gt;&gt;&gt; 1) XOR (v
+   * &gt;&gt;&gt; 2) ...
    *
    * @param v Value
    * @return Inverted gray code
@@ -492,11 +493,8 @@ public final class BitsUtil {
     if(off == 0) {
       return xorI(v, o);
     }
-    if(off < 0) {
-      throw new UnsupportedOperationException("Negative shifts are not supported.");
-    }
     // Break shift into integers to shift and bits to shift
-    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftWords = off >> LONG_LOG2_SIZE;
     final int shiftBits = off & LONG_LOG2_MASK;
 
     if(shiftWords >= v.length) {
@@ -504,20 +502,26 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords);
-      for(int i = shiftWords; i < end; i++) {
-        v[i] ^= o[i - shiftWords];
+      final int end = Math.min(v.length, o.length + shiftWords) - 1;
+      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
+        v[i] ^= o[j];
       }
       return v;
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
     final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    for(int i = end; i > shiftWords; i--) {
-      final int src = i - shiftWords;
-      v[i] ^= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    int s1 = end, s2 = end - shiftWords;
+    long t = o[s2];
+    if(shiftWords < 0) { // partial word of negative shift
+      v[s1 + 1] ^= t >>> unshiftBits;
     }
-    v[shiftWords] ^= o[0] << shiftBits;
+    while(s1 >= 0 && s2 >= 0) {
+      v[s1--] ^= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    }
+    if(s1 >= 0) { // partial word of positive shift
+      v[s1] ^= t << shiftBits;
+    }
     return v;
   }
 
@@ -913,8 +917,8 @@ public final class BitsUtil {
         }
       }
     }
-    for(; pos >= 0; --pos) {
-      digits[pos] = '0';
+    if(pos > 0) {
+      Arrays.fill(digits, 0, pos, '0');
     }
     return new String(digits);
   }

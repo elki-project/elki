@@ -274,8 +274,7 @@ public class BitsUtilTest {
 
   @Test
   public void testGrayCoding() {
-    long[] bits = zero(123);
-    long[] ones = ones(123);
+    long[] bits = zero(123), ones = ones(123);
     flipI(bits, 122);
     invgrayI(bits);
     xorI(bits, ones);
