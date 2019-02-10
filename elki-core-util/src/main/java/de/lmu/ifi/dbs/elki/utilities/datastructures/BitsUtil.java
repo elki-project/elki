@@ -115,12 +115,7 @@ public final class BitsUtil {
    */
   public static long[] ones(int bits) {
     long[] v = new long[((bits - 1) >>> LONG_LOG2_SIZE) + 1];
-    final int fillWords = bits >>> LONG_LOG2_SIZE;
-    final int fillBits = bits & LONG_LOG2_MASK;
-    Arrays.fill(v, 0, fillWords, LONG_ALL_BITS);
-    if(fillWords < v.length) {
-      v[v.length - 1] = (1L << fillBits) - 1;
-    }
+    onesI(v, bits);
     return v;
   }
 
@@ -190,7 +185,7 @@ public final class BitsUtil {
 
   /**
    * Copy a bitset.
-   *
+   * <p>
    * Note: Bits beyond mincap <em>may</em> be retained!
    *
    * @param v Array to copy
@@ -314,7 +309,7 @@ public final class BitsUtil {
 
   /**
    * Compute the cardinality (number of set bits)
-   *
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v Value
@@ -340,7 +335,7 @@ public final class BitsUtil {
 
   /**
    * Invert bit number "off" in v.
-   *
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v Buffer
@@ -364,7 +359,7 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   *
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v Buffer
@@ -377,7 +372,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Put o onto v inplace, i.e. v = o
+   * Put o onto v in-place, i.e. v = o
    *
    * @param v Primary object
    * @param o data to initialize to.
@@ -404,7 +399,7 @@ public final class BitsUtil {
 
   /**
    * Clear bit number "off" in v.
-   *
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v Buffer
@@ -428,7 +423,7 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   *
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v Buffer
@@ -449,8 +444,12 @@ public final class BitsUtil {
     final int fillWords = bits >>> LONG_LOG2_SIZE;
     final int fillBits = bits & LONG_LOG2_MASK;
     Arrays.fill(v, 0, fillWords, LONG_ALL_BITS);
-    v[fillWords] = (1L << fillBits) - 1;
-    Arrays.fill(v, fillWords + 1, v.length, 0L);
+    if(fillBits > 0) {
+      v[fillWords] = (1L << fillBits) - 1;
+    }
+    if(fillWords + 1 < v.length) {
+      Arrays.fill(v, fillWords + 1, v.length, 0L);
+    }
   }
 
   /**
@@ -467,7 +466,7 @@ public final class BitsUtil {
   }
 
   /**
-   * XOR o onto v inplace, i.e. v ^= o
+   * XOR o onto v in-place, i.e. v ^= o
    *
    * @param v Primary object
    * @param o data to xor
@@ -482,7 +481,7 @@ public final class BitsUtil {
   }
 
   /**
-   * XOR o onto v inplace, i.e. v ^= (o &lt;&lt; off)
+   * XOR o onto v in-place, i.e. v ^= (o &lt;&lt; off)
    *
    * @param v Primary object
    * @param o data to or
@@ -516,7 +515,7 @@ public final class BitsUtil {
     if(shiftWords < 0) { // partial word of negative shift
       v[s1 + 1] ^= t >>> unshiftBits;
     }
-    while(s1 >= 0 && s2 >= 0) {
+    while(s1 >= 0 && s2 > 0) {
       v[s1--] ^= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
     }
     if(s1 >= 0) { // partial word of positive shift
@@ -526,7 +525,7 @@ public final class BitsUtil {
   }
 
   /**
-   * OR o onto v inplace, i.e. v |= o
+   * OR o onto v in-place, i.e. v |= o
    *
    * @param v Primary object
    * @param o data to or
@@ -542,8 +541,8 @@ public final class BitsUtil {
   }
 
   /**
-   * OR o onto v inplace, i.e. v |= (o &lt;&lt; off)
-   *
+   * OR o onto v in-place, i.e. v |= (o &lt;&lt; off)
+   * <p>
    * Note: Bits that are shifted outside of the size of v are discarded.
    *
    * @param v Primary object
@@ -555,11 +554,8 @@ public final class BitsUtil {
     if(off == 0) {
       return orI(v, o);
     }
-    if(off < 0) {
-      throw new UnsupportedOperationException("Negative shifts are not supported.");
-    }
     // Break shift into integers to shift and bits to shift
-    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftWords = off >> LONG_LOG2_SIZE;
     final int shiftBits = off & LONG_LOG2_MASK;
 
     if(shiftWords >= v.length) {
@@ -567,25 +563,31 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords);
-      for(int i = shiftWords; i < end; i++) {
-        v[i] |= o[i - shiftWords];
+      final int end = Math.min(v.length, o.length + shiftWords) - 1;
+      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
+        v[i] |= o[j];
       }
       return v;
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
     final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    for(int i = end; i > shiftWords; i--) {
-      final int src = i - shiftWords;
-      v[i] |= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    int s1 = end, s2 = end - shiftWords;
+    long t = o[s2];
+    if(shiftWords < 0) { // partial word of negative shift
+      v[s1 + 1] |= t >>> unshiftBits;
     }
-    v[shiftWords] |= o[0] << shiftBits;
+    while(s1 >= 0 && s2 > 0) {
+      v[s1--] |= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    }
+    if(s1 >= 0) { // partial word of positive shift
+      v[s1] |= t << shiftBits;
+    }
     return v;
   }
 
   /**
-   * AND o onto v inplace, i.e. v &amp;= o
+   * AND o onto v in-place, i.e. v &amp;= o
    *
    * @param v Primary object
    * @param o data to and
@@ -602,7 +604,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v inplace, i.e. v &amp;= (o &lt;&lt; off)
+   * AND o onto v in-place, i.e. v &amp;= (o &lt;&lt; off)
    *
    * @param v Primary object
    * @param o data to or
@@ -613,11 +615,8 @@ public final class BitsUtil {
     if(off == 0) {
       return andI(v, o);
     }
-    if(off < 0) {
-      throw new UnsupportedOperationException("Negative shifts are not supported.");
-    }
     // Break shift into integers to shift and bits to shift
-    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftWords = off >> LONG_LOG2_SIZE;
     final int shiftBits = off & LONG_LOG2_MASK;
 
     if(shiftWords >= v.length) {
@@ -625,23 +624,30 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords);
-      for(int i = shiftWords; i < end; i++) {
-        v[i] &= o[i - shiftWords];
+      final int end = Math.min(v.length, o.length + shiftWords) - 1;
+      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
+        v[i] &= o[j];
       }
       // Clear bottom words
-      Arrays.fill(v, 0, shiftWords, 0);
+      if(shiftWords > 0) {
+        Arrays.fill(v, 0, shiftWords, 0);
+      }
       return v;
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
     final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    Arrays.fill(v, end + 1, v.length, 0);
-    for(int i = end; i > shiftWords; i--) {
-      final int src = i - shiftWords;
-      v[i] &= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    int s1 = end, s2 = end - shiftWords;
+    long t = o[s2];
+    if(shiftWords < 0) { // partial word of negative shift
+      v[s1 + 1] &= t >>> unshiftBits;
     }
-    v[shiftWords] &= o[0] << shiftBits;
+    while(s1 >= 0 && s2 > 0) {
+      v[s1--] &= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    }
+    if(s1 >= 0) { // partial word of positive shift
+      v[s1] &= t << shiftBits;
+    }
     // Clear bottom words
     Arrays.fill(v, 0, shiftWords, 0);
     return v;
@@ -649,7 +655,7 @@ public final class BitsUtil {
 
   /**
    * AND o onto v in a copy, i.e. v &amp; o
-   *
+   * <p>
    * The resulting array will have the shorter length of the two.
    *
    * @param v Primary object
@@ -667,34 +673,7 @@ public final class BitsUtil {
   }
 
   /**
-   * AND o onto v in a copy, i.e. v &amp; o
-   *
-   * The resulting array will have the shorter length of the two.
-   *
-   * @param v Primary object
-   * @param o data to and
-   * @return Copy of v and o
-   */
-  public static long[] andCMax(long[] v, long[] o) {
-    final int min, max;
-    if(v.length < o.length) {
-      min = v.length;
-      max = o.length;
-    }
-    else {
-      min = o.length;
-      max = v.length;
-    }
-    long[] out = new long[max];
-    int i = 0;
-    for(; i < min; i++) {
-      out[i] = v[i] & o[i];
-    }
-    return out;
-  }
-
-  /**
-   * NOTAND o onto v inplace, i.e. v &amp;= ~o
+   * NOTAND o onto v in-place, i.e. v &amp;= ~o
    *
    * @param v Primary object
    * @param o data to and
@@ -709,7 +688,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Invert v inplace.
+   * Invert v in-place.
    *
    * @param v Object to invert
    * @return v
@@ -722,8 +701,8 @@ public final class BitsUtil {
   }
 
   /**
-   * Shift a long[] bitset inplace.
-   *
+   * Shift a long[] bitset in-place.
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v existing bitset
@@ -767,8 +746,8 @@ public final class BitsUtil {
   }
 
   /**
-   * Shift a long[] bitset inplace.
-   *
+   * Shift a long[] bitset in-place.
+   * <p>
    * Low-endian layout for the array.
    *
    * @param v existing bitset
@@ -819,14 +798,8 @@ public final class BitsUtil {
    * @return cycled bit set
    */
   public static long cycleRightC(long v, int shift, int len) {
-    if(shift == 0) {
-      return v;
-    }
-    if(shift < 0) {
-      return cycleLeftC(v, -shift, len);
-    }
-    final long ones = (1 << len) - 1;
-    return (((v) >>> (shift)) | ((v) << ((len) - (shift)))) & ones;
+    return shift == 0 ? v : shift < 0 ? cycleLeftC(v, -shift, len) : //
+        (((v) >>> (shift)) | ((v) << ((len) - (shift)))) & ((1 << len) - 1);
   }
 
   /**
@@ -867,14 +840,8 @@ public final class BitsUtil {
    * @return cycled bit set
    */
   public static long cycleLeftC(long v, int shift, int len) {
-    if(shift == 0) {
-      return v;
-    }
-    if(shift < 0) {
-      return cycleRightC(v, -shift, len);
-    }
-    final long ones = (1 << len) - 1;
-    return (((v) << (shift)) | ((v) >>> ((len) - (shift)))) & ones;
+    return shift == 0 ? v : shift < 0 ? cycleRightC(v, -shift, len) : //
+        (((v) << (shift)) | ((v) >>> ((len) - (shift)))) & ((1 << len) - 1);
   }
 
   /**
@@ -1126,7 +1093,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   *
+   * <p>
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
    *
@@ -1139,7 +1106,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   *
+   * <p>
    * Note: this is the same as {@link Long#numberOfTrailingZeros}
    *
    * @param v Long
@@ -1151,7 +1118,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   *
+   * <p>
    * Note: this is the same as {@link Long#numberOfTrailingZeros}
    *
    * @param v Long
@@ -1195,7 +1162,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; -1 if all zero
-   *
+   * <p>
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
    *
@@ -1208,7 +1175,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; -1 if all zero
-   *
+   * <p>
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
    *
@@ -1221,7 +1188,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; 64 if all zero
-   *
+   * <p>
    * Note: this the same as {@link Long#numberOfLeadingZeros}.
    *
    * @param v Bitset
@@ -1233,7 +1200,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; 32 if all zero
-   *
+   * <p>
    * Note: this the same as {@link Integer#numberOfLeadingZeros}.
    *
    * @param v Bitset
@@ -1251,12 +1218,12 @@ public final class BitsUtil {
    * @return Position of previous set bit, or -1.
    */
   public static int previousSetBit(long v, int start) {
-    if(start < 0 || start >= Long.SIZE) {
+    if(start < 0) {
       return -1;
     }
+    start = start < Long.SIZE ? start : Long.SIZE - 1;
     long cur = v & (LONG_ALL_BITS >>> -(start + 1));
-    return (cur == 0) ? -1 : (cur == LONG_ALL_BITS) ? 0 : //
-        63 - Long.numberOfLeadingZeros(cur);
+    return cur == 0 ? -1 : cur == LONG_ALL_BITS ? 0 : 63 - Long.numberOfLeadingZeros(cur);
   }
 
   /**
@@ -1296,12 +1263,12 @@ public final class BitsUtil {
    * @return Position of previous clear bit, or -1.
    */
   public static int previousClearBit(long v, int start) {
-    if(start < 0 || start >= Long.SIZE) {
+    if(start < 0) {
       return -1;
     }
+    start = start < Long.SIZE ? start : Long.SIZE - 1;
     long cur = ~v & (LONG_ALL_BITS >>> -(start + 1));
-    return (cur == 0) ? -1 : //
-        63 - Long.numberOfLeadingZeros(cur);
+    return cur == 0 ? -1 : 63 - Long.numberOfLeadingZeros(cur);
   }
 
   /**
@@ -1341,12 +1308,12 @@ public final class BitsUtil {
    * @return Position of next set bit, or -1.
    */
   public static int nextSetBit(long v, int start) {
-    if(start < 0 || start >= Long.SIZE) {
+    if(start >= Long.SIZE) {
       return -1;
     }
+    start = start < 0 ? 0 : start;
     long cur = v & (LONG_ALL_BITS << start);
-    return (cur == 0) ? -1 : (cur == LONG_ALL_BITS) ? 0 : //
-        Long.numberOfTrailingZeros(cur);
+    return cur == 0 ? -1 : cur == LONG_ALL_BITS ? 0 : Long.numberOfTrailingZeros(cur);
   }
 
   /**
@@ -1357,6 +1324,7 @@ public final class BitsUtil {
    * @return Position of next set bit, or -1.
    */
   public static int nextSetBit(long[] v, int start) {
+    start = start < 0 ? 0 : start;
     int wordindex = start >>> LONG_LOG2_SIZE;
     if(wordindex >= v.length) {
       return -1;
@@ -1386,6 +1354,7 @@ public final class BitsUtil {
     if(start >= Long.SIZE) {
       return -1;
     }
+    start = start < 0 ? 0 : start;
     long cur = ~v & (LONG_ALL_BITS << start);
     return cur == 0 ? -1 : Long.numberOfTrailingZeros(cur);
   }
@@ -1398,6 +1367,7 @@ public final class BitsUtil {
    * @return Position of next clear bit, or -1.
    */
   public static int nextClearBit(long[] v, int start) {
+    start = start < 0 ? 0 : start;
     int wordindex = start >>> LONG_LOG2_SIZE;
     if(wordindex >= v.length) {
       return -1;
