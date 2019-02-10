@@ -26,10 +26,15 @@ import java.util.List;
 /**
  * QuickSelect computes ("selects") the element at a given rank and can be used
  * to compute Medians and arbitrary quantiles by computing the appropriate rank.
- *
+ * <p>
  * This algorithm is essentially an incomplete QuickSort that only descends into
  * that part of the data that we are interested in, and also attributed to
- * Charles Antony Richard Hoare
+ * Charles Antony Richard Hoare.
+ * <p>
+ * If you want to use this with a {@code Comparable} type, use the natural
+ * comparator {@code Comparator.naturalOrder()}. You can wrap arrays as lists
+ * with {@code java.util.Arrays#asList}, to sort them in-place, or implement
+ * an {@link Adapter} for your data structure.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -375,7 +380,7 @@ public class QuickSelect {
    */
   public static double median(double[] data, int begin, int end) {
     final int length = end - begin;
-    assert(length > 0);
+    assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + ((length - 1) >> 1);
     quickSelect(data, begin, end, left);
@@ -414,7 +419,7 @@ public class QuickSelect {
    */
   public static double quantile(double[] data, int begin, int end, double quant) {
     final int length = end - begin;
-    assert(length > 0) : "Quantile on empty set?";
+    assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
     final int ileft = (int) Math.floor(dleft);
@@ -569,442 +574,6 @@ public class QuickSelect {
   }
 
   /**
-   * QuickSelect is essentially quicksort, except that we only "sort" that half
-   * of the array that we are interested in.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param rank Rank position that we are interested in (integer!)
-   * @return Value at the given rank
-   */
-  public static <T extends Comparable<? super T>> T quickSelect(T[] data, int rank) {
-    quickSelect(data, 0, data.length, rank);
-    return data[rank];
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param data Data to process
-   * @return Median value
-   */
-  public static <T extends Comparable<? super T>> T median(T[] data) {
-    return median(data, 0, data.length);
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * On an odd length, it will return the lower element.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param begin Begin of valid values
-   * @param end End of valid values (exclusive!)
-   * @return Median value
-   */
-  public static <T extends Comparable<? super T>> T median(T[] data, int begin, int end) {
-    final int length = end - begin;
-    assert(length > 0);
-    // Integer division is "floor" since we are non-negative.
-    final int left = begin + ((length - 1) >> 1);
-    quickSelect(data, begin, end, left);
-    return data[left];
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param quant Quantile to compute
-   * @return Value at quantile
-   */
-  public static <T extends Comparable<? super T>> T quantile(T[] data, double quant) {
-    return quantile(data, 0, data.length, quant);
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * It will prefer the lower element.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param begin Begin of valid values
-   * @param end End of valid values (exclusive!)
-   * @param quant Quantile to compute
-   * @return Value at quantile
-   */
-  public static <T extends Comparable<? super T>> T quantile(T[] data, int begin, int end, double quant) {
-    final int length = end - begin;
-    assert(length > 0) : "Quantile on empty set?";
-    // Integer division is "floor" since we are non-negative.
-    final double dleft = begin + (length - 1) * quant;
-    final int ileft = (int) Math.floor(dleft);
-
-    quickSelect(data, begin, end, ileft);
-    return data[ileft];
-  }
-
-  /**
-   * QuickSelect is essentially quicksort, except that we only "sort" that half
-   * of the array that we are interested in.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param start Interval start
-   * @param end Interval end (exclusive)
-   * @param rank rank position we are interested in (starting at 0)
-   */
-  public static <T extends Comparable<? super T>> void quickSelect(T[] data, int start, int end, int rank) {
-    while(true) {
-      // Optimization for small arrays
-      // This also ensures a minimum size below
-      if(start + SMALL > end) {
-        insertionSort(data, start, end);
-        return;
-      }
-
-      // Best of 5 pivot picking:
-      // Choose pivots by looking at five candidates.
-      final int len = end - start;
-      final int seventh = (len >> 3) + (len >> 6) + 1;
-      final int m3 = (start + end) >> 1; // middle
-      final int m2 = m3 - seventh;
-      final int m1 = m2 - seventh;
-      final int m4 = m3 + seventh;
-      final int m5 = m4 + seventh;
-
-      // Explicit (and optimal) sorting network for 5 elements
-      // See Knuth for details.
-      if(data[m1].compareTo(data[m2]) > 0) {
-        swap(data, m1, m2);
-      }
-      if(data[m1].compareTo(data[m3]) > 0) {
-        swap(data, m1, m3);
-      }
-      if(data[m2].compareTo(data[m3]) > 0) {
-        swap(data, m2, m3);
-      }
-      if(data[m4].compareTo(data[m5]) > 0) {
-        swap(data, m4, m5);
-      }
-      if(data[m1].compareTo(data[m4]) > 0) {
-        swap(data, m1, m4);
-      }
-      if(data[m3].compareTo(data[m4]) > 0) {
-        swap(data, m3, m4);
-      }
-      if(data[m2].compareTo(data[m5]) > 0) {
-        swap(data, m2, m5);
-      }
-      if(data[m2].compareTo(data[m3]) > 0) {
-        swap(data, m2, m3);
-      }
-      if(data[m4].compareTo(data[m5]) > 0) {
-        swap(data, m4, m5);
-      }
-
-      int best = bestPivot(rank, m1, m2, m3, m4, m5);
-      final T pivot = data[best];
-      // Move middle element out of the way.
-      swap(data, best, end - 1);
-
-      // Begin partitioning
-      int i = start, j = end - 2;
-      // This is classic quicksort stuff
-      while(true) {
-        while(i <= j && data[i].compareTo(pivot) <= 0) {
-          i++;
-        }
-        while(j >= i && data[j].compareTo(pivot) >= 0) {
-          j--;
-        }
-        if(i >= j) {
-          break;
-        }
-        swap(data, i, j);
-      }
-
-      // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 1);
-
-      // Skip duplicates to narrow down the search interval:
-      while(rank < i && data[i - 1].compareTo(pivot) == 0) {
-        --i;
-      }
-      while(rank > i && data[i + 1].compareTo(pivot) == 0) {
-        ++i;
-      }
-
-      // In contrast to quicksort, we only need to recurse into the half we are
-      // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
-        end = i;
-      }
-      else if(rank > i) {
-        start = i + 1;
-      }
-      else {
-        break;
-      }
-    } // Loop until rank==i
-  }
-
-  /**
-   * Sort a small array using repetitive insertion sort.
-   *
-   * @param <T> object type
-   * @param data Data to sort
-   * @param start Interval start
-   * @param end Interval end
-   */
-  private static <T extends Comparable<? super T>> void insertionSort(T[] data, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && data[j - 1].compareTo(data[j]) > 0; j--) {
-        swap(data, j, j - 1);
-      }
-    }
-  }
-
-  /**
-   * The usual swap method.
-   *
-   * @param <T> object type
-   * @param data Array
-   * @param a First index
-   * @param b Second index
-   */
-  private static final <T extends Comparable<? super T>> void swap(T[] data, int a, int b) {
-    T tmp = data[a];
-    data[a] = data[b];
-    data[b] = tmp;
-  }
-
-  /**
-   * QuickSelect is essentially quicksort, except that we only "sort" that half
-   * of the array that we are interested in.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param rank Rank position that we are interested in (integer!)
-   * @return Value at the given rank
-   */
-  public static <T extends Comparable<? super T>> T quickSelect(List<? extends T> data, int rank) {
-    quickSelect(data, 0, data.size(), rank);
-    return data.get(rank);
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @return Median value
-   */
-  public static <T extends Comparable<? super T>> T median(List<? extends T> data) {
-    return median(data, 0, data.size());
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * On an odd length, it will return the lower element.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param begin Begin of valid values
-   * @param end End of valid values (exclusive!)
-   * @return Median value
-   */
-  public static <T extends Comparable<? super T>> T median(List<? extends T> data, int begin, int end) {
-    final int length = end - begin;
-    assert(length > 0);
-    // Integer division is "floor" since we are non-negative.
-    final int left = begin + ((length - 1) >> 1);
-    quickSelect(data, begin, end, left);
-    return data.get(left);
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param quant Quantile to compute
-   * @return Value at quantile
-   */
-  public static <T extends Comparable<? super T>> T quantile(List<? extends T> data, double quant) {
-    return quantile(data, 0, data.size(), quant);
-  }
-
-  /**
-   * Compute the median of an array efficiently using the QuickSelect method.
-   *
-   * It will prefer the lower element.
-   *
-   * Note: the array is <b>modified</b> by this.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param begin Begin of valid values
-   * @param end End of valid values (exclusive!)
-   * @param quant Quantile to compute
-   * @return Value at quantile
-   */
-  public static <T extends Comparable<? super T>> T quantile(List<? extends T> data, int begin, int end, double quant) {
-    final int length = end - begin;
-    assert(length > 0) : "Quantile on empty set?";
-    // Integer division is "floor" since we are non-negative.
-    final double dleft = begin + (length - 1) * quant;
-    final int ileft = (int) Math.floor(dleft);
-
-    quickSelect(data, begin, end, ileft);
-    return data.get(ileft);
-  }
-
-  /**
-   * QuickSelect is essentially quicksort, except that we only "sort" that half
-   * of the array that we are interested in.
-   *
-   * @param <T> object type
-   * @param data Data to process
-   * @param start Interval start
-   * @param end Interval end (exclusive)
-   * @param rank rank position we are interested in (starting at 0)
-   */
-  public static <T extends Comparable<? super T>> void quickSelect(List<? extends T> data, int start, int end, int rank) {
-    while(true) {
-      // Optimization for small arrays
-      // This also ensures a minimum size below
-      if(start + SMALL > end) {
-        insertionSort(data, start, end);
-        return;
-      }
-
-      // Best of 5 pivot picking:
-      // Choose pivots by looking at five candidates.
-      final int len = end - start;
-      final int seventh = (len >> 3) + (len >> 6) + 1;
-      final int m3 = (start + end) >> 1; // middle
-      final int m2 = m3 - seventh;
-      final int m1 = m2 - seventh;
-      final int m4 = m3 + seventh;
-      final int m5 = m4 + seventh;
-
-      // Explicit (and optimal) sorting network for 5 elements
-      // See Knuth for details.
-      if(data.get(m1).compareTo(data.get(m2)) > 0) {
-        swap(data, m1, m2);
-      }
-      if(data.get(m1).compareTo(data.get(m3)) > 0) {
-        swap(data, m1, m3);
-      }
-      if(data.get(m2).compareTo(data.get(m3)) > 0) {
-        swap(data, m2, m3);
-      }
-      if(data.get(m4).compareTo(data.get(m5)) > 0) {
-        swap(data, m4, m5);
-      }
-      if(data.get(m1).compareTo(data.get(m4)) > 0) {
-        swap(data, m1, m4);
-      }
-      if(data.get(m3).compareTo(data.get(m4)) > 0) {
-        swap(data, m3, m4);
-      }
-      if(data.get(m2).compareTo(data.get(m5)) > 0) {
-        swap(data, m2, m5);
-      }
-      if(data.get(m2).compareTo(data.get(m3)) > 0) {
-        swap(data, m2, m3);
-      }
-      if(data.get(m4).compareTo(data.get(m5)) > 0) {
-        swap(data, m4, m5);
-      }
-
-      int best = bestPivot(rank, m1, m2, m3, m4, m5);
-      final T pivot = data.get(best);
-      // Move middle element out of the way, just before end
-      // (Since we already know that "end" is bigger)
-      swap(data, best, end - 1);
-
-      // Begin partitioning
-      int i = start, j = end - 2;
-      // This is classic quicksort stuff
-      while(true) {
-        while(i <= j && data.get(i).compareTo(pivot) <= 0) {
-          i++;
-        }
-        while(j >= i && data.get(j).compareTo(pivot) >= 0) {
-          j--;
-        }
-        if(i >= j) {
-          break;
-        }
-        swap(data, i, j);
-      }
-
-      // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 1);
-
-      // Skip duplicates to narrow down the search interval:
-      while(rank < i && data.get(i - 1).compareTo(pivot) == 0) {
-        --i;
-      }
-      while(rank > i && data.get(i + 1).compareTo(pivot) == 0) {
-        ++i;
-      }
-
-      // In contrast to quicksort, we only need to recurse into the half we are
-      // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
-        end = i;
-      }
-      else if(rank > i) {
-        start = i + 1;
-      }
-      else {
-        break;
-      }
-    } // Loop until rank==i
-  }
-
-  /**
-   * Sort a small array using repetitive insertion sort.
-   *
-   * @param <T> object type
-   * @param data Data to sort
-   * @param start Interval start
-   * @param end Interval end
-   */
-  private static <T extends Comparable<? super T>> void insertionSort(List<T> data, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && data.get(j - 1).compareTo(data.get(j)) > 0; j--) {
-        swap(data, j, j - 1);
-      }
-    }
-  }
-
-  /**
    * The usual swap method.
    *
    * @param <T> object type
@@ -1063,7 +632,7 @@ public class QuickSelect {
    */
   public static <T> T median(List<? extends T> data, Comparator<? super T> comparator, int begin, int end) {
     final int length = end - begin;
-    assert(length > 0);
+    assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + ((length - 1) >> 1);
     quickSelect(data, comparator, begin, end, left);
@@ -1102,7 +671,7 @@ public class QuickSelect {
    */
   public static <T> T quantile(List<? extends T> data, Comparator<? super T> comparator, int begin, int end, double quant) {
     final int length = end - begin;
-    assert(length > 0) : "Quantile on empty set?";
+    assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
     final int ileft = (int) Math.floor(dleft);

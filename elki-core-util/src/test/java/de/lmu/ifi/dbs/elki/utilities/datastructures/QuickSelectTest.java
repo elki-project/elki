@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -142,7 +143,7 @@ public class QuickSelectTest {
   public void testTiesIntegerList() {
     List<Integer> data = Arrays.asList(new Integer[] { 1, 1, 9, 9, 5, 9, 1, 1, 1, 9, 9, 9, 9, 1, 1 });
     final int half = data.size() >> 1;
-    QuickSelect.quickSelect(data, half);
+    QuickSelect.quickSelect(data, Comparator.naturalOrder(), half);
     for (int i = 0; i < data.size(); i++) {
       assertTrue("Not partially sorted.", data.get(i) <= data.get(half) || i > half);
       assertTrue("Not partially sorted.", data.get(i) >= data.get(half) || i < half);
