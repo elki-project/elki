@@ -143,19 +143,15 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
   public OutlierResult run(Relation<V> relation) {
     SimilarityQuery<V> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
-    final WritableDoubleDataStore sod_scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    WritableDataStore<SODModel> sod_models = null;
-    if(models) { // Models requested
-      sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
-    }
+    WritableDoubleDataStore sod_scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    WritableDataStore<SODModel> sod_models = models ? DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class) : null;
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      LOG.incrementProcessed(progress);
       DBIDs neighborhood = getNearestNeighbors(relation, snnInstance, iter);
 
       double[] center;
-      long[] weightVector;
-      double sod;
+      long[] weightVector = null;
+      double sod = 0.;
       if(neighborhood.size() > 0) {
         center = Centroid.make(relation, neighborhood).getArrayRef();
         // Note: per-dimension variances; no covariances.
@@ -171,8 +167,6 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       }
       else {
         center = relation.get(iter).toArray();
-        weightVector = null;
-        sod = 0.;
       }
 
       if(sod_models != null) {
@@ -180,14 +174,14 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       }
       sod_scores.putDouble(iter, sod);
       minmax.put(sod);
+      LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
     // combine results.
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new MaterializedDoubleRelation("Subspace Outlier Degree", "sod-outlier", sod_scores, relation.getDBIDs()));
     if(sod_models != null) {
-      Relation<SODModel> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs());
-      sodResult.addChildResult(models);
+      sodResult.addChildResult(new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs()));
     }
     return sodResult;
   }
@@ -243,8 +237,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
         variances[d] += deviation * deviation;
       }
     }
-    VMath.times(variances, 1. / neighborhood.size());
-    return variances;
+    return VMath.timesEquals(variances, 1. / neighborhood.size());
   }
 
   /**
@@ -261,10 +254,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       return 0;
     }
     final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
-    double distance = df.distance(queryObject, DoubleVector.wrap(center));
-    distance /= card; // FIXME: defined and published as card, should be
-                      // sqrt(card), unfortunately
-    return distance;
+    return df.distance(queryObject, DoubleVector.wrap(center)) / card;
   }
 
   @Override

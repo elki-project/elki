@@ -42,6 +42,7 @@ public class SODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<SOD<DoubleVector>>(SOD.class) //
         .with(SOD.Parameterizer.KNN_ID, 25) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19) //
+        .with(SOD.Parameterizer.MODELS_ID) // we don't test them though.
         .build().run(db);
     testSingleScore(result, 1293, 1.5167500);
     testAUC(db, "Noise", result, 0.949131652);
