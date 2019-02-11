@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunctionTest;
@@ -31,32 +27,26 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import net.jafama.FastMath;
 
 /**
- * Unit test for Minkowski L<sub>p</sub> distances.
+ * Unit test for sparse Minkowski L<sub>p</sub> distances.
  *
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class LPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
+public class SparseLPNormDistanceFunctionTest extends AbstractDistanceFunctionTest {
   @Test
-  public void testSpatialConsistency() {
+  public void testBasic() {
     // Also test the builder - we could have just used .STATIC
-    LPNormDistanceFunction dist = new ELKIBuilder<>(LPNormDistanceFunction.class) //
+    SparseLPNormDistanceFunction dist = new ELKIBuilder<>(SparseLPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, .5) //
         .build();
-    assertSame("Subtyped", LPNormDistanceFunction.class, dist.getClass());
-    assertFalse("Not metric", dist.isMetric());
     basicChecks(dist);
-    varyingLengthBasic(0, dist, 1, 0, 1, 1, 4, 1);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
-    dist = new ELKIBuilder<>(LPNormDistanceFunction.class) //
+    sparseBasic(0, dist, 1, 0, 1, 1, 4, 1);
+
+    // Also test the builder - we could have just used .STATIC
+    dist = new ELKIBuilder<>(SparseLPNormDistanceFunction.class) //
         .with(LPNormDistanceFunction.Parameterizer.P_ID, 3) //
         .build();
-    assertSame("Not optimized", LPIntegerNormDistanceFunction.class, dist.getClass());
-    assertTrue("Not metric", dist.isMetric());
     basicChecks(dist);
-    varyingLengthBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    sparseBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
   }
 }

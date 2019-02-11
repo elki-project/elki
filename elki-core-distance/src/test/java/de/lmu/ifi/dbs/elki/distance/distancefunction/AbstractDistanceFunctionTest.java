@@ -29,6 +29,8 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
@@ -53,7 +55,7 @@ public abstract class AbstractDistanceFunctionTest {
     assertTrue("Inconsistent equals", dist.equals(dist));
     assertFalse("Squared distances shouldn't be metric?", dist.isMetric() && dist.isSquared());
     assertTrue("Squared distances shouldn't be metric?", dist.isSquared() || !dist.toString().contains("Square"));
-    assertTrue("Squared distances shouldn't be metric?", !dist.isSquared() || !dist.toString().contains("Sqrt"));
+    assertTrue("Sqrt distances should be metric?", !dist.isSquared() || !dist.toString().contains("Sqrt"));
     // assertTrue("Missing toString()", dis.toString().indexOf('@') < 0);
   }
 
@@ -106,6 +108,55 @@ public abstract class AbstractDistanceFunctionTest {
     }
     if(dist.isMetric()) {
       assertTrue("Trivial metric test failed.", dist.distance(BASIC[4], BASIC[6]) <= dist.distance(BASIC[4], BASIC[5]) + dist.distance(BASIC[5], BASIC[6]));
+    }
+  }
+
+  /**
+   * Simple toy vectors
+   */
+  public static final SparseDoubleVector[] SBASIC = new SparseDoubleVector[] { //
+      new SparseDoubleVector(new double[] { 0 }), //
+      new SparseDoubleVector(new double[] { 1 }), //
+      new SparseDoubleVector(new double[] { 0, 0 }), //
+      new SparseDoubleVector(new double[] { 0, 1 }), //
+      new SparseDoubleVector(new double[] { .1 }), //
+      new SparseDoubleVector(new double[] { .2 }), //
+      new SparseDoubleVector(new double[] { .3 }), //
+  };
+
+  /**
+   * Basic regression test for sparse vectors.
+   *
+   * @param delta tolerance
+   * @param dist Distance function
+   * @param ds Correct vectors
+   */
+  public static void sparseBasic(double tolerance, PrimitiveDistanceFunction<? super SparseNumberVector> dist, double... ds) {
+    // Should accept variable lengths in the API:
+    assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(SparseDoubleVector.class, 1, 2)));
+
+    assertEquals("Basic 0", ds[0], dist.distance(SBASIC[0], SBASIC[1]), tolerance);
+    assertEquals("Basic 1", ds[1], dist.distance(SBASIC[0], SBASIC[2]), tolerance);
+    assertEquals("Basic 2", ds[2], dist.distance(SBASIC[0], SBASIC[3]), tolerance);
+    assertEquals("Basic 3", ds[3], dist.distance(SBASIC[1], SBASIC[2]), tolerance);
+    assertEquals("Basic 4", ds[4], dist.distance(SBASIC[1], SBASIC[3]), tolerance);
+    assertEquals("Basic 4b", ds[4], dist.distance(SBASIC[3], SBASIC[1]), tolerance);
+    assertEquals("Basic 5", ds[5], dist.distance(SBASIC[2], SBASIC[3]), tolerance);
+    assertEquals("Basic 5b", ds[5], dist.distance(SBASIC[3], SBASIC[2]), tolerance);
+
+    double expect = dist.distance(SBASIC[0], SBASIC[3]);
+    assertEquals("Distance not as expected", expect, dist.distance(SBASIC[1], SBASIC[2]), 1e-15);
+    if(dist.isSymmetric()) {
+      assertEquals("Distance not as expected", expect, dist.distance(SBASIC[3], SBASIC[0]), 1e-15);
+      assertEquals("Distance not as expected", expect, dist.distance(SBASIC[2], SBASIC[1]), 1e-15);
+    }
+    if(dist instanceof Norm) {
+      Norm<? super SparseNumberVector> norm = (Norm<? super SparseNumberVector>) dist;
+      assertEquals("Distance not as expected", dist.distance(SBASIC[0], SBASIC[1]), norm.norm(SBASIC[1]), 1e-15);
+      assertEquals("Distance not as expected", dist.distance(SBASIC[2], SBASIC[3]), norm.norm(SBASIC[3]), 1e-15);
+    }
+    if(dist.isMetric()) {
+      assertTrue("Trivial metric test failed.", dist.distance(SBASIC[4], SBASIC[6]) <= dist.distance(SBASIC[4], SBASIC[5]) + dist.distance(SBASIC[5], SBASIC[6]));
     }
   }
 
