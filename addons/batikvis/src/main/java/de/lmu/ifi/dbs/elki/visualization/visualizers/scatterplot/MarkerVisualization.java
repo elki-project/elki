@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
- * Visualize e.g. a clustering using different markers for different clusters.
- * This visualizer is not constraint to clusters. It can in fact visualize any
+ * Visualize a clustering using different markers for different clusters.
+ * This visualizer is not constrained to clusters. It can in fact visualize any
  * kind of result we have a style source for.
  *
  * @author Erich Schubert

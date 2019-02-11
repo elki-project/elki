@@ -109,7 +109,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
     VisualizationTree.findVis(context, start).filter(HistogramProjector.class).forEach(p -> {
       context.addVis(p, new VisualizationTask(this, CNAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
-          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 
@@ -185,25 +185,20 @@ public class ColoredHistogramVisualizer implements VisFactory {
       final int numc = (cspol != null) ? (cspol.getMaxStyle() - cspol.getMinStyle()) : 0;
       DoubleMinMax minmax = new DoubleMinMax();
       final double frac = 1. / relation.size(); // TODO: sampling?
-      final int cols = numc + 1;
+      final int cols = numc + 2;
       ObjHistogram<double[]> histogram = new ObjHistogram<double[]>(settings.bins, 0, 1, () -> {
         return new double[cols];
       });
 
       if(cspol != null) {
-        for(int snum = 0; snum < numc; snum++) {
-          for(DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
-            if(!sample.getSample().contains(iter)) {
-              continue; // TODO: can we test more efficiently than this?
-            }
-            try {
-              final double[] row = histogram.get(proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE + .5);
-              row[0] += frac;
-              row[snum + 1] += frac;
-            }
-            catch(ObjectNotFoundException e) {
-              // Ignore. The object was probably deleted from the database
-            }
+        for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
+          try {
+            final double[] row = histogram.get(proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE + .5);
+            row[0] += frac;
+            row[cspol.getStyleForDBID(iter) - off + 2] += frac;
+          }
+          catch(ObjectNotFoundException e) {
+            // Ignore. The object was probably deleted from the database
           }
         }
       }
@@ -249,22 +244,20 @@ public class ColoredHistogramVisualizer implements VisFactory {
       // Visualizing
       if(!settings.curves) {
         for(ObjHistogram<double[]>.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
-          double lpos = iter.getLeft();
-          double rpos = iter.getRight();
+          double lpos = iter.getLeft(), rpos = iter.getRight();
           double stack = 0.0;
-          final int start = numc > 0 ? 1 : 0;
+          int start = numc > 0 ? 1 : 0;
           for(int key = start; key < cols; key++) {
             double val = yscale.getScaled(iter.getValue()[key]);
             Element row = SVGUtil.svgRect(svgp.getDocument(), xsize * lpos, ysize * (1 - (val + stack)), xsize * (rpos - lpos), ysize * val);
             stack = stack + val;
-            SVGUtil.addCSSClass(row, BIN + (off + key - 1));
+            SVGUtil.addCSSClass(row, BIN + (off + key - 1 - start));
             layer.appendChild(row);
           }
         }
       }
       else {
-        double left = histogram.getCoverMinimum();
-        double right = left;
+        double left = histogram.getCoverMinimum(), right = left;
 
         SVGPath[] paths = new SVGPath[cols];
         double[] lasty = new double[cols];
