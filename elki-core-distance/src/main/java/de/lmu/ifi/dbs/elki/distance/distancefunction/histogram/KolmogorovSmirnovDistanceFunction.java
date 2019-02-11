@@ -26,9 +26,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Distance function based on the Kolmogorov-Smirnov goodness of fit test.
- * 
+ * <p>
  * This distance function assumes there exist a natural order in the vectors,
  * i.e. they should be some 1-dimensional histogram.
+ * <p>
+ * The distance is then defined as
+ * \[\text{KS}(\vec{x},\vec{y}) := \max_i
+ * |\frac{\sum_{j=1}^i x_j}{\sum_{j=1}^d x_j}|
+ * - |\frac{\sum_{j=1}^i y_j}{\sum_{j=1}^d y_j}| \]
+ * which is the maximum difference of the empirical CDFs,
+ * where the divisors normalize the distribution to 1.
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -55,8 +62,17 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDista
     double xs = 0., ys = 0., agg = 0.;
     for(int i = 0; i < dim; i++) {
       xs += v1.doubleValue(i);
+    }
+    for(int i = 0; i < dim; i++) {
       ys += v2.doubleValue(i);
-      double diff = Math.abs(xs - ys);
+    }
+    // Scaling factors:
+    double fx = xs > 0 ? 1. / xs : 1, fy = ys > 0 ? 1. / ys : 1;
+    xs = ys = 0.; // Reset
+    for(int i = 0; i < dim; i++) {
+      xs += v1.doubleValue(i);
+      ys += v2.doubleValue(i);
+      double diff = Math.abs(xs * fx - ys * fy);
       agg = diff < agg ? agg : diff;
     }
     return agg;
