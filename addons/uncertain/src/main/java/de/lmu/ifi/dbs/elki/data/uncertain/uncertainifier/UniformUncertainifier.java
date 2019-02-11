@@ -62,6 +62,7 @@ public class UniformUncertainifier implements Uncertainifier<UniformContinuousUn
     super();
     this.minDev = minDev;
     this.maxDev = maxDev;
+    this.symmetric = symmetric;
   }
 
   @Override

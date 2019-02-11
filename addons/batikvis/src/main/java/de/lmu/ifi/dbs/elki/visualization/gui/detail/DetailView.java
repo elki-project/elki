@@ -322,12 +322,12 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     Runnable pr = new Runnable() {
       @Override
       public void run() {
-        if(DetailView.this.pendingRefresh.compareAndSet(this, null)) {
-          DetailView.this.refresh();
+        if(pendingRefresh.compareAndSet(this, null)) {
+          refresh();
         }
       }
     };
-    DetailView.this.pendingRefresh.set(pr);
+    pendingRefresh.set(pr);
     scheduleUpdate(pr);
   }
 

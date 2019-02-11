@@ -182,12 +182,11 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Run CASH on the relation.
    *
-   * @param database Database
-   * @param vrel Relation
+   * @param rel Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<V> vrel) {
-    fulldatabase = preprocess(database, vrel);
+  public Clustering<Model> run(Relation<V> rel) {
+    fulldatabase = preprocess(rel);
     processedIDs = DBIDUtil.newHashSet(fulldatabase.size());
     noiseDim = dimensionality(fulldatabase);
 
@@ -214,11 +213,10 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Preprocess the dataset, precomputing the parameterization functions.
    *
-   * @param db Database
    * @param vrel Vector relation
    * @return Preprocessed relation
    */
-  private Relation<ParameterizationFunction> preprocess(Database db, Relation<V> vrel) {
+  private Relation<ParameterizationFunction> preprocess(Relation<V> vrel) {
     DBIDs ids = vrel.getDBIDs();
     SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
     WritableDataStore<ParameterizationFunction> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ParameterizationFunction.class);

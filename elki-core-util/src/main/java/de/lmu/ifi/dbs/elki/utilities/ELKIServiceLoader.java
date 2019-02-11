@@ -104,7 +104,7 @@ public class ELKIServiceLoader {
               valid = is.read(buf, valid, buf.length - valid);
               continue;
             }
-            parseLine(parent, buf, start, cur, nextElement);
+            parseLine(parent, buf, start, cur);
             while(cur < valid && ((c = buf[cur]) == '\n' || c == '\r')) {
               cur++;
             }
@@ -126,9 +126,8 @@ public class ELKIServiceLoader {
    *
    * @param parent Parent class
    * @param line Line to read
-   * @param nam File name for error reporting
    */
-  private static void parseLine(Class<?> parent, char[] line, int begin, int end, URL nam) {
+  private static void parseLine(Class<?> parent, char[] line, int begin, int end) {
     while(begin < end && line[begin] == ' ') {
       begin++;
     }

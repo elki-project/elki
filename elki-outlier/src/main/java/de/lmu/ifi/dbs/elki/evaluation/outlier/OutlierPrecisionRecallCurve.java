@@ -91,7 +91,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
-      PRCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
+      PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
       EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), o, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
@@ -103,14 +103,14 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      PRCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
+      PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
       EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
     }
   }
 
-  private PRCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
+  private PRCurve computePrecisionResult(SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
     PRCurve curve = new PRCurve(postot + 2, postot);

@@ -129,19 +129,6 @@ public class AffineTransformation {
   }
 
   /**
-   * Return a clone of the affine transformation
-   *
-   * @return cloned affine transformation
-   */
-  @Override
-  public AffineTransformation clone() {
-    // Note that we're NOT using copied matrices here, since this class
-    // supposedly never modifies it's matrixes but replaces them with new
-    // ones. Thus it is safe to re-use it for a cloned copy.
-    return new AffineTransformation(this.dim, this.trans, this.inv);
-  }
-
-  /**
    * Query dimensionality of the transformation.
    *
    * @return dimensionality

@@ -160,7 +160,7 @@ public class TooltipStringVisualization implements VisFactory {
     protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
       final Object data = result.get(id);
       String label = (data == null) ? "null" : data.toString();
-      label = (label.isEmpty() || label == null) ? "null" : label;
+      label = (label == null || label.isEmpty()) ? "null" : label;
       return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);
     }
 

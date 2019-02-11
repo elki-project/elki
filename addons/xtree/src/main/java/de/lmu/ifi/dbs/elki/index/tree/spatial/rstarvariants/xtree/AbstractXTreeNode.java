@@ -80,7 +80,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
    * @param isLeaf indicates whether this node is a leaf node
    */
   public AbstractXTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, SpatialEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

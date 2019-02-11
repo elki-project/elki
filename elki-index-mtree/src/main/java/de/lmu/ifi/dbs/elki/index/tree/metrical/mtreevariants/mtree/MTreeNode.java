@@ -51,6 +51,6 @@ public class MTreeNode<O> extends AbstractMTreeNode<O, MTreeNode<O>, MTreeEntry>
    * @param isLeaf indicates whether this node is a leaf node
    */
   public MTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, MTreeEntry.class);
+    super(capacity, isLeaf);
   }
 }

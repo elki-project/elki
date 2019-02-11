@@ -227,7 +227,7 @@ public class LABInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
   /**
    * Partial Fisher-Yates shuffle.
    *
-   * @param sample Sample array
+   * @param ids IDs to shuffle
    * @param ssize sample size to generate
    * @param end Valid range
    * @param random Random generator

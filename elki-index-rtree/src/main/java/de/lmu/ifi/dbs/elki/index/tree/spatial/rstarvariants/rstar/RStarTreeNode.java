@@ -47,6 +47,6 @@ public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialE
    * @param isLeaf indicates whether this node is a leaf node
    */
   public RStarTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, SpatialEntry.class);
+    super(capacity, isLeaf);
   }
 }

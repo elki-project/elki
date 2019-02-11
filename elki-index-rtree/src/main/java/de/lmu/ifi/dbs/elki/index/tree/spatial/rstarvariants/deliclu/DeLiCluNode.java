@@ -48,7 +48,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    * @param isLeaf indicates whether this node is a leaf node
    */
   public DeLiCluNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, DeLiCluEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

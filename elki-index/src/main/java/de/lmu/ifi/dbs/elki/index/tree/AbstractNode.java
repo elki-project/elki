@@ -67,9 +67,8 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
-   * @param eclass Entry class, to initialize array storage
    */
-  public AbstractNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
+  public AbstractNode(int capacity, boolean isLeaf) {
     super();
     this.numEntries = 0;
     this.entries = new Entry[capacity];

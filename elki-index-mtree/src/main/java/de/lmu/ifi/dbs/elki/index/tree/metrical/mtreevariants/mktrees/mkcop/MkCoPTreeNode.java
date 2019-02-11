@@ -56,7 +56,7 @@ class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry
    * @param isLeaf indicates whether this node is a leaf node
    */
   public MkCoPTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, MkCoPEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

@@ -54,7 +54,7 @@ class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry
    * @param isLeaf indicates whether this node is a leaf node
    */
   public MkTabTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, MkTabEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

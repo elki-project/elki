@@ -48,7 +48,7 @@ public class RdKNNNode extends AbstractRStarTreeNode<RdKNNNode, RdKNNEntry> {
    * @param isLeaf indicates whether this node is a leaf node
    */
   public RdKNNNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, RdKNNEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

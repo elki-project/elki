@@ -155,8 +155,7 @@ public class SaveOptionsPanel extends JPanel {
       @Override
       public void stateChanged(ChangeEvent e) {
         if(aspectRatioLock.isSelected()) {
-          int val = modelWidth.getNumber().intValue();
-          spinnerHeight.setValue(new Integer((int) Math.round(val / ratio)));
+          spinnerHeight.setValue((int) Math.round(modelWidth.getNumber().intValue() / ratio));
         }
       }
     });
@@ -167,8 +166,7 @@ public class SaveOptionsPanel extends JPanel {
       @Override
       public void stateChanged(ChangeEvent e) {
         if(aspectRatioLock.isSelected()) {
-          int val = modelHeight.getNumber().intValue();
-          spinnerWidth.setValue(new Integer((int) Math.round(val * ratio)));
+          spinnerWidth.setValue((int) Math.round(modelHeight.getNumber().intValue() * ratio));
         }
       }
     });

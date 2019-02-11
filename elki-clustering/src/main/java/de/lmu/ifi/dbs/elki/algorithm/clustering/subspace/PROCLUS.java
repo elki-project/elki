@@ -337,11 +337,10 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * m_i.
    *
    * @param medoids the ids of the medoids
-   * @param database the database holding the objects
    * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private DataStore<DBIDs> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
+  private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
     WritableDataStore<DBIDs> result = DataStoreUtil.makeStorage(medoids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, DBIDs.class);
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
@@ -378,7 +377,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    */
   private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
     // get localities
-    DataStore<DBIDs> localities = getLocalities(medoids, database, distFunc, rangeQuery);
+    DataStore<DBIDs> localities = getLocalities(medoids, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     final int dim = RelationUtil.dimensionality(database);

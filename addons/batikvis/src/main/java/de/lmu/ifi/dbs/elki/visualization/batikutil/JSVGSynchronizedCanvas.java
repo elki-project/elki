@@ -164,6 +164,6 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
       return;
     }
     this.plot = null;
-    oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
+    oldplot.unsynchronizeWith(synchronizer);
   }
 }

@@ -150,7 +150,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
             if(node.isSuperNode()) {
               throw new IllegalStateException("This node should not be a supernode anymore");
             }
-            N n = supernodes.remove(new Long(node.getPageID()));
+            N n = supernodes.remove(Long.valueOf(node.getPageID()));
             assert (n != null);
             // update the old reference in the file
             writeNode(node);
@@ -192,7 +192,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    */
   @Override
   public N getNode(int nodeID) {
-    N nID = supernodes.get(new Long(nodeID));
+    N nID = supernodes.get(Long.valueOf(nodeID));
     if(nID != null) {
       return nID;
     }
@@ -1092,8 +1092,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     }
     // adjust supernode id
     if(oldRoot.isSuperNode()) {
-      supernodes.remove(new Long(getRootID()));
-      supernodes.put(new Long(oldRoot.getPageID()), oldRoot);
+      supernodes.remove(Long.valueOf(getRootID()));
+      supernodes.put(Long.valueOf(oldRoot.getPageID()), oldRoot);
     }
 
     root.setPageID(getRootID());

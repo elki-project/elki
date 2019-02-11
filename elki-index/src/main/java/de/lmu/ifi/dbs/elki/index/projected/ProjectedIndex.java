@@ -453,6 +453,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       this.proj = proj;
       this.inner = inner;
       this.materialize = materialize;
+      this.norefine = norefine;
       this.kmulti = kmulti;
     }
 

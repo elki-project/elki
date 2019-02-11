@@ -114,7 +114,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
     int lastk = Math.min(size, maxk);
-    XYCurve curve = new PrecisionAtKCurve("k", "Precision", lastk);
+    XYCurve curve = new PrecisionAtKCurve(lastk);
 
     int pos = 0;
     DBIDIter i = order.iter();
@@ -138,7 +138,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
      *
      * @param size Size estimation
      */
-    public PrecisionAtKCurve(String labelx, String labely, int size) {
+    public PrecisionAtKCurve(int size) {
       super("k", "Precision", size);
     }
 

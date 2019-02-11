@@ -55,7 +55,7 @@ class MkMaxTreeNode<O> extends AbstractMTreeNode<O, MkMaxTreeNode<O>, MkMaxEntry
    * @param isLeaf indicates whether this node is a leaf node
    */
   public MkMaxTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, MkMaxEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**

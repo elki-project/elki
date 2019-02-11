@@ -149,7 +149,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
       return ret;
     }
     // Image not found in registry.
-    return ImageTagRegistry.getBrokenLinkImage(ThumbnailRegistryEntry.this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
+    return ImageTagRegistry.getBrokenLinkImage(this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
   }
 
   /**

@@ -91,16 +91,13 @@ public class OutlierROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(int size, SetDBIDs positiveids, DBIDs order) {
-    if(order.size() != size) {
-      throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
-    }
+  private ROCResult computeROCResult(SetDBIDs positiveids, DBIDs order) {
     XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new SimpleAdapter(order.iter()));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
     return new ROCResult(roccurve, rocauc);
   }
 
-  private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
+  private ROCResult computeROCResult(SetDBIDs positiveids, OutlierResult or) {
     XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new OutlierScoreAdapter(or));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
     return new ROCResult(roccurve, rocauc);
@@ -122,7 +119,7 @@ public class OutlierROCCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      ROCResult rocres = computeROCResult(o.getScores().size(), positiveids, o);
+      ROCResult rocres = computeROCResult(positiveids, o);
       db.getHierarchy().add(o, rocres);
       EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), o, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
@@ -138,7 +135,10 @@ public class OutlierROCCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      ROCResult rocres = computeROCResult(or.getDBIDs().size(), positiveids, sorted);
+      if(sorted.size() != or.getDBIDs().size()) {
+        throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
+      }
+      ROCResult rocres = computeROCResult(positiveids, sorted);
       db.getHierarchy().add(or, rocres);
       EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");

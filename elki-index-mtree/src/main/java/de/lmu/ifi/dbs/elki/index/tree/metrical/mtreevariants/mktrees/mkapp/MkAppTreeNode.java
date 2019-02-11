@@ -57,7 +57,7 @@ class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry
    * @param isLeaf indicates whether this node is a leaf node
    */
   public MkAppTreeNode(int capacity, boolean isLeaf) {
-    super(capacity, isLeaf, MkAppEntry.class);
+    super(capacity, isLeaf);
   }
 
   /**
