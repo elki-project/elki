@@ -28,8 +28,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 
 /**
  * Interface for computing the quality of a K-Means clustering.
- *
- * Important note: some measures are ascending, others are descending!
+ * <p>
+ * Important note: some measures are ascending, others are descending,
+ * so use the method {@link #isBetter} for ordering.
  *
  * @author Erich Schubert
  * @since 0.6.0
@@ -49,13 +50,6 @@ public interface KMeansQualityMeasure<O extends NumberVector> {
    * @return quality measure
    */
   <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation);
-
-  /**
-   * Use ascending or descending ordering.
-   *
-   * @return {@code true} when larger scores are better.
-   */
-  boolean ascending();
 
   /**
    * Compare two scores.

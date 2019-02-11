@@ -82,7 +82,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Variance contribution of a single cluster.
-   *
+   * <p>
    * If possible, this information is reused from the clustering process (when a
    * KMeansModel is returned).
    *
@@ -112,7 +112,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Computes log likelihood of an entire clustering.
-   *
+   * <p>
    * Version as used in the X-means publication.
    *
    * @param relation Data relation
@@ -168,56 +168,6 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
           - (d_i[i] - m) * .5; // (Rn-K)/2
     }
     logLikelihood -= n * FastMath.log(n); // Prior entropy, sum_i Rn log R
-    return logLikelihood;
-  }
-
-  /**
-   * Computes log likelihood of an entire clustering.
-   *
-   * Version as used by Zhao et al.
-   *
-   * @param relation Data relation
-   * @param clustering Clustering
-   * @param distanceFunction Distance function
-   * @param <V> Vector type
-   * @return Log Likelihood.
-   */
-  @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
-      title = "Knee Point Detection on Bayesian Information Criterion", //
-      booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-      url = "https://doi.org/10.1109/ICTAI.2008.154", //
-      bibkey = "DBLP:conf/ictai/ZhaoXF08")
-  public static <V extends NumberVector> double logLikelihoodAlternate(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
-    List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
-    // number of clusters
-    final int m = clusters.size();
-
-    // number of objects in the clustering
-    int n = 0;
-    // cluster sizes
-    int[] n_i = new int[m];
-    // variances
-    double[] d_i = new double[m];
-
-    // Iterate over clusters:
-    Iterator<? extends Cluster<? extends MeanModel>> it = clusters.iterator();
-    for(int i = 0; it.hasNext(); ++i) {
-      Cluster<? extends MeanModel> cluster = it.next();
-      n += n_i[i] = cluster.size();
-      d_i[i] = varianceOfCluster(cluster, distanceFunction, relation);
-    }
-
-    final int dim = RelationUtil.dimensionality(relation);
-
-    // log likelihood of this clustering
-    double logLikelihood = 0.;
-    // Aggregate
-    for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i] / (double) n) // ni log ni/n
-          - n_i[i] * dim * .5 * MathUtil.LOGTWOPI // ni*d/2 log2pi
-          - n_i[i] * .5 * FastMath.log(d_i[i]) // ni/2 log sigma_i
-          - (n_i[i] - m) * .5; // (ni-m)/2
-    }
     return logLikelihood;
   }
 

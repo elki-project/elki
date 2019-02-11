@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 
 /**
  * Class for computing the average overall distance.
- *
+ * <p>
  * The average of all average pairwise distances in a cluster.
  *
  * @author Stephan Baier
@@ -56,11 +56,6 @@ public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMea
     }
 
     return clusterDistanceSum / clustering.getAllClusters().size();
-  }
-
-  @Override
-  public boolean ascending() {
-    return false;
   }
 
   @Override

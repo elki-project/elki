@@ -45,11 +45,6 @@ public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMe
   }
 
   @Override
-  public boolean ascending() {
-    return false;
-  }
-
-  @Override
   public boolean isBetter(double currentCost, double bestCost) {
     // Careful: bestCost may be NaN!
     return !(currentCost >= bestCost);

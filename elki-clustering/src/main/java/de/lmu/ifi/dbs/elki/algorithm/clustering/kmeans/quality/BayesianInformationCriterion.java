@@ -63,11 +63,6 @@ public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<N
   }
 
   @Override
-  public boolean ascending() {
-    return true;
-  }
-
-  @Override
   public boolean isBetter(double currentCost, double bestCost) {
     // Careful: bestCost may be NaN!
     return !(currentCost <= bestCost);

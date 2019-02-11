@@ -242,7 +242,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     // Check if split is an improvement:
-    return (childrenEvaluation > parentEvaluation) ^ informationCriterion.ascending() ? parentClusterList : childClustering.getAllClusters();
+    return informationCriterion.isBetter(parentEvaluation, childrenEvaluation) ? parentClusterList : childClustering.getAllClusters();
   }
 
   /**
