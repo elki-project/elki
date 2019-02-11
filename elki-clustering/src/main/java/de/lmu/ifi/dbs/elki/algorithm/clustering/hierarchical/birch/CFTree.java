@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -734,14 +734,14 @@ public class CFTree {
         }
 
         DoubleParameter thresholdP = new DoubleParameter(THRESHOLD_ID) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
             .setOptional(true);
         if(config.grab(thresholdP)) {
           threshold = thresholdP.doubleValue();
         }
 
         IntParameter branchingP = new IntParameter(BRANCHING_ID) //
-            .addConstraint(new GreaterConstraint(2)) //
+            .addConstraint(new GreaterEqualConstraint(2)) //
             .setDefaultValue(64);
         if(config.grab(branchingP)) {
           branchingFactor = branchingP.intValue();

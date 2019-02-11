@@ -114,4 +114,16 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
     testFMeasure(db, clustering, 0.82023);
     testClusterSizes(clustering, new int[] { 158, 224, 256 });
   }
+
+  @Test
+  public void testOverflowing() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Parameterizer.ABSORPTION_ID, DiameterCriterion.class) //
+        .with(CFTree.Factory.Parameterizer.BRANCHING_ID, 4) // Force branching
+        .with(CFTree.Factory.Parameterizer.MAXLEAVES_ID, 4) //
+        .build().run(db);
+    testFMeasure(db, clustering, 0.93814);
+    testClusterSizes(clustering, new int[] { 200, 218, 220});
+  }
 }
