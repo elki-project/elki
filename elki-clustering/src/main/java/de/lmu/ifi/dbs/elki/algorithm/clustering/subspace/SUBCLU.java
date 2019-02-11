@@ -237,6 +237,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
     // build result
     int numClusters = 0;
+    ModifiableDBIDs noise = DBIDUtil.newHashSet(relation.getDBIDs());
     TreeMap<Subspace, ModifiableDBIDs> filtered = new TreeMap<>(Subspace.DIMENSION_COMPARATOR);
     Clustering<SubspaceModel> result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
     for(Subspace subspace : clusterMap.descendingKeySet()) {
@@ -257,6 +258,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
         blacklist.addDBIDs(newids);
+        noise.removeDBIDs(newids);
       }
       if(subspace.dimensionality() > mindim) {
         // Blacklist
@@ -275,8 +277,14 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
         }
       }
     }
-    // TODO: return a noise cluster with unclustered points?
-
+    // Make a noise cluster
+    if(!noise.isEmpty()) {
+      Cluster<SubspaceModel> newCluster = new Cluster<>(noise);
+      newCluster.setModel(new SubspaceModel(new Subspace(BitsUtil.zero(dimensionality)), Centroid.make(relation, noise).getArrayRef()));
+      newCluster.setName("noise");
+      newCluster.setNoise(true);
+      result.addToplevelCluster(newCluster);
+    }
     return result;
   }
 

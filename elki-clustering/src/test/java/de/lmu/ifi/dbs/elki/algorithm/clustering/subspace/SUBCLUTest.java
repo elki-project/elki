@@ -49,7 +49,7 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINPTS_ID, 100) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    testClusterSizes(result, new int[] { 191, 194, 395 });
+    testClusterSizes(result, new int[] { 6, 191, 194, 395 });
   }
 
   @Test
@@ -60,7 +60,7 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINPTS_ID, 70) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    testClusterSizes(result, new int[] { 99, 114, 136, 247, 303, 323 });
+    testClusterSizes(result, new int[] { 74, 99, 114, 136, 247, 303, 323 });
   }
 
   @Test
@@ -72,6 +72,6 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINDIM_ID, 2) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    testClusterSizes(result, new int[] { 623, 630, 631 });
+    testClusterSizes(result, new int[] { 616, 623, 630, 631 });
   }
 }
