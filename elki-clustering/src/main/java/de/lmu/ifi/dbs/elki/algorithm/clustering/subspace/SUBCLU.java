@@ -32,13 +32,16 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingSubspaceDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
@@ -58,6 +61,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * shaped and positioned clusters in subspaces. SUBCLU delivers for each
  * subspace the same clusters DBSCAN would have found, when applied to this
  * subspace separately.
+ * <p>
+ * Note: this implementation does <em>not</em> yet implemented the suggested
+ * indexing based on inverted files, and that we also only query subsets of
+ * them, this makes the implementation as a reusable index challenging.
+ * <p>
+ * The original paper is not very clear on which clusters to return, as any
+ * subspace cluster must be part of a lower-dimensional projected cluster,
+ * so these results would be highly redundant. In this implementation, we
+ * only include points in clusters that are not already part of sub-clusters
+ * (note that this does not remove overlap of independent subspaces).
  * <p>
  * Reference:
  * <p>
@@ -105,17 +118,24 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   protected int minpts;
 
   /**
+   * Minimum dimensionality.
+   */
+  protected int mindim;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
+   * @param mindim Minimum dimensionality
    */
-  public SUBCLU(DimensionSelectingSubspaceDistanceFunction<V> distanceFunction, double epsilon, int minpts) {
+  public SUBCLU(DimensionSelectingSubspaceDistanceFunction<V> distanceFunction, double epsilon, int minpts, int mindim) {
     super();
     this.distanceFunction = distanceFunction;
     this.epsilon = epsilon;
     this.minpts = minpts;
+    this.mindim = mindim;
   }
 
   /**
@@ -126,80 +146,71 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    */
   public Clustering<SubspaceModel> run(Relation<V> relation) {
     final int dimensionality = RelationUtil.dimensionality(relation);
+    if(dimensionality <= 1) {
+      throw new IllegalStateException("SUBCLU needs multivariate data.");
+    }
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(dimensionality) : null;
 
+    // mapping of subspaces to list of clusters
+    TreeMap<Subspace, List<Cluster<Model>>> clusterMap = new TreeMap<>(Subspace.DIMENSION_COMPARATOR);
+
     // Generate all 1-dimensional clusters
     LOG.beginStep(stepprog, 1, "Generate all 1-dimensional clusters.");
-
-    // mapping of dimensionality to set of subspaces
-    HashMap<Integer, List<Subspace>> subspaceMap = new HashMap<>();
-
-    // list of 1-dimensional subspaces containing clusters
-    List<Subspace> s_1 = new ArrayList<>();
-    subspaceMap.put(0, s_1);
-
-    // mapping of subspaces to list of clusters
-    TreeMap<Subspace, List<Cluster<Model>>> clusterMap = new TreeMap<>(new Subspace.DimensionComparator());
-
+    List<Subspace> subspaces = new ArrayList<>();
     for(int d = 0; d < dimensionality; d++) {
       Subspace currentSubspace = new Subspace(d);
       List<Cluster<Model>> clusters = runDBSCAN(relation, null, currentSubspace);
 
       if(LOG.isDebuggingFiner()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append('\n').append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
+        StringBuilder msg = new StringBuilder(1000) //
+            .append(clusters.size()).append(" clusters in subspace ")//
+            .append(currentSubspace.dimensionsToString()).append(':');
         for(Cluster<Model> cluster : clusters) {
-          msg.append("      " + cluster.getIDs() + "\n");
+          msg.append("\n      ").append(cluster.getIDs());
         }
         LOG.debugFiner(msg.toString());
       }
 
       if(!clusters.isEmpty()) {
-        s_1.add(currentSubspace);
+        subspaces.add(currentSubspace);
         clusterMap.put(currentSubspace, clusters);
       }
     }
 
     // Generate (d+1)-dimensional clusters from d-dimensional clusters
-    for(int d = 0; d < dimensionality - 1; d++) {
+    for(int d = 2; d <= dimensionality; d++) {
       if(stepprog != null) {
-        stepprog.beginStep(d + 2, "Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters.", LOG);
+        stepprog.beginStep(d, "Generate " + d + "-dimensional clusters from " + (d - 1) + "-dimensional clusters.", LOG);
       }
 
-      List<Subspace> subspaces = subspaceMap.get(d);
-      if(subspaces == null || subspaces.isEmpty()) {
-        if(stepprog != null) {
-          for(int dim = d + 1; dim < dimensionality - 1; dim++) {
-            stepprog.beginStep(dim + 2, "Generation of" + (dim + 2) + "-dimensional clusters not applicable, because no more " + (d + 2) + "-dimensional subspaces found.", LOG);
-          }
-        }
-        break;
-      }
-
-      List<Subspace> candidates = generateSubspaceCandidates(subspaces);
+      final List<Subspace> candidates = generateSubspaceCandidates(subspaces);
       List<Subspace> s_d = new ArrayList<>();
-
+      FiniteProgress substepprog = LOG.isVerbose() ? new FiniteProgress("Candidates of dimensionality " + d, candidates.size(), LOG) : null;
       for(Subspace candidate : candidates) {
         Subspace bestSubspace = bestSubspace(subspaces, candidate, clusterMap);
         if(LOG.isDebuggingFine()) {
-          LOG.debugFine("best subspace of " + candidate.dimensonsToString() + ": " + bestSubspace.dimensonsToString());
+          LOG.debugFine("best subspace of " + candidate.dimensionsToString() + ": " + bestSubspace.dimensionsToString());
         }
 
-        List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
         List<Cluster<Model>> clusters = new ArrayList<>();
-        for(Cluster<Model> cluster : bestSubspaceClusters) {
+        Iterator<Cluster<Model>> iter = clusterMap.get(bestSubspace).iterator();
+        while(iter.hasNext()) {
+          Cluster<Model> cluster = iter.next();
+          if(cluster.size() < minpts) {
+            continue;
+          }
           List<Cluster<Model>> candidateClusters = runDBSCAN(relation, cluster.getIDs(), candidate);
           if(!candidateClusters.isEmpty()) {
             clusters.addAll(candidateClusters);
           }
         }
 
-        if(LOG.isDebuggingFine()) {
-          StringBuilder msg = new StringBuilder();
-          msg.append(clusters.size() + " cluster(s) in subspace " + candidate + ": \n");
+        if(LOG.isDebuggingFine() && !clusters.isEmpty()) {
+          StringBuilder msg = new StringBuilder(1000).append(clusters.size()) //
+              .append(" cluster(s) in subspace ").append(candidate).append(':');
           for(Cluster<Model> c : clusters) {
-            msg.append("      " + c.getIDs() + "\n");
+            msg.append("\n      ").append(c.getIDs());
           }
           LOG.debugFine(msg.toString());
         }
@@ -208,27 +219,64 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
           s_d.add(candidate);
           clusterMap.put(candidate, clusters);
         }
+        LOG.incrementProcessed(substepprog);
       }
+      LOG.ensureCompleted(substepprog);
 
-      if(!s_d.isEmpty()) {
-        subspaceMap.put(d + 1, s_d);
+      if(s_d.isEmpty()) {
+        if(stepprog != null) {
+          for(int dim = d + 1; dim <= dimensionality; dim++) {
+            stepprog.beginStep(dim, "Generation of " + dim + "-dimensional clusters not applicable, because no " + d + "-dimensional subspaces were found.", LOG);
+          }
+        }
+        break;
       }
+      subspaces = s_d;
     }
+    LOG.setCompleted(stepprog);
 
     // build result
-    int numClusters = 1;
+    int numClusters = 0;
+    TreeMap<Subspace, ModifiableDBIDs> filtered = new TreeMap<>(Subspace.DIMENSION_COMPARATOR);
     Clustering<SubspaceModel> result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
     for(Subspace subspace : clusterMap.descendingKeySet()) {
+      if(subspace.dimensionality() < mindim) {
+        continue;
+      }
+      // Objects already in subclusters:
+      DBIDs blacklisted = filtered.get(subspace);
+      blacklisted = blacklisted != null ? blacklisted : DBIDUtil.EMPTYDBIDS;
+      ModifiableDBIDs blacklist = DBIDUtil.newHashSet(blacklisted);
+
       List<Cluster<Model>> clusters = clusterMap.get(subspace);
       for(Cluster<Model> cluster : clusters) {
-        Cluster<SubspaceModel> newCluster = new Cluster<>(cluster.getIDs());
-        newCluster.setModel(new SubspaceModel(subspace, Centroid.make(relation, cluster.getIDs()).getArrayRef()));
+        final DBIDs ids = cluster.getIDs();
+        final ModifiableDBIDs newids = DBIDUtil.difference(ids, blacklisted);
+        Cluster<SubspaceModel> newCluster = new Cluster<>(newids);
+        newCluster.setModel(new SubspaceModel(subspace, Centroid.make(relation, ids).getArrayRef()));
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
+        blacklist.addDBIDs(newids);
+      }
+      if(subspace.dimensionality() > mindim) {
+        // Blacklist
+        long[] tmp = BitsUtil.copy(subspace.getDimensions());
+        for(int pos = BitsUtil.nextSetBit(tmp, 0); pos >= 0; pos = BitsUtil.nextSetBit(tmp, pos + 1)) {
+          BitsUtil.clearI(tmp, pos);
+          Subspace sub = new Subspace(BitsUtil.copy(tmp));
+          BitsUtil.setI(tmp, pos);
+          ModifiableDBIDs bl = filtered.get(sub);
+          if(bl != null) {
+            bl.addDBIDs(blacklist);
+          }
+          else {
+            filtered.put(sub, DBIDUtil.newHashSet(blacklist));
+          }
+        }
       }
     }
+    // TODO: return a noise cluster with unclustered points?
 
-    LOG.setCompleted(stepprog);
     return result;
   }
 
@@ -247,27 +295,20 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   private List<Cluster<Model>> runDBSCAN(Relation<V> relation, DBIDs ids, Subspace subspace) {
     // distance function
     distanceFunction.setSelectedDimensions(subspace.getDimensions());
-
-    ProxyDatabase proxy;
-    if(ids == null) {
-      // TODO: in this case, we might want to use an index - the proxy below
-      // will prevent this!
-      ids = relation.getDBIDs();
-    }
-
-    proxy = new ProxyDatabase(ids, relation);
-
-    DBSCAN<V> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(LOG.isVerbose()) {
-      LOG.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
+      LOG.verbose("Run DBSCAN on subspace " + subspace.dimensionsToString() + //
+          (ids == null ? "" : " on cluster of " + ids.size() + " objects."));
     }
-    Clustering<Model> dbsres = dbscan.run(proxy);
+    // subset filter:
+    relation = ids == null ? relation : new ProxyView<>(ids, relation);
+
+    DBSCAN<V> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
+    Clustering<Model> dbsres = dbscan.run(relation);
 
     // separate cluster and noise
-    List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();
     List<Cluster<Model>> clusters = new ArrayList<>();
-    for(Cluster<Model> c : clusterAndNoise) {
+    for(Cluster<Model> c : dbsres.getAllClusters()) {
       if(!c.isNoise()) {
         clusters.add(c);
       }
@@ -286,52 +327,40 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     if(subspaces.isEmpty()) {
       return Collections.emptyList();
     }
-    List<Subspace> candidates = new ArrayList<>();
-    // Generate (d+1)-dimensional candidate subspaces
-    int d = subspaces.get(0).dimensionality();
-
-    StringBuilder msgFine = new StringBuilder("\n");
-    if(LOG.isDebuggingFiner()) {
-      msgFine.append("subspaces ").append(subspaces).append('\n');
+    StringBuilder msgFinest = LOG.isDebuggingFinest() ? new StringBuilder(1000) : null;
+    if(msgFinest != null) {
+      msgFinest.append("subspaces ").append(subspaces).append('\n');
     }
+
+    List<Subspace> candidates = new ArrayList<>();
+    // Generate d-dimensional candidate subspaces
+    final int d = subspaces.get(0).dimensionality() + 1;
 
     for(int i = 0; i < subspaces.size(); i++) {
       Subspace s1 = subspaces.get(i);
       for(int j = i + 1; j < subspaces.size(); j++) {
-        Subspace s2 = subspaces.get(j);
-        Subspace candidate = s1.join(s2);
+        Subspace candidate = s1.join(subspaces.get(j));
 
-        if(candidate != null) {
-          if(LOG.isDebuggingFiner()) {
-            msgFine.append("candidate: ").append(candidate.dimensonsToString()).append('\n');
+        if(candidate == null) {
+          continue; // Filtered by prefix rule
+        }
+        // prune irrelevant candidate subspaces
+        if(d == 2 || checkLower(candidate, subspaces)) {
+          if(msgFinest != null) {
+            msgFinest.append("candidate: ").append(candidate.dimensionsToString()).append('\n');
           }
-          // prune irrelevant candidate subspaces
-          List<Subspace> lowerSubspaces = lowerSubspaces(candidate);
-          if(LOG.isDebuggingFiner()) {
-            msgFine.append("lowerSubspaces: ").append(lowerSubspaces).append('\n');
-          }
-          boolean irrelevantCandidate = false;
-          for(Subspace s : lowerSubspaces) {
-            if(!subspaces.contains(s)) {
-              irrelevantCandidate = true;
-              break;
-            }
-          }
-          if(!irrelevantCandidate) {
-            candidates.add(candidate);
-          }
+          candidates.add(candidate);
         }
       }
     }
 
-    if(LOG.isDebuggingFiner()) {
-      LOG.debugFiner(msgFine.toString());
+    if(msgFinest != null) {
+      LOG.debugFinest(msgFinest.toString());
     }
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append(d + 1).append("-dimensional candidate subspaces: ");
+      StringBuilder msg = new StringBuilder(1000).append(d).append("-dimensional candidate subspaces: ");
       for(Subspace candidate : candidates) {
-        msg.append(candidate.dimensonsToString()).append(' ');
+        msg.append(candidate.dimensionsToString()).append(' ');
       }
       LOG.debug(msg.toString());
     }
@@ -340,28 +369,23 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   }
 
   /**
-   * Returns the list of all {@code (d-1)}-dimensional subspaces of the
-   * specified {@code d}-dimensional subspace.
-   * 
-   * @param subspace the {@code d}-dimensional subspace
-   * @return a list of all {@code (d-1)}-dimensional subspaces
+   * Perform Apriori-style pruning.
+   *
+   * @param candidate Current candidate
+   * @param subspaces Subspaces
+   * @return {@code true} if all lower-dimensional subspaces exist
    */
-  private List<Subspace> lowerSubspaces(Subspace subspace) {
-    int dimensionality = subspace.dimensionality();
-    if(dimensionality <= 1) {
-      return null;
-    }
-
-    // order result according to the dimensions
-    List<Subspace> result = new ArrayList<>();
-    long[] dimensions = subspace.getDimensions();
+  private boolean checkLower(Subspace candidate, List<Subspace> subspaces) {
+    long[] dimensions = BitsUtil.copy(candidate.getDimensions());
+    // TODO: we could skip the generating two immediately.
     for(int dim = BitsUtil.nextSetBit(dimensions, 0); dim >= 0; dim = BitsUtil.nextSetBit(dimensions, dim + 1)) {
-      long[] newDimensions = dimensions.clone();
-      BitsUtil.clearI(newDimensions, dim);
-      result.add(new Subspace(newDimensions));
+      BitsUtil.clearI(dimensions, dim);
+      if(!subspaces.contains(new Subspace(dimensions))) {
+        return false;
+      }
+      BitsUtil.setI(dimensions, dim);
     }
-
-    return result;
+    return true;
   }
 
   /**
@@ -378,18 +402,17 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    */
   private Subspace bestSubspace(List<Subspace> subspaces, Subspace candidate, TreeMap<Subspace, List<Cluster<Model>>> clusterMap) {
     Subspace bestSubspace = null;
+    int min = Integer.MAX_VALUE;
 
     for(Subspace subspace : subspaces) {
-      int min = Integer.MAX_VALUE;
-
       if(subspace.isSubspace(candidate)) {
-        List<Cluster<Model>> clusters = clusterMap.get(subspace);
-        for(Cluster<Model> cluster : clusters) {
-          int clusterSize = cluster.size();
-          if(clusterSize < min) {
-            min = clusterSize;
-            bestSubspace = subspace;
-          }
+        int sum = 0;
+        for(Cluster<Model> cluster : clusterMap.get(subspace)) {
+          sum += cluster.size();
+        }
+        if(sum < min) {
+          min = sum;
+          bestSubspace = subspace;
         }
       }
     }
@@ -430,6 +453,11 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     public static final OptionID MINPTS_ID = new OptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
     /**
+     * Minimum dimensionality to generate clusters.
+     */
+    public static final OptionID MINDIM_ID = new OptionID("subclu.mindim", "Minimum dimensionality to generate clusters for.");
+
+    /**
      * The distance function to determine the distance between objects.
      */
     protected DimensionSelectingSubspaceDistanceFunction<V> distance;
@@ -443,6 +471,11 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
      * Minimum number of points.
      */
     protected int minpts;
+
+    /**
+     * Minimum dimensionality.
+     */
+    protected int mindim = 1;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -462,11 +495,18 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
+
+      IntParameter mindimP = new IntParameter(MINDIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true);
+      if(config.grab(mindimP)) {
+        mindim = mindimP.getValue();
+      }
     }
 
     @Override
     protected SUBCLU<V> makeInstance() {
-      return new SUBCLU<>(distance, epsilon, minpts);
+      return new SUBCLU<>(distance, epsilon, minpts, mindim);
     }
   }
 }

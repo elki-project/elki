@@ -95,7 +95,7 @@ public class Subspace {
    */
   public Subspace join(Subspace other) {
     long[] newDimensions = joinLastDimensions(other);
-    return newDimensions == null ? new Subspace(newDimensions) : null;
+    return newDimensions != null ? new Subspace(newDimensions) : null;
   }
 
   @Override
@@ -116,7 +116,7 @@ public class Subspace {
    *
    * @return a string representation of the dimensions of this subspace
    */
-  public String dimensonsToString() {
+  public String dimensionsToString() {
     return dimensonsToString(", ");
   }
 
@@ -147,16 +147,8 @@ public class Subspace {
    *         false otherwise
    */
   public boolean isSubspace(Subspace subspace) {
-    if(this.dimensionality > subspace.dimensionality) {
-      return false;
-    }
-    // FIXME: use bit operations.
-    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
-      if(!BitsUtil.get(subspace.dimensions, d)) {
-        return false;
-      }
-    }
-    return true;
+    return this.dimensionality <= subspace.dimensionality && //
+        BitsUtil.intersectionSize(dimensions, subspace.dimensions) == dimensionality;
   }
 
   /**
@@ -175,7 +167,9 @@ public class Subspace {
     if(this.dimensionality != other.dimensionality) {
       return null;
     }
-
+    if(this.dimensionality == 1) {
+      return BitsUtil.orI(BitsUtil.copy(this.dimensions), other.dimensions);
+    }
     int last1 = BitsUtil.capacity(this.dimensions) - BitsUtil.numberOfLeadingZeros(this.dimensions) - 1;
     int last2 = BitsUtil.capacity(other.dimensions) - BitsUtil.numberOfLeadingZeros(other.dimensions) - 1;
     if(last2 < 0 || last1 >= last2) {
@@ -195,56 +189,39 @@ public class Subspace {
     return BitsUtil.hashCode(dimensions);
   }
 
-  /**
-   * Indicates if the specified object is equal to this subspace, i.e. if the
-   * specified object is a Subspace and is built of the same dimensions than
-   * this subspace.
-   *
-   * {@inheritDoc}
-   */
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    Subspace other = (Subspace) obj;
-    return new DimensionComparator().compare(this, other) == 0;
+    return this == obj || obj != null && getClass() == obj.getClass() && //
+        BitsUtil.equal(this.dimensions, ((Subspace) obj).dimensions);
   }
 
   /**
    * A comparator for subspaces based on their involved dimensions. The
    * subspaces are ordered according to the ordering of their dimensions.
+   * <p>
+   * If the two subspaces have different dimensionalities a negative integer or
+   * a positive integer will be returned if the dimensionality of the first
+   * subspace is less than or greater than the dimensionality of the second
+   * subspace. Otherwise the comparison works as follows: Let {@code d1} and
+   * {@code d2} be the first occurrences of pairwise unequal dimensions in the
+   * specified subspaces. Then a negative integer or a positive integer will be
+   * returned if {@code d1} is less than or greater than {@code d2}. Otherwise
+   * the two subspaces have equal dimensions and zero will be returned.
    *
    * @author Elke Achtert
    */
-  public static class DimensionComparator implements Comparator<Subspace> {
-    /**
-     * Compares the two specified subspaces for order. If the two subspaces have
-     * different dimensionalities a negative integer or a positive integer will
-     * be returned if the dimensionality of the first subspace is less than or
-     * greater than the dimensionality of the second subspace. Otherwise the
-     * comparison works as follows: Let {@code d1} and {@code d2} be the first
-     * occurrences of pairwise unequal dimensions in the specified subspaces.
-     * Then a negative integer or a positive integer will be returned if
-     * {@code d1} is less than or greater than {@code d2}. Otherwise the two
-     * subspaces have equal dimensions and zero will be returned.
-     *
-     * {@inheritDoc}
-     */
+  public static Comparator<Subspace> DIMENSION_COMPARATOR = new Comparator<Subspace>() {
     @Override
     public int compare(Subspace s1, Subspace s2) {
-      if(s1 == s2 || s1.getDimensions() == null && s2.getDimensions() == null) {
+      if(s1 == s2 || s1.getDimensions() == s2.getDimensions()) {
         return 0;
       }
 
-      if(s1.getDimensions() == null && s2.getDimensions() != null) {
+      if(s1.getDimensions() == null) {
         return -1;
       }
 
-      if(s1.getDimensions() != null && s2.getDimensions() == null) {
+      if(s2.getDimensions() == null) {
         return 1;
       }
 
@@ -260,5 +237,5 @@ public class Subspace {
       }
       return 0;
     }
-  }
+  };
 }

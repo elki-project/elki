@@ -41,10 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class SUBCLUTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run SUBCLU with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
@@ -53,14 +49,9 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINPTS_ID, 100) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    // testFMeasure(db, result, 0.9090);
     testClusterSizes(result, new int[] { 191, 194, 395 });
   }
 
-  /**
-   * Run SUBCLU with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
@@ -69,7 +60,18 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Parameterizer.MINPTS_ID, 70) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    // testFMeasure(db, result, 0.9977257761);
-    testClusterSizes(result, new int[] { 99, 247, 303, 437, 459 });
+    testClusterSizes(result, new int[] { 99, 114, 136, 247, 303, 323 });
+  }
+
+  @Test
+  public void testSUBCLUSubspaceAxisParallel() {
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500);
+    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+        .with(SUBCLU.Parameterizer.EPSILON_ID, 5) //
+        .with(SUBCLU.Parameterizer.MINPTS_ID, 200) //
+        .with(SUBCLU.Parameterizer.MINDIM_ID, 2) //
+        .build().run(db);
+    // PairCounting is not appropriate here: overlapping clusterings!
+    testClusterSizes(result, new int[] { 623, 630, 631 });
   }
 }

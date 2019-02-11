@@ -376,7 +376,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
   private List<CLIQUESubspace> findDenseSubspaceCandidates(Relation<? extends NumberVector> database, List<CLIQUESubspace> denseSubspaces) {
     // sort (k-1)-dimensional dense subspace according to their dimensions
     List<CLIQUESubspace> denseSubspacesByDimensions = new ArrayList<>(denseSubspaces);
-    Collections.sort(denseSubspacesByDimensions, new Subspace.DimensionComparator());
+    Collections.sort(denseSubspacesByDimensions, Subspace.DIMENSION_COMPARATOR);
 
     // determine k-dimensional dense subspace candidates
     double all = database.size();
