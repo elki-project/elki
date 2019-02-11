@@ -27,7 +27,10 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Performs a full SUBCLU run, and compares the result with a clustering derived
@@ -65,13 +68,17 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
 
   @Test
   public void testSUBCLUSubspaceAxisParallel() {
-    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500);
+    ListParameterization inp = new ListParameterization();
+    inp.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, RandomSamplingStreamFilter.class);
+    inp.addParameter(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .25);
+    inp.addParameter(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0);
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 601, inp);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
         .with(SUBCLU.Parameterizer.EPSILON_ID, 5) //
-        .with(SUBCLU.Parameterizer.MINPTS_ID, 200) //
+        .with(SUBCLU.Parameterizer.MINPTS_ID, 50) //
         .with(SUBCLU.Parameterizer.MINDIM_ID, 2) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    testClusterSizes(result, new int[] { 616, 623, 630, 631 });
+    testClusterSizes(result, new int[] { 72, 135, 145, 157, 161});
   }
 }
