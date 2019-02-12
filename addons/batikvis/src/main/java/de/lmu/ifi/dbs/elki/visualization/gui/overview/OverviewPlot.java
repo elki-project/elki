@@ -430,7 +430,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     synchronized(plot) {
       boolean refreshcss = false;
       if(plotmap == null) {
-        LOG.warning("Plotmap is null", new Throwable());
+        throw new IllegalStateException("Plotmap is null");
       }
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(PlotItem pi : plotmap.keySet()) {
@@ -443,15 +443,14 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
             // New task?
             if(pair == null) {
               if(visibleInOverview(task)) {
-                pair = new Pair<>(null, null);
-                pair.first = plot.svgElement(SVGConstants.SVG_G_TAG);
-                pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
-                vistoelem.get(it, null).first.appendChild(pair.first);
+                Element elem = plot.svgElement(SVGConstants.SVG_G_TAG);
+                pair = new Pair<>(elem, embedOrThumbnail(thumbsize, it, task, elem));
+                vistoelem.get(it, null).first.appendChild(elem);
                 vistoelem.put(it, task, pair);
                 refreshcss = true;
               }
             }
-            else {
+            else if(pair.first != null) {
               if(visibleInOverview(task)) {
                 // unhide if hidden.
                 if(pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
@@ -460,7 +459,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
               }
               else {
                 // hide if there is anything to hide.
-                if(pair.first != null && pair.first.hasChildNodes()) {
+                if(pair.first.hasChildNodes()) {
                   pair.first.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
                 }
               }
@@ -570,6 +569,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   public final void lazyRefresh() {
     if(plot == null) {
       LOG.warning("'lazyRefresh' called before initialized!");
+      return;
     }
     LOG.debug("Scheduling refresh.");
     Runnable pr = new Runnable() {

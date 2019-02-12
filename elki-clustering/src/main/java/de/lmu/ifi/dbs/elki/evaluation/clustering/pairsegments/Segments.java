@@ -139,7 +139,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
 
     recursivelyFill(clusters);
     for(Segment seg : segments.keySet()) {
-      actualPairs += seg.getPairCount();
+      actualPairs += seg.pairsize;
     }
   }
 
@@ -156,7 +156,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
       }
       else {
         // Add to results.
-        makeOrUpdateSegment(path, clust.getIDs(), clust.size() * (clust.size() - 1));
+        makeOrUpdateSegment(path, clust.getIDs(), (clust.size() * (clust.size() - 1)) >>> 1);
       }
 
       totalObjects += clust.size();
@@ -323,12 +323,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    * @return pair count, with or without unclusted (non-existant) pairs
    */
   public long getPairCount(boolean withUnclusteredPairs) {
-    if(withUnclusteredPairs) {
-      return (totalObjects * (totalObjects - 1)); // / 2;
-    }
-    else {
-      return actualPairs;
-    }
+    return withUnclusteredPairs ? (totalObjects * (totalObjects - 1L)) >> 1 : actualPairs;
   }
 
   /**

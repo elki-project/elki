@@ -200,8 +200,8 @@ public class Heap<E> {
   /**
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
    * 
-   * @param pos re-insertion position
-   * @param reinsert Object to reinsert
+   * @param ipos re-insertion position
+   * @param cur Object to reinsert
    * @return true when the order was changed
    */
   protected boolean heapifyDown(final int ipos, Object cur) {
@@ -261,7 +261,7 @@ public class Heap<E> {
    */
   protected final void resize(int requiredSize) {
     // Double until 64, then increase by 50% each time.
-    int newCapacity = ((queue.length < 64) ? ((queue.length + 1) << 1) : ((queue.length >> 1) * 3));
+    int newCapacity = ((queue.length < 64) ? ((queue.length + 1) << 1) : ((queue.length >> 1) + queue.length));
     // overflow?
     if(newCapacity < 0) {
       throw new OutOfMemoryError();

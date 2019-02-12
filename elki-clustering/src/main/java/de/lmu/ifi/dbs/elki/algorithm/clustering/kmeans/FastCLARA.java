@@ -168,6 +168,9 @@ public class FastCLARA<V> extends KMedoidsFastPAM<V> {
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", best));
     }
+    if (bestmedoids == null) {
+      throw new IllegalStateException("numsamples must be larger than 0.");
+    }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
 
@@ -236,7 +239,7 @@ public class FastCLARA<V> extends KMedoidsFastPAM<V> {
       }
 
       // Larger sample size, used by Schubert and Rousseeuw, 2019
-      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 80 + 4 * k) //
+      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 80 + 4. * k) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();

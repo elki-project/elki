@@ -75,7 +75,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends ObjHistogram<T> {
   @SuppressWarnings("unchecked")
   void materialize() {
     // already materialized?
-    if(cachefill <= 0) {
+    if(cachefill < 0) {
       return;
     }
     // Compute minimum and maximum
@@ -109,8 +109,14 @@ public abstract class AbstractObjDynamicHistogram<T> extends ObjHistogram<T> {
     cachevals = null;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public T get(double coord) {
+    // Store in cache
+    if(cachefill >= 0 && cachefill < cacheposs.length) {
+      cacheposs[cachefill] = coord;
+      return (T) (cachevals[cachefill++] = makeObject());
+    }
     materialize();
     testResample(coord);
     T ret = super.get(coord);
@@ -127,8 +133,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends ObjHistogram<T> {
     // Store in cache
     if(cachefill >= 0 && cachefill < cacheposs.length) {
       cacheposs[cachefill] = coord;
-      cachevals[cachefill] = cloneForCache(value);
-      ++cachefill;
+      cachevals[cachefill++] = cloneForCache(value);
       return;
     }
     if(coord == Double.NEGATIVE_INFINITY) {

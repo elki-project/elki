@@ -121,6 +121,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
             largestCluster = cluster;
           }
         }
+        assert largestCluster != null;
         currentClusterList.remove(largestCluster);
         proxyDB.setDBIDs(largestCluster.getIDs());
       }

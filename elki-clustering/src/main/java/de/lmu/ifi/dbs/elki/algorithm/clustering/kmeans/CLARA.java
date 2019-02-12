@@ -178,6 +178,9 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", best));
     }
+    if (bestmedoids == null) {
+      throw new IllegalStateException("numsamples must be larger than 0.");
+    }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
 
@@ -316,7 +319,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       int i = id1.internalGetIndex(), j = id2.internalGetIndex();
       long idx = (((long) i) << 32) | j;
       double v = cache.get(idx);
-      if(v != v) {
+      if(Double.isNaN(v)) {
         cache.put(idx, v = inner.distance(id1, id2));
       }
       return v;

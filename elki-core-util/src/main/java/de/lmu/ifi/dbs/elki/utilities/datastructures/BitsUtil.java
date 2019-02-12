@@ -501,25 +501,24 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords) - 1;
-      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
-        v[i] ^= o[j];
+      int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+      while(i > 0 && j > 0) {
+        v[--i] ^= o[--j];
       }
       return v;
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
-    final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    int s1 = end, s2 = end - shiftWords;
-    long t = o[s2];
-    if(shiftWords < 0) { // partial word of negative shift
-      v[s1 + 1] ^= t >>> unshiftBits;
+    int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+    long t = o[--j];
+    if(i < v.length) { // partial word of negative shift
+      v[i] ^= t >>> unshiftBits;
     }
-    while(s1 >= 0 && s2 > 0) {
-      v[s1--] ^= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    while(i > 0 && j > 0) {
+      v[--i] ^= (t << shiftBits) | ((t = o[--j]) >>> unshiftBits);
     }
-    if(s1 >= 0) { // partial word of positive shift
-      v[s1] ^= t << shiftBits;
+    if(i > 0) { // partial word of positive shift
+      v[--i] ^= t << shiftBits;
     }
     return v;
   }
@@ -563,25 +562,24 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords) - 1;
-      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
-        v[i] |= o[j];
+      int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+      while(i > 0 && j > 0) {
+        v[--i] |= o[--j];
       }
       return v;
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
-    final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    int s1 = end, s2 = end - shiftWords;
-    long t = o[s2];
-    if(shiftWords < 0) { // partial word of negative shift
-      v[s1 + 1] |= t >>> unshiftBits;
+    int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+    long t = o[--j];
+    if(i < v.length) { // partial word of negative shift
+      v[i] |= t >>> unshiftBits;
     }
-    while(s1 >= 0 && s2 > 0) {
-      v[s1--] |= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    while(i > 0 && j > 0) {
+      v[--i] |= (t << shiftBits) | ((t = o[--j]) >>> unshiftBits);
     }
-    if(s1 >= 0) { // partial word of positive shift
-      v[s1] |= t << shiftBits;
+    if(i > 0) { // partial word of positive shift
+      v[--i] |= t << shiftBits;
     }
     return v;
   }
@@ -624,9 +622,9 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      final int end = Math.min(v.length, o.length + shiftWords) - 1;
-      for(int i = end, j = end - shiftWords; i >= 0 && j >= 0; i--, j--) {
-        v[i] &= o[j];
+      int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+      while(i > 0 && j > 0) {
+        v[--i] &= o[--j];
       }
       // Clear bottom words
       if(shiftWords > 0) {
@@ -636,17 +634,16 @@ public final class BitsUtil {
     }
     // Overlapping case
     final int unshiftBits = Long.SIZE - shiftBits;
-    final int end = Math.min(v.length, o.length + shiftWords) - 1;
-    int s1 = end, s2 = end - shiftWords;
-    long t = o[s2];
-    if(shiftWords < 0) { // partial word of negative shift
-      v[s1 + 1] &= t >>> unshiftBits;
+    int i = Math.min(v.length, o.length + shiftWords), j = i - shiftWords;
+    long t = o[--j];
+    if(i < v.length) { // partial word of negative shift
+      v[i] &= t >>> unshiftBits;
     }
-    while(s1 >= 0 && s2 > 0) {
-      v[s1--] &= (t << shiftBits) | ((t = o[--s2]) >>> unshiftBits);
+    while(i > 0 && j > 0) {
+      v[--i] &= (t << shiftBits) | ((t = o[--j]) >>> unshiftBits);
     }
-    if(s1 >= 0) { // partial word of positive shift
-      v[s1] &= t << shiftBits;
+    if(i > 0) { // partial word of positive shift
+      v[--i] &= t << shiftBits;
     }
     // Clear bottom words
     Arrays.fill(v, 0, shiftWords, 0);

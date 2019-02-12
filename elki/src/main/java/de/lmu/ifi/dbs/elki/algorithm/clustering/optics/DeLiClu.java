@@ -447,10 +447,8 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     /** hashCode is used in updating the heap! */
     @Override
     public int hashCode() {
-      if(!isExpandable) {
-        return entry1.hashCode();
-      }
-      return (int) (2654435761L * ((entry1 == null) ? 0 : entry1.hashCode()) + ((entry2 == null) ? 0 : entry2.hashCode()));
+      return !isExpandable ? entry1.hashCode() : //
+          (int) (2654435761L * entry1.hashCode() + entry2.hashCode());
     }
   }
 

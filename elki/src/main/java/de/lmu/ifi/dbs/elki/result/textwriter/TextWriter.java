@@ -23,25 +23,48 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.*;
+import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.evaluation.classification.ConfusionMatrixEvaluationResult;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.*;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterConfusionMatrixResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleArray;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterIntArray;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -52,8 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to write a result to human-readable text output.
- *
- * Note: these classes need to be rewritten. Contributions welcome!
+ * <p>
+ * Note: these classes need to be <b>redesigned</b>. Contributions welcome!
  *
  * @author Erich Schubert
  * @since 0.2
@@ -122,21 +145,13 @@ public class TextWriter {
     if(filenamepre == null || filenamepre.length() == 0) {
       filenamepre = "result";
     }
-    int i = 0;
-    while(true) {
-      String filename;
-      if(i > 0) {
-        filename = filenamepre + "-" + i;
-      }
-      else {
-        filename = filenamepre;
-      }
+    for(int i = 0;; i++) {
+      String filename = i > 0 ? filenamepre + "-" + i : filenamepre;
       Object existing = filenames.get(filename);
       if(existing == null || existing == result) {
         filenames.put(filename, result);
         return filename;
       }
-      i++;
     }
   }
 
@@ -258,31 +273,24 @@ public class TextWriter {
   }
 
   private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, IOException {
-    String filename = null;
-    if(naming != null) {
-      filename = filenameFromLabel(naming.getNameFor(clus));
-    }
-    else {
-      filename = "cluster";
-    }
+    String cname = naming != null ? naming.getNameFor(clus) : "cluster";
+    String filename = filenameFromLabel(cname);
 
     PrintStream outStream = streamOpener.openStream(getFilename(clus, filename));
     TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     // Write cluster information
-    out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
+    out.commentPrintLn("Cluster: " + cname);
     clus.writeToText(out, null);
     if(clustering.getClusterHierarchy().numParents(clus) > 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Parents:");
+      StringBuilder buf = new StringBuilder(100).append("Parents:");
       for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
       out.commentPrintLn(buf.toString());
     }
     if(clustering.getClusterHierarchy().numChildren(clus) > 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Children:");
+      StringBuilder buf = new StringBuilder(100).append("Children:");
       for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
@@ -290,9 +298,7 @@ public class TextWriter {
     }
     out.flush();
 
-    // print ids.
-    DBIDs ids = clus.getIDs();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
       printObject(out, db, iter, ra);
     }
     out.flush();
@@ -347,44 +353,42 @@ public class TextWriter {
     // Write settings preamble
     out.commentPrintLn("Settings:");
 
-    if(rs != null) {
-      for(SettingsResult settings : rs) {
-        Object last = null;
-        for(TrackedParameter setting : settings.getSettings()) {
-          if(setting.getOwner() != last && setting.getOwner() != null) {
-            if(last != null) {
-              out.commentPrintLn("");
-            }
-            String name;
-            try {
-              if(setting.getOwner() instanceof Class) {
-                name = ((Class<?>) setting.getOwner()).getName();
-              }
-              else {
-                name = setting.getOwner().getClass().getName();
-              }
-              if(ClassParameter.class.isInstance(setting.getOwner())) {
-                name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
-              }
-            }
-            catch(NullPointerException e) {
-              name = "[null]";
-            }
-            out.commentPrintLn(name);
-            last = setting.getOwner();
+    for(SettingsResult settings : rs) {
+      Object last = null;
+      for(TrackedParameter setting : settings.getSettings()) {
+        if(setting.getOwner() != last && setting.getOwner() != null) {
+          if(last != null) {
+            out.commentPrintLn("");
           }
-          String name = setting.getParameter().getOptionID().getName();
-          String value = "[unset]";
+          String name;
           try {
-            if(setting.getParameter().isDefined()) {
-              value = setting.getParameter().getValueAsString();
+            if(setting.getOwner() instanceof Class) {
+              name = ((Class<?>) setting.getOwner()).getName();
+            }
+            else {
+              name = setting.getOwner().getClass().getName();
+            }
+            if(ClassParameter.class.isInstance(setting.getOwner())) {
+              name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
             }
           }
           catch(NullPointerException e) {
-            value = "[null]";
+            name = "[null]";
           }
-          out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
+          out.commentPrintLn(name);
+          last = setting.getOwner();
         }
+        String name = setting.getParameter().getOptionID().getName();
+        String value = "[unset]";
+        try {
+          if(setting.getParameter().isDefined()) {
+            value = setting.getParameter().getValueAsString();
+          }
+        }
+        catch(NullPointerException e) {
+          value = "[null]";
+        }
+        out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
       }
     }
     out.flush();

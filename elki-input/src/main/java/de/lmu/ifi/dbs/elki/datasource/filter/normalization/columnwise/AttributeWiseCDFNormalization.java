@@ -169,18 +169,18 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
         for(int i = 0; i < test.length; i++) {
           test[i] = dist.cdf(col.get(i).doubleValue(d));
           if(Double.isNaN(test[i])) {
-            LOG.warning("Got NaN after fitting " + est.toString() + ": " + dist.toString());
+            LOG.warning("Got NaN after fitting " + est + ": " + dist);
             continue trials;
           }
           if(Double.isInfinite(test[i])) {
-            LOG.warning("Got infinite value after fitting " + est.toString() + ": " + dist.toString());
+            LOG.warning("Got infinite value after fitting " + est + ": " + dist);
             continue trials;
           }
         }
         Arrays.sort(test);
         double q = KolmogorovSmirnovTest.simpleTest(test);
         if(LOG.isVeryVerbose()) {
-          LOG.veryverbose("Estimator " + est.toString() + " (" + dist.toString() + ") has maximum deviation " + q + " for dimension " + d);
+          LOG.veryverbose("Estimator " + est + " (" + dist + ") has maximum deviation " + q + " for dimension " + d);
         }
         if(best == null || q < bestq) {
           best = dist;
@@ -195,7 +195,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
       }
     }
     if(LOG.isVerbose()) {
-      LOG.verbose("Best fit for dimension " + d + ": " + best.toString());
+      LOG.verbose("Best fit for dimension " + d + ": " + best);
     }
     return best;
   }
@@ -221,13 +221,11 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
     StringBuilder result = new StringBuilder(1000) //
         .append("normalization class: ").append(getClass().getName()).append('\n') //
         .append("normalization distributions: ");
-    boolean first = true;
     for(DistributionEstimator<?> est : estimators) {
-      if(!first) {
-        result.append(',');
-      }
-      first = false;
-      result.append(est.getClass().getSimpleName());
+      result.append(est.getClass().getSimpleName()).append(',');
+    }
+    if(!estimators.isEmpty()) {
+      result.setLength(result.length() - 1); // Trim trailing comma.
     }
     return result.toString();
   }

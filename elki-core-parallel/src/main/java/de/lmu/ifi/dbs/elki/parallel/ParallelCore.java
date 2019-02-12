@@ -20,16 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.parallel;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.*;
 
 /**
  * Core for parallel processing in ELKI, based on {@link ThreadPoolExecutor}.
- * 
+ * <p>
  * TODO: make configurable how many threads are used.
  * 
  * @author Erich Schubert
@@ -49,12 +44,12 @@ public class ParallelCore {
   /**
    * Executor service.
    */
-  ThreadPoolExecutor executor;
+  private volatile ThreadPoolExecutor executor;
 
   /**
    * Number of connected submitters.
    */
-  private AtomicInteger connected = new AtomicInteger(0);
+  private volatile int connected;
 
   /**
    * Maximum number of processors to use.
@@ -101,17 +96,12 @@ public class ParallelCore {
   /**
    * Connect to the executor.
    */
-  public void connect() {
+  public synchronized void connect() {
     if(executor == null) {
-      synchronized(this) {
-        if(executor == null) {
-          executor = new ThreadPoolExecutor(0, processors, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-          executor.allowCoreThreadTimeOut(true);
-        }
-      }
+      executor = new ThreadPoolExecutor(0, processors, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+      executor.allowCoreThreadTimeOut(true);
     }
-    int c = this.connected.incrementAndGet();
-    if(c == 1) {
+    if(++connected == 1) {
       executor.allowCoreThreadTimeOut(false);
       executor.setCorePoolSize(executor.getMaximumPoolSize());
     }
@@ -120,13 +110,10 @@ public class ParallelCore {
   /**
    * Disconnect to the executor.
    */
-  public void disconnect() {
-    int c = this.connected.decrementAndGet();
-    if(c == 0) {
-      synchronized(this) {
-        executor.allowCoreThreadTimeOut(true);
-        executor.setCorePoolSize(0);
-      }
+  public synchronized void disconnect() {
+    if(--connected == 0) {
+      executor.allowCoreThreadTimeOut(true);
+      executor.setCorePoolSize(0);
     }
   }
 }

@@ -213,7 +213,7 @@ public class LABInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
    */
   protected static double getMinDist(DBIDArrayIter j, DistanceQuery<?> distQ, DBIDArrayIter mi, WritableDoubleDataStore mindist) {
     double prev = mindist.doubleValue(j);
-    if(prev != prev) { // NaN = unknown
+    if(Double.isNaN(prev)) { // NaN = unknown
       prev = Double.POSITIVE_INFINITY;
       for(mi.seek(0); mi.valid(); mi.advance()) {
         double d = distQ.distance(j, mi);

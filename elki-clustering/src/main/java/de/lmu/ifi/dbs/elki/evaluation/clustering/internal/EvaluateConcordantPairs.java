@@ -163,7 +163,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
             && noiseHandling.equals(NoiseHandling.IGNORE_NOISE)) {
           continue;
         }
-        betweenPairs += ocluster1.size() * ocluster2.size();
+        betweenPairs += ocluster1.size() * (long) ocluster2.size();
         for(DBIDIter oit1 = ocluster1.getIDs().iter(); oit1.valid(); oit1.advance()) {
           NumberVector obj = rel.get(oit1);
           for(DBIDIter oit2 = ocluster2.getIDs().iter(); oit2.valid(); oit2.advance()) {

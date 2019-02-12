@@ -73,12 +73,7 @@ public final class GUIUtil {
    */
   public static void logUncaughtExceptions(Logging logger) {
     try {
-      Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-        @Override
-        public void uncaughtException(Thread t, Throwable e) {
-          logger.exception(e);
-        }
-      });
+      Thread.setDefaultUncaughtExceptionHandler((t, e) -> logger.exception(e));
     }
     catch(SecurityException e) {
       logger.warning("Could not set the Default Uncaught Exception Handler", e);

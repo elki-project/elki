@@ -241,8 +241,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     if(msg != null) {
       msg.append("\n Frequent itemsets: ").append(frequentItemsets);
     }
-    int maxSupport = 0;
-    int maxCardinality = 0;
+    int maxSupport = 0, maxCardinality = 0;
     long[] preferenceVector = BitsUtil.zero(dimensionality);
     for(Itemset itemset : frequentItemsets) {
       if((maxCardinality < itemset.length()) || (maxCardinality == itemset.length() && maxSupport == itemset.getSupport())) {
@@ -289,13 +288,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       ModifiableDBIDs intersection = candidates.remove(i);
       BitsUtil.setI(preferenceVector, i);
       while(!candidates.isEmpty()) {
-        ModifiableDBIDs newIntersection = DBIDUtil.newHashSet();
-        i = maxIntersection(candidates, intersection, newIntersection);
-        ModifiableDBIDs s_i = candidates.remove(i);
-        // TODO: aren't we re-computing the same intersection here?
-        newIntersection = DBIDUtil.intersection(intersection, s_i);
-        intersection = newIntersection;
-
+        i = maxIntersection(candidates, intersection);
+        candidates.remove(i);
         if(intersection.size() < minpts) {
           break;
         }
@@ -318,16 +312,14 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    * @return the set with the maximum size
    */
   private int max(Map<Integer, ModifiableDBIDs> candidates) {
-    DBIDs maxSet = null;
-    Integer maxDim = null;
+    int maxDim = -1, size = -1;
     for(Integer nextDim : candidates.keySet()) {
-      DBIDs nextSet = candidates.get(nextDim);
-      if(maxSet == null || maxSet.size() < nextSet.size()) {
-        maxSet = nextSet;
+      int nextSet = candidates.get(nextDim).size();
+      if(size < nextSet) {
+        size = nextSet;
         maxDim = nextDim;
       }
     }
-
     return maxDim;
   }
 
@@ -340,17 +332,21 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    * @param result the set to put the result in
    * @return the set with the maximum size
    */
-  private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, DBIDs set, ModifiableDBIDs result) {
-    Integer maxDim = null;
+  private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, ModifiableDBIDs set) {
+    int maxDim = -1;
+    ModifiableDBIDs maxIntersection = null;
     for(Integer nextDim : candidates.keySet()) {
       DBIDs nextSet = candidates.get(nextDim);
       ModifiableDBIDs nextIntersection = DBIDUtil.intersection(set, nextSet);
-      if(result.size() < nextIntersection.size()) {
-        result = nextIntersection;
+      if(maxDim < 0 || maxIntersection.size() < nextIntersection.size()) {
+        maxIntersection = nextIntersection;
         maxDim = nextDim;
       }
     }
-
+    if(maxDim >= 0) {
+      set.clear();
+      set.addDBIDs(maxIntersection);
+    }
     return maxDim;
   }
 

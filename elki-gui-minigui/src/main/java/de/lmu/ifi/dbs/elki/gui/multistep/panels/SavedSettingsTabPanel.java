@@ -22,18 +22,11 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import de.lmu.ifi.dbs.elki.gui.multistep.MultiStepGUI;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
@@ -114,51 +107,44 @@ public class SavedSettingsTabPanel extends JPanel {
       // button to load settings
       JButton loadButton = new JButton("Load");
       loadButton.setMnemonic(KeyEvent.VK_L);
-      loadButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          ArrayList<String> settings = store.get(key);
-          SerializedParameterization config = new SerializedParameterization(settings);
-          gui.setParameters(config);
-          config.logUnusedParameters();
-          config.clearErrors();
-        }
+      loadButton.addActionListener((e) -> {
+        String key = savedSettingsModel.getSelectedItem();
+        ArrayList<String> settings = store.get(key);
+        SerializedParameterization config = new SerializedParameterization(settings);
+        gui.setParameters(config);
+        config.logUnusedParameters();
+        config.clearErrors();
       });
       buttonPanel.add(loadButton);
       // button to save settings
       JButton saveButton = new JButton("Save");
       saveButton.setMnemonic(KeyEvent.VK_S);
-      saveButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          store.put(key, gui.serializeParameters());
-          try {
-            store.save();
-          } catch (IOException e1) {
-            LOG.exception(e1);
-          }
-          savedSettingsModel.update();
+      saveButton.addActionListener((e) -> {
+        String key = savedSettingsModel.getSelectedItem();
+        store.put(key, gui.serializeParameters());
+        try {
+          store.save();
         }
+        catch(IOException e1) {
+          LOG.exception(e1);
+        }
+        savedSettingsModel.update();
       });
       buttonPanel.add(saveButton);
       // button to remove saved settings
       JButton removeButton = new JButton("Remove");
       removeButton.setMnemonic(KeyEvent.VK_E);
-      removeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          store.remove(key);
-          try {
-            store.save();
-          } catch (IOException e1) {
-            LOG.exception(e1);
-          }
-          savedCombo.setSelectedItem("[Saved Settings]");
-          savedSettingsModel.update();
+      removeButton.addActionListener((e) -> {
+        String key = savedSettingsModel.getSelectedItem();
+        store.remove(key);
+        try {
+          store.save();
         }
+        catch(IOException e1) {
+          LOG.exception(e1);
+        }
+        savedCombo.setSelectedItem("[Saved Settings]");
+        savedSettingsModel.update();
       });
       buttonPanel.add(removeButton);
 
@@ -212,7 +198,7 @@ public class SavedSettingsTabPanel extends JPanel {
 
     @Override
     public void setSelectedItem(Object anItem) {
-      if (anItem instanceof String) {
+      if(anItem instanceof String) {
         selected = (String) anItem;
       }
     }

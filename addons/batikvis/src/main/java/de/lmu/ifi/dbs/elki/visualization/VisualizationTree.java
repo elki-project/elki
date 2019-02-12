@@ -225,12 +225,10 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
       for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
         VisualizationTask other = iter2.get();
         if(other != task && other.isTool() && other.isVisible()) {
-          other.visibility(false);
-          context.visChanged(other);
+          context.visChanged(other.visibility(false));
         }
       }
     }
-    task.visibility(visibility);
-    context.visChanged(task);
+    context.visChanged(task.visibility(visibility));
   }
 }

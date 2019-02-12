@@ -203,10 +203,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       }
 
       // Noise Cluster
-      if(noiseFlag) {
-        if(noiseids.isEmpty()) {
-          return result;
-        }
+      if(noiseFlag && noiseids != null && !noiseids.isEmpty()) {
         result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(null, 0)));
       }
       return result;
@@ -214,9 +211,8 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
     /**
      * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids
-     * of
-     * those FeatureVectors, that are nearest to the k<sup>th</sup> mean. And
-     * saves the distance in a MinHeap
+     * of those FeatureVectors, that are nearest to the k<sup>th</sup> mean. And
+     * saves the distance in a MinHeap.
      *
      * @return the number of reassigned objects
      */

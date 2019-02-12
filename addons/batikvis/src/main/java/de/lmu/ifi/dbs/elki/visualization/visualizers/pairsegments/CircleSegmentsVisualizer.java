@@ -27,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -292,25 +289,17 @@ public class CircleSegmentsVisualizer implements VisFactory {
       layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
       visLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
       // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid
-      // a
-      // Java drawing bug!)
-      String transform = SVGUtil.makeMarginTransform(task.getRequestedWidth(), task.getRequestedHeight(), StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
+      // a Java drawing bug!)
+      String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
       visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
       ctrlLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
       // and create svg elements
       drawSegments();
 
-      //
       // Build Interface
-      //
       SVGCheckbox checkbox = new SVGCheckbox(showUnclusteredPairs, "Show unclustered pairs");
-      checkbox.addCheckBoxListener(new ChangeListener() {
-        @Override
-        public void stateChanged(ChangeEvent e) {
-          toggleUnclusteredPairs(((SVGCheckbox) e.getSource()).isChecked());
-        }
-      });
+      checkbox.addCheckBoxListener((e) -> toggleUnclusteredPairs(((SVGCheckbox) e.getSource()).isChecked()));
 
       // Add ring:clustering info
       Element clrInfo = drawClusteringInfo();
@@ -392,8 +381,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
       double radius_delta = (RADIUS_OUTER - RADIUS_INNER - clusterings * RADIUS_DISTANCE) / clusterings;
       double border_width = SEGMENT_MIN_SEP_ANGLE;
 
-      int refClustering = 0;
-      int refSegment = Segment.UNCLUSTERED;
+      int refClustering = 0, refSegment = Segment.UNCLUSTERED;
       double offsetAngle = 0.0;
 
       for(final Segment segment : segments) {
@@ -544,7 +532,6 @@ public class CircleSegmentsVisualizer implements VisFactory {
 
       // Step size
       double increment = (cols.length - 1.) / shades;
-
       String[] colorShades = new String[shades];
 
       for(int s = 0; s < shades; s++) {
@@ -554,8 +541,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
           colorShades[s] = colors[ppos];
         }
         else {
-          Color prev = cols[ppos];
-          Color next = cols[npos];
+          Color prev = cols[ppos], next = cols[npos];
           final double mix = (increment * s - ppos) / (npos - ppos);
           final int r = (int) ((1 - mix) * prev.getRed() + mix * next.getRed());
           final int g = (int) ((1 - mix) * prev.getGreen() + mix * next.getGreen());
@@ -571,9 +557,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
       Element thumbnail = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
 
       // build thumbnail
-      int startRadius = 4;
-      int singleHeight = 12;
-      int margin = 4;
+      int startRadius = 4, singleHeight = 12, margin = 4;
       int radius = segments.getClusterings() * (singleHeight + margin) + startRadius;
 
       SVGUtil.setAtt(thumbnail, SVGConstants.SVG_HEIGHT_ATTRIBUTE, radius);
@@ -589,7 +573,6 @@ public class CircleSegmentsVisualizer implements VisFactory {
         String labelText = segments.getClusteringDescription(i);
         Element label = svgp.svgText(radius + startRadius, radius - innerRadius - startRadius, labelText);
         thumbnail.appendChild(label);
-
         thumbnail.appendChild(clr);
       }
 
@@ -626,8 +609,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
           //
           // UNPAIRED SEGMENT
           // highlight all ring segments in this clustering responsible for
-          // unpaired
-          // segment
+          // unpaired segment
           //
           // get the paired segments corresponding to the unpaired segment
           List<Segment> paired = segments.getPairedSegments(segment);
@@ -673,8 +655,6 @@ public class CircleSegmentsVisualizer implements VisFactory {
     private class SegmentListenerProxy implements EventListener {
       /**
        * Mouse double click time window in milliseconds
-       *
-       * TODO: does Batik have double click events?
        */
       public static final int EVT_DBLCLICK_DELAY = 350;
 
@@ -714,12 +694,8 @@ public class CircleSegmentsVisualizer implements VisFactory {
           segmentHover(id, ringid, false);
         }
         if(SVGConstants.SVG_CLICK_EVENT_TYPE.equals(evt.getType())) {
-          // Check Double Click
-          boolean dblClick = false;
           long time = java.util.Calendar.getInstance().getTimeInMillis();
-          if(time - lastClick <= EVT_DBLCLICK_DELAY) {
-            dblClick = true;
-          }
+          boolean dblClick = time - lastClick <= EVT_DBLCLICK_DELAY;
           lastClick = time;
 
           segmentClick(id, evt, dblClick);

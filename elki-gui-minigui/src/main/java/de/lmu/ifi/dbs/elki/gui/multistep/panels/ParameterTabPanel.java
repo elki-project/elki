@@ -22,15 +22,9 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -40,9 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 
 /**
  * Abstract panel, showing particular options.
@@ -139,18 +133,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       // button to launch the task
       runButton = new JButton("Run Task");
       runButton.setMnemonic(KeyEvent.VK_R);
-      runButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          Thread r = new Thread() {
-            @Override
-            public void run() {
-              execute();
-            }
-          };
-          r.start();
-        }
-      });
+      runButton.addActionListener((e) -> new Thread(this::execute).start());
       buttonPanel.add(runButton);
 
       // Status text field
@@ -193,7 +176,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     ListParameterization config = new ListParameterization();
     parameterTable.appendParameters(config);
     setParameters(config);
-    if (config.getErrors().size() > 0) {
+    if(config.getErrors().size() > 0) {
       reportErrors(config);
     }
     config.clearErrors();
@@ -214,7 +197,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       parameterTable.setEnabled(false);
 
       parameterTable.clear();
-      for (TrackedParameter pair : track.getAllParameters()) {
+      for(TrackedParameter pair : track.getAllParameters()) {
         parameterTable.addParameter(pair.getOwner(), pair.getParameter(), track);
       }
       // parameters.updateFromTrackParameters(track);
@@ -244,13 +227,13 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    */
   protected void reportErrors(Parameterization config) {
     StringBuilder buf = new StringBuilder();
-    for (ParameterException e : config.getErrors()) {
-      if (e instanceof UnspecifiedParameterException) {
+    for(ParameterException e : config.getErrors()) {
+      if(e instanceof UnspecifiedParameterException) {
         continue;
       }
       buf.append(e.getMessage()).append(FormatUtil.NEWLINE);
     }
-    if (buf.length() > 0) {
+    if(buf.length() > 0) {
       LOG.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
     // config.clearErrors();
@@ -265,17 +248,19 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     runButton.setEnabled(false);
     try {
       configureStep(config);
-      if (config.hasUnusedParameters()) {
+      if(config.hasUnusedParameters()) {
         // List<Pair<OptionID, Object>> remainingParameters =
         // config.getRemainingParameters();
         LOG.warning("Unused parameters: " + "FIXME");
       }
-      if (config.getErrors().size() > 0) {
+      if(config.getErrors().size() > 0) {
         reportErrors(config);
-      } else {
+      }
+      else {
         executeStep();
       }
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       LOG.exception(e);
     }
     updateStatus();
@@ -329,7 +314,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   }
 
   protected void firePanelUpdated() {
-    for (ParameterTabPanel p : listenerList.getListeners(ParameterTabPanel.class)) {
+    for(ParameterTabPanel p : listenerList.getListeners(ParameterTabPanel.class)) {
       p.panelUpdated(this);
     }
   }
@@ -344,7 +329,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
 
   @Override
   public void stateChanged(ChangeEvent e) {
-    if (e.getSource() == this.parameterTable) {
+    if(e.getSource() == this.parameterTable) {
       // logger.warning("stateChanged!");
       updateParameterTable();
     }
@@ -353,7 +338,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   /**
    * Called when an observed panel changes.
    * 
-   * @param o Observed panel 
+   * @param o Observed panel
    */
   void panelUpdated(ParameterTabPanel o) {
     // Do nothing by default.

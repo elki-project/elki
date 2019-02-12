@@ -624,6 +624,9 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       double[] weights = new double[k];
       weights[bestCluster] = 1.;
 
+      if(bestModel == null) {
+        throw new IllegalStateException("No models?");
+      }
       bestModel.setWeight(bestModel.getWeight() + pweight);
       probClusterIGivenX.put(iter, weights);
     }

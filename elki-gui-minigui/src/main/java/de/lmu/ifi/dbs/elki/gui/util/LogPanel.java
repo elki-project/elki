@@ -151,13 +151,8 @@ public class LogPanel extends JPanel {
           throw new RuntimeException("Unsupported progress record");
         }
         pbarmap.put(prog, pbar);
-        final JProgressBar pbar2 = pbar;
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            addProgressBar(pbar2);
-          }
-        });
+        final JProgressBar pbar2 = pbar; // Make final
+        SwingUtilities.invokeLater(() -> addProgressBar(pbar2));
       }
     }
     return pbar;
@@ -197,13 +192,7 @@ public class LogPanel extends JPanel {
   private void removeProgressBar(Progress prog, JProgressBar pbar) {
     synchronized(pbarmap) {
       pbarmap.remove(prog);
-      final JProgressBar pbar2 = pbar;
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          removeProgressBar(pbar2);
-        }
-      });
+      SwingUtilities.invokeLater(() -> removeProgressBar(pbar));
     }
   }
 

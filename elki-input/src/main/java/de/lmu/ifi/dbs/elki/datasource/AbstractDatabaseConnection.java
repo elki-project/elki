@@ -71,6 +71,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @return processed objects
    */
   protected MultipleObjectsBundle invokeBundleFilters(MultipleObjectsBundle bundle) {
+    assert (bundle != null);
     if(filters == null) {
       return bundle;
     }
@@ -78,14 +79,14 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
     BundleStreamSource stream = null;
     for(ObjectFilter filter : filters) {
       if(filter instanceof StreamFilter) {
-        StreamFilter sfilter = (StreamFilter) filter;
-        stream = sfilter.init((stream != null) ? stream : bundle.asStream());
+        stream = ((StreamFilter) filter).init((stream != null) ? stream : bundle.asStream());
         bundle = null; // No longer a bundle
       }
       else {
         bundle = filter.filter((bundle != null) ? bundle : stream.asMultipleObjectsBundle());
         stream = null; // No longer a stream
       }
+      assert (stream != null || bundle != null);
     }
     return (bundle != null) ? bundle : stream.asMultipleObjectsBundle();
   }
@@ -98,6 +99,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @return processed objects
    */
   protected BundleStreamSource invokeStreamFilters(BundleStreamSource stream) {
+    assert (stream != null);
     if(filters == null) {
       return stream;
     }
@@ -112,6 +114,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
         bundle = filter.filter((bundle != null) ? bundle : stream.asMultipleObjectsBundle());
         stream = null;
       }
+      assert (stream != null || bundle != null);
     }
     return (stream != null) ? stream : bundle.asStream();
   }

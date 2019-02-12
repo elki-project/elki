@@ -258,15 +258,12 @@ public class LogPane extends JTextPane {
         }
       }
       else {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              LogPane.this.publish(record);
-            }
-            catch(Exception e) {
-              reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
-            }
+        SwingUtilities.invokeLater(() -> {
+          try {
+            LogPane.this.publish(record);
+          }
+          catch(Exception e) {
+            reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
           }
         });
       }

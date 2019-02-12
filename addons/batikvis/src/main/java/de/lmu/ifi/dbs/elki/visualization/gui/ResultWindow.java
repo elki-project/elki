@@ -23,23 +23,39 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
-import de.lmu.ifi.dbs.elki.visualization.*;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuToggle;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -75,11 +91,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-
-  /**
-   * Get a logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(ResultWindow.class);
 
   /**
    * Dynamic menu.
@@ -138,46 +149,25 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         overviewItem = new JMenuItem("Open Overview");
         overviewItem.setMnemonic(KeyEvent.VK_O);
         overviewItem.setEnabled(false);
-        overviewItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent ae) {
-            showOverview();
-          }
-        });
+        overviewItem.addActionListener((e) -> showOverview());
         filemenu.add(overviewItem);
       }
 
       exportItem = new JMenuItem("Export Plot");
       exportItem.setMnemonic(KeyEvent.VK_E);
       exportItem.setEnabled(false);
-      exportItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-          saveCurrentPlot();
-        }
-      });
+      exportItem.addActionListener((e) -> saveCurrentPlot());
       filemenu.add(exportItem);
 
       editItem = new JMenuItem("Table View/Edit");
       editItem.setMnemonic(KeyEvent.VK_T);
-      editItem.addActionListener(new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-          showTableView();
-        }
-      });
+      editItem.addActionListener((e) -> showTableView());
       // FIXME: re-add when it is working again.
       // filemenu.add(editItem);
 
       quitItem = new JMenuItem("Quit");
       quitItem.setMnemonic(KeyEvent.VK_Q);
-      quitItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          close();
-        }
-      });
+      quitItem.addActionListener((e) -> close());
 
       filemenu.add(quitItem);
       menubar.add(filemenu);
@@ -292,24 +282,14 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         final VisualizationMenuAction action = (VisualizationMenuAction) r;
         JMenuItem visItem = new JMenuItem(action.getMenuName());
         visItem.setEnabled(action.enabled());
-        visItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            action.activate();
-          }
-        });
+        visItem.addActionListener((e) -> action.activate());
         return visItem;
       }
       if(r instanceof VisualizationMenuToggle) {
         final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
         visItem.setEnabled(toggle.enabled());
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            toggle.toggle();
-          }
-        });
+        visItem.addItemListener((e) -> toggle.toggle());
         return visItem;
       }
       if(!(r instanceof VisualizationTask)) {
@@ -320,26 +300,15 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
       // Currently enabled?
       final String name = v.getMenuName();
-      boolean enabled = v.isVisible();
-      boolean istool = v.isTool();
+      boolean enabled = v.isVisible(), istool = v.isTool();
       if(!istool) {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            VisualizationTree.setVisible(context, v, visItem.getState());
-          }
-        });
+        visItem.addItemListener((e) -> VisualizationTree.setVisible(context, v, visItem.getState()));
         item = visItem;
       }
       else {
         final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            VisualizationTree.setVisible(context, v, visItem.isSelected());
-          }
-        });
+        visItem.addItemListener((e) -> VisualizationTree.setVisible(context, v, visItem.isSelected()));
         item = visItem;
       }
       return item;
@@ -438,18 +407,15 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
     overview = new OverviewPlot(context, single);
     // when a subplot is clicked, show the selected subplot.
-    overview.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(e instanceof DetailViewSelectedEvent) {
-          showSubplot((DetailViewSelectedEvent) e);
-        }
-        if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand() && currentSubplot == null) {
-          showPlot(null);
-        }
-        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand() && currentSubplot == null) {
-          showOverview();
-        }
+    overview.addActionListener((e) -> {
+      if(e instanceof DetailViewSelectedEvent) {
+        showSubplot((DetailViewSelectedEvent) e);
+      }
+      if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand() && currentSubplot == null) {
+        showPlot(null);
+      }
+      if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand() && currentSubplot == null) {
+        showOverview();
       }
     });
 
@@ -477,6 +443,18 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         menubar.updateVisualizerMenus();
       }
     });
+
+    // key commands
+    KeyStroke ctrle = KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrls = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrlq = KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrlw = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrlo = KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK);
+    panel.registerKeyboardAction((e) -> saveCurrentPlot(), ctrle, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> saveCurrentPlot(), ctrls, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> close(), ctrlq, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> close(), ctrlw, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> showOverview(), ctrlo, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
     context.addResultListener(this);
     context.addVisualizationListener(this);
@@ -547,11 +525,9 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    */
   protected void saveCurrentPlot() {
     final SVGPlot currentPlot = svgCanvas.getPlot();
-    if(currentPlot == null) {
-      LOG.warning("saveCurrentPlot() called without a visible plot!");
-      return;
+    if(currentPlot != null) {
+      SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
     }
-    SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
   }
 
   /**
@@ -607,11 +583,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    * Update visualizer menus, but only from Swing thread.
    */
   private void updateVisualizerMenus() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        menubar.updateVisualizerMenus();
-      }
-    });
+    SwingUtilities.invokeLater(() -> menubar.updateVisualizerMenus());
   }
 }

@@ -24,14 +24,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -70,7 +71,7 @@ public class SimpleSVGViewer extends JFrame {
     catch(Exception e) {
       // ignore
     }
-    
+
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     // Maximize.
@@ -80,24 +81,24 @@ public class SimpleSVGViewer extends JFrame {
     // setup buttons
     JMenuItem exportItem = new JMenuItem("Export");
     exportItem.setMnemonic(KeyEvent.VK_E);
-    exportItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        saveCurrentPlot();
-      }
-    });
+    exportItem.addActionListener((e) -> saveCurrentPlot());
 
     JMenuItem quitItem = new JMenuItem("Quit");
     quitItem.setMnemonic(KeyEvent.VK_Q);
-    quitItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        close();
-      }
-    });
+    quitItem.addActionListener((e) -> close());
 
     // Create a panel and add the button, status label and the SVG canvas.
     final JPanel panel = new JPanel(new BorderLayout());
+
+    // key commands
+    KeyStroke ctrle = KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrls = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrlq = KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK);
+    KeyStroke ctrlw = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK);
+    panel.registerKeyboardAction((e) -> saveCurrentPlot(), ctrle, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> saveCurrentPlot(), ctrls, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> close(), ctrlq, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    panel.registerKeyboardAction((e) -> close(), ctrlw, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
     JMenuBar menubar = new JMenuBar();
     menubar.add(exportItem);

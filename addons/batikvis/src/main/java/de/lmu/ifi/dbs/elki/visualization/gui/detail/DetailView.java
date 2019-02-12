@@ -200,50 +200,48 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     }
     boolean updateStyle = false;
     Iterator<Map.Entry<VisualizationTask, Visualization>> it = taskmap.entrySet().iterator();
+    Element insertpos = null;
     while(it.hasNext()) {
       Entry<VisualizationTask, Visualization> ent = it.next();
       VisualizationTask task = ent.getKey();
       Visualization vis = ent.getValue();
       if(vis == null) {
-        vis = instantiateVisualization(task);
-        ent.setValue(vis);
+        ent.setValue(vis = instantiateVisualization(task));
       }
-      Element prevlayer = layermap.get(vis);
-      Element layer = vis.getLayer();
+      Element prevlayer = layermap.get(vis), layer = vis.getLayer();
       if(prevlayer == layer) { // Unchanged:
-        // Current visibility ("not hidden")
-        boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-        if(task.isVisible() != isVisible) {
-          // scheduleUpdate(new AttributeModifier(
-          layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, //
-              task.isVisible() ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
+        insertpos = layer;
+        continue;
+      }
+      if(task.has(RenderFlag.NO_EXPORT)) {
+        layer.setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+      }
+      if(prevlayer == null) {
+        if(LOG.isDebuggingFine()) {
+          LOG.debugFine("New layer: " + task);
+        }
+        // Insert new!
+        // TODO: correct stacking / insert position!
+        if(insertpos != null && insertpos.getNextSibling() != null) {
+          getRoot().insertBefore(layer, insertpos.getNextSibling());
+        }
+        else {
+          getRoot().appendChild(layer);
         }
       }
       else {
-        if(task.has(RenderFlag.NO_EXPORT)) {
-          layer.setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+        if(LOG.isDebuggingFine()) {
+          LOG.debugFine("Updated layer: " + task);
         }
-        if(prevlayer == null) {
-          if(LOG.isDebuggingFine()) {
-            LOG.debugFine("New layer: " + task);
-          }
-          // Insert new!
-          // TODO: insert position!
-          getRoot().appendChild(layer);
+        // Replace
+        final Node parent = prevlayer.getParentNode();
+        if(parent != null) {
+          parent.replaceChild(/* new! */layer, /* old */prevlayer);
         }
-        else {
-          if(LOG.isDebuggingFine()) {
-            LOG.debugFine("Updated layer: " + task);
-          }
-          // Replace
-          final Node parent = prevlayer.getParentNode();
-          if(parent != null) {
-            parent.replaceChild(/* new! */layer, /* old */prevlayer);
-          }
-        }
-        layermap.put(vis, layer);
-        updateStyle = true;
       }
+      layermap.put(vis, layer);
+      updateStyle = true;
+      insertpos = layer;
     }
     if(updateStyle) {
       updateStyleElement();
@@ -366,17 +364,11 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       if(!include) {
         return; // Attached to different projection.
       }
-    }
-    if(vis == null) { // New visualization
       taskmap.put(task, null);
       lazyRefresh();
     }
-    else {
-      Element layer = vis.getLayer();
-      if(layer != layermap.get(vis) || //
-          task.isVisible() != !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY))) {
-        lazyRefresh(); // Visibility has changed.
-      }
+    else if(vis.getLayer() != layermap.get(vis)) {
+      lazyRefresh(); // Visibility has changed.
     }
   }
 
@@ -398,7 +390,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
         vis.incrementalRedraw();
       }
     }
-    if(active || true) {
+    if(active) {
       refresh();
     }
   }

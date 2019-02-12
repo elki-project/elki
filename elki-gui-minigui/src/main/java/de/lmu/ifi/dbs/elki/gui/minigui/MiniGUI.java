@@ -25,7 +25,6 @@ import java.awt.Event;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,32 +33,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.*;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.gui.GUIUtil;
-import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
-import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
-import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
-import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
-import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
+import de.lmu.ifi.dbs.elki.gui.util.*;
 import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -259,18 +239,15 @@ public class MiniGUI extends AbstractApplication {
       sel = sel.substring(APP_PREFIX.length());
     }
     appCombo.setSelectedItem(sel);
-    appCombo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if("comboBoxChanged".equals(e.getActionCommand())) {
-          Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
-          if(clz != null) {
-            maincls = clz;
-            updateParameterTable();
-          }
-          else {
-            LOG.warning("Main class name not found.");
-          }
+    appCombo.addActionListener((e) -> {
+      if("comboBoxChanged".equals(e.getActionCommand())) {
+        Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
+        if(clz != null) {
+          maincls = clz;
+          updateParameterTable();
+        }
+        else {
+          LOG.warning("Main class name not found.");
         }
       }
     });
@@ -291,13 +268,7 @@ public class MiniGUI extends AbstractApplication {
     // Setup parameter storage and table model
     this.parameters = new DynamicParameters();
     ParametersModel parameterModel = new ParametersModel(parameters);
-    parameterModel.addTableModelListener(new TableModelListener() {
-      @Override
-      public void tableChanged(TableModelEvent e) {
-        // logger.debug("Change event.");
-        updateParameterTable();
-      }
-    });
+    parameterModel.addTableModelListener((e) -> updateParameterTable());
 
     // Create parameter table
     parameterTable = new ParameterTable(frame, parameterModel, parameters);
@@ -332,69 +303,54 @@ public class MiniGUI extends AbstractApplication {
     // button to load settings
     JButton loadButton = new JButton("Load");
     loadButton.setMnemonic(KeyEvent.VK_L);
-    loadButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        ArrayList<String> settings = store.get(key);
-        if(settings != null) {
-          doSetParameters(settings);
-        }
+    loadButton.addActionListener((e) -> {
+      ArrayList<String> settings = store.get(savedSettingsModel.getSelectedItem());
+      if(settings != null) {
+        doSetParameters(settings);
       }
     });
     buttonPanel.add(loadButton);
     // button to save settings
     JButton saveButton = new JButton("Save");
     saveButton.setMnemonic(KeyEvent.VK_S);
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        // Stop editing the table.
-        parameterTable.editCellAt(-1, -1);
-        ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
-        list.add(maincls.getCanonicalName());
-        parameters.serializeParameters(list);
-        store.put(key, list);
-        try {
-          store.save();
-        }
-        catch(IOException e1) {
-          LOG.exception(e1);
-        }
-        savedSettingsModel.update();
+    saveButton.addActionListener((e) -> {
+      String key = savedSettingsModel.getSelectedItem();
+      // Stop editing the table.
+      parameterTable.editCellAt(-1, -1);
+      ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
+      list.add(maincls.getCanonicalName());
+      parameters.serializeParameters(list);
+      store.put(key, list);
+      try {
+        store.save();
       }
+      catch(IOException e1) {
+        LOG.exception(e1);
+      }
+      savedSettingsModel.update();
     });
     buttonPanel.add(saveButton);
     // button to remove saved settings
     JButton removeButton = new JButton("Remove");
     removeButton.setMnemonic(KeyEvent.VK_E);
-    removeButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        store.remove(key);
-        try {
-          store.save();
-        }
-        catch(IOException e1) {
-          LOG.exception(e1);
-        }
-        savedCombo.setSelectedItem("[Saved Settings]");
-        savedSettingsModel.update();
+    removeButton.addActionListener((e) -> {
+      String key = savedSettingsModel.getSelectedItem();
+      store.remove(key);
+      try {
+        store.save();
       }
+      catch(IOException e1) {
+        LOG.exception(e1);
+      }
+      savedCombo.setSelectedItem("[Saved Settings]");
+      savedSettingsModel.update();
     });
     buttonPanel.add(removeButton);
 
     // button to launch the task
     runButton = new JButton("Run Task");
     runButton.setMnemonic(KeyEvent.VK_R);
-    runButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        startTask();
-      }
-    });
+    runButton.addActionListener((e) -> startTask());
     buttonPanel.add(runButton);
 
     GridBagConstraints constraints = new GridBagConstraints();

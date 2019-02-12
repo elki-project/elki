@@ -80,7 +80,7 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
     secondhash = secondhash ^ (secondhash >> 32);
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (first * 0x9e3779b1 + secondhash);
+    return first * 0x9e3779b1 + (int) secondhash;
   }
 
   /**

@@ -57,11 +57,13 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
    */
   public ObjHistogram(int bins, double min, double max, BucketFactory<T> supplier) {
     super(bins, min, max);
+    // -1 is used by ObjDynamicHistogram to delay initialization.
     if(bins >= 0) {
-      // -1 will be used by FlexiHistogram to delay initialization.
       data = new Object[bins];
-      for(int i = 0; i < bins; i++) {
-        data[i] = supplier.make();
+      if(supplier != null) {
+        for(int i = 0; i < bins; i++) {
+          data[i] = supplier.make();
+        }
       }
     }
     this.supplier = supplier;

@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A filter to replace all NaN values with random values.
- * 
+ * <p>
  * Note: currently, only dense vector columns are supported.
- * 
+ * <p>
  * TODO: add support for sparse vectors.
  * 
  * @author Erich Schubert
@@ -168,9 +168,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
           if(v != null) {
             for(int d = 0; d < v.getDimensionality(); d++) {
               if(Double.isNaN(v.doubleValue(d))) {
-                if(ro != null) {
-                  ro = v.toArray();
-                }
+                ro = ro != null ? ro : v.toArray();
                 ro[d] = dist.nextRandom();
               }
             }

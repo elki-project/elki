@@ -21,8 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -143,8 +141,8 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     this.context = context;
     this.database = (UpdatableDatabase) ResultUtil.findDatabase(context.getHierarchy());
     // FIXME: re-add labels
-    this.crep = null; //database.getClassLabelQuery();
-    this.orep = null; //database.getObjectLabelQuery();
+    this.crep = null; // database.getClassLabelQuery();
+    this.orep = null; // database.getObjectLabelQuery();
     updateFromSelection();
 
     JPanel panel = new JPanel(new BorderLayout());
@@ -160,19 +158,9 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     panel.add(buttons, BorderLayout.SOUTH);
 
     closeButton = new JButton("close");
-    closeButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        dispose();
-      }
-    });
+    closeButton.addActionListener((e) -> dispose());
     deleteButton = new JButton("delete");
-    deleteButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        handleDelete();
-      }
-    });
+    deleteButton.addActionListener((e) -> handleDelete());
     buttons.add(closeButton);
     buttons.add(deleteButton);
 
@@ -242,7 +230,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
     @Override
     public int getColumnCount() {
-      return 3; //RelationUtil.dimensionality(database) + 3;
+      return 3; // RelationUtil.dimensionality(database) + 3;
     }
 
     @Override
@@ -262,11 +250,13 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
       if(columnIndex == 2) {
         return crep.get(id);
       }
-      /*NV obj = database.get(id);
-      if(obj == null) {
-        return null;
-      }
-      return obj.getValue(columnIndex - 3 + 1);*/
+      /*
+       * NV obj = database.get(id);
+       * if(obj == null) {
+       * return null;
+       * }
+       * return obj.getValue(columnIndex - 3 + 1);
+       */
       return null;
     }
 
@@ -309,39 +299,42 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
         return;
       }
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");
-      /* NV obj = database.get(id);
-      if(obj == null) {
-        logger.warning("Tried to edit removed object?");
-        return;
-      }
-      final int dimensionality = RelationUtil.dimensionality(database);
-      double[] vals = new double[dimensionality];
-      for(int d = 0; d < dimensionality; d++) {
-        if(d == columnIndex - 3) {
-          vals[d] = FormatUtil.parseDouble((String) aValue);
-        }
-        else {
-          vals[d] = obj.doubleValue(d + 1);
-        }
-      }
-      NV newobj = obj.newInstance(vals);
-      newobj.setID(id);
-      final Representation<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
-      DatabaseObjectMetadata meta = mrep.get(id);
-      try {
-        database.delete(id);
-        database.insert(new Pair<NV, DatabaseObjectMetadata>(newobj, meta));
-      }
-      catch(UnableToComplyException e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      } */
+      /*
+       * NV obj = database.get(id);
+       * if(obj == null) {
+       * logger.warning("Tried to edit removed object?");
+       * return;
+       * }
+       * final int dimensionality = RelationUtil.dimensionality(database);
+       * double[] vals = new double[dimensionality];
+       * for(int d = 0; d < dimensionality; d++) {
+       * if(d == columnIndex - 3) {
+       * vals[d] = FormatUtil.parseDouble((String) aValue);
+       * }
+       * else {
+       * vals[d] = obj.doubleValue(d + 1);
+       * }
+       * }
+       * NV newobj = obj.newInstance(vals);
+       * newobj.setID(id);
+       * final Representation<DatabaseObjectMetadata> mrep =
+       * database.getMetadataQuery();
+       * DatabaseObjectMetadata meta = mrep.get(id);
+       * try {
+       * database.delete(id);
+       * database.insert(new Pair<NV, DatabaseObjectMetadata>(newobj, meta));
+       * }
+       * catch(UnableToComplyException e) {
+       * de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+       * }
+       */
       // TODO: refresh wrt. range selection!
     }
   }
 
   @Override
   public void contentChanged(DataStoreEvent e) {
-    if (e.getInserts().isEmpty() && e.getRemovals().isEmpty() && !e.getUpdates().isEmpty()) {
+    if(e.getInserts().isEmpty() && e.getRemovals().isEmpty() && !e.getUpdates().isEmpty()) {
       // Updates only.
       dotTableModel.fireTableDataChanged();
     }
@@ -362,7 +355,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
   @Override
   public void resultChanged(Result current) {
-    if (current instanceof SelectionResult || current instanceof Database) {
+    if(current instanceof SelectionResult || current instanceof Database) {
       updateFromSelection();
       dotTableModel.fireTableStructureChanged();
     }

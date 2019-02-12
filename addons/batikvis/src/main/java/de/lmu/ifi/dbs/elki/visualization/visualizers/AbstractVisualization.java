@@ -174,16 +174,10 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   @Override
   public void resultChanged(Result current) {
     // Default is to redraw when the result we are attached to changed.
-    if(task.getResult() == current) {
-      svgp.requestRedraw(this.task, this);
-      return;
-    }
-    if(task.has(UpdateFlag.ON_SELECTION) && current instanceof SelectionResult) {
-      svgp.requestRedraw(this.task, this);
-      return;
-    }
-    if(task.has(UpdateFlag.ON_SAMPLE) && current instanceof SamplingResult) {
-      svgp.requestRedraw(this.task, this);
+    if(task.getResult() == current //
+        || (task.has(UpdateFlag.ON_SELECTION) && current instanceof SelectionResult) //
+        || (task.has(UpdateFlag.ON_SAMPLE) && current instanceof SamplingResult)) {
+      svgp.requestRedraw(task, this);
       return;
     }
   }
@@ -196,18 +190,15 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if(task == item || task.getResult() == item) {
-      svgp.requestRedraw(this.task, this);
-      return;
-    }
-    if(task.has(UpdateFlag.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
-      svgp.requestRedraw(this.task, this);
+    if(task == item || task.getResult() == item //
+        || (task.has(UpdateFlag.ON_STYLEPOLICY) && item instanceof StylingPolicy)) {
+      svgp.requestRedraw(task, this);
       return;
     }
   }
 
   @Override
   public void contentChanged(DataStoreEvent e) {
-    svgp.requestRedraw(this.task, this);
+    svgp.requestRedraw(task, this);
   }
 }

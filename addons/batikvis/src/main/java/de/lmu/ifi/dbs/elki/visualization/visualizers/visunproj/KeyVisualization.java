@@ -185,23 +185,27 @@ public class KeyVisualization implements VisFactory {
 
     @Override
     public void fullRedraw() {
+      StyleLibrary style = context.getStyleLibrary();
+      setupCSS(svgp);
+      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+
       StylingPolicy pol = context.getStylingPolicy();
       if(!(pol instanceof ClusterStylingPolicy)) {
         Element label = svgp.svgText(0.1, 0.7, "No clustering selected.");
         SVGUtil.setCSSClass(label, KEY_CAPTION);
         layer.appendChild(label);
+        final double margin = style.getSize(StyleLibrary.MARGIN);
+        final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), 10., 1., margin / StyleLibrary.SCALE);
+        SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
         return;
       }
       @SuppressWarnings("unchecked")
       Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) pol).getClustering();
 
-      StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
       final List<Cluster<Model>> topcs = clustering.getToplevelClusters();
 
-      setupCSS(svgp);
-      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
       // Add a label for the clustering.
       {
         Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());

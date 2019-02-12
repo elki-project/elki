@@ -29,7 +29,8 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
- * Class to help keeping track of the materialized layers of the different visualizations.
+ * Class to help keeping track of the materialized layers of the different
+ * visualizations.
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -74,11 +75,7 @@ public class LayerMap {
    */
   public Visualization getVisualization(PlotItem item, VisualizationTask task) {
     Pair<Element, Visualization> pair = map.get(key(item, task));
-    if (pair == null) {
-      return null;
-    } else {
-      return pair.second;
-    }
+    return pair == null ? null : pair.second;
   }
 
   /**
@@ -90,11 +87,7 @@ public class LayerMap {
    */
   public Element getContainer(PlotItem item, VisualizationTask task) {
     Pair<Element, Visualization> pair = map.get(key(item, task));
-    if (pair == null) {
-      return null;
-    } else {
-      return pair.first;
-    }
+    return pair == null ? null : pair.first;
   }
 
   /**
