@@ -79,16 +79,15 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
     BundleStreamSource stream = null;
     for(ObjectFilter filter : filters) {
       if(filter instanceof StreamFilter) {
-        stream = ((StreamFilter) filter).init((stream != null) ? stream : bundle.asStream());
+        stream = ((StreamFilter) filter).init(bundle != null ? bundle.asStream() : stream);
         bundle = null; // No longer a bundle
       }
       else {
-        bundle = filter.filter((bundle != null) ? bundle : stream.asMultipleObjectsBundle());
+        bundle = filter.filter(stream != null ? stream.asMultipleObjectsBundle() : bundle);
         stream = null; // No longer a stream
       }
-      assert (stream != null || bundle != null);
     }
-    return (bundle != null) ? bundle : stream.asMultipleObjectsBundle();
+    return bundle != null ? bundle : stream.asMultipleObjectsBundle();
   }
 
   /**
@@ -107,16 +106,15 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
     MultipleObjectsBundle bundle = null;
     for(ObjectFilter filter : filters) {
       if(filter instanceof StreamFilter) {
-        stream = ((StreamFilter) filter).init((stream != null) ? stream : bundle.asStream());
+        stream = ((StreamFilter) filter).init(bundle != null ? bundle.asStream() : stream);
         bundle = null;
       }
       else {
-        bundle = filter.filter((bundle != null) ? bundle : stream.asMultipleObjectsBundle());
+        bundle = filter.filter(stream != null ? stream.asMultipleObjectsBundle() : bundle);
         stream = null;
       }
-      assert (stream != null || bundle != null);
     }
-    return (stream != null) ? stream : bundle.asStream();
+    return stream != null ? stream : bundle.asStream();
   }
 
   /**

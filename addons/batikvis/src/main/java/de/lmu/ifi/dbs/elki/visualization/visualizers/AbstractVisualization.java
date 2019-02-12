@@ -151,16 +151,12 @@ public abstract class AbstractVisualization implements Visualization, ResultList
    */
   @Override
   public void incrementalRedraw() {
-    Element oldcontainer = null;
-    if(layer != null && layer.hasChildNodes()) {
-      oldcontainer = layer;
-      // Shallow clone:
-      layer = (Element) layer.cloneNode(false);
+    if(layer != null) {
+      while(layer.hasChildNodes()) {
+        layer.removeChild(layer.getLastChild());
+      }
     }
     fullRedraw();
-    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-      oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
-    }
   }
 
   @Override

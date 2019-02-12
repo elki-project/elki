@@ -519,7 +519,7 @@ public class KMLOutputHandler implements ResultHandler {
       hull.add(coords.get(iter).toArray());
     }
     double weight = ids.size();
-    if(hier != null && hulls != null) {
+    if(hier != null) {
       final int numc = hier.numChildren(clu);
       if(numc > 0) {
         for(It<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {

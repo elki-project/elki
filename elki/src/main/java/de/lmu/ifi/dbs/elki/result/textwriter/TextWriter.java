@@ -273,7 +273,7 @@ public class TextWriter {
   }
 
   private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, IOException {
-    String cname = naming != null ? naming.getNameFor(clus) : "cluster";
+    String cname = naming.getNameFor(clus);
     String filename = filenameFromLabel(cname);
 
     PrintStream outStream = streamOpener.openStream(getFilename(clus, filename));

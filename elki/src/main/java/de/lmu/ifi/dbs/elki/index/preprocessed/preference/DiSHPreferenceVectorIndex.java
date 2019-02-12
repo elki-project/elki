@@ -328,8 +328,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    * specified set contained in the specified map.
    *
    * @param candidates the map containing the sets
-   * @param set the set to intersect with
-   * @param result the set to put the result in
+   * @param set the set to intersect with and output the result to
    * @return the set with the maximum size
    */
   private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, ModifiableDBIDs set) {

@@ -225,7 +225,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
       int targetkey = key;
       ModifiableDBIDs tids = null;
       // Chase arrows:
-      while(ids == null && assignment[targetkey] != targetkey) {
+      while(tids == null && assignment[targetkey] != targetkey) {
         targetkey = assignment[targetkey];
         tids = map.get(targetkey);
       }

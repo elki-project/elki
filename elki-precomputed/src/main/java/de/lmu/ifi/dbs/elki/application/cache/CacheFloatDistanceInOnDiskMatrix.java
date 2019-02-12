@@ -130,7 +130,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
     catch(IOException e) {
       throw new AbortException("Error precomputing distance matrix.", e);
     }
-    prog.ensureCompleted(LOG);
+    LOG.ensureCompleted(prog);
   }
 
   /**

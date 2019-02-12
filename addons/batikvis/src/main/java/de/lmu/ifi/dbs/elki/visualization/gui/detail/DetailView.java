@@ -20,7 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.gui.detail;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +28,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -85,11 +83,6 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
    * Map from tasks to visualizations.
    */
   Map<VisualizationTask, Visualization> taskmap = new HashMap<>();
-
-  /**
-   * Map from visualizations to SVG layers.
-   */
-  Map<Visualization, Element> layermap = new HashMap<>();
 
   /**
    * The created width
@@ -159,35 +152,22 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     width = Math.sqrt(getRatio());
     height = 1.0 / width;
 
-    ArrayList<Visualization> layers = new ArrayList<>();
     // TODO: center/arrange visualizations?
     for(Iterator<VisualizationTask> tit = item.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();
       if(task.isVisible()) {
         Visualization v = instantiateVisualization(task);
         if(v != null) {
-          layers.add(v);
           taskmap.put(task, v);
-          layermap.put(v, v.getLayer());
         }
       }
     }
-    // Arrange
-    for(Visualization layer : layers) {
-      if(layer.getLayer() != null) {
-        getRoot().appendChild(layer.getLayer());
-      }
-      else {
-        LOG.warning("NULL layer seen.");
-      }
-    }
-
     double ratio = width / height;
     getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
-    updateStyleElement();
+    refresh();
   }
 
   /**
@@ -199,29 +179,29 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       LOG.debugFine("Refresh in thread " + Thread.currentThread().getName());
     }
     boolean updateStyle = false;
-    Iterator<Map.Entry<VisualizationTask, Visualization>> it = taskmap.entrySet().iterator();
+    Iterator<Entry<VisualizationTask, Visualization>> it = taskmap.entrySet().stream() //
+        .sorted((a, b) -> Integer.compare(a.getKey().level(), b.getKey().level())) //
+        .iterator();
     Element insertpos = null;
     while(it.hasNext()) {
       Entry<VisualizationTask, Visualization> ent = it.next();
       VisualizationTask task = ent.getKey();
       Visualization vis = ent.getValue();
+      if(!task.isVisible()) {
+        if(vis != null) {
+          SVGUtil.removeFromParent(vis.getLayer());
+        }
+        continue;
+      }
       if(vis == null) {
         ent.setValue(vis = instantiateVisualization(task));
       }
-      Element prevlayer = layermap.get(vis), layer = vis.getLayer();
-      if(prevlayer == layer) { // Unchanged:
-        insertpos = layer;
-        continue;
-      }
+      Element layer = vis.getLayer();
       if(task.has(RenderFlag.NO_EXPORT)) {
         layer.setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
       }
-      if(prevlayer == null) {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("New layer: " + task);
-        }
-        // Insert new!
-        // TODO: correct stacking / insert position!
+      // Insert or append
+      if(layer.getParentNode() != getRoot()) {
         if(insertpos != null && insertpos.getNextSibling() != null) {
           getRoot().insertBefore(layer, insertpos.getNextSibling());
         }
@@ -229,17 +209,6 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
           getRoot().appendChild(layer);
         }
       }
-      else {
-        if(LOG.isDebuggingFine()) {
-          LOG.debugFine("Updated layer: " + task);
-        }
-        // Replace
-        final Node parent = prevlayer.getParentNode();
-        if(parent != null) {
-          parent.replaceChild(/* new! */layer, /* old */prevlayer);
-        }
-      }
-      layermap.put(vis, layer);
       updateStyle = true;
       insertpos = layer;
     }
@@ -367,32 +336,14 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       taskmap.put(task, null);
       lazyRefresh();
     }
-    else if(vis.getLayer() != layermap.get(vis)) {
-      lazyRefresh(); // Visibility has changed.
-    }
   }
 
   @Override
   protected void redraw() {
-    boolean active = false;
     while(!updateQueue.isEmpty()) {
-      Visualization vis = updateQueue.pop();
-      if(!active) {
-        Element prev = layermap.get(vis);
-        vis.incrementalRedraw();
-        final boolean changed = prev != vis.getLayer();
-        if(LOG.isDebuggingFine() && changed) {
-          LOG.debugFine("Visualization " + vis + " changed.");
-        }
-        active |= changed;
-      }
-      else {
-        vis.incrementalRedraw();
-      }
+      updateQueue.pop().incrementalRedraw();
     }
-    if(active) {
-      refresh();
-    }
+    refresh();
   }
 
   /**
