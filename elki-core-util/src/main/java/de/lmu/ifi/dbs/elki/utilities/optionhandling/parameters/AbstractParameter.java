@@ -283,6 +283,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @Override
   public List<ParameterConstraint<? super T>> getConstraints() {
-    return Collections.unmodifiableList(this.constraints);
+    return this.constraints != null ? Collections.unmodifiableList(this.constraints) : Collections.emptyList();
   }
 }
