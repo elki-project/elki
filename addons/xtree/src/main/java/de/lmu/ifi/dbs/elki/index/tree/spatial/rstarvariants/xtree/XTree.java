@@ -62,9 +62,6 @@ public class XTree extends AbstractXTree<XTreeNode> {
     super(pagefile, settings);
   }
 
-  /**
-   * Creates an entry representing the root node.
-   */
   @Override
   protected SpatialEntry createRootEntry() {
     return new XTreeDirectoryEntry(0, null);
@@ -75,21 +72,11 @@ public class XTree extends AbstractXTree<XTreeNode> {
     return new XTreeDirectoryEntry(node.getPageID(), node.computeMBR());
   }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @return a new leaf node
-   */
   @Override
   protected XTreeNode createNewLeafNode() {
     return new XTreeNode(leafCapacity, true);
   }
 
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @return a new directory node
-   */
   @Override
   protected XTreeNode createNewDirectoryNode() {
     return new XTreeNode(dirCapacity, false);

@@ -207,8 +207,6 @@ public class Subspace {
    * specified subspaces. Then a negative integer or a positive integer will be
    * returned if {@code d1} is less than or greater than {@code d2}. Otherwise
    * the two subspaces have equal dimensions and zero will be returned.
-   *
-   * @author Elke Achtert
    */
   public static Comparator<Subspace> DIMENSION_COMPARATOR = new Comparator<Subspace>() {
     @Override

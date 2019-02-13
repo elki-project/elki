@@ -70,7 +70,7 @@ public class XTreeSettings extends RTreeSettings {
 
   /**
    * Type of overlap to be used for testing on maximum overlap. Must be one of
-   * {@link #DATA_OVERLAP} and {@link #VOLUME_OVERLAP}.
+   * {@link Overlap#DATA_OVERLAP} and {@link Overlap#VOLUME_OVERLAP}.
    */
   protected Overlap overlap_type = Overlap.DATA_OVERLAP;
 }

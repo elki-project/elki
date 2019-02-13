@@ -71,10 +71,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends AbstractRStarTree<N, SpatialEntry, XTreeSettings> {
   /**
    * If <code>true</code>, the expensive call of
-   * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
-   * omitted for supernodes. This may lead to longer query times, however, is
-   * necessary for enabling the construction of the tree for some
-   * parameterizations.
+   * {@link #calculateOverlapIncrease} is omitted for supernodes. This may lead
+   * to longer query times, however, is necessary for enabling the construction
+   * of the tree for some parameterizations.
    */
   public boolean OMIT_OVERLAP_INCREASE_4_SUPERNODES = true;
 
@@ -237,17 +236,11 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
   /**
    * Get the overlap type used for this XTree.
    * 
-   * @return One of
-   *         <dl>
-   *         <dt><code>{@link #DATA_OVERLAP}</code></dt>
-   *         <dd>The overlap is the ratio of total data objects in the
-   *         overlapping region.</dd>
-   *         <dt><code>{@link #VOLUME_OVERLAP}</code></dt>
-   *         <dd>The overlap is the fraction of the overlapping region of the
-   *         two original mbrs:
+   * @return One of <code>{@link Overlap#DATA_OVERLAP}</code>: The overlap is
+   *         the ratio of total data objects in the overlapping region or
+   *         <code>{@link Overlap#VOLUME_OVERLAP}</code>: The overlap is the
+   *         fraction of the overlapping region of the two original mbrs:
    *         <code>(overlap volume of mbr 1 and mbr 2) / (volume of mbr 1 + volume of mbr 2)</code>
-   *         </dd>
-   *         </dl>
    */
   public Overlap get_overlap_type() {
     return settings.overlap_type;
@@ -296,9 +289,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
   /**
    * Writes all supernodes to the end of the file. This is only supposed to be
    * used for a final saving of an XTree. If another page is added to this tree,
-   * the supernodes written to file by this operation are over-written. Note
-   * that this tree will only be completely saved after an additional call of
-   * {@link #close()}.
+   * the supernodes written to file by this operation are over-written.
    * 
    * @return the number of bytes written to file for this tree's supernodes
    * @throws IOException if there are any io problems when writing the tree's
@@ -668,14 +659,14 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    * </li>
    * </ul>
    * Furthermore tries to avoid rounding errors arising from large value ranges
-   * and / or larger dimensions. <br>
-   * <br>
+   * and / or larger dimensions.
+   * <p>
    * However: hardly any difference in real runtime!
    * 
    * @param node Node
    * @param ei current entry
    * @param testMBR extended MBR of <code>ei</code>
-   * @return
+   * @return overlap increase.
    */
   private double calculateOverlapIncrease(N node, SpatialEntry ei, SpatialComparable testMBR) {
     ModifiableHyperBoundingBox eiMBR = new ModifiableHyperBoundingBox(ei);

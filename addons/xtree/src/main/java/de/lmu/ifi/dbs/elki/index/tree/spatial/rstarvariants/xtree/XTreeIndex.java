@@ -69,22 +69,11 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
     insertAll(relation.getDBIDs()); // Will check for actual bulk load!
   }
 
-  /**
-   * Inserts the specified real vector object into this index.
-   * 
-   * @param id the object id that was inserted
-   */
   @Override
   public final void insert(DBIDRef id) {
     insertLeaf(createNewLeafEntry(id));
   }
 
-  /**
-   * Inserts the specified objects into this index. If a bulk load mode is
-   * implemented, the objects are inserted in one bulk.
-   * 
-   * @param objects the objects to be inserted
-   */
   @Override
   public final void insertAll(DBIDs ids) {
     if(ids.isEmpty() || (ids.size() == 1)) {
@@ -108,12 +97,6 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
     doExtraIntegrityChecks();
   }
 
-  /**
-   * Deletes the specified object from this index.
-   * 
-   * @return true if this index did contain the object with the specified id,
-   *         false otherwise
-   */
   @Override
   public final boolean delete(DBIDRef id) {
     // find the leaf node containing o

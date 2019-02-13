@@ -36,7 +36,7 @@ public class XTreeHeader extends TreeIndexHeader {
   /**
    * The size of this header in bytes, which is 32 Bytes. We have the integers
    * {@link #min_fanout} and {@link #dimensionality} (each 4 bytes), the floats
-   * {@link #reinsert_fraction} and {@link #max_overlap} (each 4 bytes) and the
+   * {@link #max_overlap} (each 4 bytes) and the
    * 8 bytes each for the longs {@link #num_elements} and
    * {@link #supernode_offset}.
    */
@@ -81,8 +81,7 @@ public class XTreeHeader extends TreeIndexHeader {
    * <code>version</code>, <code>pageSize</code>, {@link #dirCapacity},
    * {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}, as
    * well as the minimum fanout {@link #min_fanout}, the tree's dimension
-   * {@link #dimensionality}, the fraction of pages to be re-inserted before
-   * splitting {@link #reinsert_fraction}, the maximum overlap
+   * {@link #dimensionality}, the maximum overlap
    * {@link #max_overlap} and the supernode offset {@link #supernode_offset}
    * from the file.
    */
@@ -100,8 +99,8 @@ public class XTreeHeader extends TreeIndexHeader {
    * Writes this header to the specified file. Writes to file the integer values
    * <code>version</code>, <code>pageSize</code>, {@link #dirCapacity},
    * {@link #leafCapacity}, {@link #dirMinimum}, {@link #leafMinimum},
-   * {@link #min_fanout}, {@link #dimensionality}, the <code>float</code>s
-   * {@link #reinsert_fraction} and {@link #max_overlap} and the
+   * {@link #min_fanout}, {@link #dimensionality}, the <code>float</code>
+   * {@link #max_overlap} and the
    * <code>long</code> {@link #supernode_offset}.
    */
   @Override
@@ -169,7 +168,7 @@ public class XTreeHeader extends TreeIndexHeader {
   }
 
   /**
-   * @return The number of elements stored in the tree
+   * @param num_elements The number of elements stored in the tree
    */
   public void setNumberOfElements(long num_elements) {
     this.num_elements = num_elements;

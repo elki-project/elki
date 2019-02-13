@@ -383,16 +383,16 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
      * Parameter to specify the threshold for approximate linear dependency: the
      * strong eigenvectors of q are approximately linear dependent from the
      * strong eigenvectors p if the following condition holds for all strong
-     * eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <=
-     * delta^2, must be a double equal to or greater than 0.
+     * eigenvectors q_i of q (lambda_q &lt; lambda_p): q_i' * M^check_p * q_i
+     * &lt;= delta^2, must be a double equal to or greater than 0.
      */
     public double delta;
 
     /**
      * Parameter to specify the threshold for the maximum distance between two
      * approximately linear dependent subspaces of two objects p and q (lambda_q
-     * < lambda_p) before considering them as parallel, must be a double equal
-     * to or greater than 0.
+     * &lt; lambda_p) before considering them as parallel, must be a double
+     * equal to or greater than 0.
      */
     public double tau;
 
@@ -425,8 +425,8 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     /**
      * Parameter to specify the threshold for the maximum distance between two
      * approximately linear dependent subspaces of two objects p and q (lambda_q
-     * &lt; lambda_p) before considering them as parallel, must be a double equal
-     * to or greater than 0.
+     * &lt; lambda_p) before considering them as parallel, must be a double
+     * equal to or greater than 0.
      */
     public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
 

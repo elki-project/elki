@@ -52,8 +52,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
   /**
    * Utility field for maintaining the loading of supernodes. Initialized by
    * {@link #readExternal(ObjectInput)} if the node is a supernode. Must then be
-   * filled by {@link #readSuperNode(ObjectInput, AbstractXTree)} or
-   * {@link #fillSuperNode(AbstractXTree)}.
+   * filled by {@link #readSuperNode(ObjectInput, AbstractXTree)}.
    */
   private int capacity_to_be_filled = 0;
 
@@ -206,7 +205,9 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
   /**
    * This node is a supernode and we only write it to file in order to be able
    * to re-load it in another session. It can be loaded by
-   * {@link #readSuperNode(ObjectInput)}.
+   * {@link #readSuperNode}.
+   * 
+   * @param out object output
    */
   public void writeSuperNode(ObjectOutput out) throws IOException {
     if(!isSuperNode()) {
@@ -261,9 +262,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
   /**
    * @return A list of all contained children in this node. In contrast to
    *         {@link #getEntries()} this listing ONLY contains existing children
-   *         and not empty slots for filling up the capacity. And it does not
-   *         require multiple copies of a parent path as in
-   *         {@link #children(de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath)}.
+   *         and not empty slots for filling up the capacity.
    */
   public List<Entry> getChildren() {
     List<Entry> children = new ArrayList<>(getNumEntries());

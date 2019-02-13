@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.johnrengelman.shadow" version "2.0.4"
+  id "com.github.johnrengelman.shadow" version "4.0.4"
 }
 
 description = 'ELKI - Single-jar Bundle'
@@ -10,6 +10,8 @@ def bundleExclude = [ project.path, project.parent, ":elki-docutil" ]
 configurations {
   doc { transitive false }
 }
+
+sourceSets { javadoc { java.srcDirs = ["$rootDir/elki/src/main/javadoc"] } }
 
 dependencies {
   // Depend on all subprojects, except those listed
@@ -58,6 +60,8 @@ sourceJar.from(configurations.doc)
 javadoc {
   source configurations.doc
   include "**/*.java"
+  include "**/*.html"
+  options.overview = "$rootDir/elki/src/main/javadoc/overview.html" as File
 }
 
 javadoc.dependsOn documentParameters
@@ -114,14 +118,21 @@ shadowJar {
   exclude "it/unimi/dsi/fastutil/shorts/" // fastutil
 }
 
+// Additional resources from main project
+task copyMoreDocResources(type: Copy) {
+  from("$rootDir/elki/src/main/javadoc") {
+    exclude "overview.html"
+  }
+  into "$project.buildDir/docs/javadoc"
+}
+javadoc.dependsOn copyMoreDocResources
+
 assemble.dependsOn shadowJar
 artifacts.archives shadowJar
 
 // Maven publishing plugin
-publishing {
-  publications {
-    shadow(MavenPublication) {
-      project.shadow.component(it)
-    }
+publishing.publications {
+  shadow(MavenPublication) {
+    project.shadow.component(it)
   }
 }

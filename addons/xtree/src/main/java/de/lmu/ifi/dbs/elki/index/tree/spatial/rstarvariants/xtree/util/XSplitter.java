@@ -96,7 +96,6 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * For all distributions, the sums of the two resulting MBRs' surfaces are
    * calculated and the overall sum is returned.
    * 
-   * @param <T>
    * @param minEntries minimally allowed subgroup size
    * @param maxEntries maximally allowed subgroup size; if
    *        <code>&lt; node.getNumEntries()</code>, ONLY the first half (
@@ -134,7 +133,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * 
    * @param minEntries minimally allowed subgroup size
    * @param maxEntries maximally allowed subgroup size for the first entry set
-   * @param entrySorting a permutation of the indices of {@link #entries}
+   * @param entrySorting a permutation of the indices
    * @param dim the dimension of the tree
    * @return the sum of all first and second MBRs' surfaces for the tested entry
    *         distributions
@@ -255,15 +254,15 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Adds the minimum and maximum bounds of the MBR of entry
-   * <code>entrySorting[index]</code> in {@link #entries} to the dimension-wise
+   * Adds the minimum and maximum bounds of the MBR of entry number
+   * <code>entrySorting[index]</code> to the dimension-wise
    * upper and lower bounds, <code>ub</code> and <code>lb</code>. Note that if
    * this method is called for <code>ub</code> and <code>lb</code> which are
    * already owned by an MBR, this update operation also updates the MBR defined
    * by those bounds.
    * 
    * @param entrySorting a sorting providing the mapping of <code>index</code>
-   *        to the entry in {@link #entries} to be added
+   *        to the entry to be added
    * @param ub the upper bound of the MBR to be extended
    * @param lb the lower bound of the MBR to be extended
    * @param index the index in the sorting referencing the entry to be added
@@ -283,13 +282,13 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Adds the minimum and maximum bounds of the MBR of entry
-   * <code>entrySorting[index]</code> in {@link #entries} to the dimension-wise
+   * Adds the minimum and maximum bounds of the MBR of entry number
+   * <code>entrySorting[index]</code> to the dimension-wise
    * upper and lower bound priority queues <code>pqUBFirst</code> and
    * <code>pqLBFirst</code>.
    * 
    * @param entrySorting a sorting providing the mapping of <code>index</code>
-   *        to the entry in {@link #entries} to be added
+   *        to the entry to be added
    * @param pqUB One priority queue for each dimension. They are sorted by upper
    *        bound in descending order and consist of entry indices in
    *        <code>entrySorting</code> for the entries belonging to
@@ -311,17 +310,15 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Sort the entries of {@link #entries} into the arrays
+   * Indirectly sort the entries into the arrays
    * <code>entriesByLB</code> and <code>entriesByUB</code> by lower and upper
    * bound of dimension <code>d</code>.
    * 
    * @param d selected dimension
    * @param entriesByLB entry array to be sorted by the lower bound of
    *        <code>d</code> (must be initialized to a valid selection of indices
-   *        of {@link #entries}
    * @param entriesByUB entry array to be sorted by the upper bound of
    *        <code>d</code> (must be initialized to a valid selection of indices
-   *        of {@link #entries}
    */
   private void sortEntriesForDimension(int d, int[] entriesByLB, int[] entriesByUB) {
     // Lists which hold entries sorted by their lower and
@@ -347,9 +344,6 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
       this.lb = lb;
     }
 
-    /**
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-     */
     @Override
     public int compare(int o1, int o2) {
       final double d1, d2;
@@ -400,7 +394,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * This is done by calculating every possible split in each given dimension
    * and the sum of surfaces of all splits for every dimension.
    * 
-   * @param dimensionIterable The dimensions that should be tested
+   * @param dimensionIterator The dimensions that should be tested
    * @param minEntries Minimum number of entries in each sub group; in case of a
    *        data node, this is the minimum leaf capacity, for directory nodes,
    *        this is either the minimum directory capacity or, if a topological
@@ -470,12 +464,11 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    *        this is either the minimum directory capacity or, if a topological
    *        split has already failed, the tree's minimum fan-out parameter.
    * @param maxEntries The maximum number of entries to be tested
-   * @param revert if <code>maxEntrie &lt; {@link #entries}.size()</code> and
+   * @param revert if <code>maxEntries &lt; numEntries</code> and
    *        <code>revert</code> is <code>true</code>, the upper range of the
    *        sorting is tested, i.e. not
    *        <code>{minEntries, ..., maxEntries}</code> but
-   * 
-   *        <code>{{@link #entries}.size() - maxEntries + 1, ..., {@link #entries}.size() - minEntries + 1}</code>
+   *        <code>{numEntries - maxEntries + 1, ..., numEntries - minEntries + 1}</code>
    * @return The distribution with the minimal intersection volume or
    *         <code>null</code>, if the minimum overlap split has a volume which
    *         is larger than the allowed <code>maxOverlap</code> ratio
@@ -574,13 +567,13 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Generate the split distribution for a given sorting of entry positions in
-   * {@link #entries} using the given split position <code>limit</code>. All
+   * Generate the split distribution for a given sorting of entry positions
+   * using the given split position <code>limit</code>. All
    * entries referenced by <code>entrySorting</code> from <code>0</code> to
    * <code>limit-1</code> are put into the first list (<code>ret[0]</code>), the
    * other entries are put into the second list (<code>ret[1]</code>).
-   * 
-   * @param entrySorting this splitDistribution
+   *
+   * @param sorting this splitDistribution
    * @return the split distribution for the given sorting and split point
    */
   @SuppressWarnings("unchecked")
@@ -600,12 +593,12 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Generate the split sorting for a given sorting of entry positions in
-   * {@link #entries} using the given split position <code>limit</code>. All
-   * entries referenced by <code>entrySorting</code> from <code>0</code> to
+   * Generate the split sorting for a given sorting of entry positions
+   * using the given split position <code>limit</code>.
+   * All entries referenced by <code>entrySorting</code> from <code>0</code> to
    * <code>limit-1</code> are put into the first list (<code>ret[0]</code>), the
    * other entries are put into the second list (<code>ret[1]</code>).
-   * 
+   *
    * @param entrySorting entry sorting
    * @param limit split point
    * @return the split sorting for the given sorting and split point
@@ -619,19 +612,17 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   }
 
   /**
-   * Perform an minimum overlap split. The
-   * {@link #chooseMinimumOverlapSplit(int, int, int, boolean) minimum overlap
-   * split} calculates the partition for the split dimension determined by
-   * {@link #chooseSplitAxis(Iterable, int, int) chooseSplitAxis}
-   * <code>(common split
-   * history, minFanout, maxEntries - minFanout + 1)</code> with the minimum
-   * overlap. This range may have been tested before (by the
-   * {@link #topologicalSplit()}), but for the minimum overlap test we need to
+   * Perform an minimum overlap split. The {@link #chooseMinimumOverlapSplit}
+   * calculates the partition for the split dimension determined by
+   * {@link #chooseSplitAxis}
+   * <code>(common split history, minFanout, maxEntries - minFanout + 1)</code>
+   * with the minimum overlap. This range may have been tested before (by the
+   * {@link #topologicalSplit}), but for the minimum overlap test we need to
    * test that anew. Note that this method returns <code>null</code>, if the
    * minimum overlap split has a volume which is larger than the allowed
    * <code>maxOverlap</code> ratio or if the tree's minimum fanout is not larger
    * than the minimum directory size.
-   * 
+   *
    * @return distribution resulting from the minimum overlap split
    */
   public SplitSorting minimumOverlapSplit() {
@@ -701,10 +692,6 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * Only distributions that have between <code>m</code> and <code>M-m+1</code>
    * entries in the first group will be tested.
    * 
-   * @see "Beckmann, Kriegel, Schneider, Seeger: The R*-tree: An Efficient and
-   *      Robust Access Method for Points and Rectangles, ACM SIGMOD Int. Conf.
-   *      on Management of Data (SIGMOD'90), Atlantic City, NJ, 1990, pp.
-   *      322-331"
    * @return chosen split distribution; note that this method returns null, if
    *         the minimum overlap split has a volume which is larger than the
    *         allowed <code>maxOverlap</code> ratio of #tree
@@ -728,8 +715,8 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   /**
    * Computes and returns the mbr of the specified nodes, only the nodes between
    * from and to index are considered.
-   * 
-   * @param entries the array of node indices in {@link #entries}
+   *
+   * @param entries the array of node indices
    * @param from the start index
    * @param to the end index
    * @return the mbr of the specified nodes
@@ -746,7 +733,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
   /**
    * Get the ratio of data objects in the intersection volume (weighted
    * overlap).
-   * 
+   *
    * @param split two entry lists representing the given split
    * @param mbrs the MBRs for the given split
    * @return the ration of data objects in the intersection volume as value
