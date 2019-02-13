@@ -26,10 +26,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 
 /**
- * Tutorial example for ELKI.
- * 
+ * Tutorial distance function example for ELKI.
+ * <p>
  * See <a
- * href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/DistanceFunctions">Distance
+ * href="https://elki-project.github.io/tutorial/distance_functions">Distance
  * function tutorial</a>
  * 
  * @author Erich Schubert
@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanc
 public class TutorialDistanceFunction extends AbstractNumberVectorDistanceFunction {
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
-    double dx = (o1.doubleValue(0) - o2.doubleValue(0));
-    double dy = (o1.doubleValue(1) - o2.doubleValue(1));
+    double dx = o1.doubleValue(0) - o2.doubleValue(0);
+    double dy = o1.doubleValue(1) - o2.doubleValue(1);
     return dx * dx + Math.abs(dy);
   }
 

@@ -30,10 +30,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Tutorial example for ELKI.
+ * Tutorial example Minowski-distance variation with different exponents for
+ * different dimensions for ELKI.
  * <p>
  * See
- * <a href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/DistanceFunctions">Distance
+ * <a href="https://elki-project.github.io/tutorial/distance_functions">Distance
  * function tutorial</a>
  * 
  * @author Erich Schubert

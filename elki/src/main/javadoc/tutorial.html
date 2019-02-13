@@ -5,121 +5,85 @@
 <body>
 <b>ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures.</b>
 <h1>Tutorial</h1>
-<p>This tutorial has been exported from the <a href="http://elki.dbs.ifi.lmu.de/">ELKI wiki</a>. You may be able to find revised and additional Tutorials there.</p>
+<p>This tutorial has been exported from the <a href="https://elki-project.github.io/">ELKI web site</a>. You may be able to find revised and additional tutorials there.</p>
 <h2 id="Preparation">Preparation</h2>
-<p>
-This tutorial uses <a class="wiki" href="http://elki.dbs.ifi.lmu.de/wiki/Releases">Release 0.4</a> of ELKI. Other <a class="wiki" href="http://elki.dbs.ifi.lmu.de/wiki/Releases">releases</a> will work similar.
-</p>
-<p>
-We analyze the <a class="wiki" href="http://elki.dbs.ifi.lmu.de/wiki/DataSets">"mouse" data set</a> you can find on the <a class="wiki" href="http://elki.dbs.ifi.lmu.de/wiki/DataSets">DataSets</a> page.
-</p>
-<p>
-You should have the files "<tt>elki.jar</tt>" and "<tt>mouse.csv</tt>".
-</p>
-<h2 id="RunningELKI">Running ELKI</h2>
-<p>
-The simplest way is to just run the jar file, either by double-clicking it or by typing "<tt>java -jar elki.jar</tt>". This will bring an automatically generated graphical UI similar to this:
-</p>
-<p>
-<img src="figures/tutorial-01-start.png" />
-</p>
-<p>
-The window contains three main components. In the top, a tabular view of parameters is presented. Second, a dropdown and a few buttons allow the management of saved settings, in the bottom, a log view will give textual output.
-</p>
-<h3 id="Parametertable">Parameter table</h3>
-<p>
-The parameter table will dynamically change as you set parameters, since for example adding an algorithm adds new parameters only applicable to this particular algorithm. The colors encode important information on the paranmeters: green parameters are <i>optional</i>, grey parameters have a <i>default value</i>, while orange parameters are <i>missing</i> before the algorithm can be run.
-</p>
-<p>
-Starting the GUI will generally result in two errors due to missing parameters: you have to choose at least an <i>input file</i> (the parameter <tt>dbc.in</tt>) and an algorithm (parameter <tt>algorithm</tt>).
-</p>
-<p>
-Often the table edit has input assistance such as a file chooser or a dropdown to select amongst known values for this parameter.
-</p>
-<h3 id="Settingsmanager">Settings manager</h3>
-<p>
-In order to save a setting for later use, type a new name into the dropdown on the left and click on "Save". To load a setting, choose it from the drop down and click on "Load".
-</p>
-<p>
-Settings are saved in the file <tt>MiniGUI-saved-settings.txt</tt> that you should find easily editable with any text editor. Individual entries are separated with an empty line, and the first line of each section is the title of the setting, while the remaining lines give the options. The syntax is that of the ELKI command line interface, for easy batch operation.
-</p>
-<h3 id="Logwindow">Log window</h3>
-<p>
-The log window will provide you with progress information (when you set <tt>verbose</tt> to true) and other status messages. When the "Run Task" button is grey, you probably have not yet set all required parameters. The log window will report any parameterization errors along with some suggestions on how to set the parameters. In the screenshot above, it gives a list of known algorithms to help you set the <tt>algorithm</tt> parameter.
-</p>
-<h2 id="Analyzingthemousedataset">Analyzing the "mouse" data set</h2>
-<p>
-We will analyze the mouse data set with two well-known algorithms, <a class="ext-link" href="http://en.wikipedia.org/wiki/K-means_clustering">k-means-clustering</a> and <a class="ext-link" href="http://en.wikipedia.org/wiki/Expectation-maximization_algorithm">EM clustering</a>. This data set is a simple to understand example to see a key difference between these two algorithms.
-</p>
-<p>
-First of all, we set the <tt>dbc.in</tt> parameter to the input file, <tt>mouse.csv</tt>. If you click on the table, a button with three dots <tt>...</tt> should appear that opens a file selector. Use this to locate the <tt>mouse.csv</tt> file you downloaded from the <a class="wiki" href="http://elki.dbs.ifi.lmu.de/wiki/DataSets">DataSets</a> page.
-</p>
-<p>
-For setting the <tt>algorithm</tt> parameter, a similar button marked with a plus <tt>+</tt> is available, that opens a dropdown with algorithms the UI detected:
-</p>
-<p>
-<img src="figures/tutorial-02-algorithm.png" />
-</p>
-<h3 id="K-Means">K-Means</h3>
-<p>
-By setting <tt>algorithm</tt> to <tt>clustering.KMeans</tt> we choose to use the k-Means clustering algorithm. It will require setting an additional parameter, <tt>kmeans.k</tt> that will appear below. Set this parameter to <tt>3</tt> for this data set. Leave the other k-Means parameters as is for now: the <tt>kmeans.maxiter</tt> parameter allows to limit the k-Means runtime, while the <tt>kmeans.seed</tt> parameter can be used to enforce reproducible results for this algorithm, by using a fixed random generator. We need neither of that for now.
-</p>
-<p>
-<img src="figures/tutorial-03-parameters.png" />
-</p>
-<p>
-Additionally, we set the parameter <tt>evaluator</tt> to <tt>paircounting.EvaluatePairCountingFMeasure</tt>, which will run a standard evaluation method for clustering results. Note that not all evaluators are applicable for evaluating clustering results.
-</p>
-<p>
-The log window now only gives the command line summary of our parameters, and the <tt>Run Task</tt> button is now enabled, which we now click to run the algorithm.
-</p>
-<h3 id="Visualization">Visualization</h3>
-<p>
-After running the algorithm, the GUI by default opens a simple visualization window. This is automatically generated, so the layout is not (yet) the most intuitive, but it does a fairly good job at making visualizations accessible.
-</p>
-<p>
-<img src="figures/tutorial-04-visualization.png" />
-</p>
-<p>
-In the main area, three types of visualizations are separated:
-</p>
-<ul><li>At the top, you see 1 dimensional histogram projections for both dimensions of the data set
-</li><li>Below this, you see a single 2-dimensional projection. If this data set had more dimensions, you would see additional projections here.
-</li><li>On the right, you see various "special" visualizations, in this case a key of the cluster markers, the evaluation result of 0.71 (since this algorithm involes random, you might get a slightly different number each time) and an overview of the parameters used to produce this results.
-</li></ul><p>
-The exact arrangement of visualizations depends on a dynamic layouting algorithm and may change with your screen size and your data sets.
-</p>
-<p>
-The 2d projection is most interesting for us, and by clicking it we can show it in the full window:
-</p>
-<p>
-<img src="figures/tutorial-05-kmeans.png" />
-</p>
-<p>
-This shows the clustering as obtained by a typical k-Means run. Note that there are three larger symbols, one for each cluster. The larger symbols give the cluster means. In this algorithm, each object is assigned to the cluster where the distance to the mean is the smallest.
-</p>
-<p>
-To get a more visual impression of the cluster shapes, we can go to the menu and enable the "Cluster Convex Hull Visualization" module for this clustering result:
-</p>
-<p>
-<img src="figures/tutorial-06-convexhull.png" />
-</p>
-<p>
-Now you can see more clearly the non-overlapping partitioning produced by this algorithm (more precisely, it produces <a class="ext-link" href="http://en.wikipedia.org/wiki/Voronoi_diagram"><span class="icon"> </span>Voronoi cells</a>. It has a tendency to produce clusters of the same size, which is not appropriate for this data set.
-</p>
-<h3 id="EM-Clustering">EM-Clustering</h3>
-<p>
-Much more appropriate for this data set is the EM algorithm. Close the visualization window, and replace the value of the <tt>algorithm</tt> parameter with <tt>clustering.EM</tt>. For now make sure to <i>replace</i> the value, we don't want to run both k-Means and EM since the overlapping results will be less useful. Again, set <tt>em.k</tt> to <tt>3</tt>, too.
-</p>
-<p>
-The F-Measure obtained by EM-Clustering is much better, usually around 0.97. This is because this data set consists mostly of three Gaussian clusters, the prime example for EM clustering.
-</p>
-<p>
-Note that an additional visualizer as automatically enabled to visualize the Gaussian clusters discovered by EM:
-</p>
-<p>
-<img src="figures/tutorial-07-em.png" />
-</p>
+<h1 id="basic-usage-example">Basic Usage Example</h1>
+<p>This tutorial uses Release 0.7.5 of ELKI.</p>
+<p>We analyze the <a href="https://raw.githubusercontent.com/elki-project/elki/master/data/synthetic/Vorlesung/mouse.csv">“mouse” data set (CSV)</a> you can find on the <a href="https://elki-project.github.io/datasets">DataSets</a> page.</p>
+<p>You should have the files “<code>elki-bundle-0.7.5.jar</code>” and “<code>mouse.csv</code>”.</p>
+<h2 id="running-elki">Running ELKI</h2>
+<p>The simplest way is to just run the jar file, either by double-clicking it or by typing “<code>java -jar elki.jar</code>”. This will bring an automatically generated graphical UI similar to this:</p>
+<p><img src="figures/tutorial-01-start.png" style="max-width: 50%" alt="" /></p>
+<p>At the very top, you can select the task. The default task is called <code>KDDCLIApplication</code>, meaning that we build parameters for a
+KDD (Knowledge Discovery in Databases) process that can be run by out command line interface (CLI), too.
+You can also choose experiments and some utility functions here, for example the task to precompute a distance matrix and write it to a file.</p>
+<p>Below this, you have a tabular view of parameters. This table is <em>updated dynamically</em>, so do not be surprised if new options appear as you make choices.
+Third, there is a text entry to save the current parameters, and to load previous parameters by name.
+The lower text box is read only, and represents a <em>serialized</em> list of the current parameters, useful for copying this into
+a shell script, Makefile, or similar, in order to automate experiments. Last, there follows a log window (which may also contain some progress bars).</p>
+<h3 id="parameter-table">Parameter Table</h3>
+<p>The parameter table will dynamically change as you set parameters, since for example adding an algorithm adds new parameters only applicable to this particular algorithm. The colors encode important information on the paranmeters: green parameters are <em>optional</em>, grey parameters have a <em>default value</em>, while orange parameters are <em>missing</em> before the algorithm can be run.</p>
+<p>Starting the GUI will generally result in two errors due to missing parameters: you have to choose at least an <em>input file</em> (the parameter <code>dbc.in</code>) and an algorithm (parameter <code>algorithm</code>).
+Often the table edit has input assistance such as a file chooser or a dropdown to select amongst known values for this parameter
+that will become available if you select the input cell.</p>
+<h3 id="settings-manager">Settings Manager</h3>
+<p>In order to save a setting for later use, type a new name into the dropdown on the left and click on “Save”. To load a setting, choose it from the drop down and click on “Load”.</p>
+<p>Settings are saved in the file <code>MiniGUI-saved-settings.txt</code> that you should find easily editable with any text editor. Individual entries are separated with an empty line, and the first line of each section is the title of the setting, while the remaining lines give the options. The syntax is that of the ELKI command line interface, for easy batch operation.</p>
+<h3 id="log-window">Log Window</h3>
+<p>The log window will provide you with progress information (when you set <code>verbose</code> to true) and other status messages. When the “Run Task” button is grey, you probably have not yet set all required parameters. The log window will report any parameterization errors along with some suggestions on how to set the parameters. In the screenshot above, it gives a list of known algorithms to help you set the <code>algorithm</code> parameter.</p>
+<h2 id="analyzing-the-mouse-data-set">Analyzing the “mouse” Data Set</h2>
+<p>We will analyze the mouse data set with two well-known algorithms, <a href="http://en.wikipedia.org/wiki/K-means_clustering">k-means-clustering</a> and <a href="http://en.wikipedia.org/wiki/Expectation-maximization_algorithm">EM clustering</a>. This data set is a simple to understand example to see a key difference between these two algorithms.</p>
+<p>First of all, we set the <code>dbc.in</code> parameter to the input file, <code>mouse.csv</code>. Click on the right hand side of the orange highlighted (missing) <code>dbc.in</code> parameter.</p>
+<p><img src="figures/tutorial-02-load.png" style="max-width: 50%" alt="" /></p>
+<p>At the right side of the cell, a content assist button with three dots <kbd>...</kbd> appears that opens a file selector. Use this to locate the <code>mouse.csv</code> file.
+Press Enter <kbd>&#9166;</kbd> to confirm (or click a different row), and the row should turn white now.</p>
+<p>Next, we choose the <code>algorithm</code> parameter. When we click the row, a similar button marked with a plus <kbd>+</kbd> appears, which opens a dropdown with known choices:</p>
+<p><img src="figures/tutorial-03-algorithm.png" style="max-width: 50%" alt="" /></p>
+<h3 id="k-means-clustering">K-Means Clustering</h3>
+<p>ELKI contains many different k-Means algorithm. The standard algorithm, often attributed to Lloyd is one of the slowest. The first choice in the
+<code>clustering.kmeans</code> package (a shortened name for the Java package name <code>de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans</code>) is one of the better
+algorithms, <code>KMeansSort</code>. Other good alternatives include <code>KMeansAnnulus</code> and <code>KMeansExponion</code>. Most of these will give the exact same result,
+and only differ in their run time.</p>
+<p>After choosing the k-Means algorithm and pressing Enter <kbd>&#9166;</kbd>, new options appear below.</p>
+<p>k-Means clustering requires the specification of k, the number of clusters. Set <code>kmeans.k</code> to <kbd>3</kbd>.
+The initialization parameter <code>kmeans.initialization</code> has a default value, but we would rather like to use the better <code>KMeansPlusPlusInitialMeans</code> approach.
+To always get the same result, we also fix the random generator by setting <code>kmeans.seed</code> to <kbd>0</kbd>:</p>
+<p><img src="figures/tutorial-04-kmeans-parameters.png" style="max-width: 50%" alt="" /></p>
+<p>If you want, you can also enable the parameter <code>verbose</code> at the very top of the parameter table (the second <code>verbose</code> further increases verbosity).</p>
+<p>You can now run k-Means by clicking the <kbd>Run Task</kbd> button.</p>
+<h3 id="automatic-visualization">Automatic Visualization</h3>
+<p>After running the algorithm, the GUI by default opens a simple visualization window.
+The layout is automatically generated to adapt to different window sizes, so the locations of the plots can vary.
+Usually, the overview will contain one-dimensional histograms in the top left, a scatterplot matrix below
+(here, a single scatterplot is generated because the data is two dimensional,
+and the plot is moved to the right to make it larger). At the left you can see a
+<a href="https://en.wikipedia.org/wiki/Parallel_coordinates">parallel coordinates plot</a> which become more useful with higher dimensional data.
+The bar chart is an automatic quality evaluation run on the clustering, because the data set also contained labels.
+There is a key to the symbols and colors used (but all clusters are just named “Cluster” because k-means cannot infer meaningful names).</p>
+<p><img src="figures/tutorial-05-kmeans-overview.png" style="max-width: 80%" alt="" /></p>
+<p>You can click some of the components to make them larger. Click on the scatterplot now.</p>
+<p>The black lines in the scatterplot were added automatically by ELKI and are the
+<a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi cells</a> of the clustering.
+Click on “DoubleVector,dim=2 Scatterplot” in the menu (the first part is the data type visualized),
+and uncheck “k-means Voronoi cells” to hide this layer. Then enable “Cluster hull” instead.</p>
+<p><img src="figures/tutorial-06-kmeans-convexhulls.png" style="max-width: 80%" alt="" /></p>
+<p>There are also markers that indicate the cluster means, and you can enable a “star” visualization where each point is connected to the nearest cluster mean.
+Some of these visualizations are only available on 2d data, and some are only available for k-means clustering (Voronoi cells, for example).</p>
+<p>Now you can see more clearly the non-overlapping partitioning produced by this algorithm.
+k-Means has a tendency to produce clusters of the same size, which is not appropriate for this data set.</p>
+<h3 id="em-clustering">EM-Clustering</h3>
+<p>Much more appropriate for this data set is the EM algorithm.
+Close the visualization window, and replace the value of the <code>algorithm</code> parameter with <code>clustering.em.EM</code>.
+For now make sure to <em>replace</em> the value, we don’t want to run both k-Means and EM at the same time. Again, set <code>em.k</code> to <code>3</code>, too.</p>
+<p>The evaluation scores by EM-Clustering on this data set are much better.
+This is because this data set consists mostly of three Gaussian clusters, the prime example for EM clustering.</p>
+<p>Note that an additional visualizer as automatically enabled to visualize the Gaussian clusters discovered by EM:</p>
+<p><img src="figures/tutorial-07-em.png" style="max-width: 80%" alt="" /></p>
+<h2 id="exporting-results">Exporting results</h2>
+<p>The MiniGUI will by default use the result visualizer to visually display the
+results. If you want to save them to a folder, you can set the parameter
+<code>-resulthandler ResultWriter</code> to dump the clustering result into files (in a
+GNUPlot compatible CSV output format, separated with whitespace characters).</p>
 
 </body>
 </html>

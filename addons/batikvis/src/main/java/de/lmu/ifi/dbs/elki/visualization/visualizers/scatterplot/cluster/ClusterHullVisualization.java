@@ -81,7 +81,7 @@ public class ClusterHullVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Cluster Hull (Scatterplot)";
+  private static final String NAME = "Cluster Hull";
 
   /**
    * Settings

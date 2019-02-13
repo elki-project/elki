@@ -9,7 +9,8 @@
  * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br>
  * Proc. of the 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
  * <p>
- * For further information, visit also: http://elki.dbs.ifi.lmu.de/wiki/3DPC
+ * For further information, visit also:
+ * https://elki-project.github.io/examples/3dpc
  */
 /*
  * This file is part of ELKI:

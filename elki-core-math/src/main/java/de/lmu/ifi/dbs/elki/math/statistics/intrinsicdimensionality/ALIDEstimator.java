@@ -48,7 +48,6 @@ import net.jafama.FastMath;
 @Reference(authors = "Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi", //
     title = "Enhanced Estimation of Local Intrinsic Dimensionality Using Auxiliary Distances", //
     booktitle = "Contributed to ELKI", //
-    url = "http://elki.dbs.ifi.lmu.de/", //
     bibkey = "tr/nii/ChellyHK16")
 public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   /**
