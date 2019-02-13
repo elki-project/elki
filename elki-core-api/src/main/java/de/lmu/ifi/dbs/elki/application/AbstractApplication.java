@@ -93,21 +93,20 @@ public abstract class AbstractApplication {
   /**
    * Version number of the reference below.
    */
-  private static final String REFERENCE_VERSION = "0.7.0";
+  private static final String REFERENCE_VERSION = "0.7.5";
 
   /**
    * Information for citation and version.
    */
-  @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
-      title = "A Framework for Clustering Uncertain Data", //
-      booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
-      url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf", //
-      bibkey = "DBLP:journals/pvldb/SchubertKEZSZ15")
-  public static final String REFERENCE = "ELKI Release 0.7.0 (2015, August) published in:" + NEWLINE + NEWLINE //
-      + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
-      + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //
-      + "A Framework for Clustering Uncertain Data." + NEWLINE //
-      + "In Proceedings of the VLDB Endowment, 8(12), 2015." + NEWLINE;
+  @Reference(authors = "Erich Schubert and Arthur Zimek", //
+      title = "ELKI: A large open-source library for data analysis - ELKI Release 0.7.5 \"Heidelberg\"", //
+      booktitle = "CoRR", //
+      url = "https://arxiv.org/abs/1902.03616", //
+      bibkey = "DBLP:journals/corr/abs-1902-03616")
+  public static final String REFERENCE = "ELKI Release 0.7.5 (2019, February) published in:" + NEWLINE + NEWLINE //
+      + "Erich Schubert and Arthur Zimek:" + NEWLINE //
+      + "ELKI: A large open-source library for data analysis - ELKI Release 0.7.5 \"Heidelberg\"." + NEWLINE //
+      + "CoRR arXiv:1902.03616" + NEWLINE;
 
   /**
    * Constructor.
@@ -196,7 +195,7 @@ public abstract class AbstractApplication {
   public static String usage(Collection<TrackedParameter> options) {
     StringBuilder usage = new StringBuilder(10000);
     if(!REFERENCE_VERSION.equals(VERSION)) {
-      usage.append("ELKI build: " + VERSION + NEWLINE + NEWLINE);
+      usage.append("ELKI build: ").append(VERSION).append(NEWLINE).append(NEWLINE);
     }
     usage.append(REFERENCE);
 

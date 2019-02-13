@@ -10,7 +10,7 @@ allprojects  {
   repositories { jcenter(); }
 
   group = 'de.lmu.ifi.dbs.elki'
-  version = '0.7.2-SNAPSHOT'
+  version = '0.7.5'
 
   sourceCompatibility = 1.8
   targetCompatibility = 1.8

@@ -1,6 +1,6 @@
 ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2016
+Copyright (C) 2019
 ELKI Development Team
 
 This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 You can contact the authors at:
 
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-Oettingenstraße 67
-80538 München
+Prof. Dr. Erich Schubert
+Technische Universität Dortmund
+Fachbereich Informatik
+Lehrstuhl für Künstliche Intelligenz, LS VIII
+44221 Dortmund
 GERMANY
 
 or via email at elki@dbs.ifi.lmu.de
