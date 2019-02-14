@@ -9,7 +9,8 @@ def unusedSignPom(pom) { pom.withXml {
   }
 } }
 
-if (needsSigning) { subprojects { // We only publish subprojects
+subprojects { // We only publish subprojects
+if (needsSigning && publishing.publications) {
   apply plugin: 'signing'
   task signPom(type: Sign) {
     sign project.file("${project.buildDir}/publications/maven/pom-default.xml")
@@ -24,7 +25,9 @@ if (needsSigning) { subprojects { // We only publish subprojects
   }
   model {
     // tasks.publishMavenPublicationToMavenLocal { dependsOn project.tasks.withType(Sign) }
-    tasks.publishMavenPublicationToMavenRepository { dependsOn project.tasks.withType(Sign) }
+    if (project.hasProperty("sonatypeUsername")) {
+      tasks.publishMavenPublicationToMavenRepository { dependsOn project.tasks.withType(Sign) }
+    }
     tasks.signPom { dependsOn tasks.generatePomFileForMavenPublication }
   }
 } }

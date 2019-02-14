@@ -1,7 +1,8 @@
 // Add some metadata for MavenCentral
 def customizePom(pom, project) { pom.withXml {
+  asNode().appendNode("name", project.description)
+  asNode().appendNode("description", project.description + " – Open-Source Data-Mining Framework with Index Acceleration")
   asNode().children().last() + {
-    name project.description
     url 'https://elki-project.github.io/'
     resolveStrategy = Closure.DELEGATE_FIRST
     issueManagement {
@@ -71,7 +72,9 @@ subprojects {
     into "$project.buildDir/libs/lib"
   }
   jar.dependsOn collectDependencies
+}
 
+configure(subprojects.findAll {it.name != 'elki-bundle'}) {
   publishing {
     publications {
       maven(MavenPublication) {

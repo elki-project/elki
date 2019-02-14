@@ -130,9 +130,7 @@ javadoc.dependsOn copyMoreDocResources
 assemble.dependsOn shadowJar
 artifacts.archives shadowJar
 
-// Maven publishing plugin
-publishing.publications {
-  shadow(MavenPublication) {
-    project.shadow.component(it)
-  }
+// bundle does not belong onto Maven
+tasks.withType(PublishToMavenRepository) {
+    enabled = false
 }
