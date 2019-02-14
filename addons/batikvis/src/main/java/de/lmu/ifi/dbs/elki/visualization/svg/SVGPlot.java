@@ -83,7 +83,7 @@ public class SVGPlot {
   /**
    * Default JPEG quality setting
    */
-  public static final double DEFAULT_QUALITY = 0.85;
+  public static final float DEFAULT_QUALITY = 0.85f;
 
   /**
    * Attribute to block export of element.
@@ -530,7 +530,7 @@ public class SVGPlot {
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
    */
-  public void saveAsJPEG(File file, int width, int height, double quality) throws IOException, TranscoderException {
+  public void saveAsJPEG(File file, int width, int height, float quality) throws IOException, TranscoderException {
     JPEGTranscoder t = new JPEGTranscoder();
     t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(height));
@@ -564,7 +564,7 @@ public class SVGPlot {
    * @throws TransformerException on transcoding errors
    * @throws ClassNotFoundException when the transcoder was not installed
    */
-  public void saveAsANY(File file, int width, int height, double quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
+  public void saveAsANY(File file, int width, int height, float quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
     String extension = FileUtil.getFilenameExtension(file);
     if("svg".equals(extension)) {
       saveAsSVG(file);

@@ -22,21 +22,31 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -47,6 +57,7 @@ import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
@@ -117,14 +128,19 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     private JMenuItem quitItem;
 
     /**
-     * The "Export" button, to save the image
+     * The "Export Image" button, to save the image
      */
     private JMenuItem exportItem;
 
     /**
+     * The "Write to CSV" button, to invoce the text writer.
+     */
+    private JMenuItem writeItem;
+
+    /**
      * The "tabular edit" item.
      */
-    private JMenuItem editItem;
+    // private JMenuItem editItem;
 
     /**
      * The "Visualizers" button, to enable/disable visualizers
@@ -159,10 +175,15 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       exportItem.addActionListener((e) -> saveCurrentPlot());
       filemenu.add(exportItem);
 
-      editItem = new JMenuItem("Table View/Edit");
-      editItem.setMnemonic(KeyEvent.VK_T);
-      editItem.addActionListener((e) -> showTableView());
-      // FIXME: re-add when it is working again.
+      writeItem = new JMenuItem("Write Data to Folder");
+      writeItem.setMnemonic(KeyEvent.VK_W);
+      writeItem.addActionListener((e) -> invokeTextWriter());
+      filemenu.add(writeItem);
+
+      // editItem = new JMenuItem("Table View/Edit");
+      // editItem.setMnemonic(KeyEvent.VK_T);
+      // editItem.addActionListener((e) -> showTableView());
+      // FIXME: re-add, only for dynamic database, when it is functional again.
       // filemenu.add(editItem);
 
       quitItem = new JMenuItem("Quit");
@@ -341,6 +362,15 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
      */
     public void enableExport(boolean b) {
       exportItem.setEnabled(b);
+    }
+
+    /**
+     * Enable / disable the writer menu.
+     *
+     * @param b Flag
+     */
+    public void enableWriter(boolean b) {
+      writeItem.setEnabled(b);
     }
   }
 
@@ -527,6 +557,78 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     final SVGPlot currentPlot = svgCanvas.getPlot();
     if(currentPlot != null) {
       SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
+    }
+  }
+
+  /**
+   * Save/export the current plot.
+   */
+  protected void invokeTextWriter() {
+    JOptionPane.showMessageDialog(this, //
+        "This function is a minimal call to TextWriter with default options.\n" + //
+            "You currently cannot select what data is written, or how.\n" + //
+            "Some results cannot be written to text files at all.\n" + //
+            "There will not be a 'success' or 'failure' message in the UI.\n" + //
+            "For full control, please use the Java API.", "Notice", JOptionPane.WARNING_MESSAGE);
+
+    JFileChooser fc = new JFileChooser(new File("."));
+    fc.setDialogTitle("Choose Folder to Write to");
+    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    TextWriterPanel optionsPanel = new TextWriterPanel();
+    fc.setAccessory(optionsPanel);
+    int ret = fc.showSaveDialog(null);
+    if(ret == JFileChooser.APPROVE_OPTION) {
+      File file = fc.getSelectedFile();
+      boolean gzip = optionsPanel.compress.isSelected();
+      String filtertext = optionsPanel.filterField.getText();
+      try {
+        Pattern filter = filtertext.isEmpty() ? null : Pattern.compile(filtertext);
+        new ResultWriter(file, gzip, false, filter).processNewResult(context.getHierarchy(), context.getBaseResult());
+      }
+      catch(PatternSyntaxException e) {
+        JOptionPane.showMessageDialog(this, "Filter pattern was not a valid regular expression.", //
+            "Pattern error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+
+  /**
+   * Simple configuration panel for the text output.
+   *
+   * @author Erich Schubert
+   */
+  private class TextWriterPanel extends JPanel {
+    /**
+     * Serial version.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Compression option.
+     */
+    JCheckBox compress;
+
+    /**
+     * Filter text field.
+     */
+    JTextField filterField;
+
+    /**
+     * Constructor.
+     */
+    public TextWriterPanel() {
+      this.setLayout(new GridBagLayout());
+      GridBagConstraints c = new GridBagConstraints();
+      c.gridx = 0;
+      c.anchor = GridBagConstraints.WEST;
+      c.ipadx = 2;
+
+      this.add(compress = new JCheckBox("Compress output (gzip)"), c);
+      compress.setSelected(true);
+
+      this.add(new JLabel("Result filter:"), c);
+      c.fill = GridBagConstraints.HORIZONTAL;
+      this.add(filterField = new JTextField(), c);
     }
   }
 

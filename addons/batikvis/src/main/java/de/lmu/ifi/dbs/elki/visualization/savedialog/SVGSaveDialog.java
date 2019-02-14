@@ -117,18 +117,15 @@ public final class SVGSaveDialog {
    * @return Result from {@link JFileChooser#showSaveDialog}
    */
   public static int showSaveDialog(SVGPlot plot, int width, int height) {
-    double quality = 1.0;
-    int ret = -1;
-
     JFileChooser fc = new JFileChooser(new File("."));
     fc.setDialogTitle(DEFAULT_TITLE);
     // fc.setFileFilter(new ImageFilter());
     SaveOptionsPanel optionsPanel = new SaveOptionsPanel(fc, width, height);
     fc.setAccessory(optionsPanel);
 
-    ret = fc.showSaveDialog(null);
-    fc.setDialogTitle("Saving... Please wait.");
+    int ret = fc.showSaveDialog(null);
     if(ret == JFileChooser.APPROVE_OPTION) {
+      fc.setDialogTitle("Saving... Please wait.");
       File file = fc.getSelectedFile();
       String format = optionsPanel.getSelectedFormat();
       width = optionsPanel.getSelectedWidth();
@@ -141,7 +138,7 @@ public final class SVGSaveDialog {
           showError(fc, "Error saving image.", "File format not recognized.");
         }
         else if("jpeg".equals(format) || "jpg".equals(format)) {
-          quality = optionsPanel.getJPEGQuality();
+          float quality = optionsPanel.getJPEGQuality();
           plot.saveAsJPEG(file, width, height, quality);
         }
         else if("png".equals(format)) {
@@ -192,7 +189,7 @@ public final class SVGSaveDialog {
   public static String guessFormat(String name) {
     String ext = FileUtil.getFilenameExtension(name);
     for(String format : FORMATS) {
-      if(format.equals(ext)) {
+      if(format.equalsIgnoreCase(ext)) {
         return ext;
       }
     }

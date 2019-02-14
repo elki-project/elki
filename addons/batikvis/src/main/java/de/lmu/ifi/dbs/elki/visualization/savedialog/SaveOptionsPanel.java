@@ -20,16 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.savedialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.File;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -38,8 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * A component (JPanel) which can be displayed in the save dialog to show
@@ -49,61 +41,35 @@ import javax.swing.event.ChangeListener;
  * @since 0.2
  */
 public class SaveOptionsPanel extends JPanel {
-  // TODO: externalize strings
-  private static final String STR_IMAGE_SIZE = "Size options:";
+  private static final String STR_CHOOSE_FORMAT = "Format";
 
-  private static final String STR_JPEG_QUALITY = "Quality:";
+  private static final String STR_IMAGE_WIDTH = "Width";
 
-  private static final String STR_IMAGE_HEIGHT = "Height:";
+  private static final String STR_IMAGE_HEIGHT = "Height";
 
-  private static final String STR_IMAGE_WIDTH = "Width:";
+  private static final String STR_LOCK_ASPECT_RATIO = "Ratio lock";
 
-  private static final String STR_CHOOSE_FORMAT = "Choose format:";
-
-  private static final String STR_RESET_IMAGE_SIZE = "Reset image size";
-
-  private static final String STR_LOCK_ASPECT_RATIO = "Lock aspect ratio";
+  private static final String STR_JPEG_QUALITY = "Quality";
 
   /**
    * Serial version.
    */
   private static final long serialVersionUID = 1L;
 
-  /** The fileChooser on which this panel is installed. */
-  private JFileChooser fc;
-
   /** Ratio for easier size adjustment */
   double ratio = 16.0 / 10.0;
 
-  /** Main panel */
-  private JPanel mainPanel;
+  protected JSpinner spinnerWidth, spinnerHeight, spinnerQual;
 
-  /** Shows quality info when saving as JPEG. */
-  private JPanel qualPanel;
+  protected SpinnerNumberModel modelWidth, modelHeight, modelQual;
 
-  /** If saving as JPEG/PNG show width/height infos here. */
-  private JPanel sizePanel;
-
-  protected JSpinner spinnerWidth;
-
-  protected JSpinner spinnerHeight;
-
-  protected JSpinner spinnerQual;
-
-  protected SpinnerNumberModel modelWidth;
-
-  protected SpinnerNumberModel modelHeight;
-
-  protected SpinnerNumberModel modelQuality;
-
-  protected JCheckBox aspectRatioLock;
+  protected JCheckBox checkAspectRatio;
 
   protected JButton resetSizeButton;
 
   protected JComboBox<String> formatSelector;
 
-  // Not particularly useful for most - hide it for now.
-  private final boolean hasResetButton = false;
+  private JLabel labelWidth, labelHeight, labelQual;
 
   /**
    * Construct a new Save Options Panel.
@@ -113,128 +79,72 @@ public class SaveOptionsPanel extends JPanel {
    * @param height Default image height
    */
   public SaveOptionsPanel(JFileChooser fc, final int width, final int height) {
-    this.ratio = (double) width / (double) height;
-    this.fc = fc;
+    this.setLayout(new GridBagLayout());
+    GridBagConstraints left = new GridBagConstraints(),
+        right = new GridBagConstraints(), both = new GridBagConstraints();
+    left.gridx = 0;
+    left.anchor = GridBagConstraints.WEST;
+    left.ipadx = 2;
+    right.gridx = 1;
+    right.weightx = 1;
+    right.anchor = GridBagConstraints.WEST;
+    right.ipadx = 2;
+    both.gridx = 0;
+    both.gridwidth = 2;
+    both.ipadx = 2;
 
-    mainPanel = new JPanel();
-    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-
-    sizePanel = new JPanel();
-    sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.Y_AXIS));
-    sizePanel.setBorder(BorderFactory.createTitledBorder(STR_IMAGE_SIZE));
-
-    // *** Format panel
-    mainPanel.add(new JLabel(STR_CHOOSE_FORMAT));
-
-    formatSelector = new JComboBox<>(SVGSaveDialog.getVisibleFormats());
+    this.add(new JLabel(STR_CHOOSE_FORMAT), left);
+    this.add(formatSelector = new JComboBox<>(SVGSaveDialog.getVisibleFormats()), right);
     formatSelector.setSelectedIndex(0);
-    formatSelector.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        if(e.getItem() != null) {
-          String format = (String) formatSelector.getSelectedItem();
-          setFormat(format);
-        }
-      }
-    });
-    mainPanel.add(formatSelector);
-
-    // *** Size panel
-    JPanel widthPanel = new JPanel();
-    JPanel heightPanel = new JPanel();
-    widthPanel.add(new JLabel(STR_IMAGE_WIDTH));
-    heightPanel.add(new JLabel(STR_IMAGE_HEIGHT));
-
-    // size models
-    modelWidth = new SpinnerNumberModel(width, 0, 100000, 1);
-    modelHeight = new SpinnerNumberModel(height, 0, 100000, 1);
+    formatSelector.addItemListener((e) -> setFormat((String) e.getItem()));
 
     // size spinners
-    spinnerWidth = new JSpinner(modelWidth);
-    spinnerWidth.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        if(aspectRatioLock.isSelected()) {
-          spinnerHeight.setValue((int) Math.round(modelWidth.getNumber().intValue() / ratio));
-        }
+    modelWidth = new SpinnerNumberModel(width, 0, 90000, 1);
+    this.add(labelWidth = new JLabel(STR_IMAGE_WIDTH), left);
+    this.add(spinnerWidth = new JSpinner(modelWidth), right);
+    spinnerWidth.addChangeListener((e) -> {
+      if(checkAspectRatio.isSelected()) {
+        spinnerHeight.setValue((int) Math.round(modelWidth.getNumber().intValue() / ratio));
       }
     });
-    widthPanel.add(spinnerWidth);
 
-    spinnerHeight = new JSpinner(modelHeight);
-    spinnerHeight.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        if(aspectRatioLock.isSelected()) {
-          spinnerWidth.setValue((int) Math.round(modelHeight.getNumber().intValue() * ratio));
-        }
+    modelHeight = new SpinnerNumberModel(height, 0, 90000, 1);
+    this.add(labelHeight = new JLabel(STR_IMAGE_HEIGHT), left);
+    this.add(spinnerHeight = new JSpinner(modelHeight), right);
+    spinnerHeight.addChangeListener((e) -> {
+      if(checkAspectRatio.isSelected()) {
+        spinnerWidth.setValue((int) Math.round(modelHeight.getNumber().intValue() * ratio));
       }
     });
-    heightPanel.add(spinnerHeight);
-
-    // add subpanels
-    sizePanel.add(widthPanel);
-    sizePanel.add(heightPanel);
 
     // aspect lock
-    aspectRatioLock = new JCheckBox(STR_LOCK_ASPECT_RATIO);
-    aspectRatioLock.setSelected(true);
-    // aspectRatioLock.addActionListener(x);
-    sizePanel.add(aspectRatioLock);
+    this.ratio = (double) width / (double) height;
+    checkAspectRatio = new JCheckBox(STR_LOCK_ASPECT_RATIO);
+    checkAspectRatio.setSelected(true);
+    this.add(checkAspectRatio, both);
 
-    // reset size button
-    if(hasResetButton) {
-      resetSizeButton = new JButton(STR_RESET_IMAGE_SIZE);
-      resetSizeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          modelWidth.setValue(Integer.valueOf(width));
-          modelHeight.setValue(Integer.valueOf(height));
-          aspectRatioLock.setSelected(true);
-        }
-      });
-      sizePanel.add(resetSizeButton);
-    }
-
-    mainPanel.add(sizePanel);
-
-    // Quality settings panel
-    qualPanel = new JPanel();
-    // quality settings will not be visible by default (JPEG only)
-    qualPanel.setVisible(false);
-    qualPanel.setLayout(new BoxLayout(qualPanel, BoxLayout.Y_AXIS));
-    qualPanel.setBorder(BorderFactory.createTitledBorder(STR_JPEG_QUALITY));
-    modelQuality = new SpinnerNumberModel(0.7, 0.1, 1.0, 0.1);
-    spinnerQual = new JSpinner(modelQuality);
-    // spinnerQual.addChangeListener(x);
-    qualPanel.add(spinnerQual);
-
-    mainPanel.add(qualPanel);
-
-    add(mainPanel);
+    modelQual = new SpinnerNumberModel(0.75, 0.1, 1.0, 0.05);
+    this.add(labelQual = new JLabel(STR_JPEG_QUALITY), left);
+    this.add(spinnerQual = new JSpinner(modelQual), right);
 
     // setup a listener to react to file name changes
-    this.fc.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if(e.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
-          File file = (File) e.getNewValue();
-          if(file != null && file.getName() != null) {
-            String format = SVGSaveDialog.guessFormat(file.getName());
-            if(format != null) {
-              setFormat(format);
-            }
-          }
+    fc.addPropertyChangeListener((e) -> {
+      if(e.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
+        File file = (File) e.getNewValue();
+        if(file != null && file.getName() != null) {
+          setFormat(SVGSaveDialog.guessFormat(file.getName()));
         }
       }
     });
+
+    setFormat(SVGSaveDialog.VISIBLE_FORMATS[0]);
   }
 
   protected void setFormat(String format) {
     String[] formats = SVGSaveDialog.getVisibleFormats();
     int index = -1;
     for(int i = 0; i < formats.length; i++) {
-      if(formats[i].equals(format)) {
+      if(formats[i].equalsIgnoreCase(format)) {
         index = i;
         break;
       }
@@ -242,38 +152,16 @@ public class SaveOptionsPanel extends JPanel {
     if(index != formatSelector.getSelectedIndex() && index >= 0) {
       formatSelector.setSelectedIndex(index);
     }
-    if("jpeg".equals(format) || "jpg".equals(format)) {
-      sizePanel.setVisible(true);
-      qualPanel.setVisible(true);
-    }
-    else if("png".equals(format)) {
-      sizePanel.setVisible(true);
-      qualPanel.setVisible(false);
-    }
-    else if("pdf".equals(format)) {
-      sizePanel.setVisible(false);
-      qualPanel.setVisible(false);
-      mainPanel.validate();
-    }
-    else if("ps".equals(format)) {
-      sizePanel.setVisible(false);
-      qualPanel.setVisible(false);
-      mainPanel.validate();
-    }
-    else if("eps".equals(format)) {
-      sizePanel.setVisible(false);
-      qualPanel.setVisible(false);
-      mainPanel.validate();
-    }
-    else if("svg".equals(format)) {
-      sizePanel.setVisible(false);
-      qualPanel.setVisible(false);
-      mainPanel.validate();
-    }
-    else {
-      // TODO: what to do on unknown formats?
-      // LoggingUtil.warning("Unrecognized file extension seen: " + format);
-    }
+    boolean jpeg = "jpeg".equalsIgnoreCase(format) || "jpg".equalsIgnoreCase(format);
+    boolean hassize = jpeg || "png".equalsIgnoreCase(format);
+    labelWidth.setVisible(hassize);
+    spinnerWidth.setVisible(hassize);
+    labelHeight.setVisible(hassize);
+    spinnerHeight.setVisible(hassize);
+    checkAspectRatio.setVisible(hassize);
+    labelQual.setVisible(jpeg);
+    spinnerQual.setVisible(jpeg);
+    this.revalidate();
   }
 
   /**
@@ -310,8 +198,8 @@ public class SaveOptionsPanel extends JPanel {
    *
    * @return Quality value for JPEG.
    */
-  public double getJPEGQuality() {
-    double qual = modelQuality.getNumber().doubleValue();
-    return (qual > 1.) ? 1. : (qual < 0.) ? 0. : qual;
+  public float getJPEGQuality() {
+    float qual = modelQual.getNumber().floatValue();
+    return (qual > 1.f) ? 1.f : (qual < 0.f) ? 0.f : qual;
   }
 }
