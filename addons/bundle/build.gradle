@@ -131,6 +131,16 @@ assemble.dependsOn shadowJar
 artifacts.archives shadowJar
 
 // bundle does not belong onto Maven
-tasks.withType(PublishToMavenRepository) {
+if (!isSnapshot && project.hasProperty("signing.gnupg.keyName")) {
+  tasks.withType(PublishToMavenRepository) {
     enabled = false
+  }
+} else { // Publish shadow to maven local, e.g., for jitpack
+  publishing {
+    publications {
+      shadow(MavenPublication) {
+        project.shadow.component(it)
+      }
+    }
+  }
 }

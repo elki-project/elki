@@ -22,7 +22,6 @@ allprojects  {
 
   ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
   ext.isSnapshot = version.endsWith("-SNAPSHOT")
-  ext.needsSigning = !ext.isSnapshot
 
   // For tests depending on other module's tests
   configurations { testOutput.extendsFrom testCompile }

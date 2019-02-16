@@ -1,16 +1,5 @@
-def unusedSignPom(pom) { pom.withXml {
-  // Store pom for signing
-  def pomFile = file("${project.buildDir}/generated-pom.xml")
-  writeTo(pomFile)
-  def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-  artifact(pomAscFile) {
-    classifier = null
-    extension = 'pom.asc'
-  }
-} }
-
 subprojects { // We only publish subprojects
-if (needsSigning && publishing.publications) {
+if (!isSnapshot && project.hasProperty("signing.gnupg.keyName") && publishing.publications) { // Not -bundle
   apply plugin: 'signing'
   task signPom(type: Sign) {
     sign project.file("${project.buildDir}/publications/maven/pom-default.xml")
@@ -19,7 +8,7 @@ if (needsSigning && publishing.publications) {
   }
   signing {
     useGpgCmd()
-    required { needsSigning && gradle.taskGraph.hasTask("uploadArchives") }
+    required { gradle.taskGraph.hasTask("uploadArchives") }
     // sign configurations.archives
     sign publishing.publications.maven
   }

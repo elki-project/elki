@@ -25,12 +25,8 @@ def customizePom(pom, project) { pom.withXml {
       url "https://elki-project.github.io/team"
     }
     developers {
-      developer {
-        name "Erich Schubert"
-      }
-      developer {
-        name "Arthur Zimek"
-      }
+      developer { name "Erich Schubert" }
+      developer { name "Arthur Zimek" }
     }
   }
 } }
@@ -74,7 +70,7 @@ subprojects {
   jar.dependsOn collectDependencies
 }
 
-configure(subprojects.findAll {it.name != 'elki-bundle'}) {
+configure(subprojects.findAll { isSnapshot || !project.hasProperty("signing.gnupg.keyName") || it.name != 'elki-bundle'}) {
   publishing {
     publications {
       maven(MavenPublication) {
@@ -82,22 +78,11 @@ configure(subprojects.findAll {it.name != 'elki-bundle'}) {
         artifact(sourceJar)  { classifier = 'sources' }
         artifact(javadocJar) { classifier = 'javadoc' }
         customizePom(pom, project)
-
-        if (needsSigning && false) {
-          project.tasks.withType(Sign) {
-            signatures.all {
-              def type = it.type.equals('xml.asc') ? 'pom.asc' : it.type
-              artifact source: it.file, classifier: it.classifier, extension: type
-            }
-          }
-        }
       }
-      // if (project.shadow) shadow(MavenPublication) { publication -> project.shadow.component(publication) }
     }
     // For publishing to maven central.
     // Add the sonatype data to gradle.properties!
-    if (project.hasProperty("sonatypeUsername")) {
-    repositories {
+    if (project.hasProperty("sonatypeUsername")) { repositories {
       maven {
         url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
         credentials {
