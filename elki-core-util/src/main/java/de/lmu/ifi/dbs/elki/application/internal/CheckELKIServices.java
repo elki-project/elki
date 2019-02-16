@@ -197,7 +197,7 @@ public class CheckELKIServices {
         StringBuilder message = new StringBuilder().append("Class ").append(prop)//
             .append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
-          message.append("# ").append(remaining).append(FormatUtil.NEWLINE);
+          message.append(remaining).append(FormatUtil.NEWLINE);
         }
         LOG.warning(message.toString());
         return;
@@ -208,7 +208,6 @@ public class CheckELKIServices {
         String fname = update + File.separator + ELKIServiceLoader.FILENAME_PREFIX + prop;
         PrintStream pr = new PrintStream(new FileOutputStream(fname, true));
         pr.println(); // In case there was no linefeed at the end.
-        pr.println("### Automatically appended entries:");
         for(String remaining : sorted) {
           pr.println(remaining);
         }
@@ -237,7 +236,7 @@ public class CheckELKIServices {
     Alias ann = c.getAnnotation(Alias.class);
     if(ann == null) {
       if(parts.length > 1) {
-        StringBuilder buf = new StringBuilder() //
+        StringBuilder buf = new StringBuilder(100) //
             .append("Class ").append(classname) //
             .append(" in ").append(parent.getCanonicalName()) //
             .append(" has the following extraneous aliases:");
@@ -256,7 +255,7 @@ public class CheckELKIServices {
     for(String a : ann.value()) {
       if(!aliases.remove(a)) {
         if(buf == null) {
-          buf = new StringBuilder() //
+          buf = new StringBuilder(100) //
               .append("Class ").append(classname) //
               .append(" in ").append(parent.getCanonicalName()) //
               .append(" is missing the following aliases:");
@@ -265,13 +264,8 @@ public class CheckELKIServices {
       }
     }
     if(!aliases.isEmpty()) {
-      if(buf == null) {
-        buf = new StringBuilder();
-      }
-      else {
-        buf.append(FormatUtil.NEWLINE);
-      }
-      buf.append("Class ").append(classname) //
+      buf = (buf == null ? new StringBuilder() : buf.append(FormatUtil.NEWLINE)) //
+          .append("Class ").append(classname) //
           .append(" in ").append(parent.getCanonicalName()) //
           .append(" has the following extraneous aliases:");
       for(String a : aliases) {
