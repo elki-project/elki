@@ -39,13 +39,13 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @param <O> Object class to process.
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLinear")
-public class LinearAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
+public class LinearSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function
    */
-  public LinearAdapterLinear(NormalizedSimilarityFunction<? super O> similarityFunction) {
+  public LinearSimilarityAdapter(NormalizedSimilarityFunction<? super O> similarityFunction) {
     super(similarityFunction);
   }
 
@@ -87,8 +87,8 @@ public class LinearAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O, NormalizedSimilarityFunction<? super O>> {
     @Override
-    protected LinearAdapterLinear<O> makeInstance() {
-      return new LinearAdapterLinear<>(similarityFunction);
+    protected LinearSimilarityAdapter<O> makeInstance() {
+      return new LinearSimilarityAdapter<>(similarityFunction);
     }
 
     @Override
