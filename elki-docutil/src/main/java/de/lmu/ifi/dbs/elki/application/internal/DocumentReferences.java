@@ -123,8 +123,12 @@ public class DocumentReferences {
 
     void writeReference(Reference ref);
 
+    default String nameFor(Class<?> cls) {
+      return cls.getName().replace('$', '.');
+    }
+
     default String linkFor(Class<?> cls) {
-      return cls.getName().replace('.', '/') + ".html";
+      return nameFor(cls).replace('.', '/') + ".html";
     }
 
     default String linkFor(Package name) {
@@ -203,7 +207,7 @@ public class DocumentReferences {
         classdt.appendChild(htmldoc.createTextNode(", "));
       }
       Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-      classa.setAttribute(HTMLUtil.HTML_ID_ATTRIBUTE, cls.getName());
+      classa.setAttribute(HTMLUtil.HTML_ID_ATTRIBUTE, nameFor(cls));
       classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(cls));
       classa.setTextContent(cls.getName());
       classdt.appendChild(classa);
@@ -312,7 +316,7 @@ public class DocumentReferences {
       if(!firstInEntry) {
         out.append(',').lf();
       }
-      out.append('[').append(cls.getName()).append("](./releases/current/doc/") //
+      out.append('[').append(nameFor(cls)).append("](./releases/current/doc/") //
           .append(linkFor(cls)).append(')');
       firstInEntry = false;
     }
