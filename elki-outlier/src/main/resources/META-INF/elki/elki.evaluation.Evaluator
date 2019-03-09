@@ -1,0 +1,7 @@
+elki.evaluation.outlier.ComputeOutlierHistogram de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
+elki.evaluation.outlier.OutlierRankingEvaluation
+elki.evaluation.outlier.OutlierROCCurve de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve
+elki.evaluation.outlier.OutlierPrecisionAtKCurve
+elki.evaluation.outlier.OutlierPrecisionRecallCurve
+elki.evaluation.outlier.OutlierSmROCCurve
+elki.evaluation.outlier.JudgeOutlierScores

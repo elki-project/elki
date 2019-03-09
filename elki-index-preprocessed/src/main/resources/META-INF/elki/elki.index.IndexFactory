@@ -1,0 +1,9 @@
+elki.index.preprocessed.knn.NNDescent$Factory
+elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
+elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
+elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor$Factory
+elki.index.preprocessed.knn.RandomSampleKNNPreprocessor$Factory
+elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocessor$Factory
+elki.index.preprocessed.knn.SpacefillingKNNPreprocessor$Factory
+elki.index.preprocessed.knn.NaiveProjectedKNNPreprocessor$Factory
+elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor$Factory

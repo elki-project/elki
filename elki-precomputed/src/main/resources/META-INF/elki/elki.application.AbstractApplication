@@ -1,0 +1,5 @@
+elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
+elki.application.cache.CacheFloatDistanceInOnDiskMatrix
+elki.application.cache.CacheDoubleDistanceKNNLists
+elki.application.cache.CacheDoubleDistanceRangeQueries
+elki.application.cache.PrecomputeDistancesAsciiApplication

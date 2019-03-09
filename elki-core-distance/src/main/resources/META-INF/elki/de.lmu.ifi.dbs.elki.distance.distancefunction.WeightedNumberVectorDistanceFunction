@@ -1,8 +1,0 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedSquaredEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedSquaredPearsonCorrelationDistanceFunction

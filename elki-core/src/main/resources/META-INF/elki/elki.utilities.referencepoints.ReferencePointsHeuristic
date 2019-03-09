@@ -1,0 +1,6 @@
+elki.utilities.referencepoints.GridBasedReferencePoints
+elki.utilities.referencepoints.AxisBasedReferencePoints
+elki.utilities.referencepoints.FullDatabaseReferencePoints
+elki.utilities.referencepoints.RandomGeneratedReferencePoints
+elki.utilities.referencepoints.RandomSampleReferencePoints
+elki.utilities.referencepoints.StarBasedReferencePoints

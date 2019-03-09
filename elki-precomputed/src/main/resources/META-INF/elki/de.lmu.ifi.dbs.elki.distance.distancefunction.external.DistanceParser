@@ -1,1 +1,0 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.external.AsciiDistanceParser de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser de.lmu.ifi.dbs.elki.parser.NumberDistanceParser

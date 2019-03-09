@@ -1,0 +1,5 @@
+elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter
+elki.index.tree.spatial.rstarvariants.strategies.split.RTreeQuadraticSplit
+elki.index.tree.spatial.rstarvariants.strategies.split.RTreeLinearSplit
+elki.index.tree.spatial.rstarvariants.strategies.split.AngTanLinearSplit
+elki.index.tree.spatial.rstarvariants.strategies.split.GreeneSplit

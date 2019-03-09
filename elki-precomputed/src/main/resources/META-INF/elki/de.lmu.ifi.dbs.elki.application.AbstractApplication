@@ -1,5 +1,0 @@
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
-de.lmu.ifi.dbs.elki.application.cache.CacheFloatDistanceInOnDiskMatrix
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceKNNLists
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceRangeQueries
-de.lmu.ifi.dbs.elki.application.cache.PrecomputeDistancesAsciiApplication

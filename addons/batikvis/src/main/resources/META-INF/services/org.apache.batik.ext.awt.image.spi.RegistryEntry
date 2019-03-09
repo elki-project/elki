@@ -1,3 +1,3 @@
-de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry
+elki.visualization.batikutil.ThumbnailRegistryEntry
 # BUG FIX for Batik 1.8
 org.apache.batik.ext.awt.image.codec.png.PNGRegistryEntry

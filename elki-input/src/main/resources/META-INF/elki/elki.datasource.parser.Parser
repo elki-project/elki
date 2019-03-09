@@ -1,0 +1,10 @@
+elki.datasource.parser.NumberVectorLabelParser de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser
+elki.datasource.parser.ArffParser
+elki.datasource.parser.SparseNumberVectorLabelParser
+elki.datasource.parser.LibSVMFormatParser
+elki.datasource.parser.CategorialDataAsNumberVectorParser
+elki.datasource.parser.TermFrequencyParser
+elki.datasource.parser.BitVectorLabelParser de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser
+elki.datasource.parser.SimplePolygonParser
+elki.datasource.parser.StringParser
+elki.datasource.parser.SimpleTransactionParser

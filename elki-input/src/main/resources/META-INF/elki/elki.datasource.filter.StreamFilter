@@ -1,0 +1,20 @@
+elki.datasource.filter.NoOpFilter
+elki.datasource.filter.typeconversions.ClassLabelFromPatternFilter de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFromPatternFilter
+elki.datasource.filter.typeconversions.MultivariateTimeSeriesFilter
+elki.datasource.filter.selection.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.FilterByLabelFilter
+elki.datasource.filter.selection.FirstNStreamFilter
+elki.datasource.filter.selection.RandomSamplingStreamFilter de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
+elki.datasource.filter.cleaning.VectorDimensionalityFilter
+elki.datasource.filter.cleaning.DropNaNFilter de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter
+elki.datasource.filter.cleaning.ReplaceNaNWithRandomFilter de.lmu.ifi.dbs.elki.datasource.filter.ReplaceNaNWithRandomFilter
+elki.datasource.filter.cleaning.NoMissingValuesFilter de.lmu.ifi.dbs.elki.datasource.filter.FilterNoMissingValuesFilter de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
+elki.datasource.filter.normalization.instancewise.LengthNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
+elki.datasource.filter.normalization.instancewise.HellingerHistogramNormalization
+elki.datasource.filter.normalization.instancewise.InstanceMeanVarianceNormalization
+elki.datasource.filter.normalization.instancewise.InstanceMinMaxNormalization
+elki.datasource.filter.normalization.instancewise.InstanceRankNormalization
+elki.datasource.filter.normalization.instancewise.InstanceLogRankNormalization
+elki.datasource.filter.normalization.instancewise.Log1PlusNormalization
+elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter
+elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter
+elki.datasource.filter.transform.HistogramJitterFilter de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter

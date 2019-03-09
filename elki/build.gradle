@@ -26,7 +26,7 @@ jar {
       eachEntry { it.value = it.value.replace('${project.version}', project.version) }
     }
     attributes(
-      "Main-Class" : "de.lmu.ifi.dbs.elki.application.ELKILauncher",
+      "Main-Class" : "elki.application.ELKILauncher",
       "Class-Path": configurations.runtime.collect { "lib/"+it.getName() }.join(' ')
     )
   }

@@ -20,10 +20,10 @@
  */
 package tutorial.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import elki.data.NumberVector;
+import elki.data.type.SimpleTypeInformation;
+import elki.data.type.TypeUtil;
+import elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 
 /**
  * Tutorial distance function example for ELKI.

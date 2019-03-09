@@ -1,0 +1,10 @@
+elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK single-link single-linkage
+elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
+elki.algorithm.clustering.hierarchical.NNChain
+elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+elki.algorithm.clustering.hierarchical.CLINK Defays
+elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
+elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
+elki.algorithm.clustering.hierarchical.MiniMaxAnderberg
+elki.algorithm.clustering.hierarchical.MiniMaxNNChain
+elki.algorithm.clustering.hierarchical.MiniMax

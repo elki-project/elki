@@ -1,0 +1,6 @@
+elki.algorithm.clustering.gdbscan.EpsilonNeighborPredicate
+elki.algorithm.clustering.gdbscan.SimilarityNeighborPredicate
+elki.algorithm.clustering.gdbscan.COPACNeighborPredicate
+elki.algorithm.clustering.gdbscan.ERiCNeighborPredicate
+elki.algorithm.clustering.gdbscan.FourCNeighborPredicate
+elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate

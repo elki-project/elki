@@ -1,0 +1,7 @@
+elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit str STR
+elki.index.tree.spatial.rstarvariants.strategies.bulk.AdaptiveSortTileRecursiveBulkSplit
+elki.index.tree.spatial.rstarvariants.strategies.bulk.SpatialSortBulkSplit
+elki.index.tree.spatial.rstarvariants.strategies.bulk.MaxExtensionBulkSplit de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.MaxExtensionBulkSplit
+elki.index.tree.spatial.rstarvariants.strategies.bulk.OneDimSortBulkSplit
+elki.index.tree.spatial.rstarvariants.strategies.bulk.FileOrderBulkSplit
+elki.index.tree.spatial.rstarvariants.strategies.bulk.MaxExtensionSortTileRecursiveBulkSplit

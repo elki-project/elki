@@ -1,0 +1,2 @@
+elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert
+elki.index.tree.spatial.rstarvariants.strategies.reinsert.FarReinsert

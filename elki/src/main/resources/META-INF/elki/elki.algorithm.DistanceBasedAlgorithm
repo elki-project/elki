@@ -1,0 +1,20 @@
+elki.algorithm.clustering.optics.DeLiClu de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
+elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
+elki.algorithm.outlier.clustering.CBLOF
+elki.algorithm.outlier.OPTICSOF
+elki.algorithm.outlier.SimpleCOP
+elki.algorithm.statistics.AveragePrecisionAtK
+elki.algorithm.statistics.DistanceQuantileSampler
+elki.algorithm.statistics.DistanceStatisticsWithClasses
+elki.algorithm.statistics.EstimateIntrinsicDimensionality
+elki.algorithm.statistics.EvaluateRankingQuality
+elki.algorithm.statistics.EvaluateRetrievalPerformance
+elki.algorithm.statistics.HopkinsStatisticClusteringTendency
+elki.algorithm.statistics.RangeQuerySelectivity
+elki.algorithm.statistics.RankingQualityHistogram
+elki.algorithm.benchmark.KNNBenchmarkAlgorithm
+elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
+elki.algorithm.benchmark.ValidateApproximativeKNNIndex
+elki.algorithm.DependencyDerivator
+elki.algorithm.KNNDistancesSampler de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
+elki.algorithm.KNNJoin

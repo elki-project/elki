@@ -1,0 +1,3 @@
+elki.index.tree.metrical.mtreevariants.strategies.split.distribution.GeneralizedHyperplaneDistribution
+elki.index.tree.metrical.mtreevariants.strategies.split.distribution.BalancedDistribution
+elki.index.tree.metrical.mtreevariants.strategies.split.distribution.FarthestBalancedDistribution

@@ -1,3 +1,0 @@
-de.lmu.ifi.dbs.elki.index.lsh.hashfamilies.EuclideanHashFunctionFamily
-de.lmu.ifi.dbs.elki.index.lsh.hashfamilies.ManhattanHashFunctionFamily
-de.lmu.ifi.dbs.elki.index.lsh.hashfamilies.CosineHashFunctionFamily

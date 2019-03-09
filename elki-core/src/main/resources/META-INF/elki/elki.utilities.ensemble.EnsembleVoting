@@ -1,0 +1,6 @@
+elki.utilities.ensemble.EnsembleVotingMean
+elki.utilities.ensemble.EnsembleVotingMin
+elki.utilities.ensemble.EnsembleVotingMax
+elki.utilities.ensemble.EnsembleVotingMedian
+elki.utilities.ensemble.EnsembleVotingMultiplicative
+elki.utilities.ensemble.EnsembleVotingInverseMultiplicative
