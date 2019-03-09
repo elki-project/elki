@@ -1,0 +1,2 @@
+elki.index.distancematrix.PrecomputedDistanceMatrix$Factory
+elki.index.distancematrix.PrecomputedSimilarityMatrix$Factory

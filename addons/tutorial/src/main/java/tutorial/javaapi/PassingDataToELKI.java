@@ -20,23 +20,23 @@
  */
 package tutorial.javaapi;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import elki.algorithm.clustering.kmeans.KMeansLloyd;
+import elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
+import elki.data.Cluster;
+import elki.data.Clustering;
+import elki.data.NumberVector;
+import elki.data.model.KMeansModel;
+import elki.data.type.TypeUtil;
+import elki.database.Database;
+import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRange;
+import elki.database.relation.Relation;
+import elki.datasource.ArrayAdapterDatabaseConnection;
+import elki.datasource.DatabaseConnection;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.logging.LoggingConfiguration;
+import elki.utilities.random.RandomFactory;
 
 /**
  * Example program to generate a random data set, and run k-means on it.

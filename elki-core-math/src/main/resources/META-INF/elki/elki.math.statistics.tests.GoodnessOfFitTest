@@ -1,0 +1,3 @@
+elki.math.statistics.tests.KolmogorovSmirnovTest
+elki.math.statistics.tests.WelchTTest
+elki.math.statistics.tests.StandardizedTwoSampleAndersonDarlingTest

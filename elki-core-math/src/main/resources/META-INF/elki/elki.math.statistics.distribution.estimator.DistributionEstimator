@@ -1,0 +1,46 @@
+elki.math.statistics.distribution.estimator.meta.BestFitEstimator
+elki.math.statistics.distribution.estimator.meta.TrimmedEstimator
+elki.math.statistics.distribution.estimator.meta.WinsorizingEstimator de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.WinsorisingEstimator
+elki.math.statistics.distribution.estimator.NormalMOMEstimator
+elki.math.statistics.distribution.estimator.NormalMADEstimator
+elki.math.statistics.distribution.estimator.NormalLMMEstimator
+elki.math.statistics.distribution.estimator.GammaMOMEstimator
+elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator
+elki.math.statistics.distribution.estimator.GammaLMMEstimator
+elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator
+elki.math.statistics.distribution.estimator.LogNormalLogMADEstimator
+elki.math.statistics.distribution.estimator.LogNormalLMMEstimator
+elki.math.statistics.distribution.estimator.LogNormalBilkovaLMMEstimator
+elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator
+elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator
+elki.math.statistics.distribution.estimator.ExpGammaExpMOMEstimator
+elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator
+elki.math.statistics.distribution.estimator.UniformMinMaxEstimator
+elki.math.statistics.distribution.estimator.UniformMADEstimator
+elki.math.statistics.distribution.estimator.UniformLMMEstimator
+elki.math.statistics.distribution.estimator.ExponentialMOMEstimator
+elki.math.statistics.distribution.estimator.ExponentialMADEstimator
+elki.math.statistics.distribution.estimator.ExponentialMedianEstimator
+elki.math.statistics.distribution.estimator.ExponentialLMMEstimator
+elki.math.statistics.distribution.estimator.LaplaceMLEEstimator
+elki.math.statistics.distribution.estimator.LaplaceMADEstimator
+elki.math.statistics.distribution.estimator.LaplaceLMMEstimator
+elki.math.statistics.distribution.estimator.LogisticMADEstimator
+elki.math.statistics.distribution.estimator.LogisticLMMEstimator
+elki.math.statistics.distribution.estimator.LogLogisticMADEstimator
+elki.math.statistics.distribution.estimator.GeneralizedLogisticAlternateLMMEstimator
+elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMMEstimator
+elki.math.statistics.distribution.estimator.GeneralizedParetoLMMEstimator
+elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
+elki.math.statistics.distribution.estimator.WeibullLMMEstimator
+elki.math.statistics.distribution.estimator.GumbelMADEstimator
+elki.math.statistics.distribution.estimator.GumbelLMMEstimator
+elki.math.statistics.distribution.estimator.CauchyMADEstimator
+elki.math.statistics.distribution.estimator.RayleighMADEstimator
+elki.math.statistics.distribution.estimator.RayleighMLEEstimator
+elki.math.statistics.distribution.estimator.RayleighLMMEstimator
+elki.math.statistics.distribution.estimator.InverseGaussianMLEstimator de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMLEstimator
+elki.math.statistics.distribution.estimator.InverseGaussianMOMEstimator de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator
+elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator
+elki.math.statistics.distribution.estimator.NormalLevenbergMarquardtKDEEstimator
+elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator

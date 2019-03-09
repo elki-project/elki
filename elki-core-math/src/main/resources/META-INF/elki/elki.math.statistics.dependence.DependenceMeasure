@@ -1,0 +1,11 @@
+elki.math.statistics.dependence.CorrelationDependenceMeasure
+elki.math.statistics.dependence.SpearmanCorrelationDependenceMeasure
+elki.math.statistics.dependence.DistanceCorrelationDependenceMeasure
+elki.math.statistics.dependence.MutualInformationEquiwidthDependenceMeasure
+elki.math.statistics.dependence.JensenShannonEquiwidthDependenceMeasure
+elki.math.statistics.dependence.HoeffdingsDDependenceMeasure
+elki.math.statistics.dependence.MCEDependenceMeasure
+elki.math.statistics.dependence.SlopeDependenceMeasure
+elki.math.statistics.dependence.SlopeInversionDependenceMeasure
+elki.math.statistics.dependence.HSMDependenceMeasure
+elki.math.statistics.dependence.SURFINGDependenceMeasure

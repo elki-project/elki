@@ -20,14 +20,14 @@
  */
 package tutorial.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import elki.data.NumberVector;
+import elki.data.type.SimpleTypeInformation;
+import elki.data.type.VectorFieldTypeInformation;
+import elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Tutorial example Minowski-distance variation with different exponents for

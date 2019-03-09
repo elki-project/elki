@@ -1,5 +1,0 @@
-de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory rstar r*
-# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory
-# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTreeFactory
-# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTreeFactory
-de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpatialApproximationMaterializeKNNPreprocessor$Factory

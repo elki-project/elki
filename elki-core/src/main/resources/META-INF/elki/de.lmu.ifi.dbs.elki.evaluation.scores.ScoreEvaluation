@@ -1,6 +1,0 @@
-de.lmu.ifi.dbs.elki.evaluation.scores.AveragePrecisionEvaluation
-de.lmu.ifi.dbs.elki.evaluation.scores.NDCGEvaluation
-de.lmu.ifi.dbs.elki.evaluation.scores.MaximumF1Evaluation
-de.lmu.ifi.dbs.elki.evaluation.scores.PrecisionAtKEvaluation
-de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation
-de.lmu.ifi.dbs.elki.evaluation.scores.DCGEvaluation

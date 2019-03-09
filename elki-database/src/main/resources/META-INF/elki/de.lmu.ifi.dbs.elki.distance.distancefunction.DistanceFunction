@@ -1,4 +1,0 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.RandomStableDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.ArccosSimilarityAdapter de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterArccos
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.LinearSimilarityAdapter de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLinear
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.LnSimilarityAdapter de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLn

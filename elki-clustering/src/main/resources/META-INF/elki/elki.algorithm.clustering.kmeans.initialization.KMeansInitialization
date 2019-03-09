@@ -1,0 +1,13 @@
+elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans
+elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FirstKInitialMeans
+elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans
+elki.algorithm.clustering.kmeans.initialization.SampleKMeansInitialization de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SampleKMeansInitialization
+elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FarthestPointsInitialMeans
+elki.algorithm.clustering.kmeans.initialization.FarthestSumPointsInitialMeans
+elki.algorithm.clustering.kmeans.initialization.LABInitialMeans
+elki.algorithm.clustering.kmeans.initialization.OstrovskyInitialMeans
+elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans
+elki.algorithm.clustering.kmeans.initialization.RandomNormalGeneratedInitialMeans
+elki.algorithm.clustering.kmeans.initialization.PredefinedInitialMeans
+elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans
+elki.algorithm.clustering.kmeans.initialization.ParkInitialMeans

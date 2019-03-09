@@ -37,7 +37,7 @@ subprojects {
       include "NOTICE"
       into "META-INF"
     }
-    from("$rootDir/elki/src/main/resources/de/lmu/ifi/dbs/elki/LICENSE.txt") {
+    from("$rootDir/elki/src/main/resources/elki/LICENSE.txt") {
       rename "\\.txt\$", ""
       into "license"
     }

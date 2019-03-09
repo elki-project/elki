@@ -18,7 +18,7 @@ def generate(File inp, File out, Map vals) {
 }
 
 task generateCodeArrays(description: "Generate code from templates") {
-      def pkg = "de/lmu/ifi/dbs/elki/utilities/datastructures/arraylike/";
+      def pkg = "elki/utilities/datastructures/arraylike/";
       def out = new File(generatedSrcDir, pkg);
       def inp = new File(templateDir, pkg);
       def gen = {
@@ -48,7 +48,7 @@ task generateCodeArrays(description: "Generate code from templates") {
 }
 tasks.compileJava.dependsOn generateCodeArrays
 task generateCodeHeaps(description: "Generate code from templates") {
-      def pkg = "de/lmu/ifi/dbs/elki/utilities/datastructures/heap/";
+      def pkg = "elki/utilities/datastructures/heap/";
       def out = new File(generatedSrcDir, pkg);
       def inp = new File(templateDir, pkg);
       def gen = {

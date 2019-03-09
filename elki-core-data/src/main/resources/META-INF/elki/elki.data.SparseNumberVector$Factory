@@ -1,0 +1,6 @@
+elki.data.SparseFloatVector$Factory
+elki.data.SparseDoubleVector$Factory
+elki.data.SparseByteVector$Factory
+elki.data.SparseIntegerVector$Factory
+elki.data.SparseShortVector$Factory
+elki.data.BitVector$Factory

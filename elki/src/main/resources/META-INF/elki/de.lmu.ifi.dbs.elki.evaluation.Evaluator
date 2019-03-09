@@ -1,6 +1,0 @@
-de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation
-de.lmu.ifi.dbs.elki.evaluation.NoAutomaticEvaluation
-de.lmu.ifi.dbs.elki.evaluation.index.IndexPurity
-de.lmu.ifi.dbs.elki.evaluation.index.IndexStatistics
-de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierThresholdClustering
-de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage

@@ -1,0 +1,5 @@
+elki.application.KDDCLIApplication cli kddtask
+elki.application.greedyensemble.ComputeKNNOutlierScores
+elki.application.greedyensemble.GreedyEnsembleExperiment
+elki.application.greedyensemble.EvaluatePrecomputedOutlierScores
+elki.application.experiments.EvaluateIntrinsicDimensionalityEstimators

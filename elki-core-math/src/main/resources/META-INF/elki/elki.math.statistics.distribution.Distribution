@@ -1,0 +1,29 @@
+elki.math.statistics.distribution.UniformDistribution de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution
+elki.math.statistics.distribution.NormalDistribution GaussianDistribution normal gauss
+elki.math.statistics.distribution.ExponentialDistribution
+elki.math.statistics.distribution.GammaDistribution de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.GammaDistribution
+elki.math.statistics.distribution.BetaDistribution
+elki.math.statistics.distribution.CauchyDistribution
+elki.math.statistics.distribution.ChiDistribution
+elki.math.statistics.distribution.ChiSquaredDistribution
+elki.math.statistics.distribution.LaplaceDistribution DoubleExponentialDistribution
+elki.math.statistics.distribution.LogisticDistribution log
+elki.math.statistics.distribution.LogLogisticDistribution fisk loglog
+elki.math.statistics.distribution.GeneralizedLogisticDistribution
+elki.math.statistics.distribution.GeneralizedLogisticAlternateDistribution
+elki.math.statistics.distribution.LogNormalDistribution lognormal
+elki.math.statistics.distribution.SkewGeneralizedNormalDistribution
+elki.math.statistics.distribution.LogGammaDistribution
+elki.math.statistics.distribution.ExpGammaDistribution
+elki.math.statistics.distribution.PoissonDistribution
+elki.math.statistics.distribution.StudentsTDistribution
+elki.math.statistics.distribution.WeibullDistribution
+elki.math.statistics.distribution.GumbelDistribution
+elki.math.statistics.distribution.GeneralizedExtremeValueDistribution
+elki.math.statistics.distribution.GeneralizedParetoDistribution
+elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution exgaussian
+elki.math.statistics.distribution.RayleighDistribution
+elki.math.statistics.distribution.InverseGaussianDistribution de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution invgauss wald
+elki.math.statistics.distribution.KappaDistribution
+elki.math.statistics.distribution.ConstantDistribution
+elki.math.statistics.distribution.HaltonUniformDistribution

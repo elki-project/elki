@@ -1,0 +1,63 @@
+elki.algorithm.outlier.anglebased.ABOD de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD abod
+elki.algorithm.outlier.anglebased.FastABOD de.lmu.ifi.dbs.elki.algorithm.outlier.FastABOD fastabod
+elki.algorithm.outlier.anglebased.LBABOD de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD lb-abod
+elki.algorithm.outlier.COP
+elki.algorithm.outlier.distance.DBOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
+elki.algorithm.outlier.distance.DBOutlierScore de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
+elki.algorithm.outlier.distance.HilOut de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
+elki.algorithm.outlier.distance.KNNOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier knno
+elki.algorithm.outlier.distance.KNNWeightOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier knnw
+elki.algorithm.outlier.distance.KNNDD
+elki.algorithm.outlier.distance.LocalIsolationCoefficient
+elki.algorithm.outlier.distance.ODIN de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
+elki.algorithm.outlier.distance.parallel.ParallelKNNOutlier
+elki.algorithm.outlier.distance.parallel.ParallelKNNWeightOutlier
+elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
+elki.algorithm.outlier.distance.KNNSOS
+elki.algorithm.outlier.distance.SOS
+elki.algorithm.outlier.DWOF
+elki.algorithm.outlier.GaussianModel
+elki.algorithm.outlier.GaussianUniformMixture
+elki.algorithm.outlier.lof.LOF de.lmu.ifi.dbs.elki.algorithm.outlier.LOF
+elki.algorithm.outlier.lof.parallel.ParallelLOF
+elki.algorithm.outlier.lof.ALOCI de.lmu.ifi.dbs.elki.algorithm.outlier.ALOCI
+elki.algorithm.outlier.lof.COF
+elki.algorithm.outlier.lof.FlexibleLOF
+elki.algorithm.outlier.lof.INFLO de.lmu.ifi.dbs.elki.algorithm.outlier.INFLO
+elki.algorithm.outlier.lof.KDEOS
+elki.algorithm.outlier.lof.LDF de.lmu.ifi.dbs.elki.algorithm.outlier.LDF
+elki.algorithm.outlier.lof.LDOF de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF
+elki.algorithm.outlier.lof.LOCI de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI
+elki.algorithm.outlier.lof.LoOP de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP
+elki.algorithm.outlier.lof.OnlineLOF de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF
+elki.algorithm.outlier.lof.SimplifiedLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleLOF
+elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
+elki.algorithm.outlier.lof.SimpleKernelDensityLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleKernelDensityLOF
+elki.algorithm.outlier.lof.VarianceOfVolume
+elki.algorithm.outlier.subspace.AggarwalYuEvolutionary de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary
+elki.algorithm.outlier.subspace.AggarwalYuNaive de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuNaive
+elki.algorithm.outlier.subspace.OUTRES
+elki.algorithm.outlier.subspace.SOD de.lmu.ifi.dbs.elki.algorithm.outlier.SOD
+elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
+elki.algorithm.outlier.spatial.CTLuMeanMultipleAttributes
+elki.algorithm.outlier.spatial.CTLuMedianAlgorithm
+elki.algorithm.outlier.spatial.CTLuMedianMultipleAttributes
+elki.algorithm.outlier.spatial.CTLuMoranScatterplotOutlier
+elki.algorithm.outlier.spatial.CTLuRandomWalkEC
+elki.algorithm.outlier.spatial.CTLuScatterplotOutlier
+elki.algorithm.outlier.spatial.CTLuZTestOutlier
+elki.algorithm.outlier.spatial.SLOM
+elki.algorithm.outlier.spatial.SOF
+elki.algorithm.outlier.spatial.TrimmedMeanApproach
+elki.algorithm.outlier.intrinsic.IDOS
+elki.algorithm.outlier.intrinsic.ISOS
+elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier
+elki.algorithm.outlier.meta.ExternalDoubleOutlierScore
+elki.algorithm.outlier.meta.FeatureBagging
+elki.algorithm.outlier.meta.HiCS
+elki.algorithm.outlier.meta.RescaleMetaOutlierAlgorithm
+elki.algorithm.outlier.meta.SimpleOutlierEnsemble
+elki.algorithm.outlier.trivial.ByLabelOutlier
+elki.algorithm.outlier.trivial.TrivialAllOutlier
+elki.algorithm.outlier.trivial.TrivialNoOutlier
+elki.algorithm.outlier.trivial.TrivialAverageCoordinateOutlier

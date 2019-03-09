@@ -22,12 +22,12 @@ package tutorial.outlier;
 
 import java.util.ArrayList;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
-import de.lmu.ifi.dbs.elki.result.ResultHandler;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.relation.DoubleRelation;
+import elki.result.ResultHandler;
+import elki.result.ResultUtil;
+import elki.result.outlier.OutlierResult;
 
 /**
  * Simple example output handler for processing outlier scores.

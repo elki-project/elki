@@ -1,5 +1,0 @@
-de.lmu.ifi.dbs.elki.application.KDDCLIApplication cli kddtask
-de.lmu.ifi.dbs.elki.application.greedyensemble.ComputeKNNOutlierScores
-de.lmu.ifi.dbs.elki.application.greedyensemble.GreedyEnsembleExperiment
-de.lmu.ifi.dbs.elki.application.greedyensemble.EvaluatePrecomputedOutlierScores
-de.lmu.ifi.dbs.elki.application.experiments.EvaluateIntrinsicDimensionalityEstimators

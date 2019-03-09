@@ -1,0 +1,6 @@
+elki.evaluation.scores.AveragePrecisionEvaluation
+elki.evaluation.scores.NDCGEvaluation
+elki.evaluation.scores.MaximumF1Evaluation
+elki.evaluation.scores.PrecisionAtKEvaluation
+elki.evaluation.scores.ROCEvaluation
+elki.evaluation.scores.DCGEvaluation

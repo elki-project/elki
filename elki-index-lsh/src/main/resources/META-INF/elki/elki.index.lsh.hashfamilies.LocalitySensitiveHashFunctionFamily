@@ -1,0 +1,3 @@
+elki.index.lsh.hashfamilies.EuclideanHashFunctionFamily
+elki.index.lsh.hashfamilies.ManhattanHashFunctionFamily
+elki.index.lsh.hashfamilies.CosineHashFunctionFamily

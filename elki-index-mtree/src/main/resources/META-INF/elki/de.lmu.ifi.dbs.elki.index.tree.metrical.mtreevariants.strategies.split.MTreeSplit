@@ -1,6 +1,0 @@
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MSTSplit
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MLBDistSplit de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MMRadSplit
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MRadSplit de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MRadSplit
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.RandomSplit
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.FarthestPointsSplit

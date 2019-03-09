@@ -1,0 +1,2 @@
+elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment
+elki.index.tree.spatial.rstarvariants.strategies.overflow.SplitOnlyOverflowTreatment

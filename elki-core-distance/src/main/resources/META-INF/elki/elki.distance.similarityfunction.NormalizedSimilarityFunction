@@ -1,0 +1,2 @@
+elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction
+elki.distance.distancefunction.probabilistic.HellingerDistanceFunction hellinger bhattacharyya

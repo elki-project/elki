@@ -1,0 +1,4 @@
+elki.evaluation.classification.holdout.DisjointCrossValidation
+elki.evaluation.classification.holdout.StratifiedCrossValidation
+elki.evaluation.classification.holdout.LeaveOneOut
+elki.evaluation.classification.holdout.RandomizedCrossValidation

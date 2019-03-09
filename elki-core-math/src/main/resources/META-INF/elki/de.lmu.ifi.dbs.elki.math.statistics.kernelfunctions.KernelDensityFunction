@@ -1,8 +1,0 @@
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction epanechnikov
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.CosineKernelDensityFunction
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.UniformKernelDensityFunction
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.TriangularKernelDensityFunction
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.BiweightKernelDensityFunction biweight quartic
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.TriweightKernelDensityFunction triweight
-de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.TricubeKernelDensityFunction
