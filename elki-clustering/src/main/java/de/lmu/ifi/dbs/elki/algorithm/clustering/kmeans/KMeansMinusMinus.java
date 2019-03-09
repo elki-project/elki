@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -225,7 +224,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
         double mindist = Double.POSITIVE_INFINITY;
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < mindist) {
             minIndex = i;
             mindist = dist;

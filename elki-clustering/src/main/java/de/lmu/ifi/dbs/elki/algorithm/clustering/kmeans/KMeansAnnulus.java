@@ -24,7 +24,6 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -138,7 +137,7 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
         double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
         int minIndex = -1, secIndex = -1;
         for(int i = 0; i < k; i++) {
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < min1) {
             secIndex = minIndex;
             minIndex = i;
@@ -171,9 +170,9 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
       for(int i = 0; i < k; i++) {
         cdist[i] = VMath.euclideanLength(means[i]);
         cnum[i] = i;
-        DoubleVector mi = DoubleVector.wrap(means[i]);
+        double[] mi = means[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, DoubleVector.wrap(means[j]));
+          double d = distance(mi, means[j]);
           d = 0.5 * (isSquared ? FastMath.sqrt(d) : d);
           sep[i] = (d < sep[i]) ? d : sep[i];
           sep[j] = (d < sep[j]) ? d : sep[j];
@@ -198,14 +197,14 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, DoubleVector.wrap(means[cur]));
+        double curd2 = distance(fv, means[cur]);
         u = isSquared ? FastMath.sqrt(curd2) : curd2;
         upper.putDouble(it, u);
         if(u <= z || u <= sa) {
           continue;
         }
         final int sec = second.intValue(it);
-        double secd2 = distance(fv, DoubleVector.wrap(means[sec]));
+        double secd2 = distance(fv, means[sec]);
         double secd = isSquared ? FastMath.sqrt(secd2) : secd2;
         double r = u > secd ? u : secd;
         final double norm = EuclideanDistanceFunction.STATIC.norm(fv);
@@ -230,7 +229,7 @@ public class KMeansAnnulus<V extends NumberVector> extends KMeansHamerly<V> {
           if(d > r) {
             break; // No longer a candidate
           }
-          double dist = distance(fv, DoubleVector.wrap(means[c]));
+          double dist = distance(fv, means[c]);
           if(dist < min1) {
             secIndex = minIndex;
             minIndex = c;

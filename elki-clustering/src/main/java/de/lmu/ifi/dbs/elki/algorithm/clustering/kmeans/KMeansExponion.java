@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -137,7 +136,7 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, DoubleVector.wrap(means[cur]));
+        double curd2 = distance(fv, means[cur]);
         u = isSquared ? FastMath.sqrt(curd2) : curd2;
         upper.putDouble(it, u);
         if(u <= z || u <= sa) {
@@ -152,7 +151,7 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
           if(cdist[cur][c] > r) {
             break;
           }
-          double dist = distance(fv, DoubleVector.wrap(means[c]));
+          double dist = distance(fv, means[c]);
           if(dist < min1) {
             minIndex = c;
             min2 = min1;

@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -130,7 +129,7 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
             continue; // Condition #3 i-iii not satisfied
           }
           if(recompute_u) { // Need to update bound? #3a
-            u = distance(fv, DoubleVector.wrap(means[cur]));
+            u = distance(fv, means[cur]);
             u = isSquared ? FastMath.sqrt(u) : u;
             upper.putDouble(it, u);
             recompute_u = false; // Once only
@@ -138,7 +137,7 @@ public class KMeansElkan<V extends NumberVector> extends KMeansSimplifiedElkan<V
               continue;
             }
           }
-          double dist = distance(fv, DoubleVector.wrap(means[j]));
+          double dist = distance(fv, means[j]);
           dist = isSquared ? FastMath.sqrt(dist) : dist;
           l[j] = dist;
           if(dist < u) {

@@ -390,6 +390,52 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     }
 
     /**
+     * Compute a distance (and count the distance computations).
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double distance(NumberVector x, double[] y) {
+      ++diststat;
+      if(df.getClass() == SquaredEuclideanDistanceFunction.class) {
+        if(y.length != x.getDimensionality()) {
+          throw new IllegalArgumentException("Objects do not have the same dimensionality.");
+        }
+        double v = 0;
+        for(int i = 0; i < y.length; i++) {
+          double d = x.doubleValue(i) - y[i];
+          v += d * d;
+        }
+        return v;
+      }
+      return df.distance(x, DoubleVector.wrap(y));
+    }
+
+    /**
+     * Compute a distance (and count the distance computations).
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double distance(double[] x, double[] y) {
+      ++diststat;
+      if(df.getClass() == SquaredEuclideanDistanceFunction.class) {
+        if(y.length != x.length) {
+          throw new IllegalArgumentException("Objects do not have the same dimensionality.");
+        }
+        double v = 0;
+        for(int i = 0; i < x.length; i++) {
+          double d = x[i] - y[i];
+          v += d * d;
+        }
+        return v;
+      }
+      return df.distance(DoubleVector.wrap(x), DoubleVector.wrap(y));
+    }
+
+    /**
      * Run the clustering.
      *
      * @param maxiter Maximum number of iterations
@@ -467,7 +513,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
         NumberVector fv = relation.get(iditer);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < mindist) {
             minIndex = i;
             mindist = dist;
@@ -496,9 +542,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       assert (sep.length == k);
       Arrays.fill(sep, Double.POSITIVE_INFINITY);
       for(int i = 1; i < k; i++) {
-        DoubleVector mi = DoubleVector.wrap(means[i]);
+        double[] mi = means[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, DoubleVector.wrap(means[j]));
+          double d = distance(mi, means[j]);
           d = .5 * (issquared ? FastMath.sqrt(d) : d);
           cdist[i][j] = cdist[j][i] = d;
           sep[i] = (d < sep[i]) ? d : sep[i];
@@ -523,7 +569,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       boolean issquared = df.isSquared();
       double max = 0.;
       for(int i = 0; i < means.length; i++) {
-        double d = distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
+        double d = distance(means[i], newmeans[i]);
         dists[i] = d = issquared ? FastMath.sqrt(d) : d;
         max = (d > max) ? d : max;
       }
@@ -556,27 +602,35 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @return Clustering result
      */
     protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
-      double totalvariance = 0.;
       Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-      for(int i = 0; i < clusters.size(); i++) {
-        DBIDs ids = clusters.get(i);
-        if(ids.isEmpty()) {
-          continue;
+      if(!varstat) {
+        for(int i = 0; i < clusters.size(); i++) {
+          DBIDs ids = clusters.get(i);
+          if(ids.isEmpty()) {
+            continue;
+          }
+          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], Double.NaN)));
         }
-        double varsum = 0;
-        if(varstat) {
-          DoubleVector mvec = DoubleVector.wrap(means[i]);
+      } else {
+        double totalvariance = 0.;
+        for(int i = 0; i < clusters.size(); i++) {
+          DBIDs ids = clusters.get(i);
+          if(ids.isEmpty()) {
+            continue;
+          }
+          double varsum = 0;
+          double[] mean = means[i];
           for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-            varsum += distance(mvec, relation.get(it));
+            varsum += distance(relation.get(it), mean);
           }
           totalvariance += varsum;
+          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, varsum)));
         }
-        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum)));
-      }
-      Logging log = getLogger();
-      if(varstat && log.isStatistics()) {
-        log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
-        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+        Logging log = getLogger();
+        if(log.isStatistics()) {
+          log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
+          log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+        }
       }
       return result;
     }

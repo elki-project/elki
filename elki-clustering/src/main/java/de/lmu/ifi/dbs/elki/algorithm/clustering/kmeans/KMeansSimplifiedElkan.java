@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -172,7 +171,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends AbstractKMean
         double best = Double.POSITIVE_INFINITY;
         int minIndex = -1;
         for(int j = 0; j < k; j++) {
-          double dist = distance(fv, DoubleVector.wrap(means[j]));
+          double dist = distance(fv, means[j]);
           dist = isSquared ? FastMath.sqrt(dist) : dist;
           l[j] = dist;
           if(dist < best) {
@@ -210,7 +209,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends AbstractKMean
             continue; // Condition #3 i-iii not satisfied
           }
           if(recompute_u) { // Need to update bound? #3a
-            u = distance(fv, DoubleVector.wrap(means[cur]));
+            u = distance(fv, means[cur]);
             u = isSquared ? FastMath.sqrt(u) : u;
             upper.putDouble(it, u);
             recompute_u = false; // Once only
@@ -218,7 +217,7 @@ public class KMeansSimplifiedElkan<V extends NumberVector> extends AbstractKMean
               continue;
             }
           }
-          double dist = distance(fv, DoubleVector.wrap(means[j]));
+          double dist = distance(fv, means[j]);
           dist = isSquared ? FastMath.sqrt(dist) : dist;
           l[j] = dist;
           if(dist < u) {

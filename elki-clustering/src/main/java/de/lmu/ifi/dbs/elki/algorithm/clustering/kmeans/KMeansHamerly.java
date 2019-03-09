@@ -24,7 +24,6 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -164,7 +163,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
         int minIndex = -1;
         for(int i = 0; i < k; i++) {
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < min1) {
             minIndex = i;
             min2 = min1;
@@ -205,7 +204,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, DoubleVector.wrap(means[cur]));
+        double curd2 = distance(fv, means[cur]);
         u = isSquared ? FastMath.sqrt(curd2) : curd2;
         upper.putDouble(it, u);
         if(u <= z || u <= sa) {
@@ -218,7 +217,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
           if(i == cur) {
             continue;
           }
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < min1) {
             minIndex = i;
             min2 = min1;
@@ -254,9 +253,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       assert (sep.length == k);
       Arrays.fill(sep, Double.POSITIVE_INFINITY);
       for(int i = 1; i < k; i++) {
-        DoubleVector m1 = DoubleVector.wrap(means[i]);
+        double[] m1 = means[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(m1, DoubleVector.wrap(means[j]));
+          double d = distance(m1, means[j]);
           sep[i] = (d < sep[i]) ? d : sep[i];
           sep[j] = (d < sep[j]) ? d : sep[j];
         }

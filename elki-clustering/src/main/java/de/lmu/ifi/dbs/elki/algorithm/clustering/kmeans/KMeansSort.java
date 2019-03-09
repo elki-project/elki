@@ -24,7 +24,6 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -123,14 +122,14 @@ public class KMeansSort<V extends NumberVector> extends KMeansCompare<V> {
         final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
         // Distance to current mean:
         NumberVector fv = relation.get(iditer);
-        double mindist = distance(fv, DoubleVector.wrap(means[ini]));
+        double mindist = distance(fv, means[ini]);
         final double threshold = mult * mindist;
         int minIndex = ini;
         for(int i : cnum[ini]) {
           if(cdist[minIndex][i] >= threshold) { // Sort pruning
             break; // All following can only be worse.
           }
-          double dist = distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < mindist) {
             minIndex = i;
             mindist = dist;

@@ -112,31 +112,31 @@ public class QuickSelect {
 
       // Explicit (and optimal) sorting network for 5 elements
       // See Knuth for details.
-      if(adapter.compareGreater(data, m1, m2)) {
+      if(adapter.compare(data, m1, m2) > 0) {
         adapter.swap(data, m1, m2);
       }
-      if(adapter.compareGreater(data, m1, m3)) {
+      if(adapter.compare(data, m1, m3) > 0) {
         adapter.swap(data, m1, m3);
       }
-      if(adapter.compareGreater(data, m2, m3)) {
+      if(adapter.compare(data, m2, m3) > 0) {
         adapter.swap(data, m2, m3);
       }
-      if(adapter.compareGreater(data, m4, m5)) {
+      if(adapter.compare(data, m4, m5) > 0) {
         adapter.swap(data, m4, m5);
       }
-      if(adapter.compareGreater(data, m1, m4)) {
+      if(adapter.compare(data, m1, m4) > 0) {
         adapter.swap(data, m1, m4);
       }
-      if(adapter.compareGreater(data, m3, m4)) {
+      if(adapter.compare(data, m3, m4) > 0) {
         adapter.swap(data, m3, m4);
       }
-      if(adapter.compareGreater(data, m2, m5)) {
+      if(adapter.compare(data, m2, m5) > 0) {
         adapter.swap(data, m2, m5);
       }
-      if(adapter.compareGreater(data, m2, m3)) {
+      if(adapter.compare(data, m2, m3) > 0) {
         adapter.swap(data, m2, m3);
       }
-      if(adapter.compareGreater(data, m4, m5)) {
+      if(adapter.compare(data, m4, m5) > 0) {
         adapter.swap(data, m4, m5);
       }
 
@@ -149,10 +149,10 @@ public class QuickSelect {
       int i = start, j = end - 2;
       // This is classic quicksort stuff
       while(true) {
-        while(i <= j && adapter.compareGreater(data, end - 1, i)) {
+        while(i <= j && adapter.compare(data, end - 1, i) >= 0) {
           i++;
         }
-        while(j >= i && !adapter.compareGreater(data, end - 1, j)) {
+        while(j >= i && adapter.compare(data, end - 1, j) <= 0) {
           j--;
         }
         if(i >= j) {
@@ -163,6 +163,14 @@ public class QuickSelect {
 
       // Move pivot (former middle element) back into the appropriate place
       adapter.swap(data, i, end - 1);
+
+      // Skip duplicates to narrow down the search interval:
+      while(rank < i && adapter.compare(data, i, i - 1) == 0) {
+        --i;
+      }
+      while(rank > i && adapter.compare(data, i, i + 1) == 0) {
+        ++i;
+      }
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -187,7 +195,7 @@ public class QuickSelect {
    */
   private static <T> void insertionSort(T data, Adapter<T> adapter, int start, int end) {
     for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && adapter.compareGreater(data, j - 1, j); j--) {
+      for(int j = i; j > start && adapter.compare(data, j - 1, j) > 0; j--) {
         adapter.swap(data, j, j - 1);
       }
     }
@@ -216,10 +224,10 @@ public class QuickSelect {
      * @param data Data structure
      * @param i Position i
      * @param j Position j
-     * @return {@code true} when the element at position i is greater than that
-     *         at position j.
+     * @return {@code -1,0,+1} when the element at position i is smaller, equal,
+     *         or greater than that at position j.
      */
-    boolean compareGreater(T data, int i, int j);
+    int compare(T data, int i, int j);
   }
 
   /**
@@ -234,8 +242,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(double[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(double[] data, int i, int j) {
+      return Double.compare(data[i], data[j]);
     }
   };
 
@@ -251,8 +259,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(int[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(int[] data, int i, int j) {
+      return Integer.compare(data[i], data[j]);
     }
   };
 
@@ -268,8 +276,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(float[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(float[] data, int i, int j) {
+      return Float.compare(data[i], data[j]);
     }
   };
 
@@ -285,8 +293,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(short[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(short[] data, int i, int j) {
+      return Short.compare(data[i], data[j]);
     }
   };
 
@@ -302,8 +310,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(long[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(long[] data, int i, int j) {
+      return Long.compare(data[i], data[j]);
     }
   };
 
@@ -319,8 +327,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(byte[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(byte[] data, int i, int j) {
+      return Byte.compare(data[i], data[j]);
     }
   };
 
@@ -336,8 +344,8 @@ public class QuickSelect {
     }
 
     @Override
-    public boolean compareGreater(char[] data, int i, int j) {
-      return data[i] > data[j];
+    public int compare(char[] data, int i, int j) {
+      return Character.compare(data[i], data[j]);
     }
   };
 
