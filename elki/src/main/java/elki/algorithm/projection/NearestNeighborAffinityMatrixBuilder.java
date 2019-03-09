@@ -30,7 +30,7 @@ import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -82,7 +82,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param distanceFunction Distance function
    * @param perplexity Desired perplexity (will use 3*perplexity neighbors)
    */
-  public NearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity) {
+  public NearestNeighborAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity) {
     super(distanceFunction, perplexity);
     this.numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
   }
@@ -94,7 +94,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param perplexity Desired perplexity
    * @param neighbors Number of neighbors to use
    */
-  public NearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity, int neighbors) {
+  public NearestNeighborAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity, int neighbors) {
     super(distanceFunction, perplexity);
     this.numberOfNeighbours = neighbors;
   }
@@ -114,7 +114,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !dq.getDistanceFunction().isSquared();
+    final boolean square = !dq.getDistance().isSquared();
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;

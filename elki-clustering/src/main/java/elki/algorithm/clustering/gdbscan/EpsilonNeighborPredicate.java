@@ -33,8 +33,8 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -74,7 +74,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
   /**
    * Distance function to use
    */
-  protected DistanceFunction<? super O> distFunc;
+  protected Distance<? super O> distFunc;
 
   /**
    * Full constructor.
@@ -82,7 +82,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public EpsilonNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
+  public EpsilonNeighborPredicate(double epsilon, Distance<? super O> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;
@@ -174,13 +174,13 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
     /**
      * Distance function to use
      */
-    protected DistanceFunction<O> distfun = null;
+    protected Distance<O> distfun = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get a distance function.
-      ObjectParameter<DistanceFunction<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
       }

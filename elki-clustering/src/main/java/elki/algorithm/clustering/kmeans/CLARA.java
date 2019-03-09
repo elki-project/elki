@@ -34,7 +34,7 @@ import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -124,7 +124,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * @param keepmed Keep the previous medoids in the next sample
    * @param random Random generator
    */
-  public CLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
+  public CLARA(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.numsamples = numsamples;
     this.sampling = sampling;
@@ -135,7 +135,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
   @Override
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistance());
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
     if(samplesize < 3 * k) {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
@@ -343,8 +343,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     }
 
     @Override
-    public DistanceFunction<? super V> getDistanceFunction() {
-      return inner.getDistanceFunction();
+    public Distance<? super V> getDistance() {
+      return inner.getDistance();
     }
 
     @Override

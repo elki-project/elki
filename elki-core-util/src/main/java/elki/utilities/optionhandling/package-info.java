@@ -52,7 +52,7 @@
  * 
  * <pre>
  * // Defining Parameters
- * final ObjectParameter&lt;DistanceFunction&lt;O, D&gt;&gt; DISTANCE_FUNCTION_PARAM = new ObjectParameter&lt;DistanceFunction&lt;O, D&gt;&gt;(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+ * final ObjectParameter&lt;Distance&lt;O, D&gt;&gt; DISTANCE_FUNCTION_PARAM = new ObjectParameter&lt;Distance&lt;O, D&gt;&gt;(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
  * </pre>
  * 
  * (This example is from
@@ -86,7 +86,7 @@
  * The static {@code parameterize(Parameterization config)} factory method
  * <em>may</em> return {@code null} when Parameterization failed. Otherwise, it
  * <em>must</em> return an instance of the given class or a subclass. Example:
- * LPNormDistanceFunction returns an instance of EuclideanDistance for p=2.
+ * LPNormDistance returns an instance of EuclideanDistance for p=2.
  * <p>
  * When writing constructors, try to make error handling as local as possible,
  * to report as many errors at once as possible.
@@ -196,7 +196,7 @@
  * <pre>
  * // predefine some parameters
  * ListParameterization opticsParameters = new ListParameterization();
- * opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
+ * opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistance.class);
  * // ... more parameters ...
  * ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
  * chain.errorsTo(opticsParameters);

@@ -35,7 +35,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.Centroid;
@@ -107,7 +107,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @param kernel Kernel function
    * @param range Kernel radius
    */
-  public NaiveMeanShiftClustering(DistanceFunction<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
+  public NaiveMeanShiftClustering(Distance<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
     super(distanceFunction);
     this.kernel = kernel;
     this.bandwidth = range;
@@ -121,7 +121,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @return Clustering result
    */
   public Clustering<MeanModel> run(Database database, Relation<V> relation) {
-    final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistance());
     final RangeQuery<V> rangeq = database.getRangeQuery(distq);
     final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     final int dim = RelationUtil.dimensionality(relation);

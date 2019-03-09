@@ -22,8 +22,8 @@ package elki.index.tree.spatial.rstarvariants.rdknn;
 
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.persistent.PageFile;
 import elki.persistent.PageFileFactory;
@@ -54,7 +54,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
   /**
    * The default distance function.
    */
-  public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
+  public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistance.class;
 
   /**
    * Parameter for distance function
@@ -97,7 +97,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
         settings.k_max = k_maxP.intValue();
       }
 
-      ObjectParameter<SpatialPrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      ObjectParameter<SpatialPrimitiveDistance<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, DEFAULT_DISTANCE_FUNCTION);
       if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
@@ -110,7 +110,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
     @Override
     protected RdkNNSettings createSettings() {
-      return new RdkNNSettings(1, EuclideanDistanceFunction.STATIC);
+      return new RdkNNSettings(1, EuclideanDistance.STATIC);
     }
   }
 }

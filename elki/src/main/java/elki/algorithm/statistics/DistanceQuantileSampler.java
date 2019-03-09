@@ -33,7 +33,7 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -102,7 +102,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
    *        duplicates)
    * @param rand Random generator
    */
-  public DistanceQuantileSampler(DistanceFunction<? super O> distanceFunction, double quantile, double sampling, boolean nozeros, RandomFactory rand) {
+  public DistanceQuantileSampler(Distance<? super O> distanceFunction, double quantile, double sampling, boolean nozeros, RandomFactory rand) {
     super(distanceFunction);
     this.quantile = quantile;
     this.sampling = sampling;
@@ -118,7 +118,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
    * @return Distances sample
    */
   public CollectionResult<double[]> run(Database database, Relation<O> rel) {
-    DistanceQuery<O> dq = rel.getDistanceQuery(getDistanceFunction());
+    DistanceQuery<O> dq = rel.getDistanceQuery(getDistance());
     int size = rel.size();
     long pairs = (size * (long) size) >> 1;
 
@@ -159,7 +159,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

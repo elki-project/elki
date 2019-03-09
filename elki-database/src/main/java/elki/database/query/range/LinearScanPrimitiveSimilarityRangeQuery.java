@@ -27,7 +27,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import elki.distance.similarityfunction.PrimitiveSimilarity;
 
 /**
  * Default linear scan range query class.
@@ -46,7 +46,7 @@ public class LinearScanPrimitiveSimilarityRangeQuery<O> extends AbstractSimilari
   /**
    * Unboxed similarity function.
    */
-  private PrimitiveSimilarityFunction<? super O> rawsim;
+  private PrimitiveSimilarity<? super O> rawsim;
 
   /**
    * Constructor.
@@ -55,7 +55,7 @@ public class LinearScanPrimitiveSimilarityRangeQuery<O> extends AbstractSimilari
    */
   public LinearScanPrimitiveSimilarityRangeQuery(PrimitiveSimilarityQuery<O> similarityQuery) {
     super(similarityQuery);
-    rawsim = similarityQuery.getSimilarityFunction();
+    rawsim = similarityQuery.getSimilarity();
   }
 
   @Override

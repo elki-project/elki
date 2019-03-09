@@ -32,7 +32,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.geometry.PrimsMinimumSpanningTree;
@@ -93,7 +93,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
-  public HDBSCANLinearMemory(DistanceFunction<? super O> distanceFunction, int minPts) {
+  public HDBSCANLinearMemory(Distance<? super O> distanceFunction, int minPts) {
     super(distanceFunction, minPts);
   }
 
@@ -105,7 +105,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
    * @return Clustering hierarchy
    */
   public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistance());
     final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
@@ -127,12 +127,12 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     convertToPointerRepresentation(ids, heap, pi, lambda);
 
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistanceFunction().isSquared(), coredists);
+    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

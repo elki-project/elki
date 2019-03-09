@@ -37,8 +37,8 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.statistics.DoubleStatistic;
@@ -129,7 +129,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    * @param minima Data space minima, may be {@code null} (get from data).
    * @param maxima Data space minima, may be {@code null} (get from data).
    */
-  public HopkinsStatisticClusteringTendency(NumberVectorDistanceFunction<? super NumberVector> distanceFunction, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
+  public HopkinsStatisticClusteringTendency(NumberVectorDistance<? super NumberVector> distanceFunction, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
     super(distanceFunction);
     this.sampleSize = samplesize;
     this.random = random;
@@ -147,7 +147,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    */
   public Void run(Database database, Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    final DistanceQuery<NumberVector> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<NumberVector> distanceQuery = database.getDistanceQuery(relation, getDistance());
     final KNNQuery<NumberVector> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
 
     final double[] min = new double[dim], extend = new double[dim];
@@ -362,7 +362,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<NumberVectorDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

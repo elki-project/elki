@@ -32,10 +32,10 @@ import elki.database.datastore.DataStoreListener;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.ArcCosineDistanceFunction;
-import elki.distance.distancefunction.CosineDistanceFunction;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
+import elki.distance.distancefunction.ArcCosineDistance;
+import elki.distance.distancefunction.CosineDistance;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
 import elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import elki.logging.LoggingUtil;
 import elki.result.DBIDSelection;
@@ -115,9 +115,9 @@ public class DistanceFunctionVisualization implements VisFactory {
    * @return p of LP norm, or NaN
    */
   public static double getLPNormP(AbstractMaterializeKNNPreprocessor<?> kNN) {
-    DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
-    if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
-      return ((LPNormDistanceFunction) distanceFunction).getP();
+    Distance<?> distanceFunction = kNN.getDistanceQuery().getDistance();
+    if(LPNormDistance.class.isInstance(distanceFunction)) {
+      return ((LPNormDistance) distanceFunction).getP();
     }
     return Double.NaN;
   }
@@ -129,9 +129,9 @@ public class DistanceFunctionVisualization implements VisFactory {
    * @return true when angular
    */
   public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?> kNN) {
-    DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
-    return CosineDistanceFunction.class.isInstance(distanceFunction) //
-        || ArcCosineDistanceFunction.class.isInstance(distanceFunction);
+    Distance<?> distanceFunction = kNN.getDistanceQuery().getDistance();
+    return CosineDistance.class.isInstance(distanceFunction) //
+        || ArcCosineDistance.class.isInstance(distanceFunction);
   }
 
   /**

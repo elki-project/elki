@@ -22,7 +22,7 @@ package elki.index.tree.metrical.covertree;
 
 import org.junit.Test;
 
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
@@ -39,7 +39,7 @@ public class SimplifiedCoverTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testCovertree() {
     SimplifiedCoverTree.Factory<?> factory = new ELKIBuilder<>(SimplifiedCoverTree.Factory.class) //
-        .with(SimplifiedCoverTree.Factory.Parameterizer.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class).build();
+        .with(SimplifiedCoverTree.Factory.Parameterizer.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
     testExactEuclidean(factory, SimplifiedCoverTree.CoverTreeKNNQuery.class, SimplifiedCoverTree.CoverTreeRangeQuery.class);
     testSinglePoint(factory, SimplifiedCoverTree.CoverTreeKNNQuery.class, SimplifiedCoverTree.CoverTreeRangeQuery.class);
   }

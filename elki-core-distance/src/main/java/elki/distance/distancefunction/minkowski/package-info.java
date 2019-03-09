@@ -2,10 +2,10 @@
  * Minkowski space L<sub>p</sub> norms such as the popular Euclidean and
  * Manhattan distances.
  * 
- * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistance
  * @opt include .*elki.distance.distancefunction.Norm
- * @opt include .*elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
- * @opt include .*elki.distance.distancefunction.WeightedNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.SpatialPrimitiveDistance
+ * @opt include .*elki.distance.distancefunction.WeightedNumberVectorDistance
  */
 /*
  * This file is part of ELKI:

@@ -36,7 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -89,7 +89,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    *        point)
    * @param distanceFunction the neighborhood distance function
    */
-  public COF(int k, DistanceFunction<? super O> distanceFunction) {
+  public COF(int k, Distance<? super O> distanceFunction) {
     super(distanceFunction);
     this.k = k + 1; // + query point
   }
@@ -103,7 +103,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("COF", 3) : null;
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
     LOG.beginStep(stepprog, 1, "Materializing COF neighborhoods.");
     KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, dq, k);
     DBIDs ids = relation.getDBIDs();
@@ -225,7 +225,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

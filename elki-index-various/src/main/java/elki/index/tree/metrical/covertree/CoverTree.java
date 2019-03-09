@@ -38,7 +38,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.KNNIndex;
 import elki.index.RangeIndex;
 import elki.logging.Logging;
@@ -95,7 +95,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
    * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public CoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+  public CoverTree(Relation<O> relation, Distance<? super O> distanceFunction, double expansion, int truncate) {
     super(relation, distanceFunction, expansion, truncate);
   }
 
@@ -305,7 +305,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
     if(!this.distanceFunction.equals(distanceFunction)) {
       LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
@@ -320,7 +320,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
     if(!this.distanceFunction.equals(distanceFunction)) {
       LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
@@ -487,7 +487,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+    public Factory(Distance<? super O> distanceFunction, double expansion, int truncate) {
       super(distanceFunction, expansion, truncate);
     }
 

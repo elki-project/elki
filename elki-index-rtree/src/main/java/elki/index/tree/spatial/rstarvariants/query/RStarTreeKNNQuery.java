@@ -27,7 +27,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -51,7 +51,7 @@ import elki.utilities.documentation.Reference;
  * @since 0.4.0
  *
  * @assoc - - - AbstractRStarTree
- * @assoc - - - SpatialPrimitiveDistanceFunction
+ * @assoc - - - SpatialPrimitiveDistance
  * @assoc - - - DoubleDistanceSearchCandidate
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
@@ -68,7 +68,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
   /**
    * Spatial primitive distance function.
    */
-  protected final SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super O> distanceFunction;
 
   /**
    * Relation we query.
@@ -82,7 +82,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
    * @param relation Data relation to query
    * @param distanceFunction Distance function
    */
-  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction) {
     super();
     this.relation = relation;
     this.tree = tree;

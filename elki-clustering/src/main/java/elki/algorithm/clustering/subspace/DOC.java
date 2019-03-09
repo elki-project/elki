@@ -35,7 +35,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction;
+import elki.distance.distancefunction.subspace.SubspaceMaximumDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -281,7 +281,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    */
   protected DBIDs findNeighbors(DBIDRef q, long[] nD, ArrayModifiableDBIDs S, Relation<V> relation) {
     // Weights for distance (= rectangle query)
-    DistanceQuery<V> dq = relation.getDistanceQuery(new SubspaceMaximumDistanceFunction(nD));
+    DistanceQuery<V> dq = relation.getDistanceQuery(new SubspaceMaximumDistance(nD));
 
     // TODO: add filtering capabilities into query API!
     // Until then, using the range query API will be unnecessarily slow.

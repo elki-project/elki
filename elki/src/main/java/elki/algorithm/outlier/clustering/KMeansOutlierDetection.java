@@ -42,7 +42,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -100,7 +100,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceFunction<? super O> df = clusterer.getDistanceFunction();
+    Distance<? super O> df = clusterer.getDistance();
     DistanceQuery<O> dq = database.getDistanceQuery(relation, df);
 
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
@@ -130,7 +130,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(clusterer.getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(clusterer.getDistance().getInputTypeRestriction());
   }
 
   @Override

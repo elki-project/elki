@@ -33,7 +33,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -99,7 +99,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param k the value of k
    * @param delta Radius increase factor
    */
-  public DWOF(DistanceFunction<? super O> distanceFunction, int k, double delta) {
+  public DWOF(Distance<? super O> distanceFunction, int k, double delta) {
     super(distanceFunction);
     this.k = k + 1; // + query point
     this.delta = delta;
@@ -115,7 +115,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
     // Get k nearest neighbor and range query on the relation.
     KNNQuery<O> knnq = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
     RangeQuery<O> rnnQuery = database.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
@@ -307,7 +307,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

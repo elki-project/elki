@@ -31,7 +31,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
 import elki.utilities.documentation.Reference;
@@ -83,7 +83,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    */
   public PreDeConNeighborPredicate(PreDeCon.Settings settings) {
     // Note: we use squared epsilon!
-    super(settings.epsilon * settings.epsilon, SquaredEuclideanDistanceFunction.STATIC);
+    super(settings.epsilon * settings.epsilon, SquaredEuclideanDistance.STATIC);
     this.settings = settings;
   }
 

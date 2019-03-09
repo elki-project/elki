@@ -1,4 +1,0 @@
-elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction
-elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction
-elki.distance.distancefunction.external.FileBasedSparseDoubleDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction
-elki.distance.distancefunction.external.FileBasedSparseFloatDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction

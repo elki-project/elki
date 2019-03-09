@@ -35,11 +35,11 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.similarityfunction.Similarity;
 import elki.distance.similarityfunction.kernel.KernelMatrix;
-import elki.distance.similarityfunction.kernel.LinearKernelFunction;
+import elki.distance.similarityfunction.kernel.LinearKernel;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
@@ -99,7 +99,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
    * @param kernelFunction kernel function to use
    * @param k Number of nearest neighbors
    */
-  public FastABOD(SimilarityFunction<? super V> kernelFunction, int k) {
+  public FastABOD(Similarity<? super V> kernelFunction, int k) {
     super(kernelFunction);
     this.k = k;
   }
@@ -115,7 +115,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmaxabod = new DoubleMinMax();
-    if(kernelFunction.getClass() == LinearKernelFunction.class) {
+    if(kernelFunction.getClass() == LinearKernel.class) {
       if(!kNNABOD(db, relation, ids, abodvalues, minmaxabod)) {
         // Fallback, if we do not have an index.
         fastABOD(db, relation, ids, abodvalues, minmaxabod);
@@ -142,18 +142,18 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
    * @return {@code true} if kNN were available and usable.
    */
   private boolean kNNABOD(Database db, Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
-    DistanceQuery<V> dq = db.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
+    DistanceQuery<V> dq = db.getDistanceQuery(relation, SquaredEuclideanDistance.STATIC);
     KNNQuery<V> knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     boolean squared = true;
     if(knnq == null) {
-      dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+      dq = db.getDistanceQuery(relation, EuclideanDistance.STATIC);
       knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
       if(knnq == null) {
         return false;
       }
       squared = false;
     }
-    SimilarityQuery<V> lk = db.getSimilarityQuery(relation, LinearKernelFunction.STATIC);
+    SimilarityQuery<V> lk = db.getSimilarityQuery(relation, LinearKernel.STATIC);
     int k1 = k + 1; // We will get the query point back by the knnq.
 
     MeanVariance s = new MeanVariance();

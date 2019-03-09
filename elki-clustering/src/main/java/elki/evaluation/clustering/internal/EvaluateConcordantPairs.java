@@ -30,8 +30,8 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -94,7 +94,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
+  private PrimitiveDistance<? super NumberVector> distanceFunction;
 
   /**
    * Key for logging statistics.
@@ -107,7 +107,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    * @param distance Distance function
    * @param noiseHandling Control noise handling
    */
-  public EvaluateConcordantPairs(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseHandling) {
+  public EvaluateConcordantPairs(PrimitiveDistance<? super NumberVector> distance, NoiseHandling noiseHandling) {
     super();
     this.distanceFunction = distance;
     this.noiseHandling = noiseHandling;
@@ -320,7 +320,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     /**
      * Distance function to use.
      */
-    private PrimitiveDistanceFunction<NumberVector> distance;
+    private PrimitiveDistance<NumberVector> distance;
 
     /**
      * Option, how noise should be treated.
@@ -330,7 +330,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistance<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

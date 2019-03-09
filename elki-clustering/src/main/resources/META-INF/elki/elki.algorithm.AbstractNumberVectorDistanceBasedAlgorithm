@@ -5,7 +5,7 @@ elki.algorithm.clustering.kmeans.KMeansAnnulus
 elki.algorithm.clustering.kmeans.KMeansHamerly
 elki.algorithm.clustering.kmeans.KMeansElkan
 elki.algorithm.clustering.kmeans.KMeansSimplifiedElkan
-elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans lloyd forgy
+elki.algorithm.clustering.kmeans.KMeansLloyd lloyd forgy
 elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.algorithm.clustering.kmeans.KMeansMacQueen
 elki.algorithm.clustering.kmeans.KMeansKDTreeFiltering

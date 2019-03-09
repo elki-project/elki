@@ -24,7 +24,7 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 
 /**
  * Interface for computing the quality of a K-Means clustering.
@@ -49,7 +49,7 @@ public interface KMeansQualityMeasure<O extends NumberVector> {
    *
    * @return quality measure
    */
-  <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation);
+  <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation);
 
   /**
    * Compare two scores.

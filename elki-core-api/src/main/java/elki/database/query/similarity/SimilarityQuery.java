@@ -23,7 +23,7 @@ package elki.database.query.similarity;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DatabaseQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 
 /**
  * A similarity query serves as adapter layer for database and primitive
@@ -93,5 +93,5 @@ public interface SimilarityQuery<O> extends DatabaseQuery {
    * 
    * @return Similarity function
    */
-  SimilarityFunction<? super O> getSimilarityFunction();
+  Similarity<? super O> getSimilarity();
 }

@@ -20,7 +20,7 @@
  */
 package elki.index.tree.spatial.rstarvariants.strategies.overflow;
 
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
@@ -59,7 +59,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   /**
    * Default insert strategy used by R*-tree
    */
-  public static final LimitedReinsertOverflowTreatment RSTAR_OVERFLOW = new LimitedReinsertOverflowTreatment(new CloseReinsert(0.3, SquaredEuclideanDistanceFunction.STATIC));
+  public static final LimitedReinsertOverflowTreatment RSTAR_OVERFLOW = new LimitedReinsertOverflowTreatment(new CloseReinsert(0.3, SquaredEuclideanDistance.STATIC));
 
   /**
    * Bitset to keep track of levels a reinsert has been performed at.

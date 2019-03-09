@@ -38,7 +38,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
@@ -154,7 +154,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * @param distanceFunction Distance function to use
    * @param linkage Linkage strategy
    */
-  public NaiveAgglomerativeHierarchicalClustering4(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
+  public NaiveAgglomerativeHierarchicalClustering4(Distance<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -167,7 +167,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -183,7 +183,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !getDistanceFunction().isSquared();
+    boolean square = Linkage.WARD.equals(linkage) && !getDistance().isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
@@ -271,7 +271,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     }
     LOG.ensureCompleted(prog);
 
-    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistanceFunction().isSquared());
+    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistance().isSquared());
   }
 
   /**
@@ -287,7 +287,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

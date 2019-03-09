@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 
 /**
  * Factory for initializing the EM models.
@@ -48,5 +48,5 @@ public interface EMClusterModelFactory<V extends NumberVector, M extends MeanMod
    * @param df Distance function
    * @return Initial models
    */
-  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df);
+  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df);
 }

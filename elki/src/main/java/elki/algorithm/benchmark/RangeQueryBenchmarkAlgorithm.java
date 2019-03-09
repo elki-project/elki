@@ -33,7 +33,7 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -118,7 +118,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
    * @param sampling Sampling rate
    * @param random Random factory
    */
-  public RangeQueryBenchmarkAlgorithm(DistanceFunction<? super O> distanceFunction, DatabaseConnection queries, double sampling, RandomFactory random) {
+  public RangeQueryBenchmarkAlgorithm(Distance<? super O> distanceFunction, DatabaseConnection queries, double sampling, RandomFactory random) {
     super(distanceFunction);
     this.queries = queries;
     this.sampling = sampling;
@@ -138,7 +138,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       throw new AbortException("This 'run' method will not use the given query set!");
     }
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
 
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
@@ -176,7 +176,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       throw new AbortException("A query set is required for this 'run' method.");
     }
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
     NumberVector.Factory<O> ofactory = RelationUtil.getNumberVectorFactory(relation);
     int dim = RelationUtil.dimensionality(relation);
@@ -242,10 +242,10 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     if(queries == null) {
-      return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
+      return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
     }
     else {
-      return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+      return TypeUtil.array(getDistance().getInputTypeRestriction());
     }
   }
 

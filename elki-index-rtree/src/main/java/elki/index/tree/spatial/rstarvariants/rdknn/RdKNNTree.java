@@ -47,7 +47,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.index.DynamicIndex;
 import elki.index.KNNIndex;
 import elki.index.RKNNIndex;
@@ -166,8 +166,8 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     doExtraIntegrityChecks();
   }
 
-  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistanceFunction<? super O> distanceFunction, KNNQuery<O> knnQuery) {
-    checkDistanceFunction(distanceFunction);
+  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distanceFunction, KNNQuery<O> knnQuery) {
+    checkDistance(distanceFunction);
     if(k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
     }
@@ -201,8 +201,8 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     return result;
   }
 
-  public List<ModifiableDoubleDBIDList> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O> distanceFunction, KNNQuery<O> knnQuery) {
-    checkDistanceFunction(distanceFunction);
+  public List<ModifiableDoubleDBIDList> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistance<? super O> distanceFunction, KNNQuery<O> knnQuery) {
+    checkDistance(distanceFunction);
     if(k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
     }
@@ -320,7 +320,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * @return a list of the sorted entries
    */
   // TODO: move somewhere else?
-  protected List<DoubleObjPair<RdKNNEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?> distanceFunction) {
+  protected List<DoubleObjPair<RdKNNEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistance<?> distanceFunction) {
     List<DoubleObjPair<RdKNNEntry>> result = new ArrayList<>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -535,7 +535,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * @throws IllegalArgumentException
    * @param distanceFunction the distance function to be checked
    */
-  private void checkDistanceFunction(SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+  private void checkDistance(SpatialPrimitiveDistance<? super O> distanceFunction) {
     if(!settings.distanceFunction.equals(distanceFunction)) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + this.distanceQuery.getClass() + ", but is " + distanceFunction.getClass());
     }

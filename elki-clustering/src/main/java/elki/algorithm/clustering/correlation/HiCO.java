@@ -37,7 +37,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import elki.logging.Logging;
@@ -245,7 +245,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         V dv2 = relation.get(iter);
 
         tmpCorrelation.putInt(iter, correlationDistance(pca1, pca2, dim));
-        tmpDistance.putDouble(iter, EuclideanDistanceFunction.STATIC.distance(dv1, dv2));
+        tmpDistance.putDouble(iter, EuclideanDistance.STATIC.distance(dv1, dv2));
       }
       tmpIds.sort(tmpcomp);
 

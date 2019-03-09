@@ -21,7 +21,7 @@
 package elki.index;
 
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 
 /**
  * Index with support for similarity queries (e.g. precomputed similarity
@@ -43,5 +43,5 @@ public interface SimilarityIndex<O> extends Index {
    * @param hints Hints for the optimizer
    * @return similarity query object or {@code null}
    */
-  SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> simFunction, Object... hints);
+  SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> simFunction, Object... hints);
 }

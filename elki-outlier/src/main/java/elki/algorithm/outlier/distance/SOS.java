@@ -32,7 +32,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -95,14 +95,14 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param distance Distance function
    * @param h Perplexity
    */
-  public SOS(DistanceFunction<? super O> distance, double h) {
+  public SOS(Distance<? super O> distance, double h) {
     super(distance);
     this.perplexity = h;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**
@@ -112,7 +112,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @return outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistanceFunction());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     final double logPerp = FastMath.log(perplexity);
 
     ModifiableDoubleDBIDList dlist = DBIDUtil.newDistanceDBIDList(relation.size() - 1);

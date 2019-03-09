@@ -41,8 +41,8 @@ import elki.database.ProxyDatabase;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.MutableProgress;
 import elki.logging.statistics.StringStatistic;
@@ -138,7 +138,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+  public XMeans(NumberVectorDistance<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
     super(distanceFunction, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
@@ -146,7 +146,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     this.innerKMeans = innerKMeans;
     this.splitInitializer = new PredefinedInitialMeans((double[][]) null);
     this.innerKMeans.setInitializer(this.splitInitializer);
-    this.innerKMeans.setDistanceFunction(distanceFunction);
+    this.innerKMeans.setDistance(distanceFunction);
     this.informationCriterion = informationCriterion;
     this.rnd = random;
   }
@@ -165,7 +165,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
     LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistanceFunction()));
+    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistance()));
     Clustering<M> clustering = innerKMeans.run(database, relation);
 
     if(prog != null) {
@@ -236,8 +236,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     innerKMeans.setK(2);
     Clustering<M> childClustering = innerKMeans.run(proxyDB);
 
-    double parentEvaluation = informationCriterion.quality(parentClustering, getDistanceFunction(), relation);
-    double childrenEvaluation = informationCriterion.quality(childClustering, getDistanceFunction(), relation);
+    double parentEvaluation = informationCriterion.quality(parentClustering, getDistance(), relation);
+    double childrenEvaluation = informationCriterion.quality(childClustering, getDistance(), relation);
 
     if(LOG.isDebugging()) {
       LOG.debug("parentEvaluation: " + parentEvaluation);
@@ -261,7 +261,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     // Compute size of cluster/region
     double radius = 0.;
     for(DBIDIter it = parentCluster.getIDs().iter(); it.valid(); it.advance()) {
-      double d = getDistanceFunction().distance(relation.get(it), DoubleVector.wrap(parentCentroid));
+      double d = getDistance().distance(relation.get(it), DoubleVector.wrap(parentCentroid));
       radius = (d > radius) ? d : radius;
     }
 
@@ -362,7 +362,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
       getParameterInitialization(config);
       getParameterMaxIter(config);
-      getParameterDistanceFunction(config);
+      getParameterDistance(config);
 
       RandomParameter rndP = new RandomParameter(SEED_ID);
       if(config.grab(rndP)) {
@@ -378,7 +378,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
             // Setting the distance to null if undefined at this point will
             // cause validation errors later. So fall back to the default.
             .addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction != null ? //
-                distanceFunction : SquaredEuclideanDistanceFunction.STATIC), config);
+                distanceFunction : SquaredEuclideanDistance.STATIC), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }

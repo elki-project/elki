@@ -33,8 +33,8 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -239,9 +239,9 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
 
   @Override
   public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof LPNormDistanceFunction) {
-      double p = ((LPNormDistanceFunction) df).getP();
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof LPNormDistance) {
+      double p = ((LPNormDistance) df).getP();
       return new VAFileKNNQuery(distanceQuery, p);
     }
     // Not supported.
@@ -250,9 +250,9 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
 
   @Override
   public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof LPNormDistanceFunction) {
-      double p = ((LPNormDistanceFunction) df).getP();
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof LPNormDistance) {
+      double p = ((LPNormDistance) df).getP();
       return new VAFileRangeQuery(distanceQuery, p);
     }
     // Not supported.

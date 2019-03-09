@@ -26,8 +26,8 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SimilarityFunction;
-import elki.distance.similarityfunction.kernel.LinearKernelFunction;
+import elki.distance.similarityfunction.Similarity;
+import elki.distance.similarityfunction.kernel.LinearKernel;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -47,7 +47,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
   /**
    * Similarity function.
    */
-  SimilarityFunction<? super O> similarity;
+  Similarity<? super O> similarity;
 
   /**
    * Quantile to use.
@@ -60,7 +60,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
    * @param similarity Similarity function
    * @param quantile Quantile
    */
-  public SimilarityBasedInitializationWithMedian(SimilarityFunction<? super O> similarity, double quantile) {
+  public SimilarityBasedInitializationWithMedian(Similarity<? super O> similarity, double quantile) {
     super();
     this.similarity = similarity;
     this.quantile = quantile;
@@ -119,7 +119,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     /**
      * Similarity function.
      */
-    SimilarityFunction<? super O> similarity;
+    Similarity<? super O> similarity;
 
     /**
      * Quantile to use.
@@ -129,7 +129,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<SimilarityFunction<? super O>> param = new ObjectParameter<>(SIMILARITY_ID, SimilarityFunction.class, LinearKernelFunction.class);
+      ObjectParameter<Similarity<? super O>> param = new ObjectParameter<>(SIMILARITY_ID, Similarity.class, LinearKernel.class);
       if (config.grab(param)) {
         similarity = param.instantiateClass(config);
       }

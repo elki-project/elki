@@ -11,6 +11,6 @@ elki.utilities.scaling.outlier.OutlierSqrtScaling
 elki.utilities.scaling.outlier.SqrtStandardDeviationScaling
 elki.utilities.scaling.outlier.StandardDeviationScaling
 elki.utilities.scaling.outlier.HeDESNormalizationOutlierScaling
-elki.utilities.scaling.outlier.MixtureModelOutlierScaling de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MixtureModelOutlierScalingFunction
-elki.utilities.scaling.outlier.SigmoidOutlierScaling de.lmu.ifi.dbs.elki.utilities.scaling.outlier.SigmoidOutlierScalingFunction
+elki.utilities.scaling.outlier.MixtureModelOutlierScaling
+elki.utilities.scaling.outlier.SigmoidOutlierScaling
 elki.utilities.scaling.outlier.LogRankingPseudoOutlierScaling

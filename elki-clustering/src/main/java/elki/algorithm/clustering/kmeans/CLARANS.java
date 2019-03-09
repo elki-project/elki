@@ -38,7 +38,7 @@ import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -123,7 +123,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
    */
-  public CLARANS(DistanceFunction<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
+  public CLARANS(Distance<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
     super(distanceFunction);
     this.k = k;
     this.numlocal = numlocal;
@@ -142,8 +142,8 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
       LOG.warning("A very large k was chosen. This implementation is not optimized for this case.");
     }
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
-    final boolean metric = getDistanceFunction().isMetric();
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistance());
+    final boolean metric = getDistance().isMetric();
 
     // Number of retries, relative rate, or absolute count:
     final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * k * (ids.size() - k) : maxneighbor);
@@ -425,7 +425,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

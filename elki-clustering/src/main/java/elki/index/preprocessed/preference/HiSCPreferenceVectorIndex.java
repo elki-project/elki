@@ -31,7 +31,7 @@ import elki.database.ids.DBIDs;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
@@ -109,7 +109,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
 
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistance.STATIC, k);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
     long start = System.currentTimeMillis();

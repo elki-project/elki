@@ -28,7 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialIndexTree;
@@ -74,7 +74,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
+  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
@@ -192,7 +192,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super NumberVector> distanceFunction) {
+    public Factory(int k, Distance<? super NumberVector> distanceFunction) {
       super(k, distanceFunction);
     }
 

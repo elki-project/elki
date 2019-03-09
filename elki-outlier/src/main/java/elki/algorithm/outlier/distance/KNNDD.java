@@ -38,7 +38,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -97,7 +97,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param distanceFunction distance function to use
    * @param k Value of k (excluding query point!)
    */
-  public KNNDD(DistanceFunction<? super O> distanceFunction, int k) {
+  public KNNDD(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k + 1;
   }
@@ -118,7 +118,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(getDistanceFunction());
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(getDistance());
     final KNNQuery<O> knnQuery = relation.getKNNQuery(distanceQuery, k);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
@@ -156,7 +156,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

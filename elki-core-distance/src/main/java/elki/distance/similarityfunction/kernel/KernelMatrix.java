@@ -37,7 +37,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import elki.distance.similarityfunction.PrimitiveSimilarity;
 import elki.logging.LoggingUtil;
 import net.jafama.FastMath;
 
@@ -47,7 +47,7 @@ import net.jafama.FastMath;
  * @author Simon Paradies
  * @since 0.1
  * 
- * @assoc - - - PrimitiveSimilarityFunction
+ * @assoc - - - PrimitiveSimilarity
  */
 public class KernelMatrix {
   /**
@@ -143,7 +143,7 @@ public class KernelMatrix {
    * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O> KernelMatrix(PrimitiveSimilarityFunction<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
+  public <O> KernelMatrix(PrimitiveSimilarity<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     this.kernel = new double[ids.size()][ids.size()];
     if(ids instanceof DBIDRange) {
       this.idmap = new RangeMap((DBIDRange) ids);

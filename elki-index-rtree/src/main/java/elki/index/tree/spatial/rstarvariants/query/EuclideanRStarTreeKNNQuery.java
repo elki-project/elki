@@ -28,8 +28,8 @@ import java.util.Map;
 import elki.data.NumberVector;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -49,8 +49,8 @@ import elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @assoc - - - EuclideanDistanceFunction
- * @assoc - - - SquaredEuclideanDistanceFunction
+ * @assoc - - - EuclideanDistance
+ * @assoc - - - SquaredEuclideanDistance
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //
@@ -61,7 +61,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
   /**
    * Squared euclidean distance function.
    */
-  private static final SquaredEuclideanDistanceFunction SQUARED = SquaredEuclideanDistanceFunction.STATIC;
+  private static final SquaredEuclideanDistance SQUARED = SquaredEuclideanDistance.STATIC;
 
   /**
    * Constructor.
@@ -70,7 +70,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
    * @param relation Data relation to query
    */
   public EuclideanRStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation) {
-    super(tree, relation, EuclideanDistanceFunction.STATIC);
+    super(tree, relation, EuclideanDistance.STATIC);
   }
 
   @Override

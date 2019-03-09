@@ -29,7 +29,7 @@ import elki.database.datastore.DoubleDataStore;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -70,7 +70,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * @param distanceFunction distance function to use
    * @param d radius d value
    */
-  public AbstractDBOutlier(DistanceFunction<? super O> distanceFunction, double d) {
+  public AbstractDBOutlier(Distance<? super O> distanceFunction, double d) {
     super(distanceFunction);
     this.d = d;
   }
@@ -104,7 +104,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**
@@ -134,7 +134,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      * 
      * @param config Parameterization
      */
-    protected void configD(Parameterization config, DistanceFunction<?> distanceFunction) {
+    protected void configD(Parameterization config, Distance<?> distanceFunction) {
       final DoubleParameter param = new DoubleParameter(D_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(param)) {

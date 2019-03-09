@@ -36,7 +36,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -142,9 +142,9 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     this.distanceQuery = distance;
     this.initialization = initialization;
     this.numref = numref;
-    if(!distance.getDistanceFunction().isMetric()) {
+    if(!distance.getDistance().isMetric()) {
       LOG.warning("iDistance assumes metric distance functions.\n" //
-          + distance.getDistanceFunction().getClass() + " does not report itself as metric.\n" //
+          + distance.getDistance().getClass() + " does not report itself as metric.\n" //
           + "iDistance will run, but may yield approximate results.");
     }
   }
@@ -185,8 +185,8 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       if(LOG.isDebugging()) {
         LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -201,8 +201,8 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       if(LOG.isDebugging()) {
         LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -216,8 +216,8 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @return Distance function
    */
-  private DistanceFunction<? super O> getDistanceFunction() {
-    return distanceQuery.getDistanceFunction();
+  private Distance<? super O> getDistance() {
+    return distanceQuery.getDistance();
   }
 
   @Override
@@ -447,7 +447,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     /**
      * Distance function to use.
      */
-    DistanceFunction<? super V> distance;
+    Distance<? super V> distance;
 
     /**
      * Initialization method.
@@ -466,7 +466,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
      * @param initialization Initialization method
      * @param k Number of reference points
      */
-    public Factory(DistanceFunction<? super V> distance, KMedoidsInitialization<V> initialization, int k) {
+    public Factory(Distance<? super V> distance, KMedoidsInitialization<V> initialization, int k) {
       super();
       this.distance = distance;
       this.initialization = initialization;
@@ -511,7 +511,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       /**
        * Distance function to use.
        */
-      DistanceFunction<? super V> distance;
+      Distance<? super V> distance;
 
       /**
        * Initialization method.
@@ -526,7 +526,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<DistanceFunction<? super V>> distanceP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+        ObjectParameter<Distance<? super V>> distanceP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
         if(config.grab(distanceP)) {
           distance = distanceP.instantiateClass(config);
         }

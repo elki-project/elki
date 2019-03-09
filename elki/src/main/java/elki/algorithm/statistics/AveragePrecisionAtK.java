@@ -37,7 +37,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVarianceMinMax;
@@ -96,7 +96,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    * @param random Random sampling generator
    * @param includeSelf Include query object in evaluation
    */
-  public AveragePrecisionAtK(DistanceFunction<? super O> distanceFunction, int k, double sampling, RandomFactory random, boolean includeSelf) {
+  public AveragePrecisionAtK(Distance<? super O> distanceFunction, int k, double sampling, RandomFactory random, boolean includeSelf) {
     super(distanceFunction);
     this.k = k;
     this.sampling = sampling;
@@ -113,7 +113,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    * @return Vectors containing mean and standard deviation.
    */
   public CollectionResult<double[]> run(Database database, Relation<O> relation, Relation<?> lrelation) {
-    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     final int qk = k + (includeSelf ? 0 : 1);
     final KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, qk);
 
@@ -195,7 +195,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     TypeInformation cls = new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST);
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), cls);
+    return TypeUtil.array(getDistance().getInputTypeRestriction(), cls);
   }
 
   @Override

@@ -41,7 +41,7 @@ import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -112,7 +112,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param k Neighborhood size parameter
    * @param alpha Alpha parameter
    */
-  public LSDBC(DistanceFunction<? super O> distanceFunction, int k, double alpha) {
+  public LSDBC(Distance<? super O> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.k = k + 1; // Skip query point
     this.alpha = alpha;
@@ -132,7 +132,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
     final DBIDs ids = relation.getDBIDs();
     LOG.beginStep(stepprog, 1, "Materializing kNN neighborhoods");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
 
     LOG.beginStep(stepprog, 2, "Sorting by density");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -293,7 +293,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

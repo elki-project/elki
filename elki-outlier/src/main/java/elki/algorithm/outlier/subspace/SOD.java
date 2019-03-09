@@ -36,9 +36,9 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
+import elki.distance.similarityfunction.SharedNearestNeighborSimilarity;
+import elki.distance.similarityfunction.Similarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -80,7 +80,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.2
  * 
  * @navhas - computes - SODModel
- * @has - - - SharedNearestNeighborSimilarityFunction
+ * @has - - - SharedNearestNeighborSimilarity
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -110,7 +110,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
   /**
    * Similarity function to use.
    */
-  private SimilarityFunction<V> similarityFunction;
+  private Similarity<V> similarityFunction;
 
   /**
    * Report models.
@@ -125,7 +125,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * @param similarityFunction Shared nearest neighbor similarity function
    * @param models Report generated models
    */
-  public SOD(int knn, double alpha, SimilarityFunction<V> similarityFunction, boolean models) {
+  public SOD(int knn, double alpha, Similarity<V> similarityFunction, boolean models) {
     super();
     this.knn = knn;
     this.alpha = alpha;
@@ -252,7 +252,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     if(card == 0) {
       return 0;
     }
-    final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
+    final SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(weightVector);
     return df.distance(queryObject, DoubleVector.wrap(center)) / card;
   }
 
@@ -344,7 +344,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     /**
      * The similarity function.
      */
-    private SimilarityFunction<V> similarityFunction;
+    private Similarity<V> similarityFunction;
 
     /**
      * Track models.
@@ -354,7 +354,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<SimilarityFunction<V>> simP = new ObjectParameter<>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
+      final ObjectParameter<Similarity<V>> simP = new ObjectParameter<>(SIM_ID, Similarity.class, SharedNearestNeighborSimilarity.class);
       if(config.grab(simP)) {
         similarityFunction = simP.instantiateClass(config);
       }

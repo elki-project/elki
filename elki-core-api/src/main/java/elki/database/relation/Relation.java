@@ -32,8 +32,8 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.similarityfunction.Similarity;
 
 /**
  * An object representation from a database.
@@ -121,7 +121,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return Instance to query the database with this distance
    */
-  DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+  DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints);
 
   /**
    * Get the similarity query for a particular similarity function.
@@ -130,7 +130,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return Instance to query the database with this similarity
    */
-  SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> similarityFunction, Object... hints);
+  SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query.
@@ -166,7 +166,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  default KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+  default KNNQuery<O> getKNNQuery(Distance<? super O> distanceFunction, Object... hints) {
     DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
     return getKNNQuery(distanceQuery, hints);
   }
@@ -207,7 +207,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  default RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+  default RangeQuery<O> getRangeQuery(Distance<? super O> distanceFunction, Object... hints) {
     DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
     return getRangeQuery(distanceQuery, hints);
   }
@@ -248,7 +248,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  default RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints) {
+  default RangeQuery<O> getSimilarityRangeQuery(Similarity<? super O> simFunction, Object... hints) {
     SimilarityQuery<O> simQuery = getSimilarityQuery(simFunction, hints);
     return getSimilarityRangeQuery(simQuery, hints);
   }
@@ -287,7 +287,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  default RKNNQuery<O> getRKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+  default RKNNQuery<O> getRKNNQuery(Distance<? super O> distanceFunction, Object... hints) {
     DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
     return getRKNNQuery(distanceQuery, hints);
   }

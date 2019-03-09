@@ -33,8 +33,8 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
@@ -122,7 +122,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public AGNES(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
+  public AGNES(Distance<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -140,14 +140,14 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     }
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
 
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -192,7 +192,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   protected static void initializeDistanceMatrix(MatrixParadigm mat, DistanceQuery<?> dq, Linkage linkage) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] matrix = mat.matrix;
-    final boolean issquare = dq.getDistanceFunction().isSquared();
+    final boolean issquare = dq.getDistance().isSquared();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", matrix.length, LOG) : null;
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
@@ -271,7 +271,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, linkage.restore(mindist, getDistanceFunction().isSquared()), iy);
+    builder.add(ix, linkage.restore(mindist, getDistance().isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
@@ -331,7 +331,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -362,7 +362,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     @Override
     protected void makeOptions(Parameterization config) {
       // We don't call super, because we want a different default distance.
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

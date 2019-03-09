@@ -27,7 +27,7 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.datastructures.arraylike.IntegerArray;
@@ -72,7 +72,7 @@ public class NNChain<O> extends AGNES<O> {
    *
    * @param distanceFunction Distance function
    */
-  public NNChain(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
+  public NNChain(Distance<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction, linkage);
   }
 
@@ -87,7 +87,7 @@ public class NNChain<O> extends AGNES<O> {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
 
@@ -95,7 +95,7 @@ public class NNChain<O> extends AGNES<O> {
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
 
     nnChainCore(mat, builder);
     return builder.complete();

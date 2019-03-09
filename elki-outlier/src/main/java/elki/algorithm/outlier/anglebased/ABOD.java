@@ -37,9 +37,9 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 import elki.distance.similarityfunction.kernel.KernelMatrix;
-import elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
+import elki.distance.similarityfunction.kernel.PolynomialKernel;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
@@ -91,14 +91,14 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
   /**
    * Store the configured Kernel version.
    */
-  protected SimilarityFunction<? super V> kernelFunction;
+  protected Similarity<? super V> kernelFunction;
 
   /**
    * Constructor for Angle-Based Outlier Detection (ABOD).
    *
    * @param kernelFunction kernel function to use
    */
-  public ABOD(SimilarityFunction<? super V> kernelFunction) {
+  public ABOD(Similarity<? super V> kernelFunction) {
     super();
     this.kernelFunction = kernelFunction;
   }
@@ -204,12 +204,12 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     /**
      * Distance function.
      */
-    protected SimilarityFunction<V> kernelFunction = null;
+    protected Similarity<V> kernelFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<SimilarityFunction<V>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, SimilarityFunction.class, PolynomialKernelFunction.class);
+      final ObjectParameter<Similarity<V>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, Similarity.class, PolynomialKernel.class);
       if(config.grab(param)) {
         kernelFunction = param.instantiateClass(config);
       }

@@ -33,8 +33,8 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
@@ -64,7 +64,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
   /**
    * Distance function to use.
    */
-  protected DistanceFunction<? super O> distFunc;
+  protected Distance<? super O> distFunc;
 
   /**
    * Full constructor.
@@ -72,7 +72,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public AbstractRangeQueryNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
+  public AbstractRangeQueryNeighborPredicate(double epsilon, Distance<? super O> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;
@@ -178,7 +178,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
     /**
      * Distance function to use
      */
-    DistanceFunction<O> distfun = null;
+    Distance<O> distfun = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -194,7 +194,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configDistance(Parameterization config) {
       // Get a distance function.
-      ObjectParameter<DistanceFunction<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
       }

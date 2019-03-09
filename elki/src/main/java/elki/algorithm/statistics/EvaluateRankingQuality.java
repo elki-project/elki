@@ -44,7 +44,7 @@ import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.evaluation.clustering.EvaluateClustering;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -101,7 +101,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    * @param distanceFunction Distance function
    * @param numbins Number of bins
    */
-  public EvaluateRankingQuality(DistanceFunction<? super V> distanceFunction, int numbins) {
+  public EvaluateRankingQuality(Distance<? super V> distanceFunction, int numbins) {
     super(distanceFunction);
     this.numbins = numbins;
   }
@@ -109,7 +109,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   @Override
   public HistogramResult run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistance());
     final KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
     if(LOG.isVerbose()) {
@@ -170,7 +170,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override

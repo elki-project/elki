@@ -54,7 +54,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.math.Mean;
@@ -140,7 +140,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     if(RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! (" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
-    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
+    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistance.STATIC);
     RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
     final Random random = rnd.getSingleThreadedRandom();
 

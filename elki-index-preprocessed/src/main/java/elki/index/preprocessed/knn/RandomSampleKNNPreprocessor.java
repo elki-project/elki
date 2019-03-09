@@ -32,7 +32,7 @@ import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
@@ -88,7 +88,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
    * @param share Relative share
    * @param rnd Random generator
    */
-  public RandomSampleKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, double share, RandomFactory rnd) {
+  public RandomSampleKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, double share, RandomFactory rnd) {
     super(relation, distanceFunction, k);
     this.share = share;
     this.rnd = rnd;
@@ -169,7 +169,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
      * @param share Sample size (relative)
      * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, double share, RandomFactory rnd) {
+    public Factory(int k, Distance<? super O> distanceFunction, double share, RandomFactory rnd) {
       super(k, distanceFunction);
       this.share = share;
       this.rnd = rnd;

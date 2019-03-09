@@ -35,8 +35,8 @@ import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.math.MathUtil;
 import elki.math.geometry.PrimsMinimumSpanningTree;
@@ -78,14 +78,14 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private DistanceFunction<? super O> distanceFunction;
+  private Distance<? super O> distanceFunction;
 
   /**
    * Constructor.
    *
    * @param distance Distance function
    */
-  public EvaluateDBCV(DistanceFunction<? super O> distance) {
+  public EvaluateDBCV(Distance<? super O> distance) {
     super();
     this.distanceFunction = distance;
   }
@@ -280,11 +280,11 @@ public class EvaluateDBCV<O> implements Evaluator {
     /**
      * Distance function to use.
      */
-    private DistanceFunction<? super O> distance;
+    private Distance<? super O> distance;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

@@ -30,7 +30,7 @@ import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -82,7 +82,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
    * @param partitions Number of partitions
    * @param rnd Random number generator
    */
-  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, int partitions, RandomFactory rnd) {
+  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, int partitions, RandomFactory rnd) {
     super(relation, distanceFunction, k);
     this.partitions = partitions;
     this.rnd = rnd;
@@ -187,7 +187,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      * @param partitions number of partitions
      * @param rnd
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, int partitions, RandomFactory rnd) {
+    public Factory(int k, Distance<? super O> distanceFunction, int partitions, RandomFactory rnd) {
       super(k, distanceFunction);
       this.partitions = partitions;
       this.rnd = rnd;

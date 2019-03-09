@@ -21,7 +21,7 @@
 package elki.index.tree.spatial.rstarvariants.rdknn;
 
 import elki.data.NumberVector;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.rstarvariants.RTreeSettings;
 
 /**
@@ -39,7 +39,7 @@ public class RdkNNSettings extends RTreeSettings {
   /**
    * The distance function.
    */
-  SpatialPrimitiveDistanceFunction<NumberVector> distanceFunction;
+  SpatialPrimitiveDistance<NumberVector> distanceFunction;
 
   /**
    * Constructor.
@@ -47,7 +47,7 @@ public class RdkNNSettings extends RTreeSettings {
    * @param k_max Maximum k to support
    * @param distanceFunction Distance function
    */
-  public RdkNNSettings(int k_max, SpatialPrimitiveDistanceFunction<NumberVector> distanceFunction) {
+  public RdkNNSettings(int k_max, SpatialPrimitiveDistance<NumberVector> distanceFunction) {
     super();
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;

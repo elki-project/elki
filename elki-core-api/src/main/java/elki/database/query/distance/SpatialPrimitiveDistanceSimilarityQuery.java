@@ -24,8 +24,8 @@ import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DistanceSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.similarityfunction.PrimitiveSimilarity;
 
 /**
  * Combination query class, to allow combined implementations of spatial
@@ -34,7 +34,7 @@ import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
  * @author Erich Schubert
  * @since 0.7.5
  * 
- * @depend - - - PrimitiveSimilarityFunction
+ * @depend - - - PrimitiveSimilarity
  * 
  * @param <O> Object type
  */
@@ -43,7 +43,7 @@ public class SpatialPrimitiveDistanceSimilarityQuery<O extends SpatialComparable
    * Typed reference to the similarity function (usually the same as the
    * distance function!)
    */
-  private PrimitiveSimilarityFunction<? super O> similarityFunction;
+  private PrimitiveSimilarity<? super O> similarityFunction;
 
   /**
    * Constructor.
@@ -53,7 +53,7 @@ public class SpatialPrimitiveDistanceSimilarityQuery<O extends SpatialComparable
    * @param similarityFunction similarity function (usually the same as the
    *        distance function!)
    */
-  public SpatialPrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, SpatialPrimitiveDistanceFunction<? super O> distanceFunction, PrimitiveSimilarityFunction<? super O> similarityFunction) {
+  public SpatialPrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction, PrimitiveSimilarity<? super O> similarityFunction) {
     super(relation, distanceFunction);
     this.similarityFunction = similarityFunction;
   }
@@ -79,7 +79,7 @@ public class SpatialPrimitiveDistanceSimilarityQuery<O extends SpatialComparable
   }
 
   @Override
-  public PrimitiveSimilarityFunction<? super O> getSimilarityFunction() {
+  public PrimitiveSimilarity<? super O> getSimilarity() {
     return similarityFunction;
   }
 }

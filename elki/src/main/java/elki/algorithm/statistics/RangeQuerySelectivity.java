@@ -31,7 +31,7 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -82,7 +82,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
    * @param sampling Sampling rate
    * @param random Random sampling generator
    */
-  public RangeQuerySelectivity(DistanceFunction<? super V> distanceFunction, double radius, double sampling, RandomFactory random) {
+  public RangeQuerySelectivity(Distance<? super V> distanceFunction, double radius, double sampling, RandomFactory random) {
     super(distanceFunction);
     this.radius = radius;
     this.sampling = sampling;
@@ -90,7 +90,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
   }
 
   public Void run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistance());
     RangeQuery<V> rangeQuery = database.getRangeQuery(distQuery, radius);
 
     MeanVariance numres = new MeanVariance();
@@ -114,7 +114,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

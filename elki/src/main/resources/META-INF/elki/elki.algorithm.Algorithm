@@ -1,8 +1,8 @@
 elki.algorithm.NullAlgorithm
-elki.algorithm.clustering.optics.DeLiClu de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
+elki.algorithm.clustering.optics.DeLiClu
 elki.algorithm.clustering.correlation.CASH
 elki.algorithm.clustering.subspace.DiSH
-elki.algorithm.outlier.clustering.EMOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.EMOutlier
+elki.algorithm.outlier.clustering.EMOutlier
 elki.algorithm.outlier.clustering.KMeansOutlierDetection
 elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 elki.algorithm.outlier.clustering.CBLOF
@@ -23,12 +23,10 @@ elki.algorithm.statistics.EvaluateRetrievalPerformance
 elki.algorithm.statistics.HopkinsStatisticClusteringTendency
 elki.algorithm.statistics.RangeQuerySelectivity
 elki.algorithm.statistics.RankingQualityHistogram
-# de.lmu.ifi.dbs.elki.algorithm.DummyAlgorithm
+# elki.algorithm.DummyAlgorithm
 elki.algorithm.DependencyDerivator
-elki.algorithm.KNNDistancesSampler de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
+elki.algorithm.KNNDistancesSampler
 elki.algorithm.KNNJoin
 elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 elki.algorithm.benchmark.ValidateApproximativeKNNIndex
-# de.lmu.ifi.dbs.elki.algorithm.classification.KNNClassifier
-# de.lmu.ifi.dbs.elki.algorithm.classification.PriorProbabilityClassifier

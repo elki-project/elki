@@ -42,7 +42,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.LinearEquationSystem;
@@ -128,7 +128,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(NumberVectorDistanceFunction<? super V> distanceFunction, NumberFormat nf, PCARunner pca, EigenPairFilter filter, int sampleSize, boolean randomsample) {
+  public DependencyDerivator(NumberVectorDistance<? super V> distanceFunction, NumberFormat nf, PCARunner pca, EigenPairFilter filter, int sampleSize, boolean randomsample) {
     super(distanceFunction);
     this.nf = nf;
     this.pca = pca;
@@ -159,7 +159,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
         ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, RandomFactory.DEFAULT);
       }
       else {
-        DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+        DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistance());
         KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize)//
             .getKNNForObject(centroidDV, this.sampleSize);
         ids = DBIDUtil.newHashSet(queryResults);

@@ -25,7 +25,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -77,7 +77,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public AbstractOPTICS(DistanceFunction<? super O> distanceFunction, double epsilon, int minpts) {
+  public AbstractOPTICS(Distance<? super O> distanceFunction, double epsilon, int minpts) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -99,7 +99,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**

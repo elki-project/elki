@@ -1,7 +1,7 @@
 /**
  * Distance functions for <b>one-dimensional</b> histograms.
  *
- * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistance
  */
 /*
  * This file is part of ELKI:

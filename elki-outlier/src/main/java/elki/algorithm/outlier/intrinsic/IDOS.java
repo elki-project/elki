@@ -35,7 +35,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -104,7 +104,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param kc the context set size for the ID computation
    * @param kr the neighborhood size to use in score computation
    */
-  public IDOS(DistanceFunction<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
+  public IDOS(Distance<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
     super(distanceFunction);
     this.estimator = estimator;
     this.k_c = kc;
@@ -123,7 +123,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     if(stepprog != null) {
       stepprog.beginStep(1, "Precomputing neighborhoods", LOG);
     }
-    KNNQuery<O> knnQ = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), Math.max(k_c, k_r) + 1);
+    KNNQuery<O> knnQ = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), Math.max(k_c, k_r) + 1);
     DBIDs ids = relation.getDBIDs();
 
     if(stepprog != null) {
@@ -207,7 +207,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

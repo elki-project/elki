@@ -29,7 +29,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.DistanceIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -76,7 +76,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   /**
    * Nested distance function.
    */
-  protected final DistanceFunction<? super O> distanceFunction;
+  protected final Distance<? super O> distanceFunction;
 
   /**
    * Nested distance query.
@@ -105,7 +105,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    * @param range DBID range
    * @param distanceFunction Distance function
    */
-  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, DistanceFunction<? super O> distanceFunction) {
+  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, Distance<? super O> distanceFunction) {
     super();
     this.relation = relation;
     this.ids = range;
@@ -183,7 +183,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   }
 
   @Override
-  public DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints) {
     if(this.distanceFunction.equals(distanceFunction)) {
       return new PrecomputedDistanceQuery();
     }
@@ -192,7 +192,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
 
   @Override
   public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+    if(this.distanceFunction.equals(distanceQuery.getDistance())) {
       return new PrecomputedKNNQuery();
     }
     return null;
@@ -200,7 +200,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
 
   @Override
   public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+    if(this.distanceFunction.equals(distanceQuery.getDistance())) {
       return new PrecomputedRangeQuery();
     }
     return null;
@@ -234,8 +234,8 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     @Override
-    public DistanceFunction<? super O> getDistanceFunction() {
-      return distanceQuery.getDistanceFunction();
+    public Distance<? super O> getDistance() {
+      return distanceQuery.getDistance();
     }
 
     @Override
@@ -360,14 +360,14 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     /**
      * Nested distance function.
      */
-    final protected DistanceFunction<? super O> distanceFunction;
+    final protected Distance<? super O> distanceFunction;
 
     /**
      * Constructor.
      *
      * @param distanceFunction Distance function
      */
-    public Factory(DistanceFunction<? super O> distanceFunction) {
+    public Factory(Distance<? super O> distanceFunction) {
       super();
       this.distanceFunction = distanceFunction;
     }
@@ -404,12 +404,12 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
       /**
        * Nested distance function.
        */
-      protected DistanceFunction<? super O> distanceFunction;
+      protected Distance<? super O> distanceFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<DistanceFunction<? super O>> distanceP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+        ObjectParameter<Distance<? super O>> distanceP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
         if(config.grab(distanceP)) {
           distanceFunction = distanceP.instantiateClass(config);
         }

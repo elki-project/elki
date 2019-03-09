@@ -37,7 +37,7 @@ import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.exceptions.AbortException;
@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @has - - - DistanceFunction
+ * @has - - - Distance
  * 
  * @param <O> Object type
  */
@@ -73,7 +73,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Number of neighbors to precompute.
@@ -101,7 +101,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
    * @param k Number of nearest neighbors
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceKNNLists(Database database, DistanceFunction<? super O> distance, int k, File out) {
+  public CacheDoubleDistanceKNNLists(Database database, Distance<? super O> distance, int k, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -195,7 +195,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<? super O> distance = null;
+    private Distance<? super O> distance = null;
 
     /**
      * Number of neighbors to precompute.
@@ -215,7 +215,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, Distance.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

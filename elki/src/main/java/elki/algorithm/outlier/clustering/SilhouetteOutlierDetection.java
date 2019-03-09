@@ -41,7 +41,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.evaluation.clustering.internal.EvaluateSilhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
 import elki.logging.Logging;
@@ -100,7 +100,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * @param clusterer Clustering algorithm
    * @param noiseOption Noise handling option.
    */
-  public SilhouetteOutlierDetection(DistanceFunction<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
+  public SilhouetteOutlierDetection(Distance<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
     super(distanceFunction);
     this.clusterer = clusterer;
     this.noiseOption = noiseOption;
@@ -108,8 +108,8 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
 
   @Override
   public OutlierResult run(Database database) {
-    Relation<O> relation = database.getRelation(getDistanceFunction().getInputTypeRestriction());
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
 
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database);
@@ -193,7 +193,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    final TypeInformation dt = getDistanceFunction().getInputTypeRestriction();
+    final TypeInformation dt = getDistance().getInputTypeRestriction();
     TypeInformation[] t = clusterer.getInputTypeRestriction();
     for(TypeInformation i : t) {
       if(dt.isAssignableFromType(i)) {

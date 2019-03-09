@@ -38,7 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
+import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -140,7 +140,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
       for(int i = 0; i < num; i++) {
         long[] dimset = randomSubspace(dbdim, mindim, maxdim, rand);
-        SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
+        SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(dimset);
         LOF<NumberVector> lof = new LOF<>(k, df);
 
         // run LOF and collect the result

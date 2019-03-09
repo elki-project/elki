@@ -1,8 +1,8 @@
 /**
  * Geographic (earth) distance functions
  *
- * @opt include .*elki.distance.distancefunction.NumberVectorDistanceFunction
- * @opt include .*elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
+ * @opt include .*elki.distance.distancefunction.NumberVectorDistance
+ * @opt include .*elki.distance.distancefunction.SpatialPrimitiveDistance
  * @opt include .*elki.math.geodesy.EarthModel
  */
 /*

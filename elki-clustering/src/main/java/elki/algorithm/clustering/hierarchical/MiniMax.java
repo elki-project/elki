@@ -28,7 +28,7 @@ import elki.database.DatabaseUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
@@ -77,7 +77,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    *
    * @param distanceFunction Distance function to use.
    */
-  public MiniMax(DistanceFunction<? super O> distanceFunction) {
+  public MiniMax(Distance<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
@@ -89,12 +89,12 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @return Hierarchical result
    */
   public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistanceFunction(), LOG);
+    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistance(), LOG);
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
 
     // Allocate working space:
@@ -393,7 +393,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

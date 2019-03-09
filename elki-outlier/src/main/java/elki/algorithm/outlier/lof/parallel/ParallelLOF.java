@@ -37,7 +37,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.parallel.ParallelExecutor;
@@ -87,7 +87,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLOF(DistanceFunction<? super O> distanceFunction, int k) {
+  public ParallelLOF(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -99,12 +99,12 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist

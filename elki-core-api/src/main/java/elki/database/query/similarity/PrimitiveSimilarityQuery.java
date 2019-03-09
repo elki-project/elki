@@ -22,7 +22,7 @@ package elki.database.query.similarity;
 
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import elki.distance.similarityfunction.PrimitiveSimilarity;
 
 /**
  * Run a database query in a database context.
@@ -30,7 +30,7 @@ import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @has - - - PrimitiveSimilarityFunction
+ * @has - - - PrimitiveSimilarity
  * 
  * @param <O> Database object type.
  */
@@ -43,7 +43,7 @@ public class PrimitiveSimilarityQuery<O> implements SimilarityQuery<O> {
   /**
    * The distance function we use.
    */
-  final protected PrimitiveSimilarityFunction<? super O> similarityFunction;
+  final protected PrimitiveSimilarity<? super O> similarityFunction;
 
   /**
    * Constructor.
@@ -51,7 +51,7 @@ public class PrimitiveSimilarityQuery<O> implements SimilarityQuery<O> {
    * @param relation Relation to use.
    * @param similarityFunction Our similarity function
    */
-  public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarityFunction<? super O> similarityFunction) {
+  public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarity<? super O> similarityFunction) {
     super();
     this.relation = relation;
     this.similarityFunction = similarityFunction;
@@ -83,7 +83,7 @@ public class PrimitiveSimilarityQuery<O> implements SimilarityQuery<O> {
   }
 
   @Override
-  public PrimitiveSimilarityFunction<? super O> getSimilarityFunction() {
+  public PrimitiveSimilarity<? super O> getSimilarity() {
     return similarityFunction;
   }
 }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import elki.data.DoubleVector;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
@@ -59,7 +59,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
    * @param reinsertAmount Amount of objects to reinsert
    * @param distanceFunction Distance function to use for reinsertion
    */
-  public CloseReinsert(double reinsertAmount, SpatialPrimitiveDistanceFunction<?> distanceFunction) {
+  public CloseReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distanceFunction) {
     super(reinsertAmount, distanceFunction);
   }
 

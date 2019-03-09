@@ -27,7 +27,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -95,7 +95,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(k != initialMeans.length) {
       throw new AbortException("Predefined initial means contained " + initialMeans.length //
           + " means, algorithm requested " + k + " means instead.");

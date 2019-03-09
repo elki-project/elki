@@ -29,7 +29,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -49,7 +49,7 @@ import elki.utilities.documentation.Reference;
  * @since 0.4.0
  *
  * @assoc - - - AbstractRStarTree
- * @assoc - - - SpatialPrimitiveDistanceFunction
+ * @assoc - - - SpatialPrimitiveDistance
  */
 @Reference(authors = "J. Kuan, P. Lewis", //
     title = "Fast k nearest neighbour search for R-tree family", //
@@ -65,7 +65,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
   /**
    * Spatial primitive distance function
    */
-  protected final SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super O> distanceFunction;
 
   /**
    * Relation we query.
@@ -79,7 +79,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
    * @param relation Data relation to query
    * @param distanceFunction Distance function
    */
-  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction) {
     super();
     this.relation = relation;
     this.tree = tree;

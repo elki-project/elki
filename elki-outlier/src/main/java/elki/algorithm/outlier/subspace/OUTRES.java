@@ -34,8 +34,8 @@ import elki.database.ids.*;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -150,7 +150,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    */
   public double outresScore(final int s, long[] subspace, DBIDRef id, KernelDensityEstimator kernel, DBIDs cands) {
     double score = 1.0; // Initial score is 1.0
-    final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(subspace);
+    final SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(subspace);
     MeanVariance meanv = new MeanVariance();
     ModifiableDoubleDBIDList neighcand = DBIDUtil.newDistanceDBIDList(cands.size());
     ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList(cands.size());
@@ -196,7 +196,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    * @param n Output buffer
    * @return Neighbors
    */
-  private DoubleDBIDList initialRange(DBIDRef obj, DBIDs cands, PrimitiveDistanceFunction<? super NumberVector> df, double eps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
+  private DoubleDBIDList initialRange(DBIDRef obj, DBIDs cands, PrimitiveDistance<? super NumberVector> df, double eps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
     n.clear();
     NumberVector o = kernel.relation.get(obj);
     final double twoeps = eps * 2;
@@ -225,7 +225,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    * @param n Output list
    * @return Neighbors of neighbor object
    */
-  private DoubleDBIDList subsetNeighborhoodQuery(DoubleDBIDList neighc, DBIDRef dbid, PrimitiveDistanceFunction<? super NumberVector> df, double adjustedEps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
+  private DoubleDBIDList subsetNeighborhoodQuery(DoubleDBIDList neighc, DBIDRef dbid, PrimitiveDistance<? super NumberVector> df, double adjustedEps, KernelDensityEstimator kernel, ModifiableDoubleDBIDList n) {
     n.clear();
     NumberVector query = kernel.relation.get(dbid);
     for(DoubleDBIDListIter neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {

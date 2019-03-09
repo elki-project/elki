@@ -27,7 +27,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
 
 /**
  * Default linear scan range query class.
@@ -46,7 +46,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
   /**
    * Unboxed distance function.
    */
-  private PrimitiveDistanceFunction<? super O> rawdist;
+  private PrimitiveDistance<? super O> rawdist;
 
   /**
    * Constructor.
@@ -55,7 +55,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
    */
   public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
     super(distanceQuery);
-    rawdist = distanceQuery.getDistanceFunction();
+    rawdist = distanceQuery.getDistance();
   }
 
   @Override
@@ -100,7 +100,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
    * @param result Output data structure
    */
   private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
-    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
+    final PrimitiveDistance<? super O> rawdist = this.rawdist;
     while(iter.valid()) {
       final double distance = rawdist.distance(obj, relation.get(iter));
       if(distance <= range) {

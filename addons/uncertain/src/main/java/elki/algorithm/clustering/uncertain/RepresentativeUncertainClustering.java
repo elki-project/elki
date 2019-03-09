@@ -46,8 +46,8 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction;
-import elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarityFunction;
+import elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarity;
+import elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarity;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -108,7 +108,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   /**
    * Distance function for clusterings.
    */
-  protected ClusteringDistanceSimilarityFunction distance;
+  protected ClusteringDistanceSimilarity distance;
 
   /**
    * The algorithm for meta-clustering.
@@ -150,7 +150,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * @param alpha Alpha confidence
    * @param keep Keep all samples (not only the representative results).
    */
-  public RepresentativeUncertainClustering(ClusteringDistanceSimilarityFunction distance, ClusteringAlgorithm<?> metaAlgorithm, ClusteringAlgorithm<?> samplesAlgorithm, int numsamples, RandomFactory random, double alpha, boolean keep) {
+  public RepresentativeUncertainClustering(ClusteringDistanceSimilarity distance, ClusteringAlgorithm<?> metaAlgorithm, ClusteringAlgorithm<?> samplesAlgorithm, int numsamples, RandomFactory random, double alpha, boolean keep) {
     this.samplesAlgorithm = samplesAlgorithm;
     this.numsamples = numsamples;
     this.metaAlgorithm = metaAlgorithm;
@@ -403,7 +403,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     /**
      * Distance (dissimilarity) for clusterinogs.
      */
-    protected ClusteringDistanceSimilarityFunction distance;
+    protected ClusteringDistanceSimilarity distance;
 
     /**
      * Field to store the inner algorithm for meta-clustering
@@ -438,8 +438,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      distance = ClusteringAdjustedRandIndexSimilarityFunction.STATIC;
-      ObjectParameter<ClusteringDistanceSimilarityFunction> simP = new ObjectParameter<>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarityFunction.class, ClusteringAdjustedRandIndexSimilarityFunction.class);
+      distance = ClusteringAdjustedRandIndexSimilarity.STATIC;
+      ObjectParameter<ClusteringDistanceSimilarity> simP = new ObjectParameter<>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarity.class, ClusteringAdjustedRandIndexSimilarity.class);
       if(config.grab(simP)) {
         distance = simP.instantiateClass(config);
       }

@@ -23,8 +23,8 @@ package elki.database.query.distance;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DistanceSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.similarityfunction.PrimitiveSimilarity;
 
 /**
  * Combination query class, for convenience.
@@ -32,7 +32,7 @@ import elki.distance.similarityfunction.PrimitiveSimilarityFunction;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @assoc - - - PrimitiveSimilarityFunction
+ * @assoc - - - PrimitiveSimilarity
  * 
  * @param <O> Object type
  */
@@ -41,7 +41,7 @@ public class PrimitiveDistanceSimilarityQuery<O> extends PrimitiveDistanceQuery<
    * Typed reference to the similarity function (usually the same as the
    * distance function!)
    */
-  private PrimitiveSimilarityFunction<? super O> similarityFunction;
+  private PrimitiveSimilarity<? super O> similarityFunction;
 
   /**
    * Constructor.
@@ -51,7 +51,7 @@ public class PrimitiveDistanceSimilarityQuery<O> extends PrimitiveDistanceQuery<
    * @param similarityFunction similarity function (usually the same as the
    *        distance function!)
    */
-  public PrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distanceFunction, PrimitiveSimilarityFunction<? super O> similarityFunction) {
+  public PrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, PrimitiveDistance<? super O> distanceFunction, PrimitiveSimilarity<? super O> similarityFunction) {
     super(relation, distanceFunction);
     this.similarityFunction = similarityFunction;
   }
@@ -77,7 +77,7 @@ public class PrimitiveDistanceSimilarityQuery<O> extends PrimitiveDistanceQuery<
   }
 
   @Override
-  public PrimitiveSimilarityFunction<? super O> getSimilarityFunction() {
+  public PrimitiveSimilarity<? super O> getSimilarity() {
     return similarityFunction;
   }
 }

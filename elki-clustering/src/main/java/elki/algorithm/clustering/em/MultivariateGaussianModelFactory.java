@@ -31,7 +31,7 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
 
 import net.jafama.FastMath;
@@ -61,7 +61,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
   }
 
   @Override
-  public List<MultivariateGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df) {
+  public List<MultivariateGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.length == k);
     // Compute the global covariance matrix for better starting conditions:

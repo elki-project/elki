@@ -28,7 +28,7 @@ import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.DynamicIndex;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -47,7 +47,7 @@ import elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.2
  *
- * @has - - - DistanceFunction
+ * @has - - - Distance
  * @has - - - KNNQuery
  * @has - - - KNNListener
  *
@@ -85,7 +85,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
+  public MaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
     this.knnQuery = relation.getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_BULK, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
   }
@@ -118,7 +118,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
       }
     }
     else {
-      final boolean ismetric = getDistanceQuery().getDistanceFunction().isMetric();
+      final boolean ismetric = getDistanceQuery().getDistance().isMetric();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         if(ismetric && storage.get(iter) != null) {
           log.incrementProcessed(progress);
@@ -385,7 +385,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
      * @param k k parameter
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
+    public Factory(int k, Distance<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 

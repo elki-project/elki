@@ -36,9 +36,9 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.ArcCosineDistanceFunction;
-import elki.distance.distancefunction.CosineDistanceFunction;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.ArcCosineDistance;
+import elki.distance.distancefunction.CosineDistance;
+import elki.distance.distancefunction.Distance;
 import elki.index.AbstractIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -257,11 +257,11 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
   @Override
   public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof CosineDistanceFunction) {
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof CosineDistance) {
       return new CosineKNNQuery(distanceQuery);
     }
-    if(df instanceof ArcCosineDistanceFunction) {
+    if(df instanceof ArcCosineDistance) {
       return new ArcCosineKNNQuery(distanceQuery);
     }
     return null;
@@ -269,11 +269,11 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
   @Override
   public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof CosineDistanceFunction) {
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof CosineDistance) {
       return new CosineRangeQuery(distanceQuery);
     }
-    if(df instanceof ArcCosineDistanceFunction) {
+    if(df instanceof ArcCosineDistance) {
       return new ArcCosineRangeQuery(distanceQuery);
     }
     return null;

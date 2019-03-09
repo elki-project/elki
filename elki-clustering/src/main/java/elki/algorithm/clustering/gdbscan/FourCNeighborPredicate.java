@@ -36,7 +36,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
 import elki.math.linearalgebra.pca.*;
@@ -102,7 +102,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
    * @param settings 4C settings
    */
   public FourCNeighborPredicate(FourC.Settings settings) {
-    super(settings.epsilon, EuclideanDistanceFunction.STATIC);
+    super(settings.epsilon, EuclideanDistance.STATIC);
     this.settings = settings;
     this.pca = new PCARunner(new StandardCovarianceMatrixBuilder());
     this.filter = new LimitEigenPairFilter(settings.delta, settings.absolute);

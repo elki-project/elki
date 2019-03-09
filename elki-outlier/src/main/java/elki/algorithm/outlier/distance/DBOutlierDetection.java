@@ -33,7 +33,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Description;
@@ -91,14 +91,14 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
    * @param d distance query radius
    * @param p percentage parameter
    */
-  public DBOutlierDetection(DistanceFunction<? super O> distanceFunction, double d, double p) {
+  public DBOutlierDetection(Distance<? super O> distanceFunction, double d, double p) {
     super(distanceFunction, d);
     this.p = p;
   }
 
   @Override
   protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
     // Prefer kNN query if available, as this will usually stop earlier.
     KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     RangeQuery<O> rangeQuery = knnQuery == null ? database.getRangeQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY, d) : null;

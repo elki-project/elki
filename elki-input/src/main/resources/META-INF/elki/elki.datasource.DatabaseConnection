@@ -1,12 +1,12 @@
-elki.datasource.FileBasedDatabaseConnection de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection
+elki.datasource.FileBasedDatabaseConnection
 elki.datasource.BundleDatabaseConnection
 elki.datasource.RandomDoubleVectorDatabaseConnection
 elki.datasource.DBIDRangeDatabaseConnection
 elki.datasource.ExternalIDJoinDatabaseConnection
 elki.datasource.LabelJoinDatabaseConnection
 elki.datasource.ConcatenateFilesDatabaseConnection
-elki.datasource.EmptyDatabaseConnection de.lmu.ifi.dbs.elki.database.connection.EmptyDatabaseConnection
+elki.datasource.EmptyDatabaseConnection
 elki.datasource.PresortedBlindJoinDatabaseConnection
-# de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection
-# de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection
-# de.lmu.ifi.dbs.elki.datasource.MultipleObjectsBundleDatabaseConnection
+# elki.datasource.InputStreamDatabaseConnection
+# elki.datasource.ArrayAdapterDatabaseConnection
+# elki.datasource.MultipleObjectsBundleDatabaseConnection

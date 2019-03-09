@@ -31,7 +31,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.result.Metadata;
@@ -63,7 +63,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierKNN() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    MaterializeKNNPreprocessor<NumberVector> preproc = new MaterializeKNNPreprocessor<>(rel, EuclideanDistanceFunction.STATIC, 179);
+    MaterializeKNNPreprocessor<NumberVector> preproc = new MaterializeKNNPreprocessor<>(rel, EuclideanDistance.STATIC, 179);
     Metadata.hierarchyOf(rel).addChild(preproc);
     preproc.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
@@ -82,7 +82,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     // This is a bit of a hack to make a range-only index.
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistanceFunction.STATIC) {
+    PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistance.STATIC) {
       @Override
       public KNNQuery<NumberVector> getKNNQuery(DistanceQuery<NumberVector> distanceQuery, Object... hints) {
         return null; // Disable kNN queries, to force range queries to be tested.

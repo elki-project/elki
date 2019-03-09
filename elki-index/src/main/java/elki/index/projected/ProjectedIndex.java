@@ -37,7 +37,7 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ProjectedView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
@@ -181,7 +181,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       }
     }
     @SuppressWarnings("unchecked")
-    DistanceQuery<I> innerQuery = ((DistanceFunction<? super I>) distanceQuery.getDistanceFunction()).instantiate(view);
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
     KNNQuery<I> innerq = ((KNNIndex<I>) inner).getKNNQuery(innerQuery, hints);
     if(innerq == null) {
@@ -204,7 +204,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       }
     }
     @SuppressWarnings("unchecked")
-    DistanceQuery<I> innerQuery = ((DistanceFunction<? super I>) distanceQuery.getDistanceFunction()).instantiate(view);
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
     RangeQuery<I> innerq = ((RangeIndex<I>) inner).getRangeQuery(innerQuery, hints);
     if(innerq == null) {
@@ -227,7 +227,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       }
     }
     @SuppressWarnings("unchecked")
-    DistanceQuery<I> innerQuery = ((DistanceFunction<? super I>) distanceQuery.getDistanceFunction()).instantiate(view);
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
     RKNNQuery<I> innerq = ((RKNNIndex<I>) inner).getRKNNQuery(innerQuery, hints);
     if(innerq == null) {

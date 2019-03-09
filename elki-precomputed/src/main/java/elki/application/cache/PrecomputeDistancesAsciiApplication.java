@@ -35,7 +35,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.exceptions.AbortException;
@@ -81,7 +81,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Output file.
@@ -95,7 +95,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public PrecomputeDistancesAsciiApplication(Database database, DistanceFunction<? super O> distance, File out) {
+  public PrecomputeDistancesAsciiApplication(Database database, Distance<? super O> distance, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -174,7 +174,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<? super O> distance = null;
+    private Distance<? super O> distance = null;
 
     /**
      * Output file.
@@ -189,7 +189,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, Distance.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

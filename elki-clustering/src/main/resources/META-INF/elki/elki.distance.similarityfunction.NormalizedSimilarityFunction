@@ -1,3 +1,0 @@
-elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction
-elki.distance.similarityfunction.cluster.ClusteringBCubedF1SimilarityFunction
-elki.distance.similarityfunction.cluster.ClusteringFowlkesMallowsSimilarityFunction

@@ -29,7 +29,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -81,7 +81,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public OPTICSList(DistanceFunction<? super O> distanceFunction, double epsilon, int minpts) {
+  public OPTICSList(Distance<? super O> distanceFunction, double epsilon, int minpts) {
     super(distanceFunction, epsilon, minpts);
   }
 
@@ -151,7 +151,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       clusterOrder = new ClusterOrder(ids);
       Metadata.of(clusterOrder).setLongName("OPTICS Clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
-      DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+      DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
       rangeQuery = db.getRangeQuery(dq, epsilon);
     }
 

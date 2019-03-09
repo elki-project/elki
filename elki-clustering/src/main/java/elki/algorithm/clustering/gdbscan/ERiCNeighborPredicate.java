@@ -36,7 +36,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
@@ -113,7 +113,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
    * @return Instance
    */
   public Instance instantiate(Database database, Relation<V> relation) {
-    DistanceQuery<V> dq = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<V> dq = database.getDistanceQuery(relation, EuclideanDistance.STATIC);
     KNNQuery<V> knnq = database.getKNNQuery(dq, settings.k);
 
     WritableDataStore<PCAFilteredResult> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);

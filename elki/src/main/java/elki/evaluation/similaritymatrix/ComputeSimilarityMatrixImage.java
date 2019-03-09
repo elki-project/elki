@@ -37,8 +37,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;
@@ -83,7 +83,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The distance function to use
    */
-  private DistanceFunction<? super O> distanceFunction;
+  private Distance<? super O> distanceFunction;
 
   /**
    * Scaling function to use
@@ -102,7 +102,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * @param scaling Scaling function to use for contrast
    * @param skipzero Skip zero values when scaling.
    */
-  public ComputeSimilarityMatrixImage(DistanceFunction<? super O> distanceFunction, ScalingFunction scaling, boolean skipzero) {
+  public ComputeSimilarityMatrixImage(Distance<? super O> distanceFunction, ScalingFunction scaling, boolean skipzero) {
     super();
     this.distanceFunction = distanceFunction;
     this.scaling = scaling;
@@ -323,7 +323,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     /**
      * The distance function to use
      */
-    private DistanceFunction<O> distanceFunction;
+    private Distance<O> distanceFunction;
 
     /**
      * Scaling function to use
@@ -338,7 +338,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

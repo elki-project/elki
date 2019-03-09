@@ -1,8 +1,8 @@
 /**
  * Distance functions using correlations
  * 
- * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
- * @opt include .*elki.distance.distancefunction.WeightedNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistance
+ * @opt include .*elki.distance.distancefunction.WeightedNumberVectorDistance
  */
 /*
  * This file is part of ELKI:

@@ -29,8 +29,8 @@ import elki.data.model.ModelUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -48,7 +48,7 @@ import net.jafama.FastMath;
 
 /**
  * Evaluate a clustering by reporting the squared errors (SSE, SSQ), as used by
- * k-means. This should be used with {@link SquaredEuclideanDistanceFunction}
+ * k-means. This should be used with {@link SquaredEuclideanDistance}
  * only (when used with other distances, it will manually square the values; but
  * beware that the result is less meaningful with other distance functions).
  * <p>
@@ -83,7 +83,7 @@ public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistanceFunction<?> distance;
+  private NumberVectorDistance<?> distance;
 
   /**
    * Key for logging statistics.
@@ -96,7 +96,7 @@ public class EvaluateSquaredErrors implements Evaluator {
    * @param distance Distance function to use.
    * @param noiseOption Control noise handling.
    */
-  public EvaluateSquaredErrors(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOption) {
+  public EvaluateSquaredErrors(NumberVectorDistance<?> distance, NoiseHandling noiseOption) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOption;
@@ -183,7 +183,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     /**
      * Distance function to use.
      */
-    private NumberVectorDistanceFunction<?> distance;
+    private NumberVectorDistance<?> distance;
 
     /**
      * Handling of noise clusters.
@@ -193,7 +193,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<?>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<?>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distP)) {
         distance = distP.instantiateClass(config);
       }

@@ -23,14 +23,14 @@ package elki.database.query.distance;
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 
 /**
  * Distance query for spatial distance functions
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @assoc - - - SpatialPrimitiveDistanceFunction
+ * @assoc - - - SpatialPrimitiveDistance
  * 
  * @param <V> Vector type to use
  */
@@ -38,13 +38,13 @@ public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable> extends 
   /**
    * The distance function we use.
    */
-  final protected SpatialPrimitiveDistanceFunction<? super V> distanceFunction;
+  final protected SpatialPrimitiveDistance<? super V> distanceFunction;
   
   /**
    * @param relation Representation to use
    * @param distanceFunction Distance function to use
    */
-  public SpatialPrimitiveDistanceQuery(Relation<? extends V> relation, SpatialPrimitiveDistanceFunction<? super V> distanceFunction) {
+  public SpatialPrimitiveDistanceQuery(Relation<? extends V> relation, SpatialPrimitiveDistance<? super V> distanceFunction) {
     super(relation, distanceFunction);
     this.distanceFunction = distanceFunction;
   }
@@ -60,7 +60,7 @@ public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable> extends 
   }
 
   @Override
-  public SpatialPrimitiveDistanceFunction<? super V> getDistanceFunction() {
+  public SpatialPrimitiveDistance<? super V> getDistance() {
     return distanceFunction;
   }
 }

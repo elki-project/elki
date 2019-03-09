@@ -1,4 +1,4 @@
-elki.algorithm.clustering.optics.OPTICSHeap de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
+elki.algorithm.clustering.optics.OPTICSHeap
 elki.algorithm.clustering.optics.OPTICSList
 elki.algorithm.clustering.optics.FastOPTICS
 elki.algorithm.clustering.correlation.HiCO

@@ -34,7 +34,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
@@ -162,7 +162,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * @param numclusters Number of clusters
    * @param linkage Linkage strategy
    */
-  public NaiveAgglomerativeHierarchicalClustering3(DistanceFunction<? super O> distanceFunction, int numclusters, Linkage linkage) {
+  public NaiveAgglomerativeHierarchicalClustering3(Distance<? super O> distanceFunction, int numclusters, Linkage linkage) {
     super(distanceFunction);
     this.numclusters = numclusters;
     this.linkage = linkage;
@@ -176,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * @return Clustering hierarchy
    */
   public Clustering<Model> run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -192,7 +192,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !getDistanceFunction().isSquared();
+    boolean square = Linkage.WARD.equals(linkage) && !getDistance().isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
@@ -335,7 +335,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

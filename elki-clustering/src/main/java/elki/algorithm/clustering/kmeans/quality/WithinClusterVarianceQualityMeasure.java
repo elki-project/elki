@@ -25,7 +25,7 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 
 /**
  * Class for computing the variance in a clustering result (sum-of-squares).
@@ -36,7 +36,7 @@ import elki.distance.distancefunction.NumberVectorDistanceFunction;
  */
 public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     double variance = 0.;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       variance += varianceOfCluster(cluster, distanceFunction, relation);

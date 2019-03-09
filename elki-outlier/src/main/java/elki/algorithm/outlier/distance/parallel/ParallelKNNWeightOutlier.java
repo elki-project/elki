@@ -36,7 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.parallel.ParallelExecutor;
@@ -94,7 +94,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelKNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
+  public ParallelKNNWeightOutlier(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -106,7 +106,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**
@@ -119,7 +119,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
     // Find kNN

@@ -27,7 +27,7 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.model.MedoidModel;
 import elki.database.Database;
-import elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
+import elki.distance.similarityfunction.kernel.PolynomialKernel;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -72,7 +72,7 @@ public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterA
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<MedoidModel> result = new ELKIBuilder<AffinityPropagationClusteringAlgorithm<DoubleVector>>(AffinityPropagationClusteringAlgorithm.class) //
         .with(AffinityPropagationClusteringAlgorithm.Parameterizer.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class) //
-        .with(SimilarityBasedInitializationWithMedian.Parameterizer.SIMILARITY_ID, PolynomialKernelFunction.class) //
+        .with(SimilarityBasedInitializationWithMedian.Parameterizer.SIMILARITY_ID, PolynomialKernel.class) //
         .build().run(db);
     testFMeasure(db, result, 0.352103);
     testClusterSizes(result, new int[] { 20, 30, 32, 33, 34, 35, 36, 39, 39, 40, 43, 45, 45, 49, 49, 69 });

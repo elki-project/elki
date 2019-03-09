@@ -23,7 +23,7 @@ package elki.index.preprocessed.knn;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.logging.Logging;
@@ -49,7 +49,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
    * @param distanceFunction Distance function
    * @param k k
    */
-  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, DistanceFunction<? super V> distanceFunction, int k) {
+  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, Distance<? super V> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
@@ -98,7 +98,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
      * @param k K
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
+    public Factory(int k, Distance<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 

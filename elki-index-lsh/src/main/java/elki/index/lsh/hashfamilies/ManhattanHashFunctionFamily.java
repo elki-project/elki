@@ -21,8 +21,8 @@
 package elki.index.lsh.hashfamilies;
 
 import elki.data.projection.random.CauchyRandomProjectionFamily;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.ManhattanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
 
@@ -58,9 +58,9 @@ public class ManhattanHashFunctionFamily extends AbstractProjectedHashFunctionFa
   }
 
   @Override
-  public boolean isCompatible(DistanceFunction<?> df) {
+  public boolean isCompatible(Distance<?> df) {
     // TODO: also allow HistogramIntersectionDistance?
-    return ManhattanDistanceFunction.class.isInstance(df);
+    return ManhattanDistance.class.isInstance(df);
   }
 
   /**

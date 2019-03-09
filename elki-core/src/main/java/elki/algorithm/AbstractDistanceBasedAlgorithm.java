@@ -20,8 +20,8 @@
  */
 package elki.algorithm;
 
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -33,7 +33,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.1
  *
  * @opt nodefillcolor LemonChiffon
- * @has - - - DistanceFunction
+ * @has - - - Distance
  *
  * @param <O> the type of objects handled by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
@@ -43,14 +43,14 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R> extends AbstractAlgor
    * Holds the instance of the distance function specified by
    * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
-  private DistanceFunction<? super O> distanceFunction;
+  private Distance<? super O> distanceFunction;
 
   /**
    * Constructor.
    *
    * @param distanceFunction Distance function
    */
-  protected AbstractDistanceBasedAlgorithm(DistanceFunction<? super O> distanceFunction) {
+  protected AbstractDistanceBasedAlgorithm(Distance<? super O> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -61,7 +61,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R> extends AbstractAlgor
    * @return the distanceFunction
    */
   @Override
-  public DistanceFunction<? super O> getDistanceFunction() {
+  public Distance<? super O> getDistance() {
     return distanceFunction;
   }
 
@@ -74,12 +74,12 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R> extends AbstractAlgor
     /**
      * The distance function to use.
      */
-    protected DistanceFunction<? super O> distanceFunction;
+    protected Distance<? super O> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

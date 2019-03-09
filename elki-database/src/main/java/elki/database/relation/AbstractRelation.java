@@ -28,10 +28,10 @@ import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.LinearScanRKNNQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.distancefunction.DBIDDistanceFunction;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.similarityfunction.DBIDSimilarityFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.DBIDDistance;
+import elki.distance.distancefunction.Distance;
+import elki.distance.similarityfunction.DBIDSimilarity;
+import elki.distance.similarityfunction.Similarity;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.result.Metadata;
@@ -55,7 +55,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
   }
 
   @Override
-  public DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
@@ -69,7 +69,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(distanceFunction instanceof DBIDDistanceFunction)) {
+      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(distanceFunction instanceof DBIDDistance)) {
         return null; // Linear scan is not desirable.
       }
     }
@@ -77,7 +77,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
   }
 
   @Override
-  public SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> similarityFunction, Object... hints) {
+  public SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction, Object... hints) {
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
@@ -91,7 +91,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(similarityFunction instanceof DBIDSimilarityFunction)) {
+      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(similarityFunction instanceof DBIDSimilarity)) {
         return null; // Linear scan is not desirable.
       }
     }

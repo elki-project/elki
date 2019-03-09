@@ -33,8 +33,8 @@ import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.FilterUtil;
 import elki.datasource.filter.ObjectFilter;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
@@ -72,7 +72,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
   /**
    * Distance function to use.
    */
-  PrimitiveDistanceFunction<? super I> dist;
+  PrimitiveDistance<? super I> dist;
 
   /**
    * Target dimensionality
@@ -97,7 +97,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
    * @param factory Vector factory.
    * @param random Random generator.
    */
-  public FastMultidimensionalScalingTransform(int tdim, PrimitiveDistanceFunction<? super I> dist, NumberVector.Factory<O> factory, RandomFactory random) {
+  public FastMultidimensionalScalingTransform(int tdim, PrimitiveDistance<? super I> dist, NumberVector.Factory<O> factory, RandomFactory random) {
     super();
     this.tdim = tdim;
     this.dist = dist;
@@ -331,7 +331,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
     /**
      * Distance function to use.
      */
-    PrimitiveDistanceFunction<? super I> dist = null;
+    PrimitiveDistance<? super I> dist = null;
 
     /**
      * Random generator.
@@ -352,7 +352,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
         tdim = dimP.intValue();
       }
 
-      ObjectParameter<PrimitiveDistanceFunction<? super I>> distP = new ObjectParameter<>(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistance<? super I>> distP = new ObjectParameter<>(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }

@@ -44,7 +44,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
@@ -101,7 +101,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
    * @param distanceFunction distance function
    * @param minpts minPts parameter
    */
-  public OPTICSOF(DistanceFunction<? super O> distanceFunction, int minpts) {
+  public OPTICSOF(Distance<? super O> distanceFunction, int minpts) {
     super(distanceFunction);
     this.minpts = minpts;
   }
@@ -114,7 +114,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
     DBIDs ids = relation.getDBIDs();
@@ -177,7 +177,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

@@ -22,7 +22,7 @@ package elki.index.tree.metrical;
 
 import java.util.List;
 
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.Entry;
 import elki.index.tree.IndexTree;
 import elki.index.tree.Node;
@@ -53,7 +53,7 @@ public abstract class MetricalIndexTree<O, N extends Node<E>, E extends Entry> e
    * 
    * @return the distance function of this metrical index
    */
-  public abstract DistanceFunction<? super O> getDistanceFunction();
+  public abstract Distance<? super O> getDistance();
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

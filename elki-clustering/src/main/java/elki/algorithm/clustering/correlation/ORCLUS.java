@@ -37,8 +37,8 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.math.linearalgebra.Centroid;
@@ -203,7 +203,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    *        assigned to
    */
   private void assign(Relation<V> database, List<ORCLUSCluster> clusters) {
-    NumberVectorDistanceFunction<? super V> distFunc = SquaredEuclideanDistanceFunction.STATIC;
+    NumberVectorDistance<? super V> distFunc = SquaredEuclideanDistance.STATIC;
     // clear the current clusters
     for(ORCLUSCluster cluster : clusters) {
       cluster.objectIDs.clear();
@@ -343,7 +343,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @return the projected energy of the specified cluster
    */
   private ProjectedEnergy projectedEnergy(Relation<V> relation, ORCLUSCluster c_i, ORCLUSCluster c_j, int i, int j, int dim) {
-    NumberVectorDistanceFunction<? super V> distFunc = SquaredEuclideanDistanceFunction.STATIC;
+    NumberVectorDistance<? super V> distFunc = SquaredEuclideanDistance.STATIC;
     // union of cluster c_i and c_j
     ORCLUSCluster c_ij = union(relation, c_i, c_j, dim);
 

@@ -28,8 +28,8 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -68,7 +68,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
   /**
    * Distance function to use.
    */
-  PrimitiveDistanceFunction<? super I> dist = null;
+  PrimitiveDistance<? super I> dist = null;
 
   /**
    * Target dimensionality
@@ -87,7 +87,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
    * @param dist Distance function to use.
    * @param factory Vector factory.
    */
-  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDistanceFunction<? super I> dist, NumberVector.Factory<O> factory) {
+  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDistance<? super I> dist, NumberVector.Factory<O> factory) {
     super();
     this.tdim = tdim;
     this.dist = dist;
@@ -155,7 +155,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
    * @param dist Distance function
    * @return Distance matrix.
    */
-  protected static <I> double[][] computeSquaredDistanceMatrix(final List<I> col, PrimitiveDistanceFunction<? super I> dist) {
+  protected static <I> double[][] computeSquaredDistanceMatrix(final List<I> col, PrimitiveDistance<? super I> dist) {
     final int size = col.size();
     double[][] imat = new double[size][size];
     boolean squared = dist.isSquared();
@@ -254,7 +254,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
     /**
      * Distance function to use.
      */
-    PrimitiveDistanceFunction<? super I> dist = null;
+    PrimitiveDistance<? super I> dist = null;
 
     /**
      * Vector factory.
@@ -270,7 +270,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
         tdim = dimP.intValue();
       }
 
-      ObjectParameter<PrimitiveDistanceFunction<? super I>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistance<? super I>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }

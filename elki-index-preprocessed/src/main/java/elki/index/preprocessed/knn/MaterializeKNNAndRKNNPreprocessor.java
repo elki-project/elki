@@ -34,7 +34,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.rknn.PreprocessorRKNNQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.RKNNIndex;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -75,7 +75,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
+  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
@@ -347,7 +347,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   @Override
   public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+    if(!this.distanceFunction.equals(distanceQuery.getDistance())) {
       return null;
     }
     // k max supported?
@@ -392,7 +392,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
+    public Factory(int k, Distance<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 

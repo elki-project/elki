@@ -28,7 +28,7 @@ import elki.data.DoubleVector;
 import elki.data.type.TypeUtil;
 import elki.datasource.AbstractDataSourceTest;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.linearalgebra.SingularValueDecomposition;
 import elki.utilities.ELKIBuilder;
@@ -49,7 +49,7 @@ public class ClassicMultidimensionalScalingTransformTest extends AbstractDataSou
     String filename = UNITTEST + "transformation-test-1.csv";
     ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector>>(ClassicMultidimensionalScalingTransform.class) //
         .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
-        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //
+        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistance.class) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
@@ -75,8 +75,8 @@ public class ClassicMultidimensionalScalingTransformTest extends AbstractDataSou
       for(int row = outer + 1; row < filteredBundle.dataLength(); row++) {
         DoubleVector dFil_2 = get(filteredBundle, row, 0, DoubleVector.class);
         DoubleVector dUnfil_2 = get(unfilteredBundle, row, 0, DoubleVector.class);
-        final double distF = EuclideanDistanceFunction.STATIC.distance(dFil_1, dFil_2);
-        final double distU = EuclideanDistanceFunction.STATIC.distance(dUnfil_1, dUnfil_2);
+        final double distF = EuclideanDistance.STATIC.distance(dFil_1, dFil_2);
+        final double distU = EuclideanDistance.STATIC.distance(dUnfil_1, dUnfil_2);
         assertEquals("Expected same distance", distU, distF, 1e-11);
       }
     }

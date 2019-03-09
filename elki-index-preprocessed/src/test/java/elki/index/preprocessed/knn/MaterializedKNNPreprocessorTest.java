@@ -47,7 +47,7 @@ import elki.database.relation.RelationUtil;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.parser.NumberVectorLabelParser;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.result.Metadata;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIBuilder;
@@ -95,7 +95,7 @@ public class MaterializedKNNPreprocessorTest {
     }
 
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
 
     // verify data set size.
     assertEquals("Data set size doesn't match parameters.", shoulds, rel.size());
@@ -106,7 +106,7 @@ public class MaterializedKNNPreprocessorTest {
     // get preprocessed queries
     MaterializeKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<MaterializeKNNPreprocessor.Factory<DoubleVector>>(MaterializeKNNPreprocessor.Factory.class) //
-            .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction()) //
+            .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
             .with(MaterializeKNNPreprocessor.Factory.K_ID, k) //
             .build().instantiate(rel);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);

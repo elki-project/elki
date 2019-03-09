@@ -38,8 +38,8 @@ import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.filter.FixedDBIDsFilter;
-import elki.distance.distancefunction.CosineDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.CosineDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -125,7 +125,7 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistance.STATIC);
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors
@@ -182,7 +182,7 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistance.STATIC);
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors
@@ -234,7 +234,7 @@ public abstract class AbstractIndexStructureTest {
     Database db = new StaticArrayDatabase(dbc, factory != null ? Arrays.asList(factory) : null);
     db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistance.STATIC);
     DBIDRef first = rep.iterDBIDs();
     if(expectKNNQuery != null) {
       KNNQuery<DoubleVector> knnq = rep.getKNNQuery(dist);

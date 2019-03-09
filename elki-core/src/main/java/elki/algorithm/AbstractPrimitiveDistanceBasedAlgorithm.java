@@ -20,8 +20,8 @@
  */
 package elki.algorithm;
 
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -36,7 +36,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.1
  * 
- * @has - - - PrimitiveDistanceFunction
+ * @has - - - PrimitiveDistance
  * 
  * @param <O> the type of objects handled by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
@@ -46,14 +46,14 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends Abst
    * Holds the instance of the distance function specified by
    * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
-  protected PrimitiveDistanceFunction<? super O> distanceFunction;
+  protected PrimitiveDistance<? super O> distanceFunction;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    */
-  protected AbstractPrimitiveDistanceBasedAlgorithm(PrimitiveDistanceFunction<? super O> distanceFunction) {
+  protected AbstractPrimitiveDistanceBasedAlgorithm(PrimitiveDistance<? super O> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -63,7 +63,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends Abst
    * 
    * @return the distanceFunction
    */
-  public PrimitiveDistanceFunction<? super O> getDistanceFunction() {
+  public PrimitiveDistance<? super O> getDistance() {
     return distanceFunction;
   }
 
@@ -76,12 +76,12 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends Abst
     /**
      * Distance function to use.
      */
-    protected PrimitiveDistanceFunction<O> distanceFunction;
+    protected PrimitiveDistance<O> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

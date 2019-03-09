@@ -37,7 +37,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
@@ -75,7 +75,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @param distanceFunction Distance function to use
    * @param k Number of neighbors to use
    */
-  public DistanceStddevOutlier(DistanceFunction<? super O> distanceFunction, int k) {
+  public DistanceStddevOutlier(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -89,7 +89,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistance(), k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores
@@ -120,7 +120,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

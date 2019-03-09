@@ -34,7 +34,7 @@ import elki.database.QueryUtil;
 import elki.database.ids.*;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -128,7 +128,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
    */
-  public DBSCAN(DistanceFunction<? super O> distanceFunction, double epsilon, int minpts) {
+  public DBSCAN(Distance<? super O> distanceFunction, double epsilon, int minpts) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -146,7 +146,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
       return result;
     }
 
-    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
+    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistance());
     resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
     runDBSCAN(relation, rangeQuery);
@@ -261,7 +261,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    * @param seeds Seed set
    */
   private void processNeighbors(DoubleDBIDListIter neighbor, ModifiableDBIDs currentCluster, ArrayModifiableDBIDs seeds) {
-    final boolean ismetric = getDistanceFunction().isMetric();
+    final boolean ismetric = getDistance().isMetric();
     for(; neighbor.valid(); neighbor.advance()) {
       if(processedIDs.add(neighbor)) {
         if(!ismetric || neighbor.doubleValue() > 0.) {
@@ -277,7 +277,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

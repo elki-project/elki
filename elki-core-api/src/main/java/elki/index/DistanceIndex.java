@@ -21,7 +21,7 @@
 package elki.index;
 
 import elki.database.query.distance.DistanceQuery;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 
 /**
  * Index with support for distance queries (e.g. precomputed distance matrixes,
@@ -45,5 +45,5 @@ public interface DistanceIndex<O> extends Index {
    * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+  DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints);
 }

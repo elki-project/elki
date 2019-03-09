@@ -29,7 +29,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
@@ -54,7 +54,7 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/ictai/ZhaoXF08")
 public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihoodZhao(relation, clustering, distanceFunction) //
         - (.5 * clustering.getAllClusters().size()) * FastMath.log(numPoints(clustering));
   }
@@ -70,7 +70,7 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
    * @param <V> Vector type
    * @return Log Likelihood.
    */
-  public static <V extends NumberVector> double logLikelihoodZhao(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
+  public static <V extends NumberVector> double logLikelihoodZhao(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();

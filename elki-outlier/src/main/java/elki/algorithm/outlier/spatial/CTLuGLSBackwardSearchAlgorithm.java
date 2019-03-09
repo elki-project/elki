@@ -44,7 +44,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.NormalDistribution;
@@ -110,7 +110,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
    */
-  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<? super V> distanceFunction, int k, double alpha) {
+  public CTLuGLSBackwardSearchAlgorithm(Distance<? super V> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.alpha = alpha;
     this.k = k;
@@ -169,7 +169,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relationx, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relationx, getDistance(), k + 1);
 
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
@@ -258,7 +258,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override

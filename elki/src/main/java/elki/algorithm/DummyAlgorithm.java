@@ -28,7 +28,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
@@ -75,7 +75,7 @@ public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Vo
   public Void run(Database database, Relation<O> relation) {
     // Get a distance and knn query for the Euclidean distance
     // Hardcoded, only use this if you only allow the eucliden distance
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, EuclideanDistance.STATIC);
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, 10);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -89,7 +89,7 @@ public class DummyAlgorithm<O extends NumberVector> extends AbstractAlgorithm<Vo
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
+    return TypeUtil.array(EuclideanDistance.STATIC.getInputTypeRestriction());
   }
 
   @Override

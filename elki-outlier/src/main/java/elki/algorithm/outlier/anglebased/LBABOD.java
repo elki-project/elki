@@ -39,7 +39,7 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 import elki.distance.similarityfunction.kernel.KernelMatrix;
 import elki.logging.Logging;
 import elki.logging.Logging.Level;
@@ -108,7 +108,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
    * @param k k parameter
    * @param l Number of outliers to find exact
    */
-  public LBABOD(SimilarityFunction<? super V> kernelFunction, int k, int l) {
+  public LBABOD(Similarity<? super V> kernelFunction, int k, int l) {
     super(kernelFunction, k);
     this.l = l;
   }

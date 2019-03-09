@@ -44,7 +44,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.datasource.bundle.SingleObjectBundle;
-import elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction;
+import elki.distance.distancefunction.subspace.OnedimensionalDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.FrequentItemsetsResult;
@@ -362,7 +362,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     @SuppressWarnings("unchecked")
     RangeQuery<V>[] rangeQueries = (RangeQuery<V>[]) new RangeQuery[dimensionality];
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = relation.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistanceFunction(d)));
+      rangeQueries[d] = relation.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistance(d)));
     }
     return rangeQueries;
   }

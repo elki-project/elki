@@ -20,8 +20,8 @@
  */
 package elki.algorithm;
 
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -33,7 +33,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - NumberVectorDistanceFunction
+ * @has - - - NumberVectorDistance
  *
  * @param <O> Object type
  * @param <R> the type of result to retrieve from this Algorithm
@@ -43,14 +43,14 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends A
    * Holds the instance of the distance function specified by
    * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
-  protected NumberVectorDistanceFunction<? super O> distanceFunction;
+  protected NumberVectorDistance<? super O> distanceFunction;
 
   /**
    * Constructor.
    *
    * @param distanceFunction Distance function
    */
-  protected AbstractNumberVectorDistanceBasedAlgorithm(NumberVectorDistanceFunction<? super O> distanceFunction) {
+  protected AbstractNumberVectorDistanceBasedAlgorithm(NumberVectorDistance<? super O> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -61,7 +61,7 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends A
    * @return the distanceFunction
    */
   @Override
-  final public NumberVectorDistanceFunction<? super O> getDistanceFunction() {
+  final public NumberVectorDistance<? super O> getDistance() {
     return distanceFunction;
   }
 
@@ -74,12 +74,12 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends A
     /**
      * Distance function to use.
      */
-    protected NumberVectorDistanceFunction<? super O> distanceFunction;
+    protected NumberVectorDistance<? super O> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

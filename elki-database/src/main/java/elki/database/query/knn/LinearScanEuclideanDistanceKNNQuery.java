@@ -33,8 +33,8 @@ import elki.database.ids.KNNList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 
 /**
  * Instance of this query for a particular database.
@@ -46,8 +46,8 @@ import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction
  * @since 0.7.0
  *
  * @assoc - - - PrimitiveDistanceQuery
- * @assoc - - - EuclideanDistanceFunction
- * @assoc - - - SquaredEuclideanDistanceFunction
+ * @assoc - - - EuclideanDistance
+ * @assoc - - - SquaredEuclideanDistance
  */
 public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> implements LinearScanQuery {
   /**
@@ -57,7 +57,7 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
    */
   public LinearScanEuclideanDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
     super(distanceQuery);
-    assert (EuclideanDistanceFunction.STATIC.equals(distanceQuery.getDistanceFunction()));
+    assert (EuclideanDistance.STATIC.equals(distanceQuery.getDistance()));
   }
 
   @Override
@@ -82,7 +82,7 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
    * @return Heap
    */
   private KNNHeap linearScan(Relation<? extends O> relation, DBIDIter iter, final O obj, KNNHeap heap) {
-    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
+    final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
     double max = Double.POSITIVE_INFINITY;
     while(iter.valid()) {
       final double dist = squared.distance(obj, relation.get(iter));
@@ -121,7 +121,7 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
    */
   @Override
   protected void linearScanBatchKNN(List<O> objs, List<KNNHeap> heaps) {
-    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
+    final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
     final Relation<? extends O> relation = getRelation();
     final int size = objs.size();
     // Linear scan style KNN.

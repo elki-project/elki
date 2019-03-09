@@ -29,8 +29,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -90,7 +90,7 @@ public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Key for logging statistics.
@@ -103,7 +103,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
    */
-  public EvaluateCIndex(DistanceFunction<? super O> distance, NoiseHandling noiseOpt) {
+  public EvaluateCIndex(Distance<? super O> distance, NoiseHandling noiseOpt) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -281,7 +281,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     /**
      * Distance function to use.
      */
-    private DistanceFunction<? super O> distance;
+    private Distance<? super O> distance;
 
     /**
      * Option, how noise should be treated.
@@ -291,7 +291,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

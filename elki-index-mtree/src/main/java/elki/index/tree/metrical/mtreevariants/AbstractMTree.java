@@ -26,7 +26,7 @@ import java.util.List;
 
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRef;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.BreadthFirstEnumeration;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
@@ -83,7 +83,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
   }
 
   @Override
-  public final DistanceFunction<? super O> getDistanceFunction() {
+  public final Distance<? super O> getDistance() {
     return settings.distanceFunction;
   }
 

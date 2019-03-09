@@ -25,8 +25,8 @@ import org.junit.Test;
 import elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.database.Database;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -48,8 +48,8 @@ public class LoOPTest extends AbstractOutlierAlgorithmTest {
     result = new ELKIBuilder<LoOP<DoubleVector>>(LoOP.class) //
         .with(LoOP.Parameterizer.KREACH_ID, 20) //
         .with(LoOP.Parameterizer.KCOMP_ID, 15) //
-        .with(LoOP.Parameterizer.REACHABILITY_DISTANCE_FUNCTION_ID, SquaredEuclideanDistanceFunction.class) //
-        .with(LoOP.Parameterizer.COMPARISON_DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class) //
+        .with(LoOP.Parameterizer.REACHABILITY_DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
+        .with(LoOP.Parameterizer.COMPARISON_DISTANCE_FUNCTION_ID, EuclideanDistance.class) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.9435);
     testSingleScore(result, 945, 0.2993);

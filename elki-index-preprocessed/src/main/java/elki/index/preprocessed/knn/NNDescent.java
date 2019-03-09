@@ -27,7 +27,7 @@ import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -117,7 +117,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param noInitialNeighbors Do not use initial neighbors
    * @param iterations Maximum number of iterations
    */
-  public NNDescent(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
+  public NNDescent(Relation<O> relation, Distance<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
     this.delta = delta;
@@ -525,7 +525,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
      * @param noInitialNeighbors Do not use initial neighbors
      * @param iterations Maximum number of iterations
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
+    public Factory(int k, Distance<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
       super(k, distanceFunction);
       this.rnd = rnd;
       this.delta = delta;

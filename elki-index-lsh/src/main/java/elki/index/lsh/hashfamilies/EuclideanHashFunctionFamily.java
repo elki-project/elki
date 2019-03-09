@@ -21,8 +21,8 @@
 package elki.index.lsh.hashfamilies;
 
 import elki.data.projection.random.GaussianRandomProjectionFamily;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
 
@@ -58,8 +58,8 @@ public class EuclideanHashFunctionFamily extends AbstractProjectedHashFunctionFa
   }
 
   @Override
-  public boolean isCompatible(DistanceFunction<?> df) {
-    return EuclideanDistanceFunction.class.isInstance(df);
+  public boolean isCompatible(Distance<?> df) {
+    return EuclideanDistance.class.isInstance(df);
   }
 
   /**

@@ -4,7 +4,7 @@
  * Note that some regular distance functions (e.g., Euclidean) are also used on
  * time series.
  *
- * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistance
  */
 /*
  * This file is part of ELKI:

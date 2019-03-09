@@ -36,8 +36,8 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.similarityfunction.Similarity;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -123,12 +123,12 @@ public abstract class AbstractDatabase implements Database {
   }
 
   @Override
-  public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, Distance<? super O> distanceFunction, Object... hints) {
     return objQuery.getDistanceQuery(distanceFunction, hints);
   }
 
   @Override
-  public <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O> similarityFunction, Object... hints) {
+  public <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> objQuery, Similarity<? super O> similarityFunction, Object... hints) {
     return objQuery.getSimilarityQuery(similarityFunction, hints);
   }
 

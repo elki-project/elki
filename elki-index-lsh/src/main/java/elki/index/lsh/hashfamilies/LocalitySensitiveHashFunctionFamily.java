@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import elki.data.type.TypeInformation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 
 /**
@@ -59,5 +59,5 @@ public interface LocalitySensitiveHashFunctionFamily<V> {
    * @param df Distance function.
    * @return {@code true} when appropriate.
    */
-  boolean isCompatible(DistanceFunction<?> df);
+  boolean isCompatible(Distance<?> df);
 }
