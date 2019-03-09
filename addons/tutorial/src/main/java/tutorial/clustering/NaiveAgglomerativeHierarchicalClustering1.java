@@ -34,7 +34,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
@@ -78,7 +78,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
-  public NaiveAgglomerativeHierarchicalClustering1(DistanceFunction<? super O> distanceFunction, int numclusters) {
+  public NaiveAgglomerativeHierarchicalClustering1(Distance<? super O> distanceFunction, int numclusters) {
     super(distanceFunction);
     this.numclusters = numclusters;
   }
@@ -91,7 +91,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @return Clustering hierarchy
    */
   public Clustering<Model> run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -191,7 +191,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

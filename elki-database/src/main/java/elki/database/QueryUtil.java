@@ -37,9 +37,9 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.similarityfunction.Similarity;
 
 /**
  * Static class with utilities related to querying a database.
@@ -75,7 +75,7 @@ public final class QueryUtil {
    * @param hints Optimizer hints
    * @return Distance query
    */
-  public static <O> DistanceQuery<O> getDistanceQuery(Database database, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> DistanceQuery<O> getDistanceQuery(Database database, Distance<? super O> distanceFunction, Object... hints) {
     final Relation<O> objectQuery = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
     return database.getDistanceQuery(objectQuery, distanceFunction, hints);
   }
@@ -89,7 +89,7 @@ public final class QueryUtil {
    * @param hints Optimizer hints
    * @return Similarity Query
    */
-  public static <O> SimilarityQuery<O> getSimilarityQuery(Database database, SimilarityFunction<? super O> similarityFunction, Object... hints) {
+  public static <O> SimilarityQuery<O> getSimilarityQuery(Database database, Similarity<? super O> similarityFunction, Object... hints) {
     final Relation<O> objectQuery = database.getRelation(similarityFunction.getInputTypeRestriction(), hints);
     return database.getSimilarityQuery(objectQuery, similarityFunction, hints);
   }
@@ -112,7 +112,7 @@ public final class QueryUtil {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  public static <O> KNNQuery<O> getKNNQuery(Database database, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> KNNQuery<O> getKNNQuery(Database database, Distance<? super O> distanceFunction, Object... hints) {
     final Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
     return relation.getKNNQuery(distanceQuery, hints);
@@ -137,7 +137,7 @@ public final class QueryUtil {
    * @param <O> Object type
    * @return KNN Query object
    */
-  public static <O> KNNQuery<O> getKNNQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> KNNQuery<O> getKNNQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints) {
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
     return relation.getKNNQuery(distanceQuery, hints);
   }
@@ -162,7 +162,7 @@ public final class QueryUtil {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  public static <O> RangeQuery<O> getRangeQuery(Database database, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> RangeQuery<O> getRangeQuery(Database database, Distance<? super O> distanceFunction, Object... hints) {
     final Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
     return relation.getRangeQuery(distanceQuery, hints);
@@ -189,7 +189,7 @@ public final class QueryUtil {
    * @param <O> Object type
    * @return KNN Query object
    */
-  public static <O> RangeQuery<O> getRangeQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> RangeQuery<O> getRangeQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints) {
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
     return relation.getRangeQuery(distanceQuery, hints);
   }
@@ -214,7 +214,7 @@ public final class QueryUtil {
    * @param <O> Object type
    * @return RKNN Query object
    */
-  public static <O> RKNNQuery<O> getRKNNQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
+  public static <O> RKNNQuery<O> getRKNNQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints) {
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
     return relation.getRKNNQuery(distanceQuery, hints);
   }
@@ -231,7 +231,7 @@ public final class QueryUtil {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
-      if(EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+      if(EuclideanDistance.STATIC.equals(pdq.getDistance())) {
         final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
         return (KNNQuery<O>) new LinearScanEuclideanDistanceKNNQuery<>(ndq);
       }
@@ -252,7 +252,7 @@ public final class QueryUtil {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
-      if(EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+      if(EuclideanDistance.STATIC.equals(pdq.getDistance())) {
         final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
         return (RangeQuery<O>) new LinearScanEuclideanDistanceRangeQuery<>(ndq);
       }

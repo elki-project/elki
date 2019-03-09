@@ -36,8 +36,8 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
@@ -87,7 +87,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @param distanceFunction Distance function
    */
-  public SLINK(DistanceFunction<? super O> distanceFunction) {
+  public SLINK(Distance<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
@@ -121,8 +121,8 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     log.incrementProcessed(progress);
 
     // Optimized branch
-    if(getDistanceFunction() instanceof PrimitiveDistanceFunction) {
-      PrimitiveDistanceFunction<? super O> distf = (PrimitiveDistanceFunction<? super O>) getDistanceFunction();
+    if(getDistance() instanceof PrimitiveDistance) {
+      PrimitiveDistance<? super O> distf = (PrimitiveDistance<? super O>) getDistance();
       for(id.seek(1); id.valid(); id.advance()) {
         step2primitive(id, it, id.getOffset(), relation, distf, m);
         process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK
@@ -131,7 +131,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     }
     else {
       // Fallback branch
-      DistanceQuery<O> distQ = database.getDistanceQuery(relation, getDistanceFunction());
+      DistanceQuery<O> distQ = database.getDistanceQuery(relation, getDistance());
       for(id.seek(1); id.valid(); id.advance()) {
         step2(id, it, id.getOffset(), distQ, m);
         process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK
@@ -144,7 +144,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     m.destroy();
     m = null;
 
-    return new PointerHierarchyRepresentationResult(ids, pi, lambda, getDistanceFunction().isSquared());
+    return new PointerHierarchyRepresentationResult(ids, pi, lambda, getDistance().isSquared());
   }
 
   /**
@@ -177,7 +177,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param relation Data relation
    * @param distFunc Distance function to use
    */
-  private void step2primitive(DBIDRef id, DBIDArrayIter it, int n, Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distFunc, WritableDoubleDataStore m) {
+  private void step2primitive(DBIDRef id, DBIDArrayIter it, int n, Relation<? extends O> relation, PrimitiveDistance<? super O> distFunc, WritableDoubleDataStore m) {
     O newObj = relation.get(id);
     for(it.seek(0); it.getOffset() < n; it.advance()) {
       // M(i) = dist(i, n+1)
@@ -270,7 +270,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

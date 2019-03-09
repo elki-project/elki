@@ -1,4 +1,4 @@
-elki.evaluation.clustering.EvaluateClustering de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure
+elki.evaluation.clustering.EvaluateClustering
 elki.evaluation.clustering.LogClusterSizes
 elki.evaluation.clustering.internal.EvaluateSilhouette
 elki.evaluation.clustering.internal.EvaluateSimplifiedSilhouette

@@ -32,7 +32,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
 
 /**
  * Instance of this query for a particular database.
@@ -44,13 +44,13 @@ import elki.distance.distancefunction.PrimitiveDistanceFunction;
  * @since 0.4.0
  * 
  * @assoc - - - PrimitiveDistanceQuery
- * @assoc - - - PrimitiveDistanceFunction
+ * @assoc - - - PrimitiveDistance
  */
 public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> implements LinearScanQuery {
   /**
    * Unboxed distance function.
    */
-  private PrimitiveDistanceFunction<? super O> rawdist;
+  private PrimitiveDistance<? super O> rawdist;
 
   /**
    * Constructor.
@@ -59,7 +59,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    */
   public LinearScanPrimitiveDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
     super(distanceQuery);
-    rawdist = distanceQuery.getDistanceFunction();
+    rawdist = distanceQuery.getDistance();
   }
 
   @Override
@@ -84,7 +84,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * @return Heap
    */
   private KNNHeap linearScan(Relation<? extends O> relation, DBIDIter iter, final O obj, KNNHeap heap) {
-    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
+    final PrimitiveDistance<? super O> rawdist = this.rawdist;
     double max = Double.POSITIVE_INFINITY;
     while(iter.valid()) {
       final double dist = rawdist.distance(obj, relation.get(iter));
@@ -122,7 +122,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * @param heaps Heaps array
    */
   protected void linearScanBatchKNN(List<O> objs, List<KNNHeap> heaps) {
-    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
+    final PrimitiveDistance<? super O> rawdist = this.rawdist;
     final Relation<? extends O> relation = getRelation();
     final int size = objs.size();
     // Linear scan style KNN.

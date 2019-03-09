@@ -33,8 +33,8 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.ManhattanDistance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
@@ -77,7 +77,7 @@ public class KNNJoinTest {
 
     // Euclidean
     {
-      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, EuclideanDistance.STATIC);
       KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
@@ -89,7 +89,7 @@ public class KNNJoinTest {
     }
     // Manhattan
     {
-      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, ManhattanDistanceFunction.STATIC);
+      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, ManhattanDistance.STATIC);
       KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
@@ -145,7 +145,7 @@ public class KNNJoinTest {
 
     // Euclidean
     {
-      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
+      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(EuclideanDistance.STATIC, 2);
       Relation<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
@@ -157,7 +157,7 @@ public class KNNJoinTest {
     }
     // Manhattan
     {
-      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(ManhattanDistanceFunction.STATIC, 2);
+      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(ManhattanDistance.STATIC, 2);
       Relation<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();

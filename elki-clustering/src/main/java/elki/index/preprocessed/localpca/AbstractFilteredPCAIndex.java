@@ -28,8 +28,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.preprocessed.AbstractPreprocessorIndex;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -146,7 +146,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      * Holds the instance of the distance function specified by
      * {@link Parameterizer#PCA_DISTANCE_ID}.
      */
-    protected DistanceFunction<NV> pcaDistanceFunction;
+    protected Distance<NV> pcaDistance;
 
     /**
      * PCA utility object.
@@ -161,13 +161,13 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
     /**
      * Constructor.
      *
-     * @param pcaDistanceFunction distance Function
+     * @param pcaDistance distance Function
      * @param pca PCA runner
      * @param filter Eigenvector filter
      */
-    public Factory(DistanceFunction<NV> pcaDistanceFunction, PCARunner pca, EigenPairFilter filter) {
+    public Factory(Distance<NV> pcaDistance, PCARunner pca, EigenPairFilter filter) {
       super();
-      this.pcaDistanceFunction = pcaDistanceFunction;
+      this.pcaDistance = pcaDistance;
       this.pca = pca;
       this.filter = filter;
     }
@@ -177,7 +177,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
     @Override
     public TypeInformation getInputTypeRestriction() {
-      return pcaDistanceFunction.getInputTypeRestriction();
+      return pcaDistance.getInputTypeRestriction();
     }
 
     /**
@@ -197,7 +197,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
        * Holds the instance of the distance function specified by
        * {@link #PCA_DISTANCE_ID}.
        */
-      protected DistanceFunction<NV> pcaDistanceFunction;
+      protected Distance<NV> pcaDistance;
 
       /**
        * PCA utility object.
@@ -212,10 +212,10 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final ObjectParameter<DistanceFunction<NV>> pcaDistanceFunctionP = new ObjectParameter<>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<Distance<NV>> pcaDistanceP = new ObjectParameter<>(PCA_DISTANCE_ID, Distance.class, EuclideanDistance.class);
 
-        if(config.grab(pcaDistanceFunctionP)) {
-          pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);
+        if(config.grab(pcaDistanceP)) {
+          pcaDistance = pcaDistanceP.instantiateClass(config);
         }
 
         ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);

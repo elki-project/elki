@@ -34,7 +34,7 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -87,12 +87,12 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
     /**
      * distance function to use
      */
-    private DistanceFunction<? super O> distFunc;
+    private Distance<? super O> distFunc;
 
     /**
      * Factory Constructor
      */
-    public Factory(int k, DistanceFunction<? super O> distFunc) {
+    public Factory(int k, Distance<? super O> distFunc) {
       super();
       this.k = k;
       this.distFunc = distFunc;
@@ -148,7 +148,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
       /**
        * Distance function
        */
-      DistanceFunction<? super O> distFunc;
+      Distance<? super O> distFunc;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -157,7 +157,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
         if(config.grab(kP)) {
           k = kP.getValue();
         }
-        final ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCEFUNCTION_ID, DistanceFunction.class);
+        final ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DISTANCEFUNCTION_ID, Distance.class);
         if(config.grab(distP)) {
           distFunc = distP.instantiateClass(config);
         }

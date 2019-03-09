@@ -46,8 +46,8 @@ import elki.database.ids.DBIDs;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
@@ -120,7 +120,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   /**
    * Distance function to use.
    */
-  protected NumberVectorDistanceFunction<? super O> distance;
+  protected NumberVectorDistance<? super O> distance;
 
   /**
    * Constructor.
@@ -132,7 +132,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param beta the ratio of the sizes of the clusters at the boundary between
    *        the large and the small clusters
    */
-  public CBLOF(NumberVectorDistanceFunction<? super O> distanceFunction, ClusteringAlgorithm<Clustering<MeanModel>> clusteringAlgorithm, double alpha, double beta) {
+  public CBLOF(NumberVectorDistance<? super O> distanceFunction, ClusteringAlgorithm<Clustering<MeanModel>> clusteringAlgorithm, double alpha, double beta) {
     super(distanceFunction);
     this.clusteringAlgorithm = clusteringAlgorithm;
     this.alpha = alpha;
@@ -220,7 +220,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param largeClusters Large clusters output
    * @param smallClusters Small clusters output
    */
-  private void computeCBLOFs(Relation<O> relation, NumberVectorDistanceFunction<? super O> distance, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {
+  private void computeCBLOFs(Relation<O> relation, NumberVectorDistance<? super O> distance, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {
     List<NumberVector> largeClusterMeans = new ArrayList<>(largeClusters.size());
     for(Cluster<MeanModel> largeCluster : largeClusters) {
       NumberVector mean = ModelUtil.getPrototypeOrCentroid(largeCluster.getModel(), relation, largeCluster.getIDs());
@@ -246,7 +246,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     cblofMinMax.put(cblof);
   }
 
-  private double computeSmallClusterCBLOF(O obj, NumberVectorDistanceFunction<? super O> distance, List<NumberVector> largeClusterMeans, Cluster<MeanModel> cluster) {
+  private double computeSmallClusterCBLOF(O obj, NumberVectorDistance<? super O> distance, List<NumberVector> largeClusterMeans, Cluster<MeanModel> cluster) {
     // Get distance to nearest large cluster
     double nearestLargeClusterDistance = Double.MAX_VALUE;
     for(NumberVector clusterMean : largeClusterMeans) {
@@ -258,14 +258,14 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     return cluster.size() * nearestLargeClusterDistance;
   }
 
-  private double computeLargeClusterCBLOF(O obj, NumberVectorDistanceFunction<? super O> distanceQuery, NumberVector clusterMean, Cluster<MeanModel> cluster) {
+  private double computeLargeClusterCBLOF(O obj, NumberVectorDistance<? super O> distanceQuery, NumberVector clusterMean, Cluster<MeanModel> cluster) {
     // Get distance to center of containing cluster
     return cluster.size() * distanceQuery.distance(obj, clusterMean);
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -324,13 +324,13 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     /**
      * Distance function to use.
      */
-    protected NumberVectorDistanceFunction<? super O> distance;
+    protected NumberVectorDistance<? super O> distance;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<? super O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<? super O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceP)) {
         distance = distanceP.instantiateClass(config);
       }

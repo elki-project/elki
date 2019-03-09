@@ -34,7 +34,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -95,7 +95,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    * @param k Neighborhood size
    * @param estimator Estimator for intrinsic dimensionality
    */
-  public IntrinsicDimensionalityOutlier(DistanceFunction<? super O> distanceFunction, int k, IntrinsicDimensionalityEstimator estimator) {
+  public IntrinsicDimensionalityOutlier(Distance<? super O> distanceFunction, int k, IntrinsicDimensionalityEstimator estimator) {
     super(distanceFunction);
     this.k = k;
     this.estimator = estimator;
@@ -109,7 +109,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
     final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
@@ -137,7 +137,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

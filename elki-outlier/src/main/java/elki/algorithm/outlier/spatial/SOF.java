@@ -33,7 +33,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;
@@ -81,11 +81,11 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * Constructor.
    * 
    * @param npred Neighborhood predicate
-   * @param nonSpatialDistanceFunction Distance function on non-spatial
+   * @param nonSpatialDistance Distance function on non-spatial
    *        attributes
    */
-  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O> nonSpatialDistanceFunction) {
-    super(npred, nonSpatialDistanceFunction);
+  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistance<O> nonSpatialDistance) {
+    super(npred, nonSpatialDistance);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
-    DistanceQuery<O> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
+    DistanceQuery<O> distFunc = getNonSpatialDistance().instantiate(relation);
 
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);

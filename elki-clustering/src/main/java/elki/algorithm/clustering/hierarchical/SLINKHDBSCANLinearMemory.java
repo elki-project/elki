@@ -28,7 +28,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -80,7 +80,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
-  public SLINKHDBSCANLinearMemory(DistanceFunction<? super O> distanceFunction, int minPts) {
+  public SLINKHDBSCANLinearMemory(Distance<? super O> distanceFunction, int minPts) {
     super(distanceFunction, minPts);
   }
 
@@ -92,7 +92,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    * @return Clustering hierarchy
    */
   public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistance());
     final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
@@ -124,7 +124,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
     }
     LOG.ensureCompleted(progress);
 
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistanceFunction().isSquared(), coredists);
+    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
   }
 
   /**
@@ -230,7 +230,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

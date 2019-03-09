@@ -1,0 +1,11 @@
+elki.distance.similarityfunction.Kulczynski1Similarity
+elki.distance.similarityfunction.Kulczynski2Similarity
+elki.distance.similarityfunction.InvertedDistanceSimilarity
+elki.distance.similarityfunction.kernel.LinearKernel
+elki.distance.similarityfunction.kernel.PolynomialKernel
+elki.distance.similarityfunction.kernel.RadialBasisFunctionKernel rbf
+elki.distance.similarityfunction.kernel.SigmoidKernel sigmoid
+elki.distance.similarityfunction.kernel.LaplaceKernel
+elki.distance.similarityfunction.kernel.RationalQuadraticKernel
+elki.distance.distancefunction.probabilistic.HellingerDistance hellinger bhattacharyya
+elki.distance.distancefunction.set.JaccardSimilarityDistance

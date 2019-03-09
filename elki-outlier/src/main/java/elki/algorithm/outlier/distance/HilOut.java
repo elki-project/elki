@@ -40,8 +40,8 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -157,7 +157,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * @param h Number of Bits for precision to use - max 32
    * @param tn TopN or All Outlier Rank to return
    */
-  protected HilOut(LPNormDistanceFunction distfunc, int k, int n, int h, Enum<ScoreType> tn) {
+  protected HilOut(LPNormDistance distfunc, int k, int n, int h, Enum<ScoreType> tn) {
     super(distfunc);
     this.n = n;
     // HilOut does not count the object itself. We do in KNNWeightOutlier.
@@ -170,7 +170,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
   }
 
   public OutlierResult run(Database database, Relation<O> relation) {
-    distq = database.getDistanceQuery(relation, getDistanceFunction());
+    distq = database.getDistanceQuery(relation, getDistance());
     d = RelationUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
@@ -415,7 +415,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new LPNormDistanceFunction(t).getInputTypeRestriction());
+    return TypeUtil.array(new LPNormDistance(t).getInputTypeRestriction());
   }
 
   /**
@@ -940,7 +940,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     /**
      * LPNorm distance function
      */
-    protected LPNormDistanceFunction distfunc;
+    protected LPNormDistance distfunc;
 
     /**
      * Scores to report: all or top-n only
@@ -966,7 +966,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
         h = hP.getValue();
       }
 
-      ObjectParameter<LPNormDistanceFunction> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<LPNormDistance> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distfunc = distP.instantiateClass(config);
       }

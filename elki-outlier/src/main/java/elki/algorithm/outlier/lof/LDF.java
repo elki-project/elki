@@ -37,7 +37,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -117,7 +117,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * @param h Kernel bandwidth scaling
    * @param c Score scaling parameter
    */
-  public LDF(int k, DistanceFunction<? super O> distance, KernelDensityFunction kernel, double h, double c) {
+  public LDF(int k, Distance<? super O> distance, KernelDensityFunction kernel, double h, double c) {
     super(distance);
     this.k = k + 1;
     this.kernel = kernel;
@@ -138,7 +138,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
 
     // Compute LDEs
     LOG.beginStep(stepprog, 2, "Computing LDEs.");
@@ -211,7 +211,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override

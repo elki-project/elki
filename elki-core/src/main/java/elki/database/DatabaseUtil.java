@@ -35,7 +35,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.ConvertToStringView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
@@ -193,7 +193,7 @@ public final class DatabaseUtil {
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
-    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
+    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistance(), k);
     preproc.initialize();
     // TODO: attach weakly persistent to the relation?
     return preproc.getKNNQuery(dq, k);
@@ -208,7 +208,7 @@ public final class DatabaseUtil {
    * @param k required number of neighbors
    * @return KNNQuery for the given relation, that is precomputed.
    */
-  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, int k) {
+  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, Distance<? super O> distf, int k) {
     DistanceQuery<O> dq = database.getDistanceQuery(relation, distf);
     // "HEAVY" flag for knn query since it is used more than once
     KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
@@ -216,7 +216,7 @@ public final class DatabaseUtil {
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
-    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
+    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistance(), k);
     preproc.initialize();
     // TODO: attach weakly persistent to the relation?
     return preproc.getKNNQuery(dq, k);
@@ -234,7 +234,7 @@ public final class DatabaseUtil {
    * @param log Logger
    * @return KNNQuery for the given relation, that is precomputed.
    */
-  public static <O> DistanceQuery<O> precomputedDistanceQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, Logging log) {
+  public static <O> DistanceQuery<O> precomputedDistanceQuery(Database database, Relation<O> relation, Distance<? super O> distf, Logging log) {
     DistanceQuery<O> dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(dq == null) {
       DBIDs ids = relation.getDBIDs();

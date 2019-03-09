@@ -21,7 +21,7 @@
 package elki.index.tree.spatial.rstarvariants.xtree;
 
 import elki.data.NumberVector;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
@@ -116,7 +116,7 @@ public abstract class AbstractXTreeFactory<O extends NumberVector, N extends Abs
       REINSERT_PARAMETER.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(REINSERT_PARAMETER)) {
         float reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
-        settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
+        settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistance.STATIC)));
       }
       final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
       MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);

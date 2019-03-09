@@ -37,8 +37,8 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ProjectedView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.geo.LngLatDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.geo.LngLatDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.*;
 import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * index.
  * <p>
  * Note: this index will <b>only</b> support the distance function
- * {@link LngLatDistanceFunction}, as it uses a projection that will map data
+ * {@link LngLatDistance}, as it uses a projection that will map data
  * according to this great circle distance. If the query hint "exact" is set, it
  * will not be used.
  * 
@@ -106,7 +106,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LngLatDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if(!LngLatDistance.class.isInstance(distanceQuery.getDistance())) {
       return null;
     }
     for(Object o : hints) {
@@ -114,7 +114,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
     KNNQuery<O> innerq = ((KNNIndex<O>) inner).getKNNQuery(innerQuery, hints);
     if(innerq == null) {
       return null;
@@ -131,7 +131,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LngLatDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if(!LngLatDistance.class.isInstance(distanceQuery.getDistance())) {
       return null;
     }
     for(Object o : hints) {
@@ -139,7 +139,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
     RangeQuery<O> innerq = ((RangeIndex<O>) inner).getRangeQuery(innerQuery, hints);
     if(innerq == null) {
       return null;
@@ -156,7 +156,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LngLatDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if(!LngLatDistance.class.isInstance(distanceQuery.getDistance())) {
       return null;
     }
     for(Object o : hints) {
@@ -164,7 +164,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
     RKNNQuery<O> innerq = ((RKNNIndex<O>) inner).getRKNNQuery(innerQuery, hints);
     if(innerq == null) {
       return null;

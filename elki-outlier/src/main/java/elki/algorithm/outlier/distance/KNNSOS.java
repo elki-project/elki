@@ -35,7 +35,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -110,14 +110,14 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
    * @param distance Distance function
    * @param k Number of neighbors to consider
    */
-  public KNNSOS(DistanceFunction<? super O> distance, int k) {
+  public KNNSOS(Distance<? super O> distance, int k) {
     super(distance);
     this.k = k;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**
@@ -129,7 +129,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
   public OutlierResult run(Relation<O> relation) {
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistanceFunction(), k1);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k1);
     final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
 
     double[] p = new double[k + 10];

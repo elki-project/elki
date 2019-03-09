@@ -41,7 +41,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -149,7 +149,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param scale Kernel scaling parameter
    * @param idim Intrinsic dimensionality (use 0 to use real dimensionality)
    */
-  public KDEOS(DistanceFunction<? super O> distanceFunction, int kmin, int kmax, KernelDensityFunction kernel, double minBandwidth, double scale, int idim) {
+  public KDEOS(Distance<? super O> distanceFunction, int kmin, int kmax, KernelDensityFunction kernel, double minBandwidth, double scale, int idim) {
     super(distanceFunction);
     this.kmin = kmin;
     this.kmax = kmax;
@@ -170,7 +170,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     final DBIDs ids = rel.getDBIDs();
 
     LOG.verbose("Running kNN preprocessor.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, rel, getDistanceFunction(), kmax + 1);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, rel, getDistance(), kmax + 1);
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);
@@ -313,7 +313,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation res = getDistanceFunction().getInputTypeRestriction();
+    TypeInformation res = getDistance().getInputTypeRestriction();
     if(idim < 0) {
       res = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, res);
     }

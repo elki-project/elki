@@ -35,8 +35,8 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.similarityfunction.Similarity;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -87,7 +87,7 @@ public interface Database {
    * @param hints Optimizer hints
    * @return Instance to query the database with this distance
    */
-  <O> DistanceQuery<O> getDistanceQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints);
+  <O> DistanceQuery<O> getDistanceQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints);
 
   /**
    * Get the similarity query for a particular similarity function.
@@ -98,7 +98,7 @@ public interface Database {
    * @param hints Optimizer hints
    * @return Instance to query the database with this similarity
    */
-  <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> relation, SimilarityFunction<? super O> similarityFunction, Object... hints);
+  <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> relation, Similarity<? super O> similarityFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query.

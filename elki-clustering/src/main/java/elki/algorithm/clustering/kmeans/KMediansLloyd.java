@@ -31,7 +31,7 @@ import elki.data.model.MeanModel;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
@@ -73,13 +73,13 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public KMediansLloyd(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
   public Clustering<MeanModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildMediansResult();
   }
@@ -96,7 +96,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
      * @param relation Relation
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
     }
 

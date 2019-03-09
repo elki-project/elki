@@ -1,7 +1,7 @@
 elki.algorithm.clustering.CanopyPreClustering
 elki.algorithm.clustering.DBSCAN
 elki.algorithm.clustering.affinitypropagation.AffinityPropagationClusteringAlgorithm
-elki.algorithm.clustering.em.EM de.lmu.ifi.dbs.elki.algorithm.clustering.EM
+elki.algorithm.clustering.em.EM
 elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
 elki.algorithm.clustering.gdbscan.parallel.ParallelGeneralizedDBSCAN
 elki.algorithm.clustering.gdbscan.LSDBC
@@ -11,10 +11,10 @@ elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
 elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight
 elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
-elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK single-link single-linkage
+elki.algorithm.clustering.hierarchical.SLINK single-link single-linkage
 elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
 elki.algorithm.clustering.hierarchical.NNChain
-elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+elki.algorithm.clustering.hierarchical.AGNES HAC SAHN
 elki.algorithm.clustering.hierarchical.CLINK Defays
 elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
 elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
@@ -29,7 +29,7 @@ elki.algorithm.clustering.kmeans.KMeansAnnulus
 elki.algorithm.clustering.kmeans.KMeansHamerly
 elki.algorithm.clustering.kmeans.KMeansElkan
 elki.algorithm.clustering.kmeans.KMeansSimplifiedElkan
-elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans lloyd forgy
+elki.algorithm.clustering.kmeans.KMeansLloyd lloyd forgy
 elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.algorithm.clustering.kmeans.KMeansMacQueen
 elki.algorithm.clustering.kmeans.KMeansKDTreeFiltering
@@ -40,7 +40,7 @@ elki.algorithm.clustering.kmeans.KMedoidsFastPAM
 elki.algorithm.clustering.kmeans.KMedoidsFastPAM1
 elki.algorithm.clustering.kmeans.KMedoidsPAMReynolds
 elki.algorithm.clustering.kmeans.KMedoidsPAM
-elki.algorithm.clustering.kmeans.KMedoidsPark de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
+elki.algorithm.clustering.kmeans.KMedoidsPark
 elki.algorithm.clustering.kmeans.FastCLARANS
 elki.algorithm.clustering.kmeans.CLARANS
 elki.algorithm.clustering.kmeans.CLARA
@@ -51,8 +51,8 @@ elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 elki.algorithm.clustering.kmeans.XMeans
 elki.algorithm.clustering.Leader
 elki.algorithm.clustering.NaiveMeanShiftClustering
-elki.algorithm.clustering.optics.OPTICSXi de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
-elki.algorithm.clustering.optics.OPTICSHeap de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
+elki.algorithm.clustering.optics.OPTICSXi
+elki.algorithm.clustering.optics.OPTICSHeap
 elki.algorithm.clustering.optics.OPTICSList
 elki.algorithm.clustering.optics.FastOPTICS
 elki.algorithm.clustering.SNNClustering
@@ -73,8 +73,8 @@ elki.algorithm.clustering.subspace.PreDeCon
 elki.algorithm.clustering.subspace.PROCLUS
 elki.algorithm.clustering.subspace.SUBCLU
 elki.algorithm.clustering.meta.ExternalClustering
-elki.algorithm.clustering.trivial.ByLabelClustering de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering
-elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering
-elki.algorithm.clustering.trivial.TrivialAllInOne de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne
-elki.algorithm.clustering.trivial.TrivialAllNoise de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise
+elki.algorithm.clustering.trivial.ByLabelClustering
+elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering
+elki.algorithm.clustering.trivial.TrivialAllInOne
+elki.algorithm.clustering.trivial.TrivialAllNoise
 elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering

@@ -32,7 +32,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -80,14 +80,14 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansHamerly(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+  public KMeansHamerly(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer);
     this.varstat = varstat;
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult(varstat, relation);
   }
@@ -129,7 +129,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
      * @param relation Relation
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
       upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
       lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);

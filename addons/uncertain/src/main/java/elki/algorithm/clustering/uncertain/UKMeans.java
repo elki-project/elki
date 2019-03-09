@@ -48,7 +48,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -240,7 +240,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
    * @return The distance
    */
   protected double getExpectedRepDistance(NumberVector rep, DiscreteUncertainObject uo) {
-    SquaredEuclideanDistanceFunction euclidean = SquaredEuclideanDistanceFunction.STATIC;
+    SquaredEuclideanDistance euclidean = SquaredEuclideanDistance.STATIC;
     int counter = 0;
     double sum = 0.0;
     for(int i = 0; i < uo.getNumberSamples(); i++) {

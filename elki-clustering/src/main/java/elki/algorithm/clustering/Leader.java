@@ -33,7 +33,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
@@ -78,7 +78,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
    * @param distanceFunction Distance function
    * @param threshold Maximum distance from leading object
    */
-  public Leader(DistanceFunction<? super O> distanceFunction, double threshold) {
+  public Leader(Distance<? super O> distanceFunction, double threshold) {
     super(distanceFunction);
     this.threshold = threshold;
   }
@@ -90,7 +90,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
    * @return Clustering result
    */
   public Clustering<PrototypeModel<O>> run(Relation<O> relation) {
-    RangeQuery<O> rq = relation.getRangeQuery(getDistanceFunction(), threshold);
+    RangeQuery<O> rq = relation.getRangeQuery(getDistance(), threshold);
 
     ModifiableDBIDs seen = DBIDUtil.newHashSet(relation.size());
     Clustering<PrototypeModel<O>> clustering = new Clustering<>();
@@ -127,7 +127,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

@@ -33,7 +33,7 @@ import elki.data.model.Model;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 
@@ -325,14 +325,14 @@ public class GeneratorMain {
     public int getAssignment(int i, double[] p) {
       int bestc = i;
       boolean reassign = (centers[i] == null);
-      double is = reassign ? 0. : SquaredEuclideanDistanceFunction.STATIC.distance(centers[i], p);
+      double is = reassign ? 0. : SquaredEuclideanDistance.STATIC.distance(centers[i], p);
       double bestd = reassign ? Double.POSITIVE_INFINITY : is;
       for(int j = 0; j < generators.size(); j++) {
         if(centers[j] == null) {
           continue;
         }
         // Compute distance by each (non-reassigned) generator:
-        final double dist = SquaredEuclideanDistanceFunction.STATIC.distance(centers[j], p);
+        final double dist = SquaredEuclideanDistance.STATIC.distance(centers[j], p);
         // Model testing:
         if(dist < bestd) {
           if(!reassign) {

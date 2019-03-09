@@ -22,7 +22,7 @@ package elki.database.query.distance;
 
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
 
 /**
  * Run a database query in a database context.
@@ -31,7 +31,7 @@ import elki.distance.distancefunction.PrimitiveDistanceFunction;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @assoc - - - PrimitiveDistanceFunction
+ * @assoc - - - PrimitiveDistance
  * 
  * @param <O> Database object type.
  */
@@ -44,7 +44,7 @@ public class PrimitiveDistanceQuery<O> implements DistanceQuery<O> {
   /**
    * The distance function we use.
    */
-  final protected PrimitiveDistanceFunction<? super O> distanceFunction;
+  final protected PrimitiveDistance<? super O> distanceFunction;
 
   /**
    * Constructor.
@@ -52,7 +52,7 @@ public class PrimitiveDistanceQuery<O> implements DistanceQuery<O> {
    * @param relation Representation to use.
    * @param distanceFunction Our distance function
    */
-  public PrimitiveDistanceQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distanceFunction) {
+  public PrimitiveDistanceQuery(Relation<? extends O> relation, PrimitiveDistance<? super O> distanceFunction) {
     super();
     this.relation = relation;
     this.distanceFunction = distanceFunction;
@@ -84,7 +84,7 @@ public class PrimitiveDistanceQuery<O> implements DistanceQuery<O> {
   }
 
   @Override
-  public PrimitiveDistanceFunction<? super O> getDistanceFunction() {
+  public PrimitiveDistance<? super O> getDistance() {
     return distanceFunction;
   }
 }

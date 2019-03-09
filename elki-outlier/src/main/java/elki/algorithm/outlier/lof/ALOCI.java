@@ -42,8 +42,8 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -119,7 +119,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
   /**
    * Distance function
    */
-  private NumberVectorDistanceFunction<?> distFunc;
+  private NumberVectorDistance<?> distFunc;
 
   /**
    * Constructor.
@@ -130,7 +130,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistanceFunction<?> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
+  public ALOCI(NumberVectorDistance<?> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
@@ -692,13 +692,13 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     /**
      * The distance function
      */
-    private NumberVectorDistanceFunction<?> distanceFunction;
+    private NumberVectorDistance<?> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

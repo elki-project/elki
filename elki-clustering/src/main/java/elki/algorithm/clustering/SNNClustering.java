@@ -35,7 +35,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
+import elki.distance.similarityfunction.SharedNearestNeighborSimilarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -63,7 +63,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * @since 0.1
  *
- * @assoc - - - SharedNearestNeighborSimilarityFunction
+ * @assoc - - - SharedNearestNeighborSimilarity
  *
  * @param <O> the type of Object the algorithm is applied on
  */
@@ -110,7 +110,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   /**
    * The similarity function for the shared nearest neighbor similarity.
    */
-  private SharedNearestNeighborSimilarityFunction<O> similarityFunction;
+  private SharedNearestNeighborSimilarity<O> similarityFunction;
 
   /**
    * Constructor.
@@ -119,7 +119,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param epsilon Epsilon
    * @param minpts Minpts
    */
-  public SNNClustering(SharedNearestNeighborSimilarityFunction<O> similarityFunction, int epsilon, int minpts) {
+  public SNNClustering(SharedNearestNeighborSimilarity<O> similarityFunction, int epsilon, int minpts) {
     super();
     this.similarityFunction = similarityFunction;
     this.epsilon = epsilon;
@@ -312,12 +312,12 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     protected int minpts;
 
-    private SharedNearestNeighborSimilarityFunction<O> similarityFunction;
+    private SharedNearestNeighborSimilarity<O> similarityFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Class<SharedNearestNeighborSimilarityFunction<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      Class<SharedNearestNeighborSimilarity<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarity.class);
       similarityFunction = config.tryInstantiate(cls);
 
       IntParameter epsilonP = new IntParameter(EPSILON_ID);

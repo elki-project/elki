@@ -31,7 +31,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.KNNIndex;
 import elki.index.RKNNIndex;
 import elki.index.RangeIndex;
@@ -98,8 +98,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
@@ -112,8 +112,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
@@ -122,8 +122,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
 
   @Override
   public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }

@@ -36,7 +36,7 @@ import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
@@ -121,7 +121,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
    * @param variants Number of curve variants to generate
    * @param random Random number generator
    */
-  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
+  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
     super(relation, distanceFunction, k);
     this.curvegen = curvegen;
     this.window = window;
@@ -297,7 +297,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
      * @param variants Number of curve variants to generate
      * @param random Random number generator
      */
-    public Factory(int k, DistanceFunction<? super V> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
+    public Factory(int k, Distance<? super V> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
       super(k, distanceFunction);
       this.curvegen = curvegen;
       this.window = window;

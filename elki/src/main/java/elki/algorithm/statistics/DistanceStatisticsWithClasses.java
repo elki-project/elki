@@ -42,7 +42,7 @@ import elki.database.ids.DoubleDBIDPair;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -103,7 +103,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    * @param exact Exactness flag
    * @param sampling Sampling flag
    */
-  public DistanceStatisticsWithClasses(DistanceFunction<? super O> distanceFunction, int numbins, boolean exact, boolean sampling) {
+  public DistanceStatisticsWithClasses(Distance<? super O> distanceFunction, int numbins, boolean exact, boolean sampling) {
     super(distanceFunction);
     this.numbin = numbins;
     this.exact = exact;
@@ -113,7 +113,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
   @Override
   public HistogramResult run(Database database) {
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
 
     final StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
 
@@ -399,7 +399,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

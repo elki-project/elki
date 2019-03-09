@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
 import elki.distance.distancefunction.Norm;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -94,7 +94,7 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistance.class);
       if(config.grab(normP)) {
         norm = normP.instantiateClass(config);
       }

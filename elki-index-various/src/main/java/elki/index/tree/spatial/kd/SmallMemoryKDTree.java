@@ -31,11 +31,11 @@ import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.distance.distancefunction.Norm;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
+import elki.distance.distancefunction.minkowski.SparseLPNormDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.index.AbstractIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -214,15 +214,15 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
 
   @Override
   public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    DistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
+    Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistanceFunction) {
+    if(df instanceof LPNormDistance) {
       return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
     }
-    if(df instanceof SquaredEuclideanDistanceFunction) {
+    if(df instanceof SquaredEuclideanDistance) {
       return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
     }
-    if(df instanceof SparseLPNormDistanceFunction) {
+    if(df instanceof SparseLPNormDistance) {
       return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
     }
     return null;
@@ -230,15 +230,15 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
 
   @Override
   public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    DistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
+    Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistanceFunction) {
+    if(df instanceof LPNormDistance) {
       return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
     }
-    if(df instanceof SquaredEuclideanDistanceFunction) {
+    if(df instanceof SquaredEuclideanDistance) {
       return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
     }
-    if(df instanceof SparseLPNormDistanceFunction) {
+    if(df instanceof SparseLPNormDistance) {
       return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
     }
     return null;

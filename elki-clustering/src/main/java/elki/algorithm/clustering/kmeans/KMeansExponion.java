@@ -30,7 +30,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 
@@ -75,13 +75,13 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public KMeansExponion(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+  public KMeansExponion(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer, varstat);
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult(varstat, relation);
   }
@@ -107,7 +107,7 @@ public class KMeansExponion<V extends NumberVector> extends KMeansHamerly<V> {
      */
     int[][] cnum;
 
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
       second = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
       cdist = new double[k][k];

@@ -29,10 +29,10 @@ import elki.data.DoubleVector;
 import elki.database.AbstractDatabase;
 import elki.database.Database;
 import elki.database.query.knn.PreprocessorKNNQuery;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import elki.distance.similarityfunction.kernel.LinearKernelFunction;
-import elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.similarityfunction.kernel.LinearKernel;
+import elki.distance.similarityfunction.kernel.PolynomialKernel;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
@@ -50,7 +50,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
-        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernelFunction.STATIC) //
+        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
@@ -60,13 +60,13 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
   public void testFastABODLinearIndexSquared() {
     ListParameterization pars = new ListParameterization();
     pars.addParameter(AbstractDatabase.Parameterizer.INDEX_ID, MaterializeKNNPreprocessor.Factory.class);
-    pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, SquaredEuclideanDistanceFunction.STATIC);
+    pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC);
     pars.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, 6);
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960, pars);
-    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), SquaredEuclideanDistanceFunction.STATIC), 5) instanceof PreprocessorKNNQuery);
+    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), SquaredEuclideanDistance.STATIC), 5) instanceof PreprocessorKNNQuery);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
-        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernelFunction.STATIC) //
+        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
@@ -76,13 +76,13 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
   public void testFastABODLinearIndexEuclidean() {
     ListParameterization pars = new ListParameterization();
     pars.addParameter(AbstractDatabase.Parameterizer.INDEX_ID, MaterializeKNNPreprocessor.Factory.class);
-    pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.STATIC);
+    pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, EuclideanDistance.STATIC);
     pars.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, 6);
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960, pars);
-    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), EuclideanDistanceFunction.STATIC), 5) instanceof PreprocessorKNNQuery);
+    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), EuclideanDistance.STATIC), 5) instanceof PreprocessorKNNQuery);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
-        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernelFunction.STATIC) //
+        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
@@ -93,7 +93,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
-        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, new PolynomialKernelFunction(1)) //
+        .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, new PolynomialKernel(1)) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);

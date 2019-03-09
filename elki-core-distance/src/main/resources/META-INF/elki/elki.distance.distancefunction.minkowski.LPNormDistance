@@ -1,0 +1,9 @@
+elki.distance.distancefunction.minkowski.EuclideanDistance euclidean euclid l2
+elki.distance.distancefunction.minkowski.ManhattanDistance taxicab cityblock l1
+elki.distance.distancefunction.minkowski.LPNormDistance lp minkowski p
+# elki.distance.distancefunction.minkowski.LPIntegerNormDistance
+elki.distance.distancefunction.minkowski.MaximumDistance maximum max chebyshev
+elki.distance.distancefunction.minkowski.WeightedLPNormDistance
+elki.distance.distancefunction.minkowski.WeightedEuclideanDistance
+elki.distance.distancefunction.minkowski.WeightedManhattanDistance
+elki.distance.distancefunction.minkowski.WeightedMaximumDistance

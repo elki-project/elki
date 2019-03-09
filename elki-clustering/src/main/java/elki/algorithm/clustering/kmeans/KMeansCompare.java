@@ -30,7 +30,7 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -74,13 +74,13 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansCompare(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public KMeansCompare(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult();
   }
@@ -103,7 +103,7 @@ public class KMeansCompare<V extends NumberVector> extends AbstractKMeans<V, KMe
      * @param df Distance function
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
       cdist = new double[k][k];
     }

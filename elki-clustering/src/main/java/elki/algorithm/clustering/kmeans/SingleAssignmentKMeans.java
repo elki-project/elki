@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -53,13 +53,13 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    * @param k k parameter
    * @param initializer Initialization method
    */
-  public SingleAssignmentKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, KMeansInitialization initializer) {
+  public SingleAssignmentKMeans(NumberVectorDistance<? super V> distanceFunction, int k, KMeansInitialization initializer) {
     super(distanceFunction, k, 1, initializer);
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(1);
     return instance.buildResult();
   }
@@ -76,7 +76,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
      * @param relation Relation
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
     }
 
@@ -107,7 +107,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     protected void makeOptions(Parameterization config) {
       // Do NOT invoke super.makeOptions, as we don't want to have the maxiter
       // parameter, nor a warning for other distance functions.
-      getParameterDistanceFunction(config);
+      getParameterDistance(config);
       getParameterK(config);
       getParameterInitialization(config);
     }

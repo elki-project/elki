@@ -49,9 +49,9 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.similarityfunction.kernel.LinearKernelFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.similarityfunction.kernel.LinearKernel;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
@@ -121,7 +121,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   /**
    * Distance function to use
    */
-  final DistanceFunction<? super O> distf;
+  final Distance<? super O> distf;
 
   /**
    * Range of k.
@@ -165,7 +165,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * @param disable Pattern for disabling methods
    * @param ksquarestop Maximum k for O(k^2) methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
+  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
     super();
     this.distf = distf;
     this.krange = krange;
@@ -259,7 +259,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
               .run(database, relation), out);
       // Run FastABOD
       runForEachK("FastABOD", 3, maxksq, //
-          k -> new FastABOD<O>(LinearKernelFunction.STATIC, k) //
+          k -> new FastABOD<O>(LinearKernel.STATIC, k) //
               .run(database, relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
       runForEachK("KDEOS", 2, maxk, //
@@ -301,7 +301,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // Run VOV (requires a vector field).
       if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
+        final Distance<? super DoubleVector> df = (Distance<? super DoubleVector>) distf;
         @SuppressWarnings("unchecked")
         final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
         runForEachK("VOV", 0, maxk, //
@@ -428,7 +428,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * Distance function to use
      */
-    DistanceFunction<? super O> distf;
+    Distance<? super O> distf;
 
     /**
      * By label outlier -- reference
@@ -461,7 +461,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }

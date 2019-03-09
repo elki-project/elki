@@ -32,9 +32,9 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
+import elki.distance.distancefunction.subspace.SubspaceLPNormDistance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -222,14 +222,14 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
 
   @Override
   public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof SubspaceLPNormDistanceFunction) {
-      double p = ((SubspaceLPNormDistanceFunction) df).getP();
-      long[] bits = ((SubspaceLPNormDistanceFunction) df).getSelectedDimensions();
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof SubspaceLPNormDistance) {
+      double p = ((SubspaceLPNormDistance) df).getP();
+      long[] bits = ((SubspaceLPNormDistance) df).getSelectedDimensions();
       return new PartialVAFileKNNQuery(distanceQuery, p, bits);
     }
-    if(df instanceof LPNormDistanceFunction) {
-      double p = ((LPNormDistanceFunction) df).getP();
+    if(df instanceof LPNormDistance) {
+      double p = ((LPNormDistance) df).getP();
       long[] bits = BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()));
       return new PartialVAFileKNNQuery(distanceQuery, p, bits);
     }
@@ -239,14 +239,14 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
 
   @Override
   public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
-    if(df instanceof SubspaceLPNormDistanceFunction) {
-      double p = ((SubspaceLPNormDistanceFunction) df).getP();
-      long[] bits = ((SubspaceLPNormDistanceFunction) df).getSelectedDimensions();
+    Distance<? super V> df = distanceQuery.getDistance();
+    if(df instanceof SubspaceLPNormDistance) {
+      double p = ((SubspaceLPNormDistance) df).getP();
+      long[] bits = ((SubspaceLPNormDistance) df).getSelectedDimensions();
       return new PartialVAFileRangeQuery(distanceQuery, p, bits);
     }
-    if(df instanceof LPNormDistanceFunction) {
-      double p = ((LPNormDistanceFunction) df).getP();
+    if(df instanceof LPNormDistance) {
+      double p = ((LPNormDistance) df).getP();
       long[] bits = BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()));
       return new PartialVAFileRangeQuery(distanceQuery, p, bits);
     }

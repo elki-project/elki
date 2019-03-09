@@ -28,8 +28,8 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -78,7 +78,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
   /**
    * Input distance function.
    */
-  protected DistanceFunction<? super O> distanceFunction;
+  protected Distance<? super O> distanceFunction;
 
   /**
    * Kernel bandwidth sigma.
@@ -91,7 +91,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
    * @param distanceFunction Distance function
    * @param sigma Gaussian kernel bandwidth
    */
-  public GaussianAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double sigma) {
+  public GaussianAffinityMatrixBuilder(Distance<? super O> distanceFunction, double sigma) {
     super();
     this.distanceFunction = distanceFunction;
     this.sigma = sigma;
@@ -116,7 +116,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
   protected double[][] buildDistanceMatrix(ArrayDBIDs ids, DistanceQuery<?> dq) {
     final int size = ids.size();
     double[][] dmat = new double[size][size];
-    final boolean square = !dq.getDistanceFunction().isSquared();
+    final boolean square = !dq.getDistance().isSquared();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.distancematrix").begin() : null;
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
@@ -247,7 +247,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     @Override
     protected void makeOptions(Parameterization config) {
       // Override: super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

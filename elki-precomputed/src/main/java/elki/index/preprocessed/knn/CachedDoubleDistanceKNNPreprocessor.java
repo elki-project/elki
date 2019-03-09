@@ -32,7 +32,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.ByteArrayUtil;
@@ -62,7 +62,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * @param k K
    * @param file File to load
    */
-  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, File file) {
+  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, File file) {
     super(relation, distanceFunction, k);
     this.filename = file;
   }
@@ -153,7 +153,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * @param distanceFunction distance function
      * @param filename Cache file
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, File filename) {
+    public Factory(int k, Distance<? super O> distanceFunction, File filename) {
       super(k, distanceFunction);
       this.filename = filename;
     }

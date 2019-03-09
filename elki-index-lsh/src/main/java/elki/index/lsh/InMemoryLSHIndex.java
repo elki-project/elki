@@ -35,7 +35,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -220,7 +220,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
           return null;
         }
       }
-      DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
+      Distance<? super V> df = distanceQuery.getDistance();
       if(!family.isCompatible(df)) {
         return null;
       }
@@ -234,7 +234,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
           return null;
         }
       }
-      DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
+      Distance<? super V> df = distanceQuery.getDistance();
       if(!family.isCompatible(df)) {
         return null;
       }

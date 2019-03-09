@@ -1,4 +1,4 @@
-elki.algorithm.clustering.optics.DeLiClu de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
+elki.algorithm.clustering.optics.DeLiClu
 elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 elki.algorithm.outlier.clustering.CBLOF
 elki.algorithm.outlier.OPTICSOF
@@ -16,5 +16,5 @@ elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 elki.algorithm.benchmark.ValidateApproximativeKNNIndex
 elki.algorithm.DependencyDerivator
-elki.algorithm.KNNDistancesSampler de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
+elki.algorithm.KNNDistancesSampler
 elki.algorithm.KNNJoin

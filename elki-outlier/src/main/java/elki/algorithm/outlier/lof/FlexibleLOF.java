@@ -42,7 +42,7 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -120,27 +120,27 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * Neighborhood distance function.
    */
-  protected DistanceFunction<? super O> referenceDistanceFunction;
+  protected Distance<? super O> referenceDistance;
 
   /**
    * Reachability distance function.
    */
-  protected DistanceFunction<? super O> reachabilityDistanceFunction;
+  protected Distance<? super O> reachabilityDistance;
 
   /**
    * Constructor.
    *
    * @param krefer The number of neighbors for reference
    * @param kreach The number of neighbors for reachability distance
-   * @param neighborhoodDistanceFunction the neighborhood distance function
-   * @param reachabilityDistanceFunction the reachability distance function
+   * @param neighborhoodDistance the neighborhood distance function
+   * @param reachabilityDistance the reachability distance function
    */
-  public FlexibleLOF(int krefer, int kreach, DistanceFunction<? super O> neighborhoodDistanceFunction, DistanceFunction<? super O> reachabilityDistanceFunction) {
+  public FlexibleLOF(int krefer, int kreach, Distance<? super O> neighborhoodDistance, Distance<? super O> reachabilityDistance) {
     super();
     this.krefer = krefer + 1;
     this.kreach = kreach + 1;
-    this.referenceDistanceFunction = neighborhoodDistanceFunction;
-    this.reachabilityDistanceFunction = reachabilityDistanceFunction;
+    this.referenceDistance = neighborhoodDistance;
+    this.reachabilityDistance = reachabilityDistance;
   }
 
   /**
@@ -167,31 +167,31 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    * @return the kNN queries for the algorithm
    */
   private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
-    DistanceQuery<O> distQ = database.getDistanceQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+    DistanceQuery<O> distQ = database.getDistanceQuery(relation, reachabilityDistance, DatabaseQuery.HINT_HEAVY_USE);
     // "HEAVY" flag for knnReach since it is used more than once
     KNNQuery<O> knnReach = database.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
-        if(referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
+        if(referenceDistance.equals(reachabilityDistance)) {
           stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", LOG);
         }
         else {
           stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
         }
       }
-      int kpreproc = (referenceDistanceFunction.equals(reachabilityDistanceFunction)) ? Math.max(kreach, krefer) : kreach;
-      knnReach = DatabaseUtil.precomputedKNNQuery(database, relation, reachabilityDistanceFunction, kpreproc);
+      int kpreproc = (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach;
+      knnReach = DatabaseUtil.precomputedKNNQuery(database, relation, reachabilityDistance, kpreproc);
     }
 
     // knnReach is only used once
     KNNQuery<O> knnRefer;
-    if(referenceDistanceFunction == reachabilityDistanceFunction || referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if(referenceDistance == reachabilityDistance || referenceDistance.equals(reachabilityDistance)) {
       knnRefer = knnReach;
     }
     else {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = QueryUtil.getKNNQuery(relation, referenceDistanceFunction, krefer);
+      knnRefer = QueryUtil.getKNNQuery(relation, referenceDistance, krefer);
     }
 
     return new Pair<>(knnRefer, knnReach);
@@ -317,11 +317,11 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     final TypeInformation type;
-    if(reachabilityDistanceFunction.equals(referenceDistanceFunction)) {
-      type = reachabilityDistanceFunction.getInputTypeRestriction();
+    if(reachabilityDistance.equals(referenceDistance)) {
+      type = reachabilityDistance.getInputTypeRestriction();
     }
     else {
-      type = new CombinedTypeInformation(referenceDistanceFunction.getInputTypeRestriction(), reachabilityDistanceFunction.getInputTypeRestriction());
+      type = new CombinedTypeInformation(referenceDistance.getInputTypeRestriction(), reachabilityDistance.getInputTypeRestriction());
     }
     return TypeUtil.array(type);
   }
@@ -511,12 +511,12 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     /**
      * Neighborhood distance function.
      */
-    protected DistanceFunction<? super O> neighborhoodDistanceFunction = null;
+    protected Distance<? super O> neighborhoodDistance = null;
 
     /**
      * Reachability distance function.
      */
-    protected DistanceFunction<? super O> reachabilityDistanceFunction = null;
+    protected Distance<? super O> reachabilityDistance = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -538,19 +538,19 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
         kreach = krefer;
       }
 
-      ObjectParameter<DistanceFunction<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class);
+      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class);
       reachDistP.setOptional(true);
       if(config.grab(reachDistP)) {
-        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
+        reachabilityDistance = reachDistP.instantiateClass(config);
       }
       else {
-        reachabilityDistanceFunction = distanceFunction;
+        reachabilityDistance = distanceFunction;
       }
     }
 
     @Override
     protected FlexibleLOF<O> makeInstance() {
-      return new FlexibleLOF<>(kreach, krefer, distanceFunction, reachabilityDistanceFunction);
+      return new FlexibleLOF<>(kreach, krefer, distanceFunction, reachabilityDistance);
     }
   }
 }

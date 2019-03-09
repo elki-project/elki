@@ -29,7 +29,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.evaluation.scores.AveragePrecisionEvaluation;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -104,7 +104,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    * @param includeSelf Include query object in evaluation
    * @param maxk Maximum k for kNN evaluation
    */
-  public EvaluateRetrievalPerformance(DistanceFunction<? super O> distanceFunction, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
+  public EvaluateRetrievalPerformance(Distance<? super O> distanceFunction, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
     super(distanceFunction);
     this.sampling = sampling;
     this.random = random;
@@ -121,7 +121,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    * @return Vectors containing mean and standard deviation.
    */
   public RetrievalPerformanceResult run(Database database, Relation<O> relation, Relation<?> lrelation) {
-    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     // For storing the positive neighbors.
@@ -255,7 +255,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     TypeInformation cls = new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST);
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), cls);
+    return TypeUtil.array(getDistance().getInputTypeRestriction(), cls);
   }
 
   @Override

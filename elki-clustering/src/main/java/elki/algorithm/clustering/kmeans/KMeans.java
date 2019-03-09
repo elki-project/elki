@@ -28,7 +28,7 @@ import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.optionhandling.OptionID;
 
 /**
@@ -92,7 +92,7 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
    *
    * @param distanceFunction Distance function.
    */
-  void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction);
+  void setDistance(NumberVectorDistance<? super V> distanceFunction);
 
   /**
    * Set the initialization method.

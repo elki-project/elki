@@ -20,7 +20,7 @@
  */
 package elki.index.tree.metrical.mtreevariants;
 
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 
@@ -38,7 +38,7 @@ public class MTreeSettings<O, N extends AbstractMTreeNode<O, N, E>, E extends MT
   /**
    * Holds the instance of the trees distance function.
    */
-  protected DistanceFunction<? super O> distanceFunction;
+  protected Distance<? super O> distanceFunction;
 
   /**
    * Splitting strategy.

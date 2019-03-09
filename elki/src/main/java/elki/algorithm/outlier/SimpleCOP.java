@@ -38,7 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -106,14 +106,14 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @param pca PCA runner
    * @param filter Filter for selecting eigenvectors
    */
-  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCARunner pca, EigenPairFilter filter) {
+  public SimpleCOP(Distance<? super V> distanceFunction, int k, PCARunner pca, EigenPairFilter filter) {
     super(distanceFunction);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(data, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(data, getDistance(), k + 1);
 
     DBIDs ids = data.getDBIDs();
 

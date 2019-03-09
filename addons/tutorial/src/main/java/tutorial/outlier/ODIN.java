@@ -37,7 +37,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -87,7 +87,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public ODIN(DistanceFunction<? super O> distanceFunction, int k) {
+  public ODIN(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -106,7 +106,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     // Get the query functions:
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnq = database.getKNNQuery(dq, k);
 
     // Get the objects to process, and a data storage for counting and output:
@@ -142,7 +142,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

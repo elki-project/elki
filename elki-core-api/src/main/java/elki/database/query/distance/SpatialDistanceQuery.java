@@ -22,7 +22,7 @@ package elki.database.query.distance;
 
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 
 /**
  * Query interface for spatial distance queries.
@@ -61,5 +61,5 @@ public interface SpatialDistanceQuery<V extends SpatialComparable> extends Dista
    * @return Distance function
    */
   @Override
-  SpatialPrimitiveDistanceFunction<? super V> getDistanceFunction();
+  SpatialPrimitiveDistance<? super V> getDistance();
 }

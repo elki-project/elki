@@ -29,8 +29,8 @@ import elki.data.NumberVector;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -82,7 +82,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistanceFunction<?> distanceFunction;
+  private NumberVectorDistance<?> distanceFunction;
 
   /**
    * Key for logging statistics.
@@ -95,7 +95,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
    */
-  public EvaluateDaviesBouldin(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
+  public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
     super();
     this.distanceFunction = distance;
     this.noiseOption = noiseOpt;
@@ -230,7 +230,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
     /**
      * Distance function to use.
      */
-    private NumberVectorDistanceFunction<?> distance;
+    private NumberVectorDistance<?> distance;
 
     /**
      * Option, how noise should be treated.
@@ -241,7 +241,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

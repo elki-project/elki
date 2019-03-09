@@ -32,8 +32,8 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialIndexTree;
@@ -96,7 +96,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public KNNJoin(DistanceFunction<? super V> distanceFunction, int k) {
+  public KNNJoin(Distance<? super V> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -123,8 +123,8 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @return Data store
    */
   public WritableDataStore<KNNList> run(Relation<V> relation, DBIDs ids) {
-    if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
-      throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
+    if(!(getDistance() instanceof SpatialPrimitiveDistance)) {
+      throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistance.class.getName());
     }
     It<SpatialIndexTree<N, E>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(SpatialIndexTree.class);
     if(!indexes.valid()) {
@@ -147,7 +147,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    */
   public WritableDataStore<KNNList> run(SpatialIndexTree<N, E> index, DBIDs ids) {
     @SuppressWarnings("unchecked")
-    SpatialPrimitiveDistanceFunction<V> distFunction = (SpatialPrimitiveDistanceFunction<V>) getDistanceFunction();
+    SpatialPrimitiveDistance<V> distFunction = (SpatialPrimitiveDistance<V>) getDistance();
 
     // data pages
     List<E> ps_candidates = new ArrayList<>(index.getLeaves());
@@ -245,7 +245,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param pr Node to initialize for
    * @return List of heaps
    */
-  private List<KNNHeap> initHeaps(SpatialPrimitiveDistanceFunction<V> distFunction, N pr) {
+  private List<KNNHeap> initHeaps(SpatialPrimitiveDistance<V> distFunction, N pr) {
     List<KNNHeap> pr_heaps = new ArrayList<>(pr.getNumEntries());
     // Create for each data object a knn heap
     for(int j = 0; j < pr.getNumEntries(); j++) {
@@ -267,7 +267,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
    */
-  private void processDataPages(SpatialPrimitiveDistanceFunction<? super V> df, List<KNNHeap> pr_heaps, List<KNNHeap> ps_heaps, N pr, N ps) {
+  private void processDataPages(SpatialPrimitiveDistance<? super V> df, List<KNNHeap> pr_heaps, List<KNNHeap> ps_heaps, N pr, N ps) {
     // Compare pairwise
     for(int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);

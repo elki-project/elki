@@ -30,8 +30,8 @@ import elki.data.model.ModelUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -76,7 +76,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistanceFunction<?> distance;
+  private NumberVectorDistance<?> distance;
 
   /**
    * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
@@ -95,7 +95,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    * @param noiseOpt Flag to control noise handling
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSimplifiedSilhouette(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt, boolean penalize) {
+  public EvaluateSimplifiedSilhouette(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -257,7 +257,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     /**
      * Distance function to use.
      */
-    private NumberVectorDistanceFunction<?> distance;
+    private NumberVectorDistance<?> distance;
 
     /**
      * Option, how noise should be treated.
@@ -273,7 +273,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

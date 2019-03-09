@@ -32,8 +32,8 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.LoggingUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -92,7 +92,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
@@ -109,12 +109,12 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
       LoggingUtil.warning("Initializing k-means with k-means using specialized distance functions MAY fail, if the initialization method does require a distance defined on arbitrary number vectors.");
     }
     @SuppressWarnings("unchecked")
-    NumberVectorDistanceFunction<? super V> pdf = (NumberVectorDistanceFunction<? super V>) distanceFunction;
+    NumberVectorDistance<? super V> pdf = (NumberVectorDistance<? super V>) distanceFunction;
     ProxyView<V> proxyv = new ProxyView<>(sample, rel);
     ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
 
     innerkMeans.setK(k);
-    innerkMeans.setDistanceFunction(pdf);
+    innerkMeans.setDistance(pdf);
     Clustering<?> clusters = innerkMeans.run(proxydb, proxyv);
 
     double[][] means = new double[clusters.getAllClusters().size()][];
@@ -164,7 +164,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
         // We will always invoke this with k as requested from outside!
         kMeansVariantParameters.addParameter(KMeans.K_ID, 13);
-        kMeansVariantParameters.addParameter(KMeans.DISTANCE_FUNCTION_ID, SquaredEuclideanDistanceFunction.class);
+        kMeansVariantParameters.addParameter(KMeans.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class);
 
         ChainedParameterization combinedConfig = new ChainedParameterization(kMeansVariantParameters, config);
         combinedConfig.errorsTo(config);

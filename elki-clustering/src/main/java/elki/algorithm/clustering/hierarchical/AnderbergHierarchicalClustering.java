@@ -35,8 +35,8 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Priority;
@@ -94,7 +94,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public AnderbergHierarchicalClustering(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
+  public AnderbergHierarchicalClustering(Distance<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -110,7 +110,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
     final int size = ids.size();
@@ -124,7 +124,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     initializeNNCache(mat.matrix, bestd, besti);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -226,7 +226,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, linkage.restore(mindist, getDistanceFunction().isSquared()), iy);
+    builder.add(ix, linkage.restore(mindist, getDistance().isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
@@ -355,7 +355,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -381,7 +381,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     @Override
     protected void makeOptions(Parameterization config) {
       // We don't call super, because we want a different default distance.
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

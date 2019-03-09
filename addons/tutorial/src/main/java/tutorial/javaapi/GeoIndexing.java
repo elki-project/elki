@@ -36,7 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
-import elki.distance.distancefunction.geo.LatLngDistanceFunction;
+import elki.distance.distancefunction.geo.LatLngDistance;
 import elki.index.Index;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;
@@ -94,7 +94,7 @@ public class GeoIndexing {
 
     // We use the WGS84 earth model, and "latitude, longitude" coordinates:
     // This distance function returns meters.
-    LatLngDistanceFunction df = new LatLngDistanceFunction(WGS84SpheroidEarthModel.STATIC);
+    LatLngDistance df = new LatLngDistance(WGS84SpheroidEarthModel.STATIC);
     // k nearest neighbor query:
     KNNQuery<NumberVector> knnq = QueryUtil.getKNNQuery(rel, df);
 

@@ -28,10 +28,10 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBID;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
+import elki.distance.distancefunction.minkowski.ManhattanDistance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -129,9 +129,9 @@ public class TreeSphereVisualization implements VisFactory {
   public static double getLPNormP(AbstractMTree<?, ?, ?, ?> tree) {
     // Note: we deliberately lose generics here, so the compilers complain
     // less on the next typecheck and cast!
-    DistanceFunction<?> distanceFunction = tree.getDistanceFunction();
-    if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
-      return ((LPNormDistanceFunction) distanceFunction).getP();
+    Distance<?> distanceFunction = tree.getDistance();
+    if(LPNormDistance.class.isInstance(distanceFunction)) {
+      return ((LPNormDistance) distanceFunction).getP();
     }
     return 0;
   }
@@ -202,10 +202,10 @@ public class TreeSphereVisualization implements VisFactory {
 
       p = getLPNormP(tree);
       if(tree != null) {
-        if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
+        if(ManhattanDistance.class.isInstance(tree.getDistance())) {
           dist = Mode.MANHATTAN;
         }
-        else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
+        else if(EuclideanDistance.class.isInstance(tree.getDistance())) {
           dist = Mode.EUCLIDEAN;
         }
         else {

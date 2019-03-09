@@ -28,8 +28,8 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -83,7 +83,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Option for noise handling.
@@ -107,7 +107,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param noiseOption Handling of "noise" clusters.
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, NoiseHandling noiseOption, boolean penalize) {
+  public EvaluateSilhouette(Distance<? super O> distance, NoiseHandling noiseOption, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOption;
@@ -121,7 +121,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param mergenoise Flag to treat noise as clusters, instead of breaking them
    *        into singletons.
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, boolean mergenoise) {
+  public EvaluateSilhouette(Distance<? super O> distance, boolean mergenoise) {
     this(distance, mergenoise ? NoiseHandling.MERGE_NOISE : NoiseHandling.TREAT_NOISE_AS_SINGLETONS, true);
   }
 
@@ -260,7 +260,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     /**
      * Distance function to use.
      */
-    private DistanceFunction<? super O> distance;
+    private Distance<? super O> distance;
 
     /**
      * Noise handling
@@ -275,7 +275,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distance = distP.instantiateClass(config);
       }

@@ -39,8 +39,8 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -125,28 +125,28 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   /**
    * Distance function for reachability.
    */
-  protected DistanceFunction<? super O> reachabilityDistanceFunction;
+  protected Distance<? super O> reachabilityDistance;
 
   /**
    * Distance function for comparison set.
    */
-  protected DistanceFunction<? super O> comparisonDistanceFunction;
+  protected Distance<? super O> comparisonDistance;
 
   /**
    * Constructor with parameters.
    *
    * @param kreach k for reachability
    * @param kcomp k for comparison
-   * @param reachabilityDistanceFunction distance function for reachability
-   * @param comparisonDistanceFunction distance function for comparison
+   * @param reachabilityDistance distance function for reachability
+   * @param comparisonDistance distance function for comparison
    * @param lambda Lambda parameter
    */
-  public LoOP(int kreach, int kcomp, DistanceFunction<? super O> reachabilityDistanceFunction, DistanceFunction<? super O> comparisonDistanceFunction, double lambda) {
+  public LoOP(int kreach, int kcomp, Distance<? super O> reachabilityDistance, Distance<? super O> comparisonDistance, double lambda) {
     super();
     this.kreach = kreach;
     this.kcomp = kcomp;
-    this.reachabilityDistanceFunction = reachabilityDistanceFunction;
-    this.comparisonDistanceFunction = comparisonDistanceFunction;
+    this.reachabilityDistance = reachabilityDistance;
+    this.comparisonDistance = comparisonDistance;
     this.lambda = lambda;
   }
 
@@ -160,15 +160,15 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    */
   protected Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     KNNQuery<O> knnComp, knnReach;
-    if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, MathUtil.max(kcomp, kreach) + 1);
+      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistance, MathUtil.max(kcomp, kreach) + 1);
       knnReach = knnComp;
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach + 1);
-      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp + 1);
+      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistance, kreach + 1);
+      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistance, kcomp + 1);
     }
     return new Pair<>(knnComp, knnReach);
   }
@@ -308,11 +308,11 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     final TypeInformation type;
-    if(reachabilityDistanceFunction.equals(comparisonDistanceFunction)) {
-      type = reachabilityDistanceFunction.getInputTypeRestriction();
+    if(reachabilityDistance.equals(comparisonDistance)) {
+      type = reachabilityDistance.getInputTypeRestriction();
     }
     else {
-      type = new CombinedTypeInformation(reachabilityDistanceFunction.getInputTypeRestriction(), comparisonDistanceFunction.getInputTypeRestriction());
+      type = new CombinedTypeInformation(reachabilityDistance.getInputTypeRestriction(), comparisonDistance.getInputTypeRestriction());
     }
     return TypeUtil.array(type);
   }
@@ -383,12 +383,12 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     /**
      * Preprocessor Step 1.
      */
-    protected DistanceFunction<O> reachabilityDistanceFunction = null;
+    protected Distance<O> reachabilityDistance = null;
 
     /**
      * Preprocessor Step 2.
      */
-    protected DistanceFunction<O> comparisonDistanceFunction = null;
+    protected Distance<O> comparisonDistance = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -399,9 +399,9 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         kcomp = kcompP.intValue();
       }
 
-      final ObjectParameter<DistanceFunction<O>> compDistP = new ObjectParameter<>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      final ObjectParameter<Distance<O>> compDistP = new ObjectParameter<>(COMPARISON_DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(compDistP)) {
-        comparisonDistanceFunction = compDistP.instantiateClass(config);
+        comparisonDistance = compDistP.instantiateClass(config);
       }
 
       final IntParameter kreachP = new IntParameter(KREACH_ID) //
@@ -414,9 +414,9 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         kreach = kcomp;
       }
 
-      final ObjectParameter<DistanceFunction<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      final ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class, true);
       if(config.grab(reachDistP)) {
-        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
+        reachabilityDistance = reachDistP.instantiateClass(config);
       }
 
       // TODO: make default 1.0?
@@ -429,8 +429,8 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
     @Override
     protected LoOP<O> makeInstance() {
-      DistanceFunction<O> realreach = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : comparisonDistanceFunction;
-      return new LoOP<>(kreach, kcomp, realreach, comparisonDistanceFunction, lambda);
+      Distance<O> realreach = (reachabilityDistance != null) ? reachabilityDistance : comparisonDistance;
+      return new LoOP<>(kreach, kcomp, realreach, comparisonDistance, lambda);
     }
   }
 }

@@ -31,8 +31,8 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.external.DiskCacheBasedDoubleDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.persistent.OnDiskUpperTriangleMatrix;
@@ -50,7 +50,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.2
  * 
  * @has - - - OnDiskUpperTriangleMatrix
- * @has - - - DistanceFunction
+ * @has - - - Distance
  * 
  * @param <O> Object type
  */
@@ -73,7 +73,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Output file.
@@ -87,7 +87,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceInOnDiskMatrix(Database database, DistanceFunction<? super O> distance, File out) {
+  public CacheDoubleDistanceInOnDiskMatrix(Database database, Distance<? super O> distance, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -105,7 +105,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing distances", (int) (((size + 1) * (long) size) >>> 1), LOG) : null;
     try (OnDiskUpperTriangleMatrix matrix = //
-        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, size)) {
+        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistance.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, size)) {
 
       DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
       for(; id1.valid(); id1.advance()) {
@@ -159,7 +159,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<? super O> distance = null;
+    private Distance<? super O> distance = null;
 
     /**
      * Output file.
@@ -174,7 +174,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, Distance.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

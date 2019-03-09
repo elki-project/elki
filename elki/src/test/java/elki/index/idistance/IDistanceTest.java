@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans;
 import elki.data.NumberVector;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
@@ -39,7 +39,7 @@ public class IDistanceTest extends AbstractIndexStructureTest {
   public void testIDistance() {
     InMemoryIDistanceIndex.Factory<NumberVector> factory = new ELKIBuilder<>(InMemoryIDistanceIndex.Factory.class) //
         .with(InMemoryIDistanceIndex.Factory.Parameterizer.K_ID, 4) //
-        .with(InMemoryIDistanceIndex.Factory.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class) //
+        .with(InMemoryIDistanceIndex.Factory.Parameterizer.DISTANCE_ID, EuclideanDistance.class) //
         .with(InMemoryIDistanceIndex.Factory.Parameterizer.REFERENCE_ID, FarthestPointsInitialMeans.class) //
         .build();
     testExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);

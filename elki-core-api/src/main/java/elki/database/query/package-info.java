@@ -85,7 +85,7 @@
  * 
  * <pre>
  * // Get a kNN query with maxk = 10
- * KNNQuery&lt;V, DoubleDistance&gt; knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, 10);
+ * KNNQuery&lt;V, DoubleDistance&gt; knnQuery = database.getKNNQuery(EuclideanDistance.STATIC, 10);
  * // run a 10NN query for each point, discarding the results
  * for(DBID id : database) {
  *   knnQuery.getKNNForDBID(id, 10);

@@ -27,7 +27,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -74,7 +74,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
-  public AbstractHDBSCAN(DistanceFunction<? super O> distanceFunction, int minPts) {
+  public AbstractHDBSCAN(Distance<? super O> distanceFunction, int minPts) {
     super(distanceFunction);
     this.minPts = minPts;
   }
@@ -275,7 +275,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   /**

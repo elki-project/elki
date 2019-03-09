@@ -37,7 +37,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -92,7 +92,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    * @param distanceFunction Distance function
    * @param k k Parameter (not including query point!)
    */
-  public LocalIsolationCoefficient(DistanceFunction<? super O> distanceFunction, int k) {
+  public LocalIsolationCoefficient(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -104,7 +104,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    * @param relation Data relation
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // +
                                                                        // query
                                                                        // point
@@ -140,7 +140,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

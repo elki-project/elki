@@ -1,9 +1,9 @@
 /**
  * Distance functions using correlations
  *
- * @opt include .*elki.distance.distancefunction.MatrixWeightedQuadraticDistanceFunction
- * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistanceFunction
- * @opt include .*elki.distance.distancefunction.NumberVectorDistanceFunction
+ * @opt include .*elki.distance.distancefunction.MatrixWeightedQuadraticDistance
+ * @opt include .*elki.distance.distancefunction.AbstractNumberVectorDistance
+ * @opt include .*elki.distance.distancefunction.NumberVectorDistance
  */
 /*
  * This file is part of ELKI:

@@ -31,7 +31,7 @@ import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 import elki.index.AbstractIndex;
 import elki.index.SimilarityIndex;
 import elki.index.SimilarityRangeIndex;
@@ -72,7 +72,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
   /**
    * Nested similarity function.
    */
-  final protected SimilarityFunction<? super O> similarityFunction;
+  final protected Similarity<? super O> similarityFunction;
 
   /**
    * Nested similarity query.
@@ -100,7 +100,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
    * @param relation Data relation
    * @param similarityFunction Similarity function
    */
-  public PrecomputedSimilarityMatrix(Relation<O> relation, SimilarityFunction<? super O> similarityFunction) {
+  public PrecomputedSimilarityMatrix(Relation<O> relation, Similarity<? super O> similarityFunction) {
     super(relation);
     this.similarityFunction = similarityFunction;
 
@@ -181,7 +181,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
   }
 
   @Override
-  public SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> similarityFunction, Object... hints) {
+  public SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction, Object... hints) {
     if(this.similarityFunction.equals(similarityFunction)) {
       return new PrecomputedSimilarityQuery();
     }
@@ -190,7 +190,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
 
   @Override
   public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
-    if(this.similarityFunction.equals(simQuery.getSimilarityFunction())) {
+    if(this.similarityFunction.equals(simQuery.getSimilarity())) {
       return new PrecomputedSimilarityRangeQuery();
     }
     return null;
@@ -224,8 +224,8 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
     }
 
     @Override
-    public SimilarityFunction<? super O> getSimilarityFunction() {
-      return similarityQuery.getSimilarityFunction();
+    public Similarity<? super O> getSimilarity() {
+      return similarityQuery.getSimilarity();
     }
 
     @Override
@@ -299,14 +299,14 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
     /**
      * Nested similarity function.
      */
-    final protected SimilarityFunction<? super O> similarityFunction;
+    final protected Similarity<? super O> similarityFunction;
 
     /**
      * Constructor.
      *
      * @param similarityFunction Similarity function
      */
-    public Factory(SimilarityFunction<? super O> similarityFunction) {
+    public Factory(Similarity<? super O> similarityFunction) {
       super();
       this.similarityFunction = similarityFunction;
     }
@@ -339,12 +339,12 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
       /**
        * Nested similarity function.
        */
-      protected SimilarityFunction<? super O> similarityFunction;
+      protected Similarity<? super O> similarityFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<SimilarityFunction<? super O>> similarityP = new ObjectParameter<>(DISTANCE_ID, SimilarityFunction.class);
+        ObjectParameter<Similarity<? super O>> similarityP = new ObjectParameter<>(DISTANCE_ID, Similarity.class);
         if(config.grab(similarityP)) {
           similarityFunction = similarityP.instantiateClass(config);
         }

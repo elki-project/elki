@@ -46,10 +46,10 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -101,7 +101,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public AbstractKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter > 0 ? maxiter : Integer.MAX_VALUE;
@@ -110,7 +110,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistanceFunction().getInputTypeRestriction()));
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistance().getInputTypeRestriction()));
   }
 
   /**
@@ -122,7 +122,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    */
   protected double[][] initialMeans(Database database, Relation<V> relation) {
     Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistance());
     getLogger().statistics(inittime.end());
     return means;
   }
@@ -290,7 +290,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   @Override
-  public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
+  public void setDistance(NumberVectorDistance<? super V> distanceFunction) {
     this.distanceFunction = distanceFunction;
   }
 
@@ -339,7 +339,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     /**
      * Distance function.
      */
-    private final NumberVectorDistanceFunction<?> df;
+    private final NumberVectorDistance<?> df;
 
     /**
      * Number of clusters.
@@ -362,7 +362,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param relation Relation to process
      * @param means Initial mean
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       this.relation = relation;
       this.df = df;
       this.isSquared = df.isSquared();
@@ -399,7 +399,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      */
     protected double distance(NumberVector x, double[] y) {
       ++diststat;
-      if(df.getClass() == SquaredEuclideanDistanceFunction.class) {
+      if(df.getClass() == SquaredEuclideanDistance.class) {
         if(y.length != x.getDimensionality()) {
           throw new IllegalArgumentException("Objects do not have the same dimensionality.");
         }
@@ -422,7 +422,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      */
     protected double distance(double[] x, double[] y) {
       ++diststat;
-      if(df.getClass() == SquaredEuclideanDistanceFunction.class) {
+      if(df.getClass() == SquaredEuclideanDistance.class) {
         if(y.length != x.length) {
           throw new IllegalArgumentException("Objects do not have the same dimensionality.");
         }
@@ -688,7 +688,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     protected void makeOptions(Parameterization config) {
       getParameterK(config);
       getParameterInitialization(config);
-      getParameterDistanceFunction(config);
+      getParameterDistance(config);
       getParameterMaxIter(config);
     }
 
@@ -710,13 +710,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      *
      * @param config Parameterization
      */
-    protected void getParameterDistanceFunction(Parameterization config) {
-      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+    protected void getParameterDistance(Parameterization config) {
+      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(distanceFunction == null //
-            || distanceFunction instanceof SquaredEuclideanDistanceFunction //
-            || distanceFunction instanceof EuclideanDistanceFunction) {
+            || distanceFunction instanceof SquaredEuclideanDistance //
+            || distanceFunction instanceof EuclideanDistance) {
           return;
         }
         if(needsMetric() && !distanceFunction.isMetric()) {

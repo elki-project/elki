@@ -44,8 +44,8 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.CosineDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.CosineDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -73,8 +73,8 @@ public class OnlineLOFTest extends AbstractOutlierAlgorithmTest {
 
       // Algorithms we will compare:
       final int k = 5;
-      FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistanceFunction.STATIC, CosineDistanceFunction.STATIC);
-      OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistanceFunction.STATIC, CosineDistanceFunction.STATIC);
+      FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
+      OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
 
       // 1. Run LOF on original data:
       DoubleRelation scores1 = lof.run(db).getScores();

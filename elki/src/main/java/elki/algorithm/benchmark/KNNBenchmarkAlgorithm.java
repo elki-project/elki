@@ -30,7 +30,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -92,7 +92,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @param sampling Sampling rate
    * @param random Random factory
    */
-  public KNNBenchmarkAlgorithm(DistanceFunction<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
+  public KNNBenchmarkAlgorithm(Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
     super(distanceFunction);
     this.k = k;
     this.queries = queries;
@@ -109,7 +109,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
    */
   public Void run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k);
 
     // No query set - use original database.
@@ -140,7 +140,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
     }
     else {
       // Separate query set.
-      TypeInformation res = getDistanceFunction().getInputTypeRestriction();
+      TypeInformation res = getDistance().getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
       int col = -1;
       for(int i = 0; i < bundle.metaLength(); i++) {
@@ -188,7 +188,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

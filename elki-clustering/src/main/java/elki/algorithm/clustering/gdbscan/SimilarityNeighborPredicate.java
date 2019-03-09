@@ -31,7 +31,7 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.similarityfunction.Similarity;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -41,7 +41,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * The DBSCAN neighbor predicate for a {@link SimilarityFunction}, using all
+ * The DBSCAN neighbor predicate for a {@link Similarity}, using all
  * neighbors with a minimum similarity.
  * <p>
  * Reference:
@@ -72,7 +72,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
   /**
    * Distance function to use
    */
-  protected SimilarityFunction<? super O> distFunc;
+  protected Similarity<? super O> distFunc;
 
   /**
    * Full constructor.
@@ -80,7 +80,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public SimilarityNeighborPredicate(double epsilon, SimilarityFunction<? super O> distFunc) {
+  public SimilarityNeighborPredicate(double epsilon, Similarity<? super O> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;
@@ -182,13 +182,13 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
     /**
      * Similarity function to use
      */
-    protected SimilarityFunction<O> distfun = null;
+    protected Similarity<O> distfun = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get the similarity function.
-      ObjectParameter<SimilarityFunction<O>> distanceP = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, SimilarityFunction.class);
+      ObjectParameter<Similarity<O>> distanceP = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, Similarity.class);
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
       }

@@ -24,7 +24,7 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
 
 /**
@@ -59,7 +59,7 @@ import elki.utilities.documentation.Reference;
     bibkey = "DBLP:conf/icml/PellegM00")
 public class AkaikeInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) - numberOfFreeParameters(relation, clustering);
   }
 

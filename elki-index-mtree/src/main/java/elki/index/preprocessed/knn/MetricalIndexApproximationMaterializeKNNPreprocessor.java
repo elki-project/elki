@@ -30,7 +30,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.Node;
 import elki.index.tree.metrical.MetricalIndexTree;
@@ -77,7 +77,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
+  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
@@ -205,7 +205,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
+    public Factory(int k, Distance<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 

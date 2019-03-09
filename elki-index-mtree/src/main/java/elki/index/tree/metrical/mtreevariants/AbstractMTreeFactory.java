@@ -21,8 +21,8 @@
 package elki.index.tree.metrical.mtreevariants;
 
 import elki.data.type.TypeInformation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.PagedIndexFactory;
 import elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import elki.index.tree.metrical.mtreevariants.strategies.insert.MinimumEnlargementInsert;
@@ -77,7 +77,7 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     /**
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend
-     * {@link elki.distance.distancefunction.DistanceFunction}.
+     * {@link elki.distance.distancefunction.Distance}.
      */
     public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
 
@@ -100,7 +100,7 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       settings = makeSettings();
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }

@@ -38,8 +38,8 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.subspace.DimensionSelectingSubspaceDistanceFunction;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
+import elki.distance.distancefunction.subspace.DimensionSelectingSubspaceDistance;
+import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -83,7 +83,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.3
  * 
  * @assoc - - - DBSCAN
- * @assoc - - - DimensionSelectingSubspaceDistanceFunction
+ * @assoc - - - DimensionSelectingSubspaceDistance
  * @has - - - SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this algorithm
@@ -106,7 +106,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   /**
    * The distance function to determine the distance between objects.
    */
-  protected DimensionSelectingSubspaceDistanceFunction<V> distanceFunction;
+  protected DimensionSelectingSubspaceDistance<V> distanceFunction;
 
   /**
    * Maximum radius of the neighborhood to be considered.
@@ -131,7 +131,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @param minpts Minpts value
    * @param mindim Minimum dimensionality
    */
-  public SUBCLU(DimensionSelectingSubspaceDistanceFunction<V> distanceFunction, double epsilon, int minpts, int mindim) {
+  public SUBCLU(DimensionSelectingSubspaceDistance<V> distanceFunction, double epsilon, int minpts, int mindim) {
     super();
     this.distanceFunction = distanceFunction;
     this.epsilon = epsilon;
@@ -470,7 +470,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     /**
      * The distance function to determine the distance between objects.
      */
-    protected DimensionSelectingSubspaceDistanceFunction<V> distance;
+    protected DimensionSelectingSubspaceDistance<V> distance;
 
     /**
      * Maximum radius of the neighborhood to be considered.
@@ -490,7 +490,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSelectingSubspaceDistanceFunction<V>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
+      ObjectParameter<DimensionSelectingSubspaceDistance<V>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistance.class, SubspaceEuclideanDistance.class);
       if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }

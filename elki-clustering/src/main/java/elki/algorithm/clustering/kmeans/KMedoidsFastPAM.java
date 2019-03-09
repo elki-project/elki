@@ -27,7 +27,7 @@ import elki.algorithm.clustering.kmeans.initialization.LABInitialMeans;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -101,7 +101,7 @@ public class KMedoidsFastPAM<V> extends KMedoidsFastPAM1<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsFastPAM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsFastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     this(distanceFunction, k, maxiter, initializer, 1.);
   }
 
@@ -114,7 +114,7 @@ public class KMedoidsFastPAM<V> extends KMedoidsFastPAM1<V> {
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
-  public KMedoidsFastPAM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+  public KMedoidsFastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
     super(distanceFunction, k, maxiter, initializer);
     this.fasttol = fasttol;
   }

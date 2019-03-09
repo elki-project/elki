@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * <p>
  * Using Euclidean distance (linear kernel) and this transformation is the same
  * as using Hellinger distance:
- * {@link elki.distance.distancefunction.probabilistic.HellingerDistanceFunction}
+ * {@link elki.distance.distancefunction.probabilistic.HellingerDistance}
  * 
  * @author Erich Schubert
  * @since 0.7.0

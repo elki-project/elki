@@ -47,9 +47,9 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.result.Metadata;
@@ -95,7 +95,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public SameSizeKMeansAlgorithm(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -111,7 +111,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistance());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -144,7 +144,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return Initialized storage
    */
   protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, double[][] means) {
-    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
+    NumberVectorDistance<? super V> df = getDistance();
     // The actual storage
     final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
     // Build the metadata, track the two nearest cluster centers.
@@ -231,7 +231,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param metas Metadata storage
    * @param df Distance function
    */
-  protected void updateDistances(Relation<V> relation, double[][] means, final WritableDataStore<Meta> metas, NumberVectorDistanceFunction<? super V> df) {
+  protected void updateDistances(Relation<V> relation, double[][] means, final WritableDataStore<Meta> metas, NumberVectorDistance<? super V> df) {
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
@@ -260,7 +260,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return final means
    */
   protected double[][] refineResult(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
-    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
+    NumberVectorDistance<? super V> df = getDistance();
     // Our desired cluster size:
     final int minsize = tids.size() / k; // rounded down
     final int maxsize = (tids.size() + k - 1) / k; // rounded up
@@ -471,15 +471,15 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Distance function
      */
-    protected NumberVectorDistanceFunction<? super V> distanceFunction;
+    protected NumberVectorDistance<? super V> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
+        if(!(distanceFunction instanceof EuclideanDistance) && !(distanceFunction instanceof SquaredEuclideanDistance)) {
           LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }

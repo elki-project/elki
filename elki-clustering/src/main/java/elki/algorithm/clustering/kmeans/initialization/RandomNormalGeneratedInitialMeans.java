@@ -27,7 +27,7 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.math.MeanVariance;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -76,7 +76,7 @@ public class RandomNormalGeneratedInitialMeans extends AbstractKMeansInitializat
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

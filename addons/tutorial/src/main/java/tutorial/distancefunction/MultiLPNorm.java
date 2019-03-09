@@ -23,7 +23,7 @@ package tutorial.distancefunction;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import elki.distance.distancefunction.AbstractNumberVectorDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,7 +40,7 @@ import elki.utilities.optionhandling.parameters.DoubleListParameter;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
+public class MultiLPNorm extends AbstractNumberVectorDistance {
   /**
    * The exponents
    */

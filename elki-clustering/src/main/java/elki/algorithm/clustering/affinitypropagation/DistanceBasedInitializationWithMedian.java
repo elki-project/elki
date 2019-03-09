@@ -26,8 +26,8 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -47,7 +47,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
   /**
    * Distance function.
    */
-  DistanceFunction<? super O> distance;
+  Distance<? super O> distance;
 
   /**
    * Quantile to use.
@@ -60,7 +60,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
    * @param distance Similarity function
    * @param quantile Quantile
    */
-  public DistanceBasedInitializationWithMedian(DistanceFunction<? super O> distance, double quantile) {
+  public DistanceBasedInitializationWithMedian(Distance<? super O> distance, double quantile) {
     super();
     this.distance = distance;
     this.quantile = quantile;
@@ -114,7 +114,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     /**
      * istance function.
      */
-    DistanceFunction<? super O> distance;
+    Distance<? super O> distance;
 
     /**
      * Quantile to use.
@@ -124,7 +124,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> param = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> param = new ObjectParameter<>(DISTANCE_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }

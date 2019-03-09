@@ -31,8 +31,8 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.external.DiskCacheBasedFloatDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.persistent.OnDiskUpperTriangleMatrix;
@@ -49,7 +49,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.2
  * 
  * @has - - - OnDiskUpperTriangleMatrix
- * @has - - - DistanceFunction
+ * @has - - - Distance
  * 
  * @param <O> Object type
  */
@@ -72,7 +72,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<? super O> distance;
+  private Distance<? super O> distance;
 
   /**
    * Output file.
@@ -86,7 +86,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(Database database, DistanceFunction<? super O> distance, File out) {
+  public CacheFloatDistanceInOnDiskMatrix(Database database, Distance<? super O> distance, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -104,7 +104,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing distances", (int) (((size + 1) * (long) size) >>> 1), LOG) : null;
     try (OnDiskUpperTriangleMatrix matrix = //
-        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistanceFunction.FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, size)) {
+        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistance.FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, size)) {
       DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
       for(; id1.valid(); id1.advance()) {
         for(id2.seek(id1.getOffset()); id2.valid(); id2.advance()) {
@@ -147,7 +147,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<? super O> distance = null;
+    private Distance<? super O> distance = null;
 
     /**
      * Output file.
@@ -162,7 +162,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.DISTANCE_ID, Distance.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

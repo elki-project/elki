@@ -4,9 +4,9 @@
  * <h1>Distance functions</h1>
  * <p>There are three basic types of distance functions:
  * <ul>
- * <li>{@link elki.distance.distancefunction.PrimitiveDistanceFunction Primitive Distance Function}s that can be computed for any two objects.</li>
- * <li>{@link elki.distance.distancefunction.DBIDDistanceFunction DBID Distance Function}s, that are only defined for object IDs, e.g. an external distance matrix</li>
- * <li>{@link elki.distance.distancefunction.IndexBasedDistanceFunction Index-Based Distance Function}s, that require an indexing/preprocessing step, and are then valid for existing database objects.</li>
+ * <li>{@link elki.distance.distancefunction.PrimitiveDistance Primitive Distance Function}s that can be computed for any two objects.</li>
+ * <li>{@link elki.distance.distancefunction.DBIDDistance DBID Distance Function}s, that are only defined for object IDs, e.g. an external distance matrix</li>
+ * <li>{@link elki.distance.distancefunction.IndexBasedDistance Index-Based Distance Function}s, that require an indexing/preprocessing step, and are then valid for existing database objects.</li>
  * </ul>
  * These types differ significantly in both implementation and use.
  * <p>
@@ -25,7 +25,7 @@
  * <p>
  * <h2>Code example</h2>
  * {@code
- * DistanceQuery<V> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+ * DistanceQuery<V> distanceQuery = database.getDistanceQuery(EuclideanDistance.STATIC);
  * }
  * 
  * @opt hide elki.application.*

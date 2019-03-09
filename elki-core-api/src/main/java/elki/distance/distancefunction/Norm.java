@@ -28,7 +28,7 @@ package elki.distance.distancefunction;
  * 
  * @param <O> Object type
  */
-public interface Norm<O> extends PrimitiveDistanceFunction<O> {
+public interface Norm<O> extends PrimitiveDistance<O> {
   /**
    * Compute the norm of object obj.
    * 

@@ -33,7 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 
@@ -92,7 +92,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @param <V> Vector type
    * @return Cluster variance
    */
-  public static <V extends NumberVector> double varianceOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public static <V extends NumberVector> double varianceOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     MeanModel model = cluster.getModel();
     if(model instanceof KMeansModel) {
       return ((KMeansModel) model).getVarianceContribution();
@@ -126,7 +126,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
       url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
       bibkey = "DBLP:conf/icml/PellegM00")
-  public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
+  public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();

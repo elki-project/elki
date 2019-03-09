@@ -34,8 +34,8 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
@@ -87,7 +87,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
   /**
    * Distance function
    */
-  protected DistanceFunction<? super O> distanceFunction;
+  protected Distance<? super O> distanceFunction;
 
   /**
    * Constructor.
@@ -95,7 +95,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
    * @param distanceFunction Distance function
    * @param k Number of nearest neighbors to access.
    */
-  public KNNClassifier(DistanceFunction<? super O> distanceFunction, int k) {
+  public KNNClassifier(Distance<? super O> distanceFunction, int k) {
     super();
     this.distanceFunction = distanceFunction;
     this.k = k;
@@ -103,8 +103,8 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
 
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labels) {
-    Relation<O> relation = database.getRelation(getDistanceFunction().getInputTypeRestriction());
-    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
+    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
     this.knnq = database.getKNNQuery(distanceQuery, k);
     this.labelrep = labels;
   }
@@ -158,7 +158,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
   }
 
   @Override
-  public DistanceFunction<? super O> getDistanceFunction() {
+  public Distance<? super O> getDistance() {
     return distanceFunction;
   }
 
@@ -191,7 +191,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
     /**
      * Distance function
      */
-    protected DistanceFunction<? super O> distanceFunction;
+    protected Distance<? super O> distanceFunction;
 
     /**
      * Holds the value of @link #K_PARAM}.
@@ -201,7 +201,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distanceFunction = distP.instantiateClass(config);
       }

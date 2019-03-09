@@ -34,7 +34,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;
@@ -81,11 +81,11 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * Constructor.
    * 
    * @param npred Neighborhood predicate
-   * @param nonSpatialDistanceFunction Distance function to use on the
+   * @param nonSpatialDistance Distance function to use on the
    *        non-spatial attributes
    */
-  public SLOM(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O> nonSpatialDistanceFunction) {
-    super(npred, nonSpatialDistanceFunction);
+  public SLOM(NeighborSetPredicate.Factory<N> npred, PrimitiveDistance<O> nonSpatialDistance) {
+    super(npred, nonSpatialDistance);
   }
 
   /**
@@ -96,7 +96,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
-    DistanceQuery<O> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
+    DistanceQuery<O> distFunc = getNonSpatialDistance().instantiate(relation);
 
     WritableDoubleDataStore modifiedDistance = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // calculate D-Tilde

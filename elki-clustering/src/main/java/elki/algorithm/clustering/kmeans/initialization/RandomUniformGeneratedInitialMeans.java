@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
@@ -69,7 +69,7 @@ public class RandomUniformGeneratedInitialMeans extends AbstractKMeansInitializa
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     double[][] minmax = RelationUtil.computeMinMax(relation);
     final int dim = minmax[0].length;
     double[] min = minmax[0], scale = minmax[1];

@@ -30,8 +30,8 @@ import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -97,7 +97,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param perplexity Perplexity
    * @param estimator Estimator of intrinsic dimensionality
    */
-  public IntrinsicNearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity, IntrinsicDimensionalityEstimator estimator) {
+  public IntrinsicNearestNeighborAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity, IntrinsicDimensionalityEstimator estimator) {
     super(distanceFunction, perplexity);
     this.estimator = estimator;
   }
@@ -118,7 +118,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
+    final boolean square = !SquaredEuclideanDistance.class.isInstance(dq.getDistance());
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;

@@ -34,7 +34,7 @@ import elki.data.model.KMeansModel;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -63,7 +63,7 @@ public class WithinClusterVarianceQualityMeasureTest extends AbstractClusterAlgo
 
     // Test Cluster Variance
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVarianceQualityMeasure();
-    final NumberVectorDistanceFunction<? super DoubleVector> dist = kmeans.getDistanceFunction();
+    final NumberVectorDistance<? super DoubleVector> dist = kmeans.getDistance();
 
     final double quality = variance.quality(result, dist, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);

@@ -33,7 +33,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.pca.PCAResult;
@@ -158,7 +158,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * @param dist Distance distribution model (ChiSquared, Gamma)
    * @param models Report models
    */
-  public COP(DistanceFunction<? super V> distanceFunction, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
+  public COP(Distance<? super V> distanceFunction, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
     super(distanceFunction);
     this.k = k;
     this.pca = pca;
@@ -175,7 +175,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, getDistance(), k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
     if(k <= dim + 1) {

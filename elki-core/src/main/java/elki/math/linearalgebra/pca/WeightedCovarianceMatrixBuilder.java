@@ -27,8 +27,8 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
@@ -61,7 +61,7 @@ import net.jafama.FastMath;
  * @since 0.2
  * 
  * @has - - - WeightFunction
- * @has - - - PrimitiveDistanceFunction
+ * @has - - - PrimitiveDistance
  * @assoc - - - CovarianceMatrix
  */
 @Title("Weighted Covariance Matrix / PCA")
@@ -80,7 +80,7 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
   /**
    * Holds the distance function used for weight calculation.
    */
-  private PrimitiveDistanceFunction<? super NumberVector> weightDistance = EuclideanDistanceFunction.STATIC;
+  private PrimitiveDistance<? super NumberVector> weightDistance = EuclideanDistance.STATIC;
 
   /**
    * Constructor.

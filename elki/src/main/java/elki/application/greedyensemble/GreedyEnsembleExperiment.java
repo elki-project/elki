@@ -43,11 +43,11 @@ import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
-import elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction;
-import elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction;
-import elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistance;
+import elki.distance.distancefunction.minkowski.WeightedEuclideanDistance;
+import elki.distance.distancefunction.minkowski.WeightedManhattanDistance;
+import elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistance;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.evaluation.scores.adapter.DecreasingVectorIter;
 import elki.evaluation.scores.adapter.VectorNonZero;
@@ -236,8 +236,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
     DoubleVector estimated_truth_vec = DoubleVector.wrap(estimated_truth);
 
-    PrimitiveDistanceFunction<NumberVector> wdist = getDistanceFunction(estimated_weights);
-    PrimitiveDistanceFunction<NumberVector> tdist = wdist;
+    PrimitiveDistance<NumberVector> wdist = getDistance(estimated_weights);
+    PrimitiveDistance<NumberVector> tdist = wdist;
 
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
@@ -559,16 +559,16 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
   }
 
-  private PrimitiveDistanceFunction<NumberVector> getDistanceFunction(double[] estimated_weights) {
+  private PrimitiveDistance<NumberVector> getDistance(double[] estimated_weights) {
     switch(distance){
     case SQEUCLIDEAN:
-      return new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
+      return new WeightedSquaredEuclideanDistance(estimated_weights);
     case EUCLIDEAN:
-      return new WeightedEuclideanDistanceFunction(estimated_weights);
+      return new WeightedEuclideanDistance(estimated_weights);
     case MANHATTAN:
-      return new WeightedManhattanDistanceFunction(estimated_weights);
+      return new WeightedManhattanDistance(estimated_weights);
     case PEARSON:
-      return new WeightedPearsonCorrelationDistanceFunction(estimated_weights);
+      return new WeightedPearsonCorrelationDistance(estimated_weights);
     default:
       throw new AbortException("Unsupported distance mode: " + distance);
     }

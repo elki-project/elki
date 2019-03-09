@@ -32,7 +32,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.result.Metadata;
 import elki.utilities.ELKIBuilder;
 
@@ -62,14 +62,14 @@ public class NNDescentTest {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
     NNDescent<DoubleVector> preproc = new ELKIBuilder<NNDescent.Factory<DoubleVector>>(NNDescent.Factory.class) //
-        .with(NNDescent.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction()) //
+        .with(NNDescent.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
         .with(NNDescent.Factory.K_ID, k) //
         .with(NNDescent.Factory.Parameterizer.SEED_ID, 0) //
         .with(NNDescent.Factory.Parameterizer.DELTA_ID, 0.1) //

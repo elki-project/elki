@@ -28,6 +28,7 @@ import elki.datasource.filter.normalization.NonNumericFeaturesException;
 import elki.datasource.filter.normalization.Normalization;
 import elki.logging.Logging;
 import elki.math.linearalgebra.LinearEquationSystem;
+import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -48,6 +49,7 @@ import elki.utilities.optionhandling.parameters.DoubleListParameter;
  * @assoc - - - NumberVector
  */
 @Priority(Priority.RECOMMENDED)
+@Alias({ "norm", "normalize", "minmax" })
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.

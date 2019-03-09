@@ -29,7 +29,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Description;
@@ -76,13 +76,13 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
    * @param distanceFunction Distance function
    * @param d distance radius parameter
    */
-  public DBOutlierScore(DistanceFunction<? super O> distanceFunction, double d) {
+  public DBOutlierScore(Distance<? super O> distanceFunction, double d) {
     super(distanceFunction, d);
   }
 
   @Override
   protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
     final double size = distFunc.getRelation().size();
 

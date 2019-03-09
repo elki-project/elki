@@ -27,7 +27,7 @@ import elki.data.model.MeanModel;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 
 /**
  * Class for computing the average overall distance.
@@ -39,7 +39,7 @@ import elki.distance.distancefunction.NumberVectorDistanceFunction;
  */
 public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     double clusterDistanceSum = 0;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       DBIDs ids = cluster.getIDs();

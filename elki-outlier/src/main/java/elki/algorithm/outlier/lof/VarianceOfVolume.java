@@ -41,7 +41,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -107,7 +107,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *        point)
    * @param distanceFunction the neighborhood distance function
    */
-  public VarianceOfVolume(int k, DistanceFunction<? super O> distanceFunction) {
+  public VarianceOfVolume(int k, Distance<? super O> distanceFunction) {
     super(distanceFunction);
     this.k = k + 1; // + query point
   }
@@ -125,7 +125,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     int dim = RelationUtil.dimensionality(relation);
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
 
     // Compute Volumes
     LOG.beginStep(stepprog, 2, "Computing Volumes.");
@@ -218,7 +218,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.SPATIAL_OBJECT));
+    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.SPATIAL_OBJECT));
   }
 
   @Override

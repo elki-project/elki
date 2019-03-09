@@ -187,7 +187,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
     // run outlier detection and collect the result
     // TODO extend so that any outlierAlgorithm can be used (use materialized
-    // relation instead of SubspaceEuclideanDistanceFunction?)
+    // relation instead of SubspaceEuclideanDistance?)
     for(HiCSSubspace dimset : subspaces) {
       if(LOG.isVerbose()) {
         LOG.verbose("Performing outlier detection in subspace " + dimset);

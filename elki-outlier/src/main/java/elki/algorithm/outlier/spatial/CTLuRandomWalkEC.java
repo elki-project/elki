@@ -36,7 +36,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -107,7 +107,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public CTLuRandomWalkEC(DistanceFunction<? super P> distanceFunction, double alpha, double c, int k) {
+  public CTLuRandomWalkEC(Distance<? super P> distanceFunction, double alpha, double c, int k) {
     super(distanceFunction);
     this.alpha = alpha;
     this.c = c;
@@ -122,7 +122,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
    * @return Outlier result
    */
   public OutlierResult run(Relation<P> spatial, Relation<? extends NumberVector> relation) {
-    DistanceQuery<P> distFunc = getDistanceFunction().instantiate(spatial);
+    DistanceQuery<P> distFunc = getDistance().instantiate(spatial);
     WritableDataStore<double[]> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
@@ -226,7 +226,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
+    return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   @Override

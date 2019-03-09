@@ -37,7 +37,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -88,7 +88,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    * @param k the value of k
    * @param kernel Kernel function
    */
-  public SimpleKernelDensityLOF(int k, DistanceFunction<? super O> distance, KernelDensityFunction kernel) {
+  public SimpleKernelDensityLOF(int k, Distance<? super O> distance, KernelDensityFunction kernel) {
     super(distance);
     this.k = k + 1; // + query point
     this.kernel = kernel;
@@ -107,7 +107,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing densities.");
@@ -184,7 +184,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override

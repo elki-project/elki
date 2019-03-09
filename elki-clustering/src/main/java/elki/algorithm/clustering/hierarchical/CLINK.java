@@ -24,7 +24,7 @@ import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -71,7 +71,7 @@ public class CLINK<O> extends SLINK<O> {
    *
    * @param distanceFunction Distance function
    */
-  public CLINK(DistanceFunction<? super O> distanceFunction) {
+  public CLINK(Distance<? super O> distanceFunction) {
     super(distanceFunction);
   }
 

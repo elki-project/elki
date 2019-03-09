@@ -35,7 +35,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.evaluation.clustering.EvaluateClustering;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -85,7 +85,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
    * @param distanceFunction Distance function to evaluate
    * @param numbins Number of bins
    */
-  public RankingQualityHistogram(DistanceFunction<? super O> distanceFunction, int numbins) {
+  public RankingQualityHistogram(Distance<? super O> distanceFunction, int numbins) {
     super(distanceFunction);
     this.numbins = numbins;
   }
@@ -98,7 +98,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
    * @return Histogram of ranking qualities
    */
   public HistogramResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
     final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
     if(LOG.isVerbose()) {
@@ -143,7 +143,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

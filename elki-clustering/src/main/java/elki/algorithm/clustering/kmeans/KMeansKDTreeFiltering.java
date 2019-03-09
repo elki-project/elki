@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 
@@ -95,13 +95,13 @@ public class KMeansKDTreeFiltering<V extends NumberVector> extends KMeansKDTreeP
    * @param split Splitting strategy
    * @param leafsize Leaf size
    */
-  public KMeansKDTreeFiltering(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, Split split, int leafsize) {
+  public KMeansKDTreeFiltering(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, Split split, int leafsize) {
     super(distanceFunction, k, maxiter, initializer, split, leafsize);
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult();
   }
@@ -120,7 +120,7 @@ public class KMeansKDTreeFiltering<V extends NumberVector> extends KMeansKDTreeP
      * @param df Distance function
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
     }
 

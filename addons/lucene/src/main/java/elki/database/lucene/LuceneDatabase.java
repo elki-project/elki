@@ -119,7 +119,7 @@ public class LuceneDatabase extends AbstractDatabase {
 
   @Override
   public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
+    if(distanceQuery.getDistance() instanceof LuceneDistance) {
       @SuppressWarnings("unchecked")
       final RangeQuery<O> rq = (RangeQuery<O>) new LuceneDistanceRangeQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
       return rq;
@@ -129,7 +129,7 @@ public class LuceneDatabase extends AbstractDatabase {
 
   @Override
   public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
+    if(distanceQuery.getDistance() instanceof LuceneDistance) {
       @SuppressWarnings("unchecked")
       final KNNQuery<O> kq = (KNNQuery<O>) new LuceneDistanceKNNQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
       return kq;

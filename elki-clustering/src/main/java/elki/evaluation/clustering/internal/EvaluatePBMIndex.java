@@ -30,9 +30,9 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -87,7 +87,7 @@ public class EvaluatePBMIndex implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistanceFunction<?> distanceFunction;
+  private NumberVectorDistance<?> distanceFunction;
 
   /**
    * Key for logging statistics.
@@ -100,7 +100,7 @@ public class EvaluatePBMIndex implements Evaluator {
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
    */
-  public EvaluatePBMIndex(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
+  public EvaluatePBMIndex(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
     super();
     this.distanceFunction = distance;
     this.noiseHandling = noiseOpt;
@@ -174,7 +174,7 @@ public class EvaluatePBMIndex implements Evaluator {
         case TREAT_NOISE_AS_SINGLETONS:
           // Singletons: a = 0 by definition.
           for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-            b += SquaredEuclideanDistanceFunction.STATIC.distance(overallCentroid, rel.get(it));
+            b += SquaredEuclideanDistance.STATIC.distance(overallCentroid, rel.get(it));
           }
           continue; // with NEXT cluster.
         case MERGE_NOISE:
@@ -241,7 +241,7 @@ public class EvaluatePBMIndex implements Evaluator {
     /**
      * Distance function to use.
      */
-    private NumberVectorDistanceFunction<?> distance;
+    private NumberVectorDistance<?> distance;
 
     /**
      * Option, how noise should be treated.
@@ -252,7 +252,7 @@ public class EvaluatePBMIndex implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

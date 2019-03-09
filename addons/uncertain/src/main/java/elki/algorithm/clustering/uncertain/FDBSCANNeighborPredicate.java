@@ -38,7 +38,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -233,7 +233,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
     }
 
     private boolean checkSamples(UncertainObject o1, UncertainObject o2) {
-      final SquaredEuclideanDistanceFunction distance = SquaredEuclideanDistanceFunction.STATIC;
+      final SquaredEuclideanDistance distance = SquaredEuclideanDistance.STATIC;
       // Optimization for discrete objects:
       if(o1 instanceof DiscreteUncertainObject && o2 instanceof DiscreteUncertainObject) {
         DiscreteUncertainObject d1 = (DiscreteUncertainObject) o1;

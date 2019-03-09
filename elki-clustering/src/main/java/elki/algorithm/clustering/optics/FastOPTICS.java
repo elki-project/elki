@@ -33,7 +33,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.preprocessed.fastoptics.RandomProjectedNeighborsAndDensities;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -138,7 +138,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    */
   public ClusterOrder run(Database db, Relation<V> rel) {
     DBIDs ids = rel.getDBIDs();
-    DistanceQuery<V> dq = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<V> dq = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
 
     // initialize points used and reachability distance
     reachDist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, UNDEFINED_DISTANCE);
@@ -208,7 +208,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
+    return TypeUtil.array(EuclideanDistance.STATIC.getInputTypeRestriction());
   }
 
   @Override

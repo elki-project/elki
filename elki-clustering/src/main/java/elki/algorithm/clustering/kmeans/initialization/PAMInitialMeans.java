@@ -28,8 +28,8 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -74,7 +74,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistanceFunction<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new AbortException("Database has less than k objects.");
     }
@@ -83,7 +83,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization, KMedoidsInitial
     Relation<O> rel = (Relation<O>) relation;
     // Get a distance query
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super O> distF = (PrimitiveDistanceFunction<? super O>) distanceFunction;
+    final PrimitiveDistance<? super O> distF = (PrimitiveDistance<? super O>) distanceFunction;
     final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
     DBIDs medids = chooseInitialMedoids(k, rel.getDBIDs(), distQ);
     double[][] medoids = new double[k][];

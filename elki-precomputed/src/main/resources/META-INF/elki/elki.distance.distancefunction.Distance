@@ -1,0 +1,4 @@
+elki.distance.distancefunction.external.DiskCacheBasedDoubleDistance
+elki.distance.distancefunction.external.DiskCacheBasedFloatDistance
+elki.distance.distancefunction.external.FileBasedSparseDoubleDistance
+elki.distance.distancefunction.external.FileBasedSparseFloatDistance

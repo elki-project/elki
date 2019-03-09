@@ -25,8 +25,8 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DBIDDistanceFunction;
-import elki.distance.distancefunction.DBIDRangeDistanceFunction;
+import elki.distance.distancefunction.DBIDDistance;
+import elki.distance.distancefunction.DBIDRangeDistance;
 
 /**
  * Run a distance query based on DBIDRanges
@@ -34,13 +34,13 @@ import elki.distance.distancefunction.DBIDRangeDistanceFunction;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @assoc - - - DBIDRangeDistanceFunction
+ * @assoc - - - DBIDRangeDistance
  */
 public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
   /**
    * The distance function we use.
    */
-  final protected DBIDRangeDistanceFunction distanceFunction;
+  final protected DBIDRangeDistance distanceFunction;
 
   /**
    * The DBID range we are accessing.
@@ -53,7 +53,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
    * @param relation Database to use.
    * @param distanceFunction Our distance function
    */
-  public DBIDRangeDistanceQuery(Relation<DBID> relation, DBIDRangeDistanceFunction distanceFunction) {
+  public DBIDRangeDistanceQuery(Relation<DBID> relation, DBIDRangeDistance distanceFunction) {
     super(relation, distanceFunction);
     this.range = DBIDUtil.assertRange(relation.getDBIDs());
     distanceFunction.checkRange(this.range);
@@ -66,7 +66,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
   }
 
   @Override
-  public DBIDDistanceFunction getDistanceFunction() {
+  public DBIDDistance getDistance() {
     return distanceFunction;
   }
 }

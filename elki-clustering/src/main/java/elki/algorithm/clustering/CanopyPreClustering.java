@@ -36,7 +36,7 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
@@ -90,7 +90,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
    * @param t1 Inclusion threshold
    * @param t2 Exclusion threshold
    */
-  public CanopyPreClustering(DistanceFunction<? super O> distanceFunction, double t1, double t2) {
+  public CanopyPreClustering(Distance<? super O> distanceFunction, double t1, double t2) {
     super(distanceFunction);
     this.t1 = t1;
     this.t2 = t2;
@@ -107,7 +107,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       throw new AbortException("T1 must be at least as large as T2.");
     }
 
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
     ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
     ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
     final int size = relation.size();
@@ -151,7 +151,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

@@ -20,7 +20,7 @@
  */
 package elki.algorithm;
 
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.utilities.optionhandling.OptionID;
 
 /**
@@ -42,5 +42,5 @@ public interface DistanceBasedAlgorithm<O> extends Algorithm {
    * 
    * @return the distanceFunction
    */
-  DistanceFunction<? super O> getDistanceFunction();
+  Distance<? super O> getDistance();
 }

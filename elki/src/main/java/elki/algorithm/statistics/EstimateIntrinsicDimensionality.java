@@ -30,7 +30,7 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.math.statistics.intrinsicdimensionality.GEDEstimator;
@@ -82,7 +82,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
    * @param krate kNN rate
    * @param samples Sample size
    */
-  public EstimateIntrinsicDimensionality(DistanceFunction<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
+  public EstimateIntrinsicDimensionality(Distance<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
     super(distanceFunction);
     this.estimator = estimator;
     this.krate = krate;
@@ -98,7 +98,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
 
     DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
 
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnq = database.getKNNQuery(dq, kk);
 
     double[] idim = new double[ssize];
@@ -114,7 +114,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

@@ -34,7 +34,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -86,7 +86,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
    *
    * @param k the value of k
    */
-  public SimplifiedLOF(int k, DistanceFunction<? super O> distance) {
+  public SimplifiedLOF(int k, Distance<? super O> distance) {
     super(distance);
     this.k = k + 1; // + query point
   }
@@ -103,7 +103,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing densities.");
@@ -200,7 +200,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

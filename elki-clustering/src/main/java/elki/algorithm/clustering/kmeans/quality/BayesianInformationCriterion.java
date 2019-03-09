@@ -24,7 +24,7 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
 
 import net.jafama.FastMath;
@@ -57,7 +57,7 @@ import net.jafama.FastMath;
     bibkey = "doi:10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) //
         - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
   }

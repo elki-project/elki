@@ -36,7 +36,7 @@ import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;
@@ -107,7 +107,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
    * @param distanceFunction distance function
    * @param refp Reference points heuristic
    */
-  public ReferenceBasedOutlierDetection(int k, NumberVectorDistanceFunction<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
+  public ReferenceBasedOutlierDetection(int k, NumberVectorDistance<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
     super(distanceFunction);
     this.k = k;
     this.refp = refp;

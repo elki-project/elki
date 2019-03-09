@@ -40,7 +40,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -116,7 +116,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    */
-  public LOCI(DistanceFunction<? super O> distanceFunction, double rmax, int nmin, double alpha) {
+  public LOCI(Distance<? super O> distanceFunction, double rmax, int nmin, double alpha) {
     super(distanceFunction);
     this.rmax = rmax;
     this.nmin = nmin;
@@ -131,7 +131,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
     DBIDs ids = relation.getDBIDs();
 
@@ -387,7 +387,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

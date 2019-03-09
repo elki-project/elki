@@ -30,7 +30,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.DynamicIndex;
 import elki.index.KNNIndex;
 import elki.index.RangeIndex;
@@ -72,7 +72,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
   public MTreeIndex(Relation<O> relation, PageFile<MTreeNode<O>> pagefile, MTreeSettings<O, MTreeNode<O>, MTreeEntry> settings) {
     super(pagefile, settings);
     this.relation = relation;
-    this.distanceQuery = getDistanceFunction().instantiate(relation);
+    this.distanceQuery = getDistance().instantiate(relation);
   }
 
   @Override
@@ -197,8 +197,8 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
@@ -212,8 +212,8 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
     if(distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.getDistance().equals(distanceFunction)) {
       getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }

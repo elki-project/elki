@@ -27,7 +27,7 @@ import elki.algorithm.clustering.DBSCAN;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;
-import elki.distance.similarityfunction.kernel.RadialBasisFunctionKernelFunction;
+import elki.distance.similarityfunction.kernel.RadialBasisFunctionKernel;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -72,7 +72,7 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<>(GeneralizedDBSCAN.class) //
         .with(GeneralizedDBSCAN.Parameterizer.NEIGHBORHOODPRED_ID, SimilarityNeighborPredicate.class) //
-        .with(SimilarityNeighborPredicate.Parameterizer.SIMILARITY_FUNCTION_ID, RadialBasisFunctionKernelFunction.class) //
+        .with(SimilarityNeighborPredicate.Parameterizer.SIMILARITY_FUNCTION_ID, RadialBasisFunctionKernel.class) //
         .with(SimilarityNeighborPredicate.Parameterizer.EPSILON_ID, 0.999) //
         .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
         .build().run(db);

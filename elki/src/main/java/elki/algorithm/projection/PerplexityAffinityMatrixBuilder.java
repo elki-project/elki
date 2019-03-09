@@ -27,8 +27,8 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -86,7 +86,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   /**
    * Input distance function.
    */
-  protected DistanceFunction<? super O> distanceFunction;
+  protected Distance<? super O> distanceFunction;
 
   /**
    * Perplexity.
@@ -99,7 +99,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    * @param distanceFunction Distance function
    * @param perplexity Perplexity
    */
-  public PerplexityAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity) {
+  public PerplexityAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity) {
     super(distanceFunction, Double.NaN);
     this.distanceFunction = distanceFunction;
     this.perplexity = perplexity;
@@ -243,7 +243,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     @Override
     protected void makeOptions(Parameterization config) {
       // Override: super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

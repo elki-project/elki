@@ -34,7 +34,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.relation.Relation;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.logging.LoggingConfiguration;
 import elki.utilities.random.RandomFactory;
 
@@ -75,7 +75,7 @@ public class PassingDataToELKI {
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // K-means should be used with squared Euclidean (least squares):
-    SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+    SquaredEuclideanDistance dist = SquaredEuclideanDistance.STATIC;
     // Default initialization, using global random:
     // To fix the random seed, use: new RandomFactory(seed);
     RandomUniformGeneratedInitialMeans init = new RandomUniformGeneratedInitialMeans(RandomFactory.DEFAULT);

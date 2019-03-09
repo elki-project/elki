@@ -1,0 +1,2 @@
+elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarity
+elki.distance.similarityfunction.SharedNearestNeighborSimilarity

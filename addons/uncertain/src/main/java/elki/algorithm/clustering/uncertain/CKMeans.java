@@ -28,7 +28,7 @@ import elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -87,7 +87,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    * @param maxiter Maximum number of iterations
    * @param initializer Initializer
    */
-  public CKMeans(NumberVectorDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public CKMeans(NumberVectorDistance<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(new KMeansLloyd<>(distanceFunction, k, maxiter, initializer));
   }
 

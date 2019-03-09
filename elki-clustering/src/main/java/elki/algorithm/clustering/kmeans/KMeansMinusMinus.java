@@ -32,7 +32,7 @@ import elki.data.model.KMeansModel;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
@@ -96,7 +96,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    * @param noiseFlag Create a noise cluster instead of assigning to the nearest
    *        cluster
    */
-  public KMeansMinusMinus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
+  public KMeansMinusMinus(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
     super(distanceFunction, k, maxiter, initializer);
     this.rate = rate;
     this.noiseFlag = noiseFlag;
@@ -104,7 +104,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistanceFunction(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResultWithNoise();
   }
@@ -142,7 +142,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
      * @param df Distance function
      * @param means Initial means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistanceFunction<?> df, double[][] means) {
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
       heapsize = (int) (rate < 1. ? Math.ceil(relation.size() * rate) : rate);
       minHeap = new DoubleMinHeap(heapsize);

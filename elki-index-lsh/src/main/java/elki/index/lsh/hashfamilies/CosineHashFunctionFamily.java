@@ -29,8 +29,8 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.CosineDistanceFunction;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.CosineDistance;
+import elki.distance.distancefunction.Distance;
 import elki.index.lsh.hashfunctions.CosineLocalitySensitiveHashFunction;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import elki.utilities.documentation.Reference;
@@ -112,8 +112,8 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
   }
 
   @Override
-  public boolean isCompatible(DistanceFunction<?> df) {
-    return df instanceof CosineDistanceFunction;
+  public boolean isCompatible(Distance<?> df) {
+    return df instanceof CosineDistance;
   }
 
   /**

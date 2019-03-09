@@ -23,7 +23,7 @@ package elki.database.query.distance;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DBIDDistanceFunction;
+import elki.distance.distancefunction.DBIDDistance;
 
 /**
  * Run a distance query based on DBIDs
@@ -32,7 +32,7 @@ import elki.distance.distancefunction.DBIDDistanceFunction;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @assoc - - - DBIDDistanceFunction
+ * @assoc - - - DBIDDistance
  */
 public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
   /**
@@ -43,7 +43,7 @@ public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
   /**
    * The distance function we use.
    */
-  final protected DBIDDistanceFunction distanceFunction;
+  final protected DBIDDistance distanceFunction;
 
   /**
    * Constructor.
@@ -51,7 +51,7 @@ public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
    * @param relation Database to use.
    * @param distanceFunction Our distance function
    */
-  public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistanceFunction distanceFunction) {
+  public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistance distanceFunction) {
     super();
     this.relation = relation;
     this.distanceFunction = distanceFunction;
@@ -68,7 +68,7 @@ public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
   }
 
   @Override
-  public DBIDDistanceFunction getDistanceFunction() {
+  public DBIDDistance getDistance() {
     return distanceFunction;
   }
 }

@@ -28,7 +28,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import net.jafama.FastMath;
 
 /**
@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @assoc - - - SquaredEuclideanDistanceFunction
+ * @assoc - - - SquaredEuclideanDistance
  * 
  * @param <O> Database object type
  */
@@ -93,7 +93,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
    * @param result Output data structure
    */
   private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
-    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
+    final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
     // Avoid a loss in numerical precision when using the squared radius:
     final double upper = range * 1.0000001;
     // This should be more precise, but slower:

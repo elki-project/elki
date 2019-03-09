@@ -37,7 +37,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -102,7 +102,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param distanceFunction distance function
    * @param k k Parameter
    */
-  public LDOF(DistanceFunction<? super O> distanceFunction, int k) {
+  public LDOF(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k + 1; // + query point
   }
@@ -115,7 +115,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k);
 
     // track the maximum value for normalization
@@ -170,7 +170,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

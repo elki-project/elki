@@ -32,7 +32,7 @@ import elki.data.NumberVector;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.parallel.Executor;
 import elki.parallel.processor.Processor;
 
@@ -53,7 +53,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**
    * Distance function.
    */
-  NumberVectorDistanceFunction<? super V> distance;
+  NumberVectorDistance<? super V> distance;
 
   /**
    * Assignment storage.
@@ -93,7 +93,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
    * @param assignment Cluster assignment
    * @param varsum Variance sums
    */
-  public KMeansProcessor(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, double[] varsum) {
+  public KMeansProcessor(Relation<V> relation, NumberVectorDistance<? super V> distance, WritableIntegerDataStore assignment, double[] varsum) {
     super();
     this.distance = distance;
     this.relation = relation;
@@ -185,7 +185,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
     /**
      * Distance function.
      */
-    private NumberVectorDistanceFunction<? super V> distance;
+    private NumberVectorDistance<? super V> distance;
 
     /**
      * Cluster assignment storage.
@@ -225,7 +225,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
      * @param assignment Current assignment
      * @param means Previous mean vectors
      */
-    public Instance(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, double[][] means) {
+    public Instance(Relation<V> relation, NumberVectorDistance<? super V> distance, WritableIntegerDataStore assignment, double[][] means) {
       super();
       this.relation = relation;
       this.distance = distance;

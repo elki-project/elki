@@ -36,7 +36,7 @@ import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.parallel.ParallelExecutor;
@@ -59,7 +59,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLloydKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public ParallelLloydKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -70,7 +70,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

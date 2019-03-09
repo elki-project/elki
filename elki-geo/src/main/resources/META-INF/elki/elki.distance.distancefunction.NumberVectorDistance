@@ -1,0 +1,3 @@
+elki.distance.distancefunction.geo.DimensionSelectingLatLngDistance
+elki.distance.distancefunction.geo.LatLngDistance
+elki.distance.distancefunction.geo.LngLatDistance

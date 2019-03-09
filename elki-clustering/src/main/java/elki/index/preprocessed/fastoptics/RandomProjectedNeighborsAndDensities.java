@@ -34,7 +34,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
@@ -419,7 +419,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
         if(DBIDUtil.equal(it, v)) {
           continue;
         }
-        double dist = EuclideanDistanceFunction.STATIC.distance(points.get(it), midpoint);
+        double dist = EuclideanDistance.STATIC.distance(points.get(it), midpoint);
         ++distanceComputations;
         davg.increment(v, dist);
         nDists.increment(v, 1);

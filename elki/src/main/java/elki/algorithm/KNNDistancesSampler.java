@@ -33,7 +33,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.geometry.XYCurve;
@@ -117,7 +117,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    * @param sample Sampling rate, or sample size (when &gt; 1)
    * @param rnd Random source.
    */
-  public KNNDistancesSampler(DistanceFunction<? super O> distanceFunction, int k, double sample, RandomFactory rnd) {
+  public KNNDistancesSampler(Distance<? super O> distanceFunction, int k, double sample, RandomFactory rnd) {
     super(distanceFunction);
     this.k = k;
     this.sample = sample;
@@ -133,7 +133,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    * @return Result
    */
   public KNNDistanceOrderResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
     final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
 
     final int size = (int) ((sample <= 1.) ? Math.ceil(relation.size() * sample) : sample);
@@ -154,7 +154,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

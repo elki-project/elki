@@ -36,7 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -106,7 +106,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    * @param forcelinear Force the use of linear scanning.
    * @param pattern
    */
-  public ValidateApproximativeKNNIndex(DistanceFunction<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
+  public ValidateApproximativeKNNIndex(Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
     super(distanceFunction);
     this.k = k;
     this.queries = queries;
@@ -125,7 +125,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    */
   public Void run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     // Approximate query:
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
@@ -199,7 +199,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
     }
     else {
       // Separate query set.
-      TypeInformation res = getDistanceFunction().getInputTypeRestriction();
+      TypeInformation res = getDistance().getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
       int col = -1;
       for(int i = 0; i < bundle.metaLength(); i++) {
@@ -270,7 +270,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

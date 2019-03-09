@@ -27,8 +27,8 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.preprocessed.AbstractPreprocessorIndex;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
@@ -57,7 +57,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.1
  * 
- * @has - - - DistanceFunction
+ * @has - - - Distance
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  */
@@ -77,7 +77,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceFunction<O> distanceFunction;
+  protected Distance<O> distanceFunction;
 
   /**
    * Constructor.
@@ -86,7 +86,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
    * @param numberOfNeighbors Number of neighbors
    * @param distanceFunction Distance function
    */
-  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, DistanceFunction<O> distanceFunction) {
+  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, Distance<O> distanceFunction) {
     super(relation);
     this.numberOfNeighbors = numberOfNeighbors;
     this.distanceFunction = distanceFunction;
@@ -177,7 +177,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
      * Parameter to indicate the distance function to be used to ascertain the
      * nearest neighbors.
      */
-    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("SNNDistance", "the distance function to asses the nearest neighbors");
 
     /**
      * Holds the number of nearest neighbors to be used.
@@ -187,7 +187,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
     /**
      * Hold the distance function to be used.
      */
-    protected DistanceFunction<O> distanceFunction;
+    protected Distance<O> distanceFunction;
 
     /**
      * Constructor.
@@ -195,7 +195,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
      * @param numberOfNeighbors Number of neighbors
      * @param distanceFunction Distance function
      */
-    public Factory(int numberOfNeighbors, DistanceFunction<O> distanceFunction) {
+    public Factory(int numberOfNeighbors, Distance<O> distanceFunction) {
       super();
       this.numberOfNeighbors = numberOfNeighbors;
       this.distanceFunction = distanceFunction;
@@ -235,7 +235,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       /**
        * Hold the distance function to be used.
        */
-      protected DistanceFunction<O> distanceFunction;
+      protected Distance<O> distanceFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -246,7 +246,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }
 
-        final ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
         }

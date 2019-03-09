@@ -1,5 +1,5 @@
 elki.algorithm.outlier.clustering.CBLOF
-elki.algorithm.outlier.clustering.EMOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.EMOutlier
+elki.algorithm.outlier.clustering.EMOutlier
 elki.algorithm.outlier.clustering.KMeansOutlierDetection
 elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 elki.algorithm.outlier.OPTICSOF

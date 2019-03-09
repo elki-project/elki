@@ -34,7 +34,7 @@ import elki.data.model.KMeansModel;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
+import elki.distance.distancefunction.NumberVectorDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -59,7 +59,7 @@ public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractCluster
 
     // run KMeans on database
     Clustering<KMeansModel> result = kmeans.run(db);
-    final NumberVectorDistanceFunction<? super DoubleVector> dist = kmeans.getDistanceFunction();
+    final NumberVectorDistance<? super DoubleVector> dist = kmeans.getDistance();
 
     // Test Cluster Average Overall Distance
     KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistanceQualityMeasure();

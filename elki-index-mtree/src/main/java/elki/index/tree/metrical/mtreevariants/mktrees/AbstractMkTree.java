@@ -67,7 +67,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
   public AbstractMkTree(Relation<O> relation, PageFile<N> pagefile, S settings) {
     super(pagefile, settings);
     // TODO: any way to un-tie MkTrees from relations?
-    this.distanceQuery = getDistanceFunction().instantiate(relation);
+    this.distanceQuery = getDistance().instantiate(relation);
     this.knnq = new MTreeKNNQuery<>(this, distanceQuery);
   }
 

@@ -39,7 +39,7 @@ import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -116,7 +116,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAM(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -134,7 +134,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     if(k > 0x7FFF) {
       throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
     }
-    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistanceFunction(), LOG);
+    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistance(), LOG);
     DBIDs ids = relation.getDBIDs();
     ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids);
 
@@ -255,7 +255,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         LOG.statistics(new DoubleStatistic(key + ".iteration-" + 0 + ".cost", tc));
       }
 
-      final boolean metric = distQ.getDistanceFunction().isMetric();
+      final boolean metric = distQ.getDistance().isMetric();
 
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       // Swap phase
@@ -387,7 +387,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override

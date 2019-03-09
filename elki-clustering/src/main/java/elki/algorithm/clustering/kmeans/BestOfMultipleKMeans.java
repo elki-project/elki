@@ -29,9 +29,9 @@ import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.NumberVectorDistanceFunction;
-import elki.distance.distancefunction.PrimitiveDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.distancefunction.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.exceptions.AbortException;
@@ -92,11 +92,11 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
   @Override
   public Clustering<M> run(Database database, Relation<V> relation) {
-    if(!(innerkMeans.getDistanceFunction() instanceof PrimitiveDistanceFunction)) {
-      throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistanceFunction().getClass());
+    if(!(innerkMeans.getDistance() instanceof PrimitiveDistance)) {
+      throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistance().getClass());
     }
     @SuppressWarnings("unchecked")
-    final NumberVectorDistanceFunction<? super NumberVector> df = (NumberVectorDistanceFunction<? super NumberVector>) innerkMeans.getDistanceFunction();
+    final NumberVectorDistance<? super NumberVector> df = (NumberVectorDistance<? super NumberVector>) innerkMeans.getDistance();
 
     Clustering<M> bestResult = null;
     double bestCost = Double.NaN;
@@ -122,8 +122,8 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public DistanceFunction<? super V> getDistanceFunction() {
-    return innerkMeans.getDistanceFunction();
+  public Distance<? super V> getDistance() {
+    return innerkMeans.getDistance();
   }
 
   @Override
@@ -132,8 +132,8 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
-    innerkMeans.setDistanceFunction(distanceFunction);
+  public void setDistance(NumberVectorDistance<? super V> distanceFunction) {
+    innerkMeans.setDistance(distanceFunction);
   }
 
   @Override

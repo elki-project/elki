@@ -24,7 +24,7 @@ import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DistanceFunction;
+import elki.distance.distancefunction.Distance;
 import elki.index.AbstractIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
@@ -69,7 +69,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
   /**
    * Holds the instance of the trees distance function.
    */
-  protected DistanceFunction<? super O> distanceFunction;
+  protected Distance<? super O> distanceFunction;
 
   /**
    * Distance query, on the data relation.
@@ -94,7 +94,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public AbstractCoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+  public AbstractCoverTree(Relation<O> relation, Distance<? super O> distanceFunction, double expansion, int truncate) {
     super(relation);
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceFunction.instantiate(relation);
@@ -239,7 +239,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
     /**
      * Holds the instance of the trees distance function.
      */
-    protected DistanceFunction<? super O> distanceFunction;
+    protected Distance<? super O> distanceFunction;
 
     /**
      * Constant expansion rate. 2 would be the intuitive value, but the original
@@ -261,7 +261,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+    public Factory(Distance<? super O> distanceFunction, double expansion, int truncate) {
       super();
       this.distanceFunction = distanceFunction;
       this.expansion = expansion;
@@ -282,7 +282,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       /**
        * Parameter to specify the distance function to determine the distance
        * between database objects, must extend
-       * {@link elki.distance.distancefunction.DistanceFunction}.
+       * {@link elki.distance.distancefunction.Distance}.
        */
       public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("covertree.distancefunction", "Distance function to determine the distance between objects.");
 
@@ -299,7 +299,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       /**
        * Holds the instance of the trees distance function.
        */
-      protected DistanceFunction<? super O> distanceFunction;
+      protected Distance<? super O> distanceFunction;
 
       /**
        * Truncate the tree.
@@ -314,7 +314,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+        ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
           if(!distanceFunction.isMetric()) {

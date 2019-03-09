@@ -30,8 +30,8 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -115,7 +115,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    */
   public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     // FIXME: allow using a precomputed distance matrix!
-    final SquaredEuclideanDistanceFunction df = SquaredEuclideanDistanceFunction.STATIC;
+    final SquaredEuclideanDistance df = SquaredEuclideanDistance.STATIC;
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     double vrc = 0.;
     int ignorednoise = 0;
@@ -221,7 +221,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(result);
-    Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistance.STATIC.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
       evaluateClustering(rel, c);

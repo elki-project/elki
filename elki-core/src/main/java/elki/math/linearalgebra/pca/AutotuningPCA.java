@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.logging.LoggingUtil;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.EigenvalueDecomposition;
@@ -85,7 +85,7 @@ public class AutotuningPCA extends PCARunner {
     Centroid center = Centroid.make(database, ids);
     ModifiableDoubleDBIDList dres = DBIDUtil.newDistanceDBIDList(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double dist = EuclideanDistanceFunction.STATIC.distance(center, database.get(iter));
+      final double dist = EuclideanDistance.STATIC.distance(center, database.get(iter));
       dres.add(dist, iter);
     }
     dres.sort();

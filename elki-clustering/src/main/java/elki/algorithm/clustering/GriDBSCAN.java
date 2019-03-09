@@ -45,9 +45,9 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
+import elki.distance.distancefunction.Distance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.distancefunction.minkowski.LPNormDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -126,7 +126,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @param minpts Minpts parameter
    * @param gridwidth Grid width
    */
-  public GriDBSCAN(DistanceFunction<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
+  public GriDBSCAN(Distance<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -152,7 +152,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       LOG.warning("Invalid grid width (less than 2*epsilon, recommended 10*epsilon). Increasing grid width automatically.");
       gridwidth = 2. * epsilon;
     }
-    return new Instance<V>(getDistanceFunction(), epsilon, minpts, gridwidth).run(relation);
+    return new Instance<V>(getDistance(), epsilon, minpts, gridwidth).run(relation);
   }
 
   /**
@@ -176,7 +176,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Distance function used.
      */
-    protected DistanceFunction<? super V> distanceFunction;
+    protected Distance<? super V> distanceFunction;
 
     /**
      * Holds the epsilon radius threshold.
@@ -251,7 +251,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * @param minpts MinPts
      * @param gridwidth Grid width
      */
-    public Instance(DistanceFunction<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
+    public Instance(Distance<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
       this.distanceFunction = distanceFunction;
       this.epsilon = epsilon;
       this.minpts = minpts;
@@ -658,7 +658,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // We strictly need a vector field of fixed dimensionality!
-    TypeInformation type = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistanceFunction().getInputTypeRestriction());
+    TypeInformation type = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistance().getInputTypeRestriction());
     return TypeUtil.array(type);
   }
 
@@ -703,7 +703,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected void makeOptions(Parameterization config) {
       // Disabled: super.makeOptions(config);
       // Because we currently only allow Lp norms:
-      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

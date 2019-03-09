@@ -26,8 +26,8 @@ import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 
 /**
@@ -67,8 +67,8 @@ public final class RStarTreeUtil {
   @SuppressWarnings({ "cast", "unchecked" })
   public static <O extends SpatialComparable> RangeQuery<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
-    SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
-    if(EuclideanDistanceFunction.STATIC.equals(df)) {
+    SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
+    if(EuclideanDistance.STATIC.equals(df)) {
       return (RangeQuery<O>) new EuclideanRStarTreeRangeQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
     }
     return new RStarTreeRangeQuery<>(tree, distanceQuery.getRelation(), df);
@@ -87,8 +87,8 @@ public final class RStarTreeUtil {
   @SuppressWarnings({ "cast", "unchecked" })
   public static <O extends SpatialComparable> KNNQuery<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
-    SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
-    if(EuclideanDistanceFunction.STATIC.equals(df)) {
+    SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
+    if(EuclideanDistance.STATIC.equals(df)) {
       return (KNNQuery<O>) new EuclideanRStarTreeKNNQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
     }
     return new RStarTreeKNNQuery<>(tree, distanceQuery.getRelation(), df);

@@ -25,10 +25,10 @@ import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
-import elki.distance.distancefunction.DistanceFunction;
-import elki.distance.similarityfunction.NormalizedSimilarityFunction;
-import elki.distance.similarityfunction.SimilarityFunction;
+import elki.distance.distancefunction.AbstractDatabaseDistance;
+import elki.distance.distancefunction.Distance;
+import elki.distance.similarityfunction.NormalizedSimilarity;
+import elki.distance.similarityfunction.Similarity;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -48,18 +48,18 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> object class to process
  */
-public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistanceFunction<O> {
+public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistance<O> {
   /**
    * Holds the similarity function.
    */
-  protected SimilarityFunction<? super O> similarityFunction;
+  protected Similarity<? super O> similarityFunction;
 
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function to use.
    */
-  public AbstractSimilarityAdapter(SimilarityFunction<? super O> similarityFunction) {
+  public AbstractSimilarityAdapter(Similarity<? super O> similarityFunction) {
     super();
     this.similarityFunction = similarityFunction;
   }
@@ -103,7 +103,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @param <O> Object type
    */
-  public abstract static class Instance<O> extends AbstractDatabaseDistanceFunction.Instance<O> {
+  public abstract static class Instance<O> extends AbstractDatabaseDistance.Instance<O> {
     /**
      * The similarity query we use.
      */
@@ -116,7 +116,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
      * @param parent Parent distance function
      * @param similarityQuery Similarity query
      */
-    public Instance(Relation<O> database, DistanceFunction<? super O> parent, SimilarityQuery<? super O> similarityQuery) {
+    public Instance(Relation<O> database, Distance<? super O> parent, SimilarityQuery<? super O> similarityQuery) {
       super(database, parent);
       this.similarityQuery = similarityQuery;
     }
@@ -140,11 +140,11 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O, S extends SimilarityFunction<? super O>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O, S extends Similarity<? super O>> extends AbstractParameterizer {
     /**
      * Parameter to specify the similarity function to derive the distance
      * between database objects from. Must extend
-     * {@link elki.distance.similarityfunction.SimilarityFunction}
+     * {@link elki.distance.similarityfunction.Similarity}
      * .
      */
     public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", //
@@ -158,12 +158,12 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     /**
      * Arbitrary Similarity functions
      */
-    protected Class<SimilarityFunction<? super O>> ARBITRARY_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(SimilarityFunction.class);
+    protected Class<Similarity<? super O>> ARBITRARY_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(Similarity.class);
 
     /**
      * Normalized similarity functions
      */
-    protected Class<NormalizedSimilarityFunction<? super O>> NORMALIZED_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(NormalizedSimilarityFunction.class);
+    protected Class<NormalizedSimilarity<? super O>> NORMALIZED_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(NormalizedSimilarity.class);
 
     @Override
     protected void makeOptions(Parameterization config) {
