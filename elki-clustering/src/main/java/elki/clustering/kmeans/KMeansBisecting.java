@@ -32,7 +32,6 @@ import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.ProxyDatabase;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -150,7 +149,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
   }
 
   @Override
-  public Distance<? super V> getDistance() {
+  public NumberVectorDistance<? super V> getDistance() {
     return innerkMeans.getDistance();
   }
 

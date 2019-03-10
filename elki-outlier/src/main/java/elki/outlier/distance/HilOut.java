@@ -24,9 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -46,6 +44,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.spacefillingcurves.HilbertSpatialSorter;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -966,7 +965,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
         h = hP.getValue();
       }
 
-      ObjectParameter<LPNormDistance> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
+      ObjectParameter<LPNormDistance> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distfunc = distP.instantiateClass(config);
       }

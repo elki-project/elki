@@ -21,10 +21,10 @@
 package elki.algorithm;
 
 import elki.AbstractAlgorithm;
-import elki.DistanceBasedAlgorithm;
 import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -46,7 +46,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
-   * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
+   * {@link Parameterizer#DISTANCE_FUNCTION_ID}.
    */
   protected PrimitiveDistance<? super O> distanceFunction;
 
@@ -76,6 +76,11 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends Abst
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
+     * OptionID for the distance function.
+     */
+    public static final OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID;
+
+    /**
      * Distance function to use.
      */
     protected PrimitiveDistance<O> distanceFunction;
@@ -83,7 +88,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, R> extends Abst
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
+      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

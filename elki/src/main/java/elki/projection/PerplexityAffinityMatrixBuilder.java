@@ -20,7 +20,6 @@
  */
 package elki.projection;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
@@ -243,7 +242,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     @Override
     protected void makeOptions(Parameterization config) {
       // Override: super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

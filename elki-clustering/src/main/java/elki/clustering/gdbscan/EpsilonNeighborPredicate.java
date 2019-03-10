@@ -20,7 +20,7 @@
  */
 package elki.clustering.gdbscan;
 
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
@@ -180,7 +180,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get a distance function.
-      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
       }
