@@ -20,7 +20,7 @@
  */
 package elki.index.tree.spatial.rstarvariants.strategies.overflow;
 
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;

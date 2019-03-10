@@ -49,7 +49,7 @@ import elki.database.relation.RelationUtil;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.parser.NumberVectorLabelParser;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.result.Metadata;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIBuilder;

@@ -44,7 +44,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;

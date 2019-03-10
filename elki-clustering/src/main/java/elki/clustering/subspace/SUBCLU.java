@@ -22,7 +22,7 @@ package elki.clustering.subspace;
 
 import java.util.*;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -38,8 +38,8 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.subspace.DimensionSelectingSubspaceDistance;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
+import elki.distance.subspace.DimensionSelectingSubspaceDistance;
+import elki.distance.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;

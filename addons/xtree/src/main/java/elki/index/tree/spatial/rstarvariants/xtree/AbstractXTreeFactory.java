@@ -21,7 +21,7 @@
 package elki.index.tree.spatial.rstarvariants.xtree;
 
 import elki.data.NumberVector;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;

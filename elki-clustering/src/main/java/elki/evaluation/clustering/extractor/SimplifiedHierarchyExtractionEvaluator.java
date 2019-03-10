@@ -22,7 +22,7 @@ package elki.evaluation.clustering.extractor;
 
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction;
 import elki.evaluation.Evaluator;

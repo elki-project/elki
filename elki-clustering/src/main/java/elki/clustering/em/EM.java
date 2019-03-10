@@ -25,7 +25,7 @@ import static elki.math.linearalgebra.VMath.argmax;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
@@ -44,7 +44,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;

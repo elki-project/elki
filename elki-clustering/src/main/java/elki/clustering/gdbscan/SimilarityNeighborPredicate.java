@@ -31,7 +31,7 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.similarityfunction.Similarity;
+import elki.similarity.Similarity;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;

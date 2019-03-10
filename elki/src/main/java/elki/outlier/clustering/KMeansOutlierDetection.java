@@ -22,7 +22,7 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.KMeansLloyd;
 import elki.outlier.OutlierAlgorithm;
@@ -42,7 +42,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.outlier.BasicOutlierScoreMeta;

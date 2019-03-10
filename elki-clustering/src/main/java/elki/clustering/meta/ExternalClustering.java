@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;

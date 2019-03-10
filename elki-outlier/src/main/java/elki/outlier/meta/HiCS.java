@@ -29,9 +29,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.lof.LOF;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;

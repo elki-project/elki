@@ -20,8 +20,8 @@
  */
 package elki.index.tree.spatial.rstarvariants.strategies.reinsert;
 
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.SpatialPrimitiveDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;

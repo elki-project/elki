@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.LoggingUtil;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.EigenvalueDecomposition;

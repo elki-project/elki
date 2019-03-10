@@ -5,7 +5,7 @@
  * {@link elki.KDDTask} is the basic work-flow for unsupervised
  * knowledge discovery. It will setup a
  * {@link elki.datasource.DatabaseConnection DatabaseConnection},
- * run an {@link elki.algorithm.Algorithm Algorithm} on it and
+ * run an {@link elki.Algorithm Algorithm} on it and
  * pass the result to a {@link elki.result.ResultHandler
  * ResultHandler}.
  */

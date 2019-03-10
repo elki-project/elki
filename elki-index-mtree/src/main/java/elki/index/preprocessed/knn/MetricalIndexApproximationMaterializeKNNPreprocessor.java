@@ -30,7 +30,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.Node;
 import elki.index.tree.metrical.MetricalIndexTree;

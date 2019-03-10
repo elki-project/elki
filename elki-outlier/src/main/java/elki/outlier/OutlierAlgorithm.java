@@ -20,7 +20,7 @@
  */
 package elki.outlier;
 
-import elki.algorithm.Algorithm;
+import elki.Algorithm;
 import elki.database.Database;
 import elki.result.outlier.OutlierResult;
 

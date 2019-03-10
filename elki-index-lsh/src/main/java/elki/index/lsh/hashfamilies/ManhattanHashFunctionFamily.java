@@ -21,8 +21,8 @@
 package elki.index.lsh.hashfamilies;
 
 import elki.data.projection.random.CauchyRandomProjectionFamily;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.ManhattanDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.ManhattanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
 

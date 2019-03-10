@@ -32,7 +32,7 @@ import elki.data.model.KMeansModel;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;

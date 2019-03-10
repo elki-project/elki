@@ -31,7 +31,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.result.Metadata;

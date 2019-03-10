@@ -20,6 +20,7 @@
  */
 package elki.algorithm;
 
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -28,7 +29,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;

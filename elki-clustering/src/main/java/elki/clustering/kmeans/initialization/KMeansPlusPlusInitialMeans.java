@@ -32,7 +32,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.LoggingUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;

@@ -32,7 +32,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.ByteArrayUtil;

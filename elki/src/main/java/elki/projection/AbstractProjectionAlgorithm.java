@@ -20,7 +20,7 @@
  */
 package elki.projection;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.database.relation.Relation;
 import elki.index.Index;
 import elki.logging.Logging;

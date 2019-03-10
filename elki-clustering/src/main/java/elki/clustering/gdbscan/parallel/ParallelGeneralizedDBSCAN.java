@@ -22,7 +22,7 @@ package elki.clustering.gdbscan.parallel;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.gdbscan.CorePredicate;
 import elki.clustering.gdbscan.EpsilonNeighborPredicate;

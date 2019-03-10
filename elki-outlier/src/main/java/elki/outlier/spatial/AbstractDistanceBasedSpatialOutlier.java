@@ -20,11 +20,11 @@
  */
 package elki.outlier.spatial;
 
-import elki.algorithm.DistanceBasedAlgorithm;
 import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.PrimitiveDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.DistanceBasedAlgorithm;
+import elki.distance.Distance;
+import elki.distance.PrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;

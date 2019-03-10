@@ -22,7 +22,7 @@ package elki.index.tree.metrical;
 
 import java.util.List;
 
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.Entry;
 import elki.index.tree.IndexTree;
 import elki.index.tree.Node;

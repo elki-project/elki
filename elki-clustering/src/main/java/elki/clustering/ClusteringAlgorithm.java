@@ -20,7 +20,7 @@
  */
 package elki.clustering;
 
-import elki.algorithm.Algorithm;
+import elki.Algorithm;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;
@@ -28,7 +28,7 @@ import elki.database.Database;
 /**
  * Interface for Algorithms that are capable to provide a {@link Clustering
  * Clustering} as Result. in general, clustering algorithms are supposed to
- * implement the {@link elki.algorithm.Algorithm}-Interface. The
+ * implement the {@link elki.Algorithm}-Interface. The
  * more specialized interface {@link ClusteringAlgorithm} requires an
  * implementing algorithm to provide a special result class suitable as a
  * partitioning of the database. More relaxed clustering algorithms are allowed

@@ -37,9 +37,9 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
-import elki.distance.similarityfunction.Similarity;
+import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.similarity.Similarity;
 
 /**
  * Static class with utilities related to querying a database.

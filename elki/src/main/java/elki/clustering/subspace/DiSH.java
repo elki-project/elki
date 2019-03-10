@@ -26,7 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.optics.CorrelationClusterOrder;
 import elki.clustering.optics.GeneralizedOPTICS;
 import elki.data.Cluster;

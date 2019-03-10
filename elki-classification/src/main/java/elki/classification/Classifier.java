@@ -20,7 +20,7 @@
  */
 package elki.classification;
 
-import elki.algorithm.Algorithm;
+import elki.Algorithm;
 import elki.data.ClassLabel;
 import elki.database.Database;
 import elki.database.relation.Relation;

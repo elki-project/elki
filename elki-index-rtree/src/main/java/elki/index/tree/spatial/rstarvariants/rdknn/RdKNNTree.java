@@ -47,7 +47,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.SpatialPrimitiveDistance;
 import elki.index.DynamicIndex;
 import elki.index.KNNIndex;
 import elki.index.RKNNIndex;

@@ -28,7 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialIndexTree;

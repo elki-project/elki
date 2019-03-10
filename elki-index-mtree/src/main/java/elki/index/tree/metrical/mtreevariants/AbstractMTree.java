@@ -26,7 +26,7 @@ import java.util.List;
 
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRef;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.BreadthFirstEnumeration;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;

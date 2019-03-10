@@ -1,0 +1,4 @@
+elki.distance.RandomStableDistance
+elki.distance.adapter.ArccosSimilarityAdapter
+elki.distance.adapter.LinearSimilarityAdapter
+elki.distance.adapter.LnSimilarityAdapter

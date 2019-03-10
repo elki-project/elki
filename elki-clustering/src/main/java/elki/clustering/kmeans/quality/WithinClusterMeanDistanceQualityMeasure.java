@@ -27,7 +27,7 @@ import elki.data.model.MeanModel;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 
 /**
  * Class for computing the average overall distance.

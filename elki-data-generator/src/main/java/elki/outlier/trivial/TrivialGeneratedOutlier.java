@@ -22,8 +22,8 @@ package elki.outlier.trivial;
 
 import java.util.HashSet;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.data.synthetic.bymodel.GeneratorSingleCluster;

@@ -22,13 +22,13 @@ package elki.itemsetmining.associationrules;
 
 import java.util.*;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.itemsetmining.AbstractFrequentItemsetAlgorithm;
 import elki.itemsetmining.FPGrowth;
 import elki.itemsetmining.Itemset;
 import elki.itemsetmining.SparseItemset;
 import elki.itemsetmining.associationrules.interest.Confidence;
 import elki.itemsetmining.associationrules.interest.InterestingnessMeasure;
+import elki.AbstractAlgorithm;
 import elki.data.BitVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.VectorFieldTypeInformation;

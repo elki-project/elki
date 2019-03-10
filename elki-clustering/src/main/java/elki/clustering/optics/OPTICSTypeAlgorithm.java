@@ -20,7 +20,7 @@
  */
 package elki.clustering.optics;
 
-import elki.algorithm.Algorithm;
+import elki.Algorithm;
 import elki.database.Database;
 
 /**

@@ -21,7 +21,7 @@
 package elki.index.tree.spatial.rstarvariants.rdknn;
 
 import elki.data.NumberVector;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.rstarvariants.RTreeSettings;
 
 /**

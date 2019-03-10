@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
@@ -35,7 +35,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.SharedNearestNeighborSimilarity;
+import elki.similarity.SharedNearestNeighborSimilarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;

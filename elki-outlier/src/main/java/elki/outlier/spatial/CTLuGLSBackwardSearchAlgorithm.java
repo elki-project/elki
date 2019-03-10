@@ -44,7 +44,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.NormalDistribution;

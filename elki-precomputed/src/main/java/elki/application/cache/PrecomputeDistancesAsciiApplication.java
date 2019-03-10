@@ -35,7 +35,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.exceptions.AbortException;

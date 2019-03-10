@@ -27,7 +27,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.pca.PCARunner;
 import elki.math.linearalgebra.pca.filter.EigenPairFilter;

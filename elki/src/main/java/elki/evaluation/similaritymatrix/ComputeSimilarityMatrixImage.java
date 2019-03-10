@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import elki.algorithm.DistanceBasedAlgorithm;
+import elki.DistanceBasedAlgorithm;
 import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.ArrayModifiableDBIDs;
@@ -37,8 +37,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;

@@ -20,7 +20,7 @@
  */
 package elki.outlier.clustering;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.em.EM;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.Clustering;

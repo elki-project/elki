@@ -31,7 +31,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;

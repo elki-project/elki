@@ -21,7 +21,7 @@
 package elki.index;
 
 import elki.database.query.distance.DistanceQuery;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 
 /**
  * Index with support for distance queries (e.g. precomputed distance matrixes,

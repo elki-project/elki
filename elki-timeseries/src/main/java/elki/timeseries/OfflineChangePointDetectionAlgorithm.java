@@ -22,7 +22,7 @@ package elki.timeseries;
 
 import java.util.Random;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;

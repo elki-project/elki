@@ -22,8 +22,8 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
+import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.DistanceBasedAlgorithm;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
@@ -35,8 +35,8 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Priority;

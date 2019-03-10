@@ -20,7 +20,7 @@
  */
 package elki.clustering;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.subspace.PROCLUS;
 import elki.data.Clustering;
 import elki.data.NumberVector;

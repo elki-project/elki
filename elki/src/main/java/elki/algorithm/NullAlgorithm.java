@@ -20,6 +20,7 @@
  */
 package elki.algorithm;
 
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;

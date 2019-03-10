@@ -34,7 +34,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.math.spacefillingcurves.BinarySplitSpatialSorter;
 import elki.math.spacefillingcurves.HilbertSpatialSorter;
 import elki.math.spacefillingcurves.PeanoSpatialSorter;

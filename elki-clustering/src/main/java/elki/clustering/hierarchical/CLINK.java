@@ -24,7 +24,7 @@ import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;

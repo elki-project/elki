@@ -22,8 +22,8 @@ package elki.outlier.subspace;
 
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.type.TypeInformation;

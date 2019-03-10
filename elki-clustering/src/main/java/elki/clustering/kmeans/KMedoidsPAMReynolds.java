@@ -27,7 +27,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;

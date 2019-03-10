@@ -22,8 +22,8 @@ package elki.outlier.trivial;
 
 import java.util.regex.Pattern;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.ClassLabel;
 import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;

@@ -24,7 +24,7 @@
  */
 package elki.clustering.optics;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -33,7 +33,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.preprocessed.fastoptics.RandomProjectedNeighborsAndDensities;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;

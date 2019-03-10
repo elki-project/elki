@@ -22,7 +22,7 @@ package elki.index.tree.metrical.covertree;
 
 import org.junit.Test;
 
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 

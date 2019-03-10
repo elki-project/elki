@@ -22,8 +22,8 @@ package elki.workflow;
 
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
-import elki.algorithm.Algorithm;
+import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.database.Database;
 import elki.index.Index;
 import elki.logging.Logging;

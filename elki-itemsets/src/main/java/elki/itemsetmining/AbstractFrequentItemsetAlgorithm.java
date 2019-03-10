@@ -20,7 +20,7 @@
  */
 package elki.itemsetmining;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.result.FrequentItemsetsResult;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;

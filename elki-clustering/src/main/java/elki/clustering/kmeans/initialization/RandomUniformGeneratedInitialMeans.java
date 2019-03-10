@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;

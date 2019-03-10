@@ -25,8 +25,8 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DBIDDistance;
-import elki.distance.distancefunction.DBIDRangeDistance;
+import elki.distance.DBIDDistance;
+import elki.distance.DBIDRangeDistance;
 
 /**
  * Run a distance query based on DBIDRanges

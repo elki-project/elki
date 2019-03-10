@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.em.EM;
 import elki.clustering.em.EMClusterModel;
 import elki.clustering.em.MultivariateGaussianModel;

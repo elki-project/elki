@@ -29,7 +29,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.evaluation.scores.AveragePrecisionEvaluation;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;

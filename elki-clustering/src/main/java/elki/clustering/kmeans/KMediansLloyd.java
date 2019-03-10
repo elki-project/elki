@@ -31,7 +31,7 @@ import elki.data.model.MeanModel;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;

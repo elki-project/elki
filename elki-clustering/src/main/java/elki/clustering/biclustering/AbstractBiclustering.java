@@ -22,7 +22,7 @@ package elki.clustering.biclustering;
 
 import java.util.BitSet;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;

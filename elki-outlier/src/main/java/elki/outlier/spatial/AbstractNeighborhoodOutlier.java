@@ -20,7 +20,7 @@
  */
 package elki.outlier.spatial;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.outlier.OutlierResult;

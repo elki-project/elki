@@ -30,7 +30,7 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.math.statistics.intrinsicdimensionality.GEDEstimator;

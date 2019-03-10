@@ -20,7 +20,7 @@
  */
 package elki.index.tree.metrical.mtreevariants;
 
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 

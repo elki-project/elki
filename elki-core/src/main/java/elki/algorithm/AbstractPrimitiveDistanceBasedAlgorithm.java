@@ -20,8 +20,10 @@
  */
 package elki.algorithm;
 
-import elki.distance.distancefunction.PrimitiveDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.AbstractAlgorithm;
+import elki.DistanceBasedAlgorithm;
+import elki.distance.PrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;

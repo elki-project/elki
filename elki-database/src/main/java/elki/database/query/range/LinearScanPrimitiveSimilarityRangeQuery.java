@@ -27,7 +27,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.PrimitiveSimilarity;
+import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Default linear scan range query class.

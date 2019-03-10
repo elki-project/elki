@@ -25,7 +25,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;

@@ -20,7 +20,7 @@
  */
 package elki.clustering.uncertain;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Clustering;
 import elki.data.DoubleVector;

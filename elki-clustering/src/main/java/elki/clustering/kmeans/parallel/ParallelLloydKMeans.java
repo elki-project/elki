@@ -36,7 +36,7 @@ import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.parallel.ParallelExecutor;

@@ -1,0 +1,5 @@
+elki.distance.subspace.SubspaceEuclideanDistance
+elki.distance.subspace.SubspaceLPNormDistance
+elki.distance.subspace.SubspaceManhattanDistance
+elki.distance.subspace.SubspaceMaximumDistance
+elki.distance.subspace.OnedimensionalDistance

@@ -32,8 +32,8 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.distancefunction.Distance;
-import elki.distance.similarityfunction.Similarity;
+import elki.distance.Distance;
+import elki.similarity.Similarity;
 
 /**
  * An object representation from a database.

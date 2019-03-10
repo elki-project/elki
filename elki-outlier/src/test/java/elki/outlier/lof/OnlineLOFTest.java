@@ -44,8 +44,8 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.CosineDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.CosineDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 

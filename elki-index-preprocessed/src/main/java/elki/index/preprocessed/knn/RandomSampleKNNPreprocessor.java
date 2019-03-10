@@ -32,7 +32,7 @@ import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;

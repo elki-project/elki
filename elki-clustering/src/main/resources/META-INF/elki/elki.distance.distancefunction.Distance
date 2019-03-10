@@ -1,6 +1,0 @@
-elki.distance.similarityfunction.cluster.ClusterIntersectionSimilarity
-elki.distance.similarityfunction.cluster.ClusterJaccardSimilarity
-elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarity
-elki.distance.similarityfunction.cluster.ClusteringRandIndexSimilarity
-elki.distance.similarityfunction.cluster.ClusteringBCubedF1Similarity
-elki.distance.similarityfunction.cluster.ClusteringFowlkesMallowsSimilarity

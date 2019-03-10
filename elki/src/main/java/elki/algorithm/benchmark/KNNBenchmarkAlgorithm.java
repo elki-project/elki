@@ -30,7 +30,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;

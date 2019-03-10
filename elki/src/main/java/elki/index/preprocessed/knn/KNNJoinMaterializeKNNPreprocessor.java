@@ -23,7 +23,7 @@ package elki.index.preprocessed.knn;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.logging.Logging;

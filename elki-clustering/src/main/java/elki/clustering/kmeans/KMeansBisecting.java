@@ -22,7 +22,7 @@ package elki.clustering.kmeans;
 
 import java.util.LinkedList;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -32,8 +32,8 @@ import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.ProxyDatabase;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.Distance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;

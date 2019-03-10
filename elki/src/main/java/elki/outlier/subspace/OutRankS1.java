@@ -20,7 +20,7 @@
  */
 package elki.outlier.subspace;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.subspace.SubspaceClusteringAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;

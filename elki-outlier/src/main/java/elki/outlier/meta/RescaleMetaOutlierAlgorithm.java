@@ -20,9 +20,9 @@
  */
 package elki.outlier.meta;
 
-import elki.algorithm.AbstractAlgorithm;
-import elki.algorithm.Algorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;

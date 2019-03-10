@@ -41,7 +41,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;

@@ -32,7 +32,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.result.Metadata;
 import elki.utilities.ELKIBuilder;
 

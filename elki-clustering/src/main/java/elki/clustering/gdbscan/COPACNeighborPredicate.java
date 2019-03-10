@@ -37,7 +37,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;

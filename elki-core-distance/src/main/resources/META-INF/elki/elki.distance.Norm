@@ -1,0 +1,26 @@
+elki.distance.minkowski.EuclideanDistance euclidean euclid l2
+elki.distance.minkowski.ManhattanDistance taxicab cityblock l1
+elki.distance.minkowski.MaximumDistance maximum max chebyshev
+elki.distance.minkowski.MinimumDistance minimum min
+elki.distance.minkowski.LPNormDistance lp minkowski p
+# elki.distance.minkowski.LPIntegerNormDistance
+elki.distance.minkowski.SquaredEuclideanDistance squaredeuclidean
+elki.distance.minkowski.WeightedLPNormDistance
+elki.distance.minkowski.WeightedEuclideanDistance
+elki.distance.minkowski.WeightedManhattanDistance
+elki.distance.minkowski.WeightedMaximumDistance
+elki.distance.minkowski.WeightedSquaredEuclideanDistance
+elki.distance.minkowski.SparseEuclideanDistance
+elki.distance.minkowski.SparseManhattanDistance
+elki.distance.minkowski.SparseLPNormDistance
+elki.distance.minkowski.SparseMaximumDistance
+elki.distance.minkowski.SparseSquaredEuclideanDistance
+elki.distance.colorhistogram.HSBHistogramQuadraticDistance
+elki.distance.colorhistogram.RGBHistogramQuadraticDistance
+elki.distance.subspace.SubspaceEuclideanDistance
+elki.distance.subspace.SubspaceLPNormDistance
+elki.distance.subspace.SubspaceManhattanDistance
+elki.distance.subspace.SubspaceMaximumDistance
+elki.distance.subspace.OnedimensionalDistance
+# elki.distance.MahalanobisDistance
+# elki.distance.MatrixWeightedQuadraticDistance

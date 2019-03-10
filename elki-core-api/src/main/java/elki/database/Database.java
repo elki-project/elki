@@ -35,8 +35,8 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
-import elki.distance.distancefunction.Distance;
-import elki.distance.similarityfunction.Similarity;
+import elki.distance.Distance;
+import elki.similarity.Similarity;
 
 /**
  * Database specifies the requirements for any database implementation. Note

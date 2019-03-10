@@ -33,8 +33,8 @@ import elki.database.ids.KNNList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 
 /**
  * Instance of this query for a particular database.

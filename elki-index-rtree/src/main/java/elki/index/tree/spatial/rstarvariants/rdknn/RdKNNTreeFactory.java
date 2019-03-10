@@ -22,8 +22,8 @@ package elki.index.tree.spatial.rstarvariants.rdknn;
 
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.SpatialPrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.persistent.PageFile;
 import elki.persistent.PageFileFactory;

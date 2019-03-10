@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.ClassLabel;
 import elki.database.Database;
 import elki.utilities.exceptions.AbortException;

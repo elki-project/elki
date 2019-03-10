@@ -31,7 +31,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
 import elki.utilities.documentation.Reference;
