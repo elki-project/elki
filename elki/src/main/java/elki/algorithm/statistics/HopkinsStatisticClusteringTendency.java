@@ -23,7 +23,6 @@ package elki.algorithm.statistics;
 import java.util.Arrays;
 import java.util.Random;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
@@ -362,7 +361,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<NumberVectorDistance<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
+      ObjectParameter<NumberVectorDistance<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

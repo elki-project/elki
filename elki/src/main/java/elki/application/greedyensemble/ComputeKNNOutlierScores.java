@@ -28,15 +28,7 @@ import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 
-import elki.outlier.DWOF;
-import elki.outlier.anglebased.FastABOD;
-import elki.outlier.distance.*;
-import elki.outlier.intrinsic.IDOS;
-import elki.outlier.intrinsic.ISOS;
-import elki.outlier.intrinsic.IntrinsicDimensionalityOutlier;
-import elki.outlier.lof.*;
-import elki.outlier.trivial.ByLabelOutlier;
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.application.AbstractApplication;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
@@ -51,15 +43,37 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.similarity.kernel.LinearKernel;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
 import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
+import elki.outlier.DWOF;
+import elki.outlier.anglebased.FastABOD;
+import elki.outlier.distance.KNNDD;
+import elki.outlier.distance.KNNOutlier;
+import elki.outlier.distance.KNNSOS;
+import elki.outlier.distance.KNNWeightOutlier;
+import elki.outlier.distance.LocalIsolationCoefficient;
+import elki.outlier.distance.ODIN;
+import elki.outlier.intrinsic.IDOS;
+import elki.outlier.intrinsic.ISOS;
+import elki.outlier.intrinsic.IntrinsicDimensionalityOutlier;
+import elki.outlier.lof.COF;
+import elki.outlier.lof.INFLO;
+import elki.outlier.lof.KDEOS;
+import elki.outlier.lof.LDF;
+import elki.outlier.lof.LDOF;
+import elki.outlier.lof.LOF;
+import elki.outlier.lof.LoOP;
+import elki.outlier.lof.SimpleKernelDensityLOF;
+import elki.outlier.lof.SimplifiedLOF;
+import elki.outlier.lof.VarianceOfVolume;
+import elki.outlier.trivial.ByLabelOutlier;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
+import elki.similarity.kernel.LinearKernel;
 import elki.utilities.datastructures.range.IntGenerator;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
@@ -74,7 +88,6 @@ import elki.utilities.scaling.IdentityScaling;
 import elki.utilities.scaling.ScalingFunction;
 import elki.utilities.scaling.outlier.OutlierScaling;
 import elki.workflow.InputStep;
-
 import net.jafama.FastMath;
 
 /**
@@ -461,7 +474,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }

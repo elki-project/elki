@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import elki.AbstractAlgorithm;
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.data.ClassLabel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -63,7 +63,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
 @Priority(Priority.IMPORTANT)
-public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements DistanceBasedAlgorithm<O>, Classifier<O> {
+public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classifier<O> {
   /**
    * The logger for this class.
    */
@@ -157,7 +157,11 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
     throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
   }
 
-  @Override
+  /**
+   * Returns the distanceFunction.
+   *
+   * @return the distanceFunction
+   */
   public Distance<? super O> getDistance() {
     return distanceFunction;
   }
@@ -201,7 +205,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Distanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distP)) {
         distanceFunction = distP.instantiateClass(config);
       }

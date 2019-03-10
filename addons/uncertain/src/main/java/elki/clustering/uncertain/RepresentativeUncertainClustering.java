@@ -20,10 +20,14 @@
  */
 package elki.clustering.uncertain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import elki.AbstractAlgorithm;
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMedoidsPAM;
 import elki.data.Cluster;
@@ -41,13 +45,15 @@ import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.*;
+import elki.database.ids.DBIDFactory;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRange;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity;
-import elki.similarity.cluster.ClusteringDistanceSimilarity;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -55,6 +61,8 @@ import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
+import elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity;
+import elki.similarity.cluster.ClusteringDistanceSimilarity;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -64,10 +72,13 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.*;
+import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.Flag;
+import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.pairs.DoubleObjPair;
 import elki.utilities.random.RandomFactory;
-
 import net.jafama.FastMath;
 
 /**
@@ -445,7 +456,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       }
       // Configure Distance function
       ListParameterization predef = new ListParameterization();
-      predef.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, distance);
+      predef.addParameter(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsPAM.class);

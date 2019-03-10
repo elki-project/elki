@@ -22,7 +22,6 @@ package elki.clustering;
 
 import java.util.Arrays;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.clustering.gdbscan.util.Assignment;
 import elki.clustering.gdbscan.util.Border;
@@ -703,7 +702,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected void makeOptions(Parameterization config) {
       // Disabled: super.makeOptions(config);
       // Because we currently only allow Lp norms:
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
+      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

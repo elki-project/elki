@@ -29,7 +29,6 @@ import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.distance.NumberVectorDistance;
 import elki.distance.PrimitiveDistance;
 import elki.logging.Logging;
@@ -122,7 +121,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public Distance<? super V> getDistance() {
+  public NumberVectorDistance<? super V> getDistance() {
     return innerkMeans.getDistance();
   }
 

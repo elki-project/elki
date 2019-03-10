@@ -24,10 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import elki.data.NumberVector;
+import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -43,22 +42,20 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
@@ -90,7 +87,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
     url = "https://doi.org/10.1109/ICDE.2003.1260802", //
     bibkey = "DBLP:conf/icde/PapadimitriouKGF03")
-public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,11 +114,6 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
   private RandomFactory rnd;
 
   /**
-   * Distance function
-   */
-  private NumberVectorDistance<?> distFunc;
-
-  /**
    * Constructor.
    *
    * @param distanceFunction Distance function
@@ -130,9 +122,8 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistance<?> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
-    super();
-    this.distFunc = distanceFunction;
+  public ALOCI(NumberVectorDistance<? super O> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
+    super(distanceFunction);
     this.nmin = nmin;
     this.alpha = alpha;
     this.g = g;
@@ -188,6 +179,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
+    NumberVectorDistance<? super O> distFunc = getDistance();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final O obj = relation.get(iditer);
@@ -291,12 +283,12 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distFunc.getInputTypeRestriction());
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistance().getInputTypeRestriction()));
   }
 
   /**
    * Simple quadtree for ALOCI. Not storing the actual objects, just the counts.
-   *
+   * <p>
    * Furthermore, the quadtree can be shifted by a specified vector, wrapping
    * around min/max
    *
@@ -350,12 +342,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
       }
       double[] center = new double[min.length];
       for(int d = 0; d < min.length; d++) {
-        if(shift[d] < width[d] * .5) {
-          center[d] = min[d] + shift[d] + width[d] * .5;
-        }
-        else {
-          center[d] = min[d] + shift[d] - width[d] * .5;
-        }
+        center[d] = min[d] + shift[d] + width[d] * (shift[d] < width[d] * .5 ? .5 : -.5);
       }
       this.relation = relation;
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
@@ -648,7 +635,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to specify the minimum neighborhood size
      */
@@ -689,19 +676,9 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
      */
     protected RandomFactory rnd;
 
-    /**
-     * The distance function
-     */
-    private NumberVectorDistance<?> distanceFunction;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
 
       final IntParameter nminP = new IntParameter(NMIN_ID, 20);
       if(config.grab(nminP)) {

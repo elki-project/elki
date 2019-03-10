@@ -20,7 +20,7 @@
  */
 package elki.clustering.kmeans;
 
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
@@ -42,7 +42,12 @@ import elki.utilities.optionhandling.OptionID;
  * @param <V> Number vector type
  * @param <M> Actual model type
  */
-public interface KMeans<V extends NumberVector, M extends Model> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V> {
+public interface KMeans<V extends NumberVector, M extends Model> extends ClusteringAlgorithm<Clustering<M>> {
+  /**
+   * OptionID for the distance function.
+   */
+  OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID;
+
   /**
    * Parameter to specify the initialization method
    */
@@ -93,6 +98,13 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
    * @param distanceFunction Distance function.
    */
   void setDistance(NumberVectorDistance<? super V> distanceFunction);
+
+  /**
+   * Returns the distanceFunction.
+   *
+   * @return the distanceFunction
+   */
+  NumberVectorDistance<? super V> getDistance();
 
   /**
    * Set the initialization method.

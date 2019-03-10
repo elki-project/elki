@@ -20,11 +20,11 @@
  */
 package elki.outlier.spatial;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.distance.Distance;
 import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -89,7 +89,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
+      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import elki.DistanceBasedAlgorithm;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
@@ -476,7 +475,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
+      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(!(distanceFunction instanceof EuclideanDistance) && !(distanceFunction instanceof SquaredEuclideanDistance)) {

@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import elki.DistanceBasedAlgorithm;
+import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.ArrayModifiableDBIDs;
@@ -44,7 +44,10 @@ import elki.logging.Logging;
 import elki.logging.LoggingUtil;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
-import elki.result.*;
+import elki.result.Metadata;
+import elki.result.OrderingResult;
+import elki.result.PixmapResult;
+import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -338,7 +341,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

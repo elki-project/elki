@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
@@ -711,7 +710,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterDistance(Parameterization config) {
-      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
+      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(distanceFunction == null //

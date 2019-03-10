@@ -25,11 +25,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMeansSort;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -51,6 +49,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -330,7 +329,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistance<? super O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
+      ObjectParameter<NumberVectorDistance<? super O>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
       if(config.grab(distanceP)) {
         distance = distanceP.instantiateClass(config);
       }
