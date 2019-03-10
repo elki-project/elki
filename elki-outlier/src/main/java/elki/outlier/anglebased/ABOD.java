@@ -20,8 +20,8 @@
  */
 package elki.outlier.anglebased;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -37,9 +37,9 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.Similarity;
-import elki.distance.similarityfunction.kernel.KernelMatrix;
-import elki.distance.similarityfunction.kernel.PolynomialKernel;
+import elki.similarity.Similarity;
+import elki.similarity.kernel.KernelMatrix;
+import elki.similarity.kernel.PolynomialKernel;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;

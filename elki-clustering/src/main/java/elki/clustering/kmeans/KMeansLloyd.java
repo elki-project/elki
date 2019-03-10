@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;

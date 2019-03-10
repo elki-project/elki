@@ -35,7 +35,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.ConvertToStringView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;

@@ -34,7 +34,7 @@ import elki.data.model.KMeansModel;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.utilities.ELKIBuilder;
 
 /**

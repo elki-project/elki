@@ -42,7 +42,7 @@ import elki.database.ids.DoubleDBIDPair;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;

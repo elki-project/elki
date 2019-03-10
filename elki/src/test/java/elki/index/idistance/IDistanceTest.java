@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import elki.clustering.kmeans.initialization.FarthestPointsInitialMeans;
 import elki.data.NumberVector;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 

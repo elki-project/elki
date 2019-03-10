@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
-import elki.algorithm.Algorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;

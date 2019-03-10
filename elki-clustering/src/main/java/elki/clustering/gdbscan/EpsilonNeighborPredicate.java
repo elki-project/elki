@@ -20,7 +20,7 @@
  */
 package elki.clustering.gdbscan;
 
-import elki.algorithm.DistanceBasedAlgorithm;
+import elki.DistanceBasedAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
@@ -33,8 +33,8 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;

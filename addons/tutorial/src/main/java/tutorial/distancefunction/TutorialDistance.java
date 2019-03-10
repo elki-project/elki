@@ -23,7 +23,7 @@ package tutorial.distancefunction;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
-import elki.distance.distancefunction.AbstractNumberVectorDistance;
+import elki.distance.AbstractNumberVectorDistance;
 
 /**
  * Tutorial distance function example for ELKI.

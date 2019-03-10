@@ -21,7 +21,7 @@
 package elki.index;
 
 import elki.database.query.similarity.SimilarityQuery;
-import elki.distance.similarityfunction.Similarity;
+import elki.similarity.Similarity;
 
 /**
  * Index with support for similarity queries (e.g. precomputed similarity

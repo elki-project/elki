@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.extraction;
 
 import org.junit.Test;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.HDBSCANLinearMemory;
 import elki.clustering.hierarchical.MiniMaxNNChain;

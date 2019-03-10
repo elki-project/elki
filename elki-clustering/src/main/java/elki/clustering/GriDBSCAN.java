@@ -22,8 +22,8 @@ package elki.clustering;
 
 import java.util.Arrays;
 
+import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.DistanceBasedAlgorithm;
 import elki.clustering.gdbscan.util.Assignment;
 import elki.clustering.gdbscan.util.Border;
 import elki.clustering.gdbscan.util.Core;
@@ -45,9 +45,9 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
-import elki.distance.distancefunction.minkowski.LPNormDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.LPNormDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;

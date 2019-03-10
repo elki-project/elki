@@ -23,8 +23,8 @@ package elki.database.query.distance;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DistanceSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistance;
-import elki.distance.similarityfunction.PrimitiveSimilarity;
+import elki.distance.PrimitiveDistance;
+import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Combination query class, for convenience.

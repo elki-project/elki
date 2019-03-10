@@ -20,7 +20,7 @@
  */
 package elki.clustering.correlation;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.clustering.gdbscan.COPACNeighborPredicate;

@@ -20,8 +20,8 @@
  */
 package elki.outlier.subspace;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
@@ -36,9 +36,9 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
-import elki.distance.similarityfunction.SharedNearestNeighborSimilarity;
-import elki.distance.similarityfunction.Similarity;
+import elki.distance.subspace.SubspaceEuclideanDistance;
+import elki.similarity.SharedNearestNeighborSimilarity;
+import elki.similarity.Similarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;

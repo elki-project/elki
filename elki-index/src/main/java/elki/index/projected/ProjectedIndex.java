@@ -37,7 +37,7 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ProjectedView;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;

@@ -38,9 +38,9 @@ import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.datasource.InputStreamDatabaseConnection;
-import elki.distance.distancefunction.ArcCosineDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
-import elki.distance.distancefunction.minkowski.SparseEuclideanDistance;
+import elki.distance.ArcCosineDistance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SparseEuclideanDistance;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 

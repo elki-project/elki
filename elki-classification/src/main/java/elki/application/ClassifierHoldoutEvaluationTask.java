@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.classification.Classifier;
 import elki.data.ClassLabel;
 import elki.data.type.TypeUtil;

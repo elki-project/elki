@@ -24,7 +24,7 @@ import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.AbstractIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
@@ -282,7 +282,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       /**
        * Parameter to specify the distance function to determine the distance
        * between database objects, must extend
-       * {@link elki.distance.distancefunction.Distance}.
+       * {@link elki.distance.Distance}.
        */
       public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("covertree.distancefunction", "Distance function to determine the distance between objects.");
 

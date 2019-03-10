@@ -27,7 +27,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialDirectoryEntry;

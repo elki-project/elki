@@ -25,8 +25,8 @@ import org.junit.Test;
 import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.database.Database;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 

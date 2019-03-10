@@ -38,8 +38,8 @@ import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.filter.FixedDBIDsFilter;
-import elki.distance.distancefunction.CosineDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.CosineDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**

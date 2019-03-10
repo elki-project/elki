@@ -24,7 +24,7 @@ import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Similarity;
 
 import elki.database.ids.DBIDRange;
-import elki.distance.distancefunction.AbstractDBIDRangeDistance;
+import elki.distance.AbstractDBIDRangeDistance;
 import elki.utilities.exceptions.AbortException;
 
 /**

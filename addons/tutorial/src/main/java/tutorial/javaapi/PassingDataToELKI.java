@@ -34,7 +34,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.relation.Relation;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.LoggingConfiguration;
 import elki.utilities.random.RandomFactory;
 

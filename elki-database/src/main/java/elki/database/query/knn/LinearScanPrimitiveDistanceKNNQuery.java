@@ -32,7 +32,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.PrimitiveDistance;
 
 /**
  * Instance of this query for a particular database.

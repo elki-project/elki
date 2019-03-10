@@ -22,7 +22,7 @@ package elki.clustering.subspace;
 
 import java.util.*;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.subspace.clique.CLIQUESubspace;
 import elki.clustering.subspace.clique.CLIQUEUnit;
 import elki.data.Cluster;

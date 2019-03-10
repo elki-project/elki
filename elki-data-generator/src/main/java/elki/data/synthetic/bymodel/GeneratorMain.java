@@ -33,7 +33,7 @@ import elki.data.model.Model;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 

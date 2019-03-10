@@ -31,7 +31,7 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
 
 import net.jafama.FastMath;

@@ -20,7 +20,7 @@
  */
 package elki.outlier.lof;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.type.CombinedTypeInformation;
@@ -42,7 +42,7 @@ import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;

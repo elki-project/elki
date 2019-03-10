@@ -34,7 +34,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;

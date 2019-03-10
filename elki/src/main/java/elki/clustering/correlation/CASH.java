@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.correlation.cash.CASHInterval;

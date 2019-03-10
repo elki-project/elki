@@ -22,7 +22,7 @@ package elki.database.query.distance;
 
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.PrimitiveDistance;
 
 /**
  * Run a database query in a database context.

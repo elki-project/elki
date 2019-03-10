@@ -22,7 +22,7 @@ package elki.database.query.similarity;
 
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.similarityfunction.PrimitiveSimilarity;
+import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Run a database query in a database context.

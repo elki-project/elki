@@ -22,7 +22,7 @@ package elki.database.query.distance;
 
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.SpatialPrimitiveDistance;
 
 /**
  * Query interface for spatial distance queries.

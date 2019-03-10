@@ -27,7 +27,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.PrimitiveDistance;
+import elki.distance.PrimitiveDistance;
 
 /**
  * Default linear scan range query class.

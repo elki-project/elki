@@ -23,7 +23,7 @@ package elki.clustering.kmeans.initialization;
 import elki.data.NumberVector;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 
 /**
  * Interface for initializing K-Means

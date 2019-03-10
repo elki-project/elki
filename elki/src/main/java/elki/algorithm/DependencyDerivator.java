@@ -42,7 +42,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.LinearEquationSystem;

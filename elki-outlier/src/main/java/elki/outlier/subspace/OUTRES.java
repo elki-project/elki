@@ -22,8 +22,8 @@ package elki.outlier.subspace;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -34,8 +34,8 @@ import elki.database.ids.*;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.PrimitiveDistance;
-import elki.distance.distancefunction.subspace.SubspaceEuclideanDistance;
+import elki.distance.PrimitiveDistance;
+import elki.distance.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;

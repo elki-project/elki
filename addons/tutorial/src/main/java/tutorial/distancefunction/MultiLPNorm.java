@@ -23,7 +23,7 @@ package tutorial.distancefunction;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.distance.distancefunction.AbstractNumberVectorDistance;
+import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;

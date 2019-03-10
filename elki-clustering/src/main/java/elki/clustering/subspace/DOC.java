@@ -22,7 +22,7 @@ package elki.clustering.subspace;
 
 import java.util.Random;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -35,7 +35,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.subspace.SubspaceMaximumDistance;
+import elki.distance.subspace.SubspaceMaximumDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;

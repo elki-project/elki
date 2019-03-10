@@ -20,7 +20,7 @@
  */
 package elki.algorithm.statistics;
 
-import elki.algorithm.Algorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;

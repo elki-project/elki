@@ -20,7 +20,7 @@
  */
 package elki.clustering.kmeans;
 
-import elki.algorithm.DistanceBasedAlgorithm;
+import elki.DistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
@@ -28,7 +28,7 @@ import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.utilities.optionhandling.OptionID;
 
 /**

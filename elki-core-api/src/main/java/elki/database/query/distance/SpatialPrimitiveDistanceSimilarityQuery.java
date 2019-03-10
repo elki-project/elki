@@ -24,8 +24,8 @@ import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DistanceSimilarityQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
-import elki.distance.similarityfunction.PrimitiveSimilarity;
+import elki.distance.SpatialPrimitiveDistance;
+import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Combination query class, to allow combined implementations of spatial

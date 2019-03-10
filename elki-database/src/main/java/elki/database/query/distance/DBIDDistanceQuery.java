@@ -23,7 +23,7 @@ package elki.database.query.distance;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.DBIDDistance;
+import elki.distance.DBIDDistance;
 
 /**
  * Run a distance query based on DBIDs

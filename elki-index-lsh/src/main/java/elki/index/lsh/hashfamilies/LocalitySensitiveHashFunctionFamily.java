@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import elki.data.type.TypeInformation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 
 /**

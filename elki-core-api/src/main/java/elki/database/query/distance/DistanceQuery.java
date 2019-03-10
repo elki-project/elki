@@ -23,7 +23,7 @@ package elki.database.query.distance;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DatabaseQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 
 /**
  * A distance query serves as adapter layer for database and primitive

@@ -28,7 +28,7 @@ import elki.data.DoubleVector;
 import elki.data.type.TypeUtil;
 import elki.datasource.AbstractDataSourceTest;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.linearalgebra.SingularValueDecomposition;
 import elki.utilities.ELKIBuilder;

@@ -23,7 +23,7 @@ package elki.clustering.correlation;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.clustering.gdbscan.CorePredicate;

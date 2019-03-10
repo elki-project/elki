@@ -26,8 +26,8 @@ import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.SpatialPrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 
 /**

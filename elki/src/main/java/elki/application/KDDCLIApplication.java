@@ -20,8 +20,8 @@
  */
 package elki.application;
 
+import elki.Algorithm;
 import elki.KDDTask;
-import elki.algorithm.Algorithm;
 import elki.utilities.Alias;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.workflow.OutputStep;

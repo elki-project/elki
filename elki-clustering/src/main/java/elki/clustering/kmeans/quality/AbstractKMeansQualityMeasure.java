@@ -33,7 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 

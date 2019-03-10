@@ -20,16 +20,16 @@
  */
 package elki.projection;
 
+import elki.DistanceBasedAlgorithm;
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.DistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.Distance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;

@@ -36,7 +36,7 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.utilities.random.RandomFactory;
 
 /**

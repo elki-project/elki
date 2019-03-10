@@ -37,7 +37,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.EuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import elki.logging.Logging;

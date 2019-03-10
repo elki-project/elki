@@ -22,8 +22,8 @@ package elki.clustering.uncertain;
 
 import java.util.*;
 
-import elki.algorithm.AbstractAlgorithm;
-import elki.algorithm.DistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
+import elki.DistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMedoidsPAM;
 import elki.data.Cluster;
@@ -46,8 +46,8 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarity;
-import elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarity;
+import elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity;
+import elki.similarity.cluster.ClusteringDistanceSimilarity;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;

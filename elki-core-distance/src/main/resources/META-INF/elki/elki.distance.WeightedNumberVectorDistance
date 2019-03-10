@@ -1,0 +1,8 @@
+elki.distance.WeightedCanberraDistance
+elki.distance.minkowski.WeightedLPNormDistance
+elki.distance.minkowski.WeightedEuclideanDistance
+elki.distance.minkowski.WeightedManhattanDistance
+elki.distance.minkowski.WeightedMaximumDistance
+elki.distance.minkowski.WeightedSquaredEuclideanDistance
+elki.distance.correlation.WeightedPearsonCorrelationDistance
+elki.distance.correlation.WeightedSquaredPearsonCorrelationDistance

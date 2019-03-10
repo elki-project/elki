@@ -36,7 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
-import elki.distance.distancefunction.geo.LatLngDistance;
+import elki.distance.geo.LatLngDistance;
 import elki.index.Index;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;

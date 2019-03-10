@@ -41,7 +41,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.evaluation.clustering.internal.EvaluateSilhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
 import elki.logging.Logging;

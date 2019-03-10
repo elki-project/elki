@@ -24,7 +24,7 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
 
 /**

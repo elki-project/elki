@@ -35,7 +35,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;

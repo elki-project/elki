@@ -32,7 +32,7 @@ import elki.data.NumberVector;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.parallel.Executor;
 import elki.parallel.processor.Processor;
 

@@ -29,7 +29,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;

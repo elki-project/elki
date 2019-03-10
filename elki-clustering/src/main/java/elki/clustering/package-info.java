@@ -2,7 +2,7 @@
  * Clustering algorithms
  * <p>
  * Clustering algorithms are supposed to implement the
- * {@link elki.algorithm.Algorithm}-Interface.
+ * {@link elki.Algorithm}-Interface.
  * The more specialized interface
  * {@link elki.clustering.ClusteringAlgorithm}
  * requires an implementing algorithm to provide a special result class suitable

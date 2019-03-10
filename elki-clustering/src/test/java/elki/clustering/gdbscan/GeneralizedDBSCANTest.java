@@ -27,7 +27,7 @@ import elki.clustering.DBSCAN;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;
-import elki.distance.similarityfunction.kernel.RadialBasisFunctionKernel;
+import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.utilities.ELKIBuilder;
 
 /**

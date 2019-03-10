@@ -38,7 +38,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;

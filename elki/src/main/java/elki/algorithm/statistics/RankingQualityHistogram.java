@@ -35,7 +35,7 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.evaluation.clustering.EvaluateClustering;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;

@@ -20,7 +20,7 @@
  */
 package elki.clustering.uncertain;
 
-import elki.algorithm.AbstractAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.KMeansHamerly;
 import elki.clustering.kmeans.KMeansLloyd;
@@ -28,7 +28,7 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.distance.distancefunction.NumberVectorDistance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;

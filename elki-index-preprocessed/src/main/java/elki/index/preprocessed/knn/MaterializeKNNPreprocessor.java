@@ -28,7 +28,7 @@ import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.DynamicIndex;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;

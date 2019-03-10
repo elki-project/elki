@@ -33,7 +33,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.Distance;
+import elki.distance.Distance;
 import elki.index.preprocessed.knn.*;
 import elki.logging.Logging;
 import elki.logging.progress.StepProgress;

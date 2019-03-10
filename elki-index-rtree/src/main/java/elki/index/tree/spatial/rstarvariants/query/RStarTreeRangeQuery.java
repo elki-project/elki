@@ -29,7 +29,7 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.distancefunction.SpatialPrimitiveDistance;
+import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;

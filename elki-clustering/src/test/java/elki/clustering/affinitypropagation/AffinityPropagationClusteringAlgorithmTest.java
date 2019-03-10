@@ -27,7 +27,7 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.model.MedoidModel;
 import elki.database.Database;
-import elki.distance.similarityfunction.kernel.PolynomialKernel;
+import elki.similarity.kernel.PolynomialKernel;
 import elki.utilities.ELKIBuilder;
 
 /**
