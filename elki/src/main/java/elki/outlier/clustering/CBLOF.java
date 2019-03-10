@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMeansSort;
 import elki.data.Cluster;
@@ -87,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Pattern Recognition Letters 24(9-10)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00003-5", //
     bibkey = "DBLP:journals/prl/HeXD03")
-public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,11 +117,6 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   protected double beta;
 
   /**
-   * Distance function to use.
-   */
-  protected NumberVectorDistance<? super O> distance;
-
-  /**
    * Constructor.
    *
    * @param distanceFunction the neighborhood distance function
@@ -136,7 +131,6 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     this.clusteringAlgorithm = clusteringAlgorithm;
     this.alpha = alpha;
     this.beta = beta;
-    this.distance = distanceFunction;
   }
 
   /**
@@ -170,7 +164,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     LOG.beginStep(stepprog, 3, "Computing Cluster-Based Local Outlier Factors (CBLOF).");
     WritableDoubleDataStore cblofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     DoubleMinMax cblofMinMax = new DoubleMinMax();
-    computeCBLOFs(relation, distance, cblofs, cblofMinMax, largeClusters, smallClusters);
+    computeCBLOFs(relation, cblofs, cblofMinMax, largeClusters, smallClusters);
 
     LOG.setCompleted(stepprog);
 
@@ -213,13 +207,13 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * Compute the CBLOF scores for all the data.
    *
    * @param relation Data to process
-   * @param distance The distance function
    * @param cblofs CBLOF scores
    * @param cblofMinMax Minimum/maximum score tracker
    * @param largeClusters Large clusters output
    * @param smallClusters Small clusters output
    */
-  private void computeCBLOFs(Relation<O> relation, NumberVectorDistance<? super O> distance, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {
+  private void computeCBLOFs(Relation<O> relation, WritableDoubleDataStore cblofs, DoubleMinMax cblofMinMax, List<? extends Cluster<MeanModel>> largeClusters, List<? extends Cluster<MeanModel>> smallClusters) {
+    NumberVectorDistance<? super O> distance = getDistance();
     List<NumberVector> largeClusterMeans = new ArrayList<>(largeClusters.size());
     for(Cluster<MeanModel> largeCluster : largeClusters) {
       NumberVector mean = ModelUtil.getPrototypeOrCentroid(largeCluster.getModel(), relation, largeCluster.getIDs());
@@ -257,9 +251,9 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     return cluster.size() * nearestLargeClusterDistance;
   }
 
-  private double computeLargeClusterCBLOF(O obj, NumberVectorDistance<? super O> distanceQuery, NumberVector clusterMean, Cluster<MeanModel> cluster) {
+  private double computeLargeClusterCBLOF(O obj, NumberVectorDistance<? super O> distance, NumberVector clusterMean, Cluster<MeanModel> cluster) {
     // Get distance to center of containing cluster
-    return cluster.size() * distanceQuery.distance(obj, clusterMean);
+    return cluster.size() * distance.distance(obj, clusterMean);
   }
 
   @Override

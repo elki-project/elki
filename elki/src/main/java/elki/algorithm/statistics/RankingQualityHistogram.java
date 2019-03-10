@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
@@ -59,7 +59,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
- *
+ * <p>
  * TODO: Add sampling
  *
  * @author Erich Schubert
@@ -68,7 +68,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
+public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -160,7 +160,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option to configure the number of bins to use.
      */

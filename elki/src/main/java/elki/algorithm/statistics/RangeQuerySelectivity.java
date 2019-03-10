@@ -20,7 +20,7 @@
  */
 package elki.algorithm.statistics;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -46,14 +46,14 @@ import elki.utilities.random.RandomFactory;
 
 /**
  * Evaluate the range query selectivity.
- *
+ * <p>
  * TODO: Add sampling
  *
  * @author Erich Schubert
  * @since 0.7.0
  * @param <V> Vector type
  */
-public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Void> {
+public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Void> {
   /**
    * The logger for this class.
    */
@@ -131,7 +131,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * Parameter to specify the query radius.
      */

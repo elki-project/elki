@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -61,7 +61,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
+public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
   /**
    * Class logger.
    */
@@ -174,7 +174,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Quantile to compute.
      */

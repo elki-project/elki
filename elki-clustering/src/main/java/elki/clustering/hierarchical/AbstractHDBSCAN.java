@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorithm<O, R> {
+public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, R> {
   /**
    * MinPts parameter.
    */
@@ -287,7 +287,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
    *
    * @param <O> Object type
    */
-  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -300,7 +300,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config); // distanceFunction
+      super.makeOptions(config);
 
       IntParameter minptsP = new IntParameter(MIN_PTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);

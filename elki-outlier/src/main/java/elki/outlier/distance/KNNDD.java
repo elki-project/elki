@@ -20,8 +20,8 @@
  */
 package elki.outlier.distance;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -80,7 +80,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)", //
     url = "http://prlab.tudelft.nl/sites/default/files/asci_98.pdf", //
     bibkey = "conf/asci/deRidderTD98")
-public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -169,7 +169,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the k nearest neighbor
      */

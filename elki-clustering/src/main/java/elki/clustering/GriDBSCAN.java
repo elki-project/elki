@@ -22,7 +22,7 @@ package elki.clustering;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.gdbscan.util.Assignment;
 import elki.clustering.gdbscan.util.Border;
 import elki.clustering.gdbscan.util.Core;
@@ -45,7 +45,6 @@ import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -62,7 +61,6 @@ import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.jafama.FastMath;
@@ -96,7 +94,7 @@ import net.jafama.FastMath;
     booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
     url = "https://doi.org/10.1109/CIT.2008.4594646", //
     bibkey = "DBLP:conf/IEEEcit/MahranM08")
-public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -675,7 +673,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    *
    * @param <O> Vector type to use
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to control the grid width.
      *
@@ -699,14 +697,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected double gridwidth;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      // Disabled: super.makeOptions(config);
-      // Because we currently only allow Lp norms:
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+    public Class<?> getDistanceRestriction() {
+      return LPNormDistance.class;
+    }
 
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {

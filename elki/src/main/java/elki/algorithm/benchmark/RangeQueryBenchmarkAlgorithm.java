@@ -20,7 +20,7 @@
  */
 package elki.algorithm.benchmark;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -89,7 +89,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @assoc - - - RangeQuery
  */
-public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Void> {
+public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
   /**
    * The logger for this class.
    */
@@ -192,15 +192,11 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       }
     }
     if(col < 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("No compatible data type in query input was found. Expected: ");
-      buf.append(res.toString());
-      buf.append(" have: ");
+      StringBuilder buf = new StringBuilder(1000) //
+          .append("No compatible data type in query input was found. Expected: ") //
+          .append(res.toString()).append(" have:");
       for(int i = 0; i < bundle.metaLength(); i++) {
-        if(i > 0) {
-          buf.append(' ');
-        }
-        buf.append(bundle.meta(i).toString());
+        buf.append(' ').append(bundle.meta(i).toString());
       }
       throw new IncompatibleDataException(buf.toString());
     }
@@ -263,9 +259,9 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
-     * Parameter for the query dataset.
+     * Parameter for the query data set.
      */
     public static final OptionID QUERY_ID = new OptionID("rangebench.query", "Data source for the queries. If not set, the queries are taken from the database.");
 

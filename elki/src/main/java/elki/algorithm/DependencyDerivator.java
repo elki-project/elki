@@ -31,6 +31,7 @@ import static elki.utilities.io.FormatUtil.formatTo;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
 import elki.data.type.TypeInformation;
@@ -87,7 +88,7 @@ import elki.utilities.random.RandomFactory;
     url = "https://doi.org/10.1145/1150402.1150408", //
     bibkey = "DBLP:conf/kdd/AchtertBKKZ06")
 @Priority(Priority.DEFAULT - 5) // Mostly used inside others, not standalone
-public class DependencyDerivator<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, CorrelationAnalysisSolution<V>> {
   /**
    * The logger for this class.
    */
@@ -258,7 +259,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
     /**
      * Flag to use random sample (use knn query around centroid, if flag is not
      * set).
@@ -274,8 +275,6 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
     /**
      * Optional parameter to specify the threshold for the size of the random
      * sample to use, must be an integer greater than 0.
-     * <p>
-     * Default value: the size of the complete dataset
      */
     public static final OptionID SAMPLE_SIZE_ID = new OptionID("derivator.sampleSize", "Threshold for the size of the random sample to use. " + "Default value is size of the complete dataset.");
 
@@ -305,9 +304,13 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
     protected EigenPairFilter filter;
 
     @Override
+    public Class<?> getDistanceRestriction() {
+      return NumberVectorDistance.class;
+    }
+
+    @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(outputAccuracyP)) {

@@ -22,7 +22,7 @@ package elki.clustering.gdbscan;
 
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -83,7 +83,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-3-540-71618-1_82", //
     bibkey = "DBLP:conf/icannga/BiciciY07")
 @Priority(Priority.IMPORTANT)
-public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Class logger.
    */
@@ -306,7 +306,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter for neighborhood size.
      */

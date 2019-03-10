@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -67,7 +67,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "arXiv preprint arXiv:1109.2378", //
     url = "https://arxiv.org/abs/1109.2378", //
     bibkey = "DBLP:journals/corr/abs-1109-2378")
-public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */
@@ -215,7 +215,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     @Override
     protected MiniMaxNNChain<O> makeInstance() {
       return new MiniMaxNNChain<>(distanceFunction);

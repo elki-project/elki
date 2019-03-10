@@ -22,7 +22,7 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;
@@ -77,7 +77,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
     url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
     bibkey = "doi:10.1016/0377-04278790125-7")
-public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -221,7 +221,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter for choosing the clustering algorithm
      */

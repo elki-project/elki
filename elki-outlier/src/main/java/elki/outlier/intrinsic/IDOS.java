@@ -20,8 +20,8 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -75,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "NII Technical Report (NII-2015-003E)", //
     url = "http://www.nii.ac.jp/TechReports/15-003E.html", //
     bibkey = "tr/nii/BrunkenHZ15")
-public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -221,7 +221,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @author Jonathan von Brünken
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * The class used for estimating the intrinsic dimensionality.
      */

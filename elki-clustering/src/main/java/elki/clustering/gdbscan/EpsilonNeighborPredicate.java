@@ -20,7 +20,7 @@
  */
 package elki.clustering.gdbscan;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;

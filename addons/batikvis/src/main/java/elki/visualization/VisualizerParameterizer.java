@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.database.Database;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;

@@ -21,7 +21,7 @@
 package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -478,7 +478,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * The distance function to determine the reachability distance between
      * database objects.

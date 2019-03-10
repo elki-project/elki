@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.application.AbstractApplication;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;

@@ -22,7 +22,7 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -35,7 +35,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.Distance;
+import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.Centroid;
@@ -79,7 +79,7 @@ import elki.utilities.pairs.Pair;
     booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", //
     url = "https://doi.org/10.1109/34.400568", //
     bibkey = "DBLP:journals/pami/Cheng95")
-public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
@@ -107,7 +107,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @param kernel Kernel function
    * @param range Kernel radius
    */
-  public NaiveMeanShiftClustering(Distance<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
+  public NaiveMeanShiftClustering(NumberVectorDistance<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
     super(distanceFunction);
     this.kernel = kernel;
     this.bandwidth = range;
@@ -139,7 +139,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       // Initial position:
       V position = relation.get(iter);
-      iterations: for(int j = 1; ; j++) {
+      iterations: for(int j = 1;; j++) {
         // Compute new position:
         V newvec = null;
         {
@@ -172,7 +172,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
         // Check for convergence:
         double delta = distq.distance(position, newvec);
         if(bestd < 10 * threshold || bestd * 2 < delta) {
-          assert(bestp != null);
+          assert (bestp != null);
           bestp.second.add(iter);
           break iterations;
         }
@@ -229,7 +229,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
     /**
      * Parameter for kernel function.
      */
@@ -249,6 +249,11 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
      * Kernel radius.
      */
     double range;
+
+    @Override
+    public Class<?> getDistanceRestriction() {
+      return NumberVectorDistance.class;
+    }
 
     @Override
     protected void makeOptions(Parameterization config) {

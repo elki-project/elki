@@ -22,7 +22,7 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -87,7 +87,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/1835804.1835939", //
     bibkey = "DBLP:conf/kdd/ChenLB10")
-public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -275,7 +275,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    *
    * @param <V> Input vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * Holds the alpha value - significance niveau
      */

@@ -20,8 +20,8 @@
  */
 package elki.outlier.distance;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -58,7 +58,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
     url = "http://www.vldb.org/conf/1998/p392.pdf", //
     bibkey = "DBLP:conf/vldb/KnorrN98")
-public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Radius parameter d.
    */
@@ -112,7 +112,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the size of the D-neighborhood
      */
@@ -125,7 +125,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+      super.makeOptions(config); // Distance function
       configD(config, distanceFunction);
     }
 

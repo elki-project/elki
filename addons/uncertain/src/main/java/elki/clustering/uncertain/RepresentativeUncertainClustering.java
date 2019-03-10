@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 import elki.AbstractAlgorithm;
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMedoidsPAM;
 import elki.data.Cluster;

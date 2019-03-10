@@ -20,7 +20,7 @@
  */
 package elki.outlier.spatial;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.distance.Distance;
 import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;

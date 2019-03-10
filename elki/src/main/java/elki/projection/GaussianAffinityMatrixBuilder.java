@@ -20,7 +20,7 @@
  */
 package elki.projection;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
@@ -40,7 +40,6 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
@@ -232,7 +231,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Sigma parameter, the Gaussian bandwidth
      */
@@ -244,12 +243,13 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     protected double sigma;
 
     @Override
+    public Class<?> getDefaultDistance() {
+      return SquaredEuclideanDistance.class;
+    }
+
+    @Override
     protected void makeOptions(Parameterization config) {
-      // Override: super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+      super.makeOptions(config);
       DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(sigmaP)) {

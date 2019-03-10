@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.ArrayModifiableDBIDs;

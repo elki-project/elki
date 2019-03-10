@@ -22,7 +22,7 @@ package elki.outlier;
 
 import static elki.math.linearalgebra.VMath.times;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
@@ -82,7 +82,7 @@ import net.jafama.FastMath;
     title = "Application 2: Outlier Detection (Chapter 18)", //
     booktitle = "Correlation Clustering", //
     bibkey = "phd/dnb/Zimek08/Ch18")
-public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
+public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -178,7 +178,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its COP_SCORE, must be an integer greater

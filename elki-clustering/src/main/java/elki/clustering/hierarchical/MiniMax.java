@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -66,7 +66,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Journal of the American Statistical Association 106(495)", //
     url = "https://doi.org/10.1198/jasa.2011.tm10183", //
     bibkey = "doi:10.1198/jasa.2011.tm10183")
-public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class Logger.
    */
@@ -411,7 +411,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     @Override
     protected MiniMax<O> makeInstance() {
       return new MiniMax<>(distanceFunction);

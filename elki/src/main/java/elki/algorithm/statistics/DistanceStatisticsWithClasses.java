@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
@@ -74,7 +74,7 @@ import net.jafama.FastMath;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
+public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -416,7 +416,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Flag to compute exact value range for binning.
      */
