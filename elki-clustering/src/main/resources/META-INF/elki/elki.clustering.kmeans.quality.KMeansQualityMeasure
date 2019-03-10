@@ -1,0 +1,5 @@
+elki.clustering.kmeans.quality.WithinClusterVarianceQualityMeasure
+elki.clustering.kmeans.quality.WithinClusterMeanDistanceQualityMeasure
+elki.clustering.kmeans.quality.AkaikeInformationCriterion
+elki.clustering.kmeans.quality.BayesianInformationCriterion
+elki.clustering.kmeans.quality.BayesianInformationCriterionZhao

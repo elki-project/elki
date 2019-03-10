@@ -1,7 +1,0 @@
-elki.algorithm.outlier.clustering.CBLOF
-elki.algorithm.outlier.clustering.EMOutlier
-elki.algorithm.outlier.clustering.KMeansOutlierDetection
-elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
-elki.algorithm.outlier.OPTICSOF
-elki.algorithm.outlier.SimpleCOP
-elki.algorithm.outlier.subspace.OutRankS1

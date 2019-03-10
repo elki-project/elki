@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.NumberVector;
 import elki.data.model.Model;

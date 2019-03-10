@@ -1,9 +1,0 @@
-elki.algorithm.clustering.hierarchical.linkage.WardLinkage ward MISSQ
-elki.algorithm.clustering.hierarchical.linkage.SingleLinkage single-link single slink nearest nearest-neighbor
-elki.algorithm.clustering.hierarchical.linkage.CompleteLinkage complete clink complete-link farthest-neighbor
-elki.algorithm.clustering.hierarchical.linkage.GroupAverageLinkage upgma average average-link average-linkage UPGMA
-elki.algorithm.clustering.hierarchical.linkage.WeightedAverageLinkage wpgma WPGMA
-elki.algorithm.clustering.hierarchical.linkage.CentroidLinkage centroid upgmc
-elki.algorithm.clustering.hierarchical.linkage.MedianLinkage wpgmc WPGMC weighted-centroid
-elki.algorithm.clustering.hierarchical.linkage.MinimumVarianceLinkage variance
-elki.algorithm.clustering.hierarchical.linkage.FlexibleBetaLinkage flex beta

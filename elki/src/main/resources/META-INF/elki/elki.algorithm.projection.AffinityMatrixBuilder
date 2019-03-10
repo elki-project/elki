@@ -1,4 +1,0 @@
-elki.algorithm.projection.PerplexityAffinityMatrixBuilder
-elki.algorithm.projection.NearestNeighborAffinityMatrixBuilder
-elki.algorithm.projection.GaussianAffinityMatrixBuilder
-elki.algorithm.projection.IntrinsicNearestNeighborAffinityMatrixBuilder

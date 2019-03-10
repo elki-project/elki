@@ -22,7 +22,7 @@ package elki.result;
 
 import java.util.List;
 
-import elki.algorithm.itemsetmining.Itemset;
+import elki.itemsetmining.Itemset;
 import elki.data.BitVector;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.result.textwriter.TextWriteable;

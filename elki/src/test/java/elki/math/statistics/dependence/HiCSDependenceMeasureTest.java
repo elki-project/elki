@@ -27,7 +27,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.algorithm.outlier.meta.HiCS;
+import elki.outlier.meta.HiCS;
 import elki.math.MathUtil;
 import elki.utilities.ELKIBuilder;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;

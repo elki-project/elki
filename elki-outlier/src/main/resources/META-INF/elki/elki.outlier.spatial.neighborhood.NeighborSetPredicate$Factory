@@ -1,0 +1,3 @@
+elki.outlier.spatial.neighborhood.ExtendedNeighborhood$Factory
+elki.outlier.spatial.neighborhood.ExternalNeighborhood$Factory
+elki.outlier.spatial.neighborhood.PrecomputedKNearestNeighborNeighborhood$Factory

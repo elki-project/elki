@@ -22,7 +22,7 @@ package elki.index.idistance;
 
 import org.junit.Test;
 
-import elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans;
+import elki.clustering.kmeans.initialization.FarthestPointsInitialMeans;
 import elki.data.NumberVector;
 import elki.distance.distancefunction.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;

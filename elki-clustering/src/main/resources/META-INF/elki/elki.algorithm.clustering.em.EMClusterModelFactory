@@ -1,5 +1,0 @@
-elki.algorithm.clustering.em.MultivariateGaussianModelFactory
-elki.algorithm.clustering.em.DiagonalGaussianModelFactory
-elki.algorithm.clustering.em.SphericalGaussianModelFactory
-elki.algorithm.clustering.em.TwoPassMultivariateGaussianModelFactory
-elki.algorithm.clustering.em.TextbookMultivariateGaussianModelFactory

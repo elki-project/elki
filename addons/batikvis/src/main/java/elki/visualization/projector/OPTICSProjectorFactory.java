@@ -20,7 +20,7 @@
  */
 package elki.visualization.projector;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
 

@@ -23,7 +23,7 @@ package elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.database.datastore.DBIDDataStore;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;

@@ -48,7 +48,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
  *
- * Used for example by {@link elki.algorithm.outlier.lof.LOF}.
+ * Used for example by {@link elki.outlier.lof.LOF}.
  *
  * @author Erich Schubert
  * @since 0.2

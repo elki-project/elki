@@ -25,8 +25,8 @@ import java.awt.Color;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
-import elki.algorithm.clustering.optics.OPTICSXi;
+import elki.clustering.optics.ClusterOrder;
+import elki.clustering.optics.OPTICSXi;
 import elki.database.ids.DBIDArrayIter;
 import elki.result.Metadata;
 import elki.utilities.datastructures.iterator.It;

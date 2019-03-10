@@ -22,7 +22,7 @@ package elki.math.statistics.dependence;
 
 import java.util.Random;
 
-import elki.algorithm.outlier.meta.HiCS;
+import elki.outlier.meta.HiCS;
 import elki.math.MathUtil;
 import elki.math.statistics.tests.GoodnessOfFitTest;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;

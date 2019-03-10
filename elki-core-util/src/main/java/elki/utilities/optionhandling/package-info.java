@@ -184,7 +184,7 @@
  * </pre>
  * 
  * (This example is from
- * {@link elki.algorithm.clustering.correlation.ERiC ERiC}.)
+ * {@link elki.clustering.correlation.ERiC ERiC}.)
  * </li>
  * <li><b>Combined parameterization</b>:
  * Sometimes, an algorithm will pre-define some parameters, while additional
@@ -205,7 +205,7 @@
  * </pre>
  * 
  * (This example code is from
- * {@link elki.algorithm.clustering.subspace.DiSH DiSH}.)
+ * {@link elki.clustering.subspace.DiSH DiSH}.)
  * <p>
  * Note how error handling is performed by explicity specification of an error
  * target and by calling failOnErrors() at the end of parameterization.
@@ -234,7 +234,7 @@
  * </pre>
  * 
  * (This is an example from
- * {@link elki.algorithm.clustering.correlation.COPAC COPAC}.)
+ * {@link elki.clustering.correlation.COPAC COPAC}.)
  * </li>
  * <li><b>Advanced tracking</b>:
  * When parameterizing a sub-algorithm, it can be useful to provide some

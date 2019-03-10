@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
-import elki.algorithm.clustering.trivial.TrivialAllInOne;
+import elki.clustering.trivial.ByLabelHierarchicalClustering;
+import elki.clustering.trivial.TrivialAllInOne;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.Model;

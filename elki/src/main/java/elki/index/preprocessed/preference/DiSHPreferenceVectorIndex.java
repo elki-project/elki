@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import elki.algorithm.itemsetmining.APRIORI;
-import elki.algorithm.itemsetmining.Itemset;
+import elki.itemsetmining.APRIORI;
+import elki.itemsetmining.Itemset;
 import elki.data.BitVector;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;

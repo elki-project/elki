@@ -22,7 +22,7 @@ package elki.visualization.visualizers.optics;
 
 import org.apache.batik.util.SVGConstants;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizerContext;
 import elki.visualization.gui.VisualizationPlot;

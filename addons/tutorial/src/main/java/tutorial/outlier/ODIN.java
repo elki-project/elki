@@ -21,7 +21,7 @@
 package tutorial.outlier;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.outlier.OutlierAlgorithm;
+import elki.outlier.OutlierAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;

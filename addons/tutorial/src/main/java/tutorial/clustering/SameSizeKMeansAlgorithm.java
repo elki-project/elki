@@ -26,9 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import elki.algorithm.DistanceBasedAlgorithm;
-import elki.algorithm.clustering.kmeans.AbstractKMeans;
-import elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
+import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;

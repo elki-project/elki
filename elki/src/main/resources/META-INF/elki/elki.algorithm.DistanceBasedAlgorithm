@@ -1,8 +1,8 @@
-elki.algorithm.clustering.optics.DeLiClu
-elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
-elki.algorithm.outlier.clustering.CBLOF
-elki.algorithm.outlier.OPTICSOF
-elki.algorithm.outlier.SimpleCOP
+elki.clustering.optics.DeLiClu
+elki.outlier.clustering.SilhouetteOutlierDetection
+elki.outlier.clustering.CBLOF
+elki.outlier.OPTICSOF
+elki.outlier.SimpleCOP
 elki.algorithm.statistics.AveragePrecisionAtK
 elki.algorithm.statistics.DistanceQuantileSampler
 elki.algorithm.statistics.DistanceStatisticsWithClasses

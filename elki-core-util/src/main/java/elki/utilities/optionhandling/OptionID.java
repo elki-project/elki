@@ -65,7 +65,7 @@ public final class OptionID {
    * OptionID usually is named as the classes name (lowercase) as name-prefix
    * and the given name as suffix of the complete name, separated by a dot. For
    * example, the parameter {@code epsilon} for the class
-   * {@link elki.algorithm.clustering.DBSCAN} will be named
+   * {@link elki.clustering.DBSCAN} will be named
    * {@code dbscan.epsilon}.
    * 
    * @param name the name

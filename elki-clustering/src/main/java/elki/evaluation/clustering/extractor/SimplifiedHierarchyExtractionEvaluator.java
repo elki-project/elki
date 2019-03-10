@@ -23,8 +23,8 @@ package elki.evaluation.clustering.extractor;
 import java.util.ArrayList;
 
 import elki.algorithm.AbstractAlgorithm;
-import elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction;
+import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction;
 import elki.evaluation.Evaluator;
 import elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm;
 import elki.result.Metadata;

@@ -23,7 +23,7 @@ package elki.visualization.opticsplot;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.database.ids.DBIDIter;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;

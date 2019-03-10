@@ -1,1 +1,1 @@
-elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection
+elki.outlier.distance.ReferenceBasedOutlierDetection

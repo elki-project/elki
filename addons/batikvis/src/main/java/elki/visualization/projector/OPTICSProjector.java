@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizerContext;
 import elki.visualization.gui.overview.PlotItem;

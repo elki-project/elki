@@ -23,7 +23,7 @@ package elki.visualization.visualizers.scatterplot.outlier;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.algorithm.outlier.COP;
+import elki.outlier.COP;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreListener;

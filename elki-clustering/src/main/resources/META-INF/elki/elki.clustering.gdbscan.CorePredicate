@@ -1,0 +1,3 @@
+elki.clustering.gdbscan.MinPtsCorePredicate
+elki.clustering.gdbscan.PreDeConCorePredicate
+elki.clustering.gdbscan.FourCCorePredicate
