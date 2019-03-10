@@ -7,7 +7,7 @@
  * algorithms for axis-parallel subspaces.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
- * @opt include .*elki.clustering.gdbscan.GeneralizedDBSCAN
+ * @opt include .*elki.clustering.dbscan.GeneralizedDBSCAN
  * @opt include .*elki.clustering.optics.GeneralizedOPTICS
  */
 /*

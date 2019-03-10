@@ -27,7 +27,7 @@ import java.util.List;
 
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.KMeansSort;
+import elki.clustering.kmeans.SortMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -341,7 +341,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
         beta = pB.doubleValue();
       }
 
-      ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>> clusterP = new ObjectParameter<>(CLUSTERING_ID, ClusteringAlgorithm.class, KMeansSort.class);
+      ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>> clusterP = new ObjectParameter<>(CLUSTERING_ID, ClusteringAlgorithm.class, SortMeans.class);
       if(config.grab(clusterP)) {
         clusteringAlgorithm = clusterP.instantiateClass(config);
       }

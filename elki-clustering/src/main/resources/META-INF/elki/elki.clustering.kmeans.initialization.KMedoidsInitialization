@@ -1,8 +1,0 @@
-elki.clustering.kmeans.initialization.PAMInitialMeans
-elki.clustering.kmeans.initialization.RandomlyChosenInitialMeans
-elki.clustering.kmeans.initialization.FirstKInitialMeans
-elki.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans
-elki.clustering.kmeans.initialization.FarthestPointsInitialMeans
-elki.clustering.kmeans.initialization.FarthestSumPointsInitialMeans
-elki.clustering.kmeans.initialization.LABInitialMeans
-elki.clustering.kmeans.initialization.ParkInitialMeans

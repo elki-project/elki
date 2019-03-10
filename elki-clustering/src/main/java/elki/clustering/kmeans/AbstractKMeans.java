@@ -29,7 +29,7 @@ import java.util.List;
 
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
-import elki.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.*;
 import elki.data.model.KMeansModel;
 import elki.data.model.Model;
@@ -744,7 +744,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterInitialization(Parameterization config) {
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

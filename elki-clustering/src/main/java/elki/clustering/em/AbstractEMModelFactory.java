@@ -21,7 +21,7 @@
 package elki.clustering.em;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
-import elki.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -78,7 +78,7 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

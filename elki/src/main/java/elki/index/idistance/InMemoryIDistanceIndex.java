@@ -22,7 +22,7 @@ package elki.index.idistance;
 
 import java.util.Arrays;
 
-import elki.clustering.kmeans.initialization.KMedoidsInitialization;
+import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
