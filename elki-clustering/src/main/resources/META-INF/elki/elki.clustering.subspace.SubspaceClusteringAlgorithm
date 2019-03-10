@@ -1,0 +1,6 @@
+elki.clustering.subspace.CLIQUE
+elki.clustering.subspace.DOC
+elki.clustering.subspace.FastDOC
+elki.clustering.subspace.P3C
+elki.clustering.subspace.PROCLUS
+elki.clustering.subspace.SUBCLU

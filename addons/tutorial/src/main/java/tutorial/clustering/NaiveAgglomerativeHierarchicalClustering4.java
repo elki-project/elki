@@ -21,9 +21,9 @@
 package tutorial.clustering;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import elki.algorithm.clustering.hierarchical.SLINK;
+import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
+import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.SLINK;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;

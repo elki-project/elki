@@ -54,7 +54,7 @@ import elki.utilities.optionhandling.parameters.StringParameter;
  * <p>
  * This format can be read using {@link ClusteringVectorParser} for meta
  * analysis, or read as clustering using
- * {@link elki.algorithm.clustering.meta.ExternalClustering}.
+ * {@link elki.clustering.meta.ExternalClustering}.
  * 
  * @author Erich Schubert
  * @since 0.7.0

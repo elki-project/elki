@@ -25,9 +25,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import elki.algorithm.AbstractSimpleAlgorithmTest;
-import elki.algorithm.clustering.trivial.ByLabelClustering;
-import elki.algorithm.clustering.trivial.TrivialAllInOne;
-import elki.algorithm.clustering.trivial.TrivialAllNoise;
+import elki.clustering.trivial.ByLabelClustering;
+import elki.clustering.trivial.TrivialAllInOne;
+import elki.clustering.trivial.TrivialAllNoise;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;

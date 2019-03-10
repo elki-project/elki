@@ -23,9 +23,9 @@ package elki.evaluation.clustering;
 import java.util.Collection;
 import java.util.List;
 
-import elki.algorithm.clustering.ClusteringAlgorithm;
-import elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
-import elki.algorithm.clustering.trivial.ReferenceClustering;
+import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.trivial.ByLabelOrAllInOneClustering;
+import elki.clustering.trivial.ReferenceClustering;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;

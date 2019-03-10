@@ -32,7 +32,7 @@ import net.jafama.FastMath;
  * Scaling function to invert values by computing -log(x)
  * <p>
  * Useful for example for scaling
- * {@link elki.algorithm.outlier.anglebased.ABOD}, but see
+ * {@link elki.outlier.anglebased.ABOD}, but see
  * {@link MinusLogStandardDeviationScaling} and {@link MinusLogGammaScaling} for
  * more advanced scalings for this algorithm.
  * <p>

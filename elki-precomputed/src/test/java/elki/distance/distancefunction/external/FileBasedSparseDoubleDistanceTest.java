@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import elki.algorithm.clustering.AbstractClusterAlgorithmTest;
-import elki.algorithm.clustering.hierarchical.SLINK;
-import elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight;
+import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.hierarchical.SLINK;
+import elki.clustering.hierarchical.extraction.CutDendrogramByHeight;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.database.AbstractDatabase;

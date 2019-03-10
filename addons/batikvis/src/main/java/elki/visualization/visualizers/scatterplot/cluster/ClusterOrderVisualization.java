@@ -22,7 +22,7 @@ package elki.visualization.visualizers.scatterplot.cluster;
 
 import org.w3c.dom.Element;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;

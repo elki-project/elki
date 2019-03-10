@@ -1,5 +1,0 @@
-elki.algorithm.clustering.optics.OPTICSHeap
-elki.algorithm.clustering.optics.OPTICSList
-elki.algorithm.clustering.optics.FastOPTICS
-elki.algorithm.clustering.correlation.HiCO
-elki.algorithm.clustering.subspace.HiSC

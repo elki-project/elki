@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import elki.algorithm.clustering.optics.ClusterOrder;
+import elki.clustering.optics.ClusterOrder;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.result.Metadata;

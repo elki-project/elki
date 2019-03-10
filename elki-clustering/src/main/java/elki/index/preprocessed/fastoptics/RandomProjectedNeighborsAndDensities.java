@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import elki.algorithm.clustering.optics.FastOPTICS;
+import elki.clustering.optics.FastOPTICS;
 import elki.data.NumberVector;
 import elki.database.datastore.*;
 import elki.database.ids.*;
@@ -54,7 +54,7 @@ import net.jafama.FastMath;
  * Random Projections used for computing neighbors and density estimates.
  * <p>
  * This index is specialized for the algorithm
- * {@link elki.algorithm.clustering.optics.FastOPTICS}
+ * {@link elki.clustering.optics.FastOPTICS}
  * <p>
  * Reference:
  * <p>

@@ -28,7 +28,7 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;

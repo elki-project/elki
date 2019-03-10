@@ -1,0 +1,17 @@
+elki.itemsetmining.associationrules.interest.AddedValue
+elki.itemsetmining.associationrules.interest.CertaintyFactor Loevinger
+elki.itemsetmining.associationrules.interest.Confidence
+elki.itemsetmining.associationrules.interest.Conviction
+elki.itemsetmining.associationrules.interest.Cosine
+elki.itemsetmining.associationrules.interest.GiniIndex
+elki.itemsetmining.associationrules.interest.Jaccard
+elki.itemsetmining.associationrules.interest.JMeasure
+elki.itemsetmining.associationrules.interest.Klosgen
+elki.itemsetmining.associationrules.interest.LaplaceCorrectedConfidence
+elki.itemsetmining.associationrules.interest.Leverage
+elki.itemsetmining.associationrules.interest.Lift
+elki.itemsetmining.associationrules.interest.OddsRatio
+elki.itemsetmining.associationrules.interest.PhiCorrelationCoefficient
+elki.itemsetmining.associationrules.interest.SebagSchonauer
+elki.itemsetmining.associationrules.interest.YulesQ
+elki.itemsetmining.associationrules.interest.YulesY

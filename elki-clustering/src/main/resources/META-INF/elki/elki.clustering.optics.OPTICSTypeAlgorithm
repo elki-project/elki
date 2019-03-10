@@ -1,0 +1,5 @@
+elki.clustering.optics.OPTICSHeap
+elki.clustering.optics.OPTICSList
+elki.clustering.optics.FastOPTICS
+elki.clustering.correlation.HiCO
+elki.clustering.subspace.HiSC

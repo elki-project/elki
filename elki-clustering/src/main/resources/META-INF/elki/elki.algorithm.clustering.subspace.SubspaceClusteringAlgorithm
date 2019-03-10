@@ -1,6 +1,0 @@
-elki.algorithm.clustering.subspace.CLIQUE
-elki.algorithm.clustering.subspace.DOC
-elki.algorithm.clustering.subspace.FastDOC
-elki.algorithm.clustering.subspace.P3C
-elki.algorithm.clustering.subspace.PROCLUS
-elki.algorithm.clustering.subspace.SUBCLU

@@ -24,9 +24,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import elki.algorithm.clustering.trivial.ByLabelClustering;
-import elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
-import elki.algorithm.clustering.trivial.ReferenceClustering;
+import elki.clustering.trivial.ByLabelClustering;
+import elki.clustering.trivial.ByLabelOrAllInOneClustering;
+import elki.clustering.trivial.ReferenceClustering;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.type.NoSupportedDataTypeException;

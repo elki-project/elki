@@ -20,7 +20,7 @@
  */
 package elki.index.preprocessed.preference;
 
-import elki.algorithm.clustering.subspace.HiSC;
+import elki.clustering.subspace.HiSC;
 import elki.data.NumberVector;
 import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;

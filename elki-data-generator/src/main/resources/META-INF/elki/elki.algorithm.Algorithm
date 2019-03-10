@@ -1,2 +1,2 @@
-elki.algorithm.clustering.trivial.ByModelClustering
-elki.algorithm.outlier.trivial.TrivialGeneratedOutlier
+elki.clustering.trivial.ByModelClustering
+elki.outlier.trivial.TrivialGeneratedOutlier

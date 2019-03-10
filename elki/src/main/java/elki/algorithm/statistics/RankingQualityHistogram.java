@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;

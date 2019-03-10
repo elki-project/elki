@@ -1,2 +1,2 @@
-# elki.algorithm.classification.KNNClassifier
-# elki.algorithm.classification.PriorProbabilityClassifier
+# elki.classification.KNNClassifier
+# elki.classification.PriorProbabilityClassifier

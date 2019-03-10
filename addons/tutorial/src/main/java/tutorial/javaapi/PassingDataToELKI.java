@@ -20,8 +20,8 @@
  */
 package tutorial.javaapi;
 
-import elki.algorithm.clustering.kmeans.KMeansLloyd;
-import elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
+import elki.clustering.kmeans.KMeansLloyd;
+import elki.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;

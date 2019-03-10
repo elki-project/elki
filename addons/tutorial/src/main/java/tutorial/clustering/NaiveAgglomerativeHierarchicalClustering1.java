@@ -23,8 +23,8 @@ package tutorial.clustering;
 import java.util.Arrays;
 
 import elki.algorithm.AbstractDistanceBasedAlgorithm;
-import elki.algorithm.clustering.hierarchical.SLINK;
-import elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
+import elki.clustering.hierarchical.SLINK;
+import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;

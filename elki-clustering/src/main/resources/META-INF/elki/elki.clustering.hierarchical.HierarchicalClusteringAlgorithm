@@ -1,0 +1,10 @@
+elki.clustering.hierarchical.SLINK single-link single-linkage
+elki.clustering.hierarchical.AnderbergHierarchicalClustering
+elki.clustering.hierarchical.NNChain
+elki.clustering.hierarchical.AGNES HAC SAHN
+elki.clustering.hierarchical.CLINK Defays
+elki.clustering.hierarchical.HDBSCANLinearMemory
+elki.clustering.hierarchical.SLINKHDBSCANLinearMemory
+elki.clustering.hierarchical.MiniMaxAnderberg
+elki.clustering.hierarchical.MiniMaxNNChain
+elki.clustering.hierarchical.MiniMax

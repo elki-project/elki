@@ -1,5 +1,0 @@
-elki.algorithm.clustering.kmeans.quality.WithinClusterVarianceQualityMeasure
-elki.algorithm.clustering.kmeans.quality.WithinClusterMeanDistanceQualityMeasure
-elki.algorithm.clustering.kmeans.quality.AkaikeInformationCriterion
-elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterion
-elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterionZhao

@@ -1,4 +1,4 @@
-elki.algorithm.itemsetmining.associationrules.AssociationRuleGeneration
-elki.algorithm.itemsetmining.APRIORI
-elki.algorithm.itemsetmining.Eclat
-elki.algorithm.itemsetmining.FPGrowth
+elki.itemsetmining.associationrules.AssociationRuleGeneration
+elki.itemsetmining.APRIORI
+elki.itemsetmining.Eclat
+elki.itemsetmining.FPGrowth

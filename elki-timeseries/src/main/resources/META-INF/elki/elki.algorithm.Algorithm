@@ -1,2 +1,2 @@
-elki.algorithm.timeseries.OfflineChangePointDetectionAlgorithm
-elki.algorithm.timeseries.SigniTrendChangeDetection
+elki.timeseries.OfflineChangePointDetectionAlgorithm
+elki.timeseries.SigniTrendChangeDetection
