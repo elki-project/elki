@@ -23,6 +23,7 @@ package elki.clustering.kmeans;
 import java.util.List;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmedoids.PAM;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -39,7 +40,7 @@ import elki.utilities.documentation.Reference;
 /**
  * k-medians clustering algorithm, but using Lloyd-style bulk iterations instead
  * of the more complicated approach suggested by Kaufman and Rousseeuw (see
- * {@link KMedoidsPAM} instead).
+ * {@link PAM} instead).
  * <p>
  * Reference:
  * <p>

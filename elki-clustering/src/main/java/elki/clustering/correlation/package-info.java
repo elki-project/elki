@@ -4,7 +4,7 @@
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.Abstract.*Clustering
  * @opt include .*elki.clustering.optics.GeneralizedOPTICS
- * @opt include .*elki.clustering.gdbscan.GeneralizedDBSCAN
+ * @opt include .*elki.clustering.dbscan.GeneralizedDBSCAN
  */
 /*
  * This file is part of ELKI:

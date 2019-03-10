@@ -23,7 +23,7 @@ package elki.clustering.subspace;
 import java.util.*;
 
 import elki.AbstractAlgorithm;
-import elki.clustering.DBSCAN;
+import elki.clustering.dbscan.DBSCAN;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;

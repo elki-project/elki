@@ -20,10 +20,10 @@
  */
 package elki.clustering.subspace;
 
-import elki.clustering.DBSCAN;
-import elki.clustering.gdbscan.GeneralizedDBSCAN;
-import elki.clustering.gdbscan.PreDeConCorePredicate;
-import elki.clustering.gdbscan.PreDeConNeighborPredicate;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
+import elki.clustering.dbscan.predicates.PreDeConCorePredicate;
+import elki.clustering.dbscan.predicates.PreDeConNeighborPredicate;
 import elki.data.NumberVector;
 import elki.logging.Logging;
 import elki.utilities.documentation.Description;

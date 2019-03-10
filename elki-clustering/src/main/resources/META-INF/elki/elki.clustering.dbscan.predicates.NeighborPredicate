@@ -1,0 +1,6 @@
+elki.clustering.dbscan.predicates.EpsilonNeighborPredicate
+elki.clustering.dbscan.predicates.SimilarityNeighborPredicate
+elki.clustering.dbscan.predicates.COPACNeighborPredicate
+elki.clustering.dbscan.predicates.ERiCNeighborPredicate
+elki.clustering.dbscan.predicates.FourCNeighborPredicate
+elki.clustering.dbscan.predicates.PreDeConNeighborPredicate

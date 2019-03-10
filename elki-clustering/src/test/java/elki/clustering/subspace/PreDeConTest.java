@@ -23,7 +23,7 @@ package elki.clustering.subspace;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.DBSCAN;
+import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.model.Model;

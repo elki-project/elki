@@ -20,10 +20,10 @@
  */
 package elki.clustering.correlation;
 
-import elki.clustering.DBSCAN;
-import elki.clustering.gdbscan.FourCCorePredicate;
-import elki.clustering.gdbscan.FourCNeighborPredicate;
-import elki.clustering.gdbscan.GeneralizedDBSCAN;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
+import elki.clustering.dbscan.predicates.FourCCorePredicate;
+import elki.clustering.dbscan.predicates.FourCNeighborPredicate;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;

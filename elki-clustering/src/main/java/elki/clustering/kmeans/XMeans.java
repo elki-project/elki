@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
-import elki.clustering.kmeans.initialization.PredefinedInitialMeans;
+import elki.clustering.kmeans.initialization.Predefined;
 import elki.clustering.kmeans.quality.KMeansQualityMeasure;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -114,7 +114,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   /**
    * Initializer for k-means.
    */
-  PredefinedInitialMeans splitInitializer;
+  Predefined splitInitializer;
 
   /**
    * Information criterion to choose the better split.
@@ -144,7 +144,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     this.k_max = k_max;
     this.k = k_min;
     this.innerKMeans = innerKMeans;
-    this.splitInitializer = new PredefinedInitialMeans((double[][]) null);
+    this.splitInitializer = new Predefined((double[][]) null);
     this.innerKMeans.setInitializer(this.splitInitializer);
     this.innerKMeans.setDistance(distanceFunction);
     this.informationCriterion = informationCriterion;
@@ -369,11 +369,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         random = rndP.getValue();
       }
 
-      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, KMeansLloyd.class);
+      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, LloydKMeans.class);
       if(config.grab(innerKMeansP)) {
         ChainedParameterization combinedConfig = new ChainedParameterization(new ListParameterization() //
             .addParameter(KMeans.K_ID, k_min) //
-            .addParameter(KMeans.INIT_ID, new PredefinedInitialMeans((double[][]) null)) //
+            .addParameter(KMeans.INIT_ID, new Predefined((double[][]) null)) //
             .addParameter(KMeans.MAXITER_ID, maxiter) //
             // Setting the distance to null if undefined at this point will
             // cause validation errors later. So fall back to the default.

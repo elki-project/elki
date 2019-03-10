@@ -3,10 +3,8 @@
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.kmeans.initialization.KMeansInitialization
- * @opt include .*elki.clustering.kmeans.initialization.KMedoidsInitialization
  * @opt include .*elki.data.model.KMeansModel
  * @opt include .*elki.data.model.MeanModel
- * @opt include .*elki.data.model.MedoidModel
  */
 /*
  * This file is part of ELKI:

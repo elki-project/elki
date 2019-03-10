@@ -22,8 +22,8 @@ package elki.clustering.uncertain;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.KMeansHamerly;
-import elki.clustering.kmeans.KMeansLloyd;
+import elki.clustering.kmeans.HamerlyKMeans;
+import elki.clustering.kmeans.LloydKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -88,7 +88,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    * @param initializer Initializer
    */
   public CKMeans(NumberVectorDistance<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(new KMeansLloyd<>(distanceFunction, k, maxiter, initializer));
+    super(new LloydKMeans<>(distanceFunction, k, maxiter, initializer));
   }
 
   @Override
@@ -110,7 +110,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeans<?, KMeansModel>> kmeansP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, KMeansHamerly.class);
+      ObjectParameter<KMeans<?, KMeansModel>> kmeansP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class);
       if(config.grab(kmeansP)) {
         kmeans = kmeansP.instantiateClass(config);
       }

@@ -22,11 +22,10 @@ package elki.clustering.correlation;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.DBSCAN;
-import elki.clustering.gdbscan.COPACNeighborPredicate;
-import elki.clustering.gdbscan.CorePredicate;
-import elki.clustering.gdbscan.GeneralizedDBSCAN;
-import elki.clustering.gdbscan.MinPtsCorePredicate;
+import elki.clustering.dbscan.*;
+import elki.clustering.dbscan.predicates.COPACNeighborPredicate;
+import elki.clustering.dbscan.predicates.CorePredicate;
+import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;

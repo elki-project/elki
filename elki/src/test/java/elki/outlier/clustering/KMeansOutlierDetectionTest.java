@@ -23,7 +23,7 @@ package elki.outlier.clustering;
 import org.junit.Test;
 
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.KMeansHamerly;
+import elki.clustering.kmeans.HamerlyKMeans;
 import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.database.Database;
@@ -41,7 +41,7 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testKMeansOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
-        .with(KMeansOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class) //
+        .with(KMeansOutlierDetection.Parameterizer.CLUSTERING_ID, HamerlyKMeans.class) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 0) //
         .build().run(db);

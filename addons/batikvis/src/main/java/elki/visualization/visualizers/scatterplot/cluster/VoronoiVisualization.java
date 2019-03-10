@@ -65,7 +65,7 @@ import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualizati
 /**
  * Visualizer drawing Voronoi cells for k-means clusterings.
  *
- * See also: {@link elki.clustering.kmeans.KMeansLloyd
+ * See also: {@link elki.clustering.kmeans.LloydKMeans
  * KMeans clustering}
  * 
  * @author Erich Schubert

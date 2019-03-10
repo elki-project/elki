@@ -23,7 +23,7 @@ package elki.outlier.clustering;
 import org.junit.Test;
 
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.KMeansSort;
+import elki.clustering.kmeans.SortMeans;
 import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.database.Database;
@@ -43,7 +43,7 @@ public class CBLOFTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
         .with(CBLOF.Parameterizer.ALPHPA_ID, 0.8) //
         .with(CBLOF.Parameterizer.BETA_ID, 3) //
-        .with(CBLOF.Parameterizer.CLUSTERING_ID, KMeansSort.class) //
+        .with(CBLOF.Parameterizer.CLUSTERING_ID, SortMeans.class) //
         .with(KMeans.K_ID, 1) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.8232666666666666);

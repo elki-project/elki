@@ -24,7 +24,7 @@ import java.util.List;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.KMeansLloyd;
+import elki.clustering.kmeans.LloydKMeans;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -163,7 +163,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<KMeans<O, ?>> clusterP = new ObjectParameter<>(CLUSTERING_ID, KMeans.class, KMeansLloyd.class);
+      ObjectParameter<KMeans<O, ?>> clusterP = new ObjectParameter<>(CLUSTERING_ID, KMeans.class, LloydKMeans.class);
       if(config.grab(clusterP)) {
         clusterer = clusterP.instantiateClass(config);
       }

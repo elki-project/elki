@@ -20,9 +20,9 @@
  */
 package elki.clustering.uncertain;
 
-import elki.clustering.DBSCAN;
-import elki.clustering.gdbscan.GeneralizedDBSCAN;
-import elki.clustering.gdbscan.MinPtsCorePredicate;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
+import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;

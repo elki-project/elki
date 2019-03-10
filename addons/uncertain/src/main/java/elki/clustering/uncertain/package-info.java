@@ -2,7 +2,7 @@
  * Clustering algorithms for uncertain data.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
- * @opt include .*elki.clustering.gdbscan.GeneralizedDBSCAN
+ * @opt include .*elki.clustering.dbscan.GeneralizedDBSCAN
  */
 /*
  * This file is part of ELKI:

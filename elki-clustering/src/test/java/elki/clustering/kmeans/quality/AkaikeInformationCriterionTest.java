@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.KMeansLloyd;
+import elki.clustering.kmeans.LloydKMeans;
 import elki.clustering.kmeans.XMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -47,7 +47,7 @@ public class AkaikeInformationCriterionTest extends AbstractClusterAlgorithmTest
     Clustering<?> result = new ELKIBuilder<XMeans<DoubleVector, ?>>(XMeans.class) //
         .with(XMeans.Parameterizer.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
-        .with(XMeans.Parameterizer.INNER_KMEANS_ID, KMeansLloyd.class) //
+        .with(XMeans.Parameterizer.INNER_KMEANS_ID, LloydKMeans.class) //
         .with(XMeans.Parameterizer.INFORMATION_CRITERION_ID, AkaikeInformationCriterion.class) //
         .with(KMeans.SEED_ID, 0) // // Initializer seed
         .with(XMeans.Parameterizer.SEED_ID, 0) // // X-means seed

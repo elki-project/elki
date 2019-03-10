@@ -27,7 +27,7 @@ import java.util.List;
 
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
-import elki.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
+import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -489,7 +489,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
+      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlus.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

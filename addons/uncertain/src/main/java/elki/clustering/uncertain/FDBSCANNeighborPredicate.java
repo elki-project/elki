@@ -22,9 +22,9 @@ package elki.clustering.uncertain;
 
 import java.util.Random;
 
-import elki.clustering.DBSCAN;
-import elki.clustering.gdbscan.GeneralizedDBSCAN;
-import elki.clustering.gdbscan.NeighborPredicate;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
+import elki.clustering.dbscan.predicates.NeighborPredicate;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;

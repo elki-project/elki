@@ -29,7 +29,7 @@ import java.util.Random;
 import elki.AbstractAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.KMedoidsPAM;
+import elki.clustering.kmedoids.PAM;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -459,7 +459,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       predef.addParameter(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
-      ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsPAM.class);
+      ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);
       if(chain.grab(malgorithm)) {
         metaAlgorithm = malgorithm.instantiateClass(chain);
         if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
