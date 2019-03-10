@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -76,7 +76,7 @@ import elki.utilities.documentation.Title;
     bibkey = "DBLP:journals/cj/Sibson73")
 @Alias({ "single-link", "single-linkage" })
 @Priority(Priority.RECOMMENDED)
-public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * The logger for this class.
    */
@@ -283,7 +283,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     @Override
     protected SLINK<O> makeInstance() {
       return new SLINK<>(distanceFunction);

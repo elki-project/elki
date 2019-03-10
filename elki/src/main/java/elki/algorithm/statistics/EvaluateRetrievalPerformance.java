@@ -20,7 +20,7 @@
  */
 package elki.algorithm.statistics;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
@@ -64,7 +64,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *
  * @param <O> Object type
  */
-public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgorithm<O, EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
+public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
   /**
    * The logger for this class.
    */
@@ -444,7 +444,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to enable sampling.
      */

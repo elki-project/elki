@@ -24,7 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -38,6 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
+import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.logging.Logging;
@@ -93,7 +94,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
     url = "https://doi.org/10.1007/3-540-45681-3_2", //
     bibkey = "DBLP:conf/pkdd/AngiulliP02")
-public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */

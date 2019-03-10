@@ -23,7 +23,7 @@ package elki.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMedoidsInitialization;
 import elki.clustering.kmeans.initialization.ParkInitialMeans;
@@ -93,7 +93,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "J. Math. Model. Algorithms 5(4)", //
     url = "https://doi.org/10.1007/s10852-005-9022-1", //
     bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
-public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -307,7 +307,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<V, Clusterin
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     protected int k;
 
     protected int maxiter;

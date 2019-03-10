@@ -23,7 +23,7 @@ package elki.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
@@ -85,7 +85,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     url = "https://doi.org/10.1145/3068335", //
     bibkey = "DBLP:journals/tods/SchubertSEKX17")
 @Priority(Priority.RECOMMENDED)
-public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -290,7 +290,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.

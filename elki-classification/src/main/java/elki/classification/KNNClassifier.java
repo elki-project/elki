@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import elki.AbstractAlgorithm;
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.ClassLabel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;

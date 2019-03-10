@@ -23,7 +23,7 @@ package elki.clustering.optics;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -35,7 +35,6 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
@@ -93,7 +92,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
     booktitle = "Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2006)", //
     url = "https://doi.org/10.1007/11731139_16", //
     bibkey = "DBLP:conf/pakdd/AchtertBK06")
-public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, ClusterOrder> implements OPTICSTypeAlgorithm {
+public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<SpatialPrimitiveDistance<? super V>, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,7 +119,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    * @param distanceFunction Distance function
    * @param minpts MinPts
    */
-  public DeLiClu(DeLiCluTreeFactory<? super V> indexer, Distance<? super V> distanceFunction, int minpts) {
+  public DeLiClu(DeLiCluTreeFactory<? super V> indexer, SpatialPrimitiveDistance<? super V> distanceFunction, int minpts) {
     super(distanceFunction);
     this.indexer = indexer;
     this.minpts = minpts;
@@ -130,8 +129,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     if(!(getDistance() instanceof SpatialPrimitiveDistance<?>)) {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialPrimitiveDistance.class.getName());
     }
-    @SuppressWarnings("unchecked")
-    SpatialPrimitiveDistance<V> distFunction = (SpatialPrimitiveDistance<V>) getDistance();
 
     if(LOG.isVerbose()) {
       LOG.verbose("Building DeLiClu index");
@@ -144,7 +141,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     if(LOG.isVerbose()) {
       LOG.verbose("Performing kNN join");
     }
-    DataStore<KNNList> knns = new KNNJoin<V, DeLiCluNode, DeLiCluEntry>(distFunction, minpts).run(index, relation.getDBIDs());
+    DataStore<KNNList> knns = new KNNJoin<V, DeLiCluNode, DeLiCluEntry>(getDistance(), minpts).run(index, relation.getDBIDs());
     DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -171,7 +168,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
 
       // pair of nodes
       if(dataPair.isExpandable) {
-        expandNodes(index, distFunction, dataPair, knns);
+        expandNodes(index, dataPair, knns);
       }
       // pair of objects
       else {
@@ -187,7 +184,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
         clusterOrder.add(e1id, dataPair.distance, e2.getDBID());
         numHandled++;
         // reinsert expanded leafs
-        reinsertExpanded(distFunction, index, path, knns);
+        reinsertExpanded(index, path, knns);
 
         if(progress != null) {
           progress.setProcessed(numHandled, LOG);
@@ -202,19 +199,18 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    * Expands the spatial nodes of the specified pair.
    *
    * @param index the index storing the objects
-   * @param distFunction the spatial distance function of this algorithm
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
    */
-  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistance<V> distFunction, SpatialObjectPair nodePair, DataStore<KNNList> knns) {
+  private void expandNodes(DeLiCluTree index, SpatialObjectPair nodePair, DataStore<KNNList> knns) {
     DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry) nodePair.entry1).getPageID());
     DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry) nodePair.entry2).getPageID());
 
     if(node1.isLeaf()) {
-      expandLeafNodes(distFunction, node1, node2, knns);
+      expandLeafNodes(node1, node2, knns);
     }
     else {
-      expandDirNodes(distFunction, node1, node2);
+      expandDirNodes(node1, node2);
     }
 
     index.setExpanded(nodePair.entry2, nodePair.entry1);
@@ -223,16 +219,16 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   /**
    * Expands the specified directory nodes.
    *
-   * @param distFunction the spatial distance function of this algorithm
    * @param node1 the first node
    * @param node2 the second node
    */
-  private void expandDirNodes(SpatialPrimitiveDistance<V> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
+  private void expandDirNodes(DeLiCluNode node1, DeLiCluNode node2) {
     if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("ExpandDirNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
-    int numEntries_1 = node1.getNumEntries();
-    int numEntries_2 = node2.getNumEntries();
+    int numEntries_1 = node1.getNumEntries(),
+        numEntries_2 = node2.getNumEntries();
+    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
 
     // insert all combinations of unhandled - handled children of
     // node1-node2 into pq
@@ -256,17 +252,17 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   /**
    * Expands the specified leaf nodes.
    *
-   * @param distFunction the spatial distance function of this algorithm
    * @param node1 the first node
    * @param node2 the second node
    * @param knns the knn list
    */
-  private void expandLeafNodes(SpatialPrimitiveDistance<V> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList> knns) {
+  private void expandLeafNodes(DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList> knns) {
     if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
-    int numEntries_1 = node1.getNumEntries();
-    int numEntries_2 = node2.getNumEntries();
+    int numEntries_1 = node1.getNumEntries(),
+        numEntries_2 = node2.getNumEntries();
+    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
 
     // insert all combinations of unhandled - handled children of
     // node1-node2 into pq
@@ -291,12 +287,11 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   /**
    * Reinserts the objects of the already expanded nodes.
    *
-   * @param distFunction the spatial distance function of this algorithm
    * @param index the index storing the objects
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
-  private void reinsertExpanded(SpatialPrimitiveDistance<V> distFunction, DeLiCluTree index, IndexTreePath<DeLiCluEntry> path, DataStore<KNNList> knns) {
+  private void reinsertExpanded(DeLiCluTree index, IndexTreePath<DeLiCluEntry> path, DataStore<KNNList> knns) {
     int l = 0; // Count the number of components.
     for(IndexTreePath<DeLiCluEntry> it = path; it != null; it = it.getParentPath()) {
       l++;
@@ -309,12 +304,13 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
     assert (p.size() == l - 1);
     DeLiCluEntry rootEntry = it.getEntry();
-    reinsertExpanded(distFunction, index, p, l - 2, rootEntry, knns);
+    reinsertExpanded(index, p, l - 2, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistance<V> distFunction, DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
+  private void reinsertExpanded(DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry);
     SpatialEntry entry2 = path.get(pos).getEntry();
+    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
 
     if(entry2 instanceof LeafEntry) {
       assert (pos == 0);
@@ -340,7 +336,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
       }
       // already expanded
       else {
-        reinsertExpanded(distFunction, index, path, pos - 1, entry1, knns);
+        reinsertExpanded(index, path, pos - 1, entry1, knns);
       }
     }
   }
@@ -457,7 +453,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<SpatialPrimitiveDistance<? super V>> {
     /**
      * Parameter to specify the threshold for minimum number of points within a
      * cluster, must be an integer greater than 0.
@@ -473,6 +469,11 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
      * DeLiClu Index factory.
      */
     protected DeLiCluTreeFactory<? super V> indexer;
+
+    @Override
+    public Class<?> getDistanceRestriction() {
+      return SpatialPrimitiveDistance.class;
+    }
 
     @Override
     protected void makeOptions(Parameterization config) {

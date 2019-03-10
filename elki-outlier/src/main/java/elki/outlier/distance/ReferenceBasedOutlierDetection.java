@@ -22,8 +22,7 @@ package elki.outlier.distance;
 
 import java.util.Collection;
 
-import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
-import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -39,6 +38,7 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.ReferencePointsResult;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -84,7 +84,7 @@ import elki.utilities.referencepoints.ReferencePointsHeuristic;
     booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
     url = "https://doi.org/10.1109/ICDM.2006.17", //
     bibkey = "DBLP:conf/icdm/PeiZG06")
-public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -273,7 +273,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
+  public static class Parameterizer extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super NumberVector>> {
     /**
      * Parameter for the reference points heuristic.
      */

@@ -22,7 +22,7 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -78,7 +78,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
     url = "https://doi.org/10.1145/1869790.1869841", //
     bibkey = "DBLP:conf/gis/LiuLC10")
-public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance<? super P>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.
    */
@@ -241,9 +241,9 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
    *
    * @hidden
    *
-   * @param <N> Vector type
+   * @param <O> Object type
    */
-  public static class Parameterizer<N> extends AbstractDistanceBasedAlgorithm.Parameterizer<N> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the number of neighbors.
      */
@@ -277,50 +277,23 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configK(config);
-      configAlpha(config);
-      configC(config);
-    }
-
-    /**
-     * Get the kNN parameter.
-     *
-     * @param config Parameterization
-     */
-    protected void configK(Parameterization config) {
-      final IntParameter param = new IntParameter(K_ID) //
+      final IntParameter kP = new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(param)) {
-        k = param.getValue();
+      if(config.grab(kP)) {
+        k = kP.getValue();
       }
-    }
-
-    /**
-     * Get the alpha parameter.
-     *
-     * @param config Parameterization
-     */
-    protected void configAlpha(Parameterization config) {
-      final DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.5);
-      if(config.grab(param)) {
-        alpha = param.getValue();
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
       }
-    }
-
-    /**
-     * get the c parameter.
-     *
-     * @param config Parameterization
-     */
-    protected void configC(Parameterization config) {
-      final DoubleParameter param = new DoubleParameter(C_ID);
-      if(config.grab(param)) {
-        c = param.getValue();
+      final DoubleParameter cP = new DoubleParameter(C_ID);
+      if(config.grab(cP)) {
+        c = cP.getValue();
       }
     }
 
     @Override
-    protected CTLuRandomWalkEC<N> makeInstance() {
+    protected CTLuRandomWalkEC<O> makeInstance() {
       return new CTLuRandomWalkEC<>(distanceFunction, alpha, c, k);
     }
   }

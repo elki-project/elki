@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.NumberVector;
@@ -69,13 +69,13 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
- *
+ * <p>
  * In contrast to {@link RankingQualityHistogram}, this method uses a binning
  * based on the centrality of objects. This allows analyzing whether or not a
  * particular distance degrades for the outer parts of a cluster.
- *
+ * <p>
  * TODO: Allow fixed binning range, configurable
- *
+ * <p>
  * TODO: Add sampling
  *
  * @author Erich Schubert
@@ -84,7 +84,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, CollectionResult<double[]>> {
+public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -187,7 +187,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * Option to configure the number of bins to use.
      */

@@ -24,6 +24,7 @@ import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.logging.Logging;
@@ -55,8 +56,9 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
 
   @Override
   protected void preprocess() {
+    SpatialPrimitiveDistance<? super V> distFunction = (SpatialPrimitiveDistance<? super V>) distanceFunction;
     // Run KNNJoin
-    KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distanceFunction, k);
+    KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distFunction, k);
     storage = knnjoin.run(relation, relation.getDBIDs());
   }
 

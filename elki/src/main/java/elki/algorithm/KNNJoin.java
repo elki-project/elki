@@ -23,16 +23,20 @@ package elki.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.*;
+import elki.database.ids.DBID;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.KNNHeap;
+import elki.database.ids.KNNList;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
@@ -79,7 +83,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 @Priority(Priority.DEFAULT - 10) // Mostly used inside others.
-public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, Relation<KNNList>> {
+public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<SpatialPrimitiveDistance<? super V>, Relation<KNNList>> {
   /**
    * The logger for this class.
    */
@@ -96,7 +100,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public KNNJoin(Distance<? super V> distanceFunction, int k) {
+  public KNNJoin(SpatialPrimitiveDistance<? super V> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -123,9 +127,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @return Data store
    */
   public WritableDataStore<KNNList> run(Relation<V> relation, DBIDs ids) {
-    if(!(getDistance() instanceof SpatialPrimitiveDistance)) {
-      throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistance.class.getName());
-    }
     It<SpatialIndexTree<N, E>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(SpatialIndexTree.class);
     if(!indexes.valid()) {
       throw new MissingPrerequisitesException("KNNJoin found no spatial indexes, expected exactly one.");
@@ -146,8 +147,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @return Data store
    */
   public WritableDataStore<KNNList> run(SpatialIndexTree<N, E> index, DBIDs ids) {
-    @SuppressWarnings("unchecked")
-    SpatialPrimitiveDistance<V> distFunction = (SpatialPrimitiveDistance<V>) getDistance();
+    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
 
     // data pages
     List<E> ps_candidates = new ArrayList<>(index.getLeaves());
@@ -245,7 +245,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param pr Node to initialize for
    * @return List of heaps
    */
-  private List<KNNHeap> initHeaps(SpatialPrimitiveDistance<V> distFunction, N pr) {
+  private List<KNNHeap> initHeaps(SpatialPrimitiveDistance<? super V> distFunction, N pr) {
     List<KNNHeap> pr_heaps = new ArrayList<>(pr.getNumEntries());
     // Create for each data object a knn heap
     for(int j = 0; j < pr.getNumEntries(); j++) {
@@ -360,7 +360,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<SpatialPrimitiveDistance<? super V>> {
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned, must be
      * an integer greater than 0. Default value: 1.
@@ -371,6 +371,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
      * K parameter.
      */
     protected int k;
+
+    @Override
+    public Class<?> getDistanceRestriction() {
+      return SpatialPrimitiveDistance.class;
+    }
 
     @Override
     protected void makeOptions(Parameterization config) {

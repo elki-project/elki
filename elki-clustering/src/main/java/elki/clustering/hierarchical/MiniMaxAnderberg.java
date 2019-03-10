@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -64,7 +64,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED - 5)
-public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -366,7 +366,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     @Override
     protected MiniMaxAnderberg<O> makeInstance() {
       return new MiniMaxAnderberg<>(distanceFunction);

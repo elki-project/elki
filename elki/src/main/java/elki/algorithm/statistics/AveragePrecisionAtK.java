@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
@@ -61,7 +61,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
+public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -212,7 +212,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter k to compute the average precision at.
      */

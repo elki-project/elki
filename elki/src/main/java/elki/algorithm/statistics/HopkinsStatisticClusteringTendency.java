@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.Arrays;
 import java.util.Random;
 
-import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -37,7 +37,6 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.statistics.DoubleStatistic;
@@ -53,7 +52,6 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
@@ -81,7 +79,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Annals of Botany, 18(2), 213-227", //
     url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
     bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
-public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, Void> {
+public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, Void> {
   /**
    * The logger for this class.
    */
@@ -297,7 +295,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    *
    * @author Lisa Reichert
    */
-  public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
+  public static class Parameterizer extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super NumberVector>> {
     /**
      * Sample size.
      */
@@ -360,12 +358,13 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
     private double[] minima = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      ObjectParameter<NumberVectorDistance<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+    public Class<?> getDistanceRestriction() {
+      return NumberVectorDistance.class;
+    }
 
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
       IntParameter repP = new IntParameter(REP_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(repP)) {

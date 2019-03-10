@@ -20,7 +20,7 @@
  */
 package elki.clustering.optics;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -59,7 +59,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     url = "https://doi.org/10.1145/304181.304187", //
     bibkey = "DBLP:conf/sigmod/AnkerstBKS99")
 @Alias({ "OPTICS" })
-public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrder> implements OPTICSTypeAlgorithm {
+public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * Holds the maximum distance to search for objects (performance parameter)
    */
@@ -111,7 +111,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
    * 
    * @param <O> Object type
    */
-  public static abstract class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static abstract class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.

@@ -24,7 +24,7 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -74,7 +74,7 @@ import elki.utilities.optionhandling.parameters.*;
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21", //
     bibkey = "DBLP:conf/icdm/KriegelKSZ12")
-public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
+public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -307,7 +307,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its score, must be an integer greater than 0.

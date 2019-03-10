@@ -20,7 +20,7 @@
  */
 package elki.clustering;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -66,7 +66,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Clustering algorithms", // )
     url = "http://dl.acm.org/citation.cfm?id=540298", //
     bibkey = "books/wiley/Hartigan75/C3")
-public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Maximum distance from leading object,
    */
@@ -144,7 +144,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option ID of threshold parameter.
      */

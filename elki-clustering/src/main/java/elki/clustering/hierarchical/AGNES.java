@@ -20,7 +20,8 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
@@ -33,6 +34,7 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -104,7 +106,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
 @Alias({ "HAC", "SAHN" })
-public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -347,7 +349,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -359,18 +361,18 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     protected Linkage linkage;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      // We don't call super, because we want a different default distance.
-      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+    public Class<?> getDefaultDistance() {
+      return (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) ? SquaredEuclideanDistance.class : EuclideanDistance.class;
+    }
 
+    @Override
+    protected void makeOptions(Parameterization config) {
       ObjectParameter<Linkage> linkageP = new ObjectParameter<>(LINKAGE_ID, Linkage.class);
       linkageP.setDefaultValue(WardLinkage.class);
       if(config.grab(linkageP)) {
         linkage = linkageP.instantiateClass(config);
       }
+      super.makeOptions(config);
     }
 
     @Override

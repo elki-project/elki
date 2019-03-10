@@ -20,7 +20,7 @@
  */
 package elki.outlier;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -75,7 +75,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)", //
     url = "https://doi.org/10.1007/978-3-642-38628-2_61", //
     bibkey = "DBLP:conf/ibpria/MomtazMG13")
-public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -324,7 +324,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option ID for the number of neighbors.
      */
@@ -347,8 +347,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     @Override
     protected void makeOptions(Parameterization config) {
-      // The super class has the distance function parameter!
-      super.makeOptions(config);
+      super.makeOptions(config); // Distance
       IntParameter kP = new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {

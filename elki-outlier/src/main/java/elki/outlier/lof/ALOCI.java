@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -78,7 +78,7 @@ import net.jafama.FastMath;
  *
  * @composed - - - ALOCIQuadTree
  *
- * @param <O> Object type
+ * @param <V> Vector type
  */
 @Title("Approximate LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
@@ -87,7 +87,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
     url = "https://doi.org/10.1109/ICDE.2003.1260802", //
     bibkey = "DBLP:conf/icde/PapadimitriouKGF03")
-public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -122,7 +122,7 @@ public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceB
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistance<? super O> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
+  public ALOCI(NumberVectorDistance<? super V> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
     super(distanceFunction);
     this.nmin = nmin;
     this.alpha = alpha;
@@ -130,7 +130,7 @@ public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceB
     this.rnd = rnd;
   }
 
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final Random random = rnd.getSingleThreadedRandom();
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;
@@ -179,10 +179,10 @@ public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceB
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
-    NumberVectorDistance<? super O> distFunc = getDistance();
+    NumberVectorDistance<? super V> distFunc = getDistance();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final O obj = relation.get(iditer);
+      final V obj = relation.get(iditer);
 
       double maxmdefnorm = 0;
       // For each level
@@ -635,7 +635,7 @@ public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceB
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super O>> {
     /**
      * Parameter to specify the minimum neighborhood size
      */
@@ -675,6 +675,11 @@ public class ALOCI<O extends NumberVector> extends AbstractNumberVectorDistanceB
      * Random generator
      */
     protected RandomFactory rnd;
+
+    @Override
+    public Class<?> getDistanceRestriction() {
+      return NumberVectorDistance.class;
+    }
 
     @Override
     protected void makeOptions(Parameterization config) {

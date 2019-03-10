@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import elki.data.*;
@@ -76,7 +76,7 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractNumberVectorDistanceBasedAlgorithm<V, Clustering<M>> implements KMeans<V, M> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, Clustering<M>> implements KMeans<V, M> {
   /**
    * Number of cluster centers to initialize.
    */
@@ -662,7 +662,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
+  public abstract static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
     /**
      * k Parameter.
      */

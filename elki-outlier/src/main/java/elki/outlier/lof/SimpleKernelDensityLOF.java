@@ -20,8 +20,8 @@
  */
 package elki.outlier.lof;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -66,7 +66,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> the type of objects handled by this algorithm
  */
-public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -201,7 +201,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    *
    * @param <O> vector type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Option ID for kernel density LOF kernel.
      */

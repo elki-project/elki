@@ -20,8 +20,8 @@
  */
 package elki.outlier.lof;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.spatial.SpatialComparable;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -89,7 +89,7 @@ import net.jafama.FastMath;
     booktitle = "Pattern Recognition Letters 24(16)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00165-X", //
     bibkey = "DBLP:journals/prl/HuS03")
-public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -235,7 +235,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its VOV score, must be an integer greater than

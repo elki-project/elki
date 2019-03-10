@@ -22,7 +22,7 @@ package elki.clustering.kmeans;
 
 import java.util.Random;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.data.Cluster;
@@ -88,7 +88,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
     url = "https://doi.org/10.1109/TKDE.2002.1033770", //
     bibkey = "DBLP:journals/tkde/NgH02")
-public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger.
    */
@@ -438,7 +438,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<Med
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * The number of restarts to run.
      */

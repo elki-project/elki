@@ -23,7 +23,7 @@ package elki.outlier;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.optics.AbstractOPTICS;
 import elki.clustering.optics.OPTICSTypeAlgorithm;
 import elki.data.type.TypeInformation;
@@ -84,7 +84,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 3rd European Conf. on Principles of Knowledge Discovery and Data Mining (PKDD'99)", //
     url = "https://doi.org/10.1007/978-3-540-48247-5_28", //
     bibkey = "DBLP:conf/pkdd/BreunigKNS99")
-public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -190,7 +190,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the threshold MinPts.
      */

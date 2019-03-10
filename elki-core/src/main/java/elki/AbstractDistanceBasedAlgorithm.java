@@ -18,10 +18,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.algorithm;
+package elki;
 
-import elki.AbstractAlgorithm;
-import elki.distance.NumberVectorDistance;
+import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -29,30 +28,30 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Abstract base class for distance-based algorithms that need to work with
- * synthetic numerical vectors such as <b>mean</b> vectors.
+ * Abstract base class for distance-based algorithms.
  *
- * @author Erich Schubert
- * @since 0.7.0
+ * @author Arthur Zimek
+ * @since 0.1
  *
- * @has - - - NumberVectorDistance
+ * @opt nodefillcolor LemonChiffon
+ * @has - - - Distance
  *
- * @param <O> Object type
+ * @param <D> the type of distance function used by this algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends AbstractAlgorithm<R> {
+public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
    * {@link Parameterizer#DISTANCE_FUNCTION_ID}.
    */
-  protected NumberVectorDistance<? super O> distanceFunction;
+  protected D distanceFunction;
 
   /**
    * Constructor.
    *
    * @param distanceFunction Distance function
    */
-  protected AbstractNumberVectorDistanceBasedAlgorithm(NumberVectorDistance<? super O> distanceFunction) {
+  protected AbstractDistanceBasedAlgorithm(D distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -62,7 +61,7 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends A
    *
    * @return the distanceFunction
    */
-  final public NumberVectorDistance<? super O> getDistance() {
+  public D getDistance() {
     return distanceFunction;
   }
 
@@ -71,24 +70,41 @@ public abstract class AbstractNumberVectorDistanceBasedAlgorithm<O, R> extends A
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Parameterizer<D extends Distance<?>> extends AbstractParameterizer {
     /**
      * OptionID for the distance function.
      */
-    public static final OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID;
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
     /**
-     * Distance function to use.
+     * The distance function to use.
      */
-    protected NumberVectorDistance<? super O> distanceFunction;
+    protected D distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      ObjectParameter<NumberVectorDistance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class);
+      ObjectParameter<D> distanceFunctionP = new ObjectParameter<D>(DISTANCE_FUNCTION_ID, getDistanceRestriction(), getDefaultDistance());
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
+    }
+
+    /**
+     * Get the minimum requirements for the distance function.
+     *
+     * @return Restriction class
+     */
+    public Class<?> getDistanceRestriction() {
+      return Distance.class;
+    }
+
+    /**
+     * The default distance function.
+     *
+     * @return Default distance function
+     */
+    public Class<?> getDefaultDistance() {
+      return EuclideanDistance.class;
     }
   }
 }

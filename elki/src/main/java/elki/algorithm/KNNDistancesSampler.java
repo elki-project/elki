@@ -22,6 +22,7 @@ package elki.algorithm;
 
 import java.util.Arrays;
 
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.algorithm.KNNDistancesSampler.KNNDistanceOrderResult;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -88,7 +89,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "ACM Trans. Database Systems (TODS)", //
     url = "https://doi.org/10.1145/3068335", //
     bibkey = "DBLP:journals/tods/SchubertSEKX17")
-public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KNNDistanceOrderResult> {
+public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, KNNDistanceOrderResult> {
   /**
    * The logger for this class.
    */
@@ -204,7 +205,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the distance of the k-distant object to be assessed,
      * must be an integer greater than 0.

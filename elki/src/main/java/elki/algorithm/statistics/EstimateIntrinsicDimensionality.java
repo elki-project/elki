@@ -20,7 +20,7 @@
  */
 package elki.algorithm.statistics;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -53,7 +53,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Data type
  */
-public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlgorithm<O, Void> {
+public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
   /**
    * Class logger.
    */
@@ -131,7 +131,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Estimation method
      */

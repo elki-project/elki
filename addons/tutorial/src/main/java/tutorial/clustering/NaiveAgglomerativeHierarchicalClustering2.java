@@ -22,7 +22,7 @@ package tutorial.clustering;
 
 import java.util.Arrays;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.hierarchical.SLINK;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Cluster;
@@ -61,7 +61,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
  *
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> {
+public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> {
   /**
    * Class logger
    */
@@ -245,7 +245,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Desired number of clusters.
      */

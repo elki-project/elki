@@ -22,7 +22,7 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -67,7 +67,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Proc. 6th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/347090.347123", //
     bibkey = "DBLP:conf/kdd/McCallumNU00")
-public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
    */
@@ -168,30 +168,18 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter for the inclusion threshold of canopy clustering.
-     * 
+     * <p>
      * Note: t1 >= t2
-     * 
-     * Syntax:
-     * 
-     * <pre>
-     * -canopy.t1 &lt;value&gt;
-     * </pre>
      */
     public static final OptionID T1_ID = new OptionID("canopy.t1", "Inclusion threshold for canopy clustering. t1 >= t2!");
 
     /**
      * Parameter for the removal threshold of canopy clustering.
-     * 
+     * <p>
      * Note: t1 >= t2
-     * 
-     * Syntax:
-     * 
-     * <pre>
-     * -canopy.t2 &lt;value&gt;
-     * </pre>
      */
     public static final OptionID T2_ID = new OptionID("canopy.t2", "Removal threshold for canopy clustering. t1 >= t2!");
 

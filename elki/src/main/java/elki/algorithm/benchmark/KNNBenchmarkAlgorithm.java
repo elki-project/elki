@@ -20,7 +20,7 @@
  */
 package elki.algorithm.benchmark;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -57,7 +57,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @assoc - - - KNNQuery
  */
-public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, Void> {
+public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
   /**
    * The logger for this class.
    */
@@ -205,7 +205,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter for the number of neighbors.
      */

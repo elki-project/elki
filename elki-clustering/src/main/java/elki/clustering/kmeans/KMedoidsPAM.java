@@ -20,7 +20,7 @@
  */
 package elki.clustering.kmeans;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.initialization.KMedoidsInitialization;
@@ -87,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch2", //
     bibkey = "doi:10.1002/9780470316801.ch2")
-public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -400,7 +400,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
     /**
      * The number of clusters to produce.
      */

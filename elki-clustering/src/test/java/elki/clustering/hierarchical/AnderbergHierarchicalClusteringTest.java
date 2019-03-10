@@ -146,8 +146,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Parameterizer.LINKAGE_ID, MedianLinkage.class) //
         .build().run(db);
-    testFMeasure(db, clustering, 0.9381678);
-    testClusterSizes(clustering, new int[] { 200, 217, 221 });
+    testFMeasure(db, clustering, 0.9386626);
+    testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**

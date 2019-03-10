@@ -20,7 +20,7 @@
  */
 package elki.clustering.kmeans;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;

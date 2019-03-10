@@ -20,9 +20,9 @@
  */
 package elki.outlier.distance;
 
-import elki.algorithm.AbstractDistanceBasedAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.intrinsic.ISOS;
+import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -88,7 +88,7 @@ import net.jafama.FastMath;
     booktitle = "TiCC TR 2012–001", //
     url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
     bibkey = "tr/tilburg/JanssensHPv12")
-public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -172,7 +172,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
     /**
      * Parameter to specify the number of neighbors
      */
