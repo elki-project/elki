@@ -271,16 +271,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       this.offset = new double[dim];
       this.cells = new int[dim];
       // Compute the grid start, and the number of cells in each dimension.
-      long numcells = computeGridBaseOffsets();
-      if(numcells > size) {
-        LOG.warning("The generated grid has more cells than data points. This may need excessive amounts of memory.");
-      }
-      else if(numcells == 1) {
-        LOG.warning("All data is in a single cell. This has degenerated to a non-indexed DBSCAN!");
-      }
-      else if(numcells <= dim * dim) {
-        LOG.warning("There are only " + numcells + " cells. This will likely be slower than regular DBSCAN!");
-      }
+      long numcells = computeGridBaseOffsets(size);
 
       // Build the data grid.
       buildGrid(relation, (int) numcells, offset);
@@ -308,27 +299,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         if(cellids.size() < minpts) {
           continue; // Too few objects.
         }
-        temporary.clear(); // Reset to "UNPROCESSED"
-        ProxyView<V> rel = new ProxyView<>(cellids, relation);
-        RangeQuery<V> rq = rel.getRangeQuery(distanceFunction, epsilon);
-        FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Running DBSCAN", cellids.size(), LOG) : null;
-        for(DBIDIter id = cellids.iter(); id.valid(); id.advance()) {
-          // Skip already processed ids.
-          if(temporary.intValue(id) != UNPROCESSED) {
-            continue;
-          }
-          neighbors.clear();
-          rq.getRangeForDBID(id, epsilon, neighbors);
-          if(neighbors.size() >= minpts) {
-            expandCluster(id, clusterid, temporary, neighbors, activeSet, rq, pprog);
-            ++clusterid;
-          }
-          else {
-            temporary.putInt(id, NOISE);
-            LOG.incrementProcessed(pprog);
-          }
-        }
-        LOG.ensureCompleted(pprog);
+        clusterid += runDBSCANOnCell(cellids, relation, neighbors, activeSet, clusterid);
         // Post-process DBSCAN clustering result:
         updateCoreBorderObjects(clusterid);
         mergeClusterInformation(cellids, temporary, clusterids);
@@ -337,48 +308,32 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       LOG.ensureCompleted(cprog);
       temporary.destroy();
 
-      FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Building final result", size, LOG) : null;
-      ModifiableDBIDs[] clusters = new ModifiableDBIDs[clusterid];
-      ModifiableDBIDs noise = DBIDUtil.newArray();
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        Assignment cids = clusterids.get(it);
-        if(cids == null) {
-          noise.add(it);
+      return buildResult(ids, clusterid);
+    }
+
+    private int runDBSCANOnCell(DBIDs cellids, Relation<V> relation, ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, int clusterid) {
+      temporary.clear(); // Reset to "UNPROCESSED"
+      ProxyView<V> rel = new ProxyView<>(cellids, relation);
+      RangeQuery<V> rq = rel.getRangeQuery(distanceFunction, epsilon);
+      FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Running DBSCAN", cellids.size(), LOG) : null;
+      for(DBIDIter id = cellids.iter(); id.valid(); id.advance()) {
+        // Skip already processed ids.
+        if(temporary.intValue(id) != UNPROCESSED) {
+          continue;
+        }
+        neighbors.clear();
+        rq.getRangeForDBID(id, epsilon, neighbors);
+        if(neighbors.size() >= minpts) {
+          expandCluster(id, clusterid, temporary, neighbors, activeSet, rq, pprog);
+          ++clusterid;
         }
         else {
-          if(cids instanceof MultiBorder) {
-            cids = ((MultiBorder) cids).getCore();
-          }
-          else if(cids instanceof Border) {
-            cids = ((Border) cids).core;
-          }
-          assert (cids instanceof Core);
-          Core co = (Core) cids;
-          while(cores[co.num].num != co.num) {
-            co = cores[co.num = cores[co.num].num];
-          }
-          ModifiableDBIDs clu = clusters[co.num];
-          if(clu == null) {
-            clu = clusters[co.num] = DBIDUtil.newArray();
-          }
-          clu.add(it);
+          temporary.putInt(id, NOISE);
+          LOG.incrementProcessed(pprog);
         }
-        LOG.incrementProcessed(pprog);
       }
       LOG.ensureCompleted(pprog);
-      clusterids.destroy();
-
-      Clustering<Model> result = new Clustering<>();
-      Metadata.of(result).setLongName("DBSCAN Clustering");
-      for(int i = NOISE + 1; i < clusters.length; i++) {
-        if(clusters[i] != null) {
-          result.addToplevelCluster(new Cluster<Model>(clusters[i], ClusterModel.CLUSTER));
-        }
-      }
-      if(noise.size() > 0) {
-        result.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
-      }
-      return result;
+      return clusterid;
     }
 
     /**
@@ -400,9 +355,10 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Compute the grid base offset.
      *
+     * @param size Data set size
      * @return Total number of grid cells
      */
-    private long computeGridBaseOffsets() {
+    private long computeGridBaseOffsets(int size) {
       StringBuffer buf = LOG.isDebuggingFinest() ? new StringBuffer() : null;
       double[] min = domain[0], max = domain[1];
       long total = 1;
@@ -433,6 +389,15 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       }
       if(buf != null) {
         LOG.debugFinest(buf);
+      }
+      if(total > size) {
+        LOG.warning("The generated grid has more cells than data points. This may need excessive amounts of memory.");
+      }
+      else if(total == 1) {
+        LOG.warning("All data is in a single cell. This has degenerated to a non-indexed DBSCAN!");
+      }
+      else if(total <= dim * dim) {
+        LOG.warning("There are only " + total + " cells. This will likely be slower than regular DBSCAN!");
       }
       return total;
     }
@@ -650,6 +615,58 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         LOG.incrementProcessed(mprog);
       }
       LOG.ensureCompleted(mprog);
+    }
+
+    /**
+     * Assemble the clustering result.
+     *
+     * @param ids Object IDs
+     * @param clusterid Largest valid cluster number
+     * @return Clustering
+     */
+    protected Clustering<Model> buildResult(final DBIDs ids, int clusterid) {
+      FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Building final result", ids.size(), LOG) : null;
+      ModifiableDBIDs[] clusters = new ModifiableDBIDs[clusterid];
+      ModifiableDBIDs noise = DBIDUtil.newArray();
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        Assignment cids = clusterids.get(it);
+        if(cids == null) {
+          noise.add(it);
+        }
+        else {
+          if(cids instanceof MultiBorder) {
+            cids = ((MultiBorder) cids).getCore();
+          }
+          else if(cids instanceof Border) {
+            cids = ((Border) cids).core;
+          }
+          assert (cids instanceof Core);
+          Core co = (Core) cids;
+          while(cores[co.num].num != co.num) {
+            co = cores[co.num = cores[co.num].num];
+          }
+          ModifiableDBIDs clu = clusters[co.num];
+          if(clu == null) {
+            clu = clusters[co.num] = DBIDUtil.newArray();
+          }
+          clu.add(it);
+        }
+        LOG.incrementProcessed(pprog);
+      }
+      LOG.ensureCompleted(pprog);
+      clusterids.destroy();
+
+      Clustering<Model> result = new Clustering<>();
+      Metadata.of(result).setLongName("DBSCAN Clustering");
+      for(int i = NOISE + 1; i < clusters.length; i++) {
+        if(clusters[i] != null) {
+          result.addToplevelCluster(new Cluster<Model>(clusters[i], ClusterModel.CLUSTER));
+        }
+      }
+      if(noise.size() > 0) {
+        result.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
+      }
+      return result;
     }
   }
 
