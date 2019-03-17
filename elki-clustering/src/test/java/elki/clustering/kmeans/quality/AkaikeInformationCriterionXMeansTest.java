@@ -36,14 +36,14 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class AkaikeInformationCriterionTest extends AbstractClusterAlgorithmTest {
+public class AkaikeInformationCriterionXMeansTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testXMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> result = new ELKIBuilder<XMeans<DoubleVector, ?>>(XMeans.class) //
         .with(XMeans.Parameterizer.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
-        .with(XMeans.Parameterizer.INFORMATION_CRITERION_ID, AkaikeInformationCriterion.class) //
+        .with(XMeans.Parameterizer.INFORMATION_CRITERION_ID, AkaikeInformationCriterionXMeans.class) //
         .with(KMeans.SEED_ID, 0) // // Initializer seed
         .with(XMeans.Parameterizer.SEED_ID, 0) // // X-means seed
         .build().run(db);
