@@ -29,6 +29,7 @@ import java.util.Random;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.Predefined;
+import elki.clustering.kmeans.quality.BayesianInformationCriterionXMeans;
 import elki.clustering.kmeans.quality.KMeansQualityMeasure;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -256,7 +257,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @return List of new centroids
    */
   protected double[][] splitCentroid(Cluster<? extends MeanModel> parentCluster, Relation<V> relation) {
-    double[] parentCentroid = parentCluster.getModel().getMean();
+    double[] parentCentroid = parentCluster.getModel().getMean().clone(); // Modified!
 
     // Compute size of cluster/region
     double radius = 0.;
@@ -383,7 +384,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }
 
-      ObjectParameter<KMeansQualityMeasure<V>> informationCriterionP = new ObjectParameter<>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class);
+      ObjectParameter<KMeansQualityMeasure<V>> informationCriterionP = new ObjectParameter<>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class);
       if(config.grab(informationCriterionP)) {
         informationCriterion = informationCriterionP.instantiateClass(config);
       }
