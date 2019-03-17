@@ -20,33 +20,43 @@
  */
 package elki.clustering.kmeans.quality;
 
-import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
+import elki.utilities.documentation.Reference;
 
 /**
- * Class for computing the variance in a clustering result (sum-of-squares).
+ * Akaike Information Criterion (AIC).
+ * <p>
+ * Reference:
+ * <p>
+ * The use for k-means was briefly mentioned in:
+ * <p>
+ * D. Pelleg, A. Moore<br>
+ * X-means: Extending K-means with Efficient Estimation on the Number of
+ * Clusters<br>
+ * In: Proceedings of the 17th International Conference on Machine Learning
+ * (ICML 2000)
  *
- * @author Stephan Baier
+ * @author Tibor Goldschwendt
  * @author Erich Schubert
- * @since 0.6.0
  */
-public class WithinClusterVariance extends AbstractKMeansQualityMeasure<NumberVector> {
+@Reference(authors = "D. Pelleg, A. Moore", //
+    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+    bibkey = "DBLP:conf/icml/PellegM00")
+public class AkaikeInformationCriterionXMeans extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    double variance = 0.;
-    for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
-      variance += varianceContributionOfCluster(cluster, distanceFunction, relation);
-    }
-    return variance;
+    return BayesianInformationCriterionXMeans.logLikelihoodXMeans(relation, clustering, distanceFunction) - numberOfFreeParameters(relation, clustering);
   }
 
   @Override
   public boolean isBetter(double currentCost, double bestCost) {
     // Careful: bestCost may be NaN!
-    return !(currentCost >= bestCost);
+    return !(currentCost <= bestCost);
   }
 }

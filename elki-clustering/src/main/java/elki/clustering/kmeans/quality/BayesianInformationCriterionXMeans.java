@@ -32,45 +32,49 @@ import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
- * Different version of the BIC criterion.
+ * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
+ * SBIC) for the use with evaluating k-means results.
+ * <p>
+ * This version tries to be close to the version used in X-means, although
+ * people have argued that there are errors in this formulation.
  * <p>
  * Reference:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti<br>
- * Knee Point Detection on Bayesian Information Criterion<br>
- * 20th IEEE International Conference on Tools with Artificial Intelligence
+ * D. Pelleg, A. Moore:<br>
+ * X-means: Extending K-means with Efficient Estimation on the Number of
+ * Clusters<br>
+ * Proc. 17th Int. Conf. on Machine Learning (ICML 2000)
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
- * @since 0.7.0
  */
-@Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
-    title = "Knee Point Detection on Bayesian Information Criterion", //
-    booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-    url = "https://doi.org/10.1109/ICTAI.2008.154", //
-    bibkey = "DBLP:conf/ictai/ZhaoXF08")
-public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasure<NumberVector> {
+@Reference(authors = "D. Pelleg, A. Moore", //
+    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+    booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps", //
+    bibkey = "DBLP:conf/icml/PellegM00")
+public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    final int dim = RelationUtil.dimensionality(relation);
-    return logLikelihoodZhao(relation, clustering, distanceFunction) //
-        - (.5 * clustering.getAllClusters().size()) * FastMath.log(numPoints(clustering)) * (dim + 1);
+    return logLikelihoodXMeans(relation, clustering, distanceFunction) //
+        - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
   }
 
   /**
    * Computes log likelihood of an entire clustering.
    * <p>
-   * Version as used by Zhao et al.
+   * Version as used in the X-means publication.
    *
    * @param relation Data relation
    * @param clustering Clustering
    * @param distanceFunction Distance function
    * @return Log Likelihood.
    */
-  public static double logLikelihoodZhao(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distanceFunction) {
+  public static double logLikelihoodXMeans(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();
@@ -79,6 +83,8 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
     int n = 0;
     // cluster sizes
     int[] n_i = new int[m];
+    // total variance
+    double d = 0.;
     // variances
     double[] d_i = new double[m];
 
@@ -87,21 +93,28 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
     for(int i = 0; it.hasNext(); ++i) {
       Cluster<? extends MeanModel> cluster = it.next();
       n += n_i[i] = cluster.size();
-      // Note: the paper used 1/(n-m) but that is probably a typo
-      // as it will cause divisions by zero.
-      d_i[i] = varianceContributionOfCluster(cluster, distanceFunction, relation) / (double) n_i[i];
+      d += d_i[i] = varianceContributionOfCluster(cluster, distanceFunction, relation);
     }
 
-    final int dim = RelationUtil.dimensionality(relation);
+    // No remaining variance, if every point is on its own:
+    if(n <= m) {
+      return Double.NEGATIVE_INFINITY;
+    }
 
+    // Total variance (corrected for bias)
+    final double logv = FastMath.log(d / (n - m));
+
+    final int dim = RelationUtil.dimensionality(relation);
     // log likelihood of this clustering
     double logLikelihood = 0.;
+
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i] / (double) n) // ni log ni/n
-          - n_i[i] * dim * .5 * MathUtil.LOGTWOPI // ni*d/2 log2pi
-          - n_i[i] * .5 * FastMath.log(d_i[i]) // ni/2 log sigma_i
-          - (n_i[i] - m) * .5; // (ni-m)/2
+      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Post. entropy Rn log Rn
+          - n_i[i] * .5 * MathUtil.LOGTWOPI // Rn/2 log2pi
+          - n_i[i] * dim * .5 * logv // Rn M/2 log sigma^2
+          - (d_i[i] - m) * .5 // (Rn-K)/2
+          - n_i[i] * FastMath.log(n); // Prior entropy, sum_i Rn log R
     }
     return logLikelihood;
   }
