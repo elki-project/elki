@@ -28,9 +28,9 @@ import elki.database.relation.RelationUtil;
 
 /**
  * Class to compute the centroid of some data.
- * 
+ * <p>
  * This is a more numerically stable approach than simply taking the sum divided
- * by the count.
+ * by the count repeatedly, and allows weighting.
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -164,11 +164,8 @@ public class Centroid implements NumberVector {
       }
       count += 1;
     }
-    if(count == 0) {
-      return c;
-    }
-    for(int i = 0; i < dim; i++) {
-      elems[i] /= count;
+    if(count > 0) {
+      VMath.timesEquals(elems, 1. / count);
     }
     c.wsum = count;
     return c;

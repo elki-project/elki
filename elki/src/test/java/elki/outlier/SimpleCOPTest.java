@@ -41,7 +41,7 @@ public class SimpleCOPTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<SimpleCOP<DoubleVector>>(SimpleCOP.class) //
         .with(SimpleCOP.Parameterizer.K_ID, 55).build().run(db);
-    testAUC(db, "Noise", result, 0.82323);
+    testAUC(db, "Noise", result, 0.8461333);
     testSingleScore(result, 416, 0.28814843615);
   }
 }

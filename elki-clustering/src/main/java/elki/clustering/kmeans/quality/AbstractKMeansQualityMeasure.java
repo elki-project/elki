@@ -30,7 +30,6 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.data.model.MeanModel;
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -100,19 +99,25 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @return Cluster variance
    */
   public static double varianceContributionOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistance<?> distanceFunction, Relation<? extends NumberVector> relation) {
+    if(cluster.size() <= 1) {
+      return 0.;
+    }
     MeanModel model = cluster.getModel();
+    double v = 0;
     if(model instanceof KMeansModel) {
-      return ((KMeansModel) model).getVarianceContribution();
+      v = ((KMeansModel) model).getVarianceContribution();
+      // Some k-means variants do not provide this value!
+      if(!Double.isNaN(v)) {
+        return v;
+      }
     }
     // Re-compute:
-    DBIDs ids = cluster.getIDs();
     DoubleVector mean = DoubleVector.wrap(model.getMean());
-
     boolean squared = distanceFunction.isSquared();
     double variance = 0.;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
       double dist = distanceFunction.distance(relation.get(iter), mean);
-      variance += squared ? dist : dist * dist;
+      variance += squared ? dist : (dist * dist);
     }
     return variance;
   }

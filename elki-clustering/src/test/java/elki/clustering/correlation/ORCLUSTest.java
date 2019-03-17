@@ -52,8 +52,8 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
         .with(ORCLUS.Parameterizer.L_ID, 1) //
         .with(ORCLUS.Parameterizer.SEED_ID, 1) //
         .build().run(db);
-    testFMeasure(db, result, 0.627537295);
-    testClusterSizes(result, new int[] { 25, 34, 391 });
+    testFMeasure(db, result, 0.62504);
+    testClusterSizes(result, new int[] { 28, 33, 389 });
   }
 
   /**

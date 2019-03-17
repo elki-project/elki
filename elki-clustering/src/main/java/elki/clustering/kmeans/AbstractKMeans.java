@@ -187,6 +187,18 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   /**
+   * Similar to VMath.plusEquals, but for sparse number vectors.
+   *
+   * @param sum Aggregation array
+   * @param vec Vector to add
+   */
+  public static void sparsePlusEquals(double[] mean, SparseNumberVector vec) {
+    for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
+      mean[vec.iterDim(j)] += vec.iterDoubleValue(j);
+    }
+  }
+
+  /**
    * Similar to VMath.minusEquals, but accepts a number vector.
    *
    * @param sum Aggregation array
@@ -231,17 +243,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
         newMeans[i] = means[i];
         continue;
       }
-      DBIDIter iter = list.iter();
-      // Initialize with first.
-      double[] mean = relation.get(iter).toArray();
-      // Update with remaining instances
-      for(iter.advance(); iter.valid(); iter.advance()) {
-        SparseNumberVector vec = relation.get(iter);
-        for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
-          mean[vec.iterDim(j)] += vec.iterDoubleValue(j);
-        }
+      double[] mean = new double[means[i].length];
+      // Add remaining vectors (sparse):
+      for(DBIDIter iter = list.iter(); iter.valid(); iter.advance()) {
+        sparsePlusEquals(mean, relation.get(iter));
       }
-      newMeans[i] = timesEquals(mean, 1.0 / list.size());
+      newMeans[i] = timesEquals(mean, 1. / list.size());
     }
     return newMeans;
   }
@@ -508,6 +515,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       for(ModifiableDBIDs cluster : clusters) {
         cluster.clear();
       }
+      boolean issquared = isSquared();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY;
         NumberVector fv = relation.get(iditer);
@@ -519,7 +527,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
             mindist = dist;
           }
         }
-        varsum[minIndex] += mindist;
+        varsum[minIndex] += issquared ? mindist : (mindist * mindist);
         clusters.get(minIndex).add(iditer);
         if(assignment.putInt(iditer, minIndex) != minIndex) {
           ++changed;
@@ -605,7 +613,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
       Clustering<KMeansModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Means Clustering");
-      if (relation.size() <= 0) {
+      if(relation.size() <= 0) {
         return result;
       }
       if(!varstat) {
