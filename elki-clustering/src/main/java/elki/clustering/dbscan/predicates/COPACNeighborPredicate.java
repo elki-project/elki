@@ -141,15 +141,13 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
   protected COPACModel computeLocalModel(DBIDRef id, DoubleDBIDList knnneighbors, Relation<V> relation) {
     PCAResult epairs = settings.pca.processIds(knnneighbors, relation);
     int pdim = settings.filter.filter(epairs.getEigenvalues());
-    PCAFilteredResult pcares = new PCAFilteredResult(epairs.getEigenPairs(), pdim, 1., 0.);
-
-    double[][] mat = pcares.similarityMatrix();
     double[] vecP = relation.get(id).toArray();
     if(pdim == vecP.length) {
       // Full dimensional - noise!
       return new COPACModel(pdim, DBIDUtil.EMPTYDBIDS);
     }
 
+    double[][] mat = new PCAFilteredResult(epairs.getEigenPairs(), pdim, 1., 0.).similarityMatrix();
     // Check which neighbors survive
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet();
     for(DBIDIter neighbor = relation.iterDBIDs(); neighbor.valid(); neighbor.advance()) {

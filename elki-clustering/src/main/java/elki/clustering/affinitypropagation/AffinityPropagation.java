@@ -46,6 +46,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -126,77 +127,17 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
 
     int[] assignment = new int[size];
     double[][] s = initialization.getSimilarityMatrix(db, relation, ids);
-    double[][] r = new double[size][size];
-    double[][] a = new double[size][size];
+    double[][] r = new double[size][size], a = new double[size][size];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Affinity Propagation Iteration", LOG) : null;
     MutableProgress aprog = LOG.isVerbose() ? new MutableProgress("Stable assignments", size + 1, LOG) : null;
 
     int inactive = 0;
     for(int iteration = 0; iteration < maxiter && inactive < convergence; iteration++) {
-      // Update responsibility matrix:
-      for(int i = 0; i < size; i++) {
-        double[] ai = a[i], ri = r[i], si = s[i];
-        // Find the two largest values (as initially maxk == i)
-        double max1 = Double.NEGATIVE_INFINITY, max2 = Double.NEGATIVE_INFINITY;
-        int maxk = -1;
-        for(int k = 0; k < size; k++) {
-          double val = ai[k] + si[k];
-          if(val > max1) {
-            max2 = max1;
-            max1 = val;
-            maxk = k;
-          }
-          else if(val > max2) {
-            max2 = val;
-          }
-        }
-        // With the maximum value known, update r:
-        for(int k = 0; k < size; k++) {
-          double val = si[k] - ((k != maxk) ? max1 : max2);
-          ri[k] = ri[k] * lambda + val * (1. - lambda);
-        }
-      }
-      // Update availability matrix
-      for(int k = 0; k < size; k++) {
-        // Compute sum of max(0, r_ik) for all i.
-        // For r_kk, don't apply the max.
-        double colposum = 0.;
-        for(int i = 0; i < size; i++) {
-          if(i == k || r[i][k] > 0.) {
-            colposum += r[i][k];
-          }
-        }
-        for(int i = 0; i < size; i++) {
-          double val = colposum;
-          // Adjust column sum by the one extra term.
-          if(i == k || r[i][k] > 0.) {
-            val -= r[i][k];
-          }
-          if(i != k && val > 0.) { // min
-            val = 0.;
-          }
-          a[i][k] = a[i][k] * lambda + val * (1 - lambda);
-        }
-      }
-      int changed = 0;
-      for(int i = 0; i < size; i++) {
-        double[] ai = a[i], ri = r[i];
-        double max = Double.NEGATIVE_INFINITY;
-        int maxj = -1;
-        for(int j = 0; j < size; j++) {
-          double v = ai[j] + ri[j];
-          if(v > max || (i == j && v >= max)) {
-            max = v;
-            maxj = j;
-          }
-        }
-        if(assignment[i] != maxj) {
-          changed += 1;
-          assignment[i] = maxj;
-        }
-      }
-      inactive = (changed > 0) ? 0 : (inactive + 1);
+      updateResponsibilities(s, a, r);
+      updateAvailabilities(r, a);
+      int changed = updateAssignment(r, a, assignment);
+      inactive = changed > 0 ? 0 : (inactive + 1);
       LOG.incrementProcessed(prog);
       if(aprog != null) {
         aprog.setProcessed(size - changed, LOG);
@@ -206,7 +147,111 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
       aprog.setProcessed(aprog.getTotal(), LOG);
     }
     LOG.setCompleted(prog);
-    // Cluster map, by lead object
+    return buildResult(ids, assignment);
+  }
+
+  /**
+   * Update the responsibility matrix
+   *
+   * @param s Similarities
+   * @param a Availability
+   * @param r Responsibilities
+   */
+  private void updateResponsibilities(double[][] s, double[][] a, double[][] r) {
+    final int size = r.length;
+    for(int i = 0; i < size; i++) {
+      double[] ai = a[i], ri = r[i], si = s[i];
+      // Find the two largest values (as initially maxk == i)
+      double max1 = Double.NEGATIVE_INFINITY, max2 = Double.NEGATIVE_INFINITY;
+      int maxk = -1;
+      for(int k = 0; k < size; k++) {
+        double val = ai[k] + si[k];
+        if(val > max1) {
+          max2 = max1;
+          max1 = val;
+          maxk = k;
+        }
+        else if(val > max2) {
+          max2 = val;
+        }
+      }
+      // With the maximum value known, update r:
+      for(int k = 0; k < size; k++) {
+        double val = si[k] - ((k != maxk) ? max1 : max2);
+        ri[k] = ri[k] * lambda + val * (1. - lambda);
+      }
+    }
+  }
+
+  /**
+   * Update availability matrix
+   * 
+   * @param r Responsibilities
+   * @param a Availability
+   */
+  private void updateAvailabilities(double[][] r, double[][] a) {
+    final int size = r.length;
+    for(int k = 0; k < size; k++) {
+      // Compute sum of max(0, r_ik) for all i.
+      // For r_kk, don't apply the max.
+      double colposum = 0.;
+      for(int i = 0; i < size; i++) {
+        if(i == k || r[i][k] > 0.) {
+          colposum += r[i][k];
+        }
+      }
+      for(int i = 0; i < size; i++) {
+        double val = colposum;
+        // Adjust column sum by the one extra term.
+        if(i == k || r[i][k] > 0.) {
+          val -= r[i][k];
+        }
+        if(i != k && val > 0.) { // min
+          val = 0.;
+        }
+        a[i][k] = a[i][k] * lambda + val * (1 - lambda);
+      }
+    }
+  }
+
+  /**
+   * Update the cluster assignment.
+   *
+   * @param r Responsibilities
+   * @param a Affinities
+   * @param assignment Assignment storage
+   * @return Number of changed entries
+   */
+  private int updateAssignment(double[][] r, double[][] a, int[] assignment) {
+    final int size = r.length;
+    int changed = 0;
+    for(int i = 0; i < size; i++) {
+      double[] ai = a[i], ri = r[i];
+      double max = Double.NEGATIVE_INFINITY;
+      int maxj = -1;
+      for(int j = 0; j < size; j++) {
+        double v = ai[j] + ri[j];
+        if(v > max || (i == j && v >= max)) {
+          max = v;
+          maxj = j;
+        }
+      }
+      if(assignment[i] != maxj) {
+        changed += 1;
+        assignment[i] = maxj;
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Build an int to DBIDs lookup for the clusters.
+   *
+   * @param ids DBIDs
+   * @param assignment Cluster assignment
+   * @return Index
+   */
+  private Int2ObjectOpenHashMap<ModifiableDBIDs> makeClusterMap(ArrayDBIDs ids, int[] assignment) {
     Int2ObjectOpenHashMap<ModifiableDBIDs> map = new Int2ObjectOpenHashMap<>();
     DBIDArrayIter i1 = ids.iter();
     for(int i = 0; i1.valid(); i1.advance(), i++) {
@@ -235,8 +280,21 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
         iter.remove();
       }
     }
+    return map;
+  }
+
+  /**
+   * Build the clustering result.
+   *
+   * @param ids DBIDs
+   * @param assignment Assignment index
+   * @return Clustering
+   */
+  private Clustering<MedoidModel> buildResult(ArrayDBIDs ids, int[] assignment) {
+    Int2ObjectOpenHashMap<ModifiableDBIDs> map = makeClusterMap(ids, assignment);
 
     Clustering<MedoidModel> clustering = new Clustering<>();
+    DBIDArrayIter i1 = ids.iter();
     Metadata.of(clustering).setLongName("Affinity Propagation Clustering");
     ModifiableDBIDs noise = DBIDUtil.newArray();
     for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
