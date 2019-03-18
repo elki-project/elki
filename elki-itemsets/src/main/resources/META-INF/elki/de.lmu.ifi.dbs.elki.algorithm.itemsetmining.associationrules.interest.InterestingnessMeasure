@@ -1,11 +1,17 @@
-de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Confidence
-de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Lift
-de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Leverage
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.AddedValue
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.CertaintyFactor Loevinger
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Confidence
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Conviction
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Cosine
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.GiniIndex
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Jaccard
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.JMeasure
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Klosgen
-de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Jaccard
-de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Cosine
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.LaplaceCorrectedConfidence
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Leverage
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Lift
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.OddsRatio
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.PhiCorrelationCoefficient
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.SebagSchonauer
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.YulesQ
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.YulesY
