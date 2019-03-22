@@ -333,7 +333,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     /**
      * Number of distance computations
      */
-    private long diststat = 0;
+    protected long diststat = 0;
 
     /**
      * Distance function.

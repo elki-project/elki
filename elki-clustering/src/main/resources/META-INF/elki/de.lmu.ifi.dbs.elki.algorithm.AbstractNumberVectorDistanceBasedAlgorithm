@@ -8,6 +8,8 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSimplifiedElkan
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans lloyd forgy
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansKDTreeFiltering
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansKDTreePruning
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMinusMinus
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
