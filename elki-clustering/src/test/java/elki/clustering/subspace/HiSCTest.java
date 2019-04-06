@@ -44,7 +44,7 @@ public class HiSCTest extends AbstractClusterAlgorithmTest {
         .with(HiSC.Parameterizer.ALPHA_ID, 0.05) //
         .with(HiSC.Parameterizer.K_ID, 5) //
         .build().run(db);
-    testFMeasure(db, result, .7364473);
-    testClusterSizes(result, new int[] { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 8, 14, 17, 78, 178, 201, 401 });
+    testFMeasure(db, result, .73859);
+    testClusterSizes(result, new int[] { 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 9, 15, 17, 80, 178, 200, 402 });
   }
 }
