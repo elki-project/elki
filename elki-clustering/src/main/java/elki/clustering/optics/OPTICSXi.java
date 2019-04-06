@@ -31,7 +31,6 @@ import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.ids.*;
-import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -49,7 +48,10 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Extract clusters from OPTICS Plots using the original Xi extraction.
+ * Extract clusters from OPTICS plots using the original &xi; (Xi) extraction,
+ * which defines steep areas if the reachability drops below 1-&xi;,
+ * respectively increases to 1+&xi;, of the current value, then constructs
+ * valleys that begin with a steep down, and end with a matching steep up area.
  * <p>
  * Note: this implementation includes an additional filter step that prunes
  * elements from a steep up area that don't have the predecessor in the cluster.
@@ -140,13 +142,14 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     this(optics, xi, false, false);
   }
 
-  public Clustering<OPTICSModel> run(Database database, Relation<?> relation) {
-    // TODO: ensure we are using the same relation?
-    ClusterOrder opticsresult = optics.run(database);
-    if(LOG.isVerbose()) {
-      LOG.verbose("Extracting clusters with Xi: " + xi);
-    }
-    return extractClusters(opticsresult, relation, 1.0 - xi, optics.getMinPts());
+  /**
+   * Run the algorithm.
+   *
+   * @param database Database to run on
+   * @return Clustering
+   */
+  public Clustering<OPTICSModel> run(Database database) {
+    return extractClusters(optics.run(database), 1.0 - xi, optics.getMinPts());
   }
 
   /**
@@ -157,31 +160,19 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * @param ixi Parameter 1 - Xi
    * @param minpts Parameter minPts
    */
-  private Clustering<OPTICSModel> extractClusters(ClusterOrder clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
+  private Clustering<OPTICSModel> extractClusters(ClusterOrder clusterOrderResult, double ixi, int minpts) {
     ArrayDBIDs clusterOrder = clusterOrderResult.ids;
+    DBIDArrayIter iter = clusterOrder.iter();
     DoubleDataStore reach = clusterOrderResult.reachability;
+    ClusterHierarchyBuilder builder = new ClusterHierarchyBuilder(clusterOrder);
 
-    DBIDArrayIter tmp = clusterOrder.iter();
-    DBIDVar tmp2 = DBIDUtil.newVar();
     double mib = 0.0;
     List<SteepArea> salist = keepsteep ? new ArrayList<SteepArea>() : null;
     List<SteepDownArea> sdaset = new ArrayList<>();
-    final Clustering<OPTICSModel> clustering = new Clustering<>();
-    Metadata.of(clustering).setLongName("OPTICS Xi-Clusters");
-    HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
-    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
-    FiniteProgress scanprog = LOG.isVerbose() ? new FiniteProgress("OPTICS Xi cluster extraction", clusterOrder.size(), LOG) : null;
     for(SteepScanPosition scan = new SteepScanPosition(clusterOrderResult); scan.hasNext();) {
-      if(scanprog != null) {
-        scanprog.setProcessed(scan.index, LOG);
-      }
       // Update maximum-inbetween
       mib = MathUtil.max(mib, scan.getReachability());
-      // The last point cannot be the start of a steep area.
-      if(!scan.next.valid()) {
-        break;
-      }
       // Xi-steep down area
       if(scan.steepDown(ixi)) {
         // Update mib values with current mib and filter
@@ -193,11 +184,10 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
           // still steep - continue.
           if(scan.steepDown(ixi)) {
             endsteep = scan.index;
-            continue;
           }
           // Not going downward at all - stop here.
           // Always stop looking after minpts "flat" steps.
-          if(!scan.steepDown(1.0) || scan.index - endsteep > minpts) {
+          else if(!scan.steepDown(1.0) || scan.index - endsteep > minpts) {
             break;
           }
         }
@@ -215,10 +205,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       if(scan.steepUp(ixi)) {
         // Update mib values with current mib and filter
         updateFilterSDASet(mib, sdaset, ixi);
-        final SteepUpArea sua;
         // Compute steep-up area
+        int startsteep = scan.index, endsteep = scan.index;
         {
-          int startsteep = scan.index, endsteep = scan.index;
           mib = scan.getReachability();
           double esuccr = scan.getNextReachability();
           // Find end of steep-up-area, eventually updating mib again
@@ -229,88 +218,64 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
               endsteep = scan.index;
               mib = scan.getReachability();
               esuccr = scan.getNextReachability();
-              continue;
             }
             // Not going upward - stop here.
             // Stop looking after minpts non-up steps.
-            if(!scan.steepUp(1.0) || scan.index - endsteep > minpts) {
+            else if(!scan.steepUp(1.0) || scan.index - endsteep > minpts) {
               break;
             }
+          }
+          if(LOG.isDebuggingFinest()) {
+            LOG.debugFinest("New steep up area: " + startsteep + "-" + endsteep + " max:" + esuccr);
+          }
+          if(salist != null) {
+            salist.add(new SteepUpArea(startsteep, endsteep, esuccr));
           }
           if(Double.isInfinite(esuccr)) {
             scan.next();
           }
-          sua = new SteepUpArea(startsteep, endsteep, esuccr);
-          if(LOG.isDebuggingFinest()) {
-            LOG.debugFinest("New steep up area: " + sua.toString());
-          }
-          if(salist != null) {
-            salist.add(sua);
-          }
         }
         // Validate and computer clusters
-        // LOG.debug("SDA size:"+sdaset.size()+" "+sdaset);
         ListIterator<SteepDownArea> sdaiter = sdaset.listIterator(sdaset.size());
         // Iterate backwards for correct hierarchy generation.
         while(sdaiter.hasPrevious()) {
           SteepDownArea sda = sdaiter.previous();
+          // By default, clusters cover both the steep up and steep down area
+          int cstart = sda.getStartIndex(),
+              cend = MathUtil.min(endsteep, clusterOrder.size() - 1);
+          // MST-based filtering technique of Schubert:
+          // ensure that the predecessor is in the current cluster.
+          // This filter removes common artifacts from the Xi method
+          cend = nocorrect ? cend : predecessorFilter(clusterOrderResult, cstart, cend, iter);
+          // Condition 3b: maximum-in-between < end-of-steep-up * ixi
+          double sD = sda.maximum, eU = reach.doubleValue(iter.seek(cend));
           if(LOG.isDebuggingFinest()) {
-            LOG.debugFinest("Comparing: eU=" + mib + " SDA: " + sda.toString());
+            LOG.debugFinest("Comparing: eU=" + eU + " SDA: " + sda.toString());
           }
-          // Condition 3b: end-of-steep-up > maximum-in-between lower
-          if(mib * ixi < sda.getMib()) {
+          if(sda.mib > MathUtil.min(sD, eU) * ixi) {
             if(LOG.isDebuggingFinest()) {
-              LOG.debugFinest("mib * ixi = " + mib * ixi + " >= sda.getMib() = " + sda.getMib());
+              LOG.debugFinest("mib = " + sda.mib + " > min(sD, eU) * ixi  = " + MathUtil.min(sD, eU) * ixi);
             }
             continue;
           }
-          // By default, clusters cover both the steep up and steep down area
-          int cstart = sda.getStartIndex(),
-              cend = MathUtil.min(sua.getEndIndex(), clusterOrder.size() - 1);
           // However, we sometimes have to adjust this (Condition 4):
           {
             // Case b)
-            if(sda.getMaximum() * ixi >= sua.getMaximum()) {
-              while(cstart < cend && //
-                  reach.doubleValue(tmp.seek(cstart + 1)) > sua.getMaximum()) {
+            if(sD * ixi >= eU) {
+              while(cstart < cend && reach.doubleValue(iter.seek(cstart + 1)) * ixi > eU) {
                 cstart++;
               }
             }
             // Case c)
-            else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
-              while(cend > cstart && //
-                  reach.doubleValue(tmp.seek(cend - 1)) > sda.getMaximum()) {
+            else if(eU * ixi >= sD) {
+              while(cend > cstart && reach.doubleValue(iter.seek(cend)) * ixi > sD) {
                 cend--;
               }
             }
             // Case a) is the default
           }
-          // MST-based filtering technique of Schubert:
-          // ensure that the predecessor is in the current cluster.
-          // This filter removes common artifacts from the Xi method
-          if(!nocorrect) {
-            double startval = clusterOrderResult.reachability.doubleValue(tmp.seek(cstart));
-            simplify: while(cend > cstart) {
-              tmp.seek(cend);
-              // If the reachability is less than the first points', then there
-              // must be some point inbetween that "reached" the current point.
-              if(clusterOrderResult.reachability.doubleValue(tmp) < startval) {
-                break simplify;
-              }
-              clusterOrderResult.predecessor.assignVar(tmp, tmp2);
-              // "Slow" search for predecessor:
-              for(int i = cstart; i < cend; i++) {
-                if(DBIDUtil.equal(tmp2, tmp.seek(i))) {
-                  break simplify;
-                }
-              }
-              // Not found, prune the last point
-              if(LOG.isDebuggingFinest()) {
-                LOG.debugFinest("Pruned one point by predecessor rule.");
-              }
-              --cend;
-            }
-          }
+          // Filter again, mostly in case we modified cstart
+          cend = nocorrect ? cend : predecessorFilter(clusterOrderResult, cstart, cend, iter);
           // Condition 3a: obey minpts
           if(cend - cstart + 1 < minpts) {
             if(LOG.isDebuggingFinest()) {
@@ -319,56 +284,60 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             continue;
           }
           // Build the cluster
-          ModifiableDBIDs dbids = DBIDUtil.newArray();
-          for(int idx = cstart; idx <= cend; idx++) {
-            tmp.seek(idx);
-            // Collect only unclaimed IDs.
-            if(unclaimedids.remove(tmp)) {
-              dbids.add(tmp);
-            }
-          }
-          if(LOG.isDebuggingFine()) {
-            LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cend - cstart + 1));
-          }
-          OPTICSModel model = new OPTICSModel(cstart, cend);
-          Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
-          // Build the hierarchy
-          for(Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator(); iter.hasNext();) {
-            Cluster<OPTICSModel> clus = iter.next();
-            OPTICSModel omodel = clus.getModel();
-            if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
-              clustering.addChildCluster(cluster, clus);
-              iter.remove(); // Not a top-level cluster
-            }
-          }
-          curclusters.add(cluster);
+          builder.addCluster(iter, cstart, cend);
         }
         continue;
       }
       // Flat - advance anyway.
       scan.next();
     }
-    if(scanprog != null) {
-      scanprog.setProcessed(clusterOrder.size(), LOG);
-    }
-    if(!unclaimedids.isEmpty()) {
-      boolean noise = reach.doubleValue(tmp.seek(clusterOrder.size() - 1)) >= Double.POSITIVE_INFINITY;
-      Cluster<OPTICSModel> allcluster = new Cluster<>(noise ? "Noise" : "Cluster", unclaimedids, noise, new OPTICSModel(0, clusterOrder.size() - 1));
-      for(Cluster<OPTICSModel> cluster : curclusters) {
-        clustering.addChildCluster(allcluster, cluster);
-      }
-      clustering.addToplevelCluster(allcluster);
-    }
-    else {
-      for(Cluster<OPTICSModel> cluster : curclusters) {
-        clustering.addToplevelCluster(cluster);
-      }
-    }
+    Clustering<OPTICSModel> clustering = builder.build(clusterOrderResult, iter);
     Metadata.hierarchyOf(clustering).addChild(clusterOrderResult);
     if(salist != null) {
       Metadata.hierarchyOf(clusterOrderResult).addChild(new SteepAreaResult(salist));
     }
     return clustering;
+  }
+
+  /**
+   * Filtering step to remove bad tailing points from the clusters.
+   * <p>
+   * Erich Schubert, Michael Gertz<br>
+   * Improving the Cluster Structure Extracted from OPTICS Plots<br>
+   * Proc. Lernen, Wissen, Daten, Analysen (LWDA 2018)
+   *
+   * @param clusterOrderResult Cluster order
+   * @param cstart Cluster start
+   * @param cend Cluster end
+   * @param tmp Cluster order iterator
+   * @param tmp2 Temp variable
+   * @return New end position
+   */
+  private static int predecessorFilter(ClusterOrder clusterOrderResult, int cstart, int cend, DBIDArrayIter tmp) {
+    double startval = clusterOrderResult.reachability.doubleValue(tmp.seek(cstart));
+    DBIDVar tmp2 = null;
+    simplify: while(cend > cstart) {
+      tmp.seek(cend);
+      // If the reachability is less than the first points', then there
+      // must be some point inbetween that "reached" the current point.
+      if(clusterOrderResult.reachability.doubleValue(tmp) < startval) {
+        break simplify;
+      }
+      tmp2 = tmp2 != null ? tmp2 : DBIDUtil.newVar(); // Lazy init
+      clusterOrderResult.predecessor.assignVar(tmp, tmp2);
+      // "Slow" search for predecessor:
+      for(int i = cstart; i < cend; i++) {
+        if(DBIDUtil.equal(tmp2, tmp.seek(i))) {
+          break simplify;
+        }
+      }
+      // Not found, prune the last point
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest("Pruned one point by predecessor rule.");
+      }
+      --cend;
+    }
+    return cend;
   }
 
   /**
@@ -381,26 +350,105 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     Iterator<SteepDownArea> iter = sdaset.iterator();
     while(iter.hasNext()) {
       SteepDownArea sda = iter.next();
-      if(sda.getMaximum() * ixi <= mib) {
+      if(sda.maximum * ixi <= mib) {
         iter.remove();
       }
-      else {
-        // Update
-        if(mib > sda.getMib()) {
-          sda.setMib(mib);
-        }
+      else if(mib > sda.mib) {
+        sda.mib = mib;
       }
     }
   }
 
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return optics.getInputTypeRestriction();
-  }
+  /**
+   * Class to build the hierarchical clustering result structure.
+   * 
+   * @author Erich Schubert
+   */
+  private static class ClusterHierarchyBuilder {
+    /**
+     * ELKI clustering object
+     */
+    Clustering<OPTICSModel> clustering;
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
+    /**
+     * Current "unattached" clusters.
+     */
+    HashSet<Cluster<OPTICSModel>> curclusters;
+
+    /**
+     * Unclaimed objects that will be assigned to a top level or noise cluster
+     * in the end.
+     */
+    HashSetModifiableDBIDs unclaimedids;
+
+    /**
+     * Constructor.
+     *
+     * @param ids All object ids (arbitrary order)
+     */
+    public ClusterHierarchyBuilder(DBIDs ids) {
+      clustering = new Clustering<>();
+      curclusters = new HashSet<>();
+      unclaimedids = DBIDUtil.newHashSet(ids);
+    }
+
+    /**
+     * Build a cluster object.
+     *
+     * @param tmp DBID array iterator
+     * @param cstart Interval start
+     * @param cend Interval end
+     */
+    private void addCluster(DBIDArrayIter tmp, int cstart, int cend) {
+      ModifiableDBIDs dbids = DBIDUtil.newArray();
+      for(int idx = cstart; idx <= cend; idx++) {
+        tmp.seek(idx);
+        // Collect only unclaimed IDs.
+        if(unclaimedids.remove(tmp)) {
+          dbids.add(tmp);
+        }
+      }
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cend - cstart + 1));
+      }
+      OPTICSModel model = new OPTICSModel(cstart, cend);
+      Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
+      // Build the hierarchy
+      for(Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator(); iter.hasNext();) {
+        Cluster<OPTICSModel> clus = iter.next();
+        OPTICSModel omodel = clus.getModel();
+        if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
+          clustering.addChildCluster(cluster, clus);
+          iter.remove(); // Not a top-level cluster
+        }
+      }
+      curclusters.add(cluster);
+    }
+
+    /**
+     * Build the main clustering result.
+     *
+     * @param clusterOrder Cluster order
+     * @param iter Array iterator for the cluster order
+     * @return Clustering
+     */
+    private Clustering<OPTICSModel> build(ClusterOrder clusterOrder, DBIDArrayIter iter) {
+      if(!unclaimedids.isEmpty()) {
+        boolean noise = Double.isInfinite(clusterOrder.getReachability(iter.seek(clusterOrder.size() - 1)));
+        Cluster<OPTICSModel> allcluster = new Cluster<>(noise ? "Noise" : "Cluster", unclaimedids, noise, new OPTICSModel(0, clusterOrder.size() - 1));
+        for(Cluster<OPTICSModel> cluster : curclusters) {
+          clustering.addChildCluster(allcluster, cluster);
+        }
+        clustering.addToplevelCluster(allcluster);
+      }
+      else {
+        for(Cluster<OPTICSModel> cluster : curclusters) {
+          clustering.addToplevelCluster(cluster);
+        }
+      }
+      Metadata.of(clustering).setLongName("OPTICS Xi-Clusters");
+      return clustering;
+    }
   }
 
   /**
@@ -425,6 +473,11 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     private DBIDArrayIter cur, next;
 
     /**
+     * Progress for logging.
+     */
+    private FiniteProgress prog;
+
+    /**
      * Constructor.
      *
      * @param co Cluster order
@@ -438,6 +491,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       if(next.valid()) {
         next.advance();
       }
+      this.prog = LOG.isVerbose() ? new FiniteProgress("OPTICS Xi cluster extraction", co.size(), LOG) : null;
     }
 
     /**
@@ -447,6 +501,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       index++;
       cur.advance();
       next.advance();
+      LOG.incrementProcessed(prog);
     }
 
     /**
@@ -455,6 +510,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      * @return end of cluster order
      */
     public boolean hasNext() {
+      if(index == co.size()) {
+        LOG.ensureCompleted(prog);
+      }
       return index < co.size();
     }
 
@@ -465,13 +523,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      * @return truth value
      */
     public boolean steepUp(double ixi) {
-      if(co.reachability.doubleValue(cur) >= Double.POSITIVE_INFINITY) {
-        return false;
-      }
-      if(!next.valid()) {
-        return true;
-      }
-      return co.reachability.doubleValue(cur) <= co.reachability.doubleValue(next) * ixi;
+      final double creach = co.reachability.doubleValue(cur);
+      return creach < Double.POSITIVE_INFINITY && //
+          (!next.valid() || creach <= co.reachability.doubleValue(next) * ixi);
     }
 
     /**
@@ -481,13 +535,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      * @return truth value
      */
     public boolean steepDown(double ixi) {
-      if(!next.valid()) {
-        return false;
-      }
-      if(co.reachability.doubleValue(next) >= Double.POSITIVE_INFINITY) {
-        return false;
-      }
-      return co.reachability.doubleValue(cur) * ixi >= co.reachability.doubleValue(next);
+      final double nreach = getNextReachability();
+      return nreach < Double.POSITIVE_INFINITY && //
+          nreach <= co.reachability.doubleValue(cur) * ixi;
     }
 
     /**
@@ -505,7 +555,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      * @return Reachability
      */
     public double getNextReachability() {
-      return (next.valid()) ? co.reachability.doubleValue(next) : Double.POSITIVE_INFINITY;
+      return next.valid() ? co.reachability.doubleValue(next) : Double.POSITIVE_INFINITY;
     }
   }
 
@@ -518,17 +568,17 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     /**
      * Start index of steep area
      */
-    private int startindex;
+    int startindex;
 
     /**
      * End index of steep area
      */
-    private int endindex;
+    int endindex;
 
     /**
      * Maximum value
      */
-    private double maximum;
+    double maximum;
 
     /**
      * Constructor.
@@ -561,16 +611,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     public int getEndIndex() {
       return endindex;
     }
-
-    /**
-     * Get the start value = maximum value
-     *
-     * @return the starting value
-     */
-    public double getMaximum() {
-      return maximum;
-    }
-
   }
 
   /**
@@ -580,9 +620,10 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    */
   public static class SteepDownArea extends SteepArea {
     /**
-     * Maximum in-between value
+     * Maximum in-between value (updated in
+     * {@link OPTICSXi#updateFilterSDASet}).
      */
-    private double mib;
+    double mib;
 
     /**
      * Constructor
@@ -597,27 +638,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       this.mib = mib;
     }
 
-    /**
-     * Get the maximum in-between value
-     *
-     * @return the mib value
-     */
-    public double getMib() {
-      return mib;
-    }
-
-    /**
-     * Update the maximum in-between value
-     *
-     * @param mib the mib to set
-     */
-    public void setMib(double mib) {
-      this.mib = mib;
-    }
-
     @Override
     public String toString() {
-      return "SteepDownArea(" + getStartIndex() + " - " + getEndIndex() + ", max=" + getMaximum() + ", mib=" + mib + ")";
+      return "SteepDownArea(" + getStartIndex() + " - " + getEndIndex() + ", max=" + maximum + ", mib=" + mib + ")";
     }
   }
 
@@ -640,12 +663,12 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     @Override
     public String toString() {
-      return "SteepUpArea(" + getStartIndex() + " - " + getEndIndex() + ", max=" + getMaximum() + ")";
+      return "SteepUpArea(" + getStartIndex() + " - " + getEndIndex() + ", max=" + maximum + ")";
     }
   }
 
   /**
-   * Result containing the chi-steep areas.
+   * Result containing the xi-steep areas.
    *
    * @author Erich Schubert
    *
@@ -667,20 +690,20 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       this.areas = areas;
     }
 
-    // @Override
-    public String getLongName() {
-      return "Xi-Steep areas";
-    }
-
-    // @Override
-    public String getShortName() {
-      return "xi-steep-areas";
-    }
-
     @Override
     public Iterator<SteepArea> iterator() {
       return areas.iterator();
     }
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return optics.getInputTypeRestriction();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 
   /**
