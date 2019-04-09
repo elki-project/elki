@@ -53,8 +53,8 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
-        .with(DeLiClu.Parameterizer.MINPTS_ID, 18) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
+        .with(DeLiClu.Parameterizer.MINPTS_ID, 20) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.05) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class) //
         .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000) //
         .build().run(db);
@@ -65,11 +65,6 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     double score = ct.getPaircount().f1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary.
-    if(Math.abs(score - 0.8771174) < 1e-5) {
-      assertEquals("Score does not match.", 0.8771174, score, 1e-5);
-    }
-    else {
-      assertEquals("Score does not match.", 0.8819664, score, 1e-5);
-    }
+    assertEquals("Score does not match.", 0.891033, score, 1e-5);
   }
 }

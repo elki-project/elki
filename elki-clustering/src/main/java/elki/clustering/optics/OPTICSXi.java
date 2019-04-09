@@ -241,34 +241,34 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         while(sdaiter.hasPrevious()) {
           SteepDownArea sda = sdaiter.previous();
           // By default, clusters cover both the steep up and steep down area
-          int cstart = sda.getStartIndex(),
-              cend = MathUtil.min(endsteep, clusterOrder.size() - 1);
+          int cstart = sda.getStartIndex(), cend = endsteep;
           // MST-based filtering technique of Schubert:
           // ensure that the predecessor is in the current cluster.
           // This filter removes common artifacts from the Xi method
           cend = nocorrect ? cend : predecessorFilter(clusterOrderResult, cstart, cend, iter);
+          // End of steep-up region (use next value)
+          double eU = cend + 1 < clusterOrderResult.size() ? reach.doubleValue(iter.seek(cend + 1)) : Double.POSITIVE_INFINITY;
           // Condition 3b: maximum-in-between < end-of-steep-up * ixi
-          double sD = sda.maximum, eU = reach.doubleValue(iter.seek(cend));
           if(LOG.isDebuggingFinest()) {
             LOG.debugFinest("Comparing: eU=" + eU + " SDA: " + sda.toString());
           }
-          if(sda.mib > MathUtil.min(sD, eU) * ixi) {
+          if(sda.mib > MathUtil.min(sda.maximum, eU) * ixi) {
             if(LOG.isDebuggingFinest()) {
-              LOG.debugFinest("mib = " + sda.mib + " > min(sD, eU) * ixi  = " + MathUtil.min(sD, eU) * ixi);
+              LOG.debugFinest("mib = " + sda.mib + " > min(sD, eU) * ixi  = " + MathUtil.min(sda.maximum, eU) * ixi);
             }
             continue;
           }
           // However, we sometimes have to adjust this (Condition 4):
           {
             // Case b)
-            if(sD * ixi >= eU) {
+            if(sda.maximum * ixi >= eU) {
               while(cstart < cend && reach.doubleValue(iter.seek(cstart + 1)) * ixi > eU) {
                 cstart++;
               }
             }
             // Case c)
-            else if(eU * ixi >= sD) {
-              while(cend > cstart && reach.doubleValue(iter.seek(cend)) * ixi > sD) {
+            else if(eU * ixi >= sda.maximum) {
+              while(cend > cstart && reach.doubleValue(iter.seek(cend)) * ixi > sda.maximum) {
                 cend--;
               }
             }
@@ -314,6 +314,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * @return New end position
    */
   private static int predecessorFilter(ClusterOrder clusterOrderResult, int cstart, int cend, DBIDArrayIter tmp) {
+    if (cend == clusterOrderResult.size()) {
+      return cend;
+    }
     double startval = clusterOrderResult.reachability.doubleValue(tmp.seek(cstart));
     DBIDVar tmp2 = null;
     simplify: while(cend > cstart) {

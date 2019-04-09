@@ -39,12 +39,12 @@ public class FastOPTICSTest extends AbstractClusterAlgorithmTest {
   public void testFastOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
-        .with(OPTICSList.Parameterizer.MINPTS_ID, 18) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.038) //
+        .with(OPTICSList.Parameterizer.MINPTS_ID, 20) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.1) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, FastOPTICS.class) //
         .with(RandomProjectedNeighborsAndDensities.Parameterizer.RANDOM_ID, 0) //
         .build().run(db);
-    testFMeasure(db, clustering, 0.75722304);
-    testClusterSizes(clustering, new int[] { 4, 5, 5, 6, 7, 8, 13, 23, 26, 35, 42, 57, 94, 166, 219 });
+    testFMeasure(db, clustering, 0.856917);
+    testClusterSizes(clustering, new int[] { 4, 4, 5, 6, 7, 7, 10, 15, 23, 25, 26, 57, 73, 191, 257 });
   }
 }
