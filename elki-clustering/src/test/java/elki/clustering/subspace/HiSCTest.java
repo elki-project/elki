@@ -40,11 +40,11 @@ public class HiSCTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
     Clustering<?> result = new ELKIBuilder<OPTICSXi>(OPTICSXi.class) //
         .with(OPTICSXi.Parameterizer.XIALG_ID, HiSC.class) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.1) //
+        .with(OPTICSXi.Parameterizer.XI_ID, 0.5) //
         .with(HiSC.Parameterizer.ALPHA_ID, 0.05) //
-        .with(HiSC.Parameterizer.K_ID, 5) //
+        .with(HiSC.Parameterizer.K_ID, 15) //
         .build().run(db);
-    testFMeasure(db, result, .73859);
-    testClusterSizes(result, new int[] { 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 9, 15, 17, 80, 178, 200, 402 });
+    testFMeasure(db, result, .78449);
+    testClusterSizes(result, new int[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 5, 8, 11, 17, 27, 185, 233, 536 });
   }
 }
