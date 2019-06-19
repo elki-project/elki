@@ -155,7 +155,7 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
       ev = new EvaluationResult();
       Metadata m = Metadata.of(ev);
       m.setLongName(name);
-      m.hierarchy().addChild(ev);
+      Metadata.hierarchyOf(parent).addChild(ev);
     }
     return ev;
   }
