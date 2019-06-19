@@ -48,7 +48,7 @@ import elki.utilities.optionhandling.parameters.Parameter;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @has - - -elki.gui.configurator.ParameterConfigurator
+ * @has - - - elki.gui.configurator.ParameterConfigurator
  */
 public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**

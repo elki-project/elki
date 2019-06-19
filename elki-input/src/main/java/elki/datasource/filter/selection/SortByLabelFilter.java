@@ -37,7 +37,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @navassoc - reads -elki.data.LabelList
+ * @navassoc - reads - elki.data.LabelList
  */
 public class SortByLabelFilter implements ObjectFilter {
   /**

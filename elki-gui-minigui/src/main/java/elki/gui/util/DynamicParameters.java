@@ -38,7 +38,7 @@ import elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * @since 0.3
  * 
- * @composed - - -elki.gui.util.DynamicParameters.RemainingOptions
+ * @composed - - - elki.gui.util.DynamicParameters.RemainingOptions
  */
 public class DynamicParameters {
   /**

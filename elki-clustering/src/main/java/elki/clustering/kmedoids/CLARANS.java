@@ -79,7 +79,7 @@ import elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @navassoc - - -elki.data.model.MedoidModel
+ * @navassoc - - - elki.data.model.MedoidModel
  * @has - - - Assignment
  *
  * @param <V> Vector type

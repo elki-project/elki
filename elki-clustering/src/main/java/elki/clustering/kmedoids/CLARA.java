@@ -72,7 +72,7 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @navassoc - - -elki.data.model.MedoidModel
+ * @navassoc - - - elki.data.model.MedoidModel
  *
  * @param <V> Data type
  */

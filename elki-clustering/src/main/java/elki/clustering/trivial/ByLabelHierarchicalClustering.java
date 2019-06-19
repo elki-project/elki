@@ -59,7 +59,7 @@ import elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @assoc - - -elki.data.ClassLabel
+ * @assoc - - - elki.data.ClassLabel
  */
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")

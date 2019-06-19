@@ -67,7 +67,7 @@ import elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @navassoc - - -elki.data.model.MedoidModel
+ * @navassoc - - - elki.data.model.MedoidModel
  *
  * @param <V> Data type
  */

@@ -49,7 +49,7 @@ import elki.logging.progress.ProgressLogRecord;
  * @since 0.3
  * 
  * @assoc - - - LoggingConfiguration
- * @assoc - - -elki.logging.ELKILogRecord
+ * @assoc - - - elki.logging.ELKILogRecord
  * @assoc - - - ProgressLogRecord
  * @assoc - - - LogPaneHandler
  */

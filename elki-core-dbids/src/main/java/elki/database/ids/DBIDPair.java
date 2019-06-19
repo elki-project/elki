@@ -26,7 +26,7 @@ package elki.database.ids;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @composed - - -elki.database.ids.DBID
+ * @composed - - - elki.database.ids.DBID
  */
 public interface DBIDPair extends ArrayDBIDs {
   /**

@@ -34,7 +34,7 @@ import elki.database.ids.DBIDUtil;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @composed - - -elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DataStoreIDMap
  *
  * @param <T> Representation object typ
  */

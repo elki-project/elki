@@ -48,7 +48,7 @@ import elki.logging.progress.StepProgress;
  * 
  * @composed - - - LogPane
  * @assoc - - - LoggingConfiguration
- * @assoc - - -elki.logging.ELKILogRecord
+ * @assoc - - - elki.logging.ELKILogRecord
  * @assoc - - - ProgressLogRecord
  * @assoc - - - LogPanelHandler
  */

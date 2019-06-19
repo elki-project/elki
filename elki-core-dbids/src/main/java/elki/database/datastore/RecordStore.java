@@ -26,7 +26,7 @@ package elki.database.datastore;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @navhas - projectsTo -elki.database.datastore.DataStore
+ * @navhas - projectsTo - elki.database.datastore.DataStore
  */
 public interface RecordStore {
   /**
