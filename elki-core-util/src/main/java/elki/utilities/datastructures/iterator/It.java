@@ -48,7 +48,7 @@ public interface It<O> extends Iter {
 
   /**
    * Filtered iteration.
-   * 
+   * <p>
    * Important: using the filtered iterator will also advance this iterator; so
    * usually you should stop using the original iterator after calling
    * this method.
@@ -62,7 +62,7 @@ public interface It<O> extends Iter {
 
   /**
    * Filtered iteration.
-   * 
+   * <p>
    * Important: using the filtered iterator will also advance this iterator; so
    * usually you should stop using the original iterator after calling
    * this method.

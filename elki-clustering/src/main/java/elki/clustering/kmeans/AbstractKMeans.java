@@ -192,9 +192,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param sum Aggregation array
    * @param vec Vector to add
    */
-  public static void sparsePlusEquals(double[] mean, SparseNumberVector vec) {
+  public static void sparsePlusEquals(double[] sum, SparseNumberVector vec) {
     for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
-      mean[vec.iterDim(j)] += vec.iterDoubleValue(j);
+      sum[vec.iterDim(j)] += vec.iterDoubleValue(j);
     }
   }
 
