@@ -30,7 +30,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.4.0
  * 
  * @assoc - - - Parameterization
- * @has - - -elki.utilities.optionhandling.parameters.Parameter
+ * @has - - - elki.utilities.optionhandling.parameters.Parameter
  */
 public abstract class AbstractParameterizer implements Parameterizer {
   /**

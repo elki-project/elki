@@ -35,7 +35,7 @@ import elki.visualization.projections.Projection2D;
  * @author Erich Schubert
  * @since 0.5.0
  * 
- * @assoc - - -elki.math.geometry.SweepHullDelaunay2D.Triangle
+ * @assoc - - - elki.math.geometry.SweepHullDelaunay2D.Triangle
  * @assoc - - - Projection2D
  */
 public final class VoronoiDraw {

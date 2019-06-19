@@ -30,7 +30,7 @@ import elki.utilities.HandlerList;
  * @author Erich Schubert
  * @since 0.2
  * 
- * @assoc - - -elki.result.textwriter.StreamFactory
+ * @assoc - - - elki.result.textwriter.StreamFactory
  */
 public class TextWriterStream {
   /**

@@ -34,7 +34,7 @@ import elki.database.ids.DBIDVar;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @composed - - -elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DataStoreIDMap
  */
 public class ArrayDBIDStore implements WritableDBIDDataStore {
   /**

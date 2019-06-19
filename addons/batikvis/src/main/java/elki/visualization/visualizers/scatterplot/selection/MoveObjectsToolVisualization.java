@@ -101,7 +101,7 @@ public class MoveObjectsToolVisualization implements VisFactory {
    * @author Heidi Kolb
    * @author Erich Schubert
    *
-   * @navhas - edits -elki.data.NumberVector
+   * @navhas - edits - elki.data.NumberVector
    */
   public class Instance extends AbstractScatterplotVisualization implements DragListener {
     /**

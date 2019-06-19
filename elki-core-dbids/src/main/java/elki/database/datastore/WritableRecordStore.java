@@ -30,7 +30,7 @@ import elki.database.ids.DBIDRef;
  * 
  * @opt nodefillcolor LemonChiffon
  * 
- * @navhas - projectsTo -elki.database.datastore.WritableDataStore
+ * @navhas - projectsTo - elki.database.datastore.WritableDataStore
  */
 public interface WritableRecordStore extends RecordStore {
   /**

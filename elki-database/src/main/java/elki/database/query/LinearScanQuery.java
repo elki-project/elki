@@ -26,7 +26,7 @@ package elki.database.query;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @assoc - - -elki.database.Database
+ * @assoc - - - elki.database.Database
  */
 public interface LinearScanQuery extends DatabaseQuery {
   // Empty marker interface

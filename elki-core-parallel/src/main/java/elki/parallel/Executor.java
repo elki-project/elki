@@ -28,7 +28,7 @@ import elki.parallel.variables.SharedVariable;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @assoc - - -elki.parallel.processor.Processor
+ * @assoc - - - elki.parallel.processor.Processor
  * @assoc - - - SharedVariable
  */
 public interface Executor {

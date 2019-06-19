@@ -36,7 +36,7 @@ import elki.database.ids.DBIDRange;
  * @since 0.7.0
  *
  * @opt nodefillcolor LemonChiffon
- * @assoc - "defined on" -elki.database.ids.DBIDRange
+ * @assoc - "defined on" - elki.database.ids.DBIDRange
  */
 public interface DBIDRangeDistance extends DBIDDistance {
   /**

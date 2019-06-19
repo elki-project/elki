@@ -30,7 +30,7 @@ import elki.utilities.datastructures.BitsUtil;
  * @author Elke Achtert
  * @since 0.1
  *
- * @composed - - -elki.data.Subspace.DimensionComparator
+ * @composed - - - elki.data.Subspace.DimensionComparator
  */
 public class Subspace {
   /**

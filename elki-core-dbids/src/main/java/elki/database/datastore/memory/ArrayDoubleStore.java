@@ -32,7 +32,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @composed - - -elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DataStoreIDMap
  */
 public class ArrayDoubleStore implements WritableDoubleDataStore {
   /**
