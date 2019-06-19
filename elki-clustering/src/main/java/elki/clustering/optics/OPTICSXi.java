@@ -156,7 +156,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * Extract clusters from a cluster order result.
    *
    * @param clusterOrderResult cluster order result
-   * @param relation Relation
    * @param ixi Parameter 1 - Xi
    * @param minpts Parameter minPts
    */
@@ -310,7 +309,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * @param cstart Cluster start
    * @param cend Cluster end
    * @param tmp Cluster order iterator
-   * @param tmp2 Temp variable
    * @return New end position
    */
   private static int predecessorFilter(ClusterOrder clusterOrderResult, int cstart, int cend, DBIDArrayIter tmp) {

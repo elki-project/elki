@@ -209,7 +209,6 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
      * @param relation Data relation
      * @param left Left subinterval
      * @param right Right subinterval
-     * @param comp Comparator
      * @return Root node
      */
     public KDNode buildTreeMidpoint(Relation<? extends NumberVector> relation, int left, int right) {

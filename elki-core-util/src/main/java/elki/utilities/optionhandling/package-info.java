@@ -16,8 +16,7 @@
  * </pre>
  * 
  * (This example is from
- * {@link elki.algorithm.AbstractDistanceBasedAlgorithm
- * AbstractDistanceBasedAlgorithm}.)
+ * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * </li>
  * <li><b>Parameter Object</b>: To obtain a value, you <em>must</em> use a
  * {@link elki.utilities.optionhandling.parameters.AbstractParameter
@@ -56,8 +55,7 @@
  * </pre>
  * 
  * (This example is from
- * {@link elki.algorithm.AbstractDistanceBasedAlgorithm
- * DistanceBasedAlgorithm}.)
+ * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * </li>
  * <li><b>Initialization</b>: Initialization happens in the constructor, which
  * <em>must</em> have the signature {@code Class(Parameterization config)} or
@@ -104,8 +102,7 @@
  * </pre>
  * 
  * (This example is from
- * {@link elki.algorithm.AbstractDistanceBasedAlgorithm
- * DistanceBasedAlgorithm}.)
+ * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * 
  * <pre>
  * // Using flags
