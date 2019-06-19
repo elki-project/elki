@@ -205,9 +205,11 @@ public class Metadata {
      * @return {@code true} on success
      */
     public boolean addChild(Object c) {
-      if(addChildInt(c)) {
-        Metadata.of(c).hierarchy().addParentInt(Metadata.this.owner.get());
-        ResultListenerList.resultAdded(c, Metadata.this.owner.get());
+      Object o = Metadata.this.owner.get();
+      assert o != c;
+      if(o != null && addChildInt(c)) {
+        Metadata.of(c).hierarchy().addParentInt(o);
+        ResultListenerList.resultAdded(c, o);
         return true;
       }
       return false;
@@ -221,9 +223,11 @@ public class Metadata {
      * @return {@code true} on success
      */
     public boolean addWeakChild(Object c) {
-      if(addChildInt(new WeakReference<>(c))) {
-        Metadata.of(c).hierarchy().addParentInt(Metadata.this.owner.get());
-        ResultListenerList.resultAdded(c, Metadata.this.owner.get());
+      Object o = Metadata.this.owner.get();
+      assert o != c;
+      if(o != null && addChildInt(new WeakReference<>(c))) {
+        Metadata.of(c).hierarchy().addParentInt(o);
+        ResultListenerList.resultAdded(c, o);
         return true;
       }
       return false;
@@ -596,53 +600,55 @@ public class Metadata {
        * @param extra Additional element (cannot be {@code null}).
        */
       ItrDesc(Object extra) {
-        this.childiter = new ItrChildren();
+        this.childiter = iterChildren();
         this.extra = extra;
       }
 
       @Override
       public boolean valid() {
-        return extra != null || childiter.valid() || (subiter != null && subiter.valid());
+        return extra != null || (subiter != null && subiter.valid()) || lookahead();
       }
 
       @Override
       public It<Object> advance() {
+        lookahead();
         if(extra != null) {
           extra = null;
           return this;
         }
-        if(subiter == null) { // Not yet descended
-          assert (childiter.valid());
-          subiter = Metadata.of(childiter.get()).hierarchy.new ItrDesc();
-        }
-        else { // Continue with subtree
+        if(subiter != null && subiter.valid()) {
           subiter.advance();
         }
-        if(subiter.valid()) {
-          return this;
-        }
-        // Proceed to next child.
-        childiter.advance();
-        subiter = null;
         return this;
+      }
+
+      private boolean lookahead() {
+        while(true) {
+          if(extra != null || (subiter != null && subiter.valid())) {
+            return true; // Next is available.
+          }
+          if(!childiter.valid()) {
+            return false;
+          }
+          extra = childiter.get();
+          childiter.advance();
+          subiter = extra == null ? null : Metadata.of(extra).hierarchy.iterDescendants();
+        }
       }
 
       @Override
       public Object get() {
+        lookahead(); // In case someone did not call valid()
         if(extra != null) {
           return extra;
         }
-        if(subiter != null) {
-          assert (subiter.valid());
-          return subiter.get();
-        }
-        assert (childiter.valid());
-        return childiter.get();
+        assert subiter != null && subiter.valid();
+        return subiter.get();
       }
     }
 
     /**
-     * Iterator over all Ancestors.
+     * Iterator over all ancestors.
      *
      * @author Erich Schubert
      */
@@ -675,48 +681,50 @@ public class Metadata {
        * @param extra Additional element (cannot be {@code null}).
        */
       ItrAnc(Object extra) {
-        parentiter = new ItrParents();
+        this.parentiter = iterParents();
         this.extra = extra;
       }
 
       @Override
       public boolean valid() {
-        return extra != null || parentiter.valid() || (subiter != null && subiter.valid());
+        return extra != null || (subiter != null && subiter.valid()) || lookahead();
       }
 
       @Override
       public It<Object> advance() {
+        lookahead();
         if(extra != null) {
           extra = null;
           return this;
         }
-        if(subiter == null) { // Not yet descended
-          assert (parentiter.valid());
-          subiter = Metadata.of(parentiter.get()).hierarchy().new ItrAnc();
-        }
-        else { // Continue with subtree
+        if(subiter != null && subiter.valid()) {
           subiter.advance();
         }
-        if(subiter.valid()) {
-          return this;
-        }
-        // Proceed to next child.
-        parentiter.advance();
-        subiter = null;
         return this;
+      }
+
+      private boolean lookahead() {
+        while(true) {
+          if(extra != null || (subiter != null && subiter.valid())) {
+            return true; // Next is available.
+          }
+          if(!parentiter.valid()) {
+            return false;
+          }
+          extra = parentiter.get();
+          parentiter.advance();
+          subiter = extra == null ? null : Metadata.of(extra).hierarchy.iterAncestors();
+        }
       }
 
       @Override
       public Object get() {
+        lookahead(); // In case someone did not call valid()
         if(extra != null) {
           return extra;
         }
-        if(subiter != null) {
-          assert (subiter.valid());
-          return subiter.get();
-        }
-        assert (parentiter.valid());
-        return parentiter.get();
+        assert subiter != null && subiter.valid();
+        return subiter.get();
       }
     }
   }

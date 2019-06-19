@@ -46,17 +46,23 @@ public class MetadataTest {
   public void childrenTest() {
     Object a = new byte[] { 1 };
     assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(a).numChildren());
+    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(a).numParents());
     String c = "child";
     Metadata.hierarchyOf(a).addChild(c);
     assertEquals("Expected 1 children.", 1, Metadata.hierarchyOf(a).numChildren());
+    assertEquals("Expected 1 parent.", 1, Metadata.hierarchyOf(c).numParents());
+    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numChildren());
     It<Object> it = Metadata.hierarchyOf(a).iterDescendantsSelf();
     assertTrue(it.valid());
     assertEquals(a, it.get());
     assertTrue(it.advance().valid());
     assertEquals(c, it.get());
     assertFalse(it.advance().valid());
+    assertFalse(Metadata.hierarchyOf(a).iterDescendantsSelf().filter(Integer.class).valid());
     Metadata.hierarchyOf(a).removeChild(c);
     assertEquals("Expected 0 children again.", 0, Metadata.hierarchyOf(a).numChildren());
+    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numChildren());
+    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(c).numParents());
   }
 
   @Test
@@ -68,6 +74,13 @@ public class MetadataTest {
     assertTrue(it.valid());
     assertEquals(a, it.get());
     assertTrue(it.advance().valid());
+    assertEquals(b, it.get());
+    assertTrue(it.advance().valid());
+    assertEquals(c, it.get());
+    assertFalse(it.advance().valid());
+
+    it = Metadata.hierarchyOf(a).iterDescendants();
+    assertTrue(it.valid());
     assertEquals(b, it.get());
     assertTrue(it.advance().valid());
     assertEquals(c, it.get());
