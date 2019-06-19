@@ -229,10 +229,10 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
           }
           sorted.swap(l++, r--);
         }
-        assert relation.get(iter.seek(l)).doubleValue(dim) >= mid : relation.get(iter.seek(l)).doubleValue(dim) + " " + mid;
-        if(l < right) { // Duplicate points!
-          node.leftChild = buildTreeMidpoint(relation, left, l);
-          node.rightChild = buildTreeMidpoint(relation, l, right);
+        assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
+        if(r + 1 < right) { // Duplicate points!
+          node.leftChild = buildTreeMidpoint(relation, left, r + 1);
+          node.rightChild = buildTreeMidpoint(relation, r + 1, right);
         }
       }
       return node;
