@@ -142,12 +142,14 @@ public class KDTreeFilteringKMeans<V extends NumberVector> extends KDTreePruning
 
       // Filter remaining indexes. Disable by swapping after index range.
       final double[] nmean = means[indices[0]];
-      for(int i = 1; i < alive; i++) {
+      for(int i = 1; i < alive;) {
         if(isFarther(nmean, means[indices[i]], mid, halfwidth)) {
           --alive;
           final int swap = indices[i];
           indices[i] = indices[alive];
           indices[alive] = swap;
+        } else {
+          i++;
         }
       }
       return alive;
