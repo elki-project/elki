@@ -347,12 +347,15 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
       final double[] mid = u.mid, halfwidth = u.halfwidth;
       double minmaxdist = getMinMaxDist(mid, halfwidth, alive);
       // Filter remaining indexes. Disable by swapping after index range.
-      for(int i = 0; i < alive; i++) {
+      for(int i = 0; i < alive;) {
         if(mindist(means[indices[i]], mid, halfwidth) > minmaxdist) {
           --alive;
           final int swap = indices[i];
           indices[i] = indices[alive];
           indices[alive] = swap;
+        }
+        else {
+          ++i;
         }
       }
       return alive;
