@@ -38,7 +38,7 @@ public abstract class AbstractDistribution implements Distribution {
   /**
    * Random source.
    */
-  final protected Random random;
+  protected Random random;
 
   /**
    * Constructor.
@@ -63,8 +63,19 @@ public abstract class AbstractDistribution implements Distribution {
 
   @Override
   public double nextRandom() {
-    assert random != null : "In order to use nextRandom(), provide a random generator during class initialization.";
+    assert random != null : "Provide a random generator during class initialization or via setRandomSource.";
     return quantile(random.nextDouble());
+  }
+
+
+  /**
+   * Change random source.
+   *
+   * @param rnd Random source
+   */
+  public void setRandomSource(Random rnd) {
+    assert rnd != null;
+    this.random = rnd;
   }
 
   /**
