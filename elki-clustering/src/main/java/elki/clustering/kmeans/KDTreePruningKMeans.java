@@ -20,6 +20,8 @@
  */
 package elki.clustering.kmeans;
 
+import static elki.math.linearalgebra.VMath.*;
+
 import java.util.Arrays;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
@@ -34,6 +36,7 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
+import elki.logging.statistics.StringStatistic;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
@@ -97,10 +100,20 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
      */
     MIDPOINT,
     /**
+     * Prefer a split halfway between minimum and maximum, but bound the
+     * unbalancedness by a ratio of 1:3.
+     */
+    BOUNDED_MIDPOINT,
+    /**
      * K-d-tree typical median split that guarantees minimal height, but tends
      * to produce larger cells.
      */
-    MEDIAN
+    MEDIAN,
+    /**
+     * Split to minimize the sum-of-squares of the partitions. This split is a
+     * bit more expensive, it uses O(d n log n) time.
+     */
+    SSQ
   }
 
   /**
@@ -186,15 +199,23 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
 
     @Override
     protected void run(int maxiter) {
-      Duration construction = LOG.newDuration(KDTreePruningKMeans.this.getClass().getName() + ".k-d-tree-construction").begin();
+      final String prefix = KDTreePruningKMeans.this.getClass().getName();
+      Duration construction = LOG.newDuration(prefix + ".k-d-tree-construction").begin();
       sorted = DBIDUtil.newArray(relation.getDBIDs());
       iter = sorted.iter();
+      LOG.statistics(new StringStatistic(prefix + ".k-d-tree-split", split.toString()));
       switch(split){
       case MIDPOINT:
         root = buildTreeMidpoint(relation, 0, sorted.size());
         break;
+      case BOUNDED_MIDPOINT:
+        root = buildTreeBoundedMidpoint(relation, 0, sorted.size(), new VectorUtil.SortDBIDsBySingleDimension(relation));
+        break;
       case MEDIAN:
         root = buildTreeMedian(relation, 0, sorted.size(), new VectorUtil.SortDBIDsBySingleDimension(relation));
+        break;
+      case SSQ:
+        root = buildTreeSSQ(relation, 0, sorted.size(), new VectorUtil.SortDBIDsBySingleDimension(relation));
         break;
       }
       LOG.statistics(construction.end());
@@ -204,42 +225,43 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
     }
 
     /**
-     * Build the k-d-tree.
+     * Build the k-d-tree using midpoint splitting.
      *
      * @param relation Data relation
      * @param left Left subinterval
      * @param right Right subinterval
      * @return Root node
      */
-    public KDNode buildTreeMidpoint(Relation<? extends NumberVector> relation, int left, int right) {
+    protected KDNode buildTreeMidpoint(Relation<? extends NumberVector> relation, int left, int right) {
       KDNode node = new KDNode(relation, iter, left, right);
-      if(right - left > leafsize) {
-        final int dim = VMath.argmax(node.halfwidth);
-        double mid = node.mid[dim];
-        int l = left, r = right - 1;
-        while(true) {
-          while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
-            ++l;
-          }
-          while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
-            --r;
-          }
-          if(l >= r) {
-            break;
-          }
-          sorted.swap(l++, r--);
+      if(right - left <= leafsize) {
+        return node;
+      }
+      final int dim = argmax(node.halfwidth);
+      double mid = node.mid[dim];
+      int l = left, r = right - 1;
+      while(true) {
+        while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
+          ++l;
         }
-        assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
-        if(r + 1 < right) { // Duplicate points!
-          node.leftChild = buildTreeMidpoint(relation, left, r + 1);
-          node.rightChild = buildTreeMidpoint(relation, r + 1, right);
+        while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
+          --r;
         }
+        if(l >= r) {
+          break;
+        }
+        sorted.swap(l++, r--);
+      }
+      assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
+      if(r + 1 < right) { // Duplicate points!
+        node.leftChild = buildTreeMidpoint(relation, left, r + 1);
+        node.rightChild = buildTreeMidpoint(relation, r + 1, right);
       }
       return node;
     }
 
     /**
-     * Build the k-d-tree.
+     * Build the k-d-tree using bounded midpoint splitting.
      *
      * @param relation Data relation
      * @param left Left subinterval
@@ -247,18 +269,116 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
      * @param comp Comparator
      * @return Root node
      */
-    public KDNode buildTreeMedian(Relation<? extends NumberVector> relation, int left, int right, SortDBIDsBySingleDimension comp) {
+    protected KDNode buildTreeBoundedMidpoint(Relation<? extends NumberVector> relation, int left, int right, SortDBIDsBySingleDimension comp) {
       KDNode node = new KDNode(relation, iter, left, right);
-      if(right - left > leafsize) {
-        final int middle = (left + right) >>> 1;
-        final int sdim = VMath.argmax(node.halfwidth);
-        if(node.halfwidth[sdim] > 0) { // Don't split duplicate points.
-          comp.setDimension(sdim);
-          QuickSelectDBIDs.quickSelect(sorted, comp, left, right, middle);
-          node.leftChild = buildTreeMedian(relation, left, middle, comp);
-          node.rightChild = buildTreeMedian(relation, middle, right, comp);
+      if(right - left <= leafsize) {
+        return node;
+      }
+      final int dim = argmax(node.halfwidth);
+      double mid = node.mid[dim];
+      int l = left, r = right - 1;
+      while(true) {
+        while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
+          ++l;
+        }
+        while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
+          --r;
+        }
+        if(l >= r) {
+          break;
+        }
+        sorted.swap(l++, r--);
+      }
+      assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
+      ++r;
+      // if too unbalanced, fall back to a quantile:
+      final int q = (right - left) >>> 3;
+      if(left + q > r) {
+        comp.setDimension(dim);
+        QuickSelectDBIDs.quickSelect(sorted, comp, r, right, r = left + q);
+      }
+      else if(right - q < r) {
+        comp.setDimension(dim);
+        QuickSelectDBIDs.quickSelect(sorted, comp, left, r, r = right - q);
+      }
+      node.leftChild = buildTreeBoundedMidpoint(relation, left, r, comp);
+      node.rightChild = buildTreeBoundedMidpoint(relation, r, right, comp);
+      return node;
+    }
+
+    /**
+     * Build the k-d-tree using median splitting.
+     *
+     * @param relation Data relation
+     * @param left Left subinterval
+     * @param right Right subinterval
+     * @param comp Comparator
+     * @return Root node
+     */
+    protected KDNode buildTreeMedian(Relation<? extends NumberVector> relation, int left, int right, SortDBIDsBySingleDimension comp) {
+      KDNode node = new KDNode(relation, iter, left, right);
+      if(right - left <= leafsize) {
+        return node;
+      }
+      final int middle = (left + right) >>> 1;
+      final int sdim = argmax(node.halfwidth);
+      if(node.halfwidth[sdim] > 0) { // Don't split duplicate points.
+        comp.setDimension(sdim);
+        QuickSelectDBIDs.quickSelect(sorted, comp, left, right, middle);
+        node.leftChild = buildTreeMedian(relation, left, middle, comp);
+        node.rightChild = buildTreeMedian(relation, middle, right, comp);
+      }
+      return node;
+    }
+
+    /**
+     * Build the k-d-tree using a variance-based splitting strategy.
+     *
+     * @param relation Data relation
+     * @param left Left subinterval
+     * @param right Right subinterval
+     * @param comp Comparator
+     * @return Root node
+     */
+    protected KDNode buildTreeSSQ(Relation<? extends NumberVector> relation, int left, int right, SortDBIDsBySingleDimension comp) {
+      KDNode node = new KDNode(relation, iter, left, right);
+      final int len = right - left;
+      if(len <= leafsize) {
+        return node;
+      }
+      final int dims = node.sum.length;
+      int bestdim = 0, bestpos = len >>> 1;
+      double bestscore = Double.NEGATIVE_INFINITY;
+      for(int dim = 0; dim < dims; dim++) {
+        // Sort the objects by the chosen attribute:
+        comp.setDimension(dim);
+        sorted.sort(left, right, comp);
+        // Minimizing the SSQs is the same as maximizing the weighted distance
+        // between the centers.
+        int i = 1, j = len - 1;
+        double[] s1 = new double[dims], s2 = node.sum.clone();
+        for(iter.seek(left); j > 1; iter.advance(), i++, j--) {
+          NumberVector vec = relation.get(iter);
+          plusEquals(s1, vec);
+          minusEquals(s2, vec);
+          double score = 0;
+          for(int d = 0; d < dims; d++) {
+            double v = s1[d] / i - s2[d] / j;
+            score += v * v;
+          }
+          double s = score * i * j;
+          if(s > bestscore) {
+            bestscore = s;
+            bestdim = dim;
+            bestpos = i;
+          }
         }
       }
+      bestpos += left;
+      comp.setDimension(bestdim);
+      QuickSelectDBIDs.quickSelect(sorted, comp, left, right, bestpos);
+      node.leftChild = buildTreeSSQ(relation, left, bestpos, comp);
+      node.rightChild = buildTreeSSQ(relation, bestpos, right, comp);
       return node;
     }
 
@@ -271,8 +391,8 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
 
       // re-computing means if points were allocated
       for(int k = 0; k < clusterSums.length; k++) {
-        if(clusterSizes[k] != 0) {
-          means[k] = VMath.timesEquals(clusterSums[k], 1. / clusterSizes[k]);
+        if(clusterSizes[k] > 0) {
+          means[k] = timesEquals(clusterSums[k], 1. / clusterSizes[k]);
         }
       }
 
@@ -329,7 +449,8 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
       int changed = 0;
       for(iter.seek(start); iter.getOffset() < end; iter.advance()) {
         // check if point assignments change
-        if(assignment.putInt(iter, index) != index) {
+        final int prev = assignment.putInt(iter, index);
+        if(prev != index) {
           ++changed;
         }
       }
@@ -436,7 +557,7 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
           }
         }
         clusterSizes[centerIndex]++;
-        plusEquals(clusterSums[centerIndex], relation.get(iter));
+        plusEquals(clusterSums[centerIndex], fv);
         if(assignment.putInt(iter, centerIndex) != centerIndex) {
           ++changed;
         }

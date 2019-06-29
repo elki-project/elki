@@ -57,4 +57,28 @@ public class KDTreeFilteringKMeansTest extends AbstractClusterAlgorithmTest {
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
+
+  @Test
+  public void testKDTreeFilteringKMeansBounded() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+    Clustering<?> result = new ELKIBuilder<KDTreeFilteringKMeans<DoubleVector>>(KDTreeFilteringKMeans.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KDTreePruningKMeans.Parameterizer.SPLIT_ID, Split.BOUNDED_MIDPOINT) //
+        .build().run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  @Test
+  public void testKDTreeFilteringKMeansSSQ() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+    Clustering<?> result = new ELKIBuilder<KDTreeFilteringKMeans<DoubleVector>>(KDTreeFilteringKMeans.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(KDTreePruningKMeans.Parameterizer.SPLIT_ID, Split.SSQ) //
+        .build().run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
 }
