@@ -43,25 +43,27 @@ public abstract class AbstractDistribution implements Distribution {
   /**
    * Constructor.
    * 
-   * @param rnd Random source
+   * @param rnd Random source (may be {@code null}, but then
+   *        {@code nextRandom()} must not be used).
    */
   public AbstractDistribution(RandomFactory rnd) {
-    super();
-    this.random = rnd.getRandom();
+    this(rnd != null ? rnd.getRandom() : null);
   }
 
   /**
    * Constructor.
    * 
-   * @param rnd Random source
+   * @param rnd Random source (may be {@code null}, but then
+   *        {@code nextRandom()} must not be used).
    */
   public AbstractDistribution(Random rnd) {
     super();
     this.random = rnd;
   }
-  
+
   @Override
   public double nextRandom() {
+    assert random != null : "In order to use nextRandom(), provide a random generator during class initialization.";
     return quantile(random.nextDouble());
   }
 
@@ -100,7 +102,7 @@ public abstract class AbstractDistribution implements Distribution {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if (config.grab(randomP)) {
+      if(config.grab(randomP)) {
         rnd = randomP.getValue();
       }
     }
