@@ -20,11 +20,14 @@
  */
 package elki.datasource.filter.transform;
 
+import java.util.Random;
+
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import elki.math.statistics.distribution.Distribution;
 import elki.math.statistics.distribution.ExponentialDistribution;
 import elki.utilities.documentation.Description;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -64,7 +67,12 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
   /**
    * Random generator.
    */
-  ExponentialDistribution rnd;
+  Distribution dist;
+
+  /**
+   * Random generator.
+   */
+  Random rnd;
 
   /**
    * Constructor.
@@ -75,7 +83,8 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
   public HistogramJitterFilter(double jitter, RandomFactory rnd) {
     super();
     this.jitter = jitter;
-    this.rnd = new ExponentialDistribution(1, rnd.getSingleThreadedRandom());
+    this.dist = new ExponentialDistribution(1);
+    this.rnd = rnd.getSingleThreadedRandom();
   }
 
   @Override
@@ -92,7 +101,7 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
     double[] raw = new double[dim];
     double jsum = 0; // Sum of jitter
     for(int i = 0; i < raw.length; i++) {
-      raw[i] = rnd.nextRandom() * maxjitter;
+      raw[i] = dist.nextRandom(rnd) * maxjitter;
       jsum += raw[i];
     }
     final double mix = jsum / osum;

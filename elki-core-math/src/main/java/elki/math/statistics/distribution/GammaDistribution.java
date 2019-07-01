@@ -25,10 +25,10 @@ import java.util.Random;
 import elki.logging.LoggingUtil;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class GammaDistribution extends AbstractDistribution {
+public class GammaDistribution implements Distribution {
   /**
    * Euler–Mascheroni constant
    */
@@ -84,43 +84,13 @@ public class GammaDistribution extends AbstractDistribution {
    * 
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
-   * @param random Random generator
-   */
-  public GammaDistribution(double k, double theta, Random random) {
-    super(random);
-    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
-      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
-    }
-
-    this.k = k;
-    this.theta = theta;
-  }
-
-  /**
-   * Constructor for Gamma distribution.
-   * 
-   * @param k k, alpha aka. "shape" parameter
-   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
-   * @param random Random generator
-   */
-  public GammaDistribution(double k, double theta, RandomFactory random) {
-    super(random);
-    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
-      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
-    }
-
-    this.k = k;
-    this.theta = theta;
-  }
-
-  /**
-   * Constructor for Gamma distribution.
-   * 
-   * @param k k, alpha aka. "shape" parameter
-   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    */
   public GammaDistribution(double k, double theta) {
-    this(k, theta, (Random) null);
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
+    }
+    this.k = k;
+    this.theta = theta;
   }
 
   @Override
@@ -144,7 +114,7 @@ public class GammaDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return nextRandom(k, theta, random);
   }
 
@@ -949,7 +919,7 @@ public class GammaDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * K parameter.
      */
@@ -980,7 +950,7 @@ public class GammaDistribution extends AbstractDistribution {
 
     @Override
     protected GammaDistribution makeInstance() {
-      return new GammaDistribution(k, theta, rnd);
+      return new GammaDistribution(k, theta);
     }
   }
 }

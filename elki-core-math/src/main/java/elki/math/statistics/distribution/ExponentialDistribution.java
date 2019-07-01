@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class ExponentialDistribution extends AbstractDistribution {
+public class ExponentialDistribution implements Distribution {
   /**
    * Rate, inverse of mean
    */
@@ -51,7 +51,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @param rate Rate parameter (1/scale)
    */
   public ExponentialDistribution(double rate) {
-    this(rate, 0.0, (Random) null);
+    this(rate, 0.0);
   }
 
   /**
@@ -61,41 +61,6 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @param location Location parameter
    */
   public ExponentialDistribution(double rate, double location) {
-    this(rate, location, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param random Random generator
-   */
-  public ExponentialDistribution(double rate, Random random) {
-    this(rate, 0.0, random);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param location Location parameter
-   * @param random Random generator
-   */
-  public ExponentialDistribution(double rate, double location, Random random) {
-    super(random);
-    this.rate = rate;
-    this.location = location;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param location Location parameter
-   * @param random Random generator
-   */
-  public ExponentialDistribution(double rate, double location, RandomFactory random) {
-    super(random);
     this.rate = rate;
     this.location = location;
   }
@@ -192,7 +157,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * U. Dieter, https://dl.acm.org/citation.cfm?id=361593
    */
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return -FastMath.log(random.nextDouble()) / rate + location;
   }
 
@@ -206,7 +171,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /**
      * Shape parameter gamma.
      */
@@ -232,7 +197,7 @@ public class ExponentialDistribution extends AbstractDistribution {
 
     @Override
     protected ExponentialDistribution makeInstance() {
-      return new ExponentialDistribution(rate, location, rnd);
+      return new ExponentialDistribution(rate, location);
     }
   }
 }

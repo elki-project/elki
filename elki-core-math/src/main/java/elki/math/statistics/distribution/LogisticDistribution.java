@@ -24,9 +24,9 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.Alias;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * @since 0.6.0
  */
 @Alias({ "log" })
-public class LogisticDistribution extends AbstractDistribution {
+public class LogisticDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */
@@ -49,31 +49,6 @@ public class LogisticDistribution extends AbstractDistribution {
    * @param scale Scale
    */
   public LogisticDistribution(double location, double scale) {
-    this(location, scale, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param random Random number generator
-   */
-  public LogisticDistribution(double location, double scale, Random random) {
-    super(random);
-    this.location = location;
-    this.scale = scale;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param random Random number generator
-   */
-  public LogisticDistribution(double location, double scale, RandomFactory random) {
-    super(random);
     this.location = location;
     this.scale = scale;
   }
@@ -165,11 +140,13 @@ public class LogisticDistribution extends AbstractDistribution {
    */
   public static double logcdf(double val, double loc, double scale) {
     val = (val - loc) / scale;
-    if (val <= 18.) {
+    if(val <= 18.) {
       return -FastMath.log1p(FastMath.exp(-val));
-    } else if (val > 33.3) {
+    }
+    else if(val > 33.3) {
       return val;
-    } else {
+    }
+    else {
       return val - FastMath.exp(val);
     }
   }
@@ -206,7 +183,7 @@ public class LogisticDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double u = random.nextDouble();
     return location + scale * FastMath.log(u / (1. - u));
   }
@@ -221,7 +198,7 @@ public class LogisticDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double location, scale;
 
@@ -230,19 +207,19 @@ public class LogisticDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
 
       DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locationP)) {
+      if(config.grab(locationP)) {
         location = locationP.doubleValue();
       }
     }
 
     @Override
     protected LogisticDistribution makeInstance() {
-      return new LogisticDistribution(location, scale, rnd);
+      return new LogisticDistribution(location, scale);
     }
   }
 }

@@ -23,10 +23,10 @@ package elki.math.statistics.distribution;
 import java.util.Random;
 
 import elki.utilities.Alias;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * @since 0.6.0
  */
 @Alias("DoubleExponentialDistribution")
-public class LaplaceDistribution extends AbstractDistribution {
+public class LaplaceDistribution implements Distribution {
   /**
    * Rate, inverse of mean
    */
@@ -53,7 +53,7 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @param rate Rate parameter (1/scale)
    */
   public LaplaceDistribution(double rate) {
-    this(rate, 0., (Random) null);
+    this(rate, 0.);
   }
 
   /**
@@ -63,41 +63,6 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @param location Location parameter
    */
   public LaplaceDistribution(double rate, double location) {
-    this(rate, location, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param random Random generator
-   */
-  public LaplaceDistribution(double rate, Random random) {
-    this(rate, 0., random);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param location Location parameter
-   * @param random Random generator
-   */
-  public LaplaceDistribution(double rate, double location, Random random) {
-    super(random);
-    this.rate = rate;
-    this.location = location;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param rate Rate parameter (1/scale)
-   * @param location Location parameter
-   * @param random Random generator
-   */
-  public LaplaceDistribution(double rate, double location, RandomFactory random) {
-    super(random);
     this.rate = rate;
     this.location = location;
   }
@@ -202,7 +167,7 @@ public class LaplaceDistribution extends AbstractDistribution {
    * <code>-log(uniform)</code>.
    */
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double val = random.nextDouble();
     if(val < .5) {
       return FastMath.log(2 * val) / rate + location;
@@ -222,7 +187,7 @@ public class LaplaceDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /**
      * Shape parameter gamma.
      */
@@ -248,7 +213,7 @@ public class LaplaceDistribution extends AbstractDistribution {
 
     @Override
     protected LaplaceDistribution makeInstance() {
-      return new LaplaceDistribution(rate, location, rnd);
+      return new LaplaceDistribution(rate, location);
     }
   }
 }

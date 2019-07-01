@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class GumbelDistribution extends AbstractDistribution {
+public class GumbelDistribution implements Distribution {
   /**
    * Mode parameter mu.
    */
@@ -51,31 +51,6 @@ public class GumbelDistribution extends AbstractDistribution {
    * @param beta Shape
    */
   public GumbelDistribution(double mu, double beta) {
-    this(mu, beta, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Mode
-   * @param beta Shape
-   * @param random Random number generator
-   */
-  public GumbelDistribution(double mu, double beta, Random random) {
-    super(random);
-    this.mu = mu;
-    this.beta = beta;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Mode
-   * @param beta Shape
-   * @param random Random number generator
-   */
-  public GumbelDistribution(double mu, double beta, RandomFactory random) {
-    super(random);
     this.mu = mu;
     this.beta = beta;
   }
@@ -175,7 +150,7 @@ public class GumbelDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return mu - beta * FastMath.log(-FastMath.log(random.nextDouble()));
   }
 
@@ -189,7 +164,7 @@ public class GumbelDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mean, shape;
 
@@ -210,7 +185,7 @@ public class GumbelDistribution extends AbstractDistribution {
 
     @Override
     protected GumbelDistribution makeInstance() {
-      return new GumbelDistribution(mean, shape, rnd);
+      return new GumbelDistribution(mean, shape);
     }
   }
 }

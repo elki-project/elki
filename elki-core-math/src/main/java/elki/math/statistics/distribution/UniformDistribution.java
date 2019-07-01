@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  */
-public class UniformDistribution extends AbstractDistribution {
+public class UniformDistribution implements Distribution {
   /**
    * Minimum
    */
@@ -55,61 +55,23 @@ public class UniformDistribution extends AbstractDistribution {
    * 
    * @param min Minimum value
    * @param max Maximum value
-   * @param random Random generator
-   */
-  public UniformDistribution(double min, double max, RandomFactory random) {
-    super(random);
-    if(Double.isInfinite(min) || Double.isInfinite(max)) {
-      throw new ArithmeticException("Infinite values given for uniform distribution.");
-    }
-    if(Double.isNaN(min) || Double.isNaN(max)) {
-      throw new ArithmeticException("NaN values given for uniform distribution.");
-    }
-    // Swap parameters if they were given incorrectly.
-    if(min > max) {
-      double tmp = min;
-      min = max;
-      max = tmp;
-    }
-    this.min = min;
-    this.max = max;
-    this.len = max - min;
-  }
-
-  /**
-   * Constructor for a uniform distribution on the interval [min, max[
-   * 
-   * @param min Minimum value
-   * @param max Maximum value
-   * @param random Random generator
-   */
-  public UniformDistribution(double min, double max, Random random) {
-    super(random);
-    if(Double.isInfinite(min) || Double.isInfinite(max)) {
-      throw new ArithmeticException("Infinite values given for uniform distribution.");
-    }
-    if(Double.isNaN(min) || Double.isNaN(max)) {
-      throw new ArithmeticException("NaN values given for uniform distribution.");
-    }
-    // Swap parameters if they were given incorrectly.
-    if(min > max) {
-      double tmp = min;
-      min = max;
-      max = tmp;
-    }
-    this.min = min;
-    this.max = max;
-    this.len = max - min;
-  }
-
-  /**
-   * Constructor for a uniform distribution on the interval [min, max[
-   * 
-   * @param min Minimum value
-   * @param max Maximum value
    */
   public UniformDistribution(double min, double max) {
-    this(min, max, (Random) null);
+    if(Double.isInfinite(min) || Double.isInfinite(max)) {
+      throw new ArithmeticException("Infinite values given for uniform distribution.");
+    }
+    if(Double.isNaN(min) || Double.isNaN(max)) {
+      throw new ArithmeticException("NaN values given for uniform distribution.");
+    }
+    // Swap parameters if they were given incorrectly.
+    if(min > max) {
+      double tmp = min;
+      min = max;
+      max = tmp;
+    }
+    this.min = min;
+    this.max = max;
+    this.len = max - min;
   }
 
   @Override
@@ -139,7 +101,7 @@ public class UniformDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return min + random.nextDouble() * len;
   }
 
@@ -167,7 +129,7 @@ public class UniformDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Minimum value
      */
@@ -198,7 +160,7 @@ public class UniformDistribution extends AbstractDistribution {
 
     @Override
     protected UniformDistribution makeInstance() {
-      return new UniformDistribution(min, max, rnd);
+      return new UniformDistribution(min, max);
     }
   }
 }

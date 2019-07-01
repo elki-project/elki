@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -34,7 +34,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class CauchyDistribution extends AbstractDistribution {
+public class CauchyDistribution implements Distribution {
   /**
    * The location (x0) parameter.
    */
@@ -52,31 +52,6 @@ public class CauchyDistribution extends AbstractDistribution {
    * @param shape Shape (gamma)
    */
   public CauchyDistribution(double location, double shape) {
-    this(location, shape, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location (x0)
-   * @param shape Shape (gamma)
-   * @param random Random generator
-   */
-  public CauchyDistribution(double location, double shape, Random random) {
-    super(random);
-    this.location = location;
-    this.shape = shape;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location (x0)
-   * @param shape Shape (gamma)
-   * @param random Random generator
-   */
-  public CauchyDistribution(double location, double shape, RandomFactory random) {
-    super(random);
     this.location = location;
     this.shape = shape;
   }
@@ -120,7 +95,7 @@ public class CauchyDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     final double r = random.nextDouble() - .5;
     return location + shape / FastMath.tan(Math.PI * r);
   }
@@ -189,7 +164,7 @@ public class CauchyDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /**
      * Shape parameter gamma.
      */
@@ -215,7 +190,7 @@ public class CauchyDistribution extends AbstractDistribution {
 
     @Override
     protected CauchyDistribution makeInstance() {
-      return new CauchyDistribution(location, shape, rnd);
+      return new CauchyDistribution(location, shape);
     }
   }
 }

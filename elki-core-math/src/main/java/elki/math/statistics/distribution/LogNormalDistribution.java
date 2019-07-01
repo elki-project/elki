@@ -24,11 +24,11 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.Alias;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * @since 0.5.0
  */
 @Alias({ "lognormal" })
-public class LogNormalDistribution extends AbstractDistribution {
+public class LogNormalDistribution implements Distribution {
   /**
    * Mean value for the generator
    */
@@ -67,39 +67,11 @@ public class LogNormalDistribution extends AbstractDistribution {
    * @param logmean Mean
    * @param logstddev Standard Deviation
    * @param shift Shifting offset
-   * @param random Random generator
-   */
-  public LogNormalDistribution(double logmean, double logstddev, double shift, Random random) {
-    super(random);
-    this.logmean = logmean;
-    this.logstddev = logstddev;
-    this.shift = shift;
-  }
-
-  /**
-   * Constructor for Log-Normal distribution
-   * 
-   * @param logmean Mean
-   * @param logstddev Standard Deviation
-   * @param shift Shifting offset
-   * @param random Random generator
-   */
-  public LogNormalDistribution(double logmean, double logstddev, double shift, RandomFactory random) {
-    super(random);
-    this.logmean = logmean;
-    this.logstddev = logstddev;
-    this.shift = shift;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param logmean Mean
-   * @param logstddev Standard deviation
-   * @param shift Shifting offset
    */
   public LogNormalDistribution(double logmean, double logstddev, double shift) {
-    this(logmean, logstddev, shift, (Random) null);
+    this.logmean = logmean;
+    this.logstddev = logstddev;
+    this.shift = shift;
   }
 
   /**
@@ -218,7 +190,7 @@ public class LogNormalDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return FastMath.exp(logmean + random.nextGaussian() * logstddev) + shift;
   }
 
@@ -232,7 +204,7 @@ public class LogNormalDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * LogMean parameter
      */
@@ -274,7 +246,7 @@ public class LogNormalDistribution extends AbstractDistribution {
 
     @Override
     protected LogNormalDistribution makeInstance() {
-      return new LogNormalDistribution(logmean, logsigma, shift, rnd);
+      return new LogNormalDistribution(logmean, logsigma, shift);
     }
   }
 }

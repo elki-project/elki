@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class GeneralizedLogisticDistribution extends AbstractDistribution {
+public class GeneralizedLogisticDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */
@@ -60,34 +60,6 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * @param shape Shape parameter
    */
   public GeneralizedLogisticDistribution(double location, double scale, double shape) {
-    this(location, scale, shape, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param shape Shape parameter
-   * @param random Random number generator
-   */
-  public GeneralizedLogisticDistribution(double location, double scale, double shape, Random random) {
-    super(random);
-    this.location = location;
-    this.scale = scale;
-    this.shape = shape;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param shape Shape parameter
-   * @param random Random number generator
-   */
-  public GeneralizedLogisticDistribution(double location, double scale, double shape, RandomFactory random) {
-    super(random);
     this.location = location;
     this.scale = scale;
     this.shape = shape;
@@ -191,7 +163,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double u = random.nextDouble();
     return location - scale * FastMath.log(FastMath.exp(FastMath.log(u) / -shape) - 1);
   }
@@ -206,7 +178,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double location, scale, shape;
 
@@ -232,7 +204,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
 
     @Override
     protected GeneralizedLogisticDistribution makeInstance() {
-      return new GeneralizedLogisticDistribution(location, scale, shape, rnd);
+      return new GeneralizedLogisticDistribution(location, scale, shape);
     }
   }
 }

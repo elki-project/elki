@@ -20,11 +20,9 @@
  */
 package elki.math.statistics.distribution;
 
-import java.util.Random;
-
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -34,7 +32,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class GeneralizedParetoDistribution extends AbstractDistribution {
+public class GeneralizedParetoDistribution implements Distribution {
   /**
    * Parameters (location, scale, shape)
    */
@@ -48,34 +46,6 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
    * @param xi Shape parameter xi (= -kappa)
    */
   public GeneralizedParetoDistribution(double mu, double sigma, double xi) {
-    this(mu, sigma, xi, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Location parameter mu
-   * @param sigma Scale parameter sigma
-   * @param xi Shape parameter xi (= -kappa)
-   * @param random Random number generator
-   */
-  public GeneralizedParetoDistribution(double mu, double sigma, double xi, RandomFactory random) {
-    super(random);
-    this.mu = mu;
-    this.sigma = sigma;
-    this.xi = xi;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Location parameter mu
-   * @param sigma Scale parameter sigma
-   * @param xi Shape parameter xi (= -kappa)
-   * @param random Random number generator
-   */
-  public GeneralizedParetoDistribution(double mu, double sigma, double xi, Random random) {
-    super(random);
     this.mu = mu;
     this.sigma = sigma;
     this.xi = xi;
@@ -217,7 +187,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mu, sigma, xi;
 
@@ -243,7 +213,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
 
     @Override
     protected GeneralizedParetoDistribution makeInstance() {
-      return new GeneralizedParetoDistribution(mu, sigma, xi, rnd);
+      return new GeneralizedParetoDistribution(mu, sigma, xi);
     }
   }
 }

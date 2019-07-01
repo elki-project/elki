@@ -49,6 +49,11 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   private List<Distribution> axes = new ArrayList<>();
 
   /**
+   * The random generators for each axis.
+   */
+  private List<Random> rnds = new ArrayList<>();
+
+  /**
    * The transformation matrix
    */
   private AffineTransformation trans;
@@ -115,12 +120,14 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * so far!
    *
    * @param gen Distribution generator
+   * @param rnd Random sources
    */
-  public void addGenerator(Distribution gen) {
+  public void addGenerator(Distribution gen, Random rnd) {
     if(trans != null) {
       throw new AbortException("Generators may no longer be added when transformations have been applied.");
     }
     axes.add(gen);
+    rnds.add(rnd);
     dim++;
   }
 
@@ -224,7 +231,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     while(result.size() < count) {
       double[] d = new double[dim];
       for(int i = 0; i < dim; i++) {
-        d[i] = axes.get(i).nextRandom();
+        d[i] = axes.get(i).nextRandom(rnds.get(i));
       }
       if(trans != null) {
         d = trans.apply(d);
@@ -273,9 +280,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @return double[] with lower clipping bounds. May be null.
    */
   public double[] getClipmin() {
-    if(clipmin == null) {
-      return null;
-    }
     return clipmin;
   }
 
@@ -285,9 +289,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @return double[] with upper clipping bounds. May be null.
    */
   public double[] getClipmax() {
-    if(clipmax == null) {
-      return null;
-    }
     return clipmax;
   }
 

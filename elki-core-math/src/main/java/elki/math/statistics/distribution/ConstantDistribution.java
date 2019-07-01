@@ -20,6 +20,8 @@
  */
 package elki.math.statistics.distribution;
 
+import java.util.Random;
+
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,7 +50,7 @@ public class ConstantDistribution implements Distribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return c;
   }
 

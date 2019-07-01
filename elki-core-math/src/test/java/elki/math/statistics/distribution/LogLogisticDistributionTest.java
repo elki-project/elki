@@ -82,8 +82,8 @@ public class LogLogisticDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new LogLogisticDistribution(0.9, 1, 0.1, new Random(0L)), 10000, 1e-2);
-    checkRandom(new LogLogisticDistribution(3.14, 2, 1.41, new Random(0L)), 10000, 1e-2);
-    checkRandom(new LogLogisticDistribution(1.41, 3, 3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new LogLogisticDistribution(0.9, 1, 0.1), new Random(0L), 10000, 1e-2);
+    checkRandom(new LogLogisticDistribution(3.14, 2, 1.41), new Random(0L), 10000, 1e-2);
+    checkRandom(new LogLogisticDistribution(1.41, 3, 3.14), new Random(0L), 10000, 1e-2);
   }
 }

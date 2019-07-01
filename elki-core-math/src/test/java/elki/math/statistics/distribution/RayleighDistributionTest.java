@@ -103,8 +103,8 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new RayleighDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
-    checkRandom(new RayleighDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
-    checkRandom(new RayleighDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
+    checkRandom(new RayleighDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    checkRandom(new RayleighDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    checkRandom(new RayleighDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

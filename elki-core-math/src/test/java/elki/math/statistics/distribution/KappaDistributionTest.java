@@ -169,8 +169,8 @@ public class KappaDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new KappaDistribution(1, 2, 0.1, 0.9, new Random(0L)), 10000, 1e-2);
-    checkRandom(new KappaDistribution(3, 4, 1.41, 3.14, new Random(0L)), 10000, 1e-2);
-    checkRandom(new KappaDistribution(5, 6, 3.14, 4.41, new Random(0L)), 10000, 1e-2);
+    checkRandom(new KappaDistribution(1, 2, 0.1, 0.9), new Random(0L), 10000, 1e-2);
+    checkRandom(new KappaDistribution(3, 4, 1.41, 3.14), new Random(0L), 10000, 1e-2);
+    checkRandom(new KappaDistribution(5, 6, 3.14, 4.41), new Random(0L), 10000, 1e-2);
   }
 }

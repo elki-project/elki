@@ -137,10 +137,10 @@ public class GammaDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new GammaDistribution(0.1, 0.9, new Random(0L)), 10000, 1e-2);
-    checkRandom(new GammaDistribution(1.41, 3.14, new Random(0L)), 10000, 1e-2);
-    checkRandom(new GammaDistribution(3.14, 1.41, new Random(0L)), 10000, 1e-2);
-    checkRandom(new GammaDistribution(10, 1.41, new Random(0L)), 10000, 1e-2);
-    checkRandom(new GammaDistribution(20, 1.41, new Random(0L)), 10000, 1e-2);
+    checkRandom(new GammaDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    checkRandom(new GammaDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    checkRandom(new GammaDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    checkRandom(new GammaDistribution(10, 1.41), new Random(0L), 10000, 1e-2);
+    checkRandom(new GammaDistribution(20, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

@@ -107,9 +107,9 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new ExpGammaDistribution(1, 1, 0, new Random(0L)), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
+    checkRandom(new ExpGammaDistribution(1, 1, 0), new Random(0L), 10000, 1e-2);
+    checkRandom(new ExpGammaDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    checkRandom(new ExpGammaDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    checkRandom(new ExpGammaDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

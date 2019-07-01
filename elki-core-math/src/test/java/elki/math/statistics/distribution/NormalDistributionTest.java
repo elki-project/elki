@@ -100,7 +100,7 @@ public class NormalDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new NormalDistribution(-1, 2, new Random(0L)), 10000, 1e-2);
-    checkRandom(new NormalDistribution(1, 4, new Random(1L)), 10000, 1e-2);
+    checkRandom(new NormalDistribution(-1, 2), new Random(0L), 10000, 1e-2);
+    checkRandom(new NormalDistribution(1, 4), new Random(1L), 10000, 1e-2);
   }
 }

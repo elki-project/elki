@@ -40,21 +40,23 @@ public class EMGOlivierNorbergEstimatorTest extends AbstractDistributionEstimato
   public void testEstimator() {
     final EMGOlivierNorbergEstimator est = instantiate(EMGOlivierNorbergEstimator.class, ExponentiallyModifiedGaussianDistribution.class);
     ExponentiallyModifiedGaussianDistribution dist, gen;
+    Random rnd = new Random(0L);
 
-    gen = new ExponentiallyModifiedGaussianDistribution(1, 2, .1, new Random(0L));
+    gen = new ExponentiallyModifiedGaussianDistribution(1, 2, .1);
     double[] data = new double[10000];
     for(int i = 0; i < data.length; i++) {
-      data[i] = gen.nextRandom();
+      data[i] = gen.nextRandom(rnd);
     }
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("mean", dist.getMean(), 1, -0.0265447091074848);
     assertStat("stddev", dist.getStddev(), 2, 0.17902812796064094);
     assertStat("lambda", dist.getLambda(), .1, -0.0010032987771384089);
 
-    gen = new ExponentiallyModifiedGaussianDistribution(5, 4, .3, new Random(0L));
+    rnd = new Random(0L);
+    gen = new ExponentiallyModifiedGaussianDistribution(5, 4, .3);
     data = new double[10000];
     for(int i = 0; i < data.length; i++) {
-      data[i] = gen.nextRandom();
+      data[i] = gen.nextRandom(rnd);
     }
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("mean", dist.getMean(), 5, 0.005239133140687358);

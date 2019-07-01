@@ -25,12 +25,12 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.NotImplementedException;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -46,7 +46,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class PoissonDistribution extends AbstractDistribution {
+public class PoissonDistribution implements Distribution {
   /**
    * Number of tries
    */
@@ -118,31 +118,6 @@ public class PoissonDistribution extends AbstractDistribution {
    * @param p Success probability
    */
   public PoissonDistribution(int n, double p) {
-    this(n, p, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param n Number of tries
-   * @param p Success probability
-   * @param random Random generator
-   */
-  public PoissonDistribution(int n, double p, Random random) {
-    super(random);
-    this.n = n;
-    this.p = p;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param n Number of tries
-   * @param p Success probability
-   * @param random Random generator
-   */
-  public PoissonDistribution(int n, double p, RandomFactory random) {
-    super(random);
     this.n = n;
     this.p = p;
   }
@@ -271,7 +246,7 @@ public class PoissonDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     // FIXME: implement!
     throw new NotImplementedException();
   }
@@ -491,7 +466,7 @@ public class PoissonDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Number of trials.
      */
@@ -532,7 +507,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
     @Override
     protected PoissonDistribution makeInstance() {
-      return new PoissonDistribution(n, p, rnd);
+      return new PoissonDistribution(n, p);
     }
   }
 }

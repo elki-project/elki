@@ -111,8 +111,8 @@ public class ChiSquaredDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new ChiSquaredDistribution(0.1, new Random(0L)), 10000, 1e-2);
-    checkRandom(new ChiSquaredDistribution(1.41, new Random(0L)), 10000, 1e-2);
-    checkRandom(new ChiSquaredDistribution(3.14, new Random(0L)), 10000, 1e-2);
+    checkRandom(new ChiSquaredDistribution(0.1), new Random(0L), 10000, 1e-2);
+    checkRandom(new ChiSquaredDistribution(1.41), new Random(0L), 10000, 1e-2);
+    checkRandom(new ChiSquaredDistribution(3.14), new Random(0L), 10000, 1e-2);
   }
 }

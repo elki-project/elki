@@ -403,9 +403,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     // *** new uniform generator
-    Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new UniformDistribution(min, max, random);
-    cluster.addGenerator(generator);
+    cluster.addGenerator(new UniformDistribution(min, max), cluster.getNewRandomGenerator());
 
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
@@ -436,9 +434,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     // *** New normal distribution generator
-    Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new NormalDistribution(mean, stddev, random);
-    cluster.addGenerator(generator);
+    cluster.addGenerator(new NormalDistribution(mean, stddev), cluster.getNewRandomGenerator());
 
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
@@ -469,9 +465,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     // *** New normal distribution generator
-    Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new GammaDistribution(k, theta, random);
-    cluster.addGenerator(generator);
+    cluster.addGenerator(new GammaDistribution(k, theta), cluster.getNewRandomGenerator());
 
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
@@ -505,7 +499,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** new uniform generator
     Random random = cluster.getNewRandomGenerator();
     Distribution generator = new HaltonUniformDistribution(min, max, random);
-    cluster.addGenerator(generator);
+    cluster.addGenerator(generator, random);
 
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
@@ -786,13 +780,13 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       }
       // Reassign pattern
       final PatternParameter reassignP = new PatternParameter(REASSIGN_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(reassignP)) {
         reassign = reassignP.getValue();
       }
-      if (reassign != null) {
+      if(reassign != null) {
         final Flag bydistanceF = new Flag(REASSIGN_DISTANCE_ID);
-        if (config.grab(bydistanceF)) {
+        if(config.grab(bydistanceF)) {
           reassignByDistance = bydistanceF.isTrue();
         }
       }

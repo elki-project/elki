@@ -25,8 +25,11 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.math.Primes;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
@@ -160,19 +163,8 @@ public class HaltonUniformDistribution implements Distribution {
   }
 
   /**
-   * Constructor for a halton pseudo uniform distribution on the interval [min,
-   * max[
-   * 
-   * @param min Minimum value
-   * @param max Maximum value
-   */
-  public HaltonUniformDistribution(double min, double max) {
-    this(min, max, new Random());
-  }
-
-  /**
-   * Constructor for a halton pseudo uniform distribution on the interval [min,
-   * max[
+   * Constructor for a <em>random</em> halton pseudo uniform distribution on the
+   * interval [min, max[.
    * 
    * @param min Minimum value
    * @param max Maximum value
@@ -180,18 +172,6 @@ public class HaltonUniformDistribution implements Distribution {
    */
   public HaltonUniformDistribution(double min, double max, Random rnd) {
     this(min, max, choosePrime(rnd), rnd.nextDouble());
-  }
-
-  /**
-   * Constructor for a halton pseudo uniform distribution on the interval [min,
-   * max[
-   * 
-   * @param min Minimum value
-   * @param max Maximum value
-   * @param rnd Random generator
-   */
-  public HaltonUniformDistribution(double min, double max, RandomFactory rnd) {
-    this(min, max, rnd.getRandom());
   }
 
   /**
@@ -305,7 +285,7 @@ public class HaltonUniformDistribution implements Distribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return min + nextRadicalInverse() * len;
   }
 
@@ -330,14 +310,24 @@ public class HaltonUniformDistribution implements Distribution {
 
   /**
    * Parameterization class
-   * 
+   * <p>
    * TODO: allow manual parameterization of sequence parameters!
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Generator for random distribution parameters
+     */
+    public static final OptionID RANDOM_ID = new OptionID("halton.random", "Generator to choose random distribution parameters.");
+
     /** Parameters. */
     double min, max;
+
+    /**
+     * Generator to choose random parameters.
+     */
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -352,11 +342,16 @@ public class HaltonUniformDistribution implements Distribution {
       if(config.grab(maxP)) {
         max = maxP.doubleValue();
       }
+
+      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
+      }
     }
 
     @Override
     protected HaltonUniformDistribution makeInstance() {
-      return new HaltonUniformDistribution(min, max, rnd);
+      return new HaltonUniformDistribution(min, max, rnd.getSingleThreadedRandom());
     }
   }
 }

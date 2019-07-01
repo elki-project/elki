@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class GeneralizedLogisticAlternateDistribution extends AbstractDistribution {
+public class GeneralizedLogisticAlternateDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */
@@ -56,37 +56,6 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    * @param shape Shape parameter
    */
   public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape) {
-    this(location, scale, shape, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param shape Shape parameter
-   * @param random Random number generator
-   */
-  public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape, Random random) {
-    super(random);
-    this.location = location;
-    this.scale = scale;
-    this.shape = shape;
-    if(!(shape > -1.) || !(shape < 1.)) {
-      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
-    }
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param location Location
-   * @param scale Scale
-   * @param shape Shape parameter
-   * @param random Random number generator
-   */
-  public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape, RandomFactory random) {
-    super(random);
     this.location = location;
     this.scale = scale;
     this.shape = shape;
@@ -216,7 +185,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double u = random.nextDouble();
     return quantile(u, location, scale, shape);
   }
@@ -231,7 +200,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double location, scale, shape;
 
@@ -257,7 +226,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
 
     @Override
     protected GeneralizedLogisticAlternateDistribution makeInstance() {
-      return new GeneralizedLogisticAlternateDistribution(location, scale, shape, rnd);
+      return new GeneralizedLogisticAlternateDistribution(location, scale, shape);
     }
   }
 }

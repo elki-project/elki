@@ -24,12 +24,11 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
-
 import net.jafama.FastMath;
 
 /**
@@ -53,7 +52,7 @@ import net.jafama.FastMath;
     booktitle = "Regional frequency analysis: an approach based on L-moments", //
     url = "https://doi.org/10.1017/CBO9780511529443", //
     bibkey = "doi:10.1017/CBO9780511529443")
-public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
+public class SkewGeneralizedNormalDistribution implements Distribution {
   /**
    * Location.
    */
@@ -75,39 +74,11 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * @param loc Location
    * @param scale Scale
    * @param skew Skew
-   * @param random Random generator
-   */
-  public SkewGeneralizedNormalDistribution(double loc, double scale, double skew, Random random) {
-    super(random);
-    this.loc = loc;
-    this.scale = scale;
-    this.skew = skew;
-  }
-
-  /**
-   * Constructor for Gaussian distribution
-   *
-   * @param loc Location
-   * @param scale Scale
-   * @param skew Skew
-   * @param random Random generator
-   */
-  public SkewGeneralizedNormalDistribution(double loc, double scale, double skew, RandomFactory random) {
-    super(random);
-    this.loc = loc;
-    this.scale = scale;
-    this.skew = skew;
-  }
-
-  /**
-   * Constructor for Gaussian distribution
-   * 
-   * @param loc Location
-   * @param scale Scale
-   * @param skew Skew
    */
   public SkewGeneralizedNormalDistribution(double loc, double scale, double skew) {
-    this(loc, scale, skew, (Random) null);
+    this.loc = loc;
+    this.scale = scale;
+    this.skew = skew;
   }
 
   /**
@@ -158,7 +129,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double y = random.nextGaussian();
     if(Math.abs(skew) > 0.) {
       y = (1. - FastMath.exp(-skew * y)) / skew;
@@ -260,7 +231,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /**
      * Skew parameter
      */
@@ -292,7 +263,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
 
     @Override
     protected SkewGeneralizedNormalDistribution makeInstance() {
-      return new SkewGeneralizedNormalDistribution(mean, sigma, skew, rnd);
+      return new SkewGeneralizedNormalDistribution(mean, sigma, skew);
     }
   }
 }

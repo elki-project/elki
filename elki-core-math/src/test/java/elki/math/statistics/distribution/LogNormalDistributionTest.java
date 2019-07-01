@@ -93,8 +93,8 @@ public class LogNormalDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new LogNormalDistribution(0.1, 0.9, 1, new Random(0L)), 10000, 1e-2);
-    checkRandom(new LogNormalDistribution(1.41, 3.14, 2, new Random(0L)), 10000, 1e-2);
-    checkRandom(new LogNormalDistribution(3.14, 1.41, 3, new Random(0L)), 10000, 1e-2);
+    checkRandom(new LogNormalDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    checkRandom(new LogNormalDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    checkRandom(new LogNormalDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

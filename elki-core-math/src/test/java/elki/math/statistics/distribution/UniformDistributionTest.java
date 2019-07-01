@@ -83,7 +83,7 @@ public class UniformDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new UniformDistribution(-1, 2, new Random(0L)), 10000, 1e-2);
-    checkRandom(new UniformDistribution(1, 4, new Random(1L)), 10000, 1e-2);
+    checkRandom(new UniformDistribution(-1, 2), new Random(0L), 10000, 1e-2);
+    checkRandom(new UniformDistribution(1, 4), new Random(1L), 10000, 1e-2);
   }
 }

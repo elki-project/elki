@@ -25,10 +25,10 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  * @since 0.5.0
  */
 @Alias({ "GaussianDistribution", "normal", "gauss" })
-public class NormalDistribution extends AbstractDistribution {
+public class NormalDistribution implements Distribution {
   /**
    * Treshold for switching nethods for erfinv approximation
    */
@@ -74,35 +74,10 @@ public class NormalDistribution extends AbstractDistribution {
    * 
    * @param mean Mean
    * @param stddev Standard Deviation
-   * @param random Random generator
-   */
-  public NormalDistribution(double mean, double stddev, RandomFactory random) {
-    super(random);
-    this.mean = mean;
-    this.stddev = stddev;
-  }
-
-  /**
-   * Constructor for Gaussian distribution
-   * 
-   * @param mean Mean
-   * @param stddev Standard Deviation
-   * @param random Random generator
-   */
-  public NormalDistribution(double mean, double stddev, Random random) {
-    super(random);
-    this.mean = mean;
-    this.stddev = stddev;
-  }
-
-  /**
-   * Constructor for Gaussian distribution
-   * 
-   * @param mean Mean
-   * @param stddev Standard Deviation
    */
   public NormalDistribution(double mean, double stddev) {
-    this(mean, stddev, (Random) null);
+    this.mean = mean;
+    this.stddev = stddev;
   }
 
   @Override
@@ -126,7 +101,7 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return mean + random.nextGaussian() * stddev;
   }
 
@@ -542,7 +517,7 @@ public class NormalDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mu, sigma;
 
@@ -564,7 +539,7 @@ public class NormalDistribution extends AbstractDistribution {
 
     @Override
     protected NormalDistribution makeInstance() {
-      return new NormalDistribution(mu, sigma, rnd);
+      return new NormalDistribution(mu, sigma);
     }
   }
 }

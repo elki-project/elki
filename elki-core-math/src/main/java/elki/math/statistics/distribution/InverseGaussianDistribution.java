@@ -25,18 +25,18 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.exceptions.NotImplementedException;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
  * Inverse Gaussian distribution aka Wald distribution.
- * 
+ * <p>
  * Beware that SciPy uses a different location parameter.
- * 
+ * <p>
  * <code>InverseGaussian(a, x) ~ scipy.stats.invgauss(a/x, x)</code>
- * 
+ * <p>
  * Our parameter scheme is in line with common literature. SciPy naming scheme
  * has comparable notion of location and scale across distributions. So both
  * have their benefits.
@@ -45,7 +45,7 @@ import net.jafama.FastMath;
  * @since 0.6.0
  */
 @Alias({ "invgauss", "wald" })
-public class InverseGaussianDistribution extends AbstractDistribution {
+public class InverseGaussianDistribution implements Distribution {
   /**
    * Location value
    */
@@ -57,39 +57,14 @@ public class InverseGaussianDistribution extends AbstractDistribution {
   private double shape;
 
   /**
-   * Constructor for wald distribution
-   *
-   * @param mean Mean
-   * @param shape Shape parameter
-   * @param random Random generator
-   */
-  public InverseGaussianDistribution(double mean, double shape, Random random) {
-    super(random);
-    this.mean = mean;
-    this.shape = shape;
-  }
-
-  /**
-   * Constructor for wald distribution
-   *
-   * @param mean Mean
-   * @param shape Shape parameter
-   * @param random Random generator
-   */
-  public InverseGaussianDistribution(double mean, double shape, RandomFactory random) {
-    super(random);
-    this.mean = mean;
-    this.shape = shape;
-  }
-
-  /**
-   * Constructor for Gaussian distribution
+   * Constructor for Inverse Gaussian / Wald distribution.
    *
    * @param mean Mean
    * @param shape Shape parameter
    */
   public InverseGaussianDistribution(double mean, double shape) {
-    this(mean, shape, (Random) null);
+    this.mean = mean;
+    this.shape = shape;
   }
 
   /**
@@ -135,7 +110,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double v = random.nextGaussian();
     v *= v;
     double x = mean + mean * .5 / shape * (mean * v - FastMath.sqrt(4. * mean * shape * v + mean * mean * v * v));
@@ -231,7 +206,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mean, shape;
 
@@ -252,7 +227,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
 
     @Override
     protected InverseGaussianDistribution makeInstance() {
-      return new InverseGaussianDistribution(mean, shape, rnd);
+      return new InverseGaussianDistribution(mean, shape);
     }
   }
 }

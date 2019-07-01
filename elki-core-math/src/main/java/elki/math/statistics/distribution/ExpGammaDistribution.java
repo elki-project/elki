@@ -22,18 +22,18 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
  * Exp-Gamma Distribution, with random generation and density functions.
- *
+ * <p>
  * This distribution can be outlined as Y ~ log[Gamma] distributed, or
  * equivalently exp(Y) ~ Gamma.
- *
+ * <p>
  * Note: this matches the loggamma of SciPy, whereas Wolfram calls this the
  * Exponential Gamma Distribution "at times confused with the
  * LogGammaDistribution".
@@ -41,7 +41,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class ExpGammaDistribution extends AbstractDistribution {
+public class ExpGammaDistribution implements Distribution {
   /**
    * Alpha == k.
    */
@@ -63,47 +63,15 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param shift Location offset
-   * @param random Random generator
-   */
-  public ExpGammaDistribution(double k, double theta, double shift, Random random) {
-    super(random);
-    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
-      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
-    }
-
-    this.k = k;
-    this.theta = theta;
-    this.shift = shift;
-  }
-
-  /**
-   * Constructor for Gamma distribution.
-   * 
-   * @param k k, alpha aka. "shape" parameter
-   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
-   * @param shift Location offset
-   * @param random Random generator
-   */
-  public ExpGammaDistribution(double k, double theta, double shift, RandomFactory random) {
-    super(random);
-    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
-      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
-    }
-
-    this.k = k;
-    this.theta = theta;
-    this.shift = shift;
-  }
-
-  /**
-   * Constructor for Gamma distribution.
-   * 
-   * @param k k, alpha aka. "shape" parameter
-   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
-   * @param shift Location offset
    */
   public ExpGammaDistribution(double k, double theta, double shift) {
-    this(k, theta, shift, (Random) null);
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
+    }
+
+    this.k = k;
+    this.theta = theta;
+    this.shift = shift;
   }
 
   @Override
@@ -127,7 +95,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return quantile(random.nextDouble(), k, theta, shift);
     // return FastMath.log(GammaDistribution.nextRandom(k, 1., random)) / theta
     // + shift;
@@ -250,7 +218,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Theta parameter, same as
      * {@link GammaDistribution.Parameterizer#THETA_ID}.
@@ -305,7 +273,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
 
     @Override
     protected ExpGammaDistribution makeInstance() {
-      return new ExpGammaDistribution(k, theta, shift, rnd);
+      return new ExpGammaDistribution(k, theta, shift);
     }
   }
 }

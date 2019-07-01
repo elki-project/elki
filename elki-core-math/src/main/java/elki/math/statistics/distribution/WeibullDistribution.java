@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class WeibullDistribution extends AbstractDistribution {
+public class WeibullDistribution implements Distribution {
   /**
    * Shift offset.
    */
@@ -56,7 +56,7 @@ public class WeibullDistribution extends AbstractDistribution {
    * @param lambda Scale parameter
    */
   public WeibullDistribution(double k, double lambda) {
-    this(k, lambda, 0.0, (Random) null);
+    this(k, lambda, 0.0);
   }
 
   /**
@@ -67,45 +67,6 @@ public class WeibullDistribution extends AbstractDistribution {
    * @param theta Shift offset parameter
    */
   public WeibullDistribution(double k, double lambda, double theta) {
-    this(k, lambda, theta, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param k Shape parameter
-   * @param lambda Scale parameter
-   * @param random Random number generator
-   */
-  public WeibullDistribution(double k, double lambda, Random random) {
-    this(k, lambda, 0., random);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param k Shape parameter
-   * @param lambda Scale parameter
-   * @param theta Shift offset parameter
-   * @param random Random number generator
-   */
-  public WeibullDistribution(double k, double lambda, double theta, Random random) {
-    super(random);
-    this.k = k;
-    this.lambda = lambda;
-    this.theta = theta;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param k Shape parameter
-   * @param lambda Scale parameter
-   * @param theta Shift offset parameter
-   * @param random Random number generator
-   */
-  public WeibullDistribution(double k, double lambda, double theta, RandomFactory random) {
-    super(random);
     this.k = k;
     this.lambda = lambda;
     this.theta = theta;
@@ -233,7 +194,7 @@ public class WeibullDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return theta + lambda * FastMath.pow(-FastMath.log(1 - random.nextDouble()), 1. / k);
   }
 
@@ -247,7 +208,7 @@ public class WeibullDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double theta, k, lambda;
 
@@ -273,7 +234,7 @@ public class WeibullDistribution extends AbstractDistribution {
 
     @Override
     protected WeibullDistribution makeInstance() {
-      return new WeibullDistribution(k, lambda, theta, rnd);
+      return new WeibullDistribution(k, lambda, theta);
     }
   }
 }

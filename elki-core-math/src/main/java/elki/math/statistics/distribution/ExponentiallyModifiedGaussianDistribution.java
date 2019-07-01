@@ -25,25 +25,25 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.exceptions.NotImplementedException;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
  * is a combination of a normal distribution and an exponential distribution.
- * 
+ * <p>
  * Note that scipy uses a subtly different parameterization.
- *
+ * <p>
  * TODO: implement quantile function!
  *
  * @author Erich Schubert
  * @since 0.6.0
  */
 @Alias({ "exgaussian" })
-public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribution {
+public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   /**
    * Mean value for the generator
    */
@@ -65,39 +65,11 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    * @param mean Mean
    * @param stddev Standard Deviation
    * @param lambda Rate
-   * @param random Random
-   */
-  public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda, Random random) {
-    super(random);
-    this.mean = mean;
-    this.stddev = stddev;
-    this.lambda = lambda;
-  }
-
-  /**
-   * Constructor for ExGaussian distribution
-   *
-   * @param mean Mean
-   * @param stddev Standard Deviation
-   * @param lambda Rate
-   * @param random Random
-   */
-  public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda, RandomFactory random) {
-    super(random);
-    this.mean = mean;
-    this.stddev = stddev;
-    this.lambda = lambda;
-  }
-
-  /**
-   * Constructor for ExGaussian distribution
-   *
-   * @param mean Mean
-   * @param stddev Standard Deviation
-   * @param lambda Rate
    */
   public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda) {
-    this(mean, stddev, lambda, (Random) null);
+    this.mean = mean;
+    this.stddev = stddev;
+    this.lambda = lambda;
   }
 
   @Override
@@ -125,7 +97,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     double no = mean + random.nextGaussian() * stddev;
     double ex = -FastMath.log(random.nextDouble()) / lambda;
     return no + ex;
@@ -235,7 +207,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /**
      * Rate option, same as
      * {@link ExponentialDistribution.Parameterizer#RATE_ID}.
@@ -268,7 +240,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
     @Override
     protected ExponentiallyModifiedGaussianDistribution makeInstance() {
-      return new ExponentiallyModifiedGaussianDistribution(mean, stddev, lambda, rnd);
+      return new ExponentiallyModifiedGaussianDistribution(mean, stddev, lambda);
     }
   }
 }

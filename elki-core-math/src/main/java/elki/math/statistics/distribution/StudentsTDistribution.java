@@ -23,10 +23,10 @@ package elki.math.statistics.distribution;
 import java.util.Random;
 
 import elki.utilities.exceptions.NotImplementedException;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * @author Jan Brusis
  * @since 0.5.0
  */
-public class StudentsTDistribution extends AbstractDistribution {
+public class StudentsTDistribution implements Distribution {
   /**
    * Degrees of freedom
    */
@@ -49,28 +49,6 @@ public class StudentsTDistribution extends AbstractDistribution {
    * @param v Degrees of freedom
    */
   public StudentsTDistribution(int v) {
-    this(v, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param v Degrees of freedom
-   * @param random Random generator
-   */
-  public StudentsTDistribution(int v, Random random) {
-    super(random);
-    this.v = v;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param v Degrees of freedom
-   * @param random Random generator
-   */
-  public StudentsTDistribution(int v, RandomFactory random) {
-    super(random);
     this.v = v;
   }
 
@@ -96,7 +74,7 @@ public class StudentsTDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     // FIXME: implement!
     throw new NotImplementedException();
   }
@@ -148,7 +126,7 @@ public class StudentsTDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Degrees of freedom.
      */
@@ -169,7 +147,7 @@ public class StudentsTDistribution extends AbstractDistribution {
 
     @Override
     protected StudentsTDistribution makeInstance() {
-      return new StudentsTDistribution(nu, rnd);
+      return new StudentsTDistribution(nu);
     }
   }
 }

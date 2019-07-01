@@ -38,37 +38,37 @@ public class HaltonUniformDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("unif.ascii.gz");
-    checkPDF(new HaltonUniformDistribution(0., 1.), "pdf_gnur_0_1", 1e-15);
-    checkPDF(new HaltonUniformDistribution(-1., 2.), "pdf_gnur_M1_2", 1e-15);
-    checkPDF(new HaltonUniformDistribution(0., 1.), "pdf_scipy_0_1", 1e-15);
-    checkPDF(new HaltonUniformDistribution(-1., 2.), "pdf_scipy_M1_2", 1e-15);
+    checkPDF(new HaltonUniformDistribution(0., 1., 3, 0), "pdf_gnur_0_1", 1e-15);
+    checkPDF(new HaltonUniformDistribution(-1., 2., 3, 0), "pdf_gnur_M1_2", 1e-15);
+    checkPDF(new HaltonUniformDistribution(0., 1., 3, 0), "pdf_scipy_0_1", 1e-15);
+    checkPDF(new HaltonUniformDistribution(-1., 2., 3, 0), "pdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("unif.ascii.gz");
-    checkLogPDF(new HaltonUniformDistribution(0., 1.), "logpdf_gnur_0_1", 1e-15);
-    checkLogPDF(new HaltonUniformDistribution(-1., 2.), "logpdf_gnur_M1_2", 1e-15);
-    checkLogPDF(new HaltonUniformDistribution(0., 1.), "logpdf_scipy_0_1", 1e-15);
-    checkLogPDF(new HaltonUniformDistribution(-1., 2.), "logpdf_scipy_M1_2", 1e-15);
+    checkLogPDF(new HaltonUniformDistribution(0., 1., 3, 0), "logpdf_gnur_0_1", 1e-15);
+    checkLogPDF(new HaltonUniformDistribution(-1., 2., 3, 0), "logpdf_gnur_M1_2", 1e-15);
+    checkLogPDF(new HaltonUniformDistribution(0., 1., 3, 0), "logpdf_scipy_0_1", 1e-15);
+    checkLogPDF(new HaltonUniformDistribution(-1., 2., 3, 0), "logpdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("unif.ascii.gz");
-    checkCDF(new HaltonUniformDistribution(0., 1.), "cdf_gnur_0_1", 1e-15);
-    checkCDF(new HaltonUniformDistribution(-1., 2.), "cdf_gnur_M1_2", 1e-15);
-    checkCDF(new HaltonUniformDistribution(0., 1.), "cdf_scipy_0_1", 1e-15);
-    checkCDF(new HaltonUniformDistribution(-1., 2.), "cdf_scipy_M1_2", 1e-15);
+    checkCDF(new HaltonUniformDistribution(0., 1., 3, 0), "cdf_gnur_0_1", 1e-15);
+    checkCDF(new HaltonUniformDistribution(-1., 2., 3, 0), "cdf_gnur_M1_2", 1e-15);
+    checkCDF(new HaltonUniformDistribution(0., 1., 3, 0), "cdf_scipy_0_1", 1e-15);
+    checkCDF(new HaltonUniformDistribution(-1., 2., 3, 0), "cdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("unif.ascii.gz");
-    checkQuantile(new HaltonUniformDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
-    checkQuantile(new HaltonUniformDistribution(-1., 2.), "quant_gnur_M1_2", 1e-15);
-    checkQuantile(new HaltonUniformDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
-    checkQuantile(new HaltonUniformDistribution(-1., 2.), "quant_scipy_M1_2", 1e-15);
+    checkQuantile(new HaltonUniformDistribution(0., 1., 3, 0), "quant_gnur_0_1", 1e-15);
+    checkQuantile(new HaltonUniformDistribution(-1., 2., 3, 0), "quant_gnur_M1_2", 1e-15);
+    checkQuantile(new HaltonUniformDistribution(0., 1., 3, 0), "quant_scipy_0_1", 1e-15);
+    checkQuantile(new HaltonUniformDistribution(-1., 2., 3, 0), "quant_scipy_M1_2", 1e-15);
   }
 
   @Test
@@ -83,7 +83,7 @@ public class HaltonUniformDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testRandom() {
-    checkRandom(new HaltonUniformDistribution(-1, 2, new Random(0L)), 10000, 1e-4);
-    checkRandom(new HaltonUniformDistribution(1, 4, new Random(1L)), 10000, 1e-3);
+    checkRandom(new HaltonUniformDistribution(-1, 2, 3, 0.1234), new Random(0L), 10000, 1e-4);
+    checkRandom(new HaltonUniformDistribution(1, 4, 3, 0.1234), new Random(1L), 10000, 1e-4);
   }
 }

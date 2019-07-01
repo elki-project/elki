@@ -20,6 +20,10 @@
  */
 package elki.math.statistics.distribution;
 
+import java.util.Random;
+
+import elki.utilities.optionhandling.OptionID;
+
 /**
  * Statistical distributions, with their common functions.
  * 
@@ -62,9 +66,12 @@ public interface Distribution {
   /**
    * Generate a new random value
    * 
+   * @param random Random number generator
    * @return new random value
    */
-  double nextRandom();
+  default double nextRandom(Random random) {
+    return quantile(random.nextDouble());
+  }
 
   /**
    * Describe the distribution
@@ -73,4 +80,26 @@ public interface Distribution {
    */
   @Override
   String toString();
+
+  /**
+   * Common distributions parameters.
+   *
+   * @author Erich Schubert
+   */
+  interface Parameterizer extends elki.utilities.optionhandling.Parameterizer {
+    /**
+     * Location parameter.
+     */
+    public static final OptionID LOCATION_ID = new OptionID("distribution.location", "Distribution location parameter");
+
+    /**
+     * Scale parameter.
+     */
+    public static final OptionID SCALE_ID = new OptionID("distribution.scale", "Distribution scale parameter");
+
+    /**
+     * Shape parameter.
+     */
+    public static final OptionID SHAPE_ID = new OptionID("distribution.shape", "Distribution shape parameter");
+  }
 }

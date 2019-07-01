@@ -24,10 +24,10 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.exceptions.NotImplementedException;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  *
  * @composed - - - ChiSquaredDistribution
  */
-public class ChiDistribution extends AbstractDistribution {
+public class ChiDistribution implements Distribution {
   /**
    * Degrees of freedom. Usually integer.
    */
@@ -55,36 +55,13 @@ public class ChiDistribution extends AbstractDistribution {
    * @param dof Degrees of freedom. Usually integer.
    */
   public ChiDistribution(double dof) {
-    this(dof, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param dof Degrees of freedom. Usually integer.
-   * @param random Random number generator.
-   */
-  public ChiDistribution(double dof, Random random) {
-    super(random);
     this.dof = dof;
-    this.chisq = new ChiSquaredDistribution(dof, random);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param dof Degrees of freedom. Usually integer.
-   * @param random Random number generator.
-   */
-  public ChiDistribution(double dof, RandomFactory random) {
-    super(random);
-    this.dof = dof;
-    this.chisq = new ChiSquaredDistribution(dof, random);
+    this.chisq = new ChiSquaredDistribution(dof);
   }
 
   @Override
-  public double nextRandom() {
-    return FastMath.sqrt(chisq.nextRandom());
+  public double nextRandom(Random random) {
+    return FastMath.sqrt(chisq.nextRandom(random));
   }
 
   @Override
@@ -161,7 +138,7 @@ public class ChiDistribution extends AbstractDistribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Degrees of freedom parameter - same as
      * {@link ChiSquaredDistribution.Parameterizer#DOF_ID}.
@@ -183,7 +160,7 @@ public class ChiDistribution extends AbstractDistribution {
 
     @Override
     protected ChiDistribution makeInstance() {
-      return new ChiDistribution(dof, rnd);
+      return new ChiDistribution(dof);
     }
   }
 }

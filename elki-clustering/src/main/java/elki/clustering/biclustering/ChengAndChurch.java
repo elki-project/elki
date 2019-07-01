@@ -21,6 +21,7 @@
 package elki.clustering.biclustering;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -47,6 +48,8 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.random.RandomFactory;
 
 /**
  * Cheng and Church biclustering.
@@ -126,6 +129,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
   private Distribution dist;
 
   /**
+   * Random generator
+   */
+  private RandomFactory rnd;
+
+  /**
    * Constructor.
    *
    * @param delta Delta parameter: desired quality
@@ -133,13 +141,15 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *        approach
    * @param n Number of clusters to detect
    * @param dist Distribution of random values to insert
+   * @param rnd Random factory
    */
-  public ChengAndChurch(double delta, double alpha, int n, Distribution dist) {
+  public ChengAndChurch(double delta, double alpha, int n, Distribution dist, RandomFactory rnd) {
     super();
     this.delta = delta;
     this.alpha = alpha;
     this.n = n;
     this.dist = dist;
+    this.rnd = rnd;
   }
 
   /**
@@ -464,13 +474,14 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
      *
      * @param mat Mask to update.
      * @param replacement Distribution to sample replacement values from.
+     * @param rnd Random generator.
      */
-    protected void maskMatrix(final double[][] mat, final Distribution replacement) {
+    protected void maskMatrix(final double[][] mat, final Distribution replacement, final Random rnd) {
       visitAll(mat, CellVisitor.SELECTED, new CellVisitor() {
         @Override
         public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
           assert (selrow && selcol);
-          mat[row][col] = replacement.nextRandom();
+          mat[row][col] = replacement.nextRandom(rnd);
           return false;
         }
       });
@@ -524,6 +535,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     Clustering<BiclusterWithInversionsModel> result = new Clustering<>();
     Metadata.of(result).setLongName("Cheng-and-Church");
     ModifiableDBIDs noise = DBIDUtil.newHashSet(relation.getDBIDs());
+    Random rand = rnd.getSingleThreadedRandom();
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting Cluster", n, LOG) : null;
     for(int i = 0; i < n; i++) {
@@ -540,7 +552,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
       if(LOG.isVeryVerbose()) {
         LOG.veryverbose("Residue after Alg 3: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
-      cand.maskMatrix(mat, dist);
+      cand.maskMatrix(mat, dist, rand);
       BiclusterWithInversionsModel model = new BiclusterWithInversionsModel(colsBitsetToIDs(cand.cols), rowsBitsetToIDs(cand.irow));
       final ArrayDBIDs cids = rowsBitsetToIDs(cand.rows);
       noise.removeDBIDs(cids);
@@ -807,6 +819,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     public static final OptionID DIST_ID = new OptionID("chengandchurch.replacement", "Distribution of replacement values when masking found clusters.");
 
     /**
+     * Random source / seed / generator.
+     */
+    public static final OptionID RANDOM_ID = new OptionID("chengandchurch.seed", "Random generator seed.");
+
+    /**
      * Threshold value to determine the maximal acceptable score (mean squared
      * residue) of a bicluster.
      */
@@ -845,6 +862,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
      */
     private Distribution dist;
 
+    /**
+     * Random generator
+     */
+    private RandomFactory rnd;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -870,11 +892,16 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
       if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }
+
+      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
+      }
     }
 
     @Override
     protected ChengAndChurch<V> makeInstance() {
-      return new ChengAndChurch<>(delta, alpha, n, dist);
+      return new ChengAndChurch<>(delta, alpha, n, dist, rnd);
     }
   }
 }

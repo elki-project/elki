@@ -21,6 +21,7 @@
 package elki.datasource.filter.cleaning;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
@@ -35,6 +36,8 @@ import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.random.RandomFactory;
 
 /**
  * A filter to replace all NaN values with random values.
@@ -68,11 +71,20 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
   private ArrayList<Object> rows = new ArrayList<>();
 
   /**
-   * Constructor.
+   * Random generator.
    */
-  public ReplaceNaNWithRandomFilter(Distribution dist) {
+  private Random rnd;
+
+  /**
+   * Constructor.
+   * 
+   * @param dist Distribution to draw from
+   * @param rnd Random generator
+   */
+  public ReplaceNaNWithRandomFilter(Distribution dist, RandomFactory rnd) {
     super();
     this.dist = dist;
+    this.rnd = rnd.getSingleThreadedRandom();
   }
 
   @Override
@@ -111,7 +123,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
             for(int i = 0; i < v.getDimensionality(); i++) {
               if(Double.isNaN(v.doubleValue(i))) {
                 ro = ro != null ? ro : v.toArray();
-                ro[i] = dist.nextRandom();
+                ro[i] = dist.nextRandom(rnd);
               }
             }
             // If there was no NaN, ro will still be null.
@@ -167,7 +179,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
             for(int d = 0; d < v.getDimensionality(); d++) {
               if(Double.isNaN(v.doubleValue(d))) {
                 ro = ro != null ? ro : v.toArray();
-                ro[d] = dist.nextRandom();
+                ro[d] = dist.nextRandom(rnd);
               }
             }
           }
@@ -191,9 +203,19 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
     public static final OptionID REPLACEMENT_DISTRIBUTION = new OptionID("nanfilter.replacement", "Distribution to sample replacement values from.");
 
     /**
+     * Random source
+     */
+    public static final OptionID RANDOM_ID = new OptionID("nanfilter.seed", "Random generator seed.");
+
+    /**
      * Distribution to generate replacement values with.
      */
     private Distribution dist;
+
+    /**
+     * Random generator.
+     */
+    private RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -202,11 +224,15 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
       if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }
+      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
+      }
     }
 
     @Override
     protected ReplaceNaNWithRandomFilter makeInstance() {
-      return new ReplaceNaNWithRandomFilter(dist);
+      return new ReplaceNaNWithRandomFilter(dist, rnd);
     }
   }
 }

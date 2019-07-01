@@ -20,14 +20,12 @@
  */
 package elki.math.statistics.distribution;
 
-import java.util.Random;
-
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -43,27 +41,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * @param dof Degrees of freedom.
    */
   public ChiSquaredDistribution(double dof) {
-    this(dof, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param dof Degrees of freedom.
-   * @param random Random generator.
-   */
-  public ChiSquaredDistribution(double dof, Random random) {
-    super(.5 * dof, .5, random);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param dof Degrees of freedom.
-   * @param random Random generator.
-   */
-  public ChiSquaredDistribution(double dof, RandomFactory random) {
-    super(.5 * dof, .5, random);
+    super(.5 * dof, .5);
   }
 
   /**
@@ -148,7 +126,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Degrees of freedom parameter.
      */
@@ -169,7 +147,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
 
     @Override
     protected ChiSquaredDistribution makeInstance() {
-      return new ChiSquaredDistribution(dof, rnd);
+      return new ChiSquaredDistribution(dof);
     }
   }
 }

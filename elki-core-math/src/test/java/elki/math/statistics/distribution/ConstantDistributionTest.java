@@ -22,6 +22,8 @@ package elki.math.statistics.distribution;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import elki.utilities.ClassGenericsUtil;
@@ -88,15 +90,15 @@ public class ConstantDistributionTest extends AbstractDistributionTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(ConstantDistribution.Parameterizer.CONSTANT_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ConstantDistribution.class, params);
-    assertEquals(dist.nextRandom(), 2, 0.);
+    assertEquals(dist.nextRandom(new Random(0L)), 2, 0.);
   }
 
   @Test
   public void testRandom() {
     final double val = 2.;
     ConstantDistribution d = new ConstantDistribution(val);
-    assertEquals("Random not x", val, d.nextRandom(), 0.);
-    assertEquals("Random not x", val, d.nextRandom(), 0.);
-    assertEquals("Random not x", val, d.nextRandom(), 0.);
+    for(int i = 0; i < 10; i++) {
+      assertEquals("Random not x", val, d.nextRandom(new Random(i)), 0.);
+    }
   }
 }

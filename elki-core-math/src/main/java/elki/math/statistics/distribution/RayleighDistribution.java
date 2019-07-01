@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class RayleighDistribution extends AbstractDistribution {
+public class RayleighDistribution implements Distribution {
   /**
    * Location parameter.
    */
@@ -50,7 +50,7 @@ public class RayleighDistribution extends AbstractDistribution {
    * @param sigma Scale parameter
    */
   public RayleighDistribution(double sigma) {
-    this(0., sigma, (Random) null);
+    this(0., sigma);
   }
 
   /**
@@ -60,41 +60,6 @@ public class RayleighDistribution extends AbstractDistribution {
    * @param sigma Scale parameter
    */
   public RayleighDistribution(double mu, double sigma) {
-    this(mu, sigma, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param sigma Scale parameter
-   * @param random Random number generator
-   */
-  public RayleighDistribution(double sigma, Random random) {
-    this(0., sigma, random);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Position parameter
-   * @param sigma Scale parameter
-   * @param random Random number generator
-   */
-  public RayleighDistribution(double mu, double sigma, Random random) {
-    super(random);
-    this.mu = mu;
-    this.sigma = sigma;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Position parameter
-   * @param sigma Scale parameter
-   * @param random Random number generator
-   */
-  public RayleighDistribution(double mu, double sigma, RandomFactory random) {
-    super(random);
     this.mu = mu;
     this.sigma = sigma;
   }
@@ -204,7 +169,7 @@ public class RayleighDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
+  public double nextRandom(Random random) {
     return mu + sigma * FastMath.sqrt(-2. * FastMath.log(random.nextDouble()));
   }
 
@@ -218,7 +183,7 @@ public class RayleighDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mean, scale;
 
@@ -239,7 +204,7 @@ public class RayleighDistribution extends AbstractDistribution {
 
     @Override
     protected RayleighDistribution makeInstance() {
-      return new RayleighDistribution(mean, scale, rnd);
+      return new RayleighDistribution(mean, scale);
     }
   }
 }

@@ -22,11 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
-
 import net.jafama.FastMath;
 
 /**
@@ -37,7 +36,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class BetaDistribution extends AbstractDistribution {
+public class BetaDistribution implements Distribution {
   /**
    * Numerical precision to use
    */
@@ -80,39 +79,6 @@ public class BetaDistribution extends AbstractDistribution {
    * @param b shape Parameter b
    */
   public BetaDistribution(double a, double b) {
-    this(a, b, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param a shape Parameter a
-   * @param b shape Parameter b
-   * @param random Random generator
-   */
-  public BetaDistribution(double a, double b, Random random) {
-    super(random);
-    if(a <= 0.0 || b <= 0.0) {
-      throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
-    }
-
-    this.alpha = a;
-    this.beta = b;
-    this.logbab = logBeta(a, b);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param a shape Parameter a
-   * @param b shape Parameter b
-   * @param random Random generator
-   */
-  public BetaDistribution(double a, double b, RandomFactory random) {
-    super(random);
-    if(a <= 0.0 || b <= 0.0) {
-      throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
-    }
     this.alpha = a;
     this.beta = b;
     this.logbab = logBeta(a, b);
@@ -163,9 +129,9 @@ public class BetaDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double nextRandom() {
-    double x = GammaDistribution.nextRandom(alpha, 1, random);
-    double y = GammaDistribution.nextRandom(beta, 1, random);
+  public double nextRandom(Random random) {
+    final double x = GammaDistribution.nextRandom(alpha, 1, random);
+    final double y = GammaDistribution.nextRandom(beta, 1, random);
     return x / (x + y);
   }
 
@@ -469,7 +435,7 @@ public class BetaDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Alpha parameter.
      */
@@ -485,8 +451,6 @@ public class BetaDistribution extends AbstractDistribution {
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
@@ -500,7 +464,7 @@ public class BetaDistribution extends AbstractDistribution {
 
     @Override
     protected BetaDistribution makeInstance() {
-      return new BetaDistribution(alpha, beta, rnd);
+      return new BetaDistribution(alpha, beta);
     }
   }
 }

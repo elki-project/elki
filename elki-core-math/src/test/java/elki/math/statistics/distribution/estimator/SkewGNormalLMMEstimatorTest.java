@@ -61,10 +61,11 @@ public class SkewGNormalLMMEstimatorTest extends AbstractDistributionEstimatorTe
 
     // FIXME: Test with skewed independent reference data!
 
-    SkewGeneralizedNormalDistribution gen = new SkewGeneralizedNormalDistribution(6., 4., 3., new Random(0L));
+    Random rnd = new Random(0L);
+    SkewGeneralizedNormalDistribution gen = new SkewGeneralizedNormalDistribution(6., 4., 3.);
     data = new double[10000];
     for(int i = 0; i < data.length; i++) {
-      data[i] = gen.nextRandom();
+      data[i] = gen.nextRandom(rnd);
     }
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("loc", dist.getLocation(), 6., -0.2453097710580181);

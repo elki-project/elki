@@ -20,11 +20,12 @@
  */
 package elki.datasource.cleaning;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Test;
 
@@ -52,8 +53,8 @@ public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     String filename = UNITTEST + "nan-test-1.csv";
     ReplaceNaNWithRandomFilter filter = new ELKIBuilder<>(ReplaceNaNWithRandomFilter.class) //
-        .with(ReplaceNaNWithRandomFilter.Parameterizer.REPLACEMENT_DISTRIBUTION, //
-            new NormalDistribution(0, 1, new Random(0L))).build();
+        .with(ReplaceNaNWithRandomFilter.Parameterizer.REPLACEMENT_DISTRIBUTION, new NormalDistribution(0, 1)) //
+        .with(ReplaceNaNWithRandomFilter.Parameterizer.RANDOM_ID, 0L).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

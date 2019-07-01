@@ -20,26 +20,24 @@
  */
 package elki.math.statistics.distribution;
 
-import java.util.Random;
-
+import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.random.RandomFactory;
 import net.jafama.FastMath;
 
 /**
  * Generalized Extreme Value (GEV) distribution, also known as Fisher–Tippett
  * distribution.
- * 
+ * <p>
  * This is a generalization of the Frechnet, Gumbel and (reversed) Weibull
  * distributions.
- * 
+ * <p>
  * Implementation notice: In ELKI 0.8.0, the sign of the shape was negated.
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
+public class GeneralizedExtremeValueDistribution implements Distribution {
   /**
    * Parameters (location, scale, shape)
    */
@@ -53,34 +51,6 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
    * @param k Shape parameter k
    */
   public GeneralizedExtremeValueDistribution(double mu, double sigma, double k) {
-    this(mu, sigma, k, (Random) null);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Location parameter mu
-   * @param sigma Scale parameter sigma
-   * @param k Shape parameter k
-   * @param random Random number generator
-   */
-  public GeneralizedExtremeValueDistribution(double mu, double sigma, double k, RandomFactory random) {
-    super(random);
-    this.mu = mu;
-    this.sigma = sigma;
-    this.k = k;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param mu Location parameter mu
-   * @param sigma Scale parameter sigma
-   * @param k Shape parameter k
-   * @param random Random number generator
-   */
-  public GeneralizedExtremeValueDistribution(double mu, double sigma, double k, Random random) {
-    super(random);
     this.mu = mu;
     this.sigma = sigma;
     this.k = k;
@@ -245,7 +215,7 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
     /** Parameters. */
     double mu, sigma, k;
 
@@ -271,7 +241,7 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
 
     @Override
     protected GeneralizedExtremeValueDistribution makeInstance() {
-      return new GeneralizedExtremeValueDistribution(mu, sigma, k, rnd);
+      return new GeneralizedExtremeValueDistribution(mu, sigma, k);
     }
   }
 }

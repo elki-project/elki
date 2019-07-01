@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
@@ -179,10 +180,10 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
-  public void checkRandom(Distribution d, int size, double err) {
+  public void checkRandom(Distribution d, Random rnd, int size, double err) {
     double[] data = new double[size];
     for(int i = 0; i < size; i++) {
-      data[i] = d.nextRandom();
+      data[i] = d.nextRandom(rnd);
     }
     Arrays.sort(data);
     final double q0 = d.cdf(data[0]);
