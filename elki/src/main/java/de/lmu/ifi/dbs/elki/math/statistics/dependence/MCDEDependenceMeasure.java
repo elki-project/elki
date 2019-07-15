@@ -55,7 +55,7 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
 
     protected static <A> IndexTriple[] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
-        final double[] r = IntStream.range(0, len).mapToDouble(x -> x).toArray(); // TODO: potential for optimization (1), final?
+        // final double[] r = IntStream.range(0, len).mapToDouble(x -> x).toArray();
         IndexTriple[] I = new IndexTriple[len];
 
         int j = 0; int correction = 0;
@@ -63,20 +63,20 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
             int k = j; int t = 1; double adjust = 0.0;
 
             while((k < len - 1) && (adapter.getDouble(data, idx[k]) == adapter.getDouble(data, idx[k+1]))){
-                adjust += r[k]; // TODO: (1)
+                adjust += k;
                 k++; t++;
             }
 
             if(k > j){
-                double adjusted = (adjust + r[k]) / t; // TODO: (1)
+                double adjusted = (adjust + k) / t;
                 correction += (t*t*t) - t;
 
-                for(int m = j; m <= k; m++){ // TODO: Verify if < k or <= k
+                for(int m = j; m <= k; m++){
                     I[m] = new IndexTriple(idx[m], adjusted, correction);
                 }
             }
             else {
-                I[j] = new IndexTriple(idx[j], r[j], correction);
+                I[j] = new IndexTriple(idx[j], j, correction);
             }
             j += t;
         }
