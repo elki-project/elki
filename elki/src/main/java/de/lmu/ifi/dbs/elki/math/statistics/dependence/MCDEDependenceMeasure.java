@@ -1,10 +1,14 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 
 public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
@@ -14,6 +18,18 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
     private GoodnessOfFitTest statTest;
     private RandomFactory rnd;
 
+    static protected class IndexTriple {
+        int rank;
+        double adjusted_index;
+        double correction;
+
+        protected IndexTriple(int rank, double adjusted_index, double correction){
+            this.rank = rank;
+            this.adjusted_index = adjusted_index;
+            this.correction = correction;
+        }
+    }
+
     public MCDEDependenceMeasure(GoodnessOfFitTest statTest, int m, double alpha, double beta, RandomFactory rnd){
         this.m = m;
         this.alpha = alpha;
@@ -22,13 +38,50 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
         this.rnd = rnd;
     }
 
-    protected static <A> double[][] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+    protected static <A> IndexTriple[] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
         return correctedRank(adapter, data, sortedIndex(adapter, data, len));
     }
 
-    protected static <A> double[][] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
-        double[][] array = {{1.0, 2.0}, {4.0, 5.0}};
-        return array;
+    /**
+     * Computes Corrected Rank Index as described in Algorithm 1 of source paper, adjusted for bivariate ELKI interface.
+     * Notation as ELKI convention if applicable, else as in paper.
+     *
+     * @param adapter
+     * @param data
+     * @param idx
+     * @param <A>
+     * @return
+     */
+
+    protected static <A> IndexTriple[] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
+        final int len = adapter.size(data);
+        final double[] r = IntStream.range(0, len).mapToDouble(x -> x).toArray(); // TODO: potential for optimization (1), final?
+        IndexTriple[] I = new IndexTriple[len];
+
+        int j = 0; int correction = 0;
+        while(j < len){
+            int k = j; int t = 1; double adjust = 0.0;
+
+            while((k < len - 1) && (adapter.getDouble(data, idx[k]) == adapter.getDouble(data, idx[k+1]))){
+                adjust += r[k]; // TODO: (1)
+                k++; t++;
+            }
+
+            if(k > j){
+                double adjusted = (adjust + r[k]) / t; // TODO: (1)
+                correction += (t*t*t) - t;
+
+                for(int m = j; m <= k; m++){ // TODO: Verify if < k or <= k
+                    I[m] = new IndexTriple(idx[m], adjusted, correction);
+                }
+            }
+            else {
+                I[j] = new IndexTriple(idx[j], r[j], correction);
+            }
+            j += t;
+        }
+
+        return I;
     }
 
 
