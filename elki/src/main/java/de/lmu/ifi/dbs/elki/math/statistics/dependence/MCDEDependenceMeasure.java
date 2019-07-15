@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
+import java.util.Arrays;
+import java.util.Random;
+
 
 
 public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
@@ -19,9 +19,9 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
     private RandomFactory rnd;
 
     static protected class IndexTriple {
-        int rank;
-        double adjusted_index;
-        double correction;
+        final int rank;
+        final double adjusted_index;
+        final double correction;
 
         protected IndexTriple(int rank, double adjusted_index, double correction){
             this.rank = rank;
@@ -55,7 +55,6 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
 
     protected static <A> IndexTriple[] correctedRank(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
-        // final double[] r = IntStream.range(0, len).mapToDouble(x -> x).toArray();
         IndexTriple[] I = new IndexTriple[len];
 
         int j = 0; int correction = 0;
@@ -82,6 +81,34 @@ public class MCDEDependenceMeasure extends AbstractDependenceMeasure {
         }
 
         return I;
+    }
+
+    /**
+     * Data Slicing
+     *
+     * @param len No of data instances
+     * @param nonRefIndex Index (see correctedRank()) for the dimension that is not the reference dimension
+     * @return Array of booleans that states which instances are part of the slice
+     */
+
+    protected boolean[] randomSlice(int len, IndexTriple[] nonRefIndex){
+        final Random random = rnd.getSingleThreadedRandom();
+        boolean slice[] = new boolean[len];
+        Arrays.fill(slice, Boolean.TRUE);
+
+        final int slizeSize = (int) Math.ceil(Math.pow(this.alpha, 1.0) * len);
+        final int start = random.nextInt(len - slizeSize);
+        final int end = start + slizeSize;
+
+        for(int j = 0; j < start; j++){
+            slice[nonRefIndex[j].rank] = false;
+        }
+
+        for(int j = end; j < len; j++){
+            slice[nonRefIndex[j].rank] = false;
+        }
+
+        return slice;
     }
 
 
