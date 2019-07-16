@@ -21,14 +21,6 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
     }
 
     /**
-     * Overloaded wrapper for ranks()
-     */
-
-    protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
-        return ranks(adapter, data, sortedIndex(adapter, data, len));
-    }
-
-    /**
      * Computes Corrected Rank Index as described in Algorithm 1 of source paper, adjusted for bivariate ELKI interface.
      * Notation as ELKI convention if applicable, else as in paper.
      *
@@ -38,12 +30,12 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
      * @return Array of doubles, 3 subsequent values being assigned to one data instance.
      * Containing sorted (ascending) row numbers, adjusted ranks and tying value corrections
      * as required by MWP test. Example:
-     * double[] corrected_ranks = ranks(...);
+     * double[] corrected_ranks = corrected_ranks(...);
      * double l = corrected_rank[0]; double adjusted_rank = corrected_rank[1]; double correction = corrected_rank[2];
      * // correspond to one instance of the original data
      */
 
-    protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
+    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
         double[] I = new double[len * 3];
 

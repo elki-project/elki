@@ -40,6 +40,26 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
     protected RandomFactory rnd;
 
     /**
+     * Overloaded wrapper for corrected_ranks()
+     */
+
+    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks but problem with static...
+        return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
+    }
+
+    /**
+     * Subclass should implement computation of corrected rank index used for precomputation.
+     * Adjusted for bivariate ELKI interface.
+     *
+     * @param adapter ELKI NumberArrayAdapter Subclass
+     * @param data One dimensional array containing one dimension of the data
+     * @param idx Return value of sortedIndex()
+     * @return Array of doubles, acting as rank index
+     */
+
+    protected abstract <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
+
+    /**
      * Data Slicing
      *
      * @param len No of data instances
@@ -60,8 +80,8 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
         if(len != adapter2.size(data2))
             throw new AbortException("Size of both arrays must match!");
 
-        final double[] index_0 = ranks(adapter1, data1, len); // TODO: potential for calling wron ranks
-        final double[] index_1 = ranks(adapter2, data2, len);
+        final double[] index_0 = corrected_ranks(adapter1, data1, len);
+        final double[] index_1 = corrected_ranks(adapter2, data2, len);
 
         double mwp = 0;
         for(int i = 0; i < this.m; i++){ // TODO: could also be done through modulo so that we avoid the random generation
