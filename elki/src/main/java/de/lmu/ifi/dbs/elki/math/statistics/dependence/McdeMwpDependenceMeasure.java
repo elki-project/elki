@@ -110,35 +110,35 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
 
     protected double statistical_test(int len, boolean[] slice, double[] corrected_ranks){
         final Random random = rnd.getSingleThreadedRandom(); // TODO: No "safeCut", make safecut?
-        int start = random.nextInt((int) (len * (1 - this.beta))); // TODO: Marginal restriction, eigentlich 1 bis (...) im paper, hier 0 bis, ACHTUNG!!
-        int end = start + (int) Math.ceil(len * this.beta); // TODO: Marginal restriction
+        final int start = random.nextInt((int) (len * (1 - this.beta))); // TODO: Marginal restriction
+        final int end = start + (int) Math.ceil(len * this.beta); // TODO: Marginal restriction
 
         double R = 0.0; int n1 = 0;
-        for(int j = start; j < end; j++){ // TODO: < oder <=
+        for(int j = start; j < end; j++){
 
             if(slice[(int) corrected_ranks[j*3]]){
                 R += corrected_ranks[j*3 + 1];
                 n1++;
             }
         }
-        int n_bar = end - start;
 
-        if((n1 == 0) || (n1 == n_bar)){
-            return 1;
-        }
+        R -= start * n1; // TODO: Potential for Error
 
-        double U = R - start * n1; // TODO: in Scala it is R - (n1 * (n1-1))/2 "because ranking starts at 0"
-        int n2 = n_bar - n1;
-        double b_end = corrected_ranks[(end-1) *3 +2];
-        double b_start = start == 0 ? 0 : corrected_ranks[(start-1) *3 +2];
-        double correction = (b_end - b_start) / (n_bar * (n_bar -1));
-        double std = Math.sqrt(( ((double) (n1 * n2)) / 12) * (n_bar + 1 - correction));
+        final int cutLength = end - start;
+        if((n1 == 0) || (n1 == cutLength)) return 1;
+
+        final double U = R - ((double)(n1 * (n1 - 1))) / 2; // TODO: Potential for Error
+        final int n2 = cutLength - n1;
+        final double b_end = corrected_ranks[(end-1) *3 +2];
+        final double b_start = start == 0 ? 0 : corrected_ranks[(start-1) *3 +2];
+        final double correction = (b_end - b_start) / (cutLength * (cutLength -1));
+        final double std = Math.sqrt(( ((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
 
         if(std == 0) return 0;
         else{
-            double mean = ((double) (n1 * n2)) / 2;
-            double Z = Math.abs((U - mean) / std);
-            return erf(Z / Math.sqrt(2)); // TODO: Check if this erf() is same as in scala
+            final double mean = ((double) (n1 * n2)) / 2;
+            final double Z = Math.abs((U - mean) / std);
+            return erf(Z / Math.sqrt(2)); // TODO: Potential for Error
         }
     }
 }
