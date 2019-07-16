@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
-import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
-import java.util.Arrays;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import java.util.Random;
 
 
@@ -53,8 +51,35 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
 
     protected abstract double statistical_test(int len, boolean[] slice, double[] corrected_ranks);
 
+    // TODO: Look at HiCS and what can be done here from there, e.g Nan protection
     @Override
     public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2){
-        return 1.0;
+        final Random random = rnd.getSingleThreadedRandom();
+        final int len = adapter1.size(data1);
+
+        if(len != adapter2.size(data2))
+            throw new AbortException("Size of both arrays must match!");
+
+        final double[] index_0 = ranks(adapter1, data1, len); // TODO: potential for calling wron ranks
+        final double[] index_1 = ranks(adapter2, data2, len);
+
+        double mwp = 0;
+        for(int i = 0; i < this.m; i++){ // TODO: could also be done through modulo so that we avoid the random generation
+            int r = random.nextInt(2);
+            double[] ref_index;
+            double[] other_index;
+
+            if(r == 1) {
+                ref_index = index_1;
+                other_index = index_0;
+            }
+            else {
+                ref_index = index_0;
+                other_index = index_1;
+            }
+
+            mwp += statistical_test(len, randomSlice(len, other_index), ref_index);
+        }
+        return mwp / m;
     }
 }

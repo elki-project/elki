@@ -11,33 +11,17 @@ public class Testing {
 
     public static void main(String[] args) {
         double[] data1 = {9.0, 9.0, 9.0, 3.0, 7.0, 1.0, 1.0, 1.0, 10.0, 10.0};
-        double[] data2 = new double[100];
+        double[] data2 = new double[10];
 
-        for(int i = 0; i < 100; i++){
-            double x = Math.random();
+        for(int i = 0; i < 10; i++){
+            double x = data1[i]*2;
             data2[i] = x;
         }
 
         NumberArrayAdapter adapter = DoubleArrayAdapter.STATIC;
-
-        KolmogorovSmirnovTest kogo = new KolmogorovSmirnovTest();
         RandomFactory rnd = new RandomFactory(5);
-        HiCSDependenceMeasure HiCS = new HiCSDependenceMeasure(kogo, 50, 0.1, rnd);
-        MCDEDependenceMeasure MCDE = new McdeMwpDependenceMeasure(50, 0.5, 0.5, rnd);
-        // System.out.print(HiCS.dependence(data1, data2));
-
-
-
-
-        double[] testTriple = McdeMwpDependenceMeasure.ranks(adapter, data1, 10);
-        boolean[] slice = MCDE.randomSlice(10, testTriple);
-
-        int counter = 0;
-        for(int i = 0; i < 10; i++){
-
-            if(slice[i]) ++counter;
-        }
-
-        System.out.println(counter);
+        // McdeMwpDependenceMeasure mwp = new McdeMwpDependenceMeasure(50, 0.5, 0.5, rnd);
+        // double res = mwp.dependence(adapter, data1, adapter, data2);
+        System.out.println("lol");
     }
 }
