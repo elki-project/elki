@@ -73,7 +73,7 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      * Overloaded wrapper for corrected_ranks()
      */
 
-    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks but problem with static...
+    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks() but problem with static...
         return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
     }
 
