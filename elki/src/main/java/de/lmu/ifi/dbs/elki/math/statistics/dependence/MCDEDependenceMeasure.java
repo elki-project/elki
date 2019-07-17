@@ -7,7 +7,26 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import java.util.Random;
 
+// TODO: Write tests
 
+/**
+ * Implementation of bivariate Monte Carlo Density Estimation as described in paper with the only exception that an
+ * additional parameter beta is introduced (see comment below).
+ *
+ * This is an abstract class. In order to use MCDE extend it and implement an appropriate statistical test that
+ * returns a p-value and index structure for efficient computation of the statistical test.
+ *
+ * For MCDE with MWP as the statistical test (as described in the paper) see McdeMwpDependenceMeasure.
+ *
+ * @author Alan Mazankiewicz
+ * @author Edouard Fouché
+ */
+
+@Reference(authors = "Edouard Fouché, Klemens Böhm", //
+        title = "Monte Carlo Density Estimation", //
+        booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", // TODO: Fill out
+        url = "https://doi.org/10.1145/2463676.2463696", //
+        bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 
 public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
 
@@ -28,7 +47,7 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
 
     /**
      * Expected share of instances in marginal restriction (reference dimension). Note that in the original paper
-     * alpha = beta and there is no explicit distinction between the parameters. TODO: Implement correctly that beta is used
+     * alpha = beta and there is no explicit distinction between the parameters.
      */
 
     protected double beta = 0.5;
@@ -38,6 +57,17 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      */
 
     protected RandomFactory rnd;
+
+    public MCDEDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd){
+        if((beta > 1.0) || beta < 0.0) throw new AbortException("beta has to be in (0,1) range (inclusive)");
+        if((alpha > 1.0) || alpha < 0.0) throw new AbortException("beta has to be in (0,1) range (inclusive)");
+        if(m < 1) throw new AbortException("m has to be > 0");
+
+        this.m = m;
+        this.alpha = alpha;
+        this.beta = beta;
+        this.rnd = rnd;
+    }
 
     /**
      * Overloaded wrapper for corrected_ranks()
@@ -67,11 +97,23 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      * @return Array of booleans that states which instances are part of the slice
      */
 
-    protected abstract boolean[] randomSlice(int len, double[] nonRefIndex);
+    protected abstract boolean[] randomSlice(int len, double[] nonRefIndex); // TODO: implement in abstract class, change index so that it is an objects always containing sortedIndex
 
     protected abstract double statistical_test(int len, boolean[] slice, double[] corrected_ranks);
 
-    // TODO: Look at HiCS and what can be done here from there, e.g Nan protection
+    /**
+     * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
+     * Note: Data may not contain NaN values.
+     *
+     * @param adapter1 First data adapter
+     * @param data1 First data set
+     * @param adapter2 Second data adapter
+     * @param data2 Second data set
+     * @param <A> Numeric data type, such as double
+     * @param <B> Numeric data type, such as double
+     * @return MCDE result
+     */
+
     @Override
     public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2){
         final Random random = rnd.getSingleThreadedRandom();
@@ -102,4 +144,6 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
         }
         return mwp / m;
     }
+
+    // TODO: Parametizer class
 }

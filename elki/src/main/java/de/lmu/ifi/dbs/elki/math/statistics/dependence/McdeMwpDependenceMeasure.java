@@ -1,10 +1,29 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import java.util.Arrays;
 import java.util.Random;
 import static de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution.erf;
+
+/**
+ * Implementation of bivariate Monte Carlo Density Estimation using MWP statistical test as described in paper with the
+ * only exception that an additional parameter beta is introduced (see comment below).
+ *
+ * This class extends MCDEDependenceMeasure and implements the Mann-Whitney-U statistical test (as well as p-value computation from the test statistic)
+ * and an appropriate index structure.
+ *
+ * @author Alan Mazankiewicz
+ * @author Edouard Fouché
+ */
+
+@Reference(authors = "Edouard Fouché, Klemens Böhm", //
+        title = "Monte Carlo Density Estimation", //
+        booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", // TODO: Fill out
+        url = "https://doi.org/10.1145/2463676.2463696", //
+        bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 
 public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
 
@@ -13,11 +32,7 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
      */
 
     public McdeMwpDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd){
-        super();
-        this.m = m;
-        this.alpha = alpha;
-        this.beta = beta;
-        this.rnd = rnd;
+        super(m, alpha, beta, rnd);
     }
 
     /**
@@ -100,12 +115,21 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
         return slice;
     }
 
+    /**
+     * Efficient implementation of MWP statistical test using appropriate index structure as described in Algorithm 3
+     * of source paper.
+     * @param len No of data instances
+     * @param slice Return value of randomSlice() created with the index that is not for the reference dimension
+     * @param corrected_ranks Index, return value of corrected_ranks() of the reference dimension
+     * @return p-value from two sided Mann-Whitney-U test
+     */
+
     protected double statistical_test(int len, boolean[] slice, double[] corrected_ranks){
         final Random random = rnd.getSingleThreadedRandom(); // TODO: No "safeCut", make safecut?
-        final int start = random.nextInt((int) (len * (1 - this.beta))); // TODO: Marginal restriction
-        final int end = start + (int) Math.ceil(len * this.beta); // TODO: Marginal restriction
+        final int start = random.nextInt((int) (len * (1 - this.beta)));
+        final int end = start + (int) Math.ceil(len * this.beta);
 
-        double R = 0.0; int n1 = 0;
+        double R = 0.0; long n1 = 0;
         for(int j = start; j < end; j++){
 
             if(slice[(int) corrected_ranks[j*3]]){
@@ -120,7 +144,12 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
         if((n1 == 0) || (n1 == cutLength)) return 1;
 
         final double U = R - ((double)(n1 * (n1 - 1))) / 2; // TODO: Potential for Error
-        final int n2 = cutLength - n1;
+        final long n2 = cutLength - n1;
+
+        final long two_times_sqrt_max_long = 6074000999L;
+        if(n1 + n2 > two_times_sqrt_max_long)
+            throw new AbortException("Long type overflowed. Dataset has to many dataobjects. Please subsample and try again with smaller dataset.");
+
         final double b_end = corrected_ranks[(end-1) *3 +2];
         final double b_start = start == 0 ? 0 : corrected_ranks[(start-1) *3 +2];
         final double correction = (b_end - b_start) / (cutLength * (cutLength -1));
@@ -133,4 +162,6 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
             return erf(Z / Math.sqrt(2)); // TODO: Potential for Error
         }
     }
+
+    // TODO: Parametizer class
 }
