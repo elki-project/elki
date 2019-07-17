@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
-import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
@@ -30,7 +29,7 @@ public class Testing {
         RandomFactory rnd = new RandomFactory(5);
         McdeMwpDependenceMeasure mwp = new McdeMwpDependenceMeasure(50, 0.5, 0.5, rnd);
         for(int i = 0; i < 20; i++){
-            double res = mwp.dependence(adapter, data3, adapter, data4);
+            double res = mwp.dependence(adapter, data1, adapter, data2);
             System.out.println(res);
         }
     }

@@ -4,9 +4,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
-import java.util.Arrays;
+import java.lang.reflect.Array;
 import java.util.Random;
 import static de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution.erf;
+import de.lmu.ifi.dbs.elki.utils.containers.MwpIndex;
 
 /**
  * Implementation of bivariate Monte Carlo Density Estimation using MWP statistical test as described in paper with the
@@ -25,7 +26,7 @@ import static de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistributio
         url = "https://doi.org/10.1145/2463676.2463696", //
         bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 
-public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
+public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
 
     /**
      * Constructor
@@ -50,9 +51,9 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
      * // correspond to one instance of the original data
      */
 
-    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
+    protected <A> MwpIndex[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
-        double[] I = new double[len * 3];
+        MwpIndex[] I = (MwpIndex[]) Array.newInstance(MwpIndex.class, len);
 
         int j = 0; int correction = 0;
         while(j < len){
@@ -68,51 +69,15 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
                 correction += (t*t*t) - t;
 
                 for(int m = j; m <= k; m++){
-                    int p = m*3;
-                    I[p] = (double) idx[m];
-                    I[p+1] = adjusted;
-                    I[p+2] = correction;
+                    I[m] = new MwpIndex(idx[m], adjusted, correction);
                 }
             }
-            else {
-                int p = j*3;
-                I[p] = (double)idx[j];
-                I[p+1] = j;
-                I[p+2] = correction;
-            }
+            else
+                I[j] = new MwpIndex(idx[j], j, correction);
             j += t;
         }
 
         return I;
-    }
-
-    /**
-     * Data Slicing
-     *
-     * @param len No of data instances
-     * @param nonRefIndex Index (see correctedRank()) for the dimension that is not the reference dimension
-     * @return Array of booleans that states which instances are part of the slice
-     */
-
-
-    protected boolean[] randomSlice(int len, double[] nonRefIndex){
-        final Random random = rnd.getSingleThreadedRandom();
-        boolean slice[] = new boolean[len];
-        Arrays.fill(slice, Boolean.TRUE);
-
-        final int slizeSize = (int) Math.ceil(Math.pow(this.alpha, 1.0) * len);
-        final int start = random.nextInt(len - slizeSize);
-        final int end = start + slizeSize;
-
-        for(int j = 0; j < start; j++){
-            slice[(int) nonRefIndex[j*3]] = false;
-        }
-
-        for(int j = end; j < len; j++){
-            slice[(int) nonRefIndex[j*3]] = false;
-        }
-
-        return slice;
     }
 
     /**
@@ -124,7 +89,7 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
      * @return p-value from two sided Mann-Whitney-U test
      */
 
-    protected double statistical_test(int len, boolean[] slice, double[] corrected_ranks){
+    protected double statistical_test(int len, boolean[] slice, MwpIndex[] corrected_ranks){
         final Random random = rnd.getSingleThreadedRandom(); // TODO: No "safeCut", make safecut?
         final int start = random.nextInt((int) (len * (1 - this.beta)));
         final int end = start + (int) Math.ceil(len * this.beta);
@@ -132,8 +97,8 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
         double R = 0.0; long n1 = 0;
         for(int j = start; j < end; j++){
 
-            if(slice[(int) corrected_ranks[j*3]]){
-                R += corrected_ranks[j*3 + 1];
+            if(slice[corrected_ranks[j].index]){
+                R += corrected_ranks[j].adjusted;
                 n1++;
             }
         }
@@ -150,8 +115,8 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure {
         if(n1 + n2 > two_times_sqrt_max_long)
             throw new AbortException("Long type overflowed. Dataset has to many dataobjects. Please subsample and try again with smaller dataset.");
 
-        final double b_end = corrected_ranks[(end-1) *3 +2];
-        final double b_start = start == 0 ? 0 : corrected_ranks[(start-1) *3 +2];
+        final double b_end = corrected_ranks[(end-1)].correction;
+        final double b_start = start == 0 ? 0 : corrected_ranks[(start-1)].correction;
         final double correction = (b_end - b_start) / (cutLength * (cutLength -1));
         final double std = Math.sqrt(( ((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
 

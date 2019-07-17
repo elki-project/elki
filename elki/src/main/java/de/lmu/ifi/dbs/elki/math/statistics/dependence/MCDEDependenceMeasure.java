@@ -5,7 +5,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utils.containers.RankStruct;
+import java.util.Arrays;
 import java.util.Random;
+
 
 // TODO: Write tests
 
@@ -28,7 +31,7 @@ import java.util.Random;
         url = "https://doi.org/10.1145/2463676.2463696", //
         bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
 
-public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
+public abstract class MCDEDependenceMeasure<R extends RankStruct> extends AbstractDependenceMeasure {
 
     /**
      * Monte-Carlo iterations.
@@ -73,7 +76,7 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      * Overloaded wrapper for corrected_ranks()
      */
 
-    protected <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks() but problem with static...
+    protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks() but problem with static...
         return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
     }
 
@@ -87,7 +90,7 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      * @return Array of doubles, acting as rank index
      */
 
-    protected abstract <A> double[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
+    protected abstract <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
 
     /**
      * Data Slicing
@@ -97,9 +100,28 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
      * @return Array of booleans that states which instances are part of the slice
      */
 
-    protected abstract boolean[] randomSlice(int len, double[] nonRefIndex); // TODO: implement in abstract class, change index so that it is an objects always containing sortedIndex
 
-    protected abstract double statistical_test(int len, boolean[] slice, double[] corrected_ranks);
+    protected boolean[] randomSlice(int len, R[] nonRefIndex){
+        final Random random = rnd.getSingleThreadedRandom();
+        boolean slice[] = new boolean[len];
+        Arrays.fill(slice, Boolean.TRUE);
+
+        final int slizeSize = (int) Math.ceil(Math.pow(this.alpha, 1.0) * len);
+        final int start = random.nextInt(len - slizeSize);
+        final int end = start + slizeSize;
+
+        for(int j = 0; j < start; j++){
+            slice[nonRefIndex[j].index] = false;
+        }
+
+        for(int j = end; j < len; j++){
+            slice[(int) nonRefIndex[j].index] = false;
+        }
+
+        return slice;
+    }
+
+    protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
 
     /**
      * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
@@ -122,14 +144,14 @@ public abstract class MCDEDependenceMeasure extends AbstractDependenceMeasure {
         if(len != adapter2.size(data2))
             throw new AbortException("Size of both arrays must match!");
 
-        final double[] index_0 = corrected_ranks(adapter1, data1, len);
-        final double[] index_1 = corrected_ranks(adapter2, data2, len);
+        final R[] index_0 = corrected_ranks(adapter1, data1, len);
+        final R[] index_1 = corrected_ranks(adapter2, data2, len);
 
         double mwp = 0;
         for(int i = 0; i < this.m; i++){ // TODO: could also be done through modulo so that we avoid the random generation
             int r = random.nextInt(2);
-            double[] ref_index;
-            double[] other_index;
+            R[] ref_index;
+            R[] other_index;
 
             if(r == 1) {
                 ref_index = index_1;
