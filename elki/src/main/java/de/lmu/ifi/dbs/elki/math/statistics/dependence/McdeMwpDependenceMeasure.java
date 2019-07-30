@@ -10,7 +10,10 @@ import static de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistributio
 import de.lmu.ifi.dbs.elki.utils.containers.MwpIndex;
 
 /**
- * Implementation of bivariate Monte Carlo Density Estimation using Mann-Withney U test, known as MWP.
+ * Implementation of bivariate Monte Carlo Density Estimation using Mann-Withney U test, known as MWP. See
+ * Edouard Fouché & Klemens Böhm<br>
+ * Monte Carlo Density Estimation<br>
+ * Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)
  *
  * This class extends MCDEDependenceMeasure and implements the Mann-Whitney-U statistical test and an appropriate index structure.
  *

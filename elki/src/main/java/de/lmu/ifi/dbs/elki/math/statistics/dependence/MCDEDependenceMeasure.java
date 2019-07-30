@@ -14,9 +14,9 @@ import java.util.Random;
 
 /**
  * Implementation of bivariate Monte Carlo Density Estimation as described in
- * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek<br>
- * Interactive Data Mining with 3D-Parallel-Coordinate-Trees<br>
- * Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)
+ * Edouard Fouché & Klemens Böhm<br>
+ * Monte Carlo Density Estimation<br>
+ * Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)
  *
  * This is an abstract class. In order to use MCDE extend it and implement an appropriate statistical test that
  * returns a p-value and index structure for efficient computation of the statistical test.
