@@ -22,25 +22,11 @@ package elki.index.tree.spatial.rstarvariants.rdknn;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
@@ -134,14 +120,15 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     // reverse knn of o
     ModifiableDoubleDBIDList rnns = DBIDUtil.newDistanceDBIDList();
     doReverseKNN(getRoot(), ((RdKNNLeafEntry) entry).getDBID(), rnns);
-
     // knn of rnn
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rnns);
-    ids.sort();
-    List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(ids, settings.k_max);
+    ids.sort(); // Sort by ID, not by distance!
+    double[] kdists = new double[ids.size()];
+    for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      kdists[iter.getOffset()] = knnQuery.getKNNForDBID(iter, settings.k_max).getKNNDistance();
+    }
 
-    // adjust knn distances
-    adjustKNNDistance(getRootEntry(), ids, knnLists);
+    adjustKNNDistances(getRootEntry(), ids, kdists);
   }
 
   /**
@@ -155,14 +142,16 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     // adjust all knn distances
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
     for(RdKNNEntry entry : entries) {
-      DBID id = ((RdKNNLeafEntry) entry).getDBID();
-      ids.add(id);
+      ids.add(((RdKNNLeafEntry) entry).getDBID());
     }
     ids.sort();
-    List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(ids, settings.k_max);
-    adjustKNNDistance(getRootEntry(), ids, knnLists);
+    double[] kdists = new double[ids.size()];
+    for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      kdists[iter.getOffset()] = knnQuery.getKNNForDBID(iter, settings.k_max).getKNNDistance();
+    }
 
-    // test
+    adjustKNNDistances(getRootEntry(), ids, kdists);
+    // Optional test
     doExtraIntegrityChecks();
   }
 
@@ -182,14 +171,9 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     }
 
     // refinement of candidates, if k < k_max
-    ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray(candidates);
-    candidateIDs.sort();
-    List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
-
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    int i = 0;
-    for(DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance(), i++) {
-      for(DoubleDBIDListIter qr = knnLists.get(i).iter(); qr.valid(); qr.advance()) {
+    for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+      for(DoubleDBIDListIter qr = knnQuery.getKNNForDBID(iter, k).iter(); qr.valid(); qr.advance()) {
         if(DBIDUtil.equal(oid, qr)) {
           result.add(qr.doubleValue(), iter);
           break;
@@ -199,58 +183,6 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
     result.sort();
     return result;
-  }
-
-  public List<ModifiableDoubleDBIDList> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistance<? super O> distanceFunction, KNNQuery<O> knnQuery) {
-    checkDistance(distanceFunction);
-    if(k > settings.k_max) {
-      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
-    }
-
-    // get candidates
-    Map<DBID, ModifiableDoubleDBIDList> candidateMap = new HashMap<>();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      candidateMap.put(id, DBIDUtil.newDistanceDBIDList());
-    }
-    doBulkReverseKNN(getRoot(), ids, candidateMap);
-
-    if(k == settings.k_max) {
-      List<ModifiableDoubleDBIDList> resultList = new ArrayList<>();
-      for(ModifiableDoubleDBIDList candidates : candidateMap.values()) {
-        candidates.sort();
-        resultList.add(candidates);
-      }
-      return resultList;
-    }
-
-    // refinement of candidates, if k < k_max
-    // perform a knn query for the candidates
-    ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray();
-    for(ModifiableDoubleDBIDList candidates : candidateMap.values()) {
-      candidateIDs.addDBIDs(candidates);
-    }
-    candidateIDs.sort();
-    List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
-
-    // and add candidate c to the result if o is a knn of c
-    List<ModifiableDoubleDBIDList> resultList = new ArrayList<>();
-    for(DBID id : candidateMap.keySet()) {
-      ModifiableDoubleDBIDList candidates = candidateMap.get(id);
-      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-      for(DoubleDBIDListIter candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
-        int pos = candidateIDs.binarySearch(candidate);
-        assert (pos >= 0);
-        for(DoubleDBIDListIter qr = knnLists.get(pos).iter(); qr.valid(); qr.advance()) {
-          if(DBIDUtil.equal(id, qr)) {
-            result.add(qr.doubleValue(), candidate);
-            break;
-          }
-        }
-      }
-      resultList.add(result);
-    }
-    return resultList;
   }
 
   @Override
@@ -419,52 +351,13 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   }
 
   /**
-   * Performs a bulk reverse knn query in the specified subtree.
-   *
-   * @param node the root node of the current subtree
-   * @param ids the object ids for which the rknn query is performed
-   * @param result the map containing the query results for each object
-   */
-  private void doBulkReverseKNN(RdKNNNode node, DBIDs ids, Map<DBID, ModifiableDoubleDBIDList> result) {
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNLeafEntry entry = (RdKNNLeafEntry) node.getEntry(i);
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID id = DBIDUtil.deref(iter);
-          double distance = distanceQuery.distance(entry.getDBID(), id);
-          if(distance <= entry.getKnnDistance()) {
-            result.get(id).add(distance, entry.getDBID());
-          }
-        }
-      }
-    }
-    // node is a inner node
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNDirectoryEntry entry = (RdKNNDirectoryEntry) node.getEntry(i);
-        ModifiableDBIDs candidates = DBIDUtil.newArray();
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID id = DBIDUtil.deref(iter);
-          double minDist = distanceQuery.minDist(entry, id);
-          if(minDist <= entry.getKnnDistance()) {
-            candidates.add(id);
-          }
-          if(!candidates.isEmpty()) {
-            doBulkReverseKNN(getNode(entry), candidates, result);
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Adjusts the knn distance in the subtree of the specified root entry.
    *
    * @param entry the root entry of the current subtree
    * @param ids <em>Sorted</em> list of IDs
-   * @param knnLists a map of knn lists for each leaf entry
+   * @param kdists knn distances
    */
-  private void adjustKNNDistance(RdKNNEntry entry, ArrayDBIDs ids, List<? extends KNNList> knnLists) {
+  private void adjustKNNDistances(RdKNNEntry entry, ArrayDBIDs ids, double[] kdists) {
     RdKNNNode node = getNode(entry);
     double knnDist_node = 0.;
     if(node.isLeaf()) {
@@ -473,7 +366,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
         DBID id = ((LeafEntry) leafEntry).getDBID();
         int pos = ids.binarySearch(id);
         if(pos >= 0) {
-          leafEntry.setKnnDistance(knnLists.get(pos).getKNNDistance());
+          leafEntry.setKnnDistance(kdists[pos]);
         }
         knnDist_node = Math.max(knnDist_node, leafEntry.getKnnDistance());
       }
@@ -481,7 +374,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNEntry dirEntry = node.getEntry(i);
-        adjustKNNDistance(dirEntry, ids, knnLists);
+        adjustKNNDistances(dirEntry, ids, kdists);
         knnDist_node = Math.max(knnDist_node, dirEntry.getKnnDistance());
       }
     }

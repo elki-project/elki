@@ -20,15 +20,9 @@
  */
 package elki.database.query.knn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 
 /**
  * Instance for the query on a particular database.
@@ -53,29 +47,8 @@ public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
   }
 
   @Override
-  public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // throw new
-    // UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-    // TODO: optimize
-    List<KNNList> ret = new ArrayList<>(ids.size());
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      ret.add(getKNNForDBID(iter, k));
-    }
-    return ret;
-  }
-
-  @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(getRelation().get(id), k);
-  }
-
-  /**
-   * Get the relation to query.
-   *
-   * @return Relation
-   */
-  protected Relation<? extends O> getRelation() {
-    return distanceQuery.getRelation();
+    return getKNNForObject(distanceQuery.getRelation().get(id), k);
   }
 
   @Override

@@ -20,9 +20,6 @@
  */
 package elki.index.distancematrix;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -329,16 +326,6 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
         pos += y;
       }
       return heap.toKNNList();
-    }
-
-    @Override
-    public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      // TODO: optimize
-      List<KNNList> ret = new ArrayList<>(ids.size());
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        ret.add(getKNNForDBID(iter, k));
-      }
-      return ret;
     }
 
     @Override

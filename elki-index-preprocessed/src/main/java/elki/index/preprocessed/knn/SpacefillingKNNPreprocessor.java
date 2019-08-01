@@ -396,11 +396,6 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
     }
 
     @Override
-    public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new AbortException("Not yet implemented");
-    }
-
-    @Override
     public KNNList getKNNForObject(O obj, int k) {
       throw new AbortException("Not yet implemented");
     }

@@ -25,7 +25,6 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 
 /**
  * Abstract base class for range queries that use a distance query in their
@@ -55,7 +54,7 @@ public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(getRelation().get(id), range, ret);
+    getRangeForObject(distanceQuery.getRelation().get(id), range, ret);
     ret.sort();
     return ret;
   }
@@ -70,15 +69,6 @@ public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
 
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    getRangeForObject(getRelation().get(id), range, neighbors);
-  }
-
-  /**
-   * Get the relation to query.
-   *
-   * @return Relation
-   */
-  protected Relation<? extends O> getRelation() {
-    return distanceQuery.getRelation();
+    getRangeForObject(distanceQuery.getRelation().get(id), range, neighbors);
   }
 }

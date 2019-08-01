@@ -20,15 +20,7 @@
  */
 package elki.database.query.knn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 
@@ -55,11 +47,9 @@ public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> i
     final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
       final double dist = dq.distance(id, iter);
-      if(dist <= max) {
-        max = heap.insert(dist, iter);
-      }
+      max = dist <= max ? heap.insert(dist, iter) : max;
     }
     return heap.toKNNList();
   }
@@ -69,46 +59,10 @@ public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> i
     final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
       final double dist = dq.distance(obj, iter);
-      if(dist <= max) {
-        max = heap.insert(dist, iter);
-      }
+      max = dist <= max ? heap.insert(dist, iter) : max;
     }
     return heap.toKNNList();
-  }
-
-  @Override
-  public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    final int size = ids.size();
-    final List<KNNHeap> heaps = new ArrayList<>(size);
-    for(int i = 0; i < size; i++) {
-      heaps.add(DBIDUtil.newHeap(k));
-    }
-    linearScanBatchKNN(ids, heaps);
-    // Serialize heaps
-    List<KNNList> result = new ArrayList<>(size);
-    for(KNNHeap heap : heaps) {
-      result.add(heap.toKNNList());
-    }
-    return result;
-  }
-
-  /**
-   * Linear batch knn for arbitrary distance functions.
-   * 
-   * @param ids DBIDs to process
-   * @param heaps Heaps to store the results in
-   */
-  private void linearScanBatchKNN(ArrayDBIDs ids, List<KNNHeap> heaps) {
-    final DistanceQuery<O> dq = distanceQuery;
-    // The distance is computed on database IDs
-    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
-      int index = 0;
-      for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance(), index++) {
-        KNNHeap heap = heaps.get(index);
-        heap.insert(dq.distance(iter2, iter), iter);
-      }
-    }
   }
 }

@@ -20,13 +20,10 @@
  */
 package elki.index.tree.spatial.rstarvariants.query;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import elki.data.NumberVector;
-import elki.database.ids.*;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.KNNHeap;
+import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
@@ -107,9 +104,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
         SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
         double distance = SQUARED.minDist(entry, object);
         tree.statistics.countDistanceCalculation();
-        if(distance <= maxDist) {
-          maxDist = knnList.insert(distance, entry.getDBID());
-        }
+        maxDist = distance <= maxDist ? knnList.insert(distance, entry.getDBID()) : maxDist;
       }
     }
     // directory node
@@ -122,38 +117,11 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
         if(distance <= 0) {
           expandNode(object, knnList, pq, maxDist, entry.getPageID());
         }
-        else {
-          if(distance <= maxDist) {
-            pq.add(distance, entry.getPageID());
-          }
+        else if(distance <= maxDist) {
+          pq.add(distance, entry.getPageID());
         }
       }
     }
     return maxDist;
-  }
-
-  @Override
-  public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    // While this works, it seems to be slow at least for large sets!
-    // TODO: use a DataStore instead of a map.
-    final Map<DBID, KNNHeap> knnLists = new HashMap<>(ids.size());
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      knnLists.put(id, DBIDUtil.newHeap(k));
-    }
-
-    batchNN(tree.getRoot(), knnLists);
-
-    List<KNNList> result = new ArrayList<>();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      tree.statistics.countKNNQuery();
-      result.add(knnLists.get(id).toKNNListSqrt());
-    }
-    return result;
   }
 }

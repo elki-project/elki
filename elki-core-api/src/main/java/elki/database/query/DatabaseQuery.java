@@ -31,11 +31,6 @@ package elki.database.query;
  */
 public interface DatabaseQuery {
   /**
-   * Optimizer hint: request bulk support.
-   */
-  String HINT_BULK = "need_bulk";
-
-  /**
    * Optimizer hint: only a single request will be done - avoid expensive
    * optimizations
    */

@@ -20,6 +20,8 @@
  */
 package elki.index.preprocessed.knn;
 
+import java.util.Random;
+
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
@@ -43,7 +45,7 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * NN-desent (also known as KNNGraph) is an approximate nearest neighbor search
+ * NN-descent (also known as KNNGraph) is an approximate nearest neighbor search
  * algorithm beginning with a random sample, then iteratively refining this
  * sample until.
  * <p>
@@ -149,22 +151,24 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     // Initialize data structures:
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       store.put(iditer, DBIDUtil.newHeap(internal_k));
-      newReverseNeighbors.put(iditer, DBIDUtil.newHashSet());
-      oldReverseNeighbors.put(iditer, DBIDUtil.newHashSet());
+      newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(internal_k));
+      oldReverseNeighbors.put(iditer, DBIDUtil.newHashSet(internal_k));
     }
 
     // this variable is the sampling size
     final int items = (int) Math.ceil(rho * internal_k);
 
     long counter_all = 0;
+    
+    Random rand = rnd.getSingleThreadedRandom();
 
     // initialize neighbors (depends on -setInitialNeighbors option)
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       // initialize sampled NN
-      ModifiableDBIDs sampleNew = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
+      ModifiableDBIDs sampleNew = DBIDUtil.randomSampleExcept(ids, iditer, items, rand);
       sampleNewNeighbors.put(iditer, DBIDUtil.newHashSet(sampleNew));
       // initialize RNN
-      ModifiableDBIDs sampleRev = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
+      ModifiableDBIDs sampleRev = DBIDUtil.randomSampleExcept(ids, iditer, items, rand);
       newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(sampleRev));
       // initialize new neighbors
       flag.put(iditer, DBIDUtil.newHashSet());

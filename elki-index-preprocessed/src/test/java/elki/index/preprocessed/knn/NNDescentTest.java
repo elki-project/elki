@@ -81,8 +81,8 @@ public class NNDescentTest {
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k, 16);
     // also test partial queries, forward only
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2, 6);
   }
 }

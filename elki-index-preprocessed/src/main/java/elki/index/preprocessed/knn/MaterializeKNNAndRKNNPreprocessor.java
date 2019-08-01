@@ -101,9 +101,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     }
 
     // knn query
-    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(DBIDArrayIter id = ids.iter(); id.valid(); id.advance()) {
-      KNNList kNNs = kNNList.get(id.getOffset());
+      KNNList kNNs = knnQuery.getKNNForDBID(id, k);
       storage.put(id, kNNs);
       for(DoubleDBIDListIter iter = kNNs.iter(); iter.valid(); iter.advance()) {
         materialized_RkNN.get(iter).add(DBIDUtil.newPair(iter.doubleValue(), id));
@@ -244,9 +243,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     LOG.beginStep(stepprog, 2, "New deletions ocurred, update the affected kNNs and RkNNs.");
     // Recompute the kNN for affected objects (in rkNN lists)
     {
-      List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
       for(DBIDArrayIter reknn = rkNN_ids.iter(); reknn.valid(); reknn.advance()) {
-        final KNNList rknnlist = kNNList.get(reknn.getOffset());
+        KNNList rknnlist = knnQuery.getKNNForDBID(reknn, k);
         if(rknnlist == null && !valid.contains(reknn)) {
           LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
           continue;

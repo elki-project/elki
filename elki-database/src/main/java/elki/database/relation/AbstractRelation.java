@@ -120,9 +120,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      StringBuilder buf = new StringBuilder(200) //
+          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
+          .append("Distance query: ").append(distanceQuery).append('\n');
       if(hints.length > 0) {
         buf.append("Hints:");
         for(Object o : hints) {
@@ -156,9 +156,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      StringBuilder buf = new StringBuilder(200) //
+          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
+          .append("Distance query: ").append(distanceQuery).append('\n');
       if(hints.length > 0) {
         buf.append("Hints:");
         for(Object o : hints) {
@@ -192,9 +192,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(simQuery).append('\n');
+      StringBuilder buf = new StringBuilder(200) //
+          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
+          .append("Distance query: ").append(simQuery).append('\n');
       if(hints.length > 0) {
         buf.append("Hints:");
         for(Object o : hints) {
@@ -232,9 +232,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      StringBuilder buf = new StringBuilder(200) //
+          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
+          .append("Distance query: ").append(distanceQuery).append('\n');
       if(hints.length > 0) {
         buf.append("Hints:");
         for(Object o : hints) {
@@ -243,7 +243,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
       getLogger().debugFinest(buf.toString());
     }
-    KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
+    KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
   }
 

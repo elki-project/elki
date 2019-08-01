@@ -21,14 +21,11 @@
 package elki.database.query.range;
 
 import elki.data.NumberVector;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
+
 import net.jafama.FastMath;
 
 /**
@@ -53,7 +50,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    final Relation<? extends O> relation = getRelation();
+    final Relation<? extends O> relation = distanceQuery.getRelation();
     // Note: subtle optimization. Get "id" only once!
     final O obj = relation.get(id);
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
@@ -64,7 +61,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public DoubleDBIDList getRangeForObject(O obj, double range) {
-    final Relation<? extends O> relation = getRelation();
+    final Relation<? extends O> relation = distanceQuery.getRelation();
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     linearScan(relation, relation.iterDBIDs(), obj, range, result);
     result.sort();
@@ -73,13 +70,13 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = getRelation();
+    final Relation<? extends O> relation = distanceQuery.getRelation();
     linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
   }
 
   @Override
   public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = getRelation();
+    final Relation<? extends O> relation = distanceQuery.getRelation();
     linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
   }
 

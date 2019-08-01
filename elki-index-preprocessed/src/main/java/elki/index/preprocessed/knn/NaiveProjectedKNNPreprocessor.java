@@ -317,11 +317,6 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
     }
 
     @Override
-    public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new AbortException("Not yet implemented");
-    }
-
-    @Override
     public KNNList getKNNForObject(O obj, int k) {
       throw new AbortException("Not yet implemented");
     }

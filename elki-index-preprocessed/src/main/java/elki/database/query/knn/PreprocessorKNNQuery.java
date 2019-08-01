@@ -20,10 +20,8 @@
  */
 package elki.database.query.knn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import elki.database.ids.*;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import elki.logging.Logging;
@@ -77,26 +75,6 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
       warned = true;
     }
     return preprocessor.get(id).subList(k);
-  }
-
-  @Override
-  public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    if(!warned && k > preprocessor.getK()) {
-      getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
-      warned = true;
-    }
-    if(k < preprocessor.getK()) {
-      List<KNNList> result = new ArrayList<>(ids.size());
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        result.add(preprocessor.get(iter).subList(k));
-      }
-      return result;
-    }
-    List<KNNList> result = new ArrayList<>(ids.size());
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      result.add(preprocessor.get(iter));
-    }
-    return result;
   }
 
   @Override

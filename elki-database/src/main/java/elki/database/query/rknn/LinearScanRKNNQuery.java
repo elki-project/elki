@@ -38,7 +38,6 @@ import elki.database.query.knn.KNNQuery;
  *
  * @param <O> Database object type
  */
-// FIXME: Validate this works correctly.
 public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements LinearScanQuery {
   /**
    * KNN query we use.
@@ -60,12 +59,8 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
   @Override
   public DoubleDBIDList getRKNNForObject(O obj, int k) {
     ModifiableDoubleDBIDList rNNlist = DBIDUtil.newDistanceDBIDList();
-
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
-
-    for(DBIDArrayIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = kNNLists.get(iter.getOffset());
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList knn = knnQuery.getKNNForDBID(iter, k);
       final double dist = distanceQuery.distance(obj, iter);
       final int last = Math.min(k - 1, knn.size() - 1);
       if(last < k - 1 || dist <= knn.doubleValue(last)) {
@@ -79,19 +74,13 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
   @Override
   public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
     ModifiableDoubleDBIDList rNNList = DBIDUtil.newDistanceDBIDList();
-
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
-
-    int i = 0;
-    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = kNNList.get(i);
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList knn = knnQuery.getKNNForDBID(iter, k);
       for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
         if(DBIDUtil.equal(n, id)) {
           rNNList.add(n.doubleValue(), iter);
         }
       }
-      i++;
     }
     rNNList.sort();
     return rNNList;
@@ -99,28 +88,25 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
 
   @Override
   public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    DBIDArrayIter aiter = ids.iter();
     List<ModifiableDoubleDBIDList> rNNList = new ArrayList<>(ids.size());
     for(int i = 0; i < ids.size(); i++) {
       rNNList.add(DBIDUtil.newDistanceDBIDList());
     }
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
-
-    int i = 0;
-    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = kNNList.get(i);
+    // We do not have a bulk query anymore for now, as the better way to
+    // implement this is to precompute all forward-nearest-neighbors with some
+    // index, at which point this is only a trivial lookup.
+    for(DBIDArrayIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      KNNList knn = knnQuery.getKNNForDBID(iter, k);
       for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
-        int j = 0;
-        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          if(DBIDUtil.equal(n, iter2)) {
-            ModifiableDoubleDBIDList rNN = rNNList.get(j);
-            rNN.add(n.doubleValue(), iter);
+        for(aiter.seek(0); aiter.valid(); aiter.advance()) {
+          if(DBIDUtil.equal(n, aiter)) {
+            rNNList.get(aiter.getOffset()).add(n.doubleValue(), iter);
           }
-          j++;
         }
       }
-      i++;
     }
     for(int j = 0; j < ids.size(); j++) {
       rNNList.get(j).sort();

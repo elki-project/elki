@@ -28,7 +28,6 @@ import elki.database.relation.Relation;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- *
  * @param <O> Object type stored in the index
  */
 public abstract class AbstractIndex<O> implements Index {

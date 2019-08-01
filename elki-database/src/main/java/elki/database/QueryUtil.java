@@ -21,18 +21,14 @@
 package elki.database;
 
 import elki.data.NumberVector;
+import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
 import elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
 import elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
-import elki.database.query.range.LinearScanDistanceRangeQuery;
-import elki.database.query.range.LinearScanEuclideanDistanceRangeQuery;
-import elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
-import elki.database.query.range.LinearScanPrimitiveSimilarityRangeQuery;
-import elki.database.query.range.LinearScanSimilarityRangeQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.*;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.query.similarity.SimilarityQuery;
@@ -96,14 +92,17 @@ public final class QueryUtil {
 
   /**
    * Get a KNN query object for the given distance function.
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -120,14 +119,17 @@ public final class QueryUtil {
 
   /**
    * Get a KNN query object for the given distance function.
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param relation Relation used
@@ -146,14 +148,17 @@ public final class QueryUtil {
    * Get a range query object for the given distance function for radius-based
    * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
    * rectangular query windows.)
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Range: maximum range requested</li>
-   * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -172,14 +177,17 @@ public final class QueryUtil {
    * Get a range query object for the given distance function for radius-based
    * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
    * rectangular query windows.)
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Range: maximum range requested</li>
-   * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param relation Relation used
@@ -196,15 +204,18 @@ public final class QueryUtil {
 
   /**
    * Get a rKNN query object for the given distance function.
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param relation Relation used

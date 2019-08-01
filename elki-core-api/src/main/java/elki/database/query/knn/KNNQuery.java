@@ -20,9 +20,6 @@
  */
 package elki.database.query.knn;
 
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.DatabaseQuery;
@@ -47,15 +44,6 @@ public interface KNNQuery<O> extends DatabaseQuery {
    * @return neighbors
    */
   KNNList getKNNForDBID(DBIDRef id, int k);
-
-  /**
-   * Bulk query method
-   * 
-   * @param ids query object IDs
-   * @param k Number of neighbors requested
-   * @return neighbors
-   */
-  List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 
   /**
    * Get the k nearest neighbors for a particular id.

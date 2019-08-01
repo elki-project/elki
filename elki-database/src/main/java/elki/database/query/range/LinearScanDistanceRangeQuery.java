@@ -20,11 +20,7 @@
  */
 package elki.database.query.range;
 
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -53,7 +49,7 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     final DistanceQuery<O> dq = distanceQuery;
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = distanceQuery.getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double currentDistance = dq.distance(id, iter);
       if(currentDistance <= range) {
         result.add(currentDistance, iter);
@@ -67,7 +63,7 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
   public DoubleDBIDList getRangeForObject(O obj, double range) {
     final DistanceQuery<O> dq = distanceQuery;
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = distanceQuery.getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double currentDistance = dq.distance(obj, iter);
       if(currentDistance <= range) {
         result.add(currentDistance, iter);
@@ -80,7 +76,7 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
     final DistanceQuery<O> dq = distanceQuery;
-    for(DBIDIter iter = getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = distanceQuery.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
       final double currentDistance = dq.distance(id, iter);
       if(currentDistance <= range) {
         neighbors.add(currentDistance, iter);
@@ -90,7 +86,7 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
 
   @Override
   public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = getRelation();
+    final Relation<? extends O> relation = distanceQuery.getRelation();
     final DistanceQuery<O> dq = distanceQuery;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double currentDistance = dq.distance(obj, iter);

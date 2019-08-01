@@ -272,11 +272,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     }
 
     @Override
-    public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      return inner.getKNNForBulkDBIDs(ids, k);
-    }
-
-    @Override
     public KNNList getKNNForObject(O obj, int k) {
       final I pobj = proj.project(obj);
       if(norefine) {

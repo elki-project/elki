@@ -108,7 +108,10 @@ public interface Database {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -128,7 +131,10 @@ public interface Database {
    * Hints include:
    * <ul>
    * <li>Double: Maximum query range that will be used.</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -148,7 +154,10 @@ public interface Database {
    * Hints include:
    * <ul>
    * <li>Double: Minimum query similarity that will be used.</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -166,7 +175,10 @@ public interface Database {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
    * </ul>
    *
    * @param <O> Object type

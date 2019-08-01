@@ -64,7 +64,7 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get the IDs the query is defined for.
-   *
+   * <p>
    * If possible, prefer {@link #iterDBIDs()}.
    *
    * @return IDs this is defined for
@@ -73,7 +73,7 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get an iterator access to the DBIDs.
-   *
+   * <p>
    * To iterate over all IDs, use the following code fragment:
    *
    * <pre>
@@ -134,14 +134,18 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get a KNN query object for the given distance query.
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -152,14 +156,18 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get a KNN query object for the given distance query.
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use
@@ -174,14 +182,18 @@ public interface Relation<O> extends DatabaseQuery {
   /**
    * Get a range query object for the given distance query. (Range queries in
    * ELKI refers to radius-based ranges, not rectangular query windows.)
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -193,14 +205,18 @@ public interface Relation<O> extends DatabaseQuery {
   /**
    * Get a range query object for the given distance query. (Range queries in
    * ELKI refers to radius-based ranges, not rectangular query windows.)
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use
@@ -215,14 +231,18 @@ public interface Relation<O> extends DatabaseQuery {
   /**
    * Get a range query object for the given similarity query. (Range queries in
    * ELKI refers to radius-based ranges, not rectangular query windows.)
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param simQuery Similarity query
@@ -234,14 +254,18 @@ public interface Relation<O> extends DatabaseQuery {
   /**
    * Get a range query object for the given similarity query. (Range queries in
    * ELKI refers to radius-based ranges, not rectangular query windows.)
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Double: Maximum query range</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param simFunction Similarity function to use
@@ -255,14 +279,18 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get a rKNN query object for the given distance query.
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   *
+   * quadratic scan.
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -273,14 +301,18 @@ public interface Relation<O> extends DatabaseQuery {
 
   /**
    * Get a rKNN query object for the given distance query.
-   *
+   * <p>
    * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   *
+   * quadratic scan.
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use

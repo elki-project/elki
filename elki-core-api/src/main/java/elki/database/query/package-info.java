@@ -64,8 +64,6 @@
  * (since a preprocessor or index might only support a certain fixed maximum
  * value)</li>
  * <li>A maximum distance used in range queries</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_BULK
- * DatabaseQuery.HINT_BULK} to request support for bulk operations</li>
  * <li>{@link elki.database.query.DatabaseQuery#HINT_EXACT
  * DatabaseQuery.HINT_EXACT} to exclude approximate answers</li>
  * <li>{@link elki.database.query.DatabaseQuery#HINT_HEAVY_USE

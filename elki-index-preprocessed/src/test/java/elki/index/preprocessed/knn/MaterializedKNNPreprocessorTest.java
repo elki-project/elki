@@ -112,7 +112,6 @@ public class MaterializedKNNPreprocessorTest {
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
     Metadata.hierarchyOf(rel).addChild(preproc);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
     testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
@@ -143,18 +142,17 @@ public class MaterializedKNNPreprocessorTest {
   }
 
   public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
-    ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<? extends KNNList> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<? extends KNNList> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
-    for(int i = 0; i < rep.size(); i++) {
-      KNNList lin_knn = lin_knn_ids.get(i);
-      KNNList pre_knn = preproc_knn_ids.get(i);
+    assertNotEquals("Preprocessor knn query class incorrect.", lin_knn_query.getClass(), preproc_knn_query.getClass());
+    for(DBIDIter iter = rep.iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList lin_knn = lin_knn_query.getKNNForDBID(iter, k);
+      KNNList pre_knn = preproc_knn_query.getKNNForDBID(iter, k);
       DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
-      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
+      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
         if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {
           continue;
         }
-        fail(new StringBuilder(1000).append("Neighbor distances do not agree: ") //
+        fail(new StringBuilder(1000).append("Neighbor distances do not agree: #")//
+            .append(iter).append(' ') //
             .append(lin_knn.toString()).append(" got: ").append(pre_knn.toString()).toString());
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
@@ -163,5 +161,25 @@ public class MaterializedKNNPreprocessorTest {
         assertEquals("kNNs of linear scan and preprocessor do not match!", lin.seek(j).doubleValue(), pre.seek(j).doubleValue(), 0.);
       }
     }
+  }
+
+  public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k, int allowed_errors) {
+    for(DBIDIter iter = rep.iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList lin_knn = lin_knn_query.getKNNForDBID(iter, k);
+      KNNList pre_knn = preproc_knn_query.getKNNForDBID(iter, k);
+      DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
+      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
+        if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {
+          continue;
+        }
+        if(--allowed_errors < 0) {
+          fail(new StringBuilder(1000).append("Neighbor distances do not agree: #")//
+              .append(iter).append(' ') //
+              .append(lin_knn.toString()).append(" got: ").append(pre_knn.toString()).toString());
+        }
+      }
+      assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
+    }
+    assertEquals("Error budget is not tight, remaining errors: ", 0, allowed_errors);
   }
 }
