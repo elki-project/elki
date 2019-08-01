@@ -120,6 +120,19 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
     return new IntegerDBIDKNNSubList(inner, k);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(size() * 20 + 20).append("kNNSubList[");
+    Itr iter = this.iter();
+    if(iter.valid()) {
+      buf.append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
+    }
+    while(iter.advance().valid()) {
+      buf.append(',').append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
+    }
+    return buf.append(']').toString();
+  }
+
   /**
    * Iterator for the sublist.
    *
