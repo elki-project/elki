@@ -28,7 +28,7 @@ import elki.database.query.DatabaseQuery;
 /**
  * The interface for range queries, that can return all objects within the
  * specified radius.
- *
+ * <p>
  * Do not confuse this with rectangular window queries, which are also commonly
  * called "range queries".
  *

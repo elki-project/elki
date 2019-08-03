@@ -56,7 +56,7 @@ import elki.utilities.documentation.Reference;
     bibkey = "DBLP:conf/ssd/HjaltasonS95")
 public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNQuery<O> {
   /**
-   * Squared euclidean distance function.
+   * Squared Euclidean distance function.
    */
   private static final SquaredEuclideanDistance SQUARED = SquaredEuclideanDistance.STATIC;
 

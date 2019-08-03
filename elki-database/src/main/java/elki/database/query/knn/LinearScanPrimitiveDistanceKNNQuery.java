@@ -69,7 +69,6 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * Main loop of the linear scan.
    * 
    * @param relation Data relation
-   * @param iter ID iterator
    * @param obj Query object
    * @param k Number of neighbors
    * @return Nearest neighbors

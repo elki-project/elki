@@ -35,6 +35,51 @@ package elki.database.ids;
  */
 public interface DoubleDBIDListIter extends DBIDArrayIter {
   /**
+   * Static empty iterator.
+   */
+  public static final DoubleDBIDListIter EMPTY = new DoubleDBIDListIter() {
+    @Override
+    public int internalGetIndex() {
+      return -1;
+    }
+
+    @Override
+    public boolean valid() {
+      return false;
+    }
+
+    @Override
+    public int getOffset() {
+      return -1;
+    }
+
+    @Override
+    public double doubleValue() {
+      return Double.NaN;
+    }
+
+    @Override
+    public DoubleDBIDListIter advance() {
+      return this;
+    }
+
+    @Override
+    public DoubleDBIDListIter advance(int count) {
+      return this;
+    }
+
+    @Override
+    public DoubleDBIDListIter retract() {
+      return this;
+    }
+
+    @Override
+    public DoubleDBIDListIter seek(int off) {
+      return this;
+    }
+  };
+
+  /**
    * Get the double value
    *
    * @return double value

@@ -49,7 +49,6 @@ import elki.utilities.documentation.Reference;
  *
  * @assoc - - - AbstractRStarTree
  * @assoc - - - SpatialPrimitiveDistance
- * @assoc - - - DoubleDistanceSearchCandidate
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
     title = "Ranking in spatial databases", //

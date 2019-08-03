@@ -64,7 +64,7 @@ public final class RStarTreeUtil {
    * @param hints Optimizer hints
    * @return Query object
    */
-  @SuppressWarnings({ "cast", "unchecked" })
+  @SuppressWarnings("unchecked")
   public static <O extends SpatialComparable> RangeQuery<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
@@ -84,7 +84,7 @@ public final class RStarTreeUtil {
    * @param hints Optimizer hints
    * @return Query object
    */
-  @SuppressWarnings({ "cast", "unchecked" })
+  @SuppressWarnings("unchecked")
   public static <O extends SpatialComparable> KNNQuery<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();

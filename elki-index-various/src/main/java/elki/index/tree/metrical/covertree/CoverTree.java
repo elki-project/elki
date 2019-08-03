@@ -21,17 +21,11 @@
 package elki.index.tree.metrical.covertree;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
+import elki.database.query.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.AbstractDistanceKNNQuery;
 import elki.database.query.knn.KNNQuery;
@@ -39,8 +33,7 @@ import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.index.KNNIndex;
-import elki.index.RangeIndex;
+import elki.index.DistancePriorityIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
@@ -52,6 +45,13 @@ import elki.utilities.documentation.Reference;
  * structure that is similar to the M-tree, but not as balanced and
  * disk-oriented. However, by not having these requirements it does not require
  * the expensive splitting procedures of M-tree.
+ * <p>
+ * This implementation contains some optimizations for Java: for example nodes
+ * with no children are stored efficiently in the parent node. Sometimes this
+ * also comes at some cost, as we currently do not push these onto a heap, but
+ * rather process them along with the parent node. This may cause additional
+ * distance computations (in particular for k nearest neighbor search), but also
+ * saves some overhead in managing these candidates.
  * <p>
  * Reference:
  * <p>
@@ -76,7 +76,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "In Proc. 23rd Int. Conf. Machine Learning (ICML 2006)", //
     url = "https://doi.org/10.1145/1143844.1143857", //
     bibkey = "DBLP:conf/icml/BeygelzimerKL06")
-public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>, KNNIndex<O> {
+public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriorityIndex<O> {
   /**
    * Class logger.
    */
@@ -123,7 +123,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
     /**
      * Child nodes.
      */
-    ArrayList<Node> children;
+    List<Node> children;
 
     /**
      * Expansion scale.
@@ -160,18 +160,9 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
       for(DoubleDBIDListIter it = singletons.iter(); it.valid(); it.advance()) {
         this.singletons.add(it.doubleValue(), it);
       }
-      this.children = null;
+      this.children = Collections.emptyList();
       this.maxDist = maxDist;
       this.parentDist = parentDist;
-    }
-
-    /**
-     * True, if the node is a leaf.
-     *
-     * @return {@code true}, if this is a leaf node.
-     */
-    public boolean isLeaf() {
-      return children == null || children.isEmpty();
     }
   }
 
@@ -211,7 +202,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
 
   /**
    * Bulk-load the cover tree.
-   *
+   * <p>
    * This bulk-load is slightly simpler than the one used in the original
    * cover-tree source: We do not look back into the "far" set of candidates.
    *
@@ -266,10 +257,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
     assert (candidates.size() == 0);
     // Routing object is not yet handled:
     if(curSingleton) {
-      if(node.isLeaf()) {
-        node.children = null; // First in leaf is enough.
-      }
-      else {
+      if(!node.children.isEmpty()) {
         node.singletons.add(parentDist, cur); // Add as regular singleton.
       }
     }
@@ -330,6 +318,20 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
   }
 
   @Override
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if(distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
+    if(!this.distanceFunction.equals(distanceFunction)) {
+      LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
+      return null;
+    }
+    return new PrioritySearcher();
+  }
+
+  @Override
   protected Logging getLogger() {
     return LOG;
   }
@@ -361,7 +363,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
         if(d - cur.maxDist > range) {
           continue;
         }
-        if(!cur.isLeaf()) { // Inner node:
+        if(!cur.children.isEmpty()) { // Inner node:
           for(Node c : cur.children) {
             // This only seems to reduce the number of distance computations
             // marginally, unfortunately.
@@ -433,7 +435,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
         }
 
         final DoubleDBIDListIter it = cur.singletons.iter();
-        if(!cur.isLeaf()) { // Inner node:
+        if(!cur.children.isEmpty()) { // Inner node:
           for(Node c : cur.children) {
             // This only seems to reduce the number of distance computations
             // marginally, unfortunately.
@@ -466,6 +468,169 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>,
         }
       }
       return knnList.toKNNList();
+    }
+  }
+
+  /**
+   * Priority query class.
+   *
+   * @author Erich Schubert
+   */
+  public class PrioritySearcher implements DistancePrioritySearcher<O> {
+    /**
+     * Query object
+     */
+    O query;
+
+    /**
+     * Stopping distance threshold
+     */
+    double threshold = Double.POSITIVE_INFINITY;
+
+    /**
+     * Priority queue
+     */
+    DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
+
+    /**
+     * Candidates
+     */
+    DoubleDBIDListIter candidates = DoubleDBIDListIter.EMPTY;
+
+    /**
+     * Distance to routing object.
+     */
+    double routingDist;
+
+    /**
+     * Constructor.
+     */
+    public PrioritySearcher() {
+      super();
+    }
+
+    @Override
+    public PrioritySearcher search(O query) {
+      this.query = query;
+      this.threshold = Double.POSITIVE_INFINITY;
+      pq.clear();
+      // Push the root node to the heap.
+      final double rootdist = distance(query, root.singletons.iter());
+      pq.add(rootdist - root.maxDist, root);
+      advance(); // Find first
+      return this;
+    }
+
+    @Override
+    public PrioritySearcher search(DBIDRef query) {
+      // FIXME: support using DBIDs only.
+      return search(relation.get(query));
+    }
+
+    @Override
+    public PrioritySearcher decreaseCutoff(double threshold) {
+      assert threshold <= this.threshold;
+      this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public boolean valid() {
+      return candidates.valid();
+    }
+
+    @Override
+    public PrioritySearcher advance() {
+      // Advance the main iterator, if defined:
+      if(candidates.valid()) {
+        candidates.advance();
+      }
+      // First try the singletons
+      // These aren't the best candidates usually, but we don't want to have to
+      // manage them and their bounds in the heap. If we do this locally, we get
+      // upper and lower bounds easily.
+      do {
+        while(candidates.valid()) {
+          // Pruning with lower bound:
+          if(routingDist - candidates.doubleValue() <= threshold) {
+            return this;
+          }
+          candidates.advance(); // Skip
+        }
+      }
+      while(advanceQueue()); // Try next node
+      return this;
+    }
+
+    /**
+     * Expand the next node of the priority heap.
+     */
+    protected boolean advanceQueue() {
+      if(pq.isEmpty()) {
+        return false;
+      }
+      // Poll from heap (optimized, hence key and value separate):
+      final double prio = pq.peekKey(); // Minimum distance to cover
+      if(prio > threshold) {
+        pq.clear();
+        return false;
+      }
+      final Node cur = pq.peekValue();
+      routingDist = prio + cur.maxDist; // Restore distance to center.
+      candidates = cur.singletons.iter(); // Routing object initially
+      pq.poll(); // Remove
+
+      // Add child nodes to priority queue:
+      for(Node c : cur.children) {
+        // This pruning rule very rarely works, unfortunately
+        if(routingDist - c.maxDist - c.parentDist <= threshold) {
+          final DoubleDBIDListIter f = c.singletons.iter(); // Routing object
+          final double dist = DBIDUtil.equal(f, candidates) ? routingDist : distance(query, f);
+          final double newprio = dist - c.maxDist; // Minimum distance
+          if(newprio <= threshold) {
+            pq.add(newprio, c);
+          }
+        }
+      }
+      if(!cur.children.isEmpty()) {
+        candidates.advance(); // Skip routing object (also in children)
+      }
+      return true;
+    }
+
+    @Override
+    public double getApproximateDistance() {
+      return routingDist;
+    }
+
+    @Override
+    public double getApproximateAccuracy() {
+      return candidates.getOffset() == 0 ? 0. : candidates.doubleValue();
+    }
+
+    @Override
+    public double getLowerBound() {
+      return candidates.getOffset() == 0 ? routingDist : routingDist - candidates.doubleValue();
+    }
+
+    @Override
+    public double getUpperBound() {
+      return candidates.getOffset() == 0 ? routingDist : routingDist + candidates.doubleValue();
+    }
+
+    @Override
+    public double computeExactDistance() {
+      return candidates.getOffset() == 0 ? routingDist : distance(query, candidates);
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return candidates.internalGetIndex();
+    }
+
+    @Override
+    public O getCandidate() {
+      return relation.get(this);
     }
   }
 
