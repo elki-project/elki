@@ -20,12 +20,9 @@
  */
 package elki.index.tree.metrical.mtreevariants.query;
 
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
+import elki.database.query.knn.KNNQuery;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -43,11 +40,16 @@ import elki.utilities.datastructures.heap.ComparableMinHeap;
  * 
  * @param <O> Object type
  */
-public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
+public class MTreeKNNQuery<O> implements KNNQuery<O> {
   /**
    * The index to use
    */
   protected final AbstractMTree<O, ?, ?, ?> index;
+
+  /**
+   * Hold the distance function to be used.
+   */
+  protected final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -56,8 +58,14 @@ public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
    * @param distanceQuery Distance query used
    */
   public MTreeKNNQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
     this.index = index;
+    this.distanceQuery = distanceQuery;
+  }
+
+  @Override
+  public KNNList getKNNForDBID(DBIDRef id, int k) {
+    return getKNNForObject(distanceQuery.getRelation().get(id), k);
   }
 
   @Override
@@ -78,7 +86,6 @@ public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
     // search in tree
     while(!pq.isEmpty()) {
       MTreeSearchCandidate pqNode = pq.poll();
-
       if(knnList.size() >= k && pqNode.mindist > d_k) {
         break;
       }
@@ -91,15 +98,10 @@ public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
       if(!node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry entry = node.getEntry(i);
-          DBID o_r = entry.getRoutingObjectID();
           double r_or = entry.getCoveringRadius();
           double d2 = id_p != null ? entry.getParentDistance() : 0.;
-
-          double diff = Math.abs(d1 - d2);
-
-          double sum = d_k + r_or;
-
-          if(diff <= sum) {
+          if(Math.abs(d1 - d2) <= d_k + r_or) {
+            DBID o_r = entry.getRoutingObjectID();
             double d3 = distanceQuery.distance(o_r, q);
             index.statistics.countDistanceCalculation();
             double d_min = Math.max(d3 - r_or, 0.);
@@ -113,13 +115,9 @@ public class MTreeKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry entry = node.getEntry(i);
-          DBID o_j = entry.getRoutingObjectID();
-
           double d2 = id_p != null ? entry.getParentDistance() : 0.;
-
-          double diff = Math.abs(d1 - d2);
-
-          if(diff <= d_k) {
+          if(Math.abs(d1 - d2) <= d_k) {
+            DBID o_j = entry.getRoutingObjectID();
             double d3 = distanceQuery.distance(o_j, q);
             index.statistics.countDistanceCalculation();
             if(d3 <= d_k) {

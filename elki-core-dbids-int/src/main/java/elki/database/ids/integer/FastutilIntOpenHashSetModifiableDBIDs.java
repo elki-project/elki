@@ -148,7 +148,7 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
     // TODO: re-add: store.ensureCapacity(ids.size());
     boolean success = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      success |= store.add(DBIDUtil.asInteger(iter));
+      success |= store.add(iter.internalGetIndex());
     }
     return success;
   }
@@ -157,19 +157,19 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      success |= store.remove(DBIDUtil.asInteger(id));
+      success |= store.remove(id.internalGetIndex());
     }
     return success;
   }
 
   @Override
   public boolean add(DBIDRef e) {
-    return store.add(DBIDUtil.asInteger(e));
+    return store.add(e.internalGetIndex());
   }
 
   @Override
   public boolean remove(DBIDRef o) {
-    return store.remove(DBIDUtil.asInteger(o));
+    return store.remove(o.internalGetIndex());
   }
 
   @Override
@@ -201,21 +201,20 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
 
   @Override
   public boolean contains(DBIDRef o) {
-    return store.contains(DBIDUtil.asInteger(o));
+    return store.contains(o.internalGetIndex());
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append('[');
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(buf.length() > 1) {
-        buf.append(", ");
-      }
-      buf.append(iter.toString());
+    if(isEmpty()) {
+      return "[]";
     }
-    buf.append(']');
-    return buf.toString();
+    StringBuilder buf = new StringBuilder(size() * 5).append('[');
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      buf.append(iter.toString()).append(", ");
+    }
+    buf.setLength(buf.length() - 2);
+    return buf.append(']').toString();
   }
 
   @Override

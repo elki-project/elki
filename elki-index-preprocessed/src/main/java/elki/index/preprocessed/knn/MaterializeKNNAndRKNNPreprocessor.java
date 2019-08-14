@@ -339,8 +339,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     for(DoubleDBIDPair pair : rKNN) {
       ret.add(pair);
     }
-    ret.sort();
-    return ret;
+    return ret.sort();
   }
 
   @Override

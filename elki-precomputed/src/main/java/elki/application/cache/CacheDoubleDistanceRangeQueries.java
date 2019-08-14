@@ -137,9 +137,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList();
       DoubleDBIDListIter ni = nn.iter();
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        nn.clear();
-        rangeQ.getRangeForDBID(it, radius, nn);
-        nn.sort();
+        rangeQ.getRangeForDBID(it, radius, nn.clear()).sort();
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:

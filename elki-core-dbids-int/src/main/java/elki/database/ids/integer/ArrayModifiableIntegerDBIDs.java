@@ -82,8 +82,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     this(existing.size());
     if(existing instanceof IntegerDBIDRange) {
       IntegerDBIDRange range = (IntegerDBIDRange) existing;
-      for(int i = 0; i < range.len; i++) {
-        store[i] = range.start + i;
+      for(int i = 0, s = range.start, l = range.len; i < l; i++) {
+        store[i] = s + i;
       }
       size = range.len;
     }
@@ -108,11 +108,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
       ((IntegerDBIDVar) var).internalSetIndex(store[index]);
       return var;
     }
-    else {
-      // less efficient, involves object creation.
-      var.set(get(index));
-      return var;
-    }
+    // less efficient, involves object creation.
+    return var.set(get(index));
   }
 
   /**
@@ -128,9 +125,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     while(asize < minsize) {
       asize = (asize >>> 1) + asize;
     }
-    final int[] prev = store;
-    store = new int[asize];
-    System.arraycopy(prev, 0, store, 0, size);
+    System.arraycopy(store, 0, store = new int[asize], 0, size);
   }
 
   /**
@@ -138,17 +133,14 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
    */
   private void grow() {
     final int newsize = store.length + (store.length >>> 1);
-    final int[] prev = store;
-    store = new int[newsize];
-    System.arraycopy(prev, 0, store, 0, size);
+    System.arraycopy(store, 0, store = new int[newsize], 0, size);
   }
 
   @Override
   public boolean addDBIDs(DBIDs ids) {
     ensureSize(size + ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      store[size] = iter.internalGetIndex();
-      ++size;
+      store[size++] = iter.internalGetIndex();
     }
     return true;
   }
@@ -161,8 +153,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
       // TODO: when sorted, use binary search!
       for(int i = 0; i < size; i++) {
         if(store[i] == rm) {
-          --size;
-          store[i] = store[size];
+          store[i] = store[--size];
           success = true;
           break;
         }
@@ -176,8 +167,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     if(size == store.length) {
       grow();
     }
-    store[size] = e.internalGetIndex();
-    ++size;
+    store[size++] = e.internalGetIndex();
     return true;
   }
 
@@ -187,8 +177,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     // TODO: when sorted, use binary search!
     for(int i = 0; i < size; i++) {
       if(store[i] == rm) {
-        --size;
-        store[i] = store[size];
+        store[i] = store[--size];
         return true;
       }
     }

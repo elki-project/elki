@@ -129,7 +129,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
         }
         dlist.add(dq.distance(it, i2), i2);
       }
-      dlist.sort();
+      dlist.sort(); // Used via "di" below!
       // Compute affinities
       computePi(it, di, p, perplexity, logPerp);
       // Normalization factor:

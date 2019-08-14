@@ -23,7 +23,6 @@ package elki.database.query;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
 import elki.database.ids.ModifiableDoubleDBIDList;
@@ -105,44 +104,25 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   }
 
   @Override
-  default DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
-      final double dist = iter.computeExactDistance();
-      if(dist <= range) {
-        ret.add(dist, iter);
-      }
-    }
-    ret.sort();
-    return ret;
-  }
-
-  @Override
-  default DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(obj, range, ret);
-    ret.sort();
-    return ret;
-  }
-
-  @Override
-  default void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+  default ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
       final double dist = iter.computeExactDistance();
       if(dist <= range) {
         result.add(dist, iter);
       }
     }
+    return result;
   }
 
   @Override
-  default void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  default ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
       final double dist = iter.computeExactDistance();
       if(dist <= range) {
         result.add(dist, iter);
       }
     }
+    return result;
   }
 
   /**

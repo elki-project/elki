@@ -88,11 +88,10 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
     doReverseKNNQuery(id, getRoot(), null, candidates);
 
     if (k == this.getKmax()) {
-      candidates.sort();
       // FIXME: re-add statistics.
       // rkNNStatistics.addTrueHits(candidates.size());
       // rkNNStatistics.addResults(candidates.size());
-      return candidates;
+      return candidates.sort();
     }
 
     // refinement of candidates

@@ -38,8 +38,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
+import elki.database.query.knn.KNNQuery;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -48,7 +47,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID> {
+public class LuceneDistanceKNNQuery implements KNNQuery<DBID> {
   /**
    * Lucene search function.
    */
@@ -69,8 +68,7 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID> {
    * 
    * @param distanceQuery Distance query
    */
-  public LuceneDistanceKNNQuery(DistanceQuery<DBID> distanceQuery, IndexReader ir, DBIDRange range) {
-    super(distanceQuery);
+  public LuceneDistanceKNNQuery(IndexReader ir, DBIDRange range) {
     this.range = range;
     this.mlt = new MoreLikeThis(ir);
     this.is = new IndexSearcher(ir);
@@ -98,6 +96,6 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID> {
 
   @Override
   public KNNList getKNNForObject(DBID obj, int k) {
-    return getKNNForDBID((DBIDRef) obj, k);
+    return getKNNForDBID(obj, k);
   }
 }

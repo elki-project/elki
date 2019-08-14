@@ -20,10 +20,9 @@
  */
 package elki.index.tree.metrical.mtreevariants.query;
 
-import elki.database.ids.DBID;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
+import elki.database.query.range.RangeQuery;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -39,11 +38,16 @@ import elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @param <O> Object type
  */
-public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
+public class MTreeRangeQuery<O> implements RangeQuery<O> {
   /**
    * The index to use
    */
   protected final AbstractMTree<O, ?, ?, ?> index;
+
+  /**
+   * Hold the distance function to be used.
+   */
+  protected final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -52,8 +56,9 @@ public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
    * @param distanceQuery Distance query used
    */
   public MTreeRangeQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
     this.index = index;
+    this.distanceQuery = distanceQuery;
   }
 
   /**
@@ -76,20 +81,13 @@ public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
     if(!node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry entry = node.getEntry(i);
-        DBID o_r = entry.getRoutingObjectID();
-
-        double r_or = entry.getCoveringRadius();
         double d2 = o_p != null ? entry.getParentDistance() : 0.;
-        double diff = Math.abs(d1 - d2);
-
-        double sum = r_q + r_or;
-
-        if(diff <= sum) {
-          double d3 = distanceQuery.distance(o_r, q);
+        double sum = r_q + entry.getCoveringRadius();
+        if(Math.abs(d1 - d2) <= sum) {
           index.statistics.countDistanceCalculation();
-          if(d3 <= sum) {
-            AbstractMTreeNode<O, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
-            doRangeQuery(o_r, child, q, r_q, result);
+          DBID o_r = entry.getRoutingObjectID();
+          if(distanceQuery.distance(o_r, q) <= sum) {
+            doRangeQuery(o_r, index.getNode(((DirectoryEntry) entry).getPageID()), q, r_q, result);
           }
         }
       }
@@ -97,13 +95,9 @@ public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry entry = node.getEntry(i);
-        DBID o_j = entry.getRoutingObjectID();
-
         double d2 = o_p != null ? entry.getParentDistance() : 0.;
-
-        double diff = Math.abs(d1 - d2);
-
-        if(diff <= r_q) {
+        if(Math.abs(d1 - d2) <= r_q) {
+          DBID o_j = entry.getRoutingObjectID();
           double d3 = distanceQuery.distance(o_j, q);
           index.statistics.countDistanceCalculation();
           if(d3 <= r_q) {
@@ -115,8 +109,15 @@ public class MTreeRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
   }
 
   @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    // TODO: allow searching with IDs only
+    return getRangeForObject(distanceQuery.getRelation().get(id), range, result);
+  }
+
+  @Override
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     index.statistics.countRangeQuery();
     doRangeQuery(null, index.getRoot(), obj, range, result);
+    return result;
   }
 }

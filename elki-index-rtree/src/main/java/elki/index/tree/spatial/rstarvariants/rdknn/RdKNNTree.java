@@ -166,8 +166,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     doReverseKNN(getRoot(), oid, candidates);
 
     if(k == settings.k_max) {
-      candidates.sort();
-      return candidates;
+      return candidates.sort();
     }
 
     // refinement of candidates, if k < k_max
@@ -181,8 +180,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
       }
     }
 
-    result.sort();
-    return result;
+    return result.sort();
   }
 
   @Override

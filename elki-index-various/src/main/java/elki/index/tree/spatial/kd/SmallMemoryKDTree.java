@@ -25,9 +25,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -217,13 +215,13 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance) {
-      return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new KDTreeKNNQuery((Norm<? super O>) df);
     }
     if(df instanceof SquaredEuclideanDistance) {
-      return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new KDTreeKNNQuery((Norm<? super O>) df);
     }
     if(df instanceof SparseLPNormDistance) {
-      return new KDTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new KDTreeKNNQuery((Norm<? super O>) df);
     }
     return null;
   }
@@ -232,14 +230,9 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
   public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistance) {
-      return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
-    }
-    if(df instanceof SquaredEuclideanDistance) {
-      return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
-    }
-    if(df instanceof SparseLPNormDistance) {
-      return new KDTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
+    if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
+        || df instanceof SparseLPNormDistance) {
+      return new KDTreeRangeQuery((Norm<? super O>) df);
     }
     return null;
   }
@@ -249,7 +242,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
    *
    * @author Erich Schubert
    */
-  public class KDTreeKNNQuery extends AbstractDistanceKNNQuery<O> {
+  public class KDTreeKNNQuery implements KNNQuery<O> {
     /**
      * Norm to use.
      */
@@ -258,12 +251,16 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
     /**
      * Constructor.
      *
-     * @param distanceQuery Distance query
      * @param norm Norm to use
      */
-    public KDTreeKNNQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
-      super(distanceQuery);
+    public KDTreeKNNQuery(Norm<? super O> norm) {
+      super();
       this.norm = norm;
+    }
+
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
@@ -380,7 +377,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
    *
    * @author Erich Schubert
    */
-  public class KDTreeRangeQuery extends AbstractDistanceRangeQuery<O> {
+  public class KDTreeRangeQuery implements RangeQuery<O> {
     /**
      * Norm to use.
      */
@@ -389,17 +386,22 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
     /**
      * Constructor.
      *
-     * @param distanceQuery Distance query
      * @param norm Norm to use
      */
-    public KDTreeRangeQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
-      super(distanceQuery);
+    public KDTreeRangeQuery(Norm<? super O> norm) {
+      super();
       this.norm = norm;
     }
 
     @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
+    }
+
+    @Override
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), range);
+      return result;
     }
 
     /**

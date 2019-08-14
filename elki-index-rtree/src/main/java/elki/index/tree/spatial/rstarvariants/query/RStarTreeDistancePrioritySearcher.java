@@ -120,39 +120,25 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
       double dist = iter.computeExactDistance();
       if(dist <= range) {
-        ret.add(dist, iter);
+        result.add(dist, iter);
       }
     }
-    ret.sort();
-    return ret;
+    return result;
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(obj, range, ret);
-    ret.sort();
-    return ret;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    getRangeForObject(relation.get(id), range, neighbors);
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
       double dist = iter.computeExactDistance();
       if(dist <= range) {
         result.add(dist, iter);
       }
     }
+    return result;
   }
 
   @Override

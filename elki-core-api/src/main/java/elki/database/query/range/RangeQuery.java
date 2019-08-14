@@ -21,6 +21,7 @@
 package elki.database.query.range;
 
 import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.DatabaseQuery;
@@ -48,7 +49,19 @@ public interface RangeQuery<O> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  DoubleDBIDList getRangeForDBID(DBIDRef id, double range);
+  default DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+    return getRangeForDBID(id, range, DBIDUtil.newDistanceDBIDList()).sort();
+  }
+
+  /**
+   * Get the neighbors for a particular id in a given query range
+   *
+   * @param id query object ID
+   * @param range Query range
+   * @param result Output data structure
+   * @return neighbors
+   */
+  ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
 
   /**
    * Get the neighbors for a particular object in a given query range
@@ -57,23 +70,17 @@ public interface RangeQuery<O> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  DoubleDBIDList getRangeForObject(O obj, double range);
-
-  /**
-   * Get the neighbors for a particular object in a given query range
-   *
-   * @param id query object ID
-   * @param range Query range
-   * @param result Neighbors output set
-   */
-  void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
+  default DoubleDBIDList getRangeForObject(O obj, double range) {
+    return getRangeForObject(obj, range, DBIDUtil.newDistanceDBIDList()).sort();
+  }
 
   /**
    * Get the neighbors for a particular object in a given query range
    *
    * @param obj Query object
    * @param range Query range
-   * @param result Neighbors output set
+   * @param result Output data structure
+   * @return neighbors
    */
-  void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
+  ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
 }

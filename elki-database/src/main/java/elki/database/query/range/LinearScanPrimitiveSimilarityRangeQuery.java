@@ -20,18 +20,14 @@
  */
 package elki.database.query.range;
 
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Default linear scan range query class.
- *
+ * <p>
  * Subtle optimization: for primitive similarities, retrieve the query object
  * only once from the relation.
  *
@@ -59,49 +55,20 @@ public class LinearScanPrimitiveSimilarityRangeQuery<O> extends AbstractSimilari
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    // Note: subtle optimization. Get "id" only once!
-    final O obj = relation.get(id);
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForObject(relation.get(id), range, result);
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
-  }
-
-  /**
-   * Main loop for linear scan,
-   *
-   * @param relation Data relation
-   * @param iter Iterator
-   * @param obj Query object
-   * @param range Query radius
-   * @param result Output data structure
-   */
-  private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
-    while(iter.valid()) {
-      final double similarity = rawsim.similarity(obj, relation.get(iter));
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    final PrimitiveSimilarity<? super O> sim = this.rawsim;
+    final Relation<? extends O> relation = this.relation;
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      final double similarity = sim.similarity(obj, relation.get(iter));
       if(similarity >= range) {
         result.add(similarity, iter);
       }
-      iter.advance();
     }
+    return result;
   }
 }

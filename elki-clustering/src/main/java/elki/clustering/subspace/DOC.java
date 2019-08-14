@@ -120,7 +120,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
   /**
    * Performs the DOC or FastDOC (as configured) algorithm on the given
    * Database.
-   * 
+   * <p>
    * This will run exhaustively, i.e. run DOC until no clusters are found
    * anymore / the database size has shrunk below the threshold for minimum
    * cluster size.
@@ -141,8 +141,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     int n = (int) (2. / alpha);
     // Inner loop count.
     int m = (int) (FastMath.pow(2. / alpha, r) * FastMath.log(4));
-    m = Math.min(m, Math.min(1000000, d * d)); // TODO: This should only apply
-                                               // for FastDOC.
+    m = Math.min(m, Math.min(1000000, d * d)); // TODO: FastDOC only?
 
     // Minimum size for a cluster for it to be accepted.
     int minClusterSize = (int) (alpha * S.size());
@@ -203,10 +202,6 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     long[] D = null;
     // Quality of the best cluster.
     double quality = Double.NEGATIVE_INFINITY;
-
-    // Bounds for our cluster.
-    // ModifiableHyperBoundingBox bounds = new ModifiableHyperBoundingBox(new
-    // double[d], new double[d]);
 
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
@@ -408,37 +403,29 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      {
-        DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-            .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-        if(config.grab(param)) {
-          alpha = param.getValue();
-        }
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.2) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
       }
 
-      {
-        DoubleParameter param = new DoubleParameter(BETA_ID, 0.8) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-        if(config.grab(param)) {
-          beta = param.getValue();
-        }
+      DoubleParameter betaP = new DoubleParameter(BETA_ID, 0.8) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      if(config.grab(betaP)) {
+        beta = betaP.getValue();
       }
 
-      {
-        DoubleParameter param = new DoubleParameter(W_ID, 0.05) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        if(config.grab(param)) {
-          w = param.getValue();
-        }
+      DoubleParameter wP = new DoubleParameter(W_ID, 0.05) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(wP)) {
+        w = wP.getValue();
       }
 
-      {
-        RandomParameter param = new RandomParameter(RANDOM_ID);
-        if(config.grab(param)) {
-          random = param.getValue();
-        }
+      RandomParameter randomP = new RandomParameter(RANDOM_ID);
+      if(config.grab(randomP)) {
+        random = randomP.getValue();
       }
     }
 

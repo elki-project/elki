@@ -22,8 +22,6 @@ package elki.database.query.range;
 
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.similarity.SimilarityQuery;
@@ -49,48 +47,24 @@ public class LinearScanSimilarityRangeQuery<O> extends AbstractSimilarityRangeQu
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double currentSim = simQuery.similarity(id, iter);
       if(currentSim >= range) {
         result.add(currentSim, iter);
       }
     }
-    result.sort();
     return result;
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double currentSim = simQuery.similarity(obj, iter);
       if(currentSim >= range) {
         result.add(currentSim, iter);
       }
     }
-    result.sort();
     return result;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      final double currentSim = simQuery.similarity(id, iter);
-      if(currentSim >= range) {
-        neighbors.add(currentSim, iter);
-      }
-    }
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      final double currentSim = simQuery.similarity(obj, iter);
-      if(currentSim >= range) {
-        neighbors.add(currentSim, iter);
-      }
-    }
   }
 }

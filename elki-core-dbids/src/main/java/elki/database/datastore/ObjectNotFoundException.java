@@ -20,7 +20,8 @@
  */
 package elki.database.datastore;
 
-import elki.database.ids.DBID;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
 
 /**
  * Exception thrown when the requested object was not found in the database.
@@ -35,9 +36,11 @@ public class ObjectNotFoundException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Object
+   * Constructor
+   * 
+   * @param id ID that was not found.
    */
-  public ObjectNotFoundException(DBID id) {
-    super("Object "+id+" was not found in the database.");
+  public ObjectNotFoundException(DBIDRef id) {
+    super("Object " + DBIDUtil.toString(id) + " was not found in the database.");
   }
 }

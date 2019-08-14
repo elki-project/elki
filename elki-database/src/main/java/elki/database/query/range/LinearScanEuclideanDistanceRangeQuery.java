@@ -22,7 +22,8 @@ package elki.database.query.range;
 
 import elki.data.NumberVector;
 import elki.database.ids.*;
-import elki.database.query.distance.PrimitiveDistanceQuery;
+import elki.database.query.LinearScanQuery;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 
@@ -38,73 +39,39 @@ import net.jafama.FastMath;
  * 
  * @param <O> Database object type
  */
-public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceRangeQuery<O> {
+public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> implements RangeQuery<O>, LinearScanQuery {
+  /**
+   * Relation to scan.
+   */
+  private Relation<? extends O> relation;
+
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanEuclideanDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+  public LinearScanEuclideanDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
+    super();
+    this.relation = distanceQuery.getRelation();
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    // Note: subtle optimization. Get "id" only once!
-    final O obj = relation.get(id);
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForObject(relation.get(id), range, result);
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
-  }
-
-  /**
-   * Main loop for linear scan,
-   * 
-   * @param relation Data relation
-   * @param iter Iterator
-   * @param obj Query object
-   * @param range Query radius
-   * @param result Output data structure
-   */
-  private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    final Relation<? extends O> relation = this.relation;
     final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
-    // Avoid a loss in numerical precision when using the squared radius:
-    final double upper = range * 1.0000001;
-    // This should be more precise, but slower:
-    // upper = MathUtil.floatToDoubleUpper((float)range);
-    final double sqrange = upper * upper;
-    while(iter.valid()) {
+    float frange = Math.nextUp((float) range);
+    final double sqrange = frange * frange;
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double sqdistance = squared.distance(obj, relation.get(iter));
       if(sqdistance <= sqrange) {
-        final double dist = FastMath.sqrt(sqdistance);
-        if(dist <= range) { // double check, as we increased the radius above
-          result.add(dist, iter);
-        }
+        result.add(FastMath.sqrt(sqdistance), iter);
       }
-      iter.advance();
     }
+    return result;
   }
 }

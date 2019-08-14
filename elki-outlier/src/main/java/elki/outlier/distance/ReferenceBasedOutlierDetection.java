@@ -180,8 +180,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
       referenceDists.add(distFunc.distance(iditer, refPoint), iditer);
     }
-    referenceDists.sort();
-    return referenceDists;
+    return referenceDists.sort();
   }
 
   /**

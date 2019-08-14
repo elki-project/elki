@@ -32,14 +32,20 @@ import elki.database.query.distance.DistanceQuery;
  *
  * @has - - - DistanceQuery
  */
-public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> implements LinearScanQuery {
+public class LinearScanDistanceKNNQuery<O> implements KNNQuery<O>, LinearScanQuery {
+  /**
+   * Hold the distance function to be used.
+   */
+  protected final DistanceQuery<O> distanceQuery;
+
   /**
    * Constructor.
    *
    * @param distanceQuery Distance function to use
    */
   public LinearScanDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
+    this.distanceQuery = distanceQuery;
   }
 
   @Override

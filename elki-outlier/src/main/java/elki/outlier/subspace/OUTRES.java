@@ -210,8 +210,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
         }
       }
     }
-    n.sort();
-    return n.slice(0, matches);
+    return n.sort().slice(0, matches);
   }
 
   /**

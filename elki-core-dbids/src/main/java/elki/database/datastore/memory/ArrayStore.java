@@ -26,7 +26,6 @@ import elki.database.datastore.DataStoreIDMap;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
 
 /**
  * A class to answer representation queries using the stored Array.
@@ -66,7 +65,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   public T get(DBIDRef id) {
     final int off = idmap.mapDBIDToOffset(id);
     if(off < 0 || off >= data.length) {
-      throw new ObjectNotFoundException(DBIDUtil.deref(id));
+      throw new ObjectNotFoundException(id);
     }
     return (T) data[off];
   }

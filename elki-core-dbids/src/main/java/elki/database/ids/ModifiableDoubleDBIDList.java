@@ -47,12 +47,14 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
   /**
    * Clear the list contents.
    */
-  void clear();
+  ModifiableDoubleDBIDList clear();
 
   /**
    * Sort the result in ascending order
+   * 
+   * @return this
    */
-  void sort();
+  ModifiableDoubleDBIDList sort();
 
   /**
    * Swap to entries in the list.

@@ -26,7 +26,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.similar.MoreLikeThis;
 import org.apache.lucene.util.Version;
@@ -35,11 +34,8 @@ import elki.database.ids.DBID;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
+import elki.database.query.range.RangeQuery;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -48,7 +44,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
+public class LuceneDistanceRangeQuery implements RangeQuery<DBID> {
   /**
    * Lucene search function.
    */
@@ -69,8 +65,8 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
    * 
    * @param distanceQuery Distance query
    */
-  public LuceneDistanceRangeQuery(DistanceQuery<DBID> distanceQuery, IndexReader ir, DBIDRange ids) {
-    super(distanceQuery);
+  public LuceneDistanceRangeQuery(IndexReader ir, DBIDRange ids) {
+    super();
     this.ids = ids;
     this.mlt = new MoreLikeThis(ir);
     this.is = new IndexSearcher(ir);
@@ -78,26 +74,19 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
   }
 
   @Override
-  public void getRangeForObject(DBID obj, double range, ModifiableDoubleDBIDList neighbors) {
+  public ModifiableDoubleDBIDList getRangeForObject(DBID obj, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForDBID(obj, range, result);
+  }
+
+  @Override
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     try {
-      Query query = mlt.like(ids.getOffset(obj));
-      is.search(query, new DocumentsCollector(ids, neighbors, range));
+      is.search(mlt.like(ids.getOffset(id)), new DocumentsCollector(ids, result, range));
+      return result;
     }
     catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
-  }
-
-  @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    getRangeForDBID(id, range, result);
-    return result;
-  }
-
-  @Override
-  public DoubleDBIDList getRangeForObject(DBID obj, double range) {
-    return getRangeForDBID(obj, range);
   }
 
   /**

@@ -21,24 +21,18 @@
 package elki.index.distancematrix;
 
 import elki.data.type.TypeInformation;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.similarity.Similarity;
 import elki.index.AbstractIndex;
+import elki.index.IndexFactory;
 import elki.index.SimilarityIndex;
 import elki.index.SimilarityRangeIndex;
-import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
+import elki.similarity.Similarity;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -241,15 +235,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
    */
   private class PrecomputedSimilarityRangeQuery implements RangeQuery<O> {
     @Override
-    public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-      ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-      getRangeForDBID(id, range, ret);
-      ret.sort();
-      return ret;
-    }
-
-    @Override
-    public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
       result.add(0., id);
       DBIDArrayIter it = ids.iter();
 
@@ -273,15 +259,11 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
         }
         pos += y;
       }
+      return result;
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
-      throw new AbortException("Preprocessor KNN query only supports ID queries.");
-    }
-
-    @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       throw new AbortException("Preprocessor KNN query only supports ID queries.");
     }
   }

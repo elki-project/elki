@@ -439,7 +439,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery {
+  public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeQuery<V> {
     /**
      * Lp-Norm p.
      */
@@ -464,7 +464,12 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     }
 
     @Override
-    public void getRangeForObject(V query, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
+    }
+
+    @Override
+    public ModifiableDoubleDBIDList getRangeForObject(V query, double range, ModifiableDoubleDBIDList result) {
       stats.incrementIssuedQueries();
       long t = System.nanoTime();
 
@@ -525,16 +530,10 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
           }
         }
       }
-      result.sort();
 
       stats.incrementScannedBytes(relation.size() * VectorApproximation.byteOnDisk(BitsUtil.cardinality(subspace), partitions));
-
       stats.incrementQueryTime(System.nanoTime() - t);
-
-      if(LOG.isDebuggingFine()) {
-        LOG.fine("query = " + query);
-        LOG.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
-      }
+      return result;
     }
   }
 
@@ -544,7 +543,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery {
+  public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNQuery<V> {
     /**
      * Lp-Norm p.
      */
@@ -566,6 +565,11 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       super(ddq);
       this.p = p;
       this.subspace = subspace;
+    }
+
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override

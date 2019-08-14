@@ -23,8 +23,6 @@ package elki.index;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
@@ -96,57 +94,24 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
   }
 
   /**
-   * Range query for this index.
+   * Abstract query for this index.
    * 
    * @author Erich Schubert
-   * 
    */
-  public abstract class AbstractRangeQuery extends AbstractDistanceRangeQuery<O> {
+  public abstract class AbstractRefiningQuery {
+    /**
+     * Distance query.
+     */
+    protected DistanceQuery<O> distanceQuery;
+
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query object
      */
-    public AbstractRangeQuery(DistanceQuery<O> distanceQuery) {
-      super(distanceQuery);
-    }
-
-    /**
-     * Refinement distance computation.
-     * 
-     * @param id Candidate ID
-     * @param q Query object
-     * @return Distance
-     */
-    protected double refine(DBIDRef id, O q) {
-      AbstractRefiningIndex.this.countRefinements(1);
-      return distanceQuery.distance(q, id);
-    }
-
-    /**
-     * Count extra refinements.
-     * 
-     * @param c Refinements
-     */
-    protected void incRefinements(int c) {
-      AbstractRefiningIndex.this.countRefinements(c);
-    }
-  }
-
-  /**
-   * KNN query for this index.
-   * 
-   * @author Erich Schubert
-   * 
-   */
-  public abstract class AbstractKNNQuery extends AbstractDistanceKNNQuery<O> {
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance query object
-     */
-    public AbstractKNNQuery(DistanceQuery<O> distanceQuery) {
-      super(distanceQuery);
+    public AbstractRefiningQuery(DistanceQuery<O> distanceQuery) {
+      super();
+      this.distanceQuery = distanceQuery;
     }
 
     /**

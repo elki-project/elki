@@ -321,8 +321,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         if(temporary.intValue(id) != UNPROCESSED) {
           continue;
         }
-        neighbors.clear();
-        rq.getRangeForDBID(id, epsilon, neighbors);
+        rq.getRangeForDBID(id, epsilon, neighbors.clear());
         if(neighbors.size() >= minpts) {
           expandCluster(id, clusterid, temporary, neighbors, activeSet, rq, pprog);
           ++clusterid;
@@ -506,9 +505,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       final DBIDVar id = DBIDUtil.newVar();
       while(!activeSet.isEmpty()) {
         activeSet.pop(id);
-        neighbors.clear();
         // Evaluate Neighborhood predicate
-        rq.getRangeForDBID(id, epsilon, neighbors);
+        rq.getRangeForDBID(id, epsilon, neighbors.clear());
         // Evaluate Core-Point predicate
         if(neighbors.size() >= minpts) {
           clustersize += processCorePoint(id, neighbors, clusterid, clusterids, activeSet);

@@ -21,8 +21,6 @@
 package elki.database.query.range;
 
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
@@ -59,23 +57,7 @@ public abstract class AbstractSimilarityRangeQuery<O> implements RangeQuery<O> {
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(relation.get(id), range, ret);
-    ret.sort();
-    return ret;
-  }
-
-  @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(obj, range, ret);
-    ret.sort();
-    return ret;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    getRangeForObject(relation.get(id), range, neighbors);
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForObject(relation.get(id), range, result);
   }
 }

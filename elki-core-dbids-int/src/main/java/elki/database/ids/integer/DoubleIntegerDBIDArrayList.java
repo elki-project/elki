@@ -168,13 +168,15 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
   }
 
   @Override
-  public void clear() {
+  public ModifiableDoubleDBIDList clear() {
     size = 0;
+    return this;
   }
 
   @Override
-  public void sort() {
+  public ModifiableDoubleDBIDList sort() {
     DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
+    return this;
   }
 
   /**

@@ -32,6 +32,7 @@ import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -71,9 +72,10 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
   }
 
   @Override
-  public void getRangeForObject(O object, double range, ModifiableDoubleDBIDList result) {
-    tree.statistics.countRangeQuery();
+  public ModifiableDoubleDBIDList getRangeForObject(O object, double range, ModifiableDoubleDBIDList result) {
+    final SquaredEuclideanDistance squared = SQUARED;
     final double sqepsilon = range * range;
+    tree.statistics.countRangeQuery();
 
     // Processing queue.
     int[] pq = new int[101];
@@ -89,7 +91,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
       if(node.isLeaf()) {
         for(int i = 0; i < numEntries; i++) {
           SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
-          double distance = SQUARED.minDist(object, entry);
+          double distance = squared.minDist(object, entry);
           tree.statistics.countDistanceCalculation();
           if(distance <= sqepsilon) {
             result.add(FastMath.sqrt(distance), entry.getDBID());
@@ -99,7 +101,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
       else {
         for(int i = 0; i < numEntries; i++) {
           SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
-          double distance = SQUARED.minDist(object, entry);
+          double distance = squared.minDist(object, entry);
           if(distance <= sqepsilon) {
             if(ps == pq.length) { // Resize:
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
@@ -109,5 +111,6 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
         }
       }
     }
+    return result;
   }
 }

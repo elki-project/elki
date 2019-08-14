@@ -82,14 +82,13 @@ public class AutotuningPCA extends PCARunner {
   public PCAResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
+    final EuclideanDistance dist = EuclideanDistance.STATIC;
     Centroid center = Centroid.make(database, ids);
     ModifiableDoubleDBIDList dres = DBIDUtil.newDistanceDBIDList(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double dist = EuclideanDistance.STATIC.distance(center, database.get(iter));
-      dres.add(dist, iter);
+      dres.add(dist.distance(center, database.get(iter)), iter);
     }
-    dres.sort();
-    return processQueryResult(dres, database);
+    return processQueryResult(dres.sort(), database);
   }
 
   /**

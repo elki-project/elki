@@ -22,7 +22,6 @@ package elki.database.query.knn;
 
 import elki.data.NumberVector;
 import elki.database.ids.*;
-import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
@@ -43,7 +42,7 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
  * @assoc - - - EuclideanDistance
  * @assoc - - - SquaredEuclideanDistance
  */
-public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> implements LinearScanQuery {
+public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> {
   /**
    * Constructor.
    *
@@ -56,25 +55,13 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    return linearScan(relation, relation.get(id), k);
+    return getKNNForObject(relation.get(id), k);
   }
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
-    return linearScan(distanceQuery.getRelation(), obj, k);
-  }
-
-  /**
-   * Main loop of the linear scan.
-   *
-   * @param relation Data relation
-   * @param obj Query object
-   * @param k Number of neighbors to find
-   * @return Nearest neighbors
-   */
-  private KNNList linearScan(Relation<? extends O> relation, final O obj, int k) {
     final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
+    final Relation<? extends O> relation = this.relation;
     final KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {

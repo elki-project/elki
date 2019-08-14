@@ -170,8 +170,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
         clusterOrder.add(current.objectID, current.reachability, current.predecessorID);
         processedIDs.add(current.objectID);
 
-        neighbors.clear();
-        rangeQuery.getRangeForDBID(current.objectID, epsilon, neighbors);
+        rangeQuery.getRangeForDBID(current.objectID, epsilon, neighbors.clear());
         if(neighbors.size() >= minpts) {
           neighbors.sort();
           final double coreDistance = neighbor.seek(minpts - 1).doubleValue();

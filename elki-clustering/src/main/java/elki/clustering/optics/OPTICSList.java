@@ -192,8 +192,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
         clusterOrder.add(cur, reachability.doubleValue(cur), predecessor.assignVar(cur, prev));
         LOG.incrementProcessed(progress);
 
-        neighbors.clear();
-        rangeQuery.getRangeForDBID(cur, epsilon, neighbors);
+        rangeQuery.getRangeForDBID(cur, epsilon, neighbors.clear());
         if(neighbors.size() >= minpts) {
           neighbors.sort(); // A quick select would be enough, but its cheap.
           final double coreDistance = neighbor.seek(minpts - 1).doubleValue();

@@ -27,9 +27,7 @@ import java.util.List;
 import elki.database.ids.*;
 import elki.database.query.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -215,8 +213,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     for(DoubleDBIDListIter it = candidates.iter(); it.valid();) {
       assert (it.getOffset() == 0);
       DBID t = DBIDUtil.deref(it);
-      elems.clear(); // Recycle.
-      collectByCover(it, candidates, fmax, elems);
+      collectByCover(it, candidates, fmax, elems.clear());
       assert (DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
       if(elems.size() == 0) { // Singleton
         node.singletons.add(it);
@@ -271,8 +268,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
     }
-    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return new CoverTreeRangeQuery(dq);
+    return new CoverTreeRangeQuery();
   }
 
   @Override
@@ -285,8 +281,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     if(!this.distanceFunction.equals(distanceFunction)) {
       return null;
     }
-    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return new CoverTreeKNNQuery(dq);
+    return new CoverTreeKNNQuery();
   }
 
   @Override
@@ -313,18 +308,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
-    /**
-     * Constructor.
-     *
-     * @param distanceQuery Distance query
-     */
-    public CoverTreeRangeQuery(DistanceQuery<O> distanceQuery) {
-      super(distanceQuery);
+  public class CoverTreeRangeQuery implements RangeQuery<O> {
+    @Override
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
     }
 
     @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList ret) {
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       ArrayList<Node> open = new ArrayList<Node>(); // LIFO stack
       open.add(root);
       DBIDVar r = DBIDUtil.newVar();
@@ -344,7 +335,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
         else { // Leaf node
           // Consider routing object, too:
           if(d <= range) {
-            ret.add(d, r); // First element is a candidate now
+            result.add(d, r); // First element is a candidate now
           }
         }
         // For remaining singletons, compute the distances:
@@ -352,10 +343,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
           cur.singletons.assignVar(i, r);
           final double d2 = distance(obj, r);
           if(d2 <= range) {
-            ret.add(d2, r);
+            result.add(d2, r);
           }
         }
       }
+      return result;
     }
   }
 
@@ -364,14 +356,10 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
-    /**
-     * Constructor.
-     *
-     * @param distanceQuery Distance
-     */
-    public CoverTreeKNNQuery(DistanceQuery<O> distanceQuery) {
-      super(distanceQuery);
+  public class CoverTreeKNNQuery implements KNNQuery<O> {
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override

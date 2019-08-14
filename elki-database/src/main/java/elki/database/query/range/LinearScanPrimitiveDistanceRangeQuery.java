@@ -21,6 +21,7 @@
 package elki.database.query.range;
 
 import elki.database.ids.*;
+import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
@@ -38,11 +39,16 @@ import elki.distance.PrimitiveDistance;
  * 
  * @param <O> Database object type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
+public class LinearScanPrimitiveDistanceRangeQuery<O> implements RangeQuery<O>, LinearScanQuery {
   /**
    * Unboxed distance function.
    */
   private PrimitiveDistance<? super O> rawdist;
+
+  /**
+   * Relation to query.
+   */
+  private Relation<? extends O> relation;
 
   /**
    * Constructor.
@@ -50,59 +56,26 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
    * @param distanceQuery Distance function to use
    */
   public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
+    this.relation = distanceQuery.getRelation();
     rawdist = distanceQuery.getDistance();
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    // Note: subtle optimization. Get "id" only once!
-    final O obj = relation.get(id);
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForObject(relation.get(id), range, result);
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    linearScan(relation, relation.iterDBIDs(), obj, range, result);
-    result.sort();
-    return result;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
-  }
-
-  /**
-   * Main loop for linear scan,
-   * 
-   * @param relation Data relation
-   * @param iter Iterator
-   * @param obj Query object
-   * @param range Query radius
-   * @param result Output data structure
-   */
-  private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    final Relation<? extends O> relation = this.relation;
     final PrimitiveDistance<? super O> rawdist = this.rawdist;
-    while(iter.valid()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double distance = rawdist.distance(obj, relation.get(iter));
       if(distance <= range) {
         result.add(distance, iter);
       }
-      iter.advance();
     }
+    return result;
   }
 }

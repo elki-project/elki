@@ -24,14 +24,7 @@ import java.util.Arrays;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.type.TypeInformation;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -302,7 +295,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    */
-  protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractKNNQuery {
+  protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements KNNQuery<O> {
     /**
      * Constructor.
      * 
@@ -310,6 +303,11 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
      */
     public IDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
+    }
+
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
@@ -371,11 +369,11 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
   }
 
   /**
-   * Exact Range query implementation.
+   * Exact range query implementation.
    * 
    * @author Erich Schubert
    */
-  protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRangeQuery {
+  protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements RangeQuery<O> {
     /**
      * Constructor.
      * 
@@ -386,7 +384,12 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     }
 
     @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
+    }
+
+    @Override
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       DoubleIntPair[] priority = rankReferencePoints(distanceQuery, obj, referencepoints);
       for(DoubleIntPair pair : priority) {
         final ModifiableDoubleDBIDList nindex = index[pair.second];
@@ -431,6 +434,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
           }
         }
       }
+      return result;
     }
   }
 

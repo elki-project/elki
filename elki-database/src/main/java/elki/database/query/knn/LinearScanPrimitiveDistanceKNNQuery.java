@@ -38,11 +38,16 @@ import elki.distance.PrimitiveDistance;
  * @assoc - - - PrimitiveDistanceQuery
  * @assoc - - - PrimitiveDistance
  */
-public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> implements LinearScanQuery {
+public class LinearScanPrimitiveDistanceKNNQuery<O> implements KNNQuery<O>, LinearScanQuery {
   /**
    * Unboxed distance function.
    */
   private PrimitiveDistance<? super O> rawdist;
+
+  /**
+   * Relation to query.
+   */
+  protected Relation<? extends O> relation;
 
   /**
    * Constructor.
@@ -50,31 +55,20 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * @param distanceQuery Distance function to use
    */
   public LinearScanPrimitiveDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
     rawdist = distanceQuery.getDistance();
+    relation = distanceQuery.getRelation();
   }
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    final Relation<? extends O> relation = distanceQuery.getRelation();
-    return linearScan(relation, relation.get(id), k);
+    return getKNNForObject(relation.get(id), k);
   }
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
-    return linearScan(distanceQuery.getRelation(), obj, k);
-  }
-
-  /**
-   * Main loop of the linear scan.
-   * 
-   * @param relation Data relation
-   * @param obj Query object
-   * @param k Number of neighbors
-   * @return Nearest neighbors
-   */
-  private KNNList linearScan(Relation<? extends O> relation, final O obj, int k) {
     final PrimitiveDistance<? super O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = this.relation;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {

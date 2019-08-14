@@ -31,9 +31,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.AbstractDistanceKNNQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.ArcCosineDistance;
@@ -108,8 +106,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
     // Sort indexes
     long count = 0L;
     for(ModifiableDoubleDBIDList column : index) {
-      column.sort();
-      count += column.size();
+      count += column.sort().size();
     }
     double sparsity = count / (index.size() * (double) relation.size());
     if(sparsity > .2) {
@@ -259,10 +256,10 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
   public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
     Distance<? super V> df = distanceQuery.getDistance();
     if(df instanceof CosineDistance) {
-      return new CosineKNNQuery(distanceQuery);
+      return new CosineKNNQuery();
     }
     if(df instanceof ArcCosineDistance) {
-      return new ArcCosineKNNQuery(distanceQuery);
+      return new ArcCosineKNNQuery();
     }
     return null;
   }
@@ -271,10 +268,10 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
   public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
     Distance<? super V> df = distanceQuery.getDistance();
     if(df instanceof CosineDistance) {
-      return new CosineRangeQuery(distanceQuery);
+      return new CosineRangeQuery();
     }
     if(df instanceof ArcCosineDistance) {
-      return new ArcCosineRangeQuery(distanceQuery);
+      return new ArcCosineRangeQuery();
     }
     return null;
   }
@@ -294,14 +291,10 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class CosineKNNQuery extends AbstractDistanceKNNQuery<V> {
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance query
-     */
-    public CosineKNNQuery(DistanceQuery<V> distanceQuery) {
-      super(distanceQuery);
+  protected class CosineKNNQuery implements KNNQuery<V> {
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
@@ -328,14 +321,10 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class ArcCosineKNNQuery extends AbstractDistanceKNNQuery<V> {
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance query
-     */
-    public ArcCosineKNNQuery(DistanceQuery<V> distanceQuery) {
-      super(distanceQuery);
+  protected class ArcCosineKNNQuery implements KNNQuery<V> {
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
@@ -362,18 +351,14 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class CosineRangeQuery extends AbstractDistanceRangeQuery<V> {
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance query
-     */
-    public CosineRangeQuery(DistanceQuery<V> distanceQuery) {
-      super(distanceQuery);
+  protected class CosineRangeQuery implements RangeQuery<V> {
+    @Override
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
     }
 
     @Override
-    public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
@@ -386,38 +371,36 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
           result.add(1. - sim / len, n);
         }
       }
+      return result;
     }
   }
 
   /**
-   * kNN query object, for cosine distance.
+   * Range query object, for cosine distance.
    * 
    * @author Erich Schubert
    */
-  protected class ArcCosineRangeQuery extends AbstractDistanceRangeQuery<V> {
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance query
-     */
-    public ArcCosineRangeQuery(DistanceQuery<V> distanceQuery) {
-      super(distanceQuery);
+  protected class ArcCosineRangeQuery implements RangeQuery<V> {
+    @Override
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
     }
 
     @Override
-    public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
-      double len = naiveQuery(obj, scores, cands);
+      double len = naiveQuery(obj, scores, cands), f = 1. / len;
       // dist = acos(sim/len) <-> sim = cos(dist)*len
       double simrange = FastMath.cos(range) * len;
       for(DBIDIter n = cands.iter(); n.valid(); n.advance()) {
         double sim = scores.doubleValue(n) / length.doubleValue(n);
         if(sim >= simrange) {
-          result.add(Math.acos(sim / len), n);
+          result.add(FastMath.acos(sim * f), n);
         }
       }
+      return result;
     }
   }
 

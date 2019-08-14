@@ -29,7 +29,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import elki.database.AbstractDatabase;
-import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
@@ -121,7 +120,7 @@ public class LuceneDatabase extends AbstractDatabase {
   public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery.getDistance() instanceof LuceneDistance) {
       @SuppressWarnings("unchecked")
-      final RangeQuery<O> rq = (RangeQuery<O>) new LuceneDistanceRangeQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
+      final RangeQuery<O> rq = (RangeQuery<O>) new LuceneDistanceRangeQuery(reader, ids);
       return rq;
     }
     return super.getRangeQuery(distanceQuery, hints);
@@ -131,7 +130,7 @@ public class LuceneDatabase extends AbstractDatabase {
   public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery.getDistance() instanceof LuceneDistance) {
       @SuppressWarnings("unchecked")
-      final KNNQuery<O> kq = (KNNQuery<O>) new LuceneDistanceKNNQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
+      final KNNQuery<O> kq = (KNNQuery<O>) new LuceneDistanceKNNQuery(reader, ids);
       return kq;
     }
     return super.getKNNQuery(distanceQuery, hints);

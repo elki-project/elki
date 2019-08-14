@@ -103,26 +103,6 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
   protected int minpts;
 
   /**
-   * Holds a list of clusters found.
-   */
-  protected List<ModifiableDBIDs> resultList;
-
-  /**
-   * Holds a set of noise.
-   */
-  protected ModifiableDBIDs noise;
-
-  /**
-   * Holds a set of processed ids.
-   */
-  protected ModifiableDBIDs processedIDs;
-
-  /**
-   * Number of neighbors.
-   */
-  protected long ncounter;
-
-  /**
    * Constructor with parameters.
    *
    * @param distanceFunction Distance function
@@ -148,11 +128,10 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     }
 
     RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistance());
-    resultList = new ArrayList<>();
-    noise = DBIDUtil.newHashSet();
-    runDBSCAN(relation, rangeQuery);
+    Instance dbscan = new Instance();
+    dbscan.run(relation, rangeQuery);
 
-    double averagen = ncounter / (double) relation.size();
+    double averagen = dbscan.ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
     if(averagen < 1 + 0.1 * (minpts - 1)) {
       LOG.warning("There are very few neighbors found. Epsilon may be too small.");
@@ -163,116 +142,147 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
 
     Clustering<Model> result = new Clustering<>();
     Metadata.of(result).setLongName("DBSCAN Clustering");
-    for(ModifiableDBIDs res : resultList) {
+    for(ModifiableDBIDs res : dbscan.resultList) {
       result.addToplevelCluster(new Cluster<Model>(res, ClusterModel.CLUSTER));
     }
-    result.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
+    result.addToplevelCluster(new Cluster<Model>(dbscan.noise, true, ClusterModel.CLUSTER));
     return result;
   }
 
   /**
-   * Run the DBSCAN algorithm
+   * Instance for a single data set.
    *
-   * @param relation Data relation
-   * @param rangeQuery Range query class
+   * @author Erich Schubert
    */
-  protected void runDBSCAN(Relation<O> relation, RangeQuery<O> rangeQuery) {
-    final int size = relation.size();
-    FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
-    IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
+  private class Instance {
+    /**
+     * Holds a list of clusters found.
+     */
+    protected List<ModifiableDBIDs> resultList;
 
-    processedIDs = DBIDUtil.newHashSet(size);
-    ArrayModifiableDBIDs seeds = DBIDUtil.newArray();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(!processedIDs.contains(iditer)) {
-        expandCluster(relation, rangeQuery, iditer, seeds, objprog, clusprog);
-      }
-      if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), LOG);
-        clusprog.setProcessed(resultList.size(), LOG);
-      }
-      if(processedIDs.size() == size) {
-        break;
-      }
-    }
-    // Finish progress logging
-    LOG.ensureCompleted(objprog);
-    LOG.setCompleted(clusprog);
-  }
+    /**
+     * Holds a set of noise.
+     */
+    protected ModifiableDBIDs noise;
 
-  /**
-   * DBSCAN-function expandCluster.
-   *
-   * Border-Objects become members of the first possible cluster.
-   *
-   * @param relation Database relation to run on
-   * @param rangeQuery Range query to use
-   * @param startObjectID potential seed of a new potential cluster
-   * @param seeds Array to store the current seeds
-   * @param objprog Number of objects processed (may be {@code null})
-   * @param clusprog Number of clusters found (may be {@code null})
-   */
-  protected void expandCluster(Relation<O> relation, RangeQuery<O> rangeQuery, DBIDRef startObjectID, ArrayModifiableDBIDs seeds, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
-    ncounter += neighbors.size();
+    /**
+     * Holds a set of processed ids.
+     */
+    protected ModifiableDBIDs processedIDs;
 
-    // startObject is no core-object
-    if(neighbors.size() < minpts) {
-      noise.add(startObjectID);
-      processedIDs.add(startObjectID);
-      if(objprog != null) {
-        objprog.incrementProcessed(LOG);
-      }
-      return;
-    }
+    /**
+     * Number of neighbors.
+     */
+    protected long ncounter;
 
-    ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    currentCluster.add(startObjectID);
-    processedIDs.add(startObjectID);
+    /**
+     * Progress for objects (may be null).
+     */
+    protected FiniteProgress objprog;
 
-    // try to expand the cluster
-    assert (seeds.size() == 0);
-    seeds.clear();
-    processNeighbors(neighbors.iter(), currentCluster, seeds);
+    /**
+     * Progress for clusters (may be null).
+     */
+    protected IndefiniteProgress clusprog;
 
-    DBIDVar o = DBIDUtil.newVar();
-    while(!seeds.isEmpty()) {
-      neighbors = rangeQuery.getRangeForDBID(seeds.pop(o), epsilon);
-      ncounter += neighbors.size();
+    /**
+     * Range query to use.
+     */
+    protected RangeQuery<O> rangeQuery;
 
-      if(neighbors.size() >= minpts) {
-        processNeighbors(neighbors.iter(), currentCluster, seeds);
-      }
+    /**
+     * Run the DBSCAN algorithm
+     *
+     * @param relation Data relation
+     * @param rangeQuery Range query class
+     */
+    protected void run(Relation<O> relation, RangeQuery<O> rangeQuery) {
+      final int size = relation.size();
+      this.objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
+      this.clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
+      this.rangeQuery = rangeQuery;
 
-      if(objprog != null) {
-        objprog.incrementProcessed(LOG);
-      }
-    }
-    resultList.add(currentCluster);
-    if(clusprog != null) {
-      clusprog.setProcessed(resultList.size(), LOG);
-    }
-  }
-
-  /**
-   * Process a single core point.
-   *
-   * @param neighbor Iterator over neighbors
-   * @param currentCluster Current cluster
-   * @param seeds Seed set
-   */
-  private void processNeighbors(DoubleDBIDListIter neighbor, ModifiableDBIDs currentCluster, ArrayModifiableDBIDs seeds) {
-    final boolean ismetric = getDistance().isMetric();
-    for(; neighbor.valid(); neighbor.advance()) {
-      if(processedIDs.add(neighbor)) {
-        if(!ismetric || neighbor.doubleValue() > 0.) {
-          seeds.add(neighbor);
+      resultList = new ArrayList<>();
+      noise = DBIDUtil.newHashSet();
+      processedIDs = DBIDUtil.newHashSet(size);
+      ArrayModifiableDBIDs seeds = DBIDUtil.newArray();
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        if(!processedIDs.contains(iditer)) {
+          expandCluster(iditer, seeds);
+        }
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(processedIDs.size(), LOG);
+          clusprog.setProcessed(resultList.size(), LOG);
+        }
+        if(processedIDs.size() == size) {
+          break;
         }
       }
-      else if(!noise.remove(neighbor)) {
-        continue;
+      // Finish progress logging
+      LOG.ensureCompleted(objprog);
+      LOG.setCompleted(clusprog);
+    }
+
+    /**
+     * DBSCAN-function expandCluster.
+     * <p>
+     * Border-Objects become members of the first possible cluster.
+     *
+     * @param startObjectID potential seed of a new potential cluster
+     * @param seeds Array to store the current seeds
+     */
+    protected void expandCluster(DBIDRef startObjectID, ArrayModifiableDBIDs seeds) {
+      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+      processedIDs.add(startObjectID);
+      LOG.incrementProcessed(objprog);
+      ncounter += neighbors.size();
+
+      // startObject is no core-object
+      if(neighbors.size() < minpts) {
+        noise.add(startObjectID);
+        return;
       }
-      currentCluster.add(neighbor);
+
+      ModifiableDBIDs currentCluster = DBIDUtil.newArray(neighbors.size());
+      currentCluster.add(startObjectID);
+      processNeighbors(neighbors, currentCluster, seeds);
+
+      DBIDVar o = DBIDUtil.newVar();
+      while(!seeds.isEmpty()) {
+        // Note: we could reuse the neighbors list here,
+        // but at least on JDK8 this was much slower!
+        neighbors = rangeQuery.getRangeForDBID(seeds.pop(o), epsilon);
+        ncounter += neighbors.size(); // statistics for assistance
+        if(neighbors.size() >= minpts) { // neighbor is core
+          processNeighbors(neighbors, currentCluster, seeds);
+        }
+        LOG.incrementProcessed(objprog);
+      }
+      resultList.add(currentCluster);
+      LOG.incrementProcessed(clusprog);
+    }
+
+    /**
+     * Process a single core point.
+     *
+     * @param neighbor Iterator over neighbors
+     * @param currentCluster Current cluster
+     * @param seeds Seed set
+     */
+    private void processNeighbors(DoubleDBIDList neighbors, ModifiableDBIDs currentCluster, ArrayModifiableDBIDs seeds) {
+      final boolean ismetric = getDistance().isMetric();
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(processedIDs.add(neighbor)) {
+          // No need to query again if metric and distance 0.
+          if(!ismetric || neighbor.doubleValue() > 0.) {
+            seeds.add(neighbor);
+          }
+        }
+        else if(!noise.remove(neighbor)) {
+          continue;
+        }
+        currentCluster.add(neighbor);
+      }
     }
   }
 

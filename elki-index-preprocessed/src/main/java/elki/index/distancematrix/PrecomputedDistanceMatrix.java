@@ -248,15 +248,12 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    */
   private class PrecomputedRangeQuery implements RangeQuery<O> {
     @Override
-    public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-      ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-      getRangeForDBID(id, range, ret);
-      ret.sort();
-      return ret;
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+      throw new AbortException("Preprocessor KNN query only supports ID queries.");
     }
 
     @Override
-    public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
       result.add(0., id);
       DBIDArrayIter it = ids.iter();
 
@@ -280,16 +277,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
         }
         pos += y;
       }
-    }
-
-    @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
-      throw new AbortException("Preprocessor KNN query only supports ID queries.");
-    }
-
-    @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-      throw new AbortException("Preprocessor KNN query only supports ID queries.");
+      return result;
     }
   }
 

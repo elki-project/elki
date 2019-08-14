@@ -24,8 +24,6 @@ import java.util.Arrays;
 
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -87,30 +85,13 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(relation.get(id), range, result);
-    result.sort();
-    return result;
+  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    return getRangeForObject(relation.get(id), range, result);
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(obj, range, result);
-    result.sort();
-    return result;
-  }
-
-  @Override
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    getRangeForObject(relation.get(id), range, result);
-  }
-
-  @Override
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     tree.statistics.countRangeQuery();
-
     // Processing queue.
     int[] pq = new int[101];
     int ps = 0;
@@ -136,6 +117,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
         for(int i = 0; i < numEntries; i++) {
           SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
           double distance = distanceFunction.minDist(obj, entry);
+          tree.statistics.countDistanceCalculation();
           if(distance <= range) {
             if(ps == pq.length) {
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
@@ -145,5 +127,6 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
         }
       }
     }
+    return result;
   }
 }

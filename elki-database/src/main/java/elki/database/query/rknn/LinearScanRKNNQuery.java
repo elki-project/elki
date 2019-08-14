@@ -67,8 +67,7 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
         rNNlist.add(dist, iter);
       }
     }
-    rNNlist.sort();
-    return rNNlist;
+    return rNNlist.sort();
   }
 
   @Override
@@ -82,8 +81,7 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
         }
       }
     }
-    rNNList.sort();
-    return rNNList;
+    return rNNList.sort();
   }
 
   @Override

@@ -31,7 +31,6 @@ import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.AbstractDistanceRangeQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.MaterializedRelation;
@@ -294,7 +293,12 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * 
    * @param Distance type
    */
-  class ProjectedRangeQuery extends AbstractDistanceRangeQuery<O> {
+  class ProjectedRangeQuery implements RangeQuery<O> {
+    /**
+     * Hold the distance function to be used.
+     */
+    protected final DistanceQuery<O> distanceQuery;
+
     /**
      * Inner range query.
      */
@@ -303,21 +307,31 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     /**
      * Constructor.
      * 
-     * @param inner Inner range query.
+     * @param distanceQuery Distance query to use
+     * @param inner Inner range query
      */
     public ProjectedRangeQuery(DistanceQuery<O> distanceQuery, RangeQuery<I> inner) {
-      super(distanceQuery);
+      super();
+      this.distanceQuery = distanceQuery;
       this.inner = inner;
     }
 
     @Override
-    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
+    }
+
+    @Override
+    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       final I pobj = proj.project(obj);
-      if(norefine) {
-        inner.getRangeForObject(pobj, range, result);
-        return;
-      }
       DoubleDBIDList ilist = inner.getRangeForObject(pobj, range);
+      if(norefine) {
+        // Copy without refinement:
+        for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
+          result.add(iter.doubleValue(), iter);
+        }
+        return result;
+      }
       for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
         double dist = distanceQuery.distance(obj, iter);
         countRefinement();
@@ -325,6 +339,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
           result.add(dist, iter);
         }
       }
+      return result;
     }
   }
 

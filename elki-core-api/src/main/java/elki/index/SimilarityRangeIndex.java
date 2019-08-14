@@ -37,7 +37,7 @@ import elki.database.query.similarity.SimilarityQuery;
 public interface SimilarityRangeIndex<O> extends Index {
   /**
    * Get a range query object for the given distance query and k.
-   *
+   * <p>
    * This function MAY return null, when the given distance is not supported!
    *
    * @param simQuery Similarity query

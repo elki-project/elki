@@ -23,13 +23,7 @@ package elki.index.lsh;
 import java.util.ArrayList;
 
 import elki.data.type.TypeInformation;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
@@ -274,7 +268,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      */
-    protected class LSHKNNQuery extends AbstractKNNQuery {
+    protected class LSHKNNQuery extends AbstractRefiningQuery implements KNNQuery<V> {
       /**
        * Constructor.
        *
@@ -282,6 +276,11 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
        */
       public LSHKNNQuery(DistanceQuery<V> distanceQuery) {
         super(distanceQuery);
+      }
+
+      @Override
+      public KNNList getKNNForDBID(DBIDRef id, int k) {
+        return getKNNForObject(relation.get(id), k);
       }
 
       @Override
@@ -303,7 +302,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      */
-    protected class LSHRangeQuery extends AbstractRangeQuery {
+    protected class LSHRangeQuery extends AbstractRefiningQuery implements RangeQuery<V> {
       /**
        * Constructor.
        *
@@ -314,7 +313,12 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
       }
 
       @Override
-      public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+      public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+        return getRangeForObject(relation.get(id), range, result);
+      }
+
+      @Override
+      public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
         DBIDs candidates = getCandidates(obj);
         // Refine.
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
@@ -324,6 +328,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
             result.add(dist, iter);
           }
         }
+        return result;
       }
     }
   }

@@ -264,7 +264,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @author Erich Schubert
    */
-  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery {
+  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeQuery<V> {
     /**
      * LP Norm p parameter.
      */
@@ -283,7 +283,12 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
     }
 
     @Override
-    public void getRangeForObject(V query, double eps, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      return getRangeForObject(relation.get(id), range, result);
+    }
+
+    @Override
+    public ModifiableDoubleDBIDList getRangeForObject(V query, double eps, ModifiableDoubleDBIDList result) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -311,6 +316,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
           result.add(dist, va.id);
         }
       }
+      return result;
     }
   }
 
@@ -319,7 +325,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @author Erich Schubert
    */
-  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery {
+  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNQuery<V> {
     /**
      * LP Norm p parameter.
      */
@@ -334,6 +340,11 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
     public VAFileKNNQuery(DistanceQuery<V> distanceQuery, double p) {
       super(distanceQuery);
       this.p = p;
+    }
+
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
