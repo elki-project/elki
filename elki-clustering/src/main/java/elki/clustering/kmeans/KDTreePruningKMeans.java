@@ -253,10 +253,12 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
         sorted.swap(l++, r--);
       }
       assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
-      if(r + 1 < right) { // Duplicate points!
-        node.leftChild = buildTreeMidpoint(relation, left, r + 1);
-        node.rightChild = buildTreeMidpoint(relation, r + 1, right);
+      ++r;
+      if(r == right) { // Duplicate points!
+        return node;
       }
+      node.leftChild = buildTreeMidpoint(relation, left, r);
+      node.rightChild = buildTreeMidpoint(relation, r, right);
       return node;
     }
 
@@ -291,6 +293,9 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
       }
       assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
       ++r;
+      if(r == right) { // Duplicate points!
+        return node;
+      }
       // if too unbalanced, fall back to a quantile:
       final int q = (right - left) >>> 3;
       if(left + q > r) {
@@ -301,6 +306,7 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
         comp.setDimension(dim);
         QuickSelectDBIDs.quickSelect(sorted, comp, left, r, r = right - q);
       }
+      assert left < r && r < right : "Useless split selected: " + left + " < " + r + " < " + right;
       node.leftChild = buildTreeBoundedMidpoint(relation, left, r, comp);
       node.rightChild = buildTreeBoundedMidpoint(relation, r, right, comp);
       return node;
@@ -373,6 +379,9 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
             bestpos = i;
           }
         }
+      }
+      if(bestscore == 0) { // All duplicate.
+        return node;
       }
       bestpos += left;
       comp.setDimension(bestdim);
