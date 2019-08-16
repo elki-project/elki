@@ -46,6 +46,7 @@ import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.MutableProgress;
+import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.math.MathUtil;
 import elki.result.Metadata;
@@ -207,6 +208,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       prog.setTotal(k);
       prog.setProcessed(k, LOG);
     }
+    LOG.statistics(new LongStatistic(KEY + ".num-clusters", clusters.size()));
     Clustering<M> result = new Clustering<>(clusters);
     Metadata.of(result).setLongName("X-Means Clustering");
     return result;
