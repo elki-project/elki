@@ -20,9 +20,6 @@
  */
 package elki.outlier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.optics.AbstractOPTICS;
 import elki.clustering.optics.OPTICSTypeAlgorithm;
@@ -33,14 +30,12 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -116,13 +111,11 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
   public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, minpts);
-    RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
     DBIDs ids = relation.getDBIDs();
 
     // FIXME: implicit preprocessor.
     WritableDataStore<KNNList> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNList.class);
     WritableDoubleDataStore coreDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    WritableIntegerDataStore minPtsNeighborhoodSize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
 
     // Pass 1
     // N_minpts(id) and core-distance(id)
@@ -132,25 +125,20 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
       double d = minptsNeighbours.getKNNDistance();
       nMinPts.put(iditer, minptsNeighbours);
       coreDistance.putDouble(iditer, d);
-      minPtsNeighborhoodSize.put(iditer, rangeQuery.getRangeForDBID(iditer, d).size());
     }
 
     // Pass 2
-    WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      List<Double> core = new ArrayList<>();
+      final KNNList neighbors = nMinPts.get(iditer);
       double lrd = 0;
-      // TODO: optimize for double distances
-      for(DoubleDBIDListIter neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         double coreDist = coreDistance.doubleValue(neighbor);
         double dist = distQuery.distance(iditer, neighbor);
         double rd = MathUtil.max(coreDist, dist);
-        lrd = rd + lrd;
-        core.add(rd);
+        lrd += rd;
       }
-      lrd = minPtsNeighborhoodSize.intValue(iditer) / lrd;
-      reachDistance.put(iditer, core);
+      lrd = neighbors.size() / lrd;
       lrds.putDouble(iditer, lrd);
     }
 
@@ -158,15 +146,16 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
     DoubleMinMax ofminmax = new DoubleMinMax();
     WritableDoubleDataStore ofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final KNNList neighbors = nMinPts.get(iditer);
+      double lrd = lrds.doubleValue(iditer);
       double of = 0;
-      for(DBIDIter neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
-        double lrd = lrds.doubleValue(iditer);
-        double lrdN = lrds.doubleValue(neighbor);
-        of = of + lrdN / lrd;
-      }
-      of = of / minPtsNeighborhoodSize.intValue(iditer);
+      if(lrd > 0) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          of += lrds.doubleValue(neighbor) / lrd;
+        }
+        of /= neighbors.size();
+      } // else 0.
       ofs.putDouble(iditer, of);
-      // update minimum and maximum
       ofminmax.put(of);
     }
     // Build result representation.
@@ -199,7 +188,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+      IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         minpts = param.getValue();
