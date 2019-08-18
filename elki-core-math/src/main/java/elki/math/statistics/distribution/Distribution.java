@@ -90,16 +90,16 @@ public interface Distribution {
     /**
      * Location parameter.
      */
-    public static final OptionID LOCATION_ID = new OptionID("distribution.location", "Distribution location parameter");
+    OptionID LOCATION_ID = new OptionID("distribution.location", "Distribution location parameter");
 
     /**
      * Scale parameter.
      */
-    public static final OptionID SCALE_ID = new OptionID("distribution.scale", "Distribution scale parameter");
+    OptionID SCALE_ID = new OptionID("distribution.scale", "Distribution scale parameter");
 
     /**
      * Shape parameter.
      */
-    public static final OptionID SHAPE_ID = new OptionID("distribution.shape", "Distribution shape parameter");
+    OptionID SHAPE_ID = new OptionID("distribution.shape", "Distribution shape parameter");
   }
 }

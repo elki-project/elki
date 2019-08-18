@@ -21,12 +21,11 @@
 package elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 import elki.database.ids.DBID;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import elki.logging.LoggingConfiguration;
+import elki.logging.Logging;
 import elki.utilities.io.FormatUtil;
 
 /**
@@ -41,6 +40,11 @@ import elki.utilities.io.FormatUtil;
  */
 class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry> {
   private static final long serialVersionUID = 2;
+
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(MkAppTreeNode.class);
 
   /**
    * Empty constructor for Externalizable interface.
@@ -86,10 +90,8 @@ class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry
       b[p] /= p_max;
     }
 
-    if(LoggingConfiguration.DEBUG) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("b " + FormatUtil.format(b, FormatUtil.NF4));
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+    if(LOG.isDebuggingFine()) {
+      LOG.fine("b: " + FormatUtil.format(b, FormatUtil.NF4));
     }
 
     return new PolynomialApproximation(b);

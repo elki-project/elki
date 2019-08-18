@@ -128,7 +128,6 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     heapifyUp(pos, e);
     heapModified();
-    return;
   }
 
   @Override

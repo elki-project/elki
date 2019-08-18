@@ -177,10 +177,8 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
       if(DBIDUtil.equal(ignore, ki)) {
         continue;
       }
-      double d = FastMath.pow(ki.doubleValue() * scalelin, scaleexp);
-      dists.add(d, ki);
+      dists.add(FastMath.pow(ki.doubleValue() * scalelin, scaleexp), ki);
     }
-    return;
   }
 
   /**

@@ -137,16 +137,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
      */
     public PrecisionAtKCurve(int size) {
       super("k", "Precision", size);
-    }
-
-    @Override
-    public String getLongName() {
-      return "Precision @ k Curve";
-    }
-
-    @Override
-    public String getShortName() {
-      return "precision-at-k";
+      Metadata.of(this).setLongName("Precision at k Curve");
     }
   }
 

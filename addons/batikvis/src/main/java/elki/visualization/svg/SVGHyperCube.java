@@ -118,7 +118,7 @@ public final class SVGHyperCube {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return group;
   }
 
@@ -136,7 +136,7 @@ public final class SVGHyperCube {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return group;
   }
 
@@ -158,7 +158,7 @@ public final class SVGHyperCube {
       min[i] = box.getMin(i);
     }
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return group;
   }
 
@@ -273,11 +273,10 @@ public final class SVGHyperCube {
    * @param minx starting corner
    * @param miny starting corner
    * @param r_edges edge vectors
-   * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges
    */
-  private static void recDrawSides(SVGPlot plot, Element group, String cls, double minx, double miny, List<double[]> r_edges, int off, long[] b) {
-    StringBuilder pbuf = new StringBuilder();
+  private static void recDrawSides(SVGPlot plot, Element group, String cls, double minx, double miny, List<double[]> r_edges, long[] b) {
+    StringBuilder pbuf = new StringBuilder(1000);
     // Draw all "missing" sides
     for(int i = 0; i < r_edges.size() - 1; i++) {
       if(BitsUtil.get(b, i)) {
@@ -321,7 +320,7 @@ public final class SVGHyperCube {
       }
       // Recursion
       BitsUtil.setI(b, i);
-      recDrawSides(plot, group, cls, xi, yi, r_edges, i + 1, b);
+      recDrawSides(plot, group, cls, xi, yi, r_edges, b);
       BitsUtil.clearI(b, i);
     }
   }

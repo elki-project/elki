@@ -175,6 +175,7 @@ public class OutlierROCCurve implements Evaluator {
     public ROCResult(XYCurve col, double rocauc) {
       super(col);
       this.auc = rocauc;
+      Metadata.of(this).setLongName("ROC Curve");
     }
 
     /**
@@ -182,16 +183,6 @@ public class OutlierROCCurve implements Evaluator {
      */
     public double getAUC() {
       return auc;
-    }
-
-    @Override
-    public String getLongName() {
-      return "ROC Curve";
-    }
-
-    @Override
-    public String getShortName() {
-      return "roc-curve";
     }
   }
 

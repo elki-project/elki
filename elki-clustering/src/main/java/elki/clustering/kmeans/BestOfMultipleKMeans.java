@@ -30,10 +30,8 @@ import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
-import elki.distance.PrimitiveDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -91,9 +89,6 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
   @Override
   public Clustering<M> run(Database database, Relation<V> relation) {
-    if(!(innerkMeans.getDistance() instanceof PrimitiveDistance)) {
-      throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistance().getClass());
-    }
     @SuppressWarnings("unchecked")
     final NumberVectorDistance<? super NumberVector> df = (NumberVectorDistance<? super NumberVector>) innerkMeans.getDistance();
 
@@ -103,7 +98,9 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     for(int i = 0; i < trials; i++) {
       Clustering<M> currentCandidate = innerkMeans.run(database, relation);
       double currentCost = qualityMeasure.quality(currentCandidate, df, relation);
-      LOG.verbose("Cost of candidate " + i + ": " + currentCost);
+      if(LOG.isVerbose()) {
+        LOG.verbose("Cost of candidate " + i + ": " + currentCost);
+      }
 
       if(qualityMeasure.isBetter(currentCost, bestCost)) {
         bestResult = currentCandidate;

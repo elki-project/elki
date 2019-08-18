@@ -26,10 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 
 import elki.logging.Logging;
-import elki.logging.LoggingConfiguration;
 import elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
@@ -123,16 +121,10 @@ public class RectangleArranger<T> {
     if(LOG.isDebuggingFinest()) {
       LOG.finest("Add: " + w + "x" + h);
     }
-    final int cols = widths.size();
-    final int rows = heights.size();
+    final int cols = widths.size(), rows = heights.size();
 
-    int bestsx = -1;
-    int bestsy = -1;
-    int bestex = cols - 1;
-    int bestey = -1;
-    double bestwi;
-    double besthi;
-    double bestinc;
+    int bestsx = -1, bestsy = -1, bestex = cols - 1, bestey = -1;
+    double bestwi, besthi, bestinc;
     // Baseline: grow by adding to the top or to the right.
     {
       double i1 = computeIncreaseArea(w, Math.max(0, h - theight));
@@ -231,8 +223,7 @@ public class RectangleArranger<T> {
           continue;
         }
         // Compute increase:
-        double winc = Math.max(0.0, w - avw);
-        double hinc = Math.max(0.0, h - avh);
+        double winc = Math.max(0.0, w - avw), hinc = Math.max(0.0, h - avh);
         double inc = computeIncreaseArea(winc, hinc);
 
         if(LOG.isDebuggingFinest()) {
@@ -260,7 +251,7 @@ public class RectangleArranger<T> {
     }
     // Need to increase the total area
     if(bestinc > 0) {
-      assert(bestex == cols - 1 || bestey == rows - 1);
+      assert (bestex == cols - 1 || bestey == rows - 1);
       double inc = Math.max(bestwi, besthi * ratio);
       resize(inc);
 
@@ -285,15 +276,12 @@ public class RectangleArranger<T> {
         usage.get(y).set(x, data);
       }
     }
-    double xpos = 0.0;
-    double ypos = 0.0;
-    {
-      for(int x = 0; x < bestsx; x++) {
-        xpos += widths.get(x);
-      }
-      for(int y = 0; y < bestsy; y++) {
-        ypos += heights.get(y);
-      }
+    double xpos = 0.0, ypos = 0.0;
+    for(int x = 0; x < bestsx; x++) {
+      xpos += widths.get(x);
+    }
+    for(int y = 0; y < bestsy; y++) {
+      ypos += heights.get(y);
     }
     map.put(data, new double[] { xpos, ypos, w, h });
     if(LOG.isDebuggingFinest()) {
@@ -303,12 +291,11 @@ public class RectangleArranger<T> {
 
   protected double computeIncreaseArea(double winc, double hinc) {
     double inc = Math.max(winc, hinc * ratio);
-    inc = inc * (hinc + inc / ratio + winc / ratio);
-    return inc;
+    return inc * (hinc + inc / ratio + winc / ratio);
   }
 
   protected void splitRow(int bestey, double besthi) {
-    assert(bestey < heights.size());
+    assert (bestey < heights.size());
     if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
@@ -322,7 +309,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitCol(int bestex, double bestwi) {
-    assert(bestex < widths.size());
+    assert (bestex < widths.size());
     if(widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
       return;
     }
@@ -340,8 +327,7 @@ public class RectangleArranger<T> {
   }
 
   private void resize(double inc) {
-    final int cols = widths.size();
-    final int rows = heights.size();
+    final int cols = widths.size(), rows = heights.size();
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Resize by " + inc + "x" + (inc / ratio));
       if(LOG.isDebuggingFinest()) {
@@ -358,13 +344,11 @@ public class RectangleArranger<T> {
       usage.get(y).add(null);
     }
     // Add row:
-    {
-      ArrayList<Object> row = new ArrayList<>();
-      for(int x = 0; x <= cols; x++) {
-        row.add(null);
-      }
-      usage.add(row);
+    ArrayList<Object> row = new ArrayList<>();
+    for(int x = 0; x <= cols; x++) {
+      row.add(null);
     }
+    usage.add(row);
     assert assertConsistent();
     if(LOG.isDebuggingFinest()) {
       logSizes();
@@ -386,29 +370,22 @@ public class RectangleArranger<T> {
   }
 
   private boolean assertConsistent() {
-    final int cols = widths.size();
-    final int rows = heights.size();
-    {
-      double wsum = 0.0;
-      for(int x = 0; x < cols; x++) {
-        assert(widths.get(x) > 0) : "Non-positive width: " + widths.get(x) + " at " + x;
-        wsum += widths.get(x);
-      }
-      assert(Math.abs(wsum - twidth) < 1E-10);
+    final int cols = widths.size(), rows = heights.size();
+    double wsum = 0.0;
+    for(int x = 0; x < cols; x++) {
+      assert (widths.get(x) > 0) : "Non-positive width: " + widths.get(x) + " at " + x;
+      wsum += widths.get(x);
     }
-    {
-      double hsum = 0.0;
-      for(int y = 0; y < rows; y++) {
-        assert(heights.get(y) > 0) : "Non-positive height: " + heights.get(y) + " at " + y;
-        hsum += heights.get(y);
-      }
-      assert(Math.abs(hsum - theight) < 1E-10);
+    assert (Math.abs(wsum - twidth) < 1E-10);
+    double hsum = 0.0;
+    for(int y = 0; y < rows; y++) {
+      assert (heights.get(y) > 0) : "Non-positive height: " + heights.get(y) + " at " + y;
+      hsum += heights.get(y);
     }
-    {
-      assert(usage.size() == rows);
-      for(int y = 0; y < rows; y++) {
-        assert(usage.get(y).size() == cols);
-      }
+    assert (Math.abs(hsum - theight) < 1E-10);
+    assert (usage.size() == rows);
+    for(int y = 0; y < rows; y++) {
+      assert (usage.get(y).size() == cols);
     }
     return true;
   }
@@ -418,39 +395,26 @@ public class RectangleArranger<T> {
    */
   protected void logSizes() {
     StringBuilder buf = new StringBuilder(1000);
-    final int cols = widths.size();
-    final int rows = heights.size();
-    {
-      buf.append("Widths: ");
-      for(int x = 0; x < cols; x++) {
-        if(x > 0) {
-          buf.append(", ");
-        }
-        buf.append(widths.get(x));
-      }
-      buf.append('\n');
+    final int cols = widths.size(), rows = heights.size();
+    buf.append("Widths: ");
+    for(int x = 0; x < cols; x++) {
+      buf.append(widths.get(x)).append(", ");
     }
-    {
-      buf.append("Heights: ");
-      for(int y = 0; y < rows; y++) {
-        if(y > 0) {
-          buf.append(", ");
-        }
-        buf.append(heights.get(y));
-      }
-      buf.append('\n');
+    buf.setLength(buf.length() - 2); // Remove tailing ", "
+    buf.append("\nHeights: ");
+    for(int y = 0; y < rows; y++) {
+      buf.append(heights.get(y)).append(", ");
     }
-    {
-      for(int y = 0; y < rows; y++) {
-        for(int x = 0; x < cols; x++) {
-          buf.append(usage.get(y).get(x) != null ? 'X' : '_');
-        }
-        buf.append("|\n");
-      }
+    buf.setLength(buf.length() - 2); // Remove tailing ", "
+    buf.append('\n');
+    for(int y = 0; y < rows; y++) {
       for(int x = 0; x < cols; x++) {
-        buf.append('-');
+        buf.append(usage.get(y).get(x) != null ? 'X' : '_');
       }
-      buf.append("+\n");
+      buf.append("|\n");
+    }
+    for(int x = 0; x < cols; x++) {
+      buf.append('-');
     }
     LOG.debug(buf);
   }
@@ -462,15 +426,12 @@ public class RectangleArranger<T> {
    * @return relative fill
    */
   public double relativeFill() {
+    final int cols = widths.size(), rows = heights.size();
     double acc = 0.0;
-    final int cols = widths.size();
-    final int rows = heights.size();
-    {
-      for(int y = 0; y < rows; y++) {
-        for(int x = 0; x < cols; x++) {
-          if(usage.get(y).get(x) != null) {
-            acc += widths.get(x) * heights.get(y);
-          }
+    for(int y = 0; y < rows; y++) {
+      for(int x = 0; x < cols; x++) {
+        if(usage.get(y).get(x) != null) {
+          acc += widths.get(x) * heights.get(y);
         }
       }
     }
@@ -511,35 +472,5 @@ public class RectangleArranger<T> {
    */
   public Set<T> keySet() {
     return Collections.unmodifiableSet(map.keySet());
-  }
-
-  /**
-   * Test method.
-   *
-   * @param args
-   */
-  public static void main(String[] args) {
-    LoggingConfiguration.setLevelFor(RectangleArranger.class.getName(), Level.FINEST.getName());
-    RectangleArranger<String> r = new RectangleArranger<>(1.3);
-    r.put(4., 1., "Histogram");
-    r.put(4., 4., "3D view");
-    r.put(1., 1., "Meta 1");
-    r.put(1., 1., "Meta 2");
-    r.put(1., 1., "Meta 3");
-    r.put(2., 2., "Meta 4");
-    r.put(2., 2., "Meta 5");
-
-    r = new RectangleArranger<>(3., 3.);
-    r.put(1., 2., "A");
-    r.put(2., 1., "B");
-    r.put(1., 2., "C");
-    r.put(2., 1., "D");
-    r.put(2., 2., "E");
-
-    r = new RectangleArranger<>(4 - 2.6521739130434785);
-    r.put(4., .5, "A");
-    r.put(4., 3., "B");
-    r.put(4., 1., "C");
-    r.put(1., .1, "D");
   }
 }

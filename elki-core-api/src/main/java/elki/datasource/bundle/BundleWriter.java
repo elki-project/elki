@@ -188,6 +188,7 @@ public class BundleWriter {
       TypeInformationSerializer.STATIC.toByteBuffer(buffer, type);
       serializers[i + 1] = ser;
     }
+    flushBuffer(buffer, output);
     return serializers;
   }
 }

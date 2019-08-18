@@ -126,10 +126,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   }
 
   public ClusterOrder run(Database database, Relation<V> relation) {
-    if(!(getDistance() instanceof SpatialPrimitiveDistance<?>)) {
-      throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialPrimitiveDistance.class.getName());
-    }
-
     if(LOG.isVerbose()) {
       LOG.verbose("Building DeLiClu index");
     }

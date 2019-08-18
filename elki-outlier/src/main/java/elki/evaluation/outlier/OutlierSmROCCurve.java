@@ -207,16 +207,7 @@ public class OutlierSmROCCurve implements Evaluator {
      */
     public SmROCResult(int size) {
       super("SmROC Negative", "SmROC Positive", size);
-    }
-
-    @Override
-    public String getLongName() {
-      return "SmROC Curve";
-    }
-
-    @Override
-    public String getShortName() {
-      return "smroc-curve";
+      Metadata.of(this).setLongName("SmROC Curve");
     }
 
     /**

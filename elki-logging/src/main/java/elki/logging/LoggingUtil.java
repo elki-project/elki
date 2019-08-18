@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 /**
  * This final class contains some static convenience methods for logging.
- * 
+ * <p>
  * {@link #logExpensive} allows the programmer to easily emit a log message,
  * however the function is rather expensive and thus should not be used within
  * loop constructs.
@@ -47,7 +47,7 @@ public final class LoggingUtil {
   /**
    * Expensive logging function that is convenient, but should only be used in
    * rare conditions.
-   * 
+   * <p>
    * For 'frequent' logging, use more efficient techniques, such as explained in
    * the {@link elki.logging logging package documentation}.
    * 
@@ -58,8 +58,7 @@ public final class LoggingUtil {
   public static void logExpensive(Level level, String message, Throwable e) {
     String[] caller = inferCaller();
     if(caller != null) {
-      Logger logger = Logger.getLogger(caller[0]);
-      logger.logp(level, caller[0], caller[1], message, e);
+      Logger.getLogger(caller[0]).logp(level, caller[0], caller[1], message, e);
     }
     else {
       Logger.getAnonymousLogger().log(level, message, e);
@@ -69,7 +68,7 @@ public final class LoggingUtil {
   /**
    * Expensive logging function that is convenient, but should only be used in
    * rare conditions.
-   * 
+   * <p>
    * For 'frequent' logging, use more efficient techniques, such as explained in
    * the {@link elki.logging logging package documentation}.
    * 
@@ -82,8 +81,7 @@ public final class LoggingUtil {
     if(caller != null) {
       rec.setSourceClassName(caller[0]);
       rec.setSourceMethodName(caller[1]);
-      Logger logger = Logger.getLogger(caller[0]);
-      logger.log(rec);
+      Logger.getLogger(caller[0]).log(rec);
     }
     else {
       Logger.getAnonymousLogger().log(rec);
@@ -158,25 +156,21 @@ public final class LoggingUtil {
 
   /**
    * Infer which class has called the logging helper.
-   * 
+   * <p>
    * While this looks like duplicated code from ELKILogRecord, it is needed here
    * to find an appropriate Logger (and check the logging level) for the calling
    * class, not just to log the right class and method name.
    * 
    * @return calling class name and calling method name
    */
-  private static final String[] inferCaller() {
+  private static String[] inferCaller() {
     StackTraceElement[] stack = (new Throwable()).getStackTrace();
-    int ix = 0;
-    while(ix < stack.length) {
+    for(int ix = 0; ix < stack.length; ++ix) {
       StackTraceElement frame = stack[ix];
-
       if(!frame.getClassName().equals(LoggingUtil.class.getCanonicalName())) {
         return new String[] { frame.getClassName(), frame.getMethodName() };
       }
-      ix++;
     }
-
     return null;
   }
 }

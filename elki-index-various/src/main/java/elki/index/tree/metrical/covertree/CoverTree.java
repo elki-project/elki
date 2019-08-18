@@ -253,10 +253,8 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
     }
     assert (candidates.size() == 0);
     // Routing object is not yet handled:
-    if(curSingleton) {
-      if(!node.children.isEmpty()) {
-        node.singletons.add(parentDist, cur); // Add as regular singleton.
-      }
+    if(curSingleton &&!node.children.isEmpty()) {
+      node.singletons.add(parentDist, cur); // Add as regular singleton.
     }
     // TODO: improve recycling of lists?
     return node;

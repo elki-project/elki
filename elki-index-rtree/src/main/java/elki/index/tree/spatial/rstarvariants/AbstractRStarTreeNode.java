@@ -137,50 +137,40 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
         if(i < getNumEntries() && e == null) {
-          throw new RuntimeException("i < numEntries && entry == null");
+          throw new IllegalStateException("i < numEntries && entry == null");
         }
         if(i >= getNumEntries() && e != null) {
-          throw new RuntimeException("i >= numEntries && entry != null");
+          throw new IllegalStateException("i >= numEntries && entry != null");
         }
       }
     }
-
     // dir node
     else {
       N tmp = tree.getNode(getEntry(0));
       boolean childIsLeaf = tmp.isLeaf();
-
       for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
-
         if(i < getNumEntries() && e == null) {
-          throw new RuntimeException("i < numEntries && entry == null");
+          throw new IllegalStateException("i < numEntries && entry == null");
         }
-
         if(i >= getNumEntries() && e != null) {
-          throw new RuntimeException("i >= numEntries && entry != null");
+          throw new IllegalStateException("i >= numEntries && entry != null");
         }
-
         if(e != null) {
           N node = tree.getNode(e);
-
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
               tree.getNode(getEntry(k));
             }
-
-            throw new RuntimeException("Wrong Child in " + this + " at " + i);
+            throw new IllegalStateException("Wrong Child in " + this + " at " + i);
           }
-
           if(!childIsLeaf && node.isLeaf()) {
-            throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
+            throw new IllegalStateException("Wrong Child: child id no leaf, but node is leaf!");
           }
-
           node.integrityCheckParameters((N) this, i);
           node.integrityCheck(tree);
         }
       }
-
       if(LoggingConfiguration.DEBUG) {
         Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
       }
@@ -198,14 +188,13 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
     HyperBoundingBox mbr = computeMBR();
-
     if(/* entry.getMBR() == null && */mbr == null) {
       return;
     }
     if(!SpatialUtil.equals(entry, mbr)) {
       String soll = mbr.toString();
       String ist = new HyperBoundingBox(entry).toString();
-      throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new IllegalStateException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }
 

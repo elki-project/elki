@@ -27,9 +27,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import elki.logging.Logging;
+import elki.math.MathUtil;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.pairs.IntIntPair;
-
 import net.jafama.FastMath;
 
 /**
@@ -129,14 +128,8 @@ public class LinearEquationSystem {
 
     coeff = a;
     rhs = b;
-    row = new int[coeff.length];
-    for(int i = 0; i < coeff.length; i++) {
-      row[i] = i;
-    }
-    col = new int[coeff[0].length];
-    for(int j = 0; j < coeff[0].length; j++) {
-      col[j] = j;
-    }
+    row = MathUtil.sequence(0, coeff.length);
+    col = MathUtil.sequence(0, coeff[0].length);
     rank = 0;
     x_0 = null;
     solved = false;
@@ -297,22 +290,14 @@ public class LinearEquationSystem {
     int[] coeffDigits = maxIntegerDigits(coeff);
     int rhsDigits = maxIntegerDigits(rhs);
 
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(prefix).append('\n').append(prefix);
+    StringBuilder buffer = new StringBuilder(1000).append(prefix);
     for(int i = 0; i < coeff.length; i++) {
+      buffer.append('\n').append(prefix);
       for(int j = 0; j < coeff[row[0]].length; j++) {
-        format(nf, buffer, coeff[row[i]][col[j]], coeffDigits[col[j]]);
-        buffer.append(" * x_").append(col[j]);
+        format(nf, buffer, coeff[row[i]][col[j]], coeffDigits[col[j]]) //
+            .append(" * x_").append(col[j]);
       }
-      buffer.append(" =");
-      format(nf, buffer, rhs[row[i]], rhsDigits);
-
-      if(i < coeff.length - 1) {
-        buffer.append('\n').append(prefix);
-      }
-      else {
-        buffer.append('\n').append(prefix);
-      }
+      format(nf, buffer.append(" ="), rhs[row[i]], rhsDigits);
     }
     return buffer.toString();
   }
@@ -357,24 +342,18 @@ public class LinearEquationSystem {
     nf.setPositivePrefix("");
 
     int row = coeff[0].length >> 1;
-    int params = u.length;
-    int paramsDigits = integerDigits(params);
-
+    int paramsDigits = integerDigits(u.length);
     int x0Digits = maxIntegerDigits(x_0);
     int[] uDigits = maxIntegerDigits(u);
-    StringBuilder buffer = new StringBuilder();
+    StringBuilder buffer = new StringBuilder(1000);
     for(int i = 0; i < x_0.length; i++) {
-      double value = x_0[i];
-      format(nf, buffer, value, x0Digits);
+      format(nf, buffer, x_0[i], x0Digits);
       for(int j = 0; j < u[0].length; j++) {
         if(i == row) {
           buffer.append("  +  a_").append(j).append(" * ");
         }
         else {
-          buffer.append("          ");
-          for(int d = 0; d < paramsDigits; d++) {
-            buffer.append(' ');
-          }
+          FormatUtil.appendSpace(buffer, paramsDigits + 10);
         }
         format(nf, buffer, u[i][j], uDigits[j]);
       }
@@ -390,73 +369,36 @@ public class LinearEquationSystem {
    * @param method the pivot search method to use
    */
   private void reducedRowEchelonForm(int method) {
-    final int rows = coeff.length;
-    final int cols = coeff[0].length;
-
-    int k = -1; // denotes current position on diagonal
-    int pivotRow; // row index of pivot element
-    int pivotCol; // column index of pivot element
-    double pivot; // value of pivot element
-
-    // main loop, transformation to reduced row echelon form
-    boolean exitLoop = false;
-
-    while(!exitLoop) {
-      k++;
-
+    final int rows = coeff.length, cols = coeff[0].length;
+    int[] pivotPos = new int[2];
+    for(int k = 0, m = Math.min(rows, cols); k < m; k++) {
       // pivot search for entry in remaining matrix
       // (depends on chosen method in switch)
-      // store position in pivotRow, pivotCol
-
-      // TODO: Note that we're using "row, col", whereas "col, row" would be
-      // more common?
-      IntIntPair pivotPos = new IntIntPair(0, 0);
-      IntIntPair currPos = new IntIntPair(k, k);
-
-      switch(method){
-      case TRIVAL_PIVOT_SEARCH:
-        pivotPos = nonZeroPivotSearch(k);
-        break;
-      case TOTAL_PIVOT_SEARCH:
-        pivotPos = totalPivotSearch(k);
-        break;
+      if(method == TRIVAL_PIVOT_SEARCH) {
+        nonZeroPivotSearch(k, pivotPos);
       }
-      pivotRow = pivotPos.first;
-      pivotCol = pivotPos.second;
-      pivot = coeff[this.row[pivotRow]][col[pivotCol]];
+      else {
+        assert method == TOTAL_PIVOT_SEARCH;
+        totalPivotSearch(k, pivotPos);
+      }
+      double pivot = coeff[this.row[pivotPos[0]]][col[pivotPos[1]]];
 
       if(LOG.isDebugging()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("equations ").append(equationsToString(4));
-        msg.append("  *** pivot at (").append(pivotRow).append(',').append(pivotCol).append(") = ").append(pivot).append('\n');
-        LOG.debugFine(msg.toString());
+        LOG.debugFine(new StringBuilder(1000) //
+            .append("equations ").append(equationsToString(4)) //
+            .append("  *** pivot at (").append(pivotPos[0]).append(',').append(pivotPos[1]).append(") = ").append(pivot).append('\n').toString());
       }
 
-      // permute rows and columns to get this entry onto
-      // the diagonal
-      permutePivot(pivotPos, currPos);
+      // permute rows and columns to get this entry onto the diagonal
+      permutePivot(pivotPos[0], pivotPos[1], k, k);
 
-      // test conditions for exiting loop
-      // after this iteration
+      // test conditions for exiting loop after this iteration
       // reasons are: Math.abs(pivot) == 0
       if((Math.abs(pivot) <= DELTA)) {
-        exitLoop = true;
+        break;
       }
-
-      // pivoting only if Math.abs(pivot) > 0
-      // and k <= m - 1
-      if((Math.abs(pivot) > DELTA)) {
-        rank++;
-        pivotOperation(k);
-      }
-
-      // test conditions for exiting loop
-      // after this iteration
-      // reasons are: k == rows-1 : no more rows
-      // k == cols-1 : no more columns
-      if(k == rows - 1 || k == cols - 1) {
-        exitLoop = true;
-      }
+      rank++;
+      pivotOperation(k);
     } // end while
 
     reducedRowEchelonForm = true;
@@ -467,17 +409,16 @@ public class LinearEquationSystem {
    * {@code |a_xy| > |a_ij|}
    *
    * @param k search starts at entry (k,k)
-   * @return the position of the found pivot element
+   * @param pivotpos Output pivot positions
    */
-  private IntIntPair totalPivotSearch(int k) {
+  private void totalPivotSearch(int k, int[] pivotpos) {
     double max = 0;
-    int i, j, pivotRow = k, pivotCol = k;
-    double absValue;
-    for(i = k; i < coeff.length; i++) {
-      for(j = k; j < coeff[0].length; j++) {
+    int pivotRow = k, pivotCol = k;
+    for(int i = k; i < coeff.length; i++) {
+      for(int j = k; j < coeff[0].length; j++) {
         // compute absolute value of
         // current entry in absValue
-        absValue = Math.abs(coeff[row[i]][col[j]]);
+        double absValue = Math.abs(coeff[row[i]][col[j]]);
 
         // compare absValue with value max
         // found so far
@@ -486,55 +427,58 @@ public class LinearEquationSystem {
           max = absValue;
           pivotRow = i;
           pivotCol = j;
-        } // end if
-      } // end for j
-    } // end for k
-    return new IntIntPair(pivotRow, pivotCol);
+        }
+      }
+    }
+    pivotpos[0] = pivotRow;
+    pivotpos[1] = pivotCol;
+    return;
   }
 
   /**
    * Method for trivial pivot search, searches for non-zero entry.
    *
    * @param k search starts at entry (k,k)
-   * @return the position of the found pivot element
+   * @param pivotpos Output array
    */
-  private IntIntPair nonZeroPivotSearch(int k) {
-
-    int i, j;
-    double absValue;
-    for(i = k; i < coeff.length; i++) {
-      for(j = k; j < coeff[0].length; j++) {
+  private void nonZeroPivotSearch(int k, int[] pivotpos) {
+    for(int i = k; i < coeff.length; i++) {
+      for(int j = k; j < coeff[0].length; j++) {
         // compute absolute value of
         // current entry in absValue
-        absValue = Math.abs(coeff[row[i]][col[j]]);
+        double absValue = Math.abs(coeff[row[i]][col[j]]);
 
         // check if absValue is non-zero
         if(absValue > 0) { // found a pivot element
-          return new IntIntPair(i, j);
-        } // end if
-      } // end for j
-    } // end for k
-    return new IntIntPair(k, k);
+          pivotpos[0] = i;
+          pivotpos[1] = j;
+          return;
+        }
+      }
+    }
+    pivotpos[0] = pivotpos[1] = k;
+    return;
   }
 
   /**
    * permutes two matrix rows and two matrix columns
    *
-   * @param pos1 the fist position for the permutation
-   * @param pos2 the second position for the permutation
+   * @param r1 the first row for the permutation
+   * @param c1 the first column for the permutation
+   * @param r2 the second row for the permutation
+   * @param c2 the second column for the permutation
    */
-  private void permutePivot(IntIntPair pos1, IntIntPair pos2) {
-    int r1 = pos1.first;
-    int c1 = pos1.second;
-    int r2 = pos2.first;
-    int c2 = pos2.second;
-    int index;
-    index = row[r2];
-    row[r2] = row[r1];
-    row[r1] = index;
-    index = col[c2];
-    col[c2] = col[c1];
-    col[c1] = index;
+  private void permutePivot(int r1, int c1, int r2, int c2) {
+    if(r1 != r2) {
+      int index = row[r2];
+      row[r2] = row[r1];
+      row[r1] = index;
+    }
+    if(c1 != c2) {
+      int index = col[c2];
+      col[c2] = col[c1];
+      col[c1] = index;
+    }
   }
 
   /**
@@ -580,9 +524,7 @@ public class LinearEquationSystem {
     } // end for k
 
     if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("after pivot operation ").append(equationsToString(4));
-      LOG.debugFine(msg.toString());
+      LOG.debugFine("after pivot operation " + equationsToString(4));
     }
   }
 
@@ -625,9 +567,10 @@ public class LinearEquationSystem {
       freeIndices[numfree++] = i;
     }
 
-    StringBuilder msg = new StringBuilder();
-    if(LOG.isDebugging()) {
-      msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']') //
+    StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
+    if(msg != null) {
+      msg.append("\nSpecial solution x_0 = [") //
+          .append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']') //
           .append("\nbound Indices ").append(FormatUtil.format(boundIndices, ",")) //
           .append("\nfree Indices ").append(FormatUtil.format(freeIndices, ","));
     }
@@ -652,7 +595,7 @@ public class LinearEquationSystem {
       boundIndex = 0; // Restart
     }
 
-    if(LOG.isDebugging()) {
+    if(msg != null) {
       msg.append("\nU");
       for(double[] anU : u) {
         msg.append('\n').append(FormatUtil.format(anU, ",", FormatUtil.NF4));
@@ -713,11 +656,11 @@ public class LinearEquationSystem {
    * @return the maximum integer digits of the specified values
    */
   private int maxIntegerDigits(double[] values) {
-    int digits = 0;
+    double val = 0;
     for(double value : values) {
-      digits = Math.max(digits, integerDigits(value));
+      val = Math.max(val, Math.abs(value));
     }
-    return digits;
+    return integerDigits(val);
   }
 
   /**
@@ -728,10 +671,7 @@ public class LinearEquationSystem {
    */
   private int integerDigits(double d) {
     double value = Math.abs(d);
-    if(value < 10) {
-      return 1;
-    }
-    return (int) FastMath.log10(value) + 1;
+    return value < 10 ? 1 : (int) FastMath.log10(value) + 1;
   }
 
   /**
@@ -743,19 +683,12 @@ public class LinearEquationSystem {
    * @param buffer the string buffer to append the value to
    * @param value the value to append
    * @param maxIntegerDigits the maximum number of integer digits
+   * @return the buffer for chaining
    */
-  private void format(NumberFormat nf, StringBuilder buffer, double value, int maxIntegerDigits) {
-    if(value >= 0) {
-      buffer.append(" + ");
-    }
-    else {
-      buffer.append(" - ");
-    }
-    int digits = maxIntegerDigits - integerDigits(value);
-    for(int d = 0; d < digits; d++) {
-      buffer.append(' ');
-    }
-    buffer.append(nf.format(Math.abs(value)));
+  private StringBuilder format(NumberFormat nf, StringBuilder buffer, double value, int maxIntegerDigits) {
+    return FormatUtil.appendSpace(buffer.append(value >= 0 ? " + " : " - "), //
+        maxIntegerDigits - integerDigits(value))//
+        .append(nf.format(Math.abs(value)));
   }
 
   /**

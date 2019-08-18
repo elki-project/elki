@@ -62,9 +62,6 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     super(pagefile, settings);
   }
 
-  /**
-   * Initializes the flat RTree from an existing persistent file.
-   */
   @Override
   public void initializeFromFile(TreeIndexHeader header, PageFile<FlatRStarTreeNode> file) {
     super.initializeFromFile(header, file);
@@ -83,21 +80,11 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     }
   }
 
-  /**
-   * Returns the root node of this RTree.
-   *
-   * @return the root node of this RTree
-   */
   @Override
   public FlatRStarTreeNode getRoot() {
     return root;
   }
 
-  /**
-   * Returns the height of this FlatRTree.
-   *
-   * @return 2
-   */
   @Override
   protected int computeHeight() {
     return 2;
@@ -129,12 +116,8 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     numNodes++;
     setHeight(2);
 
-    if(LOG.isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("  root = ").append(getRoot());
-      msg.append("\n  numNodes = ").append(numNodes);
-      msg.append("\n  height = ").append(getHeight());
-      LOG.debugFine(msg.toString() + "\n");
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("  root = " + getRoot() + "\n  numNodes = " + numNodes + "\n  height = " + getHeight());
     }
     doExtraIntegrityChecks();
   }
@@ -153,13 +136,6 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     setHeight(2);
   }
 
-  /**
-   * Returns true if in the specified node an overflow occurred, false
-   * otherwise.
-   *
-   * @param node the node to be tested for overflow
-   * @return true if in the specified node an overflow occurred, false otherwise
-   */
   @Override
   protected boolean hasOverflow(FlatRStarTreeNode node) {
     if(node.isLeaf()) {
@@ -171,39 +147,16 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     return false;
   }
 
-  /**
-   * Returns true if in the specified node an underflow occurred, false
-   * otherwise.
-   *
-   * @param node the node to be tested for underflow
-   * @return true if in the specified node an underflow occurred, false
-   *         otherwise
-   */
   @Override
   protected boolean hasUnderflow(FlatRStarTreeNode node) {
-    if(node.isLeaf()) {
-      return node.getNumEntries() < leafMinimum;
-    }
-    else {
-      return false;
-    }
+    return node.isLeaf() && node.getNumEntries() < leafMinimum;
   }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @return a new leaf node
-   */
   @Override
   protected FlatRStarTreeNode createNewLeafNode() {
     return new FlatRStarTreeNode(leafCapacity, true);
   }
 
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @return a new directory node
-   */
   @Override
   protected FlatRStarTreeNode createNewDirectoryNode() {
     return new FlatRStarTreeNode(dirCapacity, false);

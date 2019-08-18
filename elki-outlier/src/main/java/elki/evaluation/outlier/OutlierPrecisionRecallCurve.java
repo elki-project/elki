@@ -173,16 +173,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     public PRCurve(int size, int positive) {
       super("Recall", "Precision", size);
       this.positive = positive;
-    }
-
-    @Override
-    public String getLongName() {
-      return "Precision-Recall-Curve";
-    }
-
-    @Override
-    public String getShortName() {
-      return "pr-curve";
+      Metadata.of(this).setLongName("Precision-Recall-Curve");
     }
 
     /**

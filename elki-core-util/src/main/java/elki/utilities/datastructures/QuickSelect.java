@@ -66,20 +66,11 @@ public class QuickSelect {
    * @param m5 Pivot candidate
    * @return Best pivot candidate
    */
-  private static final int bestPivot(int rank, int m1, int m2, int m3, int m4, int m5) {
-    if(rank < m1) {
-      return m1;
-    }
-    if(rank > m5) {
-      return m5;
-    }
-    if(rank < m2) {
-      return m2;
-    }
-    if(rank > m4) {
-      return m4;
-    }
-    return m3;
+  private static int bestPivot(int rank, int m1, int m2, int m3, int m4, int m5) {
+    return rank < m1 ? m1 : //
+        rank > m5 ? m5 : //
+            rank < m2 ? m2 : //
+                rank > m4 ? m4 : m3;
   }
 
   /**
@@ -395,10 +386,8 @@ public class QuickSelect {
     if(length % 2 == 1) {
       return data[left];
     }
-    else {
-      quickSelect(data, left + 1, end, left + 1);
-      return data[left] + .5 * (data[left + 1] - data[left]);
-    }
+    quickSelect(data, left + 1, end, left + 1);
+    return data[left] + .5 * (data[left + 1] - data[left]);
   }
 
   /**
@@ -437,12 +426,9 @@ public class QuickSelect {
     if(err <= Double.MIN_NORMAL) {
       return data[ileft];
     }
-    else {
-      quickSelect(data, ileft + 1, end, ileft + 1);
-      // Mix:
-      double mix = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
-      return mix;
-    }
+    quickSelect(data, ileft + 1, end, ileft + 1);
+    // Mix:
+    return data[ileft] + (data[ileft + 1] - data[ileft]) * err;
   }
 
   /**
@@ -575,7 +561,7 @@ public class QuickSelect {
    * @param a First index
    * @param b Second index
    */
-  private static final void swap(double[] data, int a, int b) {
+  private static void swap(double[] data, int a, int b) {
     double tmp = data[a];
     data[a] = data[b];
     data[b] = tmp;
@@ -589,14 +575,14 @@ public class QuickSelect {
    * @param a First index
    * @param b Second index
    */
-  private static final <T> void swap(List<T> data, int a, int b) {
+  private static <T> void swap(List<T> data, int a, int b) {
     data.set(b, data.set(a, data.get(b)));
   }
 
   /**
    * QuickSelect is essentially quicksort, except that we only "sort" that half
    * of the array that we are interested in.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param <T> object type
@@ -612,7 +598,7 @@ public class QuickSelect {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param <T> object type
@@ -626,9 +612,9 @@ public class QuickSelect {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * On an odd length, it will return the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param <T> object type
@@ -649,7 +635,7 @@ public class QuickSelect {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param <T> object type
@@ -664,9 +650,9 @@ public class QuickSelect {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * It will prefer the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param <T> object type

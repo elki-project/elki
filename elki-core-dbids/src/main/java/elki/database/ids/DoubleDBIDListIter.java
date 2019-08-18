@@ -37,7 +37,7 @@ public interface DoubleDBIDListIter extends DBIDArrayIter {
   /**
    * Static empty iterator.
    */
-  public static final DoubleDBIDListIter EMPTY = new DoubleDBIDListIter() {
+  DoubleDBIDListIter EMPTY = new DoubleDBIDListIter() {
     @Override
     public int internalGetIndex() {
       return -1;

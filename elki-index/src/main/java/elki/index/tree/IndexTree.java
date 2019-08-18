@@ -163,12 +163,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return the node with the specified id
    */
   public N getNode(int nodeID) {
-    if(nodeID == getPageID(rootEntry)) {
-      return getRoot();
-    }
-    else {
-      return file.readPage(nodeID);
-    }
+    return nodeID == getPageID(rootEntry) ? getRoot() : file.readPage(nodeID);
   }
 
   /**
@@ -222,13 +217,9 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
     this.dirMinimum = header.getDirMinimum();
     this.leafMinimum = header.getLeafMinimum();
 
-    if(getLogger().isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append(getClass());
-      msg.append("\n file = ").append(file.getClass());
-      getLogger().debugFine(msg.toString());
+    if(getLogger().isDebuggingFine()) {
+      getLogger().debugFine(getClass() + "\n file = " + file.getClass());
     }
-
     this.initialized = true;
   }
 

@@ -60,16 +60,4 @@ public class FilteredDistanceResultAdapter extends DistanceResultAdapter {
     }
     return this;
   }
-
-  @Deprecated
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  @Deprecated
-  @Override
-  public boolean equals(Object obj) {
-    return super.equals(obj);
-  }
 }

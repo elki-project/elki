@@ -134,12 +134,12 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       }
     }
 
-    result.append(getClass().getName()).append(" hat ").append((levels + 1)).append(" Ebenen \n") //
-        .append("DirCapacity = ").append(dirCapacity).append('\n') //
-        .append("LeafCapacity = ").append(leafCapacity).append('\n') //
-        .append(dirNodes).append(" Directory Nodes \n") //
-        .append(leafNodes).append(" Leaf Nodes \n") //
-        .append(objects).append(" Objects \n");
+    result.append(getClass().getName()).append(" hat ").append((levels + 1)) //
+        .append(" Ebenen \nDirCapacity = ").append(dirCapacity) //
+        .append("\nLeafCapacity = ").append(leafCapacity).append('\n') //
+        .append(dirNodes).append(" Directory Nodes\n") //
+        .append(leafNodes).append(" Leaf Nodes\n") //
+        .append(objects).append(" Objects");
     // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     return result.toString();
   }

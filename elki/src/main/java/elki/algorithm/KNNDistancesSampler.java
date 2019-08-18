@@ -38,6 +38,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.geometry.XYCurve;
+import elki.result.Metadata;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -170,11 +171,6 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
    */
   public static class KNNDistanceOrderResult extends XYCurve {
     /**
-     * Number of neighbors considered for this KNNDIstanceOrder
-     */
-    private int k;
-
-    /**
      * Construct result
      *
      * @param knnDistances distance list to wrap.
@@ -182,21 +178,11 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
      */
     public KNNDistanceOrderResult(double[] knnDistances, int k) {
       super("Objects", k + "-NN-distance", knnDistances.length + 1);
-      this.k = k;
       Arrays.sort(knnDistances);
       for(int j = 0; j < knnDistances.length; j++) {
         this.addAndSimplify(knnDistances.length - j, knnDistances[j]);
       }
-    }
-
-    @Override
-    public String getLongName() {
-      return k + "-NN distance order";
-    }
-
-    @Override
-    public String getShortName() {
-      return k + "-NNDistanceOrder";
+      Metadata.of(this).setLongName(k + "-NN distance order");
     }
   }
 

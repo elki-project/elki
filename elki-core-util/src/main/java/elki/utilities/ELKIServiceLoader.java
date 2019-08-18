@@ -154,6 +154,5 @@ public class ELKIServiceLoader {
       }
       ELKIServiceRegistry.registerAlias(parent, new String(line, abegin, aend - abegin), cname);
     }
-    return;
   }
 }

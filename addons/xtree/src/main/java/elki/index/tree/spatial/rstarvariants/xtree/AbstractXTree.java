@@ -560,9 +560,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
       }
-      else {
-        return choosePath(newSubtree, mbr, level, ++cur);
-      }
+      return choosePath(newSubtree, mbr, level, ++cur);
     }
 
     int optEntry = -1;
@@ -643,9 +641,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     if(height - subtree.getPathCount() == level) {
       return newSubtree;
     }
-    else {
-      return choosePath(newSubtree, mbr, level, ++cur);
-    }
+    return choosePath(newSubtree, mbr, level, ++cur);
   }
 
   /**
@@ -775,32 +771,29 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
       splitAxis[0] = split.getSplitAxis();
       if(getLogger().isDebugging()) {
-        StringBuilder msg = new StringBuilder(1000) //
-            .append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n") //
-            .append("      splitAxis ").append(splitAxis[0]).append('\n') //
-            .append("      splitPoint ").append(split.getSplitPoint()).append('\n') //
-            .append("      newNode ").append(newNode.getPageID()).append('\n'); //
-        if(getLogger().isVerbose()) {
-          msg.append("      first: ").append(newNode.getChildren()).append('\n') //
-              .append("      second: ").append(node.getChildren()).append('\n');
-        }
-        getLogger().debugFine(msg.toString());
+        getLogger().debugFine(new StringBuilder(1000) //
+            .append("Split Node ").append(node.getPageID()).append(" (").append(getClass()) //
+            .append(")\n      splitAxis ").append(splitAxis[0]) //
+            .append("\n      splitPoint ").append(split.getSplitPoint()) //
+            .append("\n      newNode ").append(newNode.getPageID()) //
+            .append("\n      first: ").append(newNode.getChildren()) //
+            .append("\n      second: ").append(node.getChildren()) //
+            .toString());
       }
       return newNode;
     }
-    else { // create supernode
-      node.makeSuperNode();
-      supernodes.put((long) node.getPageID(), node);
-      writeNode(node);
-      splitAxis[0] = -1;
-      if(getLogger().isDebugging()) {
-        getLogger().debugFine(new StringBuilder(1000) //
-            .append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()).append(")\n") //
-            .append("      new capacity ").append(node.getCapacity()).append('\n') //
-            .append("      minimum overlap: ").append(minOv).append('\n').toString());
-      }
-      return null;
+    // create supernode
+    node.makeSuperNode();
+    supernodes.put((long) node.getPageID(), node);
+    writeNode(node);
+    splitAxis[0] = -1;
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine(new StringBuilder(1000) //
+          .append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()) //
+          .append(")\n      new capacity ").append(node.getCapacity()) //
+          .append("\n      minimum overlap: ").append(minOv).toString());
     }
+    return null;
   }
 
   /**

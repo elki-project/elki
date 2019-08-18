@@ -25,7 +25,7 @@ import java.util.Comparator;
 /**
  * QuickSelect computes ("selects") the element at a given rank and can be used
  * to compute Medians and arbitrary quantiles by computing the appropriate rank.
- *
+ * <p>
  * This algorithm is essentially an incomplete QuickSort that only descends into
  * that part of the data that we are interested in, and also attributed to
  * Charles Antony Richard Hoare
@@ -35,7 +35,7 @@ import java.util.Comparator;
  *
  * @assoc - - - ArrayModifiableDBIDs
  */
-public class QuickSelectDBIDs {
+public final class QuickSelectDBIDs {
   /**
    * For small arrays, use a simpler method:
    */
@@ -59,20 +59,11 @@ public class QuickSelectDBIDs {
    * @param m5 Pivot candidate
    * @return Best pivot candidate
    */
-  private static final int bestPivot(int rank, int m1, int m2, int m3, int m4, int m5) {
-    if(rank < m1) {
-      return m1;
-    }
-    if(rank > m5) {
-      return m5;
-    }
-    if(rank < m2) {
-      return m2;
-    }
-    if(rank > m4) {
-      return m4;
-    }
-    return m3;
+  private static int bestPivot(int rank, int m1, int m2, int m3, int m4, int m5) {
+    return rank < m1 ? m1 : //
+        rank > m5 ? m5 : //
+            rank < m2 ? m2 : //
+                rank > m4 ? m4 : m3;
   }
 
   /**
@@ -91,7 +82,7 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -104,9 +95,9 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * On an odd length, it will return the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -126,7 +117,7 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -140,9 +131,9 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * It will prefer the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -291,7 +282,7 @@ public class QuickSelectDBIDs {
   /**
    * QuickSelect is essentially quicksort, except that we only "sort" that half
    * of the array that we are interested in.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -303,7 +294,7 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -315,9 +306,9 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * On an odd length, it will return the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -336,7 +327,7 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process
@@ -349,9 +340,9 @@ public class QuickSelectDBIDs {
 
   /**
    * Compute the median of an array efficiently using the QuickSelect method.
-   *
+   * <p>
    * It will prefer the lower element.
-   *
+   * <p>
    * Note: the array is <b>modified</b> by this.
    *
    * @param data Data to process

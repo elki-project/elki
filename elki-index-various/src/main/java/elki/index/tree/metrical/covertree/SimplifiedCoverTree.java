@@ -226,10 +226,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     }
     assert (candidates.size() == 0);
     // Routing object is not yet handled:
-    if(curSingleton) {
-      if(!node.children.isEmpty()) {
-        node.singletons.add(cur); // Add as regular singleton.
-      }
+    if(curSingleton && !node.children.isEmpty()) {
+      node.singletons.add(cur); // Add as regular singleton.
     }
     // TODO: improve recycling of lists?
     return node;

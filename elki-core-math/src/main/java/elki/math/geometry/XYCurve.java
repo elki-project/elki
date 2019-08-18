@@ -20,6 +20,7 @@
  */
 package elki.math.geometry;
 
+import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
@@ -76,6 +77,7 @@ public class XYCurve {
     this.data = new DoubleArray();
     this.labelx = labelx;
     this.labely = labely;
+    Metadata.of(this).setLongName(labelx + "-" + labely + "-Curve");
   }
 
   /**
@@ -90,6 +92,7 @@ public class XYCurve {
     this.data = new DoubleArray(size << 1);
     this.labelx = labelx;
     this.labely = labely;
+    Metadata.of(this).setLongName(labelx + "-" + labely + "-Curve");
   }
 
   /**
@@ -277,13 +280,13 @@ public class XYCurve {
 
   /**
    * Get an iterator for the curve.
-   *
+   * <p>
    * Note: this is <em>not</em> a Java style iterator, since the only way to get
    * positions is using "next" in Java style. Here, we can have two getters for
    * current values!
-   *
+   * <p>
    * Instead, use this style of iteration: <blockquote>
-   *
+   * 
    * <pre>
    * {@code
    * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
@@ -291,7 +294,7 @@ public class XYCurve {
    * }
    * }
    * </pre>
-   *
+   * 
    * </blockquote>
    *
    * @return Iterator
@@ -302,24 +305,12 @@ public class XYCurve {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("XYCurve[");
-    buf.append(labelx).append(',').append(labely).append(':');
+    StringBuilder buf = new StringBuilder(data.size() * 20 + 20).append("XYCurve[") //
+        .append(labelx).append(',').append(labely).append(':');
     for(int pos = 0; pos < data.size(); pos += 2) {
       buf.append(' ').append(data.get(pos)).append(',').append(data.get(pos + 1));
     }
-    buf.append(']');
-    return buf.toString();
-  }
-
-  // @Override
-  public String getLongName() {
-    return labelx + "-" + labely + "-Curve";
-  }
-
-  // @Override
-  public String getShortName() {
-    return (labelx + "-" + labely + "-curve").toLowerCase();
+    return buf.append(']').toString();
   }
 
   /**
@@ -357,7 +348,7 @@ public class XYCurve {
    * reason is that we want to have {@code #getX()} and {@code #getY()}
    * operations, which does not work consistently with Java's
    * <code>next()</code> style of iterations.
-   *
+   * <p>
    * Instead, use this style of iteration: <blockquote>
    *
    * <pre>

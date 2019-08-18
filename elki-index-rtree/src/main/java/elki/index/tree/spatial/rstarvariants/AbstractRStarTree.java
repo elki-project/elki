@@ -516,7 +516,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N node = getNode(subtree.getEntry());
     if(node == null) {
-      throw new RuntimeException("Page file did not return node for node id: " + getPageID(subtree.getEntry()));
+      throw new IllegalStateException("Page file did not return node for node id: " + getPageID(subtree.getEntry()));
     }
     if(node.isLeaf()) {
       return subtree;
