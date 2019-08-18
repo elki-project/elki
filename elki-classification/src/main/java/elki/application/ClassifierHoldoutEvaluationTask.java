@@ -114,25 +114,26 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     int[][] confusion = new int[labels.size()][labels.size()];
     for(int p = 0; p < holdout.numberOfPartitions(); p++) {
       TrainingAndTestSet partition = holdout.nextPartitioning();
+      final String fold = this.getClass().getName() + ".fold-" + (p + 1);
       // Load the data set into a database structure (for indexing)
-      Duration dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".train.init").begin();
+      Duration dur = LOG.newDuration(fold + ".train.init").begin();
       Database db = new StaticArrayDatabase(new MultipleObjectsBundleDatabaseConnection(partition.getTraining()), indexFactories);
       db.initialize();
       LOG.statistics(dur.end());
       // Train the classifier
-      dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".train.time").begin();
+      dur = LOG.newDuration(fold + ".train.time").begin();
       Relation<ClassLabel> lrel = db.getRelation(TypeUtil.CLASSLABEL);
       algorithm.buildClassifier(db, lrel);
       LOG.statistics(dur.end());
 
       // Evaluate the test set
-      dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".test.init").begin();
+      dur = LOG.newDuration(fold + ".test.init").begin();
       Database testdb = new StaticArrayDatabase(new MultipleObjectsBundleDatabaseConnection(partition.getTest()));
       testdb.initialize();
       Relation<O> testdata = testdb.getRelation(algorithm.getInputTypeRestriction()[0]);
       Relation<ClassLabel> testlabels = testdb.getRelation(TypeUtil.CLASSLABEL);
       LOG.statistics(dur.end());
-      dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".evaluation.time").begin();
+      dur = LOG.newDuration(fold + ".evaluation.time").begin();
       for(DBIDIter iter = testdata.iterDBIDs(); iter.valid(); iter.advance()) {
         ClassLabel predlbl = algorithm.classify(testdata.get(iter));
         ClassLabel truelbl = testlabels.get(iter);
