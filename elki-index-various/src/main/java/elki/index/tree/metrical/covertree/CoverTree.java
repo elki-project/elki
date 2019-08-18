@@ -275,12 +275,11 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
     counts[2] = depth > counts[2] ? depth : counts[2]; // Max depth
     counts[3] += cur.singletons.size() - 1;
     counts[4] += cur.singletons.size() - (cur.children == null ? 0 : 1);
-    if(cur.children != null) {
+    if(!cur.children.isEmpty()) {
       ++depth;
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert (!cur.children.isEmpty()) : "Empty childs list.";
     }
   }
 
