@@ -229,10 +229,10 @@ public class EvaluateSilhouette<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(result);
-    Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
+    Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
+    DistanceQuery<O> dq = relation.getDistanceQuery(distance);
     for(Clustering<?> c : crs) {
-      evaluateClustering(rel, dq, c);
+      evaluateClustering(relation, dq, c);
     }
   }
 

@@ -31,7 +31,6 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -132,7 +131,13 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     this.random = random;
   }
 
-  public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
+  /**
+   * Run CLARANS clustering.
+   *
+   * @param relation Data relation
+   * @return Clustering
+   */
+  public Clustering<MedoidModel> run(Relation<V> relation) {
     if(relation.size() <= 0) {
       Clustering<MedoidModel> empty = new Clustering<>();
       Metadata.of(empty).setLongName("CLARANS Clustering");
@@ -143,7 +148,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
       LOG.warning("A very large k was chosen. This implementation is not optimized for this case.");
     }
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
     final boolean metric = getDistance().isMetric();
 
     // Number of retries, relative rate, or absolute count:

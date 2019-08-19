@@ -46,7 +46,7 @@ import elki.utilities.ELKIBuilder;
 
 /**
  * Regression test for space-filling curve NN search.
- *
+ * <p>
  * Note: as these are approximate indexes, there is a dependency on the random
  * generator, so we use fixed seeds. But this regression test may fail when,
  * e.g., the random generator is modified.
@@ -73,8 +73,8 @@ public class SpacefillingKNNPreprocessorTest {
   public void testAchlioptas() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -91,25 +91,25 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
             .with(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     preproc.initialize();
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   @Test
   public void testCauchy() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -126,25 +126,25 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
             .with(CauchyRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L)//
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     preproc.initialize();
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   @Test
   public void testGaussian() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -161,25 +161,25 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
             .with(GaussianRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     preproc.initialize();
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   @Test
   public void testSubset() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -196,25 +196,25 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
             .with(RandomSubsetProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     preproc.initialize();
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   @Test
   public void testHenzinger() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -231,17 +231,17 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
             .with(SimplifiedRandomHyperplaneProjectionFamily.Parameterizer.RANDOM_ID, 1L) //
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     preproc.initialize();
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {

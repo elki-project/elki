@@ -27,7 +27,6 @@ import elki.clustering.ClusteringAlgorithmUtil;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -86,13 +85,14 @@ public class FastCLARANS<V> extends CLARANS<V> {
     super(distanceFunction, k, numlocal, maxneighbor, random);
   }
 
-  public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
+  @Override
+  public Clustering<MedoidModel> run(Relation<V> relation) {
     if(k * 2 >= relation.size()) {
       // Random sampling of non-medoids will be slow for huge k
       LOG.warning("A very large k was chosen. This implementation is not optimized for this case.");
     }
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
     final boolean metric = getDistance().isMetric();
 
     // Number of retries, relative rate, or absolute count:

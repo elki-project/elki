@@ -179,16 +179,15 @@ public final class DatabaseUtil {
 
   /**
    * Get (or create) a precomputed kNN query for the database.
-   * 
-   * @param database Database
+   *
    * @param relation Relation
    * @param dq Distance query
    * @param k required number of neighbors
    * @return KNNQuery for the given relation, that is precomputed.
    */
-  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceQuery<O> dq, int k) {
+  public static <O> KNNQuery<O> precomputedKNNQuery(Relation<O> relation, DistanceQuery<O> dq, int k) {
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnq = relation.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     // No optimized kNN query - use a preprocessor!
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
@@ -201,17 +200,16 @@ public final class DatabaseUtil {
 
   /**
    * Get (or create) a precomputed kNN query for the database.
-   * 
-   * @param database Database
+   *
    * @param relation Relation
    * @param distf Distance function
    * @param k required number of neighbors
    * @return KNNQuery for the given relation, that is precomputed.
    */
-  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, Distance<? super O> distf, int k) {
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, distf);
+  public static <O> KNNQuery<O> precomputedKNNQuery(Relation<O> relation, Distance<? super O> distf, int k) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(distf);
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnq = relation.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     // No optimized kNN query - use a preprocessor!
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
@@ -224,18 +222,17 @@ public final class DatabaseUtil {
 
   /**
    * Get (or create) a precomputed distance query for the database.
-   * 
+   * <p>
    * This will usually force computing a distance matrix, unless there already
    * is one.
-   * 
-   * @param database Database
+   *
    * @param relation Relation
    * @param distf Distance function
    * @param log Logger
    * @return KNNQuery for the given relation, that is precomputed.
    */
-  public static <O> DistanceQuery<O> precomputedDistanceQuery(Database database, Relation<O> relation, Distance<? super O> distf, Logging log) {
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+  public static <O> DistanceQuery<O> precomputedDistanceQuery(Relation<O> relation, Distance<? super O> distf, Logging log) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(dq == null) {
       DBIDs ids = relation.getDBIDs();
       if(ids instanceof DBIDRange) {
@@ -247,7 +244,7 @@ public final class DatabaseUtil {
       }
     }
     if(dq == null) {
-      dq = database.getDistanceQuery(relation, distf, DatabaseQuery.HINT_HEAVY_USE);
+      dq = relation.getDistanceQuery(distf, DatabaseQuery.HINT_HEAVY_USE);
       log.warning("We could not automatically use a distance matrix, expect a performance degradation.");
     }
     return dq;

@@ -22,7 +22,6 @@ package elki.clustering.kmeans.initialization;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
@@ -61,7 +60,7 @@ public class FirstK<O> implements KMeansInitialization, KMedoidsInitialization<O
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
     double[][] means = new double[k][];
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

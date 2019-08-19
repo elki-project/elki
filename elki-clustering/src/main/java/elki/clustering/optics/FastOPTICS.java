@@ -28,7 +28,6 @@ import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -133,18 +132,17 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
   /**
    * Run the algorithm.
    *
-   * @param db Database
-   * @param rel Relation
+   * @param relation Relation
    */
-  public ClusterOrder run(Database db, Relation<V> rel) {
-    DBIDs ids = rel.getDBIDs();
-    DistanceQuery<V> dq = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+  public ClusterOrder run(Relation<V> relation) {
+    DBIDs ids = relation.getDBIDs();
+    DistanceQuery<V> dq = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // initialize points used and reachability distance
     reachDist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, UNDEFINED_DISTANCE);
 
     // compute projections, density estimates and neighborhoods
-    index.computeSetsBounds(rel, minPts, ids); // project points
+    index.computeSetsBounds(relation, minPts, ids); // project points
     inverseDensities = index.computeAverageDistInSet(); // compute densities
     neighs = index.getNeighs(); // get neighbors of points
 

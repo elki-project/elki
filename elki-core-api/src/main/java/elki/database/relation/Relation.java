@@ -340,7 +340,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @param hints Optimizer hints
    * @return Priority searcher
    */
-  DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object[] hints);
+  DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
    * Get a priority search object for the given distance function. It will

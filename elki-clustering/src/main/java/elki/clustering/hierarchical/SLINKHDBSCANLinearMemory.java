@@ -22,7 +22,6 @@ package elki.clustering.hierarchical;
 
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -87,13 +86,12 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistance());
-    final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts);
+  public PointerDensityHierarchyRepresentationResult run(Relation<O> relation) {
+    final DistanceQuery<O> distQ = relation.getDistanceQuery(getDistance());
+    final KNNQuery<O> knnQ = relation.getKNNQuery(distQ, minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 

@@ -23,6 +23,7 @@ package elki.database.lucene;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
@@ -30,7 +31,6 @@ import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.similar.MoreLikeThis;
 import org.apache.lucene.util.Version;
 
-import elki.database.ids.DBID;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
@@ -44,7 +44,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDistanceRangeQuery implements RangeQuery<DBID> {
+public class LuceneDistanceRangeQuery implements RangeQuery<Document> {
   /**
    * Lucene search function.
    */
@@ -74,8 +74,8 @@ public class LuceneDistanceRangeQuery implements RangeQuery<DBID> {
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForObject(DBID obj, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForDBID(obj, range, result);
+  public ModifiableDoubleDBIDList getRangeForObject(Document obj, double range, ModifiableDoubleDBIDList result) {
+    throw new UnsupportedOperationException("More-like-this only works on IDs right now.");
   }
 
   @Override

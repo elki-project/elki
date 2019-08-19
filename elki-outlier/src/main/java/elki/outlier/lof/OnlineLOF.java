@@ -22,7 +22,6 @@ package elki.outlier.lof;
 
 import java.util.List;
 
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -80,10 +79,10 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    * the preprocessors.
    */
   @Override
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
 
-    Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> queries = getKNNAndRkNNQueries(database, relation, stepprog);
+    Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> queries = getKNNAndRkNNQueries(relation, stepprog);
     KNNQuery<O> kNNRefer = queries.getFirst().getFirst();
     KNNQuery<O> kNNReach = queries.getFirst().getSecond();
     RKNNQuery<O> rkNNRefer = queries.getSecond().getFirst();
@@ -108,11 +107,11 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    * @param stepprog Progress logger
    * @return the kNN and rkNN queries
    */
-  private Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> getKNNAndRkNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
-    DistanceQuery<O> drefQ = database.getDistanceQuery(relation, referenceDistance);
+  private Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> getKNNAndRkNNQueries(Relation<O> relation, StepProgress stepprog) {
+    DistanceQuery<O> drefQ = relation.getDistanceQuery(referenceDistance);
     // Use "HEAVY" flag, since this is an online algorithm
-    KNNQuery<O> kNNRefer = database.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNRefer = database.getRKNNQuery(drefQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> kNNRefer = relation.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O> rkNNRefer = relation.getRKNNQuery(drefQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
 
     // No optimized kNN query or RkNN query - use a preprocessor!
     if(kNNRefer == null || rkNNRefer == null) {
@@ -131,9 +130,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
     }
 
-    DistanceQuery<O> dreachQ = database.getDistanceQuery(relation, reachabilityDistance);
-    KNNQuery<O> kNNReach = database.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNReach = database.getRKNNQuery(dreachQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    DistanceQuery<O> dreachQ = relation.getDistanceQuery(reachabilityDistance);
+    KNNQuery<O> kNNReach = relation.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O> rkNNReach = relation.getRKNNQuery(dreachQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     if(kNNReach == null || rkNNReach == null) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", LOG);

@@ -23,24 +23,14 @@ package elki.outlier.anglebased;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.similarity.Similarity;
-import elki.similarity.kernel.KernelMatrix;
 import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
@@ -50,6 +40,8 @@ import elki.math.MeanVariance;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.similarity.Similarity;
+import elki.similarity.kernel.KernelMatrix;
 import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.DoubleMinHeap;
 import elki.utilities.documentation.Description;
@@ -59,6 +51,7 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -120,10 +113,10 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
    * @return Outlier detection result
    */
   @Override
-  public OutlierResult run(Database db, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     DBIDArrayIter pB = ids.iter(), pC = ids.iter();
-    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = relation.getSimilarityQuery(kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     // Output storage.

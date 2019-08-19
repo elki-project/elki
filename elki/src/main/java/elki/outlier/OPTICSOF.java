@@ -25,7 +25,6 @@ import elki.clustering.optics.AbstractOPTICS;
 import elki.clustering.optics.OPTICSTypeAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -34,7 +33,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -104,13 +102,11 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
   /**
    * Perform OPTICS-based outlier detection.
    *
-   * @param database Database
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, minpts);
+  public OutlierResult run(Relation<O> relation) {
+    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), minpts);
     DBIDs ids = relation.getDBIDs();
 
     // FIXME: implicit preprocessor.
@@ -134,8 +130,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
       double lrd = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         double coreDist = coreDistance.doubleValue(neighbor);
-        double dist = distQuery.distance(iditer, neighbor);
-        double rd = MathUtil.max(coreDist, dist);
+        double rd = MathUtil.max(coreDist, neighbor.doubleValue());
         lrd += rd;
       }
       lrd = neighbors.size() / lrd;

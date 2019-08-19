@@ -28,11 +28,9 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -139,13 +137,11 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
   /**
    * Runs the algorithm in the timed evaluation part.
    *
-   * @param database Database context
    * @param relation Relation to analyze
    */
-  public Void run(Database database, Relation<NumberVector> relation) {
+  public Void run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    final DistanceQuery<NumberVector> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    final KNNQuery<NumberVector> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
+    final KNNQuery<NumberVector> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
 
     final double[] min = new double[dim], extend = new double[dim];
     initializeDataExtends(relation, dim, min, extend);

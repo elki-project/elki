@@ -23,7 +23,6 @@ package elki.outlier;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
@@ -83,9 +82,9 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
   /**
    * Holds the value of {@link Parameterizer#K_ID} i.e. Number of neighbors to
-   * consider during the calculation of DWOF scores.
+   * consider during the calculation of DWOF scores + the query point.
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * The radii changing ratio
@@ -101,7 +100,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    */
   public DWOF(Distance<? super O> distanceFunction, int k, double delta) {
     super(distanceFunction);
-    this.k = k + 1; // + query point
+    this.kplus = k + 1; // + query point
     this.delta = delta;
   }
 
@@ -109,16 +108,15 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * Performs the Generalized DWOF_SCORE algorithm on the given database by
    * calling all the other methods in the proper order.
    *
-   * @param database Database to query
    * @param relation Data to process
    * @return new OutlierResult instance
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     final DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
     // Get k nearest neighbor and range query on the relation.
-    KNNQuery<O> knnq = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
-    RangeQuery<O> rnnQuery = database.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnq = relation.getKNNQuery(distFunc, kplus, DatabaseQuery.HINT_HEAVY_USE);
+    RangeQuery<O> rnnQuery = relation.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
 
     StepProgress stepProg = LOG.isVerbose() ? new StepProgress("DWOF", 2) : null;
     // DWOF output score storage.
@@ -192,7 +190,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     Mean mean = new Mean();
     // Iterate over all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList iterNeighbors = knnq.getKNNForDBID(iter, k);
+      KNNList iterNeighbors = knnq.getKNNForDBID(iter, kplus);
       // skip the point itself
       mean.reset();
       for(DBIDIter neighbor1 = iterNeighbors.iter(); neighbor1.valid(); neighbor1.advance()) {

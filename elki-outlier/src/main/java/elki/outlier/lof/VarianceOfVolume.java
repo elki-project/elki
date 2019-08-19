@@ -20,13 +20,11 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.spatial.SpatialComparable;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -48,6 +46,7 @@ import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.GammaDistribution;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -119,13 +118,13 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    * @param relation Data to process
    * @return VOV outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("VOV", 3) : null;
     DBIDs ids = relation.getDBIDs();
     int dim = RelationUtil.dimensionality(relation);
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), k);
 
     // Compute Volumes
     LOG.beginStep(stepprog, 2, "Computing Volumes.");

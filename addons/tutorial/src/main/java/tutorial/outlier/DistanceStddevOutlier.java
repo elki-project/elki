@@ -20,12 +20,9 @@
  */
 package tutorial.outlier;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -41,6 +38,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -83,13 +81,12 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
   /**
    * Run the outlier detection algorithm
    *
-   * @param database Database to use
    * @param relation Relation to analyze
    * @return Outlier score result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistance(), k);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores

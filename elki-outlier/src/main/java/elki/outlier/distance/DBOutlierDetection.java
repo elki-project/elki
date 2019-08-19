@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -97,11 +96,11 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   }
 
   @Override
-  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
+  protected DoubleDataStore computeOutlierScores(Relation<O> relation, double d) {
+    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
     // Prefer kNN query if available, as this will usually stop earlier.
-    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    RangeQuery<O> rangeQuery = knnQuery == null ? database.getRangeQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY, d) : null;
+    KNNQuery<O> knnQuery = relation.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    RangeQuery<O> rangeQuery = knnQuery == null ? relation.getRangeQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY, d) : null;
 
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) Math.floor((distFunc.getRelation().size()) * (1 - p));

@@ -27,7 +27,6 @@ import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
@@ -133,9 +132,9 @@ public class CLARA<V> extends PAM<V> {
   }
 
   @Override
-  public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
+  public Clustering<MedoidModel> run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
     if(samplesize < 3 * k) {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
@@ -176,7 +175,7 @@ public class CLARA<V> extends PAM<V> {
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", best));
     }
-    if (bestmedoids == null) {
+    if(bestmedoids == null) {
       throw new IllegalStateException("numsamples must be larger than 0.");
     }
 

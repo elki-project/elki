@@ -25,7 +25,6 @@ import java.util.List;
 import elki.data.Cluster;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.exceptions.AbortException;
@@ -95,7 +94,7 @@ public class Predefined extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(k != initialMeans.length) {
       throw new AbortException("Predefined initial means contained " + initialMeans.length //
           + " means, algorithm requested " + k + " means instead.");

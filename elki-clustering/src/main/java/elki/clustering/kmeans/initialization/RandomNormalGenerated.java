@@ -23,7 +23,6 @@ package elki.clustering.kmeans.initialization;
 import java.util.Random;
 
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -76,7 +75,7 @@ public class RandomNormalGenerated extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

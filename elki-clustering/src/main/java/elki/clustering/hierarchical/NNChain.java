@@ -22,7 +22,6 @@ package elki.clustering.hierarchical;
 
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
-import elki.database.Database;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
@@ -78,16 +77,15 @@ public class NNChain<O> extends AGNES<O> {
 
   /**
    * Run the algorithm
-   * 
-   * @param db Database to run on
+   *
    * @param relation Data relation
    * @return Clustering result
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
 

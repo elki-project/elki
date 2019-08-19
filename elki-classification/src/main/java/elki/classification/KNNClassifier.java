@@ -31,7 +31,6 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -104,8 +103,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labels) {
     Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
-    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    this.knnq = database.getKNNQuery(distanceQuery, k);
+    this.knnq = relation.getKNNQuery(getDistance(), k);
     this.labelrep = labels;
   }
 

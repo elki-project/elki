@@ -20,11 +20,9 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -32,7 +30,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -41,6 +38,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -116,22 +114,18 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Runs the algorithm in the timed evaluation part.
    *
-   * @param database Database context
    * @param relation Data relation
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // +
-                                                                       // query
-                                                                       // point
-
+  public OutlierResult run(Relation<O> relation) {
+    // k neighbors + query point
+    final int kplus = k + 1;
+    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), kplus);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query
-                                                                 // point
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, kplus);
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {

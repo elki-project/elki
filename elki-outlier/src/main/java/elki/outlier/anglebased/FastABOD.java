@@ -23,7 +23,6 @@ package elki.outlier.anglebased;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -37,15 +36,15 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.similarity.Similarity;
-import elki.similarity.kernel.KernelMatrix;
-import elki.similarity.kernel.LinearKernel;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.similarity.Similarity;
+import elki.similarity.kernel.KernelMatrix;
+import elki.similarity.kernel.LinearKernel;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -111,18 +110,18 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
    * @return Outlier detection result
    */
   @Override
-  public OutlierResult run(Database db, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmaxabod = new DoubleMinMax();
     if(kernelFunction.getClass() == LinearKernel.class) {
-      if(!kNNABOD(db, relation, ids, abodvalues, minmaxabod)) {
+      if(!kNNABOD(relation, ids, abodvalues, minmaxabod)) {
         // Fallback, if we do not have an index.
-        fastABOD(db, relation, ids, abodvalues, minmaxabod);
+        fastABOD(relation, ids, abodvalues, minmaxabod);
       }
     }
     else {
-      fastABOD(db, relation, ids, abodvalues, minmaxabod);
+      fastABOD(relation, ids, abodvalues, minmaxabod);
     }
 
     // Build result representation.
@@ -134,26 +133,24 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
   /**
    * Simpler kNN based, can use more indexing.
    *
-   * @param db Database
    * @param relation Data relation
    * @param ids IDs
    * @param abodvalues Score storage
    * @param minmaxabod Min/max storage
    * @return {@code true} if kNN were available and usable.
    */
-  private boolean kNNABOD(Database db, Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
-    DistanceQuery<V> dq = db.getDistanceQuery(relation, SquaredEuclideanDistance.STATIC);
-    KNNQuery<V> knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+  private boolean kNNABOD(Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
+    DistanceQuery<V> dq = relation.getDistanceQuery(SquaredEuclideanDistance.STATIC);
+    KNNQuery<V> knnq = relation.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     boolean squared = true;
     if(knnq == null) {
-      dq = db.getDistanceQuery(relation, EuclideanDistance.STATIC);
-      knnq = db.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-      if(knnq == null) {
+      dq = relation.getDistanceQuery(EuclideanDistance.STATIC);
+      if((knnq = relation.getKNNQuery(dq, DatabaseQuery.HINT_OPTIMIZED_ONLY)) == null) {
         return false;
       }
       squared = false;
     }
-    SimilarityQuery<V> lk = db.getSimilarityQuery(relation, LinearKernel.STATIC);
+    SimilarityQuery<V> lk = relation.getSimilarityQuery(LinearKernel.STATIC);
     int k1 = k + 1; // We will get the query point back by the knnq.
 
     MeanVariance s = new MeanVariance();
@@ -200,15 +197,14 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
   /**
    * Full kernel-based version.
    *
-   * @param db Database
    * @param relation Data relation
    * @param ids IDs
    * @param abodvalues Score storage
    * @param minmaxabod Min/max storage
    */
-  private void fastABOD(Database db, Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
+  private void fastABOD(Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
     // Build a kernel matrix, to make O(n^3) slightly less bad.
-    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = relation.getSimilarityQuery(kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     MeanVariance s = new MeanVariance();

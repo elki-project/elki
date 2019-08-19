@@ -22,13 +22,10 @@ package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -48,6 +45,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -147,13 +145,12 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    * Performs the Generalized LOF algorithm on the given database by calling
    * {@link #doRunInTime}.
    *
-   * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(database, relation, stepprog);
+    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O> kNNRefer = pair.getFirst();
     KNNQuery<O> kNNReach = pair.getSecond();
     return doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog).getResult();
@@ -166,10 +163,10 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
    */
-  private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
-    DistanceQuery<O> distQ = database.getDistanceQuery(relation, reachabilityDistance, DatabaseQuery.HINT_HEAVY_USE);
+  private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
+    DistanceQuery<O> distQ = relation.getDistanceQuery(reachabilityDistance, DatabaseQuery.HINT_HEAVY_USE);
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O> knnReach = database.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnReach = relation.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
@@ -181,17 +178,14 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
         }
       }
       int kpreproc = (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach;
-      knnReach = DatabaseUtil.precomputedKNNQuery(database, relation, reachabilityDistance, kpreproc);
+      knnReach = DatabaseUtil.precomputedKNNQuery(relation, reachabilityDistance, kpreproc);
     }
 
     // knnReach is only used once
-    KNNQuery<O> knnRefer;
-    if(referenceDistance == reachabilityDistance || referenceDistance.equals(reachabilityDistance)) {
-      knnRefer = knnReach;
-    }
-    else {
+    KNNQuery<O> knnRefer = knnReach;
+    if(referenceDistance != reachabilityDistance && !referenceDistance.equals(reachabilityDistance)) {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = QueryUtil.getKNNQuery(relation, referenceDistance, krefer);
+      knnRefer = relation.getKNNQuery(referenceDistance, krefer);
     }
 
     return new Pair<>(knnRefer, knnReach);

@@ -31,7 +31,6 @@ import elki.database.QueryUtil;
 import elki.database.ids.*;
 import elki.database.query.DatabaseQuery;
 import elki.database.query.LinearScanQuery;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
@@ -124,20 +123,18 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    * @return Null result
    */
   public Void run(Database database, Relation<O> relation) {
-    // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
     // Approximate query:
-    KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
       throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     // Exact query:
     KNNQuery<O> truekNNQuery;
     if(forcelinear) {
-      truekNNQuery = QueryUtil.getLinearScanKNNQuery(distQuery);
+      truekNNQuery = QueryUtil.getLinearScanKNNQuery(relation.getDistanceQuery(getDistance()));
     }
     else {
-      truekNNQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_EXACT);
+      truekNNQuery = relation.getKNNQuery(getDistance(), k, DatabaseQuery.HINT_EXACT);
     }
     if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
       LOG.warning("Query classes are the same. This experiment may be invalid!");

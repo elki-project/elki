@@ -30,7 +30,6 @@ import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -86,12 +85,11 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public Clustering<Model> run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
+  public Clustering<Model> run(Relation<O> relation) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 

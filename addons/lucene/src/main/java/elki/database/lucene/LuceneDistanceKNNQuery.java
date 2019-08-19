@@ -23,6 +23,7 @@ package elki.database.lucene;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -31,7 +32,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similar.MoreLikeThis;
 import org.apache.lucene.util.Version;
 
-import elki.database.ids.DBID;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDFactory;
 import elki.database.ids.DBIDRange;
@@ -47,7 +47,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDistanceKNNQuery implements KNNQuery<DBID> {
+public class LuceneDistanceKNNQuery implements KNNQuery<Document> {
   /**
    * Lucene search function.
    */
@@ -76,6 +76,11 @@ public class LuceneDistanceKNNQuery implements KNNQuery<DBID> {
   }
 
   @Override
+  public KNNList getKNNForObject(Document obj, int k) {
+    throw new UnsupportedOperationException("More-like-this only works on IDs right now.");
+  }
+
+  @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
     try {
       Query query = mlt.like(range.getOffset(id));
@@ -92,10 +97,5 @@ public class LuceneDistanceKNNQuery implements KNNQuery<DBID> {
     catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
-  }
-
-  @Override
-  public KNNList getKNNForObject(DBID obj, int k) {
-    return getKNNForDBID(obj, k);
   }
 }

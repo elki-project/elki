@@ -21,7 +21,6 @@
 package elki.index.preprocessed.snn;
 
 import elki.data.type.TypeInformation;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
@@ -98,7 +97,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
-    KNNQuery<O> knnquery = QueryUtil.getKNNQuery(relation, distanceFunction, numberOfNeighbors);
+    KNNQuery<O> knnquery = relation.getKNNQuery(distanceFunction, numberOfNeighbors);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

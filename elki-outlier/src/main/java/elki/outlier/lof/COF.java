@@ -20,11 +20,9 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -41,6 +39,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -97,15 +96,14 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
   /**
    * Runs the COF algorithm on the given database.
    *
-   * @param database Database to query
    * @param relation Data to process
    * @return COF outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("COF", 3) : null;
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     LOG.beginStep(stepprog, 1, "Materializing COF neighborhoods.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, dq, k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, dq, k);
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 2, "Computing Average Chaining Distances.");

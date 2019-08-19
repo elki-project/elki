@@ -20,16 +20,15 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -82,10 +81,8 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    // Run the actual score process
-    DoubleDataStore dbodscore = computeOutlierScores(database, relation, d);
-
+  public OutlierResult run(Relation<O> relation) {
+    DoubleDataStore dbodscore = computeOutlierScores(relation, d);
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Density-Based Outlier Detection", relation.getDBIDs(), dbodscore);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
@@ -95,12 +92,11 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
   /**
    * computes an outlier score for each object of the database.
    * 
-   * @param database Database
    * @param relation Relation
    * @param d distance
    * @return computed scores
    */
-  protected abstract DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d);
+  protected abstract DoubleDataStore computeOutlierScores(Relation<O> relation, double d);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {

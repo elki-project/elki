@@ -20,14 +20,11 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -47,6 +44,7 @@ import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.NormalDistribution;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -153,22 +151,21 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   /**
    * Get the kNN queries for the algorithm.
    *
-   * @param database Database to analyze
    * @param relation Relation to analyze
    * @param stepprog Progress logger, may be {@code null}
    * @return result
    */
-  protected Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
+  protected Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
     KNNQuery<O> knnComp, knnReach;
     if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistance, MathUtil.max(kcomp, kreach) + 1);
+      knnComp = DatabaseUtil.precomputedKNNQuery(relation, comparisonDistance, MathUtil.max(kcomp, kreach) + 1);
       knnReach = knnComp;
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistance, kreach + 1);
-      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistance, kcomp + 1);
+      knnComp = relation.getKNNQuery(comparisonDistance, kreach + 1);
+      knnReach = relation.getKNNQuery(reachabilityDistance, kcomp + 1);
     }
     return new Pair<>(knnComp, knnReach);
   }
@@ -176,14 +173,13 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   /**
    * Performs the LoOP algorithm on the given database.
    *
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(5) : null;
 
-    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(database, relation, stepprog);
+    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O> knnComp = pair.getFirst();
     KNNQuery<O> knnReach = pair.getSecond();
 

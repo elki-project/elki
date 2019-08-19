@@ -60,7 +60,7 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
 
   @Override
   public List<DiagonalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
-    double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
+    double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
     assert (initialMeans.length == k);
     final int dim = RelationUtil.dimensionality(relation);
     MeanVariance[] mvs = MeanVariance.newArray(dim);

@@ -24,11 +24,9 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -89,14 +87,11 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     this.random = random;
   }
 
-  public Void run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistance());
-    RangeQuery<V> rangeQuery = database.getRangeQuery(distQuery, radius);
+  public Void run(Relation<V> relation) {
+    RangeQuery<V> rangeQuery = relation.getRangeQuery(getDistance(), radius);
+    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     MeanVariance numres = new MeanVariance();
-
-    final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
-
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Performing range queries", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       numres.put(rangeQuery.getRangeForDBID(iter, radius).size());

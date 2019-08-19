@@ -22,11 +22,9 @@ package elki.outlier.lof;
 
 import java.util.Arrays;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -35,7 +33,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.DoubleDBIDListIter;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -45,6 +42,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -126,13 +124,11 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Run the algorithm
    *
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
-    RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
+  public OutlierResult run(Relation<O> relation) {
+    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
     DBIDs ids = relation.getDBIDs();
 
     // LOCI preprocessing step

@@ -21,7 +21,6 @@
 package elki.clustering.affinitypropagation;
 
 import elki.data.type.TypeInformation;
-import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.relation.Relation;
 import elki.utilities.optionhandling.OptionID;
@@ -46,7 +45,7 @@ public interface AffinityPropagationInitialization<O> {
    * @param ids indexed DBIDs
    * @return Similarity matrix
    */
-  double[][] getSimilarityMatrix(Database db, Relation<O> relation, ArrayDBIDs ids);
+  double[][] getSimilarityMatrix(Relation<O> relation, ArrayDBIDs ids);
 
   /**
    * Get the data type information for the similarity computations.

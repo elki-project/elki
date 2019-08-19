@@ -34,7 +34,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.DatabaseQuery;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -113,8 +112,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
-    KNNQuery<O> knnQ = database.getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnQ = relation.getKNNQuery(distance, DatabaseQuery.HINT_HEAVY_USE);
 
     // open file.
     try (RandomAccessFile file = new RandomAccessFile(out, "rw");

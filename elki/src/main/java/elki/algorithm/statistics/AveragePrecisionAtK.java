@@ -29,12 +29,10 @@ import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -107,15 +105,13 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
   /**
    * Run the algorithm
    *
-   * @param database Database to run on (for kNN queries)
    * @param relation Relation for distance computations
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public CollectionResult<double[]> run(Database database, Relation<O> relation, Relation<?> lrelation) {
-    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
+  public CollectionResult<double[]> run(Relation<O> relation, Relation<?> lrelation) {
     final int qk = k + (includeSelf ? 0 : 1);
-    final KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, qk);
+    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), qk);
 
     MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
 

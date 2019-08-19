@@ -28,9 +28,11 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.QueryUtil;
 import elki.database.datastore.*;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
@@ -175,7 +177,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, getDistance(), k + 1);
+    KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
     if(k <= dim + 1) {

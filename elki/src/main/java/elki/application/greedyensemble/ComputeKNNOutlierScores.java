@@ -34,7 +34,6 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.query.knn.KNNQuery;
@@ -50,25 +49,11 @@ import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import elki.outlier.DWOF;
 import elki.outlier.anglebased.FastABOD;
-import elki.outlier.distance.KNNDD;
-import elki.outlier.distance.KNNOutlier;
-import elki.outlier.distance.KNNSOS;
-import elki.outlier.distance.KNNWeightOutlier;
-import elki.outlier.distance.LocalIsolationCoefficient;
-import elki.outlier.distance.ODIN;
+import elki.outlier.distance.*;
 import elki.outlier.intrinsic.IDOS;
 import elki.outlier.intrinsic.ISOS;
 import elki.outlier.intrinsic.IntrinsicDimensionalityOutlier;
-import elki.outlier.lof.COF;
-import elki.outlier.lof.INFLO;
-import elki.outlier.lof.KDEOS;
-import elki.outlier.lof.LDF;
-import elki.outlier.lof.LDOF;
-import elki.outlier.lof.LOF;
-import elki.outlier.lof.LoOP;
-import elki.outlier.lof.SimpleKernelDensityLOF;
-import elki.outlier.lof.SimplifiedLOF;
-import elki.outlier.lof.VarianceOfVolume;
+import elki.outlier.lof.*;
 import elki.outlier.trivial.ByLabelOutlier;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
@@ -88,6 +73,7 @@ import elki.utilities.scaling.IdentityScaling;
 import elki.utilities.scaling.ScalingFunction;
 import elki.utilities.scaling.outlier.OutlierScaling;
 import elki.workflow.InputStep;
+
 import net.jafama.FastMath;
 
 /**
@@ -199,7 +185,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, lim);
+    KNNQuery<O> knnq = relation.getKNNQuery(distf, lim);
 
     // Precompute kNN:
     if(!(knnq instanceof PreprocessorKNNQuery)) {
@@ -209,7 +195,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     }
 
     // Test that we now get a proper index query
-    knnq = QueryUtil.getKNNQuery(relation, distf, lim);
+    knnq = relation.getKNNQuery(distf, lim);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       throw new AbortException("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
@@ -245,72 +231,72 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       // KNN
       runForEachK("KNN", 0, maxk, //
           k -> new KNNOutlier<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // KNN Weight
       runForEachK("KNNW", 0, maxk, //
           k -> new KNNWeightOutlier<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run LOF
       runForEachK("LOF", 0, maxk, //
           k -> new LOF<O>(k, distf) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run Simplified-LOF
       runForEachK("SimplifiedLOF", 0, maxk, //
           k -> new SimplifiedLOF<O>(k, distf) //
-              .run(database, relation), out);
+              .run(relation), out);
       // LoOP
       runForEachK("LoOP", 0, maxk, //
           k -> new LoOP<O>(k, k, distf, distf, 1.0) //
-              .run(database, relation), out);
+              .run(relation), out);
       // LDOF
       runForEachK("LDOF", 2, maxksq, //
           k -> new LDOF<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run ODIN
       runForEachK("ODIN", 0, maxk, //
           k -> new ODIN<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run FastABOD
       runForEachK("FastABOD", 3, maxksq, //
           k -> new FastABOD<O>(LinearKernel.STATIC, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
       runForEachK("KDEOS", 2, maxk, //
           k -> new KDEOS<O>(distf, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
               .5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2)//
-                  .run(database, relation), out);
+                  .run(relation), out);
       // Run LDF
       runForEachK("LDF", 0, maxk, //
           k -> new LDF<O>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run INFLO
       runForEachK("INFLO", 0, maxk, //
           k -> new INFLO<O>(distf, 1.0, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run COF
       runForEachK("COF", 0, maxksq, //
           k -> new COF<O>(k, distf) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run simple Intrinsic dimensionality
       runForEachK("Intrinsic", 2, maxk, //
           k -> new IntrinsicDimensionalityOutlier<O>(distf, k, AggregatedHillEstimator.STATIC) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run IDOS
       runForEachK("IDOS", 2, maxk, //
           k -> new IDOS<O>(distf, AggregatedHillEstimator.STATIC, k, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run simple kernel-density LOF variant
       runForEachK("KDLOF", 2, maxk, //
           k -> new SimpleKernelDensityLOF<O>(k, distf, GaussianKernelDensityFunction.KERNEL) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run DWOF (need pairwise distances, too)
       runForEachK("DWOF", 2, maxksq, //
           k -> new DWOF<O>(distf, k, 1.1) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run LIC
       runForEachK("LIC", 0, maxk, //
           k -> new LocalIsolationCoefficient<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run VOV (requires a vector field).
       if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
@@ -319,12 +305,12 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
         runForEachK("VOV", 0, maxk, //
             k -> new VarianceOfVolume<DoubleVector>(k, df) //
-                .run(database, rel), out);
+                .run(rel), out);
       }
       // Run KNN DD
       runForEachK("KNNDD", 0, maxk, //
           k -> new KNNDD<O>(distf, k) //
-              .run(database, relation), out);
+              .run(relation), out);
       // Run KNN SOS
       runForEachK("KNNSOS", 0, maxk, //
           k -> new KNNSOS<O>(distf, k) //

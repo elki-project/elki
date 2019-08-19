@@ -26,12 +26,7 @@ import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.clustering.hierarchical.SLINK;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
+import elki.database.datastore.*;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDIter;
@@ -161,13 +156,12 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
 
   /**
    * Run the algorithm
-   * 
-   * @param db Database
+   *
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 

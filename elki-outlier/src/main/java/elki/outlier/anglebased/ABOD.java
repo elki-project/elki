@@ -20,12 +20,10 @@
  */
 package elki.outlier.anglebased;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -37,15 +35,16 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.similarity.Similarity;
-import elki.similarity.kernel.KernelMatrix;
-import elki.similarity.kernel.PolynomialKernel;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.similarity.Similarity;
+import elki.similarity.kernel.KernelMatrix;
+import elki.similarity.kernel.PolynomialKernel;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -106,13 +105,12 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
   /**
    * Run ABOD on the data set.
    *
-   * @param relation Relation to process
-   * @return Outlier detection result
+   * @return Angle-based outlier detection result
    */
-  public OutlierResult run(Database db, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Build a kernel matrix, to make O(n^3) slightly less bad.
-    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = relation.getSimilarityQuery(kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);

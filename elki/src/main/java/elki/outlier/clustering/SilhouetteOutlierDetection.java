@@ -106,10 +106,15 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     this.noiseOption = noiseOption;
   }
 
-  @Override
+  /**
+   * Run the Silhouette score as outlier method.
+   *
+   * @param database Database
+   * @return Outlier scores
+   */
   public OutlierResult run(Database database) {
     Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
 
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database);

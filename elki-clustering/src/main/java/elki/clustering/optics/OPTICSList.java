@@ -20,13 +20,11 @@
  */
 package elki.clustering.optics;
 
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -86,8 +84,8 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
   }
 
   @Override
-  public ClusterOrder run(Database db, Relation<O> relation) {
-    return new Instance(db, relation).run();
+  public ClusterOrder run(Relation<O> relation) {
+    return new Instance(relation).run();
   }
 
   /**
@@ -139,10 +137,9 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     /**
      * Constructor for a single data set.
      *
-     * @param db Database
      * @param relation Data relation
      */
-    public Instance(Database db, Relation<O> relation) {
+    public Instance(Relation<O> relation) {
       ids = relation.getDBIDs();
       processedIDs = DBIDUtil.newHashSet(ids.size());
       candidates = DBIDUtil.newArray();
@@ -151,8 +148,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       clusterOrder = new ClusterOrder(ids);
       Metadata.of(clusterOrder).setLongName("OPTICS Clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
-      DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
-      rangeQuery = db.getRangeQuery(dq, epsilon);
+      rangeQuery = relation.getRangeQuery(getDistance(), epsilon);
     }
 
     /**

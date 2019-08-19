@@ -36,12 +36,7 @@ import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.distance.DistanceQuery;
+import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -109,8 +104,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   @Override
   public HistogramResult run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistance());
-    final KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, relation.size());
+    final KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");

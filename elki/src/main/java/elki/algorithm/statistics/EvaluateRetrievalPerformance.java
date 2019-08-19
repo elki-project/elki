@@ -25,7 +25,6 @@ import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -115,13 +114,12 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   /**
    * Run the algorithm
    *
-   * @param database Database to run on (for kNN queries)
    * @param relation Relation for distance computations
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public RetrievalPerformanceResult run(Database database, Relation<O> relation, Relation<?> lrelation) {
-    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
+  public RetrievalPerformanceResult run(Relation<O> relation, Relation<?> lrelation) {
+    final DistanceQuery<O> distQuery = relation.getDistanceQuery(getDistance());
     final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     // For storing the positive neighbors.
@@ -406,12 +404,12 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
       return map;
     }
 
-    //@Override
+    // @Override
     public String getLongName() {
       return "Distance function retrieval evaluation.";
     }
 
-    //@Override
+    // @Override
     public String getShortName() {
       return "distance-retrieval-evaluation";
     }

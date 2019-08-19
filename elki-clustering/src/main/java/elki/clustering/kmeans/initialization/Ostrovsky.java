@@ -26,7 +26,6 @@ import java.util.Random;
 
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -82,7 +81,7 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
@@ -92,7 +91,7 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
     }
     DBIDs ids = relation.getDBIDs();
     @SuppressWarnings("unchecked")
-    DistanceQuery<NumberVector> distQ = database.getDistanceQuery((Relation<NumberVector>) relation, (NumberVectorDistance<NumberVector>) distanceFunction);
+    DistanceQuery<NumberVector> distQ = ((Relation<NumberVector>) relation).getDistanceQuery((NumberVectorDistance<NumberVector>) distanceFunction);
     Random random = rnd.getSingleThreadedRandom();
 
     // Center and total variance

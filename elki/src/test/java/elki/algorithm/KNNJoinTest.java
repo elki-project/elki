@@ -77,7 +77,7 @@ public class KNNJoinTest {
 
     // Euclidean
     {
-      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, EuclideanDistance.STATIC);
+      DistanceQuery<NumberVector> dq = relation.getDistanceQuery(EuclideanDistance.STATIC);
       KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
@@ -89,7 +89,7 @@ public class KNNJoinTest {
     }
     // Manhattan
     {
-      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, ManhattanDistance.STATIC);
+      DistanceQuery<NumberVector> dq = relation.getDistanceQuery(ManhattanDistance.STATIC);
       KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();

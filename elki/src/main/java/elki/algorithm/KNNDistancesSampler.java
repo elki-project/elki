@@ -26,12 +26,10 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.algorithm.KNNDistancesSampler.KNNDistanceOrderResult;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -130,27 +128,23 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
    * Provides an order of the kNN-distances for all objects within the specified
    * database.
    *
-   * @param database Database
    * @param relation Relation
    * @return Result
    */
-  public KNNDistanceOrderResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
-
+  public KNNDistanceOrderResult run(Relation<O> relation) {
+    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
     final int size = (int) ((sample <= 1.) ? Math.ceil(relation.size() * sample) : sample);
     DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), size, rnd);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Sampling kNN distances", size, LOG) : null;
     double[] knnDistances = new double[size];
     int i = 0;
-    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance(), i++) {
+    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       final KNNList neighbors = knnQuery.getKNNForDBID(iditer, k + 1);
-      knnDistances[i] = neighbors.getKNNDistance();
+      knnDistances[i++] = neighbors.getKNNDistance();
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-
     return new KNNDistanceOrderResult(knnDistances, k);
   }
 

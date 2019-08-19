@@ -21,7 +21,6 @@
 package elki.clustering.affinitypropagation;
 
 import elki.data.type.TypeInformation;
-import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.query.similarity.SimilarityQuery;
@@ -67,21 +66,21 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
   }
 
   @Override
-  public double[][] getSimilarityMatrix(Database db, Relation<O> relation, ArrayDBIDs ids) {
+  public double[][] getSimilarityMatrix(Relation<O> relation, ArrayDBIDs ids) {
     final int size = ids.size();
-    SimilarityQuery<O> sq = db.getSimilarityQuery(relation, similarity);
+    SimilarityQuery<O> sq = relation.getSimilarityQuery(similarity);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
     // Compute self-similarities first, for centering:
-    for (int i = 0; i < size; i++, i1.advance()) {
+    for(int i = 0; i < size; i++, i1.advance()) {
       mat[i][i] = sq.similarity(i1, i1) * .5;
     }
     i1.seek(0);
-    for (int i = 0, j = 0; i < size; i++, i1.advance()) {
+    for(int i = 0, j = 0; i < size; i++, i1.advance()) {
       final double[] mati = mat[i]; // Probably faster access.
       i2.seek(i + 1);
-      for (int k = i + 1; k < size; k++, i2.advance()) {
+      for(int k = i + 1; k < size; k++, i2.advance()) {
         mati[k] = sq.similarity(i1, i2) - mati[i] - mat[k][k];
         mat[k][i] = mati[k]; // symmetry.
         flat[j] = mati[k];
@@ -90,7 +89,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     }
     double median = QuickSelect.quantile(flat, quantile);
     // On the diagonal, we place the median
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       mat[i][i] = median;
     }
     return mat;
@@ -130,12 +129,12 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<Similarity<? super O>> param = new ObjectParameter<>(SIMILARITY_ID, Similarity.class, LinearKernel.class);
-      if (config.grab(param)) {
+      if(config.grab(param)) {
         similarity = param.instantiateClass(config);
       }
 
       DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      if (config.grab(quantileP)) {
+      if(config.grab(quantileP)) {
         quantile = quantileP.doubleValue();
       }
     }

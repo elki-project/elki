@@ -30,12 +30,15 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.query.knn.KNNQuery;
+import elki.database.query.range.RangeQuery;
 import elki.database.relation.AbstractRelation;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 
 /**
- * Relation representing the Lucene document.
+ * Relation representing the Lucene documents.
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -105,7 +108,23 @@ public class LuceneDocumentRelation extends AbstractRelation<Document> {
 
   @Override
   public String getLongName() {
-    return "Lucene document";
+    return "Lucene documents";
+  }
+
+  @Override
+  public RangeQuery<Document> getRangeQuery(DistanceQuery<Document> distanceQuery, Object... hints) {
+    if(distanceQuery.getDistance().getClass() == LuceneDistance.class) {
+      return (RangeQuery<Document>) new LuceneDistanceRangeQuery(reader, ids);
+    }
+    return super.getRangeQuery(distanceQuery, hints);
+  }
+
+  @Override
+  public KNNQuery<Document> getKNNQuery(DistanceQuery<Document> distanceQuery, Object... hints) {
+    if(distanceQuery.getDistance().getClass() == LuceneDistance.class) {
+      return (KNNQuery<Document>) new LuceneDistanceKNNQuery(reader, ids);
+    }
+    return super.getKNNQuery(distanceQuery, hints);
   }
 
   @Override

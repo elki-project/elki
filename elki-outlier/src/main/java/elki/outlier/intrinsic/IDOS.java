@@ -20,11 +20,9 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -42,6 +40,7 @@ import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.intrinsicdimensionality.ALIDEstimator;
 import elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -114,16 +113,15 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Run the algorithm
    *
-   * @param database Database
    * @param relation Data relation
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("IDOS", 3) : null;
     if(stepprog != null) {
       stepprog.beginStep(1, "Precomputing neighborhoods", LOG);
     }
-    KNNQuery<O> knnQ = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), Math.max(k_c, k_r) + 1);
+    KNNQuery<O> knnQ = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), Math.max(k_c, k_r) + 1);
     DBIDs ids = relation.getDBIDs();
 
     if(stepprog != null) {

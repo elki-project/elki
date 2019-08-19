@@ -29,7 +29,6 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
@@ -115,14 +114,13 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
 
   /**
    * Run the mean-shift clustering algorithm.
-   * 
-   * @param database Database
+   *
    * @param relation Data relation
    * @return Clustering result
    */
-  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
-    final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistance());
-    final RangeQuery<V> rangeq = database.getRangeQuery(distq);
+  public Clustering<MeanModel> run(Relation<V> relation) {
+    final DistanceQuery<V> distq = relation.getDistanceQuery(getDistance());
+    final RangeQuery<V> rangeq = relation.getRangeQuery(distq);
     final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     final int dim = RelationUtil.dimensionality(relation);
 

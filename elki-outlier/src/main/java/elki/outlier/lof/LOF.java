@@ -20,11 +20,9 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -41,6 +39,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -110,17 +109,16 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
 
   /**
    * Runs the LOF algorithm on the given database.
-   * 
-   * @param database Database to query
+   *
    * @param relation Data to process
    * @return LOF outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), k);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing Local Reachability Densities (LRD).");

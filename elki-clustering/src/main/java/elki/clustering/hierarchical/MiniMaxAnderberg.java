@@ -25,7 +25,6 @@ import java.util.Arrays;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -82,12 +81,11 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistance(), LOG);
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 

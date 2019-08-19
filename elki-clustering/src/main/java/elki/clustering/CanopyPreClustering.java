@@ -29,7 +29,6 @@ import elki.data.model.PrototypeModel;
 import elki.data.model.SimplePrototypeModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDMIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
@@ -98,16 +97,15 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
 
   /**
    * Run the algorithm
-   * 
-   * @param database Database
+   *
    * @param relation Relation to process
    */
-  public Clustering<PrototypeModel<O>> run(Database database, Relation<O> relation) {
+  public Clustering<PrototypeModel<O>> run(Relation<O> relation) {
     if(!(t1 >= t2)) {
       throw new AbortException("T1 must be at least as large as T2.");
     }
 
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
     ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
     final int size = relation.size();

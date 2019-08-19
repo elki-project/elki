@@ -141,11 +141,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       for(int i = 0; i < num; i++) {
         long[] dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(dimset);
-        LOF<NumberVector> lof = new LOF<>(k, df);
-
         // run LOF and collect the result
-        OutlierResult result = lof.run(database, relation);
-        results.add(result);
+        results.add(new LOF<>(k, df).run(relation));
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);

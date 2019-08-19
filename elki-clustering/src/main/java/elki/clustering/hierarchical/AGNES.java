@@ -27,7 +27,6 @@ import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -131,17 +130,16 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
 
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);

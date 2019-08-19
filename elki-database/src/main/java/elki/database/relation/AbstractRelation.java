@@ -121,16 +121,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder(200) //
-          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery);
-      if(hints.length > 0) {
-        buf.append("\nHints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
+      logNotAccelerated(distanceQuery, hints);
     }
     return QueryUtil.getLinearScanKNNQuery(distanceQuery);
   }
@@ -157,16 +148,7 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder(200) //
-          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery);
-      if(hints.length > 0) {
-        buf.append("\nHints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
+      logNotAccelerated(distanceQuery, hints);
     }
     return QueryUtil.getLinearScanRangeQuery(distanceQuery);
   }
@@ -233,23 +215,14 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder(200) //
-          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery);
-      if(hints.length > 0) {
-        buf.append("\nHints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
+      logNotAccelerated(distanceQuery, hints);
     }
     KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object[] hints) {
+  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
@@ -270,18 +243,21 @@ public abstract class AbstractRelation<O> implements Relation<O> {
       }
     }
     if(getLogger().isDebuggingFinest()) {
-      StringBuilder buf = new StringBuilder(200) //
-          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery);
-      if(hints.length > 0) {
-        buf.append("\nHints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
+      logNotAccelerated(distanceQuery, hints);
     }
     return QueryUtil.getLinearScanPrioritySearcher(distanceQuery);
+  }
+
+  private void logNotAccelerated(DistanceQuery<O> distanceQuery, Object... hints) {
+    StringBuilder buf = new StringBuilder(200) //
+        .append("Fallback to linear scan - no index was able to accelerate this query.\nDistance query: ").append(distanceQuery);
+    if(hints.length > 0) {
+      buf.append("\nHints:");
+      for(Object o : hints) {
+        buf.append('\n').append(o);
+      }
+    }
+    getLogger().debugFinest(buf.toString());
   }
 
   /**

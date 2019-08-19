@@ -31,9 +31,6 @@ import org.apache.lucene.store.FSDirectory;
 import elki.database.AbstractDatabase;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
 import elki.database.relation.DBIDView;
 import elki.logging.Logging;
 import elki.result.ResultUtil;
@@ -114,26 +111,6 @@ public class LuceneDatabase extends AbstractDatabase {
     catch(IOException e) {
       throw new AbortException("I/O error reading index.", e);
     }
-  }
-
-  @Override
-  public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistance() instanceof LuceneDistance) {
-      @SuppressWarnings("unchecked")
-      final RangeQuery<O> rq = (RangeQuery<O>) new LuceneDistanceRangeQuery(reader, ids);
-      return rq;
-    }
-    return super.getRangeQuery(distanceQuery, hints);
-  }
-
-  @Override
-  public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistance() instanceof LuceneDistance) {
-      @SuppressWarnings("unchecked")
-      final KNNQuery<O> kq = (KNNQuery<O>) new LuceneDistanceKNNQuery(reader, ids);
-      return kq;
-    }
-    return super.getKNNQuery(distanceQuery, hints);
   }
 
   @Override

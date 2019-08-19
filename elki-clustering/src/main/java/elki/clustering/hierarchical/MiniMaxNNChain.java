@@ -23,7 +23,6 @@ package elki.clustering.hierarchical;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -84,13 +83,12 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<Distance<?
 
   /**
    * Run the algorithm
-   * 
-   * @param db Database to run on
+   *
    * @param relation Data relation
    * @return Clustering result
    */
-  public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(db, relation, getDistance(), LOG);
+  public PointerPrototypeHierarchyRepresentationResult run(Relation<O> relation) {
+    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
     final DBIDs ids = relation.getDBIDs();
 
     // Initialize space for result:

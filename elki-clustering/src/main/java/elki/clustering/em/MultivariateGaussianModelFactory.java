@@ -62,7 +62,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
 
   @Override
   public List<MultivariateGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
-    double[][] initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
+    double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
     assert (initialMeans.length == k);
     // Compute the global covariance matrix for better starting conditions:
     double[][] covmat = CovarianceMatrix.make(relation).destroyToSampleMatrix();

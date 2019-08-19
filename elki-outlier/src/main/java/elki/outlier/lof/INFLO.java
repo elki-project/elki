@@ -20,11 +20,9 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
@@ -38,6 +36,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -120,16 +119,15 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Run the algorithm
    *
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("INFLO", 3) : null;
 
     // Step one: find the kNN
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), kplus1);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), kplus1);
 
     // Step two: find the RkNN, minus kNN.
     LOG.beginStep(stepprog, 2, "Materialize reverse NN.");

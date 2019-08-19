@@ -20,11 +20,9 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -38,6 +36,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -92,9 +91,9 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? sup
   private static final Logging LOG = Logging.getLogger(KNNOutlier.class);
 
   /**
-   * The parameter k (including query point!)
+   * The parameter k (plus query point!)
    */
-  private int k;
+  private int kplus;
 
   /**
    * Constructor for a single kNN query.
@@ -104,17 +103,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? sup
    */
   public KNNOutlier(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k + 1; // INCLUDE the query point now
-  }
-
-  /**
-   * Runs the algorithm in the timed evaluation part.
-   *
-   * @param database Database (no longer used)
-   * @param relation Data relation
-   */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    return run(relation);
+    this.kplus = k + 1; // INCLUDE the query point now
   }
 
   /**
@@ -124,21 +113,18 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? sup
    */
   public OutlierResult run(Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(getDistance());
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(distanceQuery, k);
+    final KNNQuery<O> knnQuery = relation.getKNNQuery(distanceQuery, kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
-
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knno_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     // compute distance to the k nearest neighbor.
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       // distance to the kth nearest neighbor
       // (assuming the query point is always included, with distance 0)
-      final double dkn = knnQuery.getKNNForDBID(it, k).getKNNDistance();
-
+      final double dkn = knnQuery.getKNNForDBID(it, kplus).getKNNDistance();
       knno_score.putDouble(it, dkn);
       minmax.put(dkn);
-
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -167,8 +153,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? sup
      * Parameter to specify the k nearest neighbor
      */
     public static final OptionID K_ID = new OptionID("knno.k", //
-        "The k nearest neighbor, excluding the query point "//
-            + "(i.e. query point is the 0-nearest-neighbor)");
+        "The k nearest neighbor, excluding the query point (i.e. query point is the 0-nearest-neighbor)");
 
     /**
      * k parameter

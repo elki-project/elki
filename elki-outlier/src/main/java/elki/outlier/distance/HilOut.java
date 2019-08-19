@@ -28,7 +28,6 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -169,8 +168,14 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     this.omega_star = 0.0;
   }
 
-  public OutlierResult run(Database database, Relation<O> relation) {
-    distq = database.getDistanceQuery(relation, getDistance());
+  /**
+   * Run the HilOut algorithm.
+   *
+   * @param relation Data relation
+   * @return Outlier result
+   */
+  public OutlierResult run(Relation<O> relation) {
+    distq = relation.getDistanceQuery(getDistance());
     d = RelationUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 

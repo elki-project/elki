@@ -31,7 +31,6 @@ import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -121,18 +120,17 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   /**
    * Run the LSDBC algorithm
    *
-   * @param database Database to process
    * @param relation Data relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<O> relation) {
+  public Clustering<Model> run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LSDBC", 3) : null;
     final int dim = RelationUtil.dimensionality(relation);
     final double factor = FastMath.pow(2., alpha / dim);
 
     final DBIDs ids = relation.getDBIDs();
     LOG.beginStep(stepprog, 1, "Materializing kNN neighborhoods");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistance(), k);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), k);
 
     LOG.beginStep(stepprog, 2, "Sorting by density");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);

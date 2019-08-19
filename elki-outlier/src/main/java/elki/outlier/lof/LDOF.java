@@ -20,11 +20,9 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -32,6 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.DatabaseQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
@@ -42,6 +41,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.Mean;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
@@ -92,9 +92,9 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   private static final double LDOF_BASELINE = 0.5;
 
   /**
-   * Number of neighbors to query.
+   * Number of neighbors to query + query point itself.
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * Constructor.
@@ -104,19 +104,18 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    */
   public LDOF(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k + 1; // + query point
+    this.kplus = k + 1; // + query point
   }
 
   /**
    * Run the algorithm
    *
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k);
+  public OutlierResult run(Relation<O> relation) {
+    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance(), DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnQuery = relation.getKNNQuery(distFunc, kplus);
 
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
@@ -131,7 +130,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
+      KNNList neighbors = knnQuery.getKNNForDBID(iditer, kplus);
       dxp.reset();
       Dxp.reset();
       DoubleDBIDListIter neighbor1 = neighbors.iter(),

@@ -110,10 +110,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     this.sampling = sampling;
   }
 
-  @Override
-  public HistogramResult run(Database database) {
-    final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
+  public HistogramResult run(Database database, Relation<O> relation) {
+    final DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
 
     final StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
 

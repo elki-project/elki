@@ -133,7 +133,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     // Run Generalized DBSCAN
     LOG.beginStep(stepprog, 1, "Preprocessing local correlation dimensionalities and partitioning data");
     // FIXME: how to ensure we are running on the same relation?
-    ERiCNeighborPredicate<V>.Instance npred = new ERiCNeighborPredicate<V>(settings).instantiate(database, relation);
+    ERiCNeighborPredicate<V>.Instance npred = new ERiCNeighborPredicate<V>(settings).instantiate(relation);
     CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
     Clustering<Model> copacResult = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
 

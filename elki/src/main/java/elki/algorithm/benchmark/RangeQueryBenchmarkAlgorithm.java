@@ -25,9 +25,7 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -128,18 +126,16 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
   /**
    * Run the algorithm, with separate radius relation
    *
-   * @param database Database
    * @param relation Relation
    * @param radrel Radius relation
    * @return Null result
    */
-  public Void run(Database database, Relation<O> relation, Relation<NumberVector> radrel) {
+  public Void run(Relation<O> relation, Relation<NumberVector> radrel) {
     if(queries != null) {
       throw new AbortException("This 'run' method will not use the given query set!");
     }
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
-    RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
+    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
 
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
@@ -167,17 +163,15 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
   /**
    * Run the algorithm, with a separate query set.
    *
-   * @param database Database
    * @param relation Relation
    * @return Null result
    */
-  public Void run(Database database, Relation<O> relation) {
+  public Void run(Relation<O> relation) {
     if(queries == null) {
       throw new AbortException("A query set is required for this 'run' method.");
     }
     // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
-    RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
+    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
     NumberVector.Factory<O> ofactory = RelationUtil.getNumberVectorFactory(relation);
     int dim = RelationUtil.dimensionality(relation);
 

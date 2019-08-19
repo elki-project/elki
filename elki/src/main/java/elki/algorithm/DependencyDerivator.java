@@ -20,11 +20,7 @@
  */
 package elki.algorithm;
 
-import static elki.math.linearalgebra.VMath.copy;
-import static elki.math.linearalgebra.VMath.setCol;
-import static elki.math.linearalgebra.VMath.setMatrix;
-import static elki.math.linearalgebra.VMath.times;
-import static elki.math.linearalgebra.VMath.transpose;
+import static elki.math.linearalgebra.VMath.*;
 import static elki.utilities.io.FormatUtil.format;
 import static elki.utilities.io.FormatUtil.formatTo;
 
@@ -36,11 +32,9 @@ import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
+import elki.database.query.DatabaseQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -142,12 +136,11 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
    * Computes quantitatively linear dependencies among the attributes of the
    * given database based on a linear correlation PCA.
    *
-   * @param database the database to run this DependencyDerivator on
-   * @param relation the relation to use
+   * @param relation the relation to process
    * @return the CorrelationAnalysisSolution computed by this
    *         DependencyDerivator
    */
-  public CorrelationAnalysisSolution<V> run(Database database, Relation<V> relation) {
+  public CorrelationAnalysisSolution<V> run(Relation<V> relation) {
     if(LOG.isVerbose()) {
       LOG.verbose("retrieving database objects...");
     }
@@ -155,21 +148,16 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
     NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     V centroidDV = factory.newNumberVector(centroid.getArrayRef());
     DBIDs ids;
-    if(this.sampleSize > 0) {
-      if(randomsample) {
-        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, RandomFactory.DEFAULT);
-      }
-      else {
-        DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistance());
-        KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize)//
-            .getKNNForObject(centroidDV, this.sampleSize);
-        ids = DBIDUtil.newHashSet(queryResults);
-      }
-    }
-    else {
+    if(sampleSize == 0) {
       ids = relation.getDBIDs();
     }
-
+    else if(randomsample) {
+      ids = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, RandomFactory.DEFAULT);
+    }
+    else {
+      ids = relation.getKNNQuery(getDistance(), sampleSize, DatabaseQuery.HINT_SINGLE) //
+          .getKNNForObject(centroidDV, sampleSize);
+    }
     return generateModel(relation, ids, centroid.getArrayRef());
   }
 

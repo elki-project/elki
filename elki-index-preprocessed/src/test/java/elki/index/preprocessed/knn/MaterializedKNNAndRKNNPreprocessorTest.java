@@ -97,11 +97,11 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       return;
     }
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // verify data set size.
-    assertEquals("Data set size doesn't match parameters.", shoulds, rel.size());
+    assertEquals("Data set size doesn't match parameters.", shoulds, relation.size());
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -112,43 +112,43 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
         new ELKIBuilder<MaterializeKNNAndRKNNPreprocessor.Factory<DoubleVector>>(MaterializeKNNAndRKNNPreprocessor.Factory.class) //
             .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
             .with(MaterializeKNNPreprocessor.Factory.K_ID, k) //
-            .build().instantiate(rel);
+            .build().instantiate(relation);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
     assertFalse("Preprocessor rknn query class incorrect.", preproc_rknn_query instanceof LinearScanRKNNQuery);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(relation, lin_rknn_query, preproc_rknn_query, k);
     // also test partial queries, forward only
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<>();
-    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rel);
-    int dim = RelationUtil.dimensionality(rel);
+    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(relation);
+    int dim = RelationUtil.dimensionality(relation);
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
       DoubleVector obj = VectorUtil.randomVector(o, dim, random);
       insertions.add(obj);
     }
     // System.out.println("Insert " + insertions);
-    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rel.getDataTypeInformation(), insertions));
+    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(relation.getDataTypeInformation(), insertions));
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(relation, lin_rknn_query, preproc_rknn_query, k);
 
     // delete objects
     // System.out.println("Delete " + deletions);
     db.delete(deletions);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(relation, lin_rknn_query, preproc_rknn_query, k);
   }
 
   public static void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector> lin_rknn_query, RKNNQuery<DoubleVector> preproc_rknn_query, int k) {

@@ -121,7 +121,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    */
   protected double[][] initialMeans(Database database, Relation<V> relation) {
     Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistance());
+    double[][] means = initializer.chooseInitialMeans(relation, k, getDistance());
     getLogger().statistics(inittime.end());
     return means;
   }

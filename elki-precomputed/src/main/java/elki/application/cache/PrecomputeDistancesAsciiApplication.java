@@ -106,7 +106,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
+    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distance);
 
     DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
     final int size = ids.size();

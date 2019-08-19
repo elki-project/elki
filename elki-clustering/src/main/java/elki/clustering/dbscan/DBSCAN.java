@@ -31,7 +31,6 @@ import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.QueryUtil;
 import elki.database.ids.*;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -127,9 +126,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
       return result;
     }
 
-    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistance());
     Instance dbscan = new Instance();
-    dbscan.run(relation, rangeQuery);
+    dbscan.run(relation, relation.getRangeQuery(getDistance()));
 
     double averagen = dbscan.ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));

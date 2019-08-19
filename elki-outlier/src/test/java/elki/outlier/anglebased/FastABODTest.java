@@ -24,17 +24,19 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
+import elki.data.NumberVector;
 import elki.database.AbstractDatabase;
 import elki.database.Database;
 import elki.database.query.knn.PreprocessorKNNQuery;
+import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import elki.outlier.AbstractOutlierAlgorithmTest;
+import elki.result.outlier.OutlierResult;
 import elki.similarity.kernel.LinearKernel;
 import elki.similarity.kernel.PolynomialKernel;
-import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
-import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -63,7 +65,8 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC);
     pars.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, 6);
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960, pars);
-    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), SquaredEuclideanDistance.STATIC), 5) instanceof PreprocessorKNNQuery);
+    Relation<NumberVector> relation = db.getRelation(DoubleVector.FIELD);
+    assertTrue(relation.getKNNQuery(SquaredEuclideanDistance.STATIC, 5) instanceof PreprocessorKNNQuery);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
         .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
@@ -79,7 +82,8 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     pars.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, EuclideanDistance.STATIC);
     pars.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, 6);
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960, pars);
-    assertTrue(db.getKNNQuery(db.getDistanceQuery(db.getRelation(DoubleVector.FIELD), EuclideanDistance.STATIC), 5) instanceof PreprocessorKNNQuery);
+    Relation<NumberVector> relation = db.getRelation(DoubleVector.FIELD);
+    assertTrue(relation.getKNNQuery(EuclideanDistance.STATIC, 5) instanceof PreprocessorKNNQuery);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Parameterizer.K_ID, 5)//
         .with(FastABOD.Parameterizer.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //

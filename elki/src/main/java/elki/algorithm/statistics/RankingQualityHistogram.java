@@ -32,7 +32,6 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -98,8 +97,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
    * @return Histogram of ranking qualities
    */
   public HistogramResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
+    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");

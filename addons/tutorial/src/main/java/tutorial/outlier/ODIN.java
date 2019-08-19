@@ -20,11 +20,9 @@
  */
 package tutorial.outlier;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -39,6 +37,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -94,20 +93,19 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
   /**
    * Run the ODIN algorithm
-   *
+   * <p>
    * Tutorial note: the <em>signature</em> of this method depends on the types
    * that we requested in the {@link #getInputTypeRestriction} method. Here we
    * requested a single relation of type {@code O} , the data type of our
    * distance function.
    *
-   * @param database Database to run on.
    * @param relation Relation to process.
    * @return ODIN outlier result.
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     // Get the query functions:
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k);
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    KNNQuery<O> knnq = relation.getKNNQuery(dq, k);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();

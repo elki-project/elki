@@ -20,19 +20,15 @@
  */
 package elki.outlier.lof.parallel;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.outlier.lof.LOF;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -40,6 +36,8 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
+import elki.outlier.lof.LOF;
 import elki.parallel.ParallelExecutor;
 import elki.parallel.processor.*;
 import elki.parallel.variables.SharedDouble;
@@ -77,9 +75,9 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     bibkey = "DBLP:journals/datamine/SchubertZK14")
 public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
-   * Parameter k
+   * Parameter k + 1 for query point
    */
-  private int k;
+  private int kplus;
 
   /**
    * Constructor.
@@ -89,7 +87,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
    */
   public ParallelLOF(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k;
+    this.kplus = k + 1;
   }
 
   /**
@@ -102,23 +100,28 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
     return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
-  public OutlierResult run(Database database, Relation<O> relation) {
+  /**
+   * Run the LOF algorithm in parallel.
+   *
+   * @param relation Data relation
+   * @return LOF result
+   */
+  public OutlierResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), kplus);
 
     // Phase one: KNN and k-dist
     WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
-      KNNProcessor<O> knnm = new KNNProcessor<>(k + 1, knnq);
+      KNNProcessor<O> knnm = new KNNProcessor<>(kplus, knnq);
       SharedObject<KNNList> knnv = new SharedObject<>();
       WriteDataStoreProcessor<KNNList> storek = new WriteDataStoreProcessor<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
       // Compute k-dist
-      KDistanceProcessor kdistm = new KDistanceProcessor(k + 1);
+      KDistanceProcessor kdistm = new KDistanceProcessor(kplus);
       SharedDouble kdistv = new SharedDouble();
       WriteDoubleDataStoreProcessor storem = new WriteDoubleDataStoreProcessor(kdists);
       kdistm.connectKNNInput(knnv);

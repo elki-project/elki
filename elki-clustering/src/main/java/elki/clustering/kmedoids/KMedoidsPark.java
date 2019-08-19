@@ -34,7 +34,6 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -152,13 +151,12 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
   /**
    * Run k-medoids
-   * 
-   * @param database Database
+   *
    * @param relation relation to use
    * @return result
    */
-  public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(database, relation, getDistance(), LOG);
+  public Clustering<MedoidModel> run(Relation<V> relation) {
+    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));

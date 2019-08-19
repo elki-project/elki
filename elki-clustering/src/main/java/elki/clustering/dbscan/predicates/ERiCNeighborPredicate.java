@@ -33,7 +33,6 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
@@ -42,8 +41,6 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
 import elki.math.linearalgebra.pca.PCAFilteredResult;
 import elki.math.linearalgebra.pca.PCAResult;
-import elki.math.linearalgebra.pca.PCARunner;
-import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -102,30 +99,25 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
 
   @Override
   public Instance instantiate(Database database) {
-    return instantiate(database, database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return instantiate(database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
    * Full instantiation interface.
-   * 
-   * @param database Database
+   *
    * @param relation Relation
    * @return Instance
    */
-  public Instance instantiate(Database database, Relation<V> relation) {
-    DistanceQuery<V> dq = database.getDistanceQuery(relation, EuclideanDistance.STATIC);
-    KNNQuery<V> knnq = database.getKNNQuery(dq, settings.k);
-
+  public Instance instantiate(Relation<V> relation) {
+    KNNQuery<V> knnq = relation.getKNNQuery(EuclideanDistance.STATIC, settings.k);
     WritableDataStore<PCAFilteredResult> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
-    PCARunner pca = settings.pca;
-    EigenPairFilter filter = settings.filter;
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList ref = knnq.getKNNForDBID(iditer, settings.k);
-      PCAResult pcares = pca.processQueryResult(ref, relation);
-      storage.put(iditer, new PCAFilteredResult(pcares.getEigenPairs(), filter.filter(pcares.getEigenvalues()), 1., 0.));
+      PCAResult pcares = settings.pca.processQueryResult(ref, relation);
+      storage.put(iditer, new PCAFilteredResult(pcares.getEigenPairs(), settings.filter.filter(pcares.getEigenvalues()), 1., 0.));
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);

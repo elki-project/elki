@@ -23,7 +23,6 @@ elki.algorithm.statistics.EvaluateRetrievalPerformance
 elki.algorithm.statistics.HopkinsStatisticClusteringTendency
 elki.algorithm.statistics.RangeQuerySelectivity
 elki.algorithm.statistics.RankingQualityHistogram
-# elki.algorithm.DummyAlgorithm
 elki.algorithm.DependencyDerivator
 elki.algorithm.KNNDistancesSampler
 elki.algorithm.KNNJoin

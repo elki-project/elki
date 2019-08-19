@@ -34,7 +34,6 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
@@ -102,20 +101,17 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
 
   @Override
   public NeighborPredicate.Instance<COPACModel> instantiate(Database database) {
-    return instantiate(database, database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return instantiate(database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
    * Full instantiation method.
    * 
-   * @param database Database
    * @param relation Vector relation
    * @return Instance
    */
-  public COPACNeighborPredicate.Instance instantiate(Database database, Relation<V> relation) {
-    DistanceQuery<V> dq = database.getDistanceQuery(relation, EuclideanDistance.STATIC);
-    KNNQuery<V> knnq = database.getKNNQuery(dq, settings.k);
-
+  public COPACNeighborPredicate.Instance instantiate(Relation<V> relation) {
+    KNNQuery<V> knnq = relation.getKNNQuery(EuclideanDistance.STATIC, settings.k);
     WritableDataStore<COPACModel> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, COPACModel.class);
 
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();

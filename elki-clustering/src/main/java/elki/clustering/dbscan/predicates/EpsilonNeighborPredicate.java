@@ -26,13 +26,12 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.documentation.Reference;
@@ -90,9 +89,9 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
 
   @Override
   public Instance instantiate(Database database) {
-    DistanceQuery<O> dq = QueryUtil.getDistanceQuery(database, distFunc);
-    RangeQuery<O> rq = database.getRangeQuery(dq);
-    return new Instance(epsilon, rq, dq.getRelation().getDBIDs());
+    Relation<O> relation = database.getRelation(distFunc.getInputTypeRestriction());
+    RangeQuery<O> rq = relation.getRangeQuery(distFunc);
+    return new Instance(epsilon, rq, relation.getDBIDs());
   }
 
   @Override

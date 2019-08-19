@@ -20,13 +20,11 @@
  */
 package elki.outlier.lof;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -50,6 +48,7 @@ import elki.math.MeanVariance;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -162,15 +161,14 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Run the KDEOS outlier detection algorithm.
    *
-   * @param database Database to query
    * @param rel Relation to process
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<O> rel) {
+  public OutlierResult run(Relation<O> rel) {
     final DBIDs ids = rel.getDBIDs();
 
     LOG.verbose("Running kNN preprocessor.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, rel, getDistance(), kmax + 1);
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(rel, getDistance(), kmax + 1);
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);

@@ -23,7 +23,6 @@ package elki.clustering.kmeans.initialization;
 import java.util.Random;
 
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -69,7 +68,7 @@ public class RandomUniformGenerated extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     double[][] minmax = RelationUtil.computeMinMax(relation);
     final int dim = minmax[0].length;
     double[] min = minmax[0], scale = minmax[1];

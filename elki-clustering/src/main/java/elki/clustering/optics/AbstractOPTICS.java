@@ -23,7 +23,6 @@ package elki.clustering.optics;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.utilities.Alias;
@@ -85,12 +84,11 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
 
   /**
    * Run OPTICS on the database.
-   * 
-   * @param db Database
+   *
    * @param relation Relation
    * @return Result
    */
-  public abstract ClusterOrder run(Database db, Relation<O> relation);
+  public abstract ClusterOrder run(Relation<O> relation);
 
   @Override
   public int getMinPts() {

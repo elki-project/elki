@@ -27,7 +27,6 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
@@ -117,16 +116,15 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
   /**
    * Perform affinity propagation clustering.
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<MedoidModel> run(Database db, Relation<O> relation) {
+  public Clustering<MedoidModel> run(Relation<O> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
     int[] assignment = new int[size];
-    double[][] s = initialization.getSimilarityMatrix(db, relation, ids);
+    double[][] s = initialization.getSimilarityMatrix(relation, ids);
     double[][] r = new double[size][size], a = new double[size][size];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Affinity Propagation Iteration", LOG) : null;

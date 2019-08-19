@@ -23,17 +23,11 @@ package elki.clustering.hierarchical;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -94,10 +88,9 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Performs the SLINK algorithm on the given database.
    *
-   * @param database Database to process
    * @param relation Data relation to use
    */
-  public PointerHierarchyRepresentationResult run(Database database, Relation<O> relation) {
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
@@ -131,7 +124,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
     else {
       // Fallback branch
-      DistanceQuery<O> distQ = database.getDistanceQuery(relation, getDistance());
+      DistanceQuery<O> distQ = relation.getDistanceQuery(getDistance());
       for(id.seek(1); id.valid(); id.advance()) {
         step2(id, it, id.getOffset(), distQ, m);
         process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK

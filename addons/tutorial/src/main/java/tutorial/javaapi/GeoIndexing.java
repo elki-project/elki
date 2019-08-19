@@ -27,7 +27,6 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DoubleDBIDListIter;
@@ -96,7 +95,7 @@ public class GeoIndexing {
     // This distance function returns meters.
     LatLngDistance df = new LatLngDistance(WGS84SpheroidEarthModel.STATIC);
     // k nearest neighbor query:
-    KNNQuery<NumberVector> knnq = QueryUtil.getKNNQuery(rel, df);
+    KNNQuery<NumberVector> knnq = rel.getKNNQuery(df);
 
     // Let's find the closest points to New York:
     DoubleVector newYork = DoubleVector.wrap(new double[] { 40.730610, -73.935242 });

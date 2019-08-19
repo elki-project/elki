@@ -26,7 +26,6 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -116,13 +115,12 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
   /**
    * Run the algorithm on the given relation.
    *
-   * @param database Database
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<? extends NumberVector> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     @SuppressWarnings("unchecked")
-    PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) database.getDistanceQuery(relation, distanceFunction);
+    PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) relation.getDistanceQuery(distanceFunction);
     Collection<? extends NumberVector> refPoints = refp.getReferencePoints(relation);
     if(refPoints.isEmpty()) {
       throw new AbortException("Cannot compute ROS without reference points!");

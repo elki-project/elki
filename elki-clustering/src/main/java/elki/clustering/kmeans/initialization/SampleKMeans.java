@@ -26,7 +26,6 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.ModelUtil;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ProxyDatabase;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -92,7 +91,7 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }

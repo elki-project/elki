@@ -22,7 +22,6 @@ package elki.clustering.kmeans.initialization;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -65,7 +64,7 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }

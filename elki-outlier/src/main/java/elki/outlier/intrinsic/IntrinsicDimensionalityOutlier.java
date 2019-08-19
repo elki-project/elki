@@ -20,16 +20,13 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -40,6 +37,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import elki.math.statistics.intrinsicdimensionality.MOMEstimator;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -79,9 +77,9 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
   private static final Logging LOG = Logging.getLogger(IntrinsicDimensionalityOutlier.class);
 
   /**
-   * Number of neighbors to use.
+   * Number of neighbors to use + query point.
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * Estimator for intrinsic dimensionality.
@@ -97,20 +95,18 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    */
   public IntrinsicDimensionalityOutlier(Distance<? super O> distanceFunction, int k, IntrinsicDimensionalityEstimator estimator) {
     super(distanceFunction);
-    this.k = k;
+    this.kplus = k + 1; // + query point
     this.estimator = estimator;
   }
 
   /**
    * Run the algorithm
    *
-   * @param database Database
    * @param relation Data relation
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistance());
-    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
+  public OutlierResult run(Relation<O> relation) {
+    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
@@ -119,14 +115,13 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double id = 0.;
       try {
-        id = estimator.estimate(knnQuery, iditer, k + 1);
+        id = estimator.estimate(knnQuery, iditer, kplus);
       }
       catch(ArithmeticException e) {
-        // pass
+        // pass, use 0.
       }
       id_score.putDouble(iditer, id);
       minmax.put(id);
-
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);

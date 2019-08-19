@@ -20,24 +20,23 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
+import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -97,21 +96,19 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Run the ODIN algorithm
    *
-   * @param database Database to run on.
    * @param relation Relation to process.
    * @return ODIN outlier result.
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     // Get the query functions:
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB, 0.);
 
     double inc = 1. / (k - 1);
-    double min = Double.POSITIVE_INFINITY, max = 0.0;
+    DoubleMinMax minmax = new DoubleMinMax();
     // Process all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
@@ -122,18 +119,13 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
           continue;
         }
         final double value = scores.doubleValue(nei) + inc;
-        if(value < min) {
-          min = value;
-        }
-        if(value > max) {
-          max = value;
-        }
         scores.put(nei, value);
+        minmax.put(value);
       }
     }
 
     // Wrap the result and add metadata.
-    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., inc * (ids.size() - 1), 1);
+    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., inc * (ids.size() - 1), 1);
     DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", ids, scores);
     return new OutlierResult(meta, rel);
   }

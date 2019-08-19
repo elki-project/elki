@@ -22,7 +22,6 @@ package elki.index.preprocessed.preference;
 
 import elki.clustering.subspace.HiSC;
 import elki.data.NumberVector;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.DBIDIter;
@@ -108,8 +107,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       throw new EmptyDataException();
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
-
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistance.STATIC, k);
+    KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, k);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
     long start = System.currentTimeMillis();

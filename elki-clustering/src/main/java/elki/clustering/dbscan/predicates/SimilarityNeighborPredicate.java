@@ -24,13 +24,12 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.range.RangeQuery;
-import elki.database.query.similarity.SimilarityQuery;
+import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -70,27 +69,27 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
   protected double epsilon;
 
   /**
-   * Distance function to use
+   * Similarity function to use
    */
-  protected Similarity<? super O> distFunc;
+  protected Similarity<? super O> simFunc;
 
   /**
    * Full constructor.
    *
    * @param epsilon Epsilon value
-   * @param distFunc Distance function to use
+   * @param simFunc Similarity function to use
    */
-  public SimilarityNeighborPredicate(double epsilon, Similarity<? super O> distFunc) {
+  public SimilarityNeighborPredicate(double epsilon, Similarity<? super O> simFunc) {
     super();
     this.epsilon = epsilon;
-    this.distFunc = distFunc;
+    this.simFunc = simFunc;
   }
 
   @Override
   public Instance instantiate(Database database) {
-    SimilarityQuery<O> dq = QueryUtil.getSimilarityQuery(database, distFunc);
-    RangeQuery<O> rq = database.getSimilarityRangeQuery(dq);
-    return new Instance(epsilon, rq, dq.getRelation().getDBIDs());
+    Relation<O> relation = database.getRelation(simFunc.getInputTypeRestriction());
+    RangeQuery<O> rq = relation.getSimilarityRangeQuery(simFunc);
+    return new Instance(epsilon, rq, relation.getDBIDs());
   }
 
   @Override
@@ -100,7 +99,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
 
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distFunc.getInputTypeRestriction();
+    return simFunc.getInputTypeRestriction();
   }
 
   /**

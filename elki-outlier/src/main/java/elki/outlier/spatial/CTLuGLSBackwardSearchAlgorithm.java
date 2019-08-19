@@ -23,31 +23,20 @@ package elki.outlier.spatial;
 import static elki.math.linearalgebra.VMath.*;
 
 import elki.AbstractDistanceBasedAlgorithm;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
-import elki.database.relation.DoubleRelation;
-import elki.database.relation.MaterializedDoubleRelation;
-import elki.database.relation.ProxyView;
-import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
+import elki.database.relation.*;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.NormalDistribution;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -58,6 +47,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.pairs.Pair;
+
 import net.jafama.FastMath;
 
 /**
@@ -119,12 +109,11 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
   /**
    * Run the algorithm
    *
-   * @param database Database to process
    * @param relationx Spatial relation
    * @param relationy Attribute relation
    * @return Algorithm result
    */
-  public OutlierResult run(Database database, Relation<V> relationx, Relation<? extends NumberVector> relationy) {
+  public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector> relationy) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
@@ -169,7 +158,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relationx, getDistance(), k + 1);
+    KNNQuery<V> knnQuery = relationx.getKNNQuery(getDistance(), k + 1);
 
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());

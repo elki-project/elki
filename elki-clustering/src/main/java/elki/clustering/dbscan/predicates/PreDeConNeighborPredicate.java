@@ -24,10 +24,8 @@ import elki.clustering.subspace.PreDeCon;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -87,12 +85,10 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
     this.settings = settings;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Instance instantiate(Database database) {
-    DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
-    Relation<V> relation = (Relation<V>) dq.getRelation();
-    RangeQuery<V> rq = database.getRangeQuery(dq);
+    Relation<V> relation = database.getRelation(distFunc.getInputTypeRestriction());
+    RangeQuery<V> rq = relation.getRangeQuery(distFunc);
     mvSize.reset();
     mvVar.reset();
     DataStore<PreDeConModel> storage = preprocess(PreDeConModel.class, relation, rq);
@@ -112,7 +108,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
             ", but you will need to experiment with these parameters and epsilon.");
       }
     }
-    return new Instance(dq.getRelation().getDBIDs(), storage);
+    return new Instance(relation.getDBIDs(), storage);
   }
 
   @Override

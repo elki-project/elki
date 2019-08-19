@@ -101,7 +101,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     Distance<? super O> df = clusterer.getDistance();
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, df);
+    DistanceQuery<O> dq = relation.getDistanceQuery(df);
 
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database, relation);

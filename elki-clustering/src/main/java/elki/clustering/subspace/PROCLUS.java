@@ -20,12 +20,7 @@
  */
 package elki.clustering.subspace;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import elki.clustering.AbstractProjectedClustering;
 import elki.data.Cluster;
@@ -35,21 +30,8 @@ import elki.data.Subspace;
 import elki.data.model.SubspaceModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
-import elki.database.datastore.DataStore;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.datastore.*;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -72,6 +54,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.pairs.Pair;
 import elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -133,15 +116,14 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Performs the PROCLUS algorithm on the given database.
    *
-   * @param database Database to process
    * @param relation Relation to process
    */
-  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<V> relation) {
     if(RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! (" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
-    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistance.STATIC);
-    RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
+    DistanceQuery<V> distFunc = relation.getDistanceQuery(SquaredEuclideanDistance.STATIC);
+    RangeQuery<V> rangeQuery = relation.getRangeQuery(distFunc);
     final Random random = rnd.getSingleThreadedRandom();
 
     // TODO: use a StepProgress!

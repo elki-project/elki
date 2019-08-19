@@ -29,7 +29,6 @@ import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -103,15 +102,14 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistance());
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
     final int size = ids.size();

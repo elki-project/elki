@@ -32,14 +32,16 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
-import elki.math.linearalgebra.pca.*;
+import elki.math.linearalgebra.pca.PCAFilteredResult;
+import elki.math.linearalgebra.pca.PCAResult;
+import elki.math.linearalgebra.pca.PCARunner;
+import elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import elki.utilities.documentation.Reference;
@@ -111,8 +113,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   @Override
   public Instance instantiate(Database database) {
     Relation<V> relation = database.getRelation(getInputTypeRestriction());
-    DistanceQuery<V> dq = database.getDistanceQuery(relation, distFunc);
-    RangeQuery<V> rq = database.getRangeQuery(dq);
+    RangeQuery<V> rq = relation.getRangeQuery(distFunc);
     mvSize.reset();
     mvSize2.reset();
     mvCorDim.reset();
@@ -139,7 +140,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
             + ", but you will need to experiment with these parameters and epsilon.");
       }
     }
-    return new Instance(dq.getRelation().getDBIDs(), storage);
+    return new Instance(relation.getDBIDs(), storage);
   }
 
   @Override

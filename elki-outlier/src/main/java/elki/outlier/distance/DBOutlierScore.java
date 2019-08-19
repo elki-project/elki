@@ -20,13 +20,11 @@
  */
 package elki.outlier.distance;
 
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -81,17 +79,16 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   }
 
   @Override
-  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
-    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistance());
-    RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
-    final double size = distFunc.getRelation().size();
+  protected DoubleDataStore computeOutlierScores(Relation<O> relation, double d) {
+    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
+    final int size = relation.size();
 
-    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("DBOutlier scores", distFunc.getRelation().size(), LOG) : null;
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("DBOutlier scores", relation.size(), LOG) : null;
     // TODO: use bulk when implemented.
-    for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // compute percentage of neighbors in the given neighborhood with size d
-      double n = rangeQuery.getRangeForDBID(iditer, d).size() / size;
+      double n = rangeQuery.getRangeForDBID(iditer, d).size() / (double) size;
       scores.putDouble(iditer, 1.0 - n);
       LOG.incrementProcessed(prog);
     }

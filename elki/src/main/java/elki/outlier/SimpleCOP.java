@@ -29,8 +29,6 @@ import elki.data.model.CorrelationAnalysisSolution;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
@@ -58,6 +56,7 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -112,10 +111,9 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
 
-  public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
-    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(data, getDistance(), k + 1);
-
-    DBIDs ids = data.getDBIDs();
+  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
+    KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
+    DBIDs ids = relation.getDBIDs();
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDataStore<double[]> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
@@ -123,25 +121,25 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
-      FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
+      FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
       double sqrt2 = MathUtil.SQRT2;
-      for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
         KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 
         // TODO: do we want to use the query point as centroid?
-        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(data, nids);
+        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(relation, nids);
 
         double stddev = depsol.getStandardDeviation();
-        double distance = FastMath.sqrt(depsol.squaredDistance(data.get(id)));
+        double distance = FastMath.sqrt(depsol.squaredDistance(relation.get(id)));
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
         cop_score.putDouble(id, prob);
 
-        cop_err_v.put(id, times(depsol.errorVector(data.get(id)), -1));
+        cop_err_v.put(id, times(depsol.errorVector(relation.get(id)), -1));
 
-        cop_datav.put(id, depsol.dataVector(data.get(id)));
+        cop_datav.put(id, depsol.dataVector(relation.get(id)));
 
         cop_dim.putInt(id, depsol.getCorrelationDimensionality());
 

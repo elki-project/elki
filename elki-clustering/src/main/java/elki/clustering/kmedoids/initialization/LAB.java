@@ -25,7 +25,6 @@ import java.util.Random;
 import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.NumberVector;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -88,7 +87,7 @@ public class LAB<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Database database, Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
     if(relation.size() < k) {
       throw new AbortException("Database has less than k objects.");
     }
@@ -98,7 +97,7 @@ public class LAB<O> implements KMeansInitialization, KMedoidsInitialization<O> {
     // Get a distance query
     @SuppressWarnings("unchecked")
     final PrimitiveDistance<? super O> distF = (PrimitiveDistance<? super O>) distanceFunction;
-    final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
+    final DistanceQuery<O> distQ = rel.getDistanceQuery(distF);
     DBIDs medids = chooseInitialMedoids(k, rel.getDBIDs(), distQ);
     double[][] medoids = new double[k][];
     DBIDIter iter = medids.iter();

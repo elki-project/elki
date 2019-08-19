@@ -23,9 +23,7 @@ package elki.algorithm.benchmark;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
@@ -103,15 +101,12 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
   /**
    * Run the algorithm.
    *
-   * @param database Database
    * @param relation Relation
    * @return Null result
    */
-  public Void run(Database database, Relation<O> relation) {
-    // Get a distance and kNN query instance.
-    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k);
-
+  public Void run(Relation<O> relation) {
+    // Get a kNN query instance.
+    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k);
     // No query set - use original database.
     if(queries == null) {
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);

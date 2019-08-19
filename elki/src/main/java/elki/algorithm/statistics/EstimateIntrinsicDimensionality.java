@@ -23,11 +23,9 @@ package elki.algorithm.statistics;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -45,8 +43,9 @@ import elki.utilities.random.RandomFactory;
 
 /**
  * Estimate global average intrinsic dimensionality of a data set.
- *
+ * <p>
  * Note: this algorithm does not produce a result, but only logs statistics.
+ * FIXME: make this an application instead?
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -89,7 +88,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     this.samples = samples;
   }
 
-  public Void run(Database database, Relation<O> relation) {
+  public Void run(Relation<O> relation) {
     DBIDs allids = relation.getDBIDs();
     // Number of samples to draw.
     int ssize = (int) ((samples > 1.) ? samples : Math.ceil(samples * allids.size()));
@@ -97,15 +96,12 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     int kk = 1 + (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
     DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
-
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistance());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, kk);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), kk);
 
     double[] idim = new double[ssize];
     int samples = 0;
     for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
-      idim[samples] = estimator.estimate(knnq, iter, kk);
-      ++samples;
+      idim[samples++] = estimator.estimate(knnq, iter, kk);
     }
     double id = (samples > 1) ? QuickSelect.median(idim, 0, samples) : -1;
     LOG.statistics(new DoubleStatistic(EstimateIntrinsicDimensionality.class.getName() + ".intrinsic-dimensionality", id));
@@ -170,7 +166,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
         estimator = estimatorP.instantiateClass(config);
       }
       DoubleParameter krateP = new DoubleParameter(KRATE_ID, 50) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(krateP)) {
         krate = krateP.doubleValue();
       }

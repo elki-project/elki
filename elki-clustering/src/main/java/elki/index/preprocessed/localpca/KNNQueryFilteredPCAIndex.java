@@ -21,7 +21,6 @@
 package elki.index.preprocessed.localpca;
 
 import elki.data.NumberVector;
-import elki.database.QueryUtil;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.knn.KNNQuery;
@@ -145,7 +144,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
     @Override
     public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      KNNQuery<V> knnquery = QueryUtil.getKNNQuery(relation, pcaDistance, k);
+      KNNQuery<V> knnquery = relation.getKNNQuery(pcaDistance, k);
       return new KNNQueryFilteredPCAIndex<>(relation, pca, filter, knnquery, k);
     }
 

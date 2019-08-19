@@ -61,8 +61,8 @@ public class NNDescentTest {
   public void testPreprocessor() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistance.STATIC);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -74,15 +74,15 @@ public class NNDescentTest {
         .with(NNDescent.Factory.Parameterizer.SEED_ID, 0) //
         .with(NNDescent.Factory.Parameterizer.DELTA_ID, 0.1) //
         .with(NNDescent.Factory.Parameterizer.RHO_ID, 0.5) //
-        .build().instantiate(rel);
+        .build().instantiate(relation);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
-    Metadata.hierarchyOf(rel).addChild(preproc);
+    Metadata.hierarchyOf(relation).addChild(preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k, 16);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k, 16);
     // also test partial queries, forward only
-    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2, 6);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2, 6);
   }
 }

@@ -22,16 +22,11 @@ package elki.outlier.spatial.neighborhood;
 
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -100,7 +95,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
 
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
-      KNNQuery<?> knnQuery = QueryUtil.getKNNQuery(relation, distFunc);
+      KNNQuery<?> knnQuery = relation.getKNNQuery(distFunc);
 
       // TODO: use bulk?
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBIDs.class);
