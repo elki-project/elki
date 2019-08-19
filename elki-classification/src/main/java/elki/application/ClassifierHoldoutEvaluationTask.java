@@ -31,13 +31,13 @@ import elki.data.type.TypeUtil;
 import elki.database.AbstractDatabase;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.FileBasedDatabaseConnection;
 import elki.datasource.MultipleObjectsBundleDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.evaluation.classification.ConfusionMatrix;
-import elki.evaluation.classification.holdout.AbstractHoldout;
 import elki.evaluation.classification.holdout.Holdout;
 import elki.evaluation.classification.holdout.StratifiedCrossValidation;
 import elki.evaluation.classification.holdout.TrainingAndTestSet;
@@ -51,9 +51,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Evaluate a classifier.
- *
+ * <p>
  * TODO: split into application and task.
- *
+ * <p>
  * TODO: add support for predefined test and training pairs!
  *
  * @author Erich Schubert
@@ -115,7 +115,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     for(int p = 0; p < holdout.numberOfPartitions(); p++) {
       TrainingAndTestSet partition = holdout.nextPartitioning();
       // Load the data set into a database structure (for indexing)
-      Duration dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".init.time").begin();
+      Duration dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".train.init").begin();
       Database db = new StaticArrayDatabase(new MultipleObjectsBundleDatabaseConnection(partition.getTraining()), indexFactories);
       db.initialize();
       LOG.statistics(dur.end());
@@ -124,17 +124,18 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
       Relation<ClassLabel> lrel = db.getRelation(TypeUtil.CLASSLABEL);
       algorithm.buildClassifier(db, lrel);
       LOG.statistics(dur.end());
+
       // Evaluate the test set
+      dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".test.init").begin();
+      Database testdb = new StaticArrayDatabase(new MultipleObjectsBundleDatabaseConnection(partition.getTest()));
+      testdb.initialize();
+      Relation<O> testdata = testdb.getRelation(algorithm.getInputTypeRestriction()[0]);
+      Relation<ClassLabel> testlabels = testdb.getRelation(TypeUtil.CLASSLABEL);
+      LOG.statistics(dur.end());
       dur = LOG.newDuration(this.getClass().getName() + ".fold-" + (p + 1) + ".evaluation.time").begin();
-      // FIXME: this part is still a big hack, unfortunately!
-      MultipleObjectsBundle test = partition.getTest();
-      int lcol = AbstractHoldout.findClassLabelColumn(test);
-      int tcol = (lcol == 0) ? 1 : 0;
-      for(int i = 0, l = test.dataLength(); i < l; ++i) {
-        @SuppressWarnings("unchecked")
-        O obj = (O) test.data(i, tcol);
-        ClassLabel truelbl = (ClassLabel) test.data(i, lcol);
-        ClassLabel predlbl = algorithm.classify(obj);
+      for(DBIDIter iter = testdata.iterDBIDs(); iter.valid(); iter.advance()) {
+        ClassLabel predlbl = algorithm.classify(testdata.get(iter));
+        ClassLabel truelbl = testlabels.get(iter);
         int pred = Collections.binarySearch(labels, predlbl);
         int real = Collections.binarySearch(labels, truelbl);
         confusion[pred][real]++;
@@ -161,7 +162,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     /**
      * Holds the database connection to get the initial data from.
      */
-    protected DatabaseConnection databaseConnection = null;
+    protected DatabaseConnection databaseConnection;
 
     /**
      * Indexes to add.
