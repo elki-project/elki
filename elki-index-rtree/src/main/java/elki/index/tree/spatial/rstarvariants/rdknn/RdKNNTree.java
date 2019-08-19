@@ -27,6 +27,7 @@ import java.util.List;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
@@ -34,10 +35,9 @@ import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
+import elki.index.DistancePriorityIndex;
 import elki.index.DynamicIndex;
-import elki.index.KNNIndex;
 import elki.index.RKNNIndex;
-import elki.index.RangeIndex;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.TreeIndexHeader;
@@ -66,7 +66,7 @@ import elki.utilities.pairs.DoubleObjPair;
  * @param <O> Object type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNode, RdKNNEntry, RdkNNSettings> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNode, RdKNNEntry, RdkNNSettings> implements DistancePriorityIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
    */
@@ -530,6 +530,20 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
       return null;
     }
     return RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, hints);
+  }
+
+  @Override
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if(distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    // Can we support this distance function - spatial distances only!
+    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
+      return null;
+    }
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
+    return RStarTreeUtil.getDistancePrioritySearcher(this, dq, hints);
   }
 
   @Override

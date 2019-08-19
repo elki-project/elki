@@ -20,13 +20,10 @@
  */
 package elki.index.tree.metrical.covertree;
 
-import java.util.logging.Level;
-
 import org.junit.Test;
 
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
-import elki.logging.LoggingConfiguration;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -41,10 +38,10 @@ public class SimplifiedCoverTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testCovertree() {
-    LoggingConfiguration.setVerbose(Level.FINEST);
     SimplifiedCoverTree.Factory<?> factory = new ELKIBuilder<>(SimplifiedCoverTree.Factory.class) //
         .with(SimplifiedCoverTree.Factory.Parameterizer.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
     testExactEuclidean(factory, SimplifiedCoverTree.CoverTreeKNNQuery.class, SimplifiedCoverTree.CoverTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, SimplifiedCoverTree.PrioritySearcher.class);
     testSinglePoint(factory, SimplifiedCoverTree.CoverTreeKNNQuery.class, SimplifiedCoverTree.CoverTreeRangeQuery.class);
   }
 }

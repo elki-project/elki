@@ -20,8 +20,7 @@
  */
 package elki.index;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -31,6 +30,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.*;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -249,6 +249,85 @@ public abstract class AbstractIndexStructureTest {
       DoubleDBIDList range = rangeq.getRangeForDBID(first, 0);
       assertEquals("Wrong number of range results", 1, range.size());
       assertTrue("Wrong range result", DBIDUtil.equal(range.iter(), first));
+    }
+  }
+
+  /**
+   * Actual test routine.
+   *
+   * @param inputparams
+   */
+  protected void testPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery) {
+    // Use a fixed DBID - historically, we used 1 indexed - to reduce random
+    // variation in results due to different hash codes everywhere.
+    ListParameterization inputparams = new ListParameterization() //
+        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    if(factory != null) {
+      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+    }
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
+    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistance.STATIC);
+
+    if(expectQuery != null) {
+      // get the 10 next neighbors
+      DoubleVector dv = DoubleVector.wrap(querypoint);
+      DistancePrioritySearcher<DoubleVector> prioq = db.getPrioritySearcher(dist, k);
+      assertTrue("Returned priority search is not of expected class: expected " + expectQuery + " got " + prioq.getClass(), expectQuery.isAssignableFrom(prioq.getClass()));
+
+      { // verify the knn result:
+        int i = 0;
+        ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
+        for(prioq.search(dv); prioq.valid(); prioq.advance()) {
+          double approx = prioq.getApproximateDistance(); // May be NaN
+          double atol = prioq.getApproximateAccuracy(); // May be NaN
+          double lb = prioq.getLowerBound(); // May be NaN
+          double ub = prioq.getUpperBound(); // May be NaN
+          double exact = prioq.computeExactDistance();
+          ids.add(exact, prioq);
+          assertFalse("Lower bound incorrect", exact < lb);
+          assertFalse("Upper bound incorrect", exact > ub);
+          assertFalse("Lower tolerance incorrect", exact < approx - atol);
+          assertFalse("Upper tolerance incorrect", exact > approx + atol);
+        }
+        ids.sort();
+        for(DoubleDBIDListIter res = ids.iter(); res.valid() && i < shouldd.length; res.advance(), i++) {
+          // Verify distance
+          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
+          // verify vector
+          DoubleVector c = rep.get(res);
+          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
+          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+        }
+      }
+      { // verify the knn result:
+        KNNList ids = prioq.getKNNForObject(dv, k);
+        assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
+
+        // verify that the neighbors match.
+        int i = 0;
+        for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
+          // Verify distance
+          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
+          // verify vector
+          DoubleVector c = rep.get(res);
+          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
+          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+        }
+      }
+      { // verify the range query result:
+        DoubleDBIDList ids = prioq.getRangeForObject(dv, eps);
+        assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
+        int i = 0;
+        for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
+          // Verify distance
+          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
+          // verify vector
+          DoubleVector c = rep.get(res);
+          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
+          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+        }
+      }
     }
   }
 }

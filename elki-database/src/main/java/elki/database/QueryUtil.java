@@ -22,8 +22,7 @@ package elki.database;
 
 import elki.data.NumberVector;
 import elki.database.query.DatabaseQuery;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.distance.PrimitiveDistanceQuery;
+import elki.database.query.distance.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
 import elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
@@ -286,5 +285,21 @@ public final class QueryUtil {
       return new LinearScanPrimitiveSimilarityRangeQuery<>(pdq);
     }
     return new LinearScanSimilarityRangeQuery<>(simQuery);
+  }
+
+  /**
+   * Get a linear scan query for the given similarity query.
+   *
+   * @param <O> Object type
+   * @param distanceQuery distance query
+   * @return Priority searcher
+   */
+  @SuppressWarnings("unchecked")
+  public static <O> DistancePrioritySearcher<O> getLinearScanPrioritySearcher(DistanceQuery<O> distanceQuery) {
+    if(EuclideanDistance.STATIC.equals(distanceQuery.getDistance())) {
+      final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) distanceQuery;
+      return (DistancePrioritySearcher<O>) new LinearScanEuclideanDistancePrioritySearcher<>(ndq);
+    }
+    return new LinearScanDistancePrioritySearcher<>(distanceQuery);
   }
 }

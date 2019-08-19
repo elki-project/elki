@@ -29,15 +29,8 @@ import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDRef;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
-import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
-import elki.distance.Distance;
-import elki.similarity.Similarity;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -94,9 +87,8 @@ public abstract class AbstractDatabase implements Database {
     }
     catch(RuntimeException e) {
       if(id == null) {
-        throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!");
+        throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!", e);
       }
-      // throw e upwards.
       throw e;
     }
   }
@@ -120,44 +112,6 @@ public abstract class AbstractDatabase implements Database {
       types.add(relation.getDataTypeInformation());
     }
     throw new NoSupportedDataTypeException(restriction, types);
-  }
-
-  @Override
-  public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, Distance<? super O> distanceFunction, Object... hints) {
-    return objQuery.getDistanceQuery(distanceFunction, hints);
-  }
-
-  @Override
-  public <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> objQuery, Similarity<? super O> similarityFunction, Object... hints) {
-    return objQuery.getSimilarityQuery(similarityFunction, hints);
-  }
-
-  @Override
-  public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
-    return relation.getKNNQuery(distanceQuery, hints);
-  }
-
-  @Override
-  public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
-    return relation.getRangeQuery(distanceQuery, hints);
-  }
-
-  @Override
-  public <O> RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> relation = (Relation<O>) simQuery.getRelation();
-    return relation.getSimilarityRangeQuery(simQuery, hints);
-  }
-
-  @Override
-  public <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
-    return relation.getRKNNQuery(distanceQuery, hints);
   }
 
   @Override

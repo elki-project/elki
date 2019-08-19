@@ -22,6 +22,7 @@ package elki.database.relation;
 
 import elki.database.QueryUtil;
 import elki.database.query.DatabaseQuery;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -122,9 +123,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(getLogger().isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder(200) //
           .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery).append('\n');
+          .append("Distance query: ").append(distanceQuery);
       if(hints.length > 0) {
-        buf.append("Hints:");
+        buf.append("\nHints:");
         for(Object o : hints) {
           buf.append(' ').append(o);
         }
@@ -158,9 +159,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(getLogger().isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder(200) //
           .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery).append('\n');
+          .append("Distance query: ").append(distanceQuery);
       if(hints.length > 0) {
-        buf.append("Hints:");
+        buf.append("\nHints:");
         for(Object o : hints) {
           buf.append(' ').append(o);
         }
@@ -194,9 +195,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(getLogger().isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder(200) //
           .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(simQuery).append('\n');
+          .append("Distance query: ").append(simQuery);
       if(hints.length > 0) {
-        buf.append("Hints:");
+        buf.append("\nHints:");
         for(Object o : hints) {
           buf.append(' ').append(o);
         }
@@ -234,9 +235,9 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     if(getLogger().isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder(200) //
           .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
-          .append("Distance query: ").append(distanceQuery).append('\n');
+          .append("Distance query: ").append(distanceQuery);
       if(hints.length > 0) {
-        buf.append("Hints:");
+        buf.append("\nHints:");
         for(Object o : hints) {
           buf.append(' ').append(o);
         }
@@ -245,6 +246,42 @@ public abstract class AbstractRelation<O> implements Relation<O> {
     }
     KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
+  }
+
+  @Override
+  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object[] hints) {
+    if(distanceQuery == null) {
+      throw new AbortException("Range query requested for 'null' distance!");
+    }
+    for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(this).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
+      DistancePrioritySearcher<O> q = it.get().getPriorityQuery(distanceQuery, hints);
+      if(getLogger().isDebuggingFinest()) {
+        getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    if(getLogger().isDebuggingFinest()) {
+      StringBuilder buf = new StringBuilder(200) //
+          .append("Fallback to linear scan - no index was able to accelerate this query.\n") //
+          .append("Distance query: ").append(distanceQuery);
+      if(hints.length > 0) {
+        buf.append("\nHints:");
+        for(Object o : hints) {
+          buf.append(' ').append(o);
+        }
+      }
+      getLogger().debugFinest(buf.toString());
+    }
+    return QueryUtil.getLinearScanPrioritySearcher(distanceQuery);
   }
 
   /**

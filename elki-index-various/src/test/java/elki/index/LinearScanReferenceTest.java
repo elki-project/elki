@@ -22,6 +22,7 @@ package elki.index;
 
 import org.junit.Test;
 
+import elki.database.query.distance.LinearScanEuclideanDistancePrioritySearcher;
 import elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
 import elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
 import elki.database.query.range.LinearScanEuclideanDistanceRangeQuery;
@@ -40,6 +41,7 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
   @Test
   public void testExact() {
     testExactEuclidean(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
+    testPrioritySearchEuclidean(null, LinearScanEuclideanDistancePrioritySearcher.class);
     testSinglePoint(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
   }
 

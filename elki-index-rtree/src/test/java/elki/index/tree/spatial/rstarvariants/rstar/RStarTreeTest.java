@@ -25,6 +25,7 @@ import org.junit.Test;
 import elki.data.NumberVector;
 import elki.index.AbstractIndexStructureTest;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import elki.index.tree.spatial.rstarvariants.query.EuclideanRStarTreeDistancePrioritySearcher;
 import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
 import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
 import elki.index.tree.spatial.rstarvariants.strategies.bulk.*;
@@ -56,6 +57,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -73,6 +75,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -87,6 +90,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -101,6 +105,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -115,6 +120,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, GreeneSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -129,6 +135,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -143,6 +150,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -157,6 +165,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -171,6 +180,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -187,6 +197,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, ZCurveSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -203,6 +214,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, HilbertSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -219,6 +231,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, PeanoSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -235,6 +248,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, BinarySplitSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -249,6 +263,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -264,6 +279,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
@@ -279,6 +295,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
     testExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }

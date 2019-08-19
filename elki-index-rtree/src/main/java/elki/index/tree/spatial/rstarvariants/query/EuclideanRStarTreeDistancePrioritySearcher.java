@@ -22,7 +22,7 @@ package elki.index.tree.spatial.rstarvariants.query;
 
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
-import elki.database.query.DistancePrioritySearcher;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;

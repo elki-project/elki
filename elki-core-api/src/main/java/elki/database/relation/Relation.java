@@ -27,6 +27,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.query.DatabaseQuery;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -175,8 +176,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @return KNN Query object
    */
   default KNNQuery<O> getKNNQuery(Distance<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getKNNQuery(distanceQuery, hints);
+    return getKNNQuery(getDistanceQuery(distanceFunction, hints), hints);
   }
 
   /**
@@ -224,8 +224,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @return KNN Query object
    */
   default RangeQuery<O> getRangeQuery(Distance<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getRangeQuery(distanceQuery, hints);
+    return getRangeQuery(getDistanceQuery(distanceFunction, hints), hints);
   }
 
   /**
@@ -273,8 +272,7 @@ public interface Relation<O> extends DatabaseQuery {
    * @return KNN Query object
    */
   default RangeQuery<O> getSimilarityRangeQuery(Similarity<? super O> simFunction, Object... hints) {
-    SimilarityQuery<O> simQuery = getSimilarityQuery(simFunction, hints);
-    return getSimilarityRangeQuery(simQuery, hints);
+    return getSimilarityRangeQuery(getSimilarityQuery(simFunction, hints), hints);
   }
 
   /**
@@ -320,7 +318,50 @@ public interface Relation<O> extends DatabaseQuery {
    * @return KNN Query object
    */
   default RKNNQuery<O> getRKNNQuery(Distance<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getRKNNQuery(distanceQuery, hints);
+    return getRKNNQuery(getDistanceQuery(distanceFunction, hints), hints);
+  }
+
+  /**
+   * Get a priority search object for the given distance query. It will
+   * incrementally provide results in approximately ascending order.
+   * <p>
+   * An index is used when possible, but it may fall back to a linear scan.
+   * <p>
+   * Hints include:
+   * <ul>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
+   * </ul>
+   *
+   * @param distance Distance function
+   * @param hints Optimizer hints
+   * @return Priority searcher
+   */
+  DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object[] hints);
+
+  /**
+   * Get a priority search object for the given distance function. It will
+   * incrementally provide results in approximately ascending order.
+   * <p>
+   * An index is used when possible, but it may fall back to a linear scan.
+   * <p>
+   * Hints include:
+   * <ul>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
+   * </ul>
+   *
+   * @param distance Distance function
+   * @param hints Optimizer hints
+   * @return Priority searcher
+   */
+  default DistancePrioritySearcher<O> getPrioritySearcher(Distance<O> distance, Object... hints) {
+    return getPrioritySearcher(getDistanceQuery(distance, hints), hints);
   }
 }

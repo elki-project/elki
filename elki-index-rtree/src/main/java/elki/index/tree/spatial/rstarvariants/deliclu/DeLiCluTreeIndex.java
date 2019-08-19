@@ -24,19 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.data.NumberVector;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
+import elki.index.DistancePriorityIndex;
 import elki.index.DynamicIndex;
-import elki.index.KNNIndex;
-import elki.index.RangeIndex;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
@@ -52,7 +48,7 @@ import elki.utilities.exceptions.AbortException;
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implements KNNIndex<O>, RangeIndex<O>, DynamicIndex {
+public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implements DistancePriorityIndex<O>, DynamicIndex {
   /**
    * The relation we index.
    */
@@ -222,6 +218,20 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
     }
     SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
+  }
+
+  @Override
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if(distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    // Can we support this distance function - spatial distances only!
+    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
+      return null;
+    }
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
+    return RStarTreeUtil.getDistancePrioritySearcher(this, dq, hints);
   }
 
   @Override

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import elki.database.ids.*;
-import elki.database.query.DistancePrioritySearcher;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;

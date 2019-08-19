@@ -20,7 +20,7 @@
  */
 package elki.index;
 
-import elki.database.query.DistancePrioritySearcher;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;

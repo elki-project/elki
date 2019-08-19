@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query;
+package elki.database.query.distance;
 
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
@@ -26,16 +26,21 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
 import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.query.DatabaseQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 
 /**
- * Distance priority-based searcher.
- * 
+ * Distance priority-based searcher. When used with an index, this will return
+ * relevant objects in - approximately - increasing order. But unless you give
+ * the hint {@link DatabaseQuery#HINT_OPTIMIZED_ONLY}, the system may fall back
+ * to a slow linear scan that returns objects in arbitrary order, if no suitable
+ * index is available.
+ *
  * @author Erich Schubert
- * 
+ *
  * @opt nodefillcolor LemonChiffon
- * 
+ *
  * @param <O> Object type
  */
 public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>, DBIDIter {
@@ -51,7 +56,7 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   }
 
   /**
-   * Search function with callback.
+   * Start search with a new object and threshold.
    *
    * @param query Query object
    * @param threshold Distance threshold
@@ -62,7 +67,7 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   }
 
   /**
-   * Search function with callback.
+   * Start search with a new object.
    *
    * @param query Query object
    * @return {@code this}, for chaining
@@ -70,7 +75,7 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   DistancePrioritySearcher<O> search(DBIDRef query);
 
   /**
-   * Search function with callback.
+   * Start search with a new object.
    *
    * @param query Query object
    * @return {@code this}, for chaining

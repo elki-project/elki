@@ -28,6 +28,7 @@ import elki.database.datastore.DataStoreEvent;
 import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDRef;
 import elki.database.query.DatabaseQuery;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -87,7 +88,9 @@ public interface Database {
    * @param hints Optimizer hints
    * @return Instance to query the database with this distance
    */
-  <O> DistanceQuery<O> getDistanceQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints);
+  default <O> DistanceQuery<O> getDistanceQuery(Relation<O> relation, Distance<? super O> distanceFunction, Object... hints) {
+    return relation.getDistanceQuery(distanceFunction, hints);
+  }
 
   /**
    * Get the similarity query for a particular similarity function.
@@ -98,20 +101,23 @@ public interface Database {
    * @param hints Optimizer hints
    * @return Instance to query the database with this similarity
    */
-  <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> relation, Similarity<? super O> similarityFunction, Object... hints);
+  default <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> relation, Similarity<? super O> similarityFunction, Object... hints) {
+    return relation.getSimilarityQuery(similarityFunction, hints);
+  }
 
   /**
    * Get a KNN query object for the given distance query.
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
    * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
    * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
-   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -119,22 +125,27 @@ public interface Database {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  default <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getKNNQuery(distanceQuery, hints);
+  }
 
   /**
    * Get a range query object for the given distance query for radius-based
    * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
    * rectangular query windows.)
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Double: Maximum query range that will be used.</li>
    * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
    * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
    * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
-   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -142,22 +153,27 @@ public interface Database {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  default <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getRangeQuery(distanceQuery, hints);
+  }
 
   /**
    * Get a range query object for the given distance query for radius-based
    * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
    * rectangular query windows.)
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Double: Minimum query similarity that will be used.</li>
    * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
    * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
    * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
-   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -165,20 +181,51 @@ public interface Database {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O> RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints);
+  default <O> RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) simQuery.getRelation();
+    return relation.getSimilarityRangeQuery(simQuery, hints);
+  }
+
+  /**
+   * Get a priority search object for the given distance query. It will
+   * incrementally provide results in approximately ascending order.
+   * <p>
+   * An index is used when possible, but it may fall back to a linear scan.
+   * <p>
+   * Hints include:
+   * <ul>
+   * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
+   * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
+   * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
+   * </ul>
+   *
+   * @param <O> Object type
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints
+   * @return Priority searcher
+   */
+  default <O> DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getPrioritySearcher(distanceQuery, hints);
+  }
 
   /**
    * Get a rKNN query object for the given distance query.
-   *
+   * <p>
    * An index is used when possible, but it may fall back to a linear scan.
-   *
+   * <p>
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link DatabaseQuery#HINT_EXACT} -- no approximative indexes</li>
    * <li>{@link DatabaseQuery#HINT_OPTIMIZED_ONLY} -- no linear scans</li>
    * <li>{@link DatabaseQuery#HINT_HEAVY_USE} -- recommend optimization</li>
-   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive optimization</li>
+   * <li>{@link DatabaseQuery#HINT_SINGLE} -- discourage expensive
+   * optimization</li>
    * </ul>
    *
    * @param <O> Object type
@@ -186,7 +233,11 @@ public interface Database {
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  default <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getRKNNQuery(distanceQuery, hints);
+  }
 
   /**
    * Returns the DatabaseObject represented by the specified id.

@@ -24,19 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.data.NumberVector;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
+import elki.index.DistancePriorityIndex;
 import elki.index.DynamicIndex;
-import elki.index.KNNIndex;
-import elki.index.RangeIndex;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
@@ -53,7 +49,7 @@ import elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree implements DistancePriorityIndex<O>, DynamicIndex {
   /**
    * The relation we index
    */
@@ -117,13 +113,13 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
     // Make an example leaf
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<>(ids.size());
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }
       bulkLoad(leafs);
     }
     else {
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         insert(iter);
       }
     }
@@ -151,7 +147,7 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       delete(DBIDUtil.deref(iter));
     }
   }
@@ -182,6 +178,20 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
     }
     SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
+  }
+
+  @Override
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if(distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    // Can we support this distance function - spatial distances only!
+    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
+      return null;
+    }
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
+    return RStarTreeUtil.getDistancePrioritySearcher(this, dq, hints);
   }
 
   @Override

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import elki.database.ids.*;
-import elki.database.query.DistancePrioritySearcher;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -525,6 +525,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       }
       final Node cur = pq.peekValue();
       routingDist = prio + cur.maxDist; // Restore distance to center.
+      maxDist = cur.maxDist; // Accuracy for bounds
       candidates = cur.singletons.iter(); // Routing object initially
       pq.poll(); // Remove
 
