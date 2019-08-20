@@ -96,7 +96,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * Data Slicing
      *
      * @param len No of data instances
-     * @param nonRefIndex Index (see correctedRank()) for the dimension that is not the reference dimension
+     * @param nonRefIndex Index (see correctedRank()) computed for the dimension that is not the reference dimension
      * @return Array of booleans that states which instances are part of the slice
      */
 
@@ -120,6 +120,15 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
 
         return slice;
     }
+
+    /**
+     * Subclass should implement statistical test returning a p-value
+     *
+     * @param len No of data instances
+     * @param slice Return value of randomSlice(), boolean array indicating which instance is in the slice (by index)
+     * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
+     * @return
+     */
 
     protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
 

@@ -85,7 +85,7 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      * of source paper.
      * @param len No of data instances
      * @param slice Return value of randomSlice() created with the index that is not for the reference dimension
-     * @param corrected_ranks Index, return value of corrected_ranks() of the reference dimension
+     * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
      * @return p-value from two sided Mann-Whitney-U test
      */
 
