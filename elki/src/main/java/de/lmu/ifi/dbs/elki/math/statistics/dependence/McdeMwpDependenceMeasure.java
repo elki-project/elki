@@ -90,7 +90,7 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      */
 
     protected double statistical_test(int len, boolean[] slice, MwpIndex[] corrected_ranks){
-        final Random random = rnd.getSingleThreadedRandom(); // TODO: No "safeCut", make safecut?
+        final Random random = rnd.getSingleThreadedRandom();
         final int start = random.nextInt((int) (len * (1 - this.beta)));
         final int end = start + (int) Math.ceil(len * this.beta);
 
