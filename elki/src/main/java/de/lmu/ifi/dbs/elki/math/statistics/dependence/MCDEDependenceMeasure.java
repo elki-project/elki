@@ -40,17 +40,13 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
     protected int m = 50;
 
     /**
-     * Alpha threshold.
-     */
-
-    /**
      * Expected share of instances in slice (independent dimensions).
      */
     protected double alpha = 0.5;
 
     /**
      * Expected share of instances in marginal restriction (reference dimension). Note that in the original paper
-     * alpha = beta and there is no explicit distinction between the parameters.
+     * alpha = beta and as such there is no explicit distinction between the parameters.
      */
 
     protected double beta = 0.5;
@@ -176,5 +172,4 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
         return mwp / m;
     }
 
-    // TODO: Parametizer class
 }
