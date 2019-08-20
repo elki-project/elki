@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
+import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
@@ -59,7 +60,10 @@ public class Testing {
 
         NumberArrayAdapter adapter = DoubleArrayAdapter.STATIC;
         RandomFactory rnd = new RandomFactory((long) Math.random());
-        McdeMwpDependenceMeasure mwp = new McdeMwpDependenceMeasure(1000, 0.5, 0.5, rnd);
+
+        McdeMwpDependenceMeasure mwp = new ELKIBuilder<>(McdeMwpDependenceMeasure.class) //
+                .with(McdeMwpDependenceMeasure.Parameterizer.M_ID, 1000) //
+                .build();
 
         test_result(indi1, indi2, 0.65, 0.35, 0.67, 0.33, adapter, mwp);
         test_result(lin1, lin2, 1.0, 0.99, 1.0, 0.97, adapter, mwp);
