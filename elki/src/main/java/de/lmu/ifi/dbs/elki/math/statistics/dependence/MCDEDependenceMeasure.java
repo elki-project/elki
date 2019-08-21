@@ -83,7 +83,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * @param adapter ELKI NumberArrayAdapter Subclass
      * @param data One dimensional array containing one dimension of the data
      * @param idx Return value of sortedIndex()
-     * @return Array of doubles, acting as rank index
+     * @return Array of RankStruct, acting as rank index
      */
 
     protected abstract <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
@@ -123,14 +123,14 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * @param len No of data instances
      * @param slice Return value of randomSlice(), boolean array indicating which instance is in the slice (by index)
      * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
-     * @return
+     * @return p-value of given statistical test
      */
 
     protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
 
     /**
      * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
-     * Note: Data may not contain NaN values.
+     * Note: Data must not contain NaN values.
      *
      * @param adapter1 First data adapter
      * @param data1 First data set
