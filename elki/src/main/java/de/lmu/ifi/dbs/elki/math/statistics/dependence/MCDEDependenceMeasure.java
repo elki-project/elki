@@ -27,9 +27,9 @@ import java.util.Random;
 
 @Reference(authors = "Edouard Fouché, Klemens Böhm", //
         title = "Monte Carlo Density Estimation", //
-        booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", // TODO: Fill out
-        url = "https://doi.org/10.1145/2463676.2463696", //
-        bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
+        booktitle = "Proceedings of the 31st International Conference on Scientific and Statistical Database Management (SSDBM 2019)",
+        url = "http://doi.acm.org/10.1145/3335783.3335795", //
+        bibkey = "DBLP:conf/ssdbm/FouchéB19")
 
 public abstract class MCDEDependenceMeasure<R extends RankStruct> extends AbstractDependenceMeasure {
 
