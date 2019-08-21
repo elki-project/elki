@@ -72,7 +72,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * Overloaded wrapper for corrected_ranks()
      */
 
-    protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks() but problem with static...
+    protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
         return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
     }
 
@@ -153,7 +153,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
         final R[] index_1 = corrected_ranks(adapter2, data2, len);
 
         double mwp = 0;
-        for(int i = 0; i < this.m; i++){ // TODO: could also be done through modulo so that we avoid the random generation
+        for(int i = 0; i < this.m; i++){
             int r = random.nextInt(2);
             R[] ref_index;
             R[] other_index;
