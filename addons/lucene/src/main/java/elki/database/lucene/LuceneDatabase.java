@@ -53,11 +53,6 @@ public class LuceneDatabase extends AbstractDatabase {
   public static final Logging LOG = Logging.getLogger(LuceneDatabase.class);
 
   /**
-   * IDs of this database
-   */
-  private DBIDRange ids;
-
-  /**
    * The DBID representation we use
    */
   private DBIDView idrep;
@@ -66,11 +61,6 @@ public class LuceneDatabase extends AbstractDatabase {
    * Lucene database directory.
    */
   private Directory directory;
-
-  /**
-   * Lucene index reader.
-   */
-  private IndexReader reader;
 
   /**
    * Document representation.
@@ -90,8 +80,8 @@ public class LuceneDatabase extends AbstractDatabase {
   @Override
   public void initialize() {
     try {
-      reader = IndexReader.open(directory);
-      ids = DBIDUtil.generateStaticDBIDRange(reader.maxDoc());
+      IndexReader reader = IndexReader.open(directory);
+      DBIDRange ids = DBIDUtil.generateStaticDBIDRange(reader.maxDoc());
 
       // ID relation:
       idrep = new DBIDView(ids);

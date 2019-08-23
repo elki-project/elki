@@ -77,7 +77,6 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
   /**
    * Runs the algorithm in the timed evaluation part.
    * 
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */

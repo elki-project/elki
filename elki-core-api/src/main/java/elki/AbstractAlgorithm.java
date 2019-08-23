@@ -53,10 +53,8 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
   @SuppressWarnings("unchecked")
   @Override
   public R run(Database database) {
-    final Object[] relations1;
-    final Class<?>[] signature1;
-    final Object[] relations2;
-    final Class<?>[] signature2;
+    final Object[] relations1, relations2;
+    final Class<?>[] signature1, signature2;
     // Build candidate method signatures
     {
       final TypeInformation[] inputs = getInputTypeRestriction();
@@ -125,11 +123,6 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
     throw new APIViolationException("No appropriate 'run' method found.");
   }
 
-  /**
-   * Get the input type restriction used for negotiating the data query.
-   *
-   * @return Type restriction
-   */
   @Override
   public abstract TypeInformation[] getInputTypeRestriction();
 

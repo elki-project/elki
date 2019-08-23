@@ -40,7 +40,6 @@ public interface AffinityPropagationInitialization<O> {
   /**
    * Compute the initial similarity matrix.
    * 
-   * @param db Database
    * @param relation Data relation
    * @param ids indexed DBIDs
    * @return Similarity matrix

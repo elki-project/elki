@@ -336,7 +336,7 @@ public interface Relation<O> extends DatabaseQuery {
    * optimization</li>
    * </ul>
    *
-   * @param distance Distance function
+   * @param distanceQuery Distance function
    * @param hints Optimizer hints
    * @return Priority searcher
    */

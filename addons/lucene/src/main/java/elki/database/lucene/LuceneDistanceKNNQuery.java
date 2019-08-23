@@ -65,8 +65,9 @@ public class LuceneDistanceKNNQuery implements KNNQuery<Document> {
 
   /**
    * Constructor.
-   * 
-   * @param distanceQuery Distance query
+   *
+   * @param ir Index reader
+   * @param range ID range
    */
   public LuceneDistanceKNNQuery(IndexReader ir, DBIDRange range) {
     this.range = range;

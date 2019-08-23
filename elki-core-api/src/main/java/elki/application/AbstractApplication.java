@@ -183,6 +183,7 @@ public abstract class AbstractApplication {
     }
     catch(Exception e) {
       printErrorMessage(e);
+      System.exit(1);
     }
   }
 
@@ -314,10 +315,7 @@ public abstract class AbstractApplication {
     protected File getParameterOutputFile(Parameterization config, String description) {
       final FileParameter outputP = new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
       outputP.setShortDescription(description);
-      if(config.grab(outputP)) {
-        return outputP.getValue();
-      }
-      return null;
+      return config.grab(outputP) ? outputP.getValue() : null;
     }
 
     /**
@@ -340,10 +338,7 @@ public abstract class AbstractApplication {
     protected File getParameterInputFile(Parameterization config, String description) {
       final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       inputP.setShortDescription(description);
-      if(config.grab(inputP)) {
-        return inputP.getValue();
-      }
-      return null;
+      return config.grab(inputP) ? inputP.getValue() : null;
     }
 
     /**

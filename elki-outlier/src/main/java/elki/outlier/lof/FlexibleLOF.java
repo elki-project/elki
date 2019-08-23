@@ -58,7 +58,6 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.pairs.Pair;
 
 /**
  * Flexible variant of the "Local Outlier Factor" algorithm.
@@ -150,32 +149,15 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(relation, stepprog);
-    KNNQuery<O> kNNRefer = pair.getFirst();
-    KNNQuery<O> kNNReach = pair.getSecond();
-    return doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog).getResult();
-  }
-
-  /**
-   * Get the kNN queries for the algorithm.
-   *
-   * @param relation the data
-   * @param stepprog the progress logger
-   * @return the kNN queries for the algorithm
-   */
-  private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
     DistanceQuery<O> distQ = relation.getDistanceQuery(reachabilityDistance, DatabaseQuery.HINT_HEAVY_USE);
     // "HEAVY" flag for knnReach since it is used more than once
     KNNQuery<O> knnReach = relation.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
-        if(referenceDistance.equals(reachabilityDistance)) {
-          stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", LOG);
-        }
-        else {
-          stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
-        }
+        stepprog.beginStep(1, referenceDistance.equals(reachabilityDistance) ? //
+            "Materializing neighborhoods w.r.t. reference neighborhood distance function." //
+            : "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
       }
       int kpreproc = (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach;
       knnReach = DatabaseUtil.precomputedKNNQuery(relation, reachabilityDistance, kpreproc);
@@ -183,12 +165,11 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
 
     // knnReach is only used once
     KNNQuery<O> knnRefer = knnReach;
-    if(referenceDistance != reachabilityDistance && !referenceDistance.equals(reachabilityDistance)) {
+    if(!referenceDistance.equals(reachabilityDistance)) {
       // do not materialize the first neighborhood, since it is used only once
       knnRefer = relation.getKNNQuery(referenceDistance, krefer);
     }
-
-    return new Pair<>(knnRefer, knnReach);
+    return doRunInTime(relation.getDBIDs(), knnRefer, knnReach, stepprog).getResult();
   }
 
   /**
@@ -276,8 +257,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
   protected void computeLOFs(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double lof;
-      final double lrdp = lrds.doubleValue(iter);
+      final double lof, lrdp = lrds.doubleValue(iter);
       final KNNList neighbors = knnq.getKNNForDBID(iter, krefer);
       if(!Double.isInfinite(lrdp)) {
         double sum = 0.;
@@ -525,21 +505,11 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
       IntParameter pK2 = new IntParameter(KREACH_ID)//
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(pK2)) {
-        kreach = pK2.intValue();
-      }
-      else {
-        kreach = krefer;
-      }
+      kreach = config.grab(pK2) ? pK2.intValue() : krefer;
 
       ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class);
       reachDistP.setOptional(true);
-      if(config.grab(reachDistP)) {
-        reachabilityDistance = reachDistP.instantiateClass(config);
-      }
-      else {
-        reachabilityDistance = distanceFunction;
-      }
+      reachabilityDistance = config.grab(reachDistP) ? reachDistP.instantiateClass(config) : distanceFunction;
     }
 
     @Override

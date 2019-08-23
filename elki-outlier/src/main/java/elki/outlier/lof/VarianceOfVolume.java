@@ -114,7 +114,6 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
   /**
    * Runs the VOV algorithm on the given database.
    *
-   * @param database Database to query
    * @param relation Data to process
    * @return VOV outlier result
    */

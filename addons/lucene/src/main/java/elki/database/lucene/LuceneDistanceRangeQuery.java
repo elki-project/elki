@@ -62,8 +62,9 @@ public class LuceneDistanceRangeQuery implements RangeQuery<Document> {
 
   /**
    * Constructor.
-   * 
-   * @param distanceQuery Distance query
+   *
+   * @param ir Index reader
+   * @param ids ID range
    */
   public LuceneDistanceRangeQuery(IndexReader ir, DBIDRange ids) {
     super();
