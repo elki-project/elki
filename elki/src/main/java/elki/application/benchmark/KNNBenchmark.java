@@ -18,17 +18,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.algorithm.benchmark;
+package elki.application.benchmark;
 
 import elki.AbstractDistanceBasedAlgorithm;
+import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
-import elki.data.type.TypeUtil;
+import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -42,9 +44,10 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+import elki.workflow.InputStep;
 
 /**
- * Benchmarking algorithm that computes the k nearest neighbors for each query
+ * Benchmarking experiment that computes the k nearest neighbors for each query
  * point. The query points can either come from a separate data source, or from
  * the original database.
  *
@@ -55,11 +58,11 @@ import elki.utilities.random.RandomFactory;
  *
  * @assoc - - - KNNQuery
  */
-public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
+public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KNNBenchmarkAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(KNNBenchmark.class);
 
   /**
    * Number of neighbors to retrieve.
@@ -84,29 +87,30 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
   /**
    * Constructor.
    *
+   * @param inputstep Input step
    * @param distanceFunction Distance function to use
    * @param k K parameter
    * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
    * @param random Random factory
    */
-  public KNNBenchmarkAlgorithm(Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
-    super(distanceFunction);
+  public KNNBenchmark(InputStep inputstep, Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
+    super(inputstep, distanceFunction);
     this.k = k;
     this.queries = queries;
     this.sampling = sampling;
     this.random = random;
   }
 
-  /**
-   * Run the algorithm.
-   *
-   * @param relation Relation
-   * @return Null result
-   */
-  public Void run(Relation<O> relation) {
+  @Override
+  public void run() {
+    if(!LOG.isStatistics()) {
+      LOG.error("Logging level should be at least level STATISTICS (parameter -time) to see any output.");
+    }
+    Database database = inputstep.getDatabase();
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     // Get a kNN query instance.
-    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k);
+    KNNQuery<O> knnQuery = relation.getKNNQuery(distance, k);
     // No query set - use original database.
     if(queries == null) {
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
@@ -135,7 +139,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
     }
     else {
       // Separate query set.
-      TypeInformation res = getDistance().getInputTypeRestriction();
+      TypeInformation res = distance.getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
       int col = -1;
       for(int i = 0; i < bundle.metaLength(); i++) {
@@ -178,17 +182,6 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
         }
       }
     }
-    return null;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**
@@ -200,7 +193,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedApplication.Parameterizer<O> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -244,6 +237,13 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      // Data input
+      inputstep = config.tryInstantiate(InputStep.class);
+      // Distance function
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      if(config.grab(distP)) {
+        distance = distP.instantiateClass(config);
+      }
       IntParameter kP = new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
@@ -267,8 +267,8 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<Dis
     }
 
     @Override
-    protected KNNBenchmarkAlgorithm<O> makeInstance() {
-      return new KNNBenchmarkAlgorithm<>(distanceFunction, k, queries, sampling, random);
+    protected KNNBenchmark<O> makeInstance() {
+      return new KNNBenchmark<>(inputstep, distance, k, queries, sampling, random);
     }
   }
 }

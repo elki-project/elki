@@ -120,6 +120,13 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     super.setValue(obj);
   }
 
+  // Override the return type
+  @Override
+  public ObjectParameter<C> setOptional(boolean opt) {
+    super.setOptional(opt);
+    return this;
+  }
+
   /**
    * Returns a string representation of the parameter's type.
    * 

@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.algorithm.benchmark;
+package elki.application.benchmark;
 
 import java.util.regex.Pattern;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
-import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.QueryUtil;
@@ -45,6 +44,7 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.random.RandomFactory;
+import elki.workflow.InputStep;
 
 /**
  * Algorithm to validate the quality of an approximative kNN index, by
@@ -58,7 +58,7 @@ import elki.utilities.random.RandomFactory;
  * 
  * @assoc - - - KNNQuery
  */
-public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
+public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedApplication<O> {
   /**
    * The logger for this class.
    */
@@ -97,6 +97,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
   /**
    * Constructor.
    * 
+   * @param input Data input
    * @param distanceFunction Distance function to use
    * @param k K parameter
    * @param queries Query data set (may be null!)
@@ -105,8 +106,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    * @param forcelinear Force the use of linear scanning.
    * @param pattern
    */
-  public ValidateApproximativeKNNIndex(Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
-    super(distanceFunction);
+  public ValidateApproximativeKNNIndex(InputStep input, Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
+    super(input, distanceFunction);
     this.k = k;
     this.queries = queries;
     this.sampling = sampling;
@@ -115,31 +116,29 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
     this.pattern = pattern;
   }
 
-  /**
-   * Run the algorithm.
-   * 
-   * @param database Database
-   * @param relation Relation
-   * @return Null result
-   */
-  public Void run(Database database, Relation<O> relation) {
+  @Override
+  public void run() {
+    if(!LOG.isStatistics()) {
+      LOG.error("Logging level should be at least level STATISTICS (parameter -time) to see any output.");
+    }
+    Database database = inputstep.getDatabase();
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     // Approximate query:
-    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnQuery = relation.getKNNQuery(distance, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
       throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     // Exact query:
-    KNNQuery<O> truekNNQuery;
-    if(forcelinear) {
-      truekNNQuery = QueryUtil.getLinearScanKNNQuery(relation.getDistanceQuery(getDistance()));
-    }
-    else {
-      truekNNQuery = relation.getKNNQuery(getDistance(), k, DatabaseQuery.HINT_EXACT);
-    }
+    KNNQuery<O> truekNNQuery = forcelinear ? QueryUtil.getLinearScanKNNQuery(relation.getDistanceQuery(distance)) //
+        : relation.getKNNQuery(distance, k, DatabaseQuery.HINT_EXACT);
     if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
       LOG.warning("Query classes are the same. This experiment may be invalid!");
     }
 
+    MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance(),
+        mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
+        mvdrerr = new MeanVariance();
+    int misses = 0;
     // No query set - use original database.
     if(queries == null || pattern != null) {
       // Relation to filter on
@@ -147,10 +146,6 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
 
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
-      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
-          mvdrerr = new MeanVariance();
-      int misses = 0;
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         if(pattern == null || pattern.matcher(lrel.get(iditer)).find()) {
           // Query index:
@@ -181,22 +176,10 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      if(LOG.isStatistics()) {
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-        LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
-        if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
-          LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
-          LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
-        }
-        if(misses > 0) {
-          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));
-        }
-      }
     }
     else {
       // Separate query set.
-      TypeInformation res = getDistance().getInputTypeRestriction();
+      TypeInformation res = distance.getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
       int col = -1;
       for(int i = 0; i < bundle.metaLength(); i++) {
@@ -213,10 +196,6 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
       DBIDRange sids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
       final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
-      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
-          mvdrerr = new MeanVariance();
-      int misses = 0;
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
         assert (off >= 0);
@@ -250,29 +229,18 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      if(LOG.isStatistics()) {
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-        LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
-        if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
-          LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
-        }
-        if(misses > 0) {
-          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));
-        }
+    }
+    if(LOG.isStatistics()) {
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+      LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
+      if(mvdist.getCount() > 0) {
+        LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
+        LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
+      }
+      if(misses > 0) {
+        LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));
       }
     }
-    return null;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**
@@ -284,7 +252,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedApplication.Parameterizer<O> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -383,7 +351,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
 
     @Override
     protected ValidateApproximativeKNNIndex<O> makeInstance() {
-      return new ValidateApproximativeKNNIndex<>(distanceFunction, k, queries, sampling, forcelinear, random, pattern);
+      return new ValidateApproximativeKNNIndex<>(inputstep, distance, k, queries, sampling, forcelinear, random, pattern);
     }
   }
 }

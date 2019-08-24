@@ -28,8 +28,7 @@ import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 
-import elki.AbstractDistanceBasedAlgorithm;
-import elki.application.AbstractApplication;
+import elki.application.AbstractDistanceBasedApplication;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
@@ -41,7 +40,6 @@ import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
@@ -106,21 +104,11 @@ import net.jafama.FastMath;
     booktitle = "Proc. 12th SIAM Int. Conf. on Data Mining (SDM 2012)", //
     url = "https://doi.org/10.1137/1.9781611972825.90", //
     bibkey = "DBLP:conf/sdm/SchubertWZK12")
-public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApplication {
+public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDistanceBasedApplication<O> {
   /**
    * Our logger class.
    */
   private static final Logging LOG = Logging.getLogger(ComputeKNNOutlierScores.class);
-
-  /**
-   * Input step
-   */
-  final InputStep inputstep;
-
-  /**
-   * Distance function to use
-   */
-  final Distance<? super O> distf;
 
   /**
    * Range of k.
@@ -156,7 +144,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * Constructor.
    *
    * @param inputstep Input step
-   * @param distf Distance function
+   * @param distanceFunction Distance function
    * @param krange K parameter range
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
@@ -164,11 +152,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    * @param disable Pattern for disabling methods
    * @param ksquarestop Maximum k for O(k^2) methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distf, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
-    super();
-    this.distf = distf;
+  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distanceFunction, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
+    super(inputstep, distanceFunction);
     this.krange = krange;
-    this.inputstep = inputstep;
     this.bylabel = bylabel;
     this.outfile = outfile;
     this.scaling = scaling;
@@ -179,23 +165,23 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
-    final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
+    final Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     // Ensure we don't go beyond the relation size:
     final int maxk = Math.min(krange.getMax(), relation.size() - 1);
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
-    KNNQuery<O> knnq = relation.getKNNQuery(distf, lim);
+    KNNQuery<O> knnq = relation.getKNNQuery(distance, lim);
 
     // Precompute kNN:
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, lim);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distance, lim);
       preproc.initialize();
       Metadata.hierarchyOf(relation).addChild(preproc);
     }
 
     // Test that we now get a proper index query
-    knnq = relation.getKNNQuery(distf, lim);
+    knnq = relation.getKNNQuery(distance, lim);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       throw new AbortException("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
@@ -230,31 +216,31 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
       // KNN
       runForEachK("KNN", 0, maxk, //
-          k -> new KNNOutlier<O>(distf, k) //
+          k -> new KNNOutlier<O>(distance, k) //
               .run(relation), out);
       // KNN Weight
       runForEachK("KNNW", 0, maxk, //
-          k -> new KNNWeightOutlier<O>(distf, k) //
+          k -> new KNNWeightOutlier<O>(distance, k) //
               .run(relation), out);
       // Run LOF
       runForEachK("LOF", 0, maxk, //
-          k -> new LOF<O>(k, distf) //
+          k -> new LOF<O>(k, distance) //
               .run(relation), out);
       // Run Simplified-LOF
       runForEachK("SimplifiedLOF", 0, maxk, //
-          k -> new SimplifiedLOF<O>(k, distf) //
+          k -> new SimplifiedLOF<O>(k, distance) //
               .run(relation), out);
       // LoOP
       runForEachK("LoOP", 0, maxk, //
-          k -> new LoOP<O>(k, k, distf, distf, 1.0) //
+          k -> new LoOP<O>(k, k, distance, distance, 1.0) //
               .run(relation), out);
       // LDOF
       runForEachK("LDOF", 2, maxksq, //
-          k -> new LDOF<O>(distf, k) //
+          k -> new LDOF<O>(distance, k) //
               .run(relation), out);
       // Run ODIN
       runForEachK("ODIN", 0, maxk, //
-          k -> new ODIN<O>(distf, k) //
+          k -> new ODIN<O>(distance, k) //
               .run(relation), out);
       // Run FastABOD
       runForEachK("FastABOD", 3, maxksq, //
@@ -262,45 +248,45 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
               .run(relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
       runForEachK("KDEOS", 2, maxk, //
-          k -> new KDEOS<O>(distf, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
+          k -> new KDEOS<O>(distance, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
               .5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2)//
                   .run(relation), out);
       // Run LDF
       runForEachK("LDF", 0, maxk, //
-          k -> new LDF<O>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1) //
+          k -> new LDF<O>(k, distance, GaussianKernelDensityFunction.KERNEL, 1., .1) //
               .run(relation), out);
       // Run INFLO
       runForEachK("INFLO", 0, maxk, //
-          k -> new INFLO<O>(distf, 1.0, k) //
+          k -> new INFLO<O>(distance, 1.0, k) //
               .run(relation), out);
       // Run COF
       runForEachK("COF", 0, maxksq, //
-          k -> new COF<O>(k, distf) //
+          k -> new COF<O>(k, distance) //
               .run(relation), out);
       // Run simple Intrinsic dimensionality
       runForEachK("Intrinsic", 2, maxk, //
-          k -> new IntrinsicDimensionalityOutlier<O>(distf, k, AggregatedHillEstimator.STATIC) //
+          k -> new IntrinsicDimensionalityOutlier<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
       // Run IDOS
       runForEachK("IDOS", 2, maxk, //
-          k -> new IDOS<O>(distf, AggregatedHillEstimator.STATIC, k, k) //
+          k -> new IDOS<O>(distance, AggregatedHillEstimator.STATIC, k, k) //
               .run(relation), out);
       // Run simple kernel-density LOF variant
       runForEachK("KDLOF", 2, maxk, //
-          k -> new SimpleKernelDensityLOF<O>(k, distf, GaussianKernelDensityFunction.KERNEL) //
+          k -> new SimpleKernelDensityLOF<O>(k, distance, GaussianKernelDensityFunction.KERNEL) //
               .run(relation), out);
       // Run DWOF (need pairwise distances, too)
       runForEachK("DWOF", 2, maxksq, //
-          k -> new DWOF<O>(distf, k, 1.1) //
+          k -> new DWOF<O>(distance, k, 1.1) //
               .run(relation), out);
       // Run LIC
       runForEachK("LIC", 0, maxk, //
-          k -> new LocalIsolationCoefficient<O>(distf, k) //
+          k -> new LocalIsolationCoefficient<O>(distance, k) //
               .run(relation), out);
       // Run VOV (requires a vector field).
       if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        final Distance<? super DoubleVector> df = (Distance<? super DoubleVector>) distf;
+        final Distance<? super DoubleVector> df = (Distance<? super DoubleVector>) distance;
         @SuppressWarnings("unchecked")
         final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
         runForEachK("VOV", 0, maxk, //
@@ -309,15 +295,15 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
       // Run KNN DD
       runForEachK("KNNDD", 0, maxk, //
-          k -> new KNNDD<O>(distf, k) //
+          k -> new KNNDD<O>(distance, k) //
               .run(relation), out);
       // Run KNN SOS
       runForEachK("KNNSOS", 0, maxk, //
-          k -> new KNNSOS<O>(distf, k) //
+          k -> new KNNSOS<O>(distance, k) //
               .run(relation), out);
       // Run ISOS
       runForEachK("ISOS", 2, maxk, //
-          k -> new ISOS<O>(distf, k, AggregatedHillEstimator.STATIC) //
+          k -> new ISOS<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
     }
     catch(FileNotFoundException e) {
@@ -393,7 +379,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<O> {
     /**
      * Option ID for k parameter range
      */
@@ -418,16 +404,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
      * k step size
      */
     IntGenerator krange;
-
-    /**
-     * Data source
-     */
-    InputStep inputstep;
-
-    /**
-     * Distance function to use
-     */
-    Distance<? super O> distf;
 
     /**
      * By label outlier -- reference
@@ -457,13 +433,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // Data input
-      inputstep = config.tryInstantiate(InputStep.class);
-      // Distance function
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distf = distP.instantiateClass(config);
-      }
       IntGeneratorParameter kP = new IntGeneratorParameter(KRANGE_ID);
       if(config.grab(kP)) {
         krange = kP.getValue();
@@ -491,7 +460,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     @Override
     protected ComputeKNNOutlierScores<O> makeInstance() {
-      return new ComputeKNNOutlierScores<>(inputstep, distf, krange, bylabel, outfile, scaling, disable, ksquarestop);
+      return new ComputeKNNOutlierScores<>(inputstep, distance, krange, bylabel, outfile, scaling, disable, ksquarestop);
     }
   }
 

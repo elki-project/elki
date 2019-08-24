@@ -53,7 +53,7 @@ import elki.utilities.random.RandomFactory;
 /**
  * Compute a quantile of a distance sample, useful for choosing parameters for
  * algorithms.
- *
+ * <p>
  * TODO: allow specifying multiple quantiles.
  *
  * @author Erich Schubert

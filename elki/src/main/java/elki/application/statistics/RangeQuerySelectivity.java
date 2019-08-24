@@ -18,12 +18,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.algorithm.statistics;
+package elki.application.statistics;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.application.AbstractDistanceBasedApplication;
 import elki.data.NumberVector;
-import elki.data.type.TypeInformation;
-import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -41,6 +39,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+import elki.workflow.InputStep;
 
 /**
  * Evaluate the range query selectivity.
@@ -51,7 +50,7 @@ import elki.utilities.random.RandomFactory;
  * @since 0.7.0
  * @param <V> Vector type
  */
-public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Void> {
+public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedApplication<V> {
   /**
    * The logger for this class.
    */
@@ -75,20 +74,23 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
   /**
    * Constructor.
    *
+   * @param inputstep Input step
    * @param distanceFunction Distance function
    * @param radius Radius
    * @param sampling Sampling rate
    * @param random Random sampling generator
    */
-  public RangeQuerySelectivity(Distance<? super V> distanceFunction, double radius, double sampling, RandomFactory random) {
-    super(distanceFunction);
+  public RangeQuerySelectivity(InputStep inputstep, Distance<? super V> distanceFunction, double radius, double sampling, RandomFactory random) {
+    super(inputstep, distanceFunction);
     this.radius = radius;
     this.sampling = sampling;
     this.random = random;
   }
 
-  public Void run(Relation<V> relation) {
-    RangeQuery<V> rangeQuery = relation.getRangeQuery(getDistance(), radius);
+  @Override
+  public void run() {
+    Relation<V> relation = inputstep.getDatabase().getRelation(distance.getInputTypeRestriction());
+    RangeQuery<V> rangeQuery = relation.getRangeQuery(distance, radius);
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     MeanVariance numres = new MeanVariance();
@@ -104,17 +106,6 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     LOG.statistics(new DoubleStatistic(prefix + ".norm.mean", numres.getMean() / relation.size()));
     LOG.statistics(new DoubleStatistic(prefix + ".norm.std", numres.getSampleStddev() / relation.size()));
     LOG.statistics(new LongStatistic(prefix + ".samplesize", ids.size()));
-    return null;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**
@@ -126,7 +117,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<V> {
     /**
      * Parameter to specify the query radius.
      */
@@ -180,7 +171,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
 
     @Override
     protected RangeQuerySelectivity<V> makeInstance() {
-      return new RangeQuerySelectivity<>(distanceFunction, radius, sampling, random);
+      return new RangeQuerySelectivity<>(inputstep, distance, radius, sampling, random);
     }
   }
 }

@@ -35,21 +35,27 @@
  * <li>rkNN (reverse k-nearest-neighbors) queries:
  * {@link elki.database.query.rknn.RKNNQuery RKNNQuery}</li>
  * </ul>
- * with a quite similar API.
+ * with a quite similar API. In addition, there are the more complicated
+ * distance priority searchers:
+ * {@link elki.database.query.distance.DistancePrioritySearcher
+ * DistancePrioritySearcher} that allow incremental search.
+ * 
  * <h2>Obtaining query objects</h2>
- * The general process of obtaining a Query is to retrieve it from the database
+ * The general process of obtaining a query is to retrieve it from the relation
  * using:
  * <ul>
- * <li>{@link elki.database.Database#getDistanceQuery
- * Database.getDistanceQuery(distance)}</li>
- * <li>{@link elki.database.Database#getSimilarityQuery
- * Database.getSimilarityQuery(similarity)}</li>
- * <li>{@link elki.database.Database#getKNNQuery
- * Database.getKNNQuery(distance)}</li>
- * <li>{@link elki.database.Database#getRangeQuery
- * Database.getRangeQuery(distance)}</li>
- * <li>{@link elki.database.Database#getRKNNQuery
- * Database.getRKNNQuery(distance)}</li>
+ * <li>{@link elki.database.relation.Relation#getDistanceQuery
+ * Relation.getDistanceQuery(distance)}</li>
+ * <li>{@link elki.database.relation.Relation#getSimilarityQuery
+ * Relation.getSimilarityQuery(similarity)}</li>
+ * <li>{@link elki.database.relation.Relation#getKNNQuery
+ * Relation.getKNNQuery(distance)}</li>
+ * <li>{@link elki.database.relation.Relation#getRangeQuery
+ * Relation.getRangeQuery(distance)}</li>
+ * <li>{@link elki.database.relation.Relation#getRKNNQuery
+ * Relation.getRKNNQuery(distance)}</li>
+ * <li>{@link elki.database.relation.Relation#getPrioritySearcher
+ * Relation.getPrioritySearcher(distance)}</li>
  * </ul>
  * as appropriate. See the query class links above for the detailed API. Avoid
  * calling this method within a loop construct!<br>
@@ -83,7 +89,7 @@
  * 
  * <pre>
  * // Get a kNN query with maxk = 10
- * KNNQuery&lt;V, DoubleDistance&gt; knnQuery = database.getKNNQuery(EuclideanDistance.STATIC, 10);
+ * KNNQuery&lt;V, DoubleDistance&gt; knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, 10);
  * // run a 10NN query for each point, discarding the results
  * for(DBID id : database) {
  *   knnQuery.getKNNForDBID(id, 10);

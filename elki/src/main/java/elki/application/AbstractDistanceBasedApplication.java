@@ -1,0 +1,89 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2019
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package elki.application;
+
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.workflow.InputStep;
+
+/**
+ * Abstract base class for distance-based tasks and experiments.
+ *
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
+public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplication {
+  /**
+   * Distance function to use.
+   */
+  protected Distance<? super O> distance;
+
+  /**
+   * Data input step
+   */
+  protected InputStep inputstep;
+
+  /**
+   * Constructor.
+   */
+  public AbstractDistanceBasedApplication(InputStep inputstep, Distance<? super O> distance) {
+    super();
+    this.inputstep = inputstep;
+    this.distance = distance;
+  }
+
+  /**
+   * Parameterization class
+   *
+   * @hidden
+   *
+   * @author Erich Schubert
+   *
+   * @param <O> Object type
+   */
+  public abstract static class Parameterizer<O> extends AbstractApplication.Parameterizer {
+    /**
+     * Data input step
+     */
+    protected InputStep inputstep;
+
+    /**
+     * Distance function to use
+     */
+    protected Distance<? super O> distance;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // Data input
+      inputstep = config.tryInstantiate(InputStep.class);
+      // Distance function
+      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
+      if(config.grab(distP)) {
+        distance = distP.instantiateClass(config);
+      }
+    }
+  }
+}

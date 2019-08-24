@@ -77,7 +77,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Annals of Botany, 18(2), 213-227", //
     url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
     bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
-public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, Void> {
+public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, Double> {
   /**
    * The logger for this class.
    */
@@ -138,8 +138,9 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
    * Runs the algorithm in the timed evaluation part.
    *
    * @param relation Relation to analyze
+   * @return Hopkins p
    */
-  public Void run(Relation<NumberVector> relation) {
+  public Double run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final KNNQuery<NumberVector> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
 
@@ -183,7 +184,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     double ix = BetaDistribution.regularizedIncBeta(x, sampleSize, sampleSize);
     double p = (x > .5) ? (1. - ix) : ix;
     LOG.statistics(new DoubleStatistic(prefix + ".hopkins.p", p));
-    return null;
+    return p;
   }
 
   /**

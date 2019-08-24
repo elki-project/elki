@@ -18,13 +18,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.algorithm.benchmark;
+package elki.application.benchmark;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.application.AbstractDistanceBasedApplication;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
+import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -36,7 +37,6 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
 import elki.utilities.Util;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -45,6 +45,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+import elki.workflow.InputStep;
 
 /**
  * Benchmarking algorithm that computes a range query for each point. The query
@@ -79,6 +80,8 @@ import elki.utilities.random.RandomFactory;
  * vector.
  * <p>
  * TODO: alternatively, allow using a fixed radius?
+ * <p>
+ * TODO: use an InputStream instead of a DatabaseConnection for the query set?
  *
  * @author Erich Schubert
  * @since 0.5.5
@@ -87,11 +90,11 @@ import elki.utilities.random.RandomFactory;
  *
  * @assoc - - - RangeQuery
  */
-public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Void> {
+public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanceBasedApplication<O> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(RangeQueryBenchmarkAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(RangeQueryBenchmark.class);
 
   /**
    * The alternate query point source. Optional.
@@ -111,67 +114,75 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param input Data input
+   * @param distance Distance function to use
    * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
    * @param random Random factory
    */
-  public RangeQueryBenchmarkAlgorithm(Distance<? super O> distanceFunction, DatabaseConnection queries, double sampling, RandomFactory random) {
-    super(distanceFunction);
+  public RangeQueryBenchmark(InputStep input, Distance<? super O> distance, DatabaseConnection queries, double sampling, RandomFactory random) {
+    super(input, distance);
     this.queries = queries;
     this.sampling = sampling;
     this.random = random;
   }
 
-  /**
-   * Run the algorithm, with separate radius relation
-   *
-   * @param relation Relation
-   * @param radrel Radius relation
-   * @return Null result
-   */
-  public Void run(Relation<O> relation, Relation<NumberVector> radrel) {
+  @Override
+  public void run() {
+    if(!LOG.isStatistics()) {
+      LOG.error("Logging level should be at least level STATISTICS (parameter -time) to see any output.");
+    }
+    Database database = inputstep.getDatabase();
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    RangeQuery<O> rangeQuery = relation.getRangeQuery(distance);
+    int hash;
+    MeanVariance mv = new MeanVariance(); // result statistics to collect.
     if(queries != null) {
-      throw new AbortException("This 'run' method will not use the given query set!");
+      hash = run(rangeQuery, relation, queries, mv);
     }
-    // Get a distance and kNN query instance.
-    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
-
-    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
-    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-    int hash = 0;
-    MeanVariance mv = new MeanVariance();
-    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-      double r = radrel.get(iditer).doubleValue(0);
-      DoubleDBIDList rres = rangeQuery.getRangeForDBID(iditer, r);
-      int ichecksum = 0;
-      for(DBIDIter it = rres.iter(); it.valid(); it.advance()) {
-        ichecksum += DBIDUtil.asInteger(it);
-      }
-      hash = Util.mixHashCodes(hash, ichecksum);
-      mv.put(rres.size());
-      LOG.incrementProcessed(prog);
+    else {
+      // Get a query radius relation:
+      Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
+      hash = run(rangeQuery, relation, qrad, mv);
     }
-    LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics("Result hashcode: " + hash);
       LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
     }
-    return null;
+  }
+
+  /**
+   * Run the algorithm, with separate radius relation
+   *
+   * @param rangeQuery query to test
+   * @param relation Relation
+   * @param radrel Radius relation
+   * @param mv Mean and variance statistics
+   * @return hash code over all results
+   */
+  protected int run(RangeQuery<O> rangeQuery, Relation<O> relation, Relation<NumberVector> radrel, MeanVariance mv) {
+    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    int hash = 0;
+    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
+      DoubleDBIDList rres = rangeQuery.getRangeForDBID(iditer, radrel.get(iditer).doubleValue(0));
+      hash = Util.mixHashCodes(hash, processResult(rres, mv));
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+    return hash;
   }
 
   /**
    * Run the algorithm, with a separate query set.
    *
+   * @param rangeQuery query to test
    * @param relation Relation
-   * @return Null result
+   * @param queries Queries database connection
+   * @param mv Statistics output
+   * @return result hashcode
    */
-  public Void run(Relation<O> relation) {
-    if(queries == null) {
-      throw new AbortException("A query set is required for this 'run' method.");
-    }
-    // Get a distance and kNN query instance.
-    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
+  protected int run(RangeQuery<O> rangeQuery, Relation<O> relation, DatabaseConnection queries, MeanVariance mv) {
     NumberVector.Factory<O> ofactory = RelationUtil.getNumberVectorFactory(relation);
     int dim = RelationUtil.dimensionality(relation);
 
@@ -201,47 +212,38 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
     int hash = 0;
-    MeanVariance mv = new MeanVariance();
     double[] buf = new double[dim];
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       int off = sids.binarySearch(iditer);
       assert (off >= 0);
+      // Split query data into object + radius
       NumberVector o = (NumberVector) bundle.data(off, col);
       for(int i = 0; i < dim; i++) {
         buf[i] = o.doubleValue(i);
       }
-      O v = ofactory.newNumberVector(buf);
-      double r = o.doubleValue(dim);
-      DoubleDBIDList rres = rangeQuery.getRangeForObject(v, r);
-      int ichecksum = 0;
-      for(DBIDIter it = rres.iter(); it.valid(); it.advance()) {
-        ichecksum += DBIDUtil.asInteger(it);
-      }
-      hash = Util.mixHashCodes(hash, ichecksum);
-      mv.put(rres.size());
+      DoubleDBIDList rres = rangeQuery.getRangeForObject(ofactory.newNumberVector(buf), o.doubleValue(dim));
+      hash = Util.mixHashCodes(hash, processResult(rres, mv));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    if(LOG.isStatistics()) {
-      LOG.statistics("Result hashcode: " + hash);
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-    }
-    return null;
+    return hash;
   }
 
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    if(queries == null) {
-      return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
+  /**
+   * Method to test a result.
+   *
+   * @param rres Result to process
+   * @param mv Statistics output
+   * @return hash code
+   */
+  protected int processResult(DoubleDBIDList rres, MeanVariance mv) {
+    mv.put(rres.size());
+    int ichecksum = 0;
+    for(DBIDIter it = rres.iter(); it.valid(); it.advance()) {
+      // intentionally NOT order dependent, because of ties:
+      ichecksum += DBIDUtil.asInteger(it);
     }
-    else {
-      return TypeUtil.array(getDistance().getInputTypeRestriction());
-    }
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
+    return ichecksum;
   }
 
   /**
@@ -253,7 +255,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<O> {
     /**
      * Parameter for the query data set.
      */
@@ -287,8 +289,8 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
-      queryP.setOptional(true);
+      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+          .setOptional(true);
       if(config.grab(queryP)) {
         queries = queryP.instantiateClass(config);
       }
@@ -305,8 +307,8 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     }
 
     @Override
-    protected RangeQueryBenchmarkAlgorithm<O> makeInstance() {
-      return new RangeQueryBenchmarkAlgorithm<>(distanceFunction, queries, sampling, random);
+    protected RangeQueryBenchmark<O> makeInstance() {
+      return new RangeQueryBenchmark<>(inputstep, distance, queries, sampling, random);
     }
   }
 }
