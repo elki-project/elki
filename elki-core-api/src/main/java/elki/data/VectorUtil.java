@@ -32,9 +32,9 @@ import net.jafama.FastMath;
 
 /**
  * Utility functions for use with vectors.
- *
+ * <p>
  * Note: obviously, many functions are class methods or database related.
- * 
+ * <p>
  * TODO: add more precise but slower O(n^2) angle computation according to:
  * Computing the Angle between Vectors, P. Schatte
  * Journal of Computing, Volume 63, Number 1 (1999)
@@ -85,7 +85,7 @@ public final class VectorUtil {
 
   /**
    * Compute the absolute cosine of the angle between two dense vectors.
-   *
+   * <p>
    * To convert it to radians, use <code>Math.acos(angle)</code>!
    *
    * @param v1 first vector
@@ -217,7 +217,7 @@ public final class VectorUtil {
 
   /**
    * Compute the absolute cosine of the angle between two vectors.
-   *
+   * <p>
    * To convert it to radians, use <code>Math.acos(angle)</code>!
    *
    * @param v1 first vector
@@ -507,8 +507,7 @@ public final class VectorUtil {
 
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      final double v1 = data.get(id1).doubleValue(d);
-      final double v2 = data.get(id2).doubleValue(d);
+      final double v1 = data.get(id1).doubleValue(d), v2 = data.get(id2).doubleValue(d);
       return v1 < v2 ? -1 : v1 > v2 ? +1 : 0;
     }
   }
@@ -561,8 +560,7 @@ public final class VectorUtil {
 
     @Override
     public int compare(NumberVector o1, NumberVector o2) {
-      final double v1 = o1.doubleValue(d);
-      final double v2 = o2.doubleValue(d);
+      final double v1 = o1.doubleValue(d), v2 = o2.doubleValue(d);
       return v1 < v2 ? -1 : v1 > v2 ? +1 : 0;
     }
   }
@@ -594,10 +592,8 @@ public final class VectorUtil {
     }
     else {
       double[] newAttributes = new double[card];
-      int i = 0;
-      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0); d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
-        newAttributes[i] = v.doubleValue(d);
-        i++;
+      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0), i = 0; d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
+        newAttributes[i++] = v.doubleValue(d);
       }
       return factory.newNumberVector(newAttributes);
     }

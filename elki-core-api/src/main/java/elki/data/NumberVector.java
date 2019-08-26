@@ -82,7 +82,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as double.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).doubleValue()}, but usually this is much more
    * efficient due to boxing/unboxing cost.
@@ -95,7 +95,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as float.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).floatValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
@@ -110,7 +110,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as int.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).intValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
@@ -125,7 +125,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as long.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).longValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
@@ -138,7 +138,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as short.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).shortValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
@@ -153,7 +153,7 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   /**
    * Returns the value in the specified dimension as byte.
-   * 
+   * <p>
    * Note: this might seem redundant with respect to
    * {@code getValue(dim).byteValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.

@@ -21,7 +21,6 @@
 package elki.data.spatial;
 
 import elki.data.ModifiableHyperBoundingBox;
-import elki.utilities.datastructures.arraylike.ArrayAdapter;
 
 /**
  * Utility class with spatial functions.
@@ -237,41 +236,12 @@ public final class SpatialUtil {
     double v1 = 1.;
     double v2 = 1.;
     for(int i = 0; i < dim; i++) {
-      final double emin = exist.getMin(i);
-      final double emax = exist.getMax(i);
-      final double amin = addit.getMin(i);
-      final double amax = addit.getMax(i);
-
+      final double emin = exist.getMin(i), emax = exist.getMax(i);
+      final double amin = addit.getMin(i), amax = addit.getMax(i);
       final double min = Math.min(emin, amin);
       final double max = Math.max(emax, amax);
       v1 *= (max - min);
       v2 *= (emax - emin);
-    }
-    return v2 - v1;
-  }
-
-  /**
-   * Compute the enlargement obtained by adding an object to an existing object.
-   * 
-   * @param exist Existing rectangle
-   * @param addit Additional rectangle
-   * @param scale Scaling helper
-   * @return Enlargement factor
-   */
-  public static double enlargementScaled(SpatialComparable exist, SpatialComparable addit, double scale) {
-    final int dim = assertSameDimensionality(exist, addit);
-    double v1 = 1.;
-    double v2 = 1.;
-    for(int i = 0; i < dim; i++) {
-      final double emin = exist.getMin(i);
-      final double emax = exist.getMax(i);
-      final double amin = addit.getMin(i);
-      final double amax = addit.getMax(i);
-
-      final double min = Math.min(emin, amin);
-      final double max = Math.max(emax, amax);
-      v1 *= (max - min) * scale;
-      v2 *= (emax - emin) * scale;
     }
     return v2 - v1;
   }
@@ -293,7 +263,7 @@ public final class SpatialUtil {
 
   /**
    * Computes the volume of the overlapping box between two SpatialComparables.
-   * 
+   *
    * @param box1 the first SpatialComparable
    * @param box2 the second SpatialComparable
    * @return the overlap volume.
@@ -301,25 +271,16 @@ public final class SpatialUtil {
   public static double overlap(SpatialComparable box1, SpatialComparable box2) {
     final int dim = assertSameDimensionality(box1, box2);
 
-    // the maximal and minimal value of the overlap box.
-    double omax, omin;
-
     // the overlap volume
     double overlap = 1.;
-
     for(int i = 0; i < dim; i++) {
-      // The maximal value of that overlap box in the current
-      // dimension is the minimum of the max values.
-      omax = Math.min(box1.getMax(i), box2.getMax(i));
-      // The minimal value is the maximum of the min values.
-      omin = Math.max(box1.getMin(i), box2.getMin(i));
-
-      // if omax <= omin in any dimension, the overlap box has a volume of zero
-      if(omax <= omin) {
+      // Overlap lengths.
+      double delta = Math.min(box1.getMax(i), box2.getMax(i)) //
+          - Math.max(box1.getMin(i), box2.getMin(i));
+      if(delta <= 0) {
         return 0.;
       }
-
-      overlap *= omax - omin;
+      overlap *= delta;
     }
 
     return overlap;
@@ -338,29 +299,21 @@ public final class SpatialUtil {
     final int dim = assertSameDimensionality(box1, box2);
 
     // the overlap volume
-    double overlap = 1.;
-    double vol1 = 1.;
-    double vol2 = 1.;
+    double overlap = 1., vol1 = 1., vol2 = 1.;
 
     for(int i = 0; i < dim; i++) {
-      final double box1min = box1.getMin(i);
-      final double box1max = box1.getMax(i);
-      final double box2min = box2.getMin(i);
-      final double box2max = box2.getMax(i);
-
-      final double omax = Math.min(box1max, box2max);
-      final double omin = Math.max(box1min, box2min);
+      double box1min = box1.getMin(i), box1max = box1.getMax(i);
+      double box2min = box2.getMin(i), box2max = box2.getMax(i);
+      double delta = Math.min(box1max, box2max) - Math.max(box1min, box2min);
 
       // if omax <= omin in any dimension, the overlap box has a volume of zero
-      if(omax <= omin) {
+      if(delta <= 0) {
         return 0.;
       }
-
-      overlap *= omax - omin;
+      overlap *= delta;
       vol1 *= box1max - box1min;
       vol2 *= box2max - box2min;
     }
-
     return overlap / (vol1 + vol2);
   }
 
@@ -374,9 +327,7 @@ public final class SpatialUtil {
    */
   public static ModifiableHyperBoundingBox union(SpatialComparable box1, SpatialComparable box2) {
     final int dim = assertSameDimensionality(box1, box2);
-
-    double[] min = new double[dim];
-    double[] max = new double[dim];
+    double[] min = new double[dim], max = new double[dim];
 
     for(int i = 0; i < dim; i++) {
       min[i] = Math.min(box1.getMin(i), box2.getMin(i));
@@ -393,52 +344,8 @@ public final class SpatialUtil {
    * @return the union of the two specified MBRs
    */
   public static ModifiableHyperBoundingBox unionTolerant(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(mbr1 == null && mbr2 == null) {
-      return null;
-    }
-    if(mbr1 == null) {
-      // Clone - intentionally
-      return new ModifiableHyperBoundingBox(mbr2);
-    }
-    if(mbr2 == null) {
-      // Clone - intentionally
-      return new ModifiableHyperBoundingBox(mbr1);
-    }
-    return union(mbr1, mbr2);
-  }
-
-  /**
-   * Compute the union of a number of objects as a flat MBR (low-level, for
-   * index structures).
-   * 
-   * @param data Object
-   * @param getter Array adapter
-   * @param <E> object type
-   * @param <A> data value type
-   * @return Flat MBR
-   */
-  public static <E extends SpatialComparable, A> double[] unionFlatMBR(A data, ArrayAdapter<E, ? super A> getter) {
-    final int num = getter.size(data);
-    assert (num > 0) : "Cannot compute MBR of empty set.";
-    final int dim;
-    final double[] mbr;
-    { // First entry
-      final E first = getter.get(data, 0);
-      dim = first.getDimensionality();
-      mbr = new double[2 * dim];
-      for(int d = 0; d < dim; d++) {
-        mbr[d] = first.getMin(d);
-        mbr[dim + d] = first.getMax(d);
-      }
-    } // Remaining entries
-    for(int i = 1; i < num; i++) {
-      E next = getter.get(data, i);
-      for(int d = 0; d < dim; d++) {
-        mbr[d] = Math.min(mbr[d], next.getMin(d));
-        mbr[dim + d] = Math.max(mbr[dim + d], next.getMax(d));
-      }
-    }
-    return mbr;
+    return mbr1 == null ? (mbr2 == null ? null : new ModifiableHyperBoundingBox(mbr2)) : //
+        mbr2 == null ? new ModifiableHyperBoundingBox(mbr1) : union(mbr1, mbr2);
   }
 
   /**
@@ -453,9 +360,7 @@ public final class SpatialUtil {
   public static ModifiableHyperBoundingBox intersection(final SpatialComparable box1, final SpatialComparable box2) {
     final int dim = assertSameDimensionality(box1, box2);
 
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-
+    double[] min = new double[dim], max = new double[dim];
     for(int i = 0; i < dim; i++) {
       min[i] = Math.max(box1.getMin(i), box2.getMin(i));
       max[i] = Math.min(box1.getMax(i), box2.getMax(i));
@@ -493,10 +398,7 @@ public final class SpatialUtil {
       return false;
     }
     for(int i = 0; i < box1.getDimensionality(); i++) {
-      if(box1.getMin(i) != box2.getMin(i)) {
-        return false;
-      }
-      if(box1.getMax(i) != box2.getMax(i)) {
+      if(box1.getMin(i) != box2.getMin(i) || box1.getMax(i) != box2.getMax(i)) {
         return false;
       }
     }

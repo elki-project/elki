@@ -20,17 +20,16 @@
  */
 package elki.data.projection;
 
+import java.util.function.Function;
+
 import elki.data.FeatureVector;
-import elki.data.FeatureVector.Factory;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.data.type.VectorTypeInformation;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
-import elki.utilities.datastructures.arraylike.FeatureVectorAdapter;
-import elki.utilities.datastructures.arraylike.NumberVectorAdapter;
-import elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
+import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -56,19 +55,19 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
   private int mindim;
 
   /**
+   * Dimensions to select.
+   */
+  private int[] dims;
+
+  /**
    * Object factory.
    */
   private FeatureVector.Factory<V, F> factory;
 
   /**
-   * Output dimensionality.
+   * Projection lambda.
    */
-  private int dimensionality;
-
-  /**
-   * Array adapter.
-   */
-  protected ArrayAdapter<F, V> adapter;
+  private Function<V, V> project;
 
   /**
    * Constructor.
@@ -76,9 +75,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * @param dims Dimensions
    */
   public FeatureSelection(int[] dims) {
-    this.adapter = new SubsetArrayAdapter<>(getAdapter(factory), dims);
-    this.dimensionality = dims.length;
-
+    this.dims = dims;
     int mind = 0;
     for(int dim : dims) {
       mind = Math.max(mind, dim + 1);
@@ -91,6 +88,15 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
   public void initialize(SimpleTypeInformation<? extends V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
     factory = (FeatureVector.Factory<V, F>) vin.getFactory();
+    if(factory instanceof NumberVector.Factory) {
+      NumberVector.Factory<?> vfactory = (NumberVector.Factory<?>) factory;
+      ProjectedNumberFeatureVectorAdapter proj = new ProjectedNumberFeatureVectorAdapter();
+      project = v -> (V) vfactory.newNumberVector((NumberVector) v, proj);
+    }
+    else {
+      ProjectedFeatureVectorAdapter proj = new ProjectedFeatureVectorAdapter();
+      project = v -> factory.newFeatureVector(v, proj);
+    }
     if(vin.getDimensionality() < mindim) {
       throw new AbortException("Data does not have enough dimensions for this projection!");
     }
@@ -98,28 +104,58 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
 
   @Override
   public V project(V data) {
-    return factory.newFeatureVector(data, adapter);
+    return project.apply(data);
   }
 
   /**
-   * Choose the best adapter for this.
-   * 
-   * @param factory Object factory, for type inference
-   * @param <V> Vector type
-   * @param <F> Value type
-   * @return Adapter
+   * Generic projection function
+   *
+   * @author Erich Schubert
    */
-  @SuppressWarnings("unchecked")
-  private static <V extends FeatureVector<F>, F> ArrayAdapter<F, ? super V> getAdapter(Factory<V, F> factory) {
-    if(factory instanceof NumberVector.Factory) {
-      return (ArrayAdapter<F, ? super V>) NumberVectorAdapter.STATIC;
+  private class ProjectedFeatureVectorAdapter implements ArrayAdapter<F, V> {
+    @Override
+    public int size(V array) {
+      return dims.length;
     }
-    return (ArrayAdapter<F, ? super V>) FeatureVectorAdapter.STATIC;
+
+    @Override
+    public F get(V array, int off) throws IndexOutOfBoundsException {
+      return array.getValue(dims[off]);
+    }
+  }
+
+  /**
+   * Adapter for generating number vectors without reboxing.
+   *
+   * @author Erich Schubert
+   *
+   * @param <V> Vector type
+   */
+  private class ProjectedNumberFeatureVectorAdapter implements NumberArrayAdapter<Double, NumberVector> {
+    @Override
+    public int size(NumberVector array) {
+      return dims.length;
+    }
+
+    @Override
+    public Double get(NumberVector array, int off) throws IndexOutOfBoundsException {
+      return array.doubleValue(dims[off]);
+    }
+
+    @Override
+    public double getDouble(NumberVector array, int off) throws IndexOutOfBoundsException {
+      return array.doubleValue(dims[off]);
+    }
+
+    @Override
+    public long getLong(NumberVector array, int off) throws IndexOutOfBoundsException {
+      return array.longValue(dims[off]);
+    }
   }
 
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
-    return new VectorFieldTypeInformation<>(factory, dimensionality);
+    return new VectorFieldTypeInformation<>(factory, dims.length);
   }
 
   @Override

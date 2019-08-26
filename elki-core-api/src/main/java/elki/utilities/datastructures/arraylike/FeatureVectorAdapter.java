@@ -24,7 +24,7 @@ import elki.data.FeatureVector;
 
 /**
  * Adapter to use a feature vector as an array of features.
- *
+ * <p>
  * Use the static instance from {@link ArrayLikeUtil}!
  *
  * @author Erich Schubert
@@ -40,7 +40,7 @@ public final class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVec
   
   /**
    * Constructor.
-   *
+   * <p>
    * Use the static instance from {@link ArrayLikeUtil}!
    */
   private FeatureVectorAdapter() {

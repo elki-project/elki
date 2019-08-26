@@ -69,7 +69,6 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     if(min.length != max.length) {
       throw new IllegalArgumentException("min/max need same dimensionality");
     }
-
     this.min = min;
     this.max = max;
   }

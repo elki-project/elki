@@ -21,7 +21,7 @@
 package elki;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import elki.data.type.TypeInformation;
 import elki.database.Database;
@@ -53,40 +53,39 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
   @SuppressWarnings("unchecked")
   @Override
   public R run(Database database) {
-    final Object[] relations1, relations2;
-    final Class<?>[] signature1, signature2;
     // Build candidate method signatures
-    {
-      final TypeInformation[] inputs = getInputTypeRestriction();
-      relations1 = new Object[inputs.length + 1];
-      signature1 = new Class<?>[inputs.length + 1];
-      relations2 = new Object[inputs.length];
-      signature2 = new Class<?>[inputs.length];
-      // First parameter is the database
-      relations1[0] = database;
-      signature1[0] = Database.class;
-      // Other parameters are the bound relations
-      for(int i = 0; i < inputs.length; i++) {
-        // TODO: don't bind the same relation twice?
-        // But sometimes this is wanted (e.g. using projected distances)
-        relations1[i + 1] = database.getRelation(inputs[i]);
-        signature1[i + 1] = Relation.class;
-        relations2[i] = database.getRelation(inputs[i]);
-        signature2[i] = Relation.class;
-      }
+    TypeInformation[] inputs = getInputTypeRestriction();
+    Object[] relations = new Object[inputs.length + 1];
+    Class<?>[] signature = new Class<?>[inputs.length + 1];
+    // First parameter is the database
+    relations[0] = database;
+    signature[0] = Database.class;
+    // Other parameters are the bound relations
+    for(int i = 1; i <= inputs.length; i++) {
+      // TODO: don't bind the same relation twice?
+      // But sometimes this is wanted (e.g. using projected distances)
+      relations[i] = database.getRelation(inputs[i - 1]);
+      signature[i] = Relation.class;
     }
 
-    // Find appropriate run method.
     try {
-      Method runmethod1 = this.getClass().getMethod("run", signature1);
-      return (R) runmethod1.invoke(this, relations1);
-    }
-    catch(NoSuchMethodException e) {
-      // continue below.
-    }
-    catch(IllegalArgumentException | IllegalAccessException
-        | SecurityException e) {
-      throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      try {
+        return (R) this.getClass().getMethod("run", signature).invoke(this, relations);
+      }
+      catch(NoSuchMethodException e) {
+        // continue below.
+      }
+
+      // Try without the Database argument
+      signature = Arrays.copyOfRange(signature, 1, signature.length);
+      relations = Arrays.copyOfRange(relations, 1, relations.length);
+      try {
+        return (R) this.getClass().getMethod("run", signature).invoke(this, relations);
+      }
+      catch(NoSuchMethodException e) {
+        // continue below.
+      }
+      throw new APIViolationException("No appropriate 'run' method found.");
     }
     catch(InvocationTargetException e) {
       final Throwable cause = e.getTargetException();
@@ -98,29 +97,10 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
       }
       throw new APIViolationException("Invoking the real 'run' method failed: " + cause.toString(), cause);
     }
-
-    try {
-      Method runmethod2 = this.getClass().getMethod("run", signature2);
-      return (R) runmethod2.invoke(this, relations2);
-    }
-    catch(NoSuchMethodException e) {
-      // continue below.
-    }
     catch(IllegalArgumentException | IllegalAccessException
         | SecurityException e) {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
-    catch(InvocationTargetException e) {
-      final Throwable cause = e.getTargetException();
-      if(cause instanceof RuntimeException) {
-        throw (RuntimeException) cause;
-      }
-      if(cause instanceof Error) {
-        throw (Error) cause;
-      }
-      throw new APIViolationException("Invoking the real 'run' method failed: " + cause.toString(), cause);
-    }
-    throw new APIViolationException("No appropriate 'run' method found.");
   }
 
   @Override

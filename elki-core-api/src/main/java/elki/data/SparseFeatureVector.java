@@ -29,15 +29,15 @@ package elki.data;
 public interface SparseFeatureVector<D> extends FeatureVector<D> {
   /**
    * Iterator over non-zero features only, <em>ascending</em>.
-   * 
+   * <p>
    * Note: depending on the underlying implementation, this may or may not be
    * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
    * usually this will be the ith non-zero value, assuming an array
    * representation.
-   * 
+   * <p>
    * Think of this number as an iterator. For efficiency, it has a primitive
    * type!
-   * 
+   * <p>
    * Intended usage:
    * 
    * <pre>

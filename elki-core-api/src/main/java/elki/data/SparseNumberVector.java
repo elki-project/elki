@@ -22,6 +22,7 @@ package elki.data;
 
 import elki.data.type.VectorFieldTypeInformation;
 import elki.data.type.VectorTypeInformation;
+
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
@@ -43,15 +44,15 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Iterator over non-zero features only, <em>ascendingly</em>.
-   *
+   * <p>
    * Note: depending on the underlying implementation, this may or may not be
    * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
    * usually this will be the ith non-zero value, assuming an array
    * representation.
-   *
+   * <p>
    * Think of this number as an iterator. For efficiency, it has a primitive
    * type!
-   *
+   * <p>
    * Intended usage:
    *
    * <pre>
@@ -71,7 +72,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
   default int iter() {
     return 0;
   }
-  
+
   /**
    * Update the vector space dimensionality.
    *

@@ -84,7 +84,7 @@ public interface FeatureVector<D> {
 
     /**
      * Get the default serializer for this type.
-     * 
+     * <p>
      * Note, this may be {@code null} when no serializer is available.
      * 
      * @return Serializer
