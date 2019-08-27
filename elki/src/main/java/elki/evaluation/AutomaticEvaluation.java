@@ -70,7 +70,7 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateOutliers(Object newResult) {
     Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
-    if(LOG.isDebugging()) {
+    if(LOG.isDebuggingFinest() || (LOG.isDebugging() && !outliers.isEmpty())) {
       LOG.debug("Number of new outlier results: " + outliers.size());
     }
     if(!outliers.isEmpty()) {
@@ -123,7 +123,7 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateClusterings(Object newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-    if(LOG.isDebugging()) {
+    if(LOG.isDebuggingFinest() || (LOG.isDebugging() && !clusterings.isEmpty())) {
       LOG.debug("Number of new clustering results: " + clusterings.size());
     }
     for(Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {

@@ -211,6 +211,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
           if(curdim > maxdim || mindim > curdim) {
             mindim = (curdim < mindim) ? curdim : mindim;
             maxdim = (curdim > maxdim) ? curdim : maxdim;
+            if(mindim != maxdim && LOG.isVerbose()) {
+              LOG.verbose("Non-uniform column width detected in input line " + reader.getLineNumber() + ", widening data type to " + mindim + "-" + maxdim + " dimensions.");
+            }
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
