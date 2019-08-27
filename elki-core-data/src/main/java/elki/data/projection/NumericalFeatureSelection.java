@@ -135,12 +135,9 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntListParameter selectedAttributesP = new IntListParameter(FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
-      if(config.grab(selectedAttributesP)) {
-        dims = selectedAttributesP.getValue();
-      }
+      new IntListParameter(FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+          .grab(config, x -> dims = x);
     }
 
     @Override

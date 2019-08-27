@@ -215,12 +215,10 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter dimP = new IntParameter(P_ID, 2) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      new IntParameter(P_ID, 2) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
 
-      if(config.grab(dimP)) {
-        tdim = dimP.getValue();
-      }
+          .grab(config, x -> tdim = x);
     }
   }
 }

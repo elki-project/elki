@@ -101,10 +101,8 @@ public class LatLngToECEFProjection<V extends NumberVector> implements Projectio
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if(config.grab(modelP)) {
-        model = modelP.instantiateClass(config);
-      }
+      new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
+          .grab(config, x -> model = x);
     }
 
     @Override

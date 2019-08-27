@@ -183,12 +183,9 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-
         // Input file parameter
-        final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.INPUT_FILE);
-        if(config.grab(cpar)) {
-          filename = cpar.getValue();
-        }
+        new FileParameter(CACHE_ID, FileParameter.FileType.INPUT_FILE) //
+            .grab(config, x -> filename = x);
       }
 
       @Override

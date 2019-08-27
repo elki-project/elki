@@ -32,14 +32,7 @@ import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDListMIter;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -653,32 +646,22 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Voting method
-      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
-      if(config.grab(votingP)) {
-        voting = votingP.instantiateClass(config);
-      }
+      new ObjectParameter<EnsembleVoting>(VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class) //
+          .grab(config, x -> voting = x);
       // Similarity measure
-      EnumParameter<Distance> distanceP = new EnumParameter<>(DISTANCE_ID, Distance.class);
-      if(config.grab(distanceP)) {
-        distance = distanceP.getValue();
-      }
+      new EnumParameter<Distance>(DISTANCE_ID, Distance.class) //
+          .grab(config, x -> distance = x);
       // Prescaling
-      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<ScalingFunction>(PRESCALING_ID, ScalingFunction.class) //
-          .setOptional(true);
-      if(config.grab(prescalingP)) {
-        prescaling = prescalingP.instantiateClass(config);
-      }
+      new ObjectParameter<ScalingFunction>(PRESCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
+          .grab(config, x -> prescaling = x);
       // Ensemble scaling
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
-          .setOptional(true);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
+          .grab(config, x -> scaling = x);
       // Expected rate of outliers
-      DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.01);
-      if(config.grab(rateP)) {
-        rate = rateP.doubleValue();
-      }
+      new DoubleParameter(RATE_ID, 0.01) //
+          .grab(config, x -> rate = x);
     }
 
     @Override

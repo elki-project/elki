@@ -283,31 +283,13 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      FileParameter fileP = new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(fileP)) {
-        file = fileP.getValue();
-      }
-
-      PatternParameter idP = new PatternParameter(ID_ID, ID_PATTERN_DEFAULT);
-      if(config.grab(idP)) {
-        idpattern = idP.getValue();
-      }
-
-      PatternParameter scoreP = new PatternParameter(SCORE_ID);
-      if(config.grab(scoreP)) {
-        scorepattern = scoreP.getValue();
-      }
-
-      Flag inverstedF = new Flag(INVERTED_ID);
-      if(config.grab(inverstedF)) {
-        inverted = inverstedF.getValue();
-      }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
+      new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> file = x);
+      new PatternParameter(ID_ID, ID_PATTERN_DEFAULT).grab(config, x -> idpattern = x);
+      new PatternParameter(SCORE_ID).grab(config, x -> scorepattern = x);
+      new Flag(INVERTED_ID).grab(config, x -> inverted = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class) //
+          .grab(config, x -> scaling = x);
     }
 
     @Override

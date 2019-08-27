@@ -215,11 +215,9 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter numclustersP = new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(numclustersP)) {
-        numclusters = numclustersP.intValue();
-      }
+      new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> numclusters = x);
     }
 
     @Override

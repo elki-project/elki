@@ -256,16 +256,10 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag multipleF = new Flag(MULTIPLE_ID);
-      if(config.grab(multipleF)) {
-        multiple = multipleF.getValue();
-      }
-
-      PatternParameter noisepatP = new PatternParameter(NOISE_ID) //
-          .setOptional(true);
-      if(config.grab(noisepatP)) {
-        noisepat = noisepatP.getValue();
-      }
+      new Flag(MULTIPLE_ID).grab(config, x -> multiple = x);
+      new PatternParameter(NOISE_ID) //
+          .setOptional(true) //
+          .grab(config, x -> noisepat = x);
     }
 
     @Override

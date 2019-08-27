@@ -109,10 +109,7 @@ public class MultiLPNorm extends AbstractNumberVectorDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleListParameter ps_param = new DoubleListParameter(EXPONENTS_ID);
-      if(config.grab(ps_param)) {
-        ps = ps_param.getValue().clone();
-      }
+      new DoubleListParameter(EXPONENTS_ID).grab(config, x -> ps = x);
     }
 
     @Override

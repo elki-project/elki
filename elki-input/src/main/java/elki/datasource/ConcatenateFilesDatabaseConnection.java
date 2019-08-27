@@ -74,7 +74,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    * @param parser Parser
    * @param filters Filters
    */
-  public ConcatenateFilesDatabaseConnection(List<File> files, Parser parser, List<ObjectFilter> filters) {
+  public ConcatenateFilesDatabaseConnection(List<File> files, Parser parser, List<? extends ObjectFilter> filters) {
     super(filters);
     this.files = files;
     this.parser = parser;
@@ -165,10 +165,8 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileListParameter filesP = new FileListParameter(INPUT_ID, FilesType.INPUT_FILES);
-      if(config.grab(filesP)) {
-        files = filesP.getValue();
-      }
+      new FileListParameter(INPUT_ID, FilesType.INPUT_FILES) //
+          .grab(config, x -> files = x);
       configFilters(config);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
     }

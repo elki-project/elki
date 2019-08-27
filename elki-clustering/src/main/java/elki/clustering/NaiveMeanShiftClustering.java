@@ -256,14 +256,10 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.instantiateClass(config);
-      }
-      DoubleParameter rangeP = new DoubleParameter(RANGE_ID);
-      if(config.grab(rangeP)) {
-        range = rangeP.getValue();
-      }
+      new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
+          .grab(config, x -> kernel = x);
+      new DoubleParameter(RANGE_ID) //
+          .grab(config, x -> range = x);
     }
 
     @Override

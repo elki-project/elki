@@ -427,48 +427,28 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config); // Distance function
 
-      ObjectParameter<AffinityMatrixBuilder<? super O>> affinityP = new ObjectParameter<>(AFFINITY_ID, AffinityMatrixBuilder.class, getDefaultAffinity());
-      if(config.grab(affinityP)) {
-        affinity = affinityP.instantiateClass(config);
-      }
-
-      IntParameter dimP = new IntParameter(DIM_ID) //
+      new ObjectParameter<AffinityMatrixBuilder<? super O>>(AFFINITY_ID, AffinityMatrixBuilder.class, getDefaultAffinity()) //
+          .grab(config, x -> affinity = x);
+      new IntParameter(DIM_ID) //
           .setDefaultValue(2) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(dimP)) {
-        dim = dimP.intValue();
-      }
-
-      DoubleParameter momentumP = new DoubleParameter(MOMENTUM_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dim = x);
+      new DoubleParameter(MOMENTUM_ID)//
           .setDefaultValue(0.8) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(momentumP)) {
-        finalMomentum = momentumP.doubleValue();
-      }
-
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> finalMomentum = x);
       // Note that original tSNE defaulted to 100, Barnes-Hut variant to 200.
-      DoubleParameter learningRateP = new DoubleParameter(LEARNING_RATE_ID)//
+      new DoubleParameter(LEARNING_RATE_ID)//
           .setDefaultValue(200.) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(learningRateP)) {
-        learningRate = learningRateP.doubleValue();
-      }
-
-      IntParameter maxiterP = new IntParameter(ITER_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> learningRate = x);
+      new IntParameter(ITER_ID)//
           .setDefaultValue(1000)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(maxiterP)) {
-        iterations = maxiterP.intValue();
-      }
-
-      RandomParameter randP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randP)) {
-        random = randP.getValue();
-      }
-
-      Flag keepF = new Flag(KEEP_ID);
-      keep = config.grab(keepF) && keepF.isTrue();
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> iterations = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
+      new Flag(KEEP_ID).grab(config, x -> keep = x);
     }
 
     /**

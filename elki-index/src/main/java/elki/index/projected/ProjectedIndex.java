@@ -550,29 +550,17 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<Projection<O, I>> projP = new ObjectParameter<>(PROJ_ID, Projection.class);
-        if(config.grab(projP)) {
-          proj = projP.instantiateClass(config);
-        }
-        ObjectParameter<IndexFactory<I>> innerP = new ObjectParameter<>(INDEX_ID, IndexFactory.class);
-        if(config.grab(innerP)) {
-          inner = innerP.instantiateClass(config);
-        }
-        Flag materializeF = new Flag(MATERIALIZE_FLAG);
-        if(config.grab(materializeF)) {
-          materialize = materializeF.isTrue();
-        }
-        Flag norefineF = new Flag(DISABLE_REFINE_FLAG);
-        if(config.grab(norefineF)) {
-          norefine = norefineF.isTrue();
-        }
+        new ObjectParameter<Projection<O, I>>(PROJ_ID, Projection.class) //
+            .grab(config, x -> proj = x);
+        new ObjectParameter<IndexFactory<I>>(INDEX_ID, IndexFactory.class) //
+            .grab(config, x -> inner = x);
+        new Flag(MATERIALIZE_FLAG).grab(config, x -> materialize = x);
+        new Flag(DISABLE_REFINE_FLAG).grab(config, x -> norefine = x);
         if(!norefine) {
-          DoubleParameter kmultP = new DoubleParameter(K_MULTIPLIER_ID) //
+          new DoubleParameter(K_MULTIPLIER_ID) //
               .setDefaultValue(1.0) //
-              .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
-          if(config.grab(kmultP)) {
-            kmulti = kmultP.doubleValue();
-          }
+              .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+              .grab(config, x -> kmulti = x);
         }
       }
 

@@ -102,12 +102,10 @@ public abstract class AbstractDimensionsSelectingDistance<V extends FeatureVecto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntListParameter dimsP = new IntListParameter(DIMS_ID) //
+      new IntListParameter(DIMS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
-          .setOptional(true);
-      if(config.grab(dimsP)) {
-        dimensions = dimsP.getValueAsBitSet();
-      }
+          .setOptional(true) //
+          .grab(config, x -> BitsUtil.of(x));
     }
   }
 }

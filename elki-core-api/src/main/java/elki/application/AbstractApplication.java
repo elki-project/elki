@@ -128,8 +128,7 @@ public abstract class AbstractApplication {
     try {
       ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class) //
           .setOptional(true);
-      params.grab(descriptionP);
-      if(descriptionP.isDefined()) {
+      if(params.grab(descriptionP)) {
         params.clearErrors();
         printDescription(descriptionP.getValue());
         System.exit(1);
@@ -382,7 +381,7 @@ public abstract class AbstractApplication {
      * @return Output file
      */
     protected File getParameterOutputFile(Parameterization config, String description) {
-      final FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
+      FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
       return config.grab(outputP) ? outputP.getValue() : null;
     }
 

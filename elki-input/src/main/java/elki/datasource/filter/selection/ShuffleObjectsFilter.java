@@ -115,10 +115,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

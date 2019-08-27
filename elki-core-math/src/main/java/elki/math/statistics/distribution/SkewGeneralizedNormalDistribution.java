@@ -243,22 +243,13 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(meanP)) {
-        mean = meanP.doubleValue();
-      }
-
-      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(sigmaP)) {
-        sigma = sigmaP.doubleValue();
-      }
-
-      DoubleParameter skewP = new DoubleParameter(SKEW_ID);
-      if(config.grab(skewP)) {
-        skew = skewP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> mean = x);
+      new DoubleParameter(SCALE_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> sigma = x);
+      new DoubleParameter(SKEW_ID) //
+          .grab(config, x -> skew = x);
     }
 
     @Override

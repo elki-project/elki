@@ -551,12 +551,10 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter tethaP = new DoubleParameter(THETA_ID) //
+      new DoubleParameter(THETA_ID) //
           .setDefaultValue(0.5) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(tethaP)) {
-        theta = tethaP.getValue();
-      }
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> theta = x);
     }
 
     @Override

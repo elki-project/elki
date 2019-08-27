@@ -325,19 +325,13 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
-
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.getValue();
-        if(minpts <= 2) {
-          LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
-        }
+      new DoubleParameter(EPSILON_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
+      if(new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x) && minpts <= 2) {
+        LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
       }
     }
 

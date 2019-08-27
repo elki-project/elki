@@ -138,11 +138,8 @@ public class StudentsTDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter nuP = new IntParameter(NU_ID);
-      if(config.grab(nuP)) {
-        nu = nuP.intValue();
-      }
+      new IntParameter(NU_ID) //
+          .grab(config, x -> nu = x);
     }
 
     @Override

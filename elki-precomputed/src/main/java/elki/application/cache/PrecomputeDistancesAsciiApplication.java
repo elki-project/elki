@@ -184,15 +184,11 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if(config.grab(dbP)) {
-        database = dbP.instantiateClass(config);
-      }
+      new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
+          .grab(config, x -> database = x);
       // Distance function parameter
-      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, Distance.class);
-      if(config.grab(dpar)) {
-        distance = dpar.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class) //
+          .grab(config, x -> distance = x);
       // Output file parameter
       out = getParameterOutputFile(config);
     }

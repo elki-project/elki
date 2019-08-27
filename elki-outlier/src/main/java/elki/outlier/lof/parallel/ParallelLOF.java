@@ -190,11 +190,8 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      new IntParameter(LOF.Parameterizer.K_ID) //
+          .grab(config, x -> k = x);
     }
 
     @Override

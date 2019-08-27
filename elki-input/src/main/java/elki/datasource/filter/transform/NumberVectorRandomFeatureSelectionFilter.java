@@ -136,15 +136,10 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

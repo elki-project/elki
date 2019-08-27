@@ -68,12 +68,9 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter k_maxP = new IntParameter(K_MAX_ID);
-      k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-
-      if(config.grab(k_maxP)) {
-        settings.kmax = k_maxP.getValue();
-      }
+      new IntParameter(K_MAX_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> settings.kmax = x);
     }
 
     @Override

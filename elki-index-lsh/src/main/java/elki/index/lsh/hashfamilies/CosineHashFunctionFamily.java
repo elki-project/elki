@@ -145,17 +145,11 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter randP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randP)) {
-        random = randP.getValue();
-      }
-
-      IntParameter lP = new IntParameter(NUMPROJ_ID) //
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
+      new IntParameter(NUMPROJ_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .addConstraint(new LessEqualConstraint(32)); // Integer precision
-      if(config.grab(lP)) {
-        k = lP.intValue();
-      }
+          .addConstraint(new LessEqualConstraint(32)) // Integer precision
+          .grab(config, x -> k = x);
     }
 
     @Override

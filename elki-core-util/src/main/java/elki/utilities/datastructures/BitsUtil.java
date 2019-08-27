@@ -108,6 +108,24 @@ public final class BitsUtil {
   }
 
   /**
+   * Generate a bitset with the given list of positions set to 1.
+   *
+   * @param positions Positions of ones.
+   * @return Bitmask
+   */
+  public static long[] of(int... positions) {
+    int maxd = 0;
+    for(int d : positions) {
+      maxd = (d > maxd) ? d : maxd;
+    }
+    long[] dimensions = new long[(maxd >>> 6) + 1];
+    for(int d : positions) {
+      dimensions[d >>> 6] |= 1L << (d & 0x3F);
+    }
+    return dimensions;
+  }
+
+  /**
    * Create a vector initialized with "bits" ones.
    *
    * @param bits Size

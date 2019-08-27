@@ -101,11 +101,8 @@ public class ConstantDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter constP = new DoubleParameter(CONSTANT_ID);
-      if(config.grab(constP)) {
-        constant = constP.doubleValue();
-      }
+      new DoubleParameter(CONSTANT_ID) //
+          .grab(config, x -> constant = x);
     }
 
     @Override

@@ -130,11 +130,9 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      * @param config Parameterization
      */
     protected void configD(Parameterization config, Distance<?> distanceFunction) {
-      final DoubleParameter param = new DoubleParameter(D_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(param)) {
-        d = param.getValue();
-      }
+      new DoubleParameter(D_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> d = x);
     }
   }
 }

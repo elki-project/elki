@@ -88,7 +88,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
   /**
    * Spatial curve generators
    */
-  final List<SpatialSorter> curvegen;
+  final List<? extends SpatialSorter> curvegen;
 
   /**
    * Curve window size
@@ -121,7 +121,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
    * @param variants Number of curve variants to generate
    * @param random Random number generator
    */
-  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
+  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, List<? extends SpatialSorter> curvegen, double window, int variants, Random random) {
     super(relation, distanceFunction, k);
     this.curvegen = curvegen;
     this.window = window;
@@ -272,7 +272,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
     /**
      * Spatial curve generators
      */
-    List<SpatialSorter> curvegen;
+    List<? extends SpatialSorter> curvegen;
 
     /**
      * Curve window size
@@ -297,7 +297,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
      * @param variants Number of curve variants to generate
      * @param random Random number generator
      */
-    public Factory(int k, Distance<? super V> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
+    public Factory(int k, Distance<? super V> distanceFunction, List<? extends SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
       super(k, distanceFunction);
       this.curvegen = curvegen;
       this.window = window;
@@ -348,7 +348,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       /**
        * Spatial curve generators
        */
-      List<SpatialSorter> curvegen;
+      List<? extends SpatialSorter> curvegen;
 
       /**
        * Curve window size
@@ -368,23 +368,14 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
-        if(config.grab(curveP)) {
-          curvegen = curveP.instantiateClasses(config);
-        }
-        DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if(config.grab(windowP)) {
-          window = windowP.getValue();
-        }
-        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(variantsP)) {
-          variants = variantsP.getValue();
-        }
-        RandomParameter randomP = new RandomParameter(RANDOM_ID);
-        if(config.grab(randomP)) {
-          random = randomP.getValue();
-        }
+        new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class) //
+            .grab(config, x -> curvegen = x);
+        new DoubleParameter(WINDOW_ID, 10.0) //
+            .grab(config, x -> window = x);
+        new IntParameter(VARIANTS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> variants = x);
+        new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
       }
 
       @Override

@@ -89,10 +89,8 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistance<O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+      new ObjectParameter<PrimitiveDistance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distanceFunction = x);
     }
   }
 }

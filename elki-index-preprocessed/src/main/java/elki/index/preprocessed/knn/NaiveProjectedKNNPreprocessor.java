@@ -427,26 +427,16 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if(config.grab(windowP)) {
-          window = windowP.getValue();
-        }
-        IntParameter projectionsP = new IntParameter(PROJECTIONS_ID) //
+        new DoubleParameter(WINDOW_ID, 10.0)
+            .grab(config, x -> window = x);
+        new IntParameter(PROJECTIONS_ID) //
             .setOptional(true) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(projectionsP)) {
-          projections = projectionsP.getValue();
-        }
-
-        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
-            .setOptional(true);
-        if(config.grab(projP)) {
-          proj = projP.instantiateClass(config);
-        }
-        RandomParameter randomP = new RandomParameter(RANDOM_ID);
-        if(config.grab(randomP)) {
-          random = randomP.getValue();
-        }
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> projections = x);
+        new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
+            .setOptional(true) //
+            .grab(config, x -> proj = x);
+        new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
       }
 
       @Override

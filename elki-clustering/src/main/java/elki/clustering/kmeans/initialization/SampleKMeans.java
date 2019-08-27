@@ -170,10 +170,8 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
         innerkMeans = kMeansVariantP.instantiateClass(combinedConfig);
       }
 
-      DoubleParameter sampleP = new DoubleParameter(SAMPLE_ID);
-      if(config.grab(sampleP)) {
-        rate = sampleP.doubleValue();
-      }
+      new DoubleParameter(SAMPLE_ID) //
+          .grab(config, x -> rate = x);
     }
 
     @Override

@@ -158,16 +158,10 @@ public class ClassLabelFilter implements ObjectFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // parameter class label index
-      final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID);
-      final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
-
-      config.grab(classLabelIndexParam);
-      config.grab(classlabelClassParam);
-      if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
-        classLabelIndex = classLabelIndexParam.intValue();
-        classLabelFactory = classlabelClassParam.instantiateClass(config);
-      }
+      new IntParameter(CLASS_LABEL_INDEX_ID) //
+          .grab(config, x -> classLabelIndex = x);
+      new ObjectParameter<ClassLabel.Factory<?>>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class) //
+          .grab(config, x -> classLabelFactory = x);
     }
 
     @Override

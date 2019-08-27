@@ -539,11 +539,9 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter leafP = new IntParameter(LEAFSIZE_P, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(leafP)) {
-          leafsize = leafP.intValue();
-        }
+        new IntParameter(LEAFSIZE_P, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> leafsize = x);
       }
 
       @Override

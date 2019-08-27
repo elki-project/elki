@@ -669,26 +669,13 @@ public class KMLOutputHandler implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final OptionID opt = new OptionID(OutputStep.Parameterizer.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
-      FileParameter outputP = new FileParameter(opt, FileParameter.FileType.OUTPUT_FILE);
-      if(config.grab(outputP)) {
-        filename = outputP.getValue();
-      }
-
-      ObjectParameter<OutlierScaling> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScaling.class, OutlierLinearScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
-
-      Flag compatF = new Flag(COMPAT_ID);
-      if(config.grab(compatF)) {
-        compat = compatF.getValue();
-      }
-
-      Flag autoopenF = new Flag(AUTOOPEN_ID);
-      if(config.grab(autoopenF)) {
-        autoopen = autoopenF.getValue();
-      }
+      OptionID opt = new OptionID(OutputStep.Parameterizer.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
+      new FileParameter(opt, FileParameter.FileType.OUTPUT_FILE) //
+          .grab(config, x -> filename = x);
+      new ObjectParameter<OutlierScaling>(SCALING_ID, OutlierScaling.class, OutlierLinearScaling.class) //
+          .grab(config, x -> scaling = x);
+      new Flag(COMPAT_ID).grab(config, x -> compat = x);
+      new Flag(AUTOOPEN_ID).grab(config, x -> autoopen = x);
     }
 
     @Override

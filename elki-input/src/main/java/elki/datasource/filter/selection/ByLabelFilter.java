@@ -168,14 +168,8 @@ public class ByLabelFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final PatternParameter patternP = new PatternParameter(LABELFILTER_PATTERN_ID);
-      if(config.grab(patternP)) {
-        pattern = patternP.getValue();
-      }
-      final Flag invertedF = new Flag(LABELFILTER_PATTERN_INVERT_ID);
-      if(config.grab(invertedF)) {
-        inverted = invertedF.getValue().booleanValue();
-      }
+      new PatternParameter(LABELFILTER_PATTERN_ID).grab(config, x -> pattern = x);
+      new Flag(LABELFILTER_PATTERN_INVERT_ID).grab(config, x -> inverted = x);
     }
 
     @Override

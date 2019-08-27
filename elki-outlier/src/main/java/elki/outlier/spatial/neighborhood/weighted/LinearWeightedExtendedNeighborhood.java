@@ -24,16 +24,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDPair;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -46,7 +41,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * neighborhood. Objects are weighted linearly by their distance: the object
  * itself has a weight of 1 and this decreases linearly to 1/(n+1) for the
  * nth-step neighbors.
- * 
+ * <p>
  * TODO: make actual weighting parameterizable?
  * 
  * @author Erich Schubert
@@ -184,40 +179,14 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
        */
       private NeighborSetPredicate.Factory<O> inner;
 
-      /**
-       * Inner neighborhood parameter.
-       * 
-       * @param config Parameterization
-       * @return Inner neighborhood.
-       */
-      protected static <O> NeighborSetPredicate.Factory<O> getParameterInnerNeighborhood(Parameterization config) {
-        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
-        if(config.grab(param)) {
-          return param.instantiateClass(config);
-        }
-        return null;
-      }
-
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        inner = getParameterInnerNeighborhood(config);
-        steps = getParameterSteps(config);
-      }
-
-      /**
-       * Get the number of steps to do in the neighborhood graph.
-       * 
-       * @param config Parameterization
-       * @return number of steps, default 1
-       */
-      public static int getParameterSteps(Parameterization config) {
-        final IntParameter param = new IntParameter(STEPS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(param)) {
-          return param.getValue();
-        }
-        return 1;
+        new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class) //
+            .grab(config, x -> inner = x);
+        new IntParameter(STEPS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> steps = x);
       }
 
       @Override

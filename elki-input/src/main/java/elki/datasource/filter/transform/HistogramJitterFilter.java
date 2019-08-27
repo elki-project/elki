@@ -152,15 +152,10 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter jitterP = new DoubleParameter(JITTER_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(jitterP)) {
-        jitter = jitterP.getValue().doubleValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new DoubleParameter(JITTER_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> jitter = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

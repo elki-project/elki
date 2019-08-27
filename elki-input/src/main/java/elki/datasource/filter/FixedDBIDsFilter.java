@@ -87,11 +87,9 @@ public class FixedDBIDsFilter implements ObjectFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startidParam = new IntParameter(IDSTART_ID, 0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(startidParam)) {
-        startid = startidParam.intValue();
-      }
+      new IntParameter(IDSTART_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> startid = x);
     }
 
     @Override

@@ -111,15 +111,10 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplesizeP = new IntParameter(N_ID)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(samplesizeP)) {
-        samplesize = samplesizeP.intValue();
-      }
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        rnd = randomP.getValue();
-      }
+      new IntParameter(N_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> samplesize = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

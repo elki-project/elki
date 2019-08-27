@@ -231,15 +231,11 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class) //
-          .setOptional(true);
-      if(config.grab(filterP)) {
-        filter = filterP.instantiateClass(config);
-      }
-      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.FULL);
-      if(config.grab(modeP)) {
-        mode = modeP.getValue();
-      }
+      new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class) //
+          .setOptional(true) //
+          .grab(config, x -> filter = x);
+      new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.FULL) //
+          .grab(config, x -> mode = x);
     }
 
     @Override

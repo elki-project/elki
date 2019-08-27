@@ -723,36 +723,22 @@ public class CFTree {
 
       @Override
       protected void makeOptions(Parameterization config) {
-        ObjectParameter<BIRCHDistance> distanceP = new ObjectParameter<>(DISTANCE_ID, BIRCHDistance.class, VarianceIncreaseDistance.class);
-        if(config.grab(distanceP)) {
-          distance = distanceP.instantiateClass(config);
-        }
-
-        ObjectParameter<BIRCHAbsorptionCriterion> absorptionP = new ObjectParameter<>(ABSORPTION_ID, BIRCHAbsorptionCriterion.class, DiameterCriterion.class);
-        if(config.grab(absorptionP)) {
-          absorption = absorptionP.instantiateClass(config);
-        }
-
-        DoubleParameter thresholdP = new DoubleParameter(THRESHOLD_ID) //
+        new ObjectParameter<BIRCHDistance>(DISTANCE_ID, BIRCHDistance.class, VarianceIncreaseDistance.class) //
+            .grab(config, x -> distance = x);
+        new ObjectParameter<BIRCHAbsorptionCriterion>(ABSORPTION_ID, BIRCHAbsorptionCriterion.class, DiameterCriterion.class) //
+            .grab(config, x -> absorption = x);
+        new DoubleParameter(THRESHOLD_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-            .setOptional(true);
-        if(config.grab(thresholdP)) {
-          threshold = thresholdP.doubleValue();
-        }
-
-        IntParameter branchingP = new IntParameter(BRANCHING_ID) //
+            .setOptional(true) //
+            .grab(config, x -> threshold = x);
+        new IntParameter(BRANCHING_ID) //
             .addConstraint(new GreaterEqualConstraint(2)) //
-            .setDefaultValue(64);
-        if(config.grab(branchingP)) {
-          branchingFactor = branchingP.intValue();
-        }
-
-        DoubleParameter maxleavesP = new DoubleParameter(MAXLEAVES_ID) //
+            .setDefaultValue(64) //
+            .grab(config, x -> branchingFactor = x);
+        new DoubleParameter(MAXLEAVES_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-            .setDefaultValue(0.05);
-        if(config.grab(maxleavesP)) {
-          maxleaves = maxleavesP.doubleValue();
-        }
+            .setDefaultValue(0.05) //
+            .grab(config, x -> maxleaves = x);
       }
 
       @Override

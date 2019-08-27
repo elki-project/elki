@@ -125,24 +125,16 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       settings = createSettings();
-      ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
-      if(config.grab(insertionStrategyP)) {
-        settings.insertionStrategy = insertionStrategyP.instantiateClass(config);
-      }
-      ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
-      if(config.grab(splitStrategyP)) {
-        settings.nodeSplitter = splitStrategyP.instantiateClass(config);
-      }
-      DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, 0.4) //
+      new ObjectParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class) //
+          .grab(config, x -> settings.insertionStrategy = x);
+      new ObjectParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class) //
+          .grab(config, x -> settings.nodeSplitter = x);
+      new DoubleParameter(MINIMUM_FILL_ID, 0.4) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
-      if(config.grab(minimumFillP)) {
-        settings.relativeMinFill = minimumFillP.getValue();
-      }
-      ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
-      if(config.grab(overflowP)) {
-        settings.setOverflowTreatment(overflowP.instantiateClass(config));
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
+          .grab(config, x -> settings.relativeMinFill = x);
+      new ObjectParameter<OverflowTreatment>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class) //
+          .grab(config, x -> settings.setOverflowTreatment(x));
       configBulkLoad(config);
     }
 
@@ -152,11 +144,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
      * @param config Parameterization
      */
     protected void configBulkLoad(Parameterization config) {
-      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class) //
-          .setOptional(true);
-      if(config.grab(bulkSplitP)) {
-        settings.bulkSplitter = bulkSplitP.instantiateClass(config);
-      }
+      new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class) //
+          .setOptional(true) //
+          .grab(config, x -> settings.bulkSplitter = x);
     }
 
     @Override

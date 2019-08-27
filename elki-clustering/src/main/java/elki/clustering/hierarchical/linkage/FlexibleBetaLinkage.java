@@ -101,12 +101,10 @@ public class FlexibleBetaLinkage implements Linkage {
 
     @Override
     protected void makeOptions(Parameterization config) {
-      DoubleParameter betaP = new DoubleParameter(BETA_ID, -0.25)//
+      new DoubleParameter(BETA_ID, -0.25)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
-          .addConstraint(new GreaterConstraint(-1.)); // Better even < 0
-      if(config.grab(betaP)) {
-        beta = betaP.doubleValue();
-      }
+          .addConstraint(new GreaterConstraint(-1.)) // Better even < 0
+          .grab(config, x -> beta = x);
     }
 
     @Override

@@ -239,16 +239,11 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(numberOfNeighborsP)) {
-          numberOfNeighbors = numberOfNeighborsP.getValue();
-        }
-
-        final ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-        if(config.grab(distanceFunctionP)) {
-          distanceFunction = distanceFunctionP.instantiateClass(config);
-        }
+        new IntParameter(NUMBER_OF_NEIGHBORS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> numberOfNeighbors = x);
+        new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+            .grab(config, x -> distanceFunction = x);
       }
 
       @Override

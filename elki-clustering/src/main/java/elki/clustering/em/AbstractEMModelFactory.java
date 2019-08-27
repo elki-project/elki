@@ -78,10 +78,8 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
+      new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class) //
+          .grab(config, x -> initializer = x);
     }
   }
 }

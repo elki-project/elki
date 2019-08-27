@@ -350,14 +350,10 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       // Do NOT invoke super.makeOptions to hide the "k" parameter.
       IntParameter kMinP = new IntParameter(K_MIN_ID, 2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kMinP)) {
-        k_min = kMinP.intValue();
-      }
+      kMinP.grab(config, x -> k_min = x);
       IntParameter kMaxP = new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kMaxP)) {
-        k_max = kMaxP.intValue();
-      }
+      kMaxP.grab(config, x -> k_max = x);
       // Non-formalized parameter constraint: k_min <= k_max
       if(k_min > k_max) {
         config.reportError(new WrongParameterValueException(kMinP, "must be at most", kMaxP, ""));
@@ -367,11 +363,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       getParameterMaxIter(config);
       getParameterDistance(config);
 
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        random = rndP.getValue();
-      }
-
+      new RandomParameter(SEED_ID).grab(config, x -> random = x);
       ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, LloydKMeans.class);
       if(config.grab(innerKMeansP)) {
         ChainedParameterization combinedConfig = new ChainedParameterization(new ListParameterization() //
@@ -386,10 +378,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }
 
-      ObjectParameter<KMeansQualityMeasure<V>> informationCriterionP = new ObjectParameter<>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class);
-      if(config.grab(informationCriterionP)) {
-        informationCriterion = informationCriterionP.instantiateClass(config);
-      }
+      new ObjectParameter<KMeansQualityMeasure<V>>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class) //
+          .grab(config, x -> informationCriterion = x);
     }
 
     @Override

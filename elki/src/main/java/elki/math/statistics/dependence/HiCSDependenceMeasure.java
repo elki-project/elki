@@ -196,27 +196,15 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter mP = new IntParameter(HiCS.Parameterizer.M_ID, 50) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(mP)) {
-        m = mP.intValue();
-      }
-
-      final DoubleParameter alphaP = new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
-      if(config.grab(testP)) {
-        statTest = testP.instantiateClass(config);
-      }
-
-      final RandomParameter rndP = new RandomParameter(HiCS.Parameterizer.SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(HiCS.Parameterizer.M_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> m = x);
+      new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new ObjectParameter<GoodnessOfFitTest>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class) //
+          .grab(config, x -> statTest = x);
+      new RandomParameter(HiCS.Parameterizer.SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

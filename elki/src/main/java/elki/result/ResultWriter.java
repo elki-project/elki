@@ -170,24 +170,14 @@ public class ResultWriter implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter outputP = new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .setOptional(true);
-      if(config.grab(outputP)) {
-        out = outputP.getValue();
-      }
-      Flag gzipF = new Flag(GZIP_OUTPUT_ID);
-      if(config.grab(gzipF)) {
-        gzip = gzipF.getValue();
-      }
-      Flag overwriteF = new Flag(OVERWRITE_OPTION_ID);
-      if(config.grab(overwriteF)) {
-        warnoverwrite = !overwriteF.getValue(); // inverse!
-      }
-      PatternParameter filterP = new PatternParameter(FILTER_PATTERN_ID) //
-          .setOptional(true);
-      if(config.grab(filterP)) {
-        filter = filterP.getValue();
-      }
+      new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
+          .setOptional(true) //
+          .grab(config, x -> out = x);
+      new Flag(GZIP_OUTPUT_ID).grab(config, x -> gzip = x);
+      new Flag(OVERWRITE_OPTION_ID).grab(config, x -> warnoverwrite = !x);
+      new PatternParameter(FILTER_PATTERN_ID) //
+          .setOptional(true) //
+          .grab(config, x -> filter = x);
     }
 
     @Override

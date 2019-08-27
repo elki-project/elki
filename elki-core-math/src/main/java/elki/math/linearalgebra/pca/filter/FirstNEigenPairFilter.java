@@ -78,11 +78,9 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter nP = new IntParameter(EIGENPAIR_FILTER_N) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(nP)) {
-        n = nP.intValue();
-      }
+      new IntParameter(EIGENPAIR_FILTER_N) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> n = x);
     }
 
     @Override

@@ -818,33 +818,19 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      IntParameter k_iP = new IntParameter(K_I_ID, 30) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(k_iP)) {
-        k_i = k_iP.getValue();
-      }
-      IntParameter lP = new IntParameter(L_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(lP)) {
-        l = lP.getValue();
-      }
-
-      IntParameter m_iP = new IntParameter(M_I_ID, 10) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(m_iP)) {
-        m_i = m_iP.getValue();
-      }
-
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(K_I_ID, 30) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k_i = x);
+      new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> l = x);
+      new IntParameter(M_I_ID, 10) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> m_i = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

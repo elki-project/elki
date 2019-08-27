@@ -237,11 +237,9 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minptsP = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.intValue();
-      }
+      new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x);
       Class<RandomProjectedNeighborsAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandomProjectedNeighborsAndDensities.class);
       index = config.tryInstantiate(clz);
     }

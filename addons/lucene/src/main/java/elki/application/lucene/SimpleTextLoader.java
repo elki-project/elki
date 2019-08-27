@@ -103,14 +103,10 @@ public class SimpleTextLoader extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter srcP = new FileParameter(SOURCE_ID, FileParameter.FileType.INPUT_FILE);
-      if (config.grab(srcP)) {
-        source = srcP.getValue();
-      }
-      FileParameter idxP = new FileParameter(INDEX_ID, FileParameter.FileType.OUTPUT_FILE);
-      if (config.grab(idxP)) {
-        index = idxP.getValue();
-      }
+      new FileParameter(SOURCE_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> source = x);
+      new FileParameter(INDEX_ID, FileParameter.FileType.OUTPUT_FILE) //
+          .grab(config, x -> index = x);
     }
 
     @Override

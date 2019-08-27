@@ -435,20 +435,12 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter rmaxP = new DoubleParameter(RMAX_ID);
-      if(config.grab(rmaxP)) {
-        rmax = rmaxP.doubleValue();
-      }
-
-      final IntParameter nminP = new IntParameter(NMIN_ID, 20);
-      if(config.grab(nminP)) {
-        nmin = nminP.intValue();
-      }
-
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
-      }
+      new DoubleParameter(RMAX_ID) //
+          .grab(config, x -> rmax = x);
+      new IntParameter(NMIN_ID, 20) //
+          .grab(config, x -> nmin = x);
+      new DoubleParameter(ALPHA_ID, 0.5) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

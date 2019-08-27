@@ -320,10 +320,8 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DependenceMeasure> simP = new ObjectParameter<>(SIM_ID, DependenceMeasure.class, CorrelationDependenceMeasure.class);
-      if(config.grab(simP)) {
-        sim = simP.instantiateClass(config);
-      }
+      new ObjectParameter<DependenceMeasure>(SIM_ID, DependenceMeasure.class, CorrelationDependenceMeasure.class) //
+          .grab(config, x -> sim = x);
     }
   }
 }

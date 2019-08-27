@@ -175,15 +175,12 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter param = new IntParameter(K_ID);
-      // Since in a database context, the 1 nearest neighbor
-      // will usually be the query object itself, we require
-      // this value to be at least 2.
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(param)) {
-        k = param.intValue();
-      }
+      new IntParameter(K_ID)//
+          // Since in a database context, the 1 nearest neighbor
+          // will usually be the query object itself, we require
+          // this value to be at least 2.
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

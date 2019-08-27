@@ -433,29 +433,19 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntGeneratorParameter kP = new IntGeneratorParameter(KRANGE_ID);
-      if(config.grab(kP)) {
-        krange = kP.getValue();
-      }
+      new IntGeneratorParameter(KRANGE_ID) //
+          .grab(config, x -> krange = x);
       bylabel = config.tryInstantiate(ByLabelOutlier.class);
       // Output
       outfile = super.getParameterOutputFile(config, "File to output the resulting score vectors to.");
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
-          .setOptional(true);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
-
-      PatternParameter disableP = new PatternParameter(DISABLE_ID) //
-          .setOptional(true);
-      if(config.grab(disableP)) {
-        disable = disableP.getValue();
-      }
-      IntParameter ksqP = new IntParameter(KSQUARE_ID, 100);
-      if(config.grab(ksqP)) {
-        ksquarestop = ksqP.intValue();
-      }
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
+          .grab(config, x -> scaling = x);
+      new PatternParameter(DISABLE_ID) //
+          .setOptional(true) //
+          .grab(config, x -> disable = x);
+      new IntParameter(KSQUARE_ID, 100) //
+          .grab(config, x -> ksquarestop = x);
     }
 
     @Override

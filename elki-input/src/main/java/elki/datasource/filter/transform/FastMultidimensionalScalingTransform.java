@@ -346,26 +346,13 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter dimP = new IntParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID);
-      if(config.grab(dimP)) {
-        tdim = dimP.intValue();
-      }
-
-      ObjectParameter<PrimitiveDistance<? super I>> distP = new ObjectParameter<>(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distP)) {
-        dist = distP.instantiateClass(config);
-      }
-
-      RandomParameter randP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randP)) {
-        random = randP.getValue();
-      }
-
-      ObjectParameter<NumberVector.Factory<O>> factoryP = new ObjectParameter<>(ClassicMultidimensionalScalingTransform.Parameterizer.VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
+      new IntParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID) //
+          .grab(config, x -> tdim = x);
+      new ObjectParameter<PrimitiveDistance<? super I>>(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> dist = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
+      new ObjectParameter<NumberVector.Factory<O>>(ClassicMultidimensionalScalingTransform.Parameterizer.VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class) //
+          .grab(config, x -> factory = x);
     }
 
     @Override

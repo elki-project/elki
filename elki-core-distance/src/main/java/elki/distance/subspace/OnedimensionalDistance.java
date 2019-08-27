@@ -153,11 +153,9 @@ public class OnedimensionalDistance extends AbstractNumberVectorDistance impleme
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimP = new IntParameter(DIM_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(dimP)) {
-        dim = dimP.getValue();
-      }
+      new IntParameter(DIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> dim = x);
     }
 
     @Override

@@ -147,10 +147,8 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter patternP = new PatternParameter(OUTLIER_PATTERN_ID, DEFAULT_PATTERN);
-      if(config.grab(patternP)) {
-        pattern = patternP.getValue();
-      }
+      new PatternParameter(OUTLIER_PATTERN_ID, DEFAULT_PATTERN) //
+          .grab(config, x -> pattern = x);
     }
 
     @Override

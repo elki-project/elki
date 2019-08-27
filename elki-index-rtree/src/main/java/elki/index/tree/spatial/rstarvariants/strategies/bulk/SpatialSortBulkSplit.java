@@ -91,11 +91,8 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<SpatialSorter> sorterP = new ObjectParameter<>(SORTER_ID, SpatialSorter.class);
-      if(config.grab(sorterP)) {
-        sorter = sorterP.instantiateClass(config);
-      }
+      new ObjectParameter<SpatialSorter>(SORTER_ID, SpatialSorter.class) //
+          .grab(config, x -> sorter = x);
     }
 
     @Override

@@ -110,10 +110,8 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeans<?, KMeansModel>> kmeansP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class);
-      if(config.grab(kmeansP)) {
-        kmeans = kmeansP.instantiateClass(config);
-      }
+      new ObjectParameter<KMeans<?, KMeansModel>>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class) //
+          .grab(config, x -> kmeans = x);
     }
 
     @Override

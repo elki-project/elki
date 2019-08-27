@@ -151,11 +151,8 @@ public class ChiDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter dofP = new DoubleParameter(DOF_ID);
-      if(config.grab(dofP)) {
-        dof = dofP.doubleValue();
-      }
+      new DoubleParameter(DOF_ID) //
+          .grab(config, x -> dof = x);
     }
 
     @Override

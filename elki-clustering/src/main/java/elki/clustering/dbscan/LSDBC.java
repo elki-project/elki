@@ -328,17 +328,12 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
+      new IntParameter(K_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(ALPHA_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

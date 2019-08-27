@@ -215,10 +215,8 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter fileP = new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(fileP)) {
-        file = fileP.getValue();
-      }
+      new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> file = x);
     }
 
     @Override

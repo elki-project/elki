@@ -213,16 +213,11 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter shareP = new DoubleParameter(SHARE_ID) //
+        new DoubleParameter(SHARE_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-        if(config.grab(shareP)) {
-          share = shareP.getValue();
-        }
-        RandomParameter rndP = new RandomParameter(SEED_ID);
-        if(config.grab(rndP)) {
-          rnd = rndP.getValue();
-        }
+            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+            .grab(config, x -> share = x);
+        new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
       }
 
       @Override

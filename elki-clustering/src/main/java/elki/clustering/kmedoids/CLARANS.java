@@ -493,29 +493,16 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(KMeans.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      IntParameter numlocalP = new IntParameter(RESTARTS_ID, 2) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(numlocalP)) {
-        numlocal = numlocalP.intValue();
-      }
-
-      DoubleParameter maxneighborP = new DoubleParameter(NEIGHBORS_ID, defaultRate()) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(maxneighborP)) {
-        maxneighbor = maxneighborP.doubleValue();
-      }
-
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+      new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(RESTARTS_ID, 2) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> numlocal = x);
+      new DoubleParameter(NEIGHBORS_ID, defaultRate()) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> maxneighbor = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
 
     @Override

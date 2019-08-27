@@ -366,10 +366,8 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<Distance<? super O>> distanceP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
-        if(config.grab(distanceP)) {
-          distanceFunction = distanceP.instantiateClass(config);
-        }
+        new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class) //
+            .grab(config, x -> distanceFunction = x);
       }
 
       @Override

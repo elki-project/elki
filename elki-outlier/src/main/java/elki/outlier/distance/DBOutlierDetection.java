@@ -175,12 +175,10 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pP = new DoubleParameter(P_ID) //
+      new DoubleParameter(P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(pP)) {
-        p = pP.getValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> p = x);
     }
 
     @Override

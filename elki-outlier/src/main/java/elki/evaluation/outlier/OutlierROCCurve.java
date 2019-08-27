@@ -205,10 +205,8 @@ public class OutlierROCCurve implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if(config.grab(positiveClassNameP)) {
-        positiveClassName = positiveClassNameP.getValue();
-      }
+      new PatternParameter(POSITIVE_CLASS_NAME_ID) //
+          .grab(config, x -> positiveClassName = x);
     }
 
     @Override

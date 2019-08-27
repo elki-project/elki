@@ -37,8 +37,8 @@ import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.math.MeanVariance;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
@@ -275,21 +275,12 @@ public class EvaluateSilhouette<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distance = distP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
-
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        Flag penalizeP = new Flag(NO_PENALIZE_ID);
-        if(config.grab(penalizeP)) {
-          penalize = penalizeP.isFalse();
-        }
+        new Flag(NO_PENALIZE_ID).grab(config, x -> penalize = !x);
       }
     }
 

@@ -622,14 +622,10 @@ public class DendrogramVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<DrawingStyle> styleP = new EnumParameter<>(STYLE_ID, DrawingStyle.class, DrawingStyle.RECTANGULAR);
-      if(config.grab(styleP)) {
-        style = styleP.getValue();
-      }
-      EnumParameter<PositionStyle> style2P = new EnumParameter<>(LAYOUT_ID, PositionStyle.class, PositionStyle.HALF_POS);
-      if(config.grab(style2P)) {
-        style2 = style2P.getValue();
-      }
+      new EnumParameter<DrawingStyle>(STYLE_ID, DrawingStyle.class, DrawingStyle.RECTANGULAR) //
+          .grab(config, x -> style = x);
+      new EnumParameter<PositionStyle>(LAYOUT_ID, PositionStyle.class, PositionStyle.HALF_POS) //
+          .grab(config, x -> style2 = x);
     }
 
     @Override

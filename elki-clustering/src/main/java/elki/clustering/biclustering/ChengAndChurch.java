@@ -870,33 +870,18 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.doubleValue();
-      }
-
-      IntParameter nP = new IntParameter(N_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(nP)) {
-        n = nP.intValue();
-      }
-
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      ObjectParameter<Distribution> distP = new ObjectParameter<>(DIST_ID, Distribution.class, UniformDistribution.class);
-      if(config.grab(distP)) {
-        dist = distP.instantiateClass(config);
-      }
-
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new DoubleParameter(DELTA_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> delta = x);
+      new IntParameter(N_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> n = x);
+      new DoubleParameter(ALPHA_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new ObjectParameter<Distribution>(DIST_ID, Distribution.class, UniformDistribution.class) //
+          .grab(config, x -> dist = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

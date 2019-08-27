@@ -54,6 +54,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
@@ -684,29 +685,16 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter nminP = new IntParameter(NMIN_ID, 20);
-      if(config.grab(nminP)) {
-        nmin = nminP.getValue();
-      }
-
-      final IntParameter g = new IntParameter(GRIDS_ID, 1);
-      if(config.grab(g)) {
-        this.g = g.getValue();
-      }
-
-      final RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        this.rnd = rndP.getValue();
-      }
-
-      final IntParameter alphaP = new IntParameter(ALPHA_ID, 4);
-      if(config.grab(alphaP)) {
-        this.alpha = alphaP.getValue();
-        if(this.alpha < 1) {
-          this.alpha = 1;
-        }
-      }
+      new IntParameter(NMIN_ID, 20) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> this.nmin = x);
+      new IntParameter(GRIDS_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> this.g = x);
+      new IntParameter(ALPHA_ID, 4) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> this.alpha = x);
+      new RandomParameter(SEED_ID).grab(config, x -> this.rnd = x);
     }
 
     @Override

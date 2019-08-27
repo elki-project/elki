@@ -176,16 +176,10 @@ public class CauchyDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(locP)) {
-        location = locP.doubleValue();
-      }
-
-      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if(config.grab(shapeP)) {
-        shape = shapeP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> location = x);
+      new DoubleParameter(SHAPE_ID) //
+          .grab(config, x -> shape = x);
     }
 
     @Override

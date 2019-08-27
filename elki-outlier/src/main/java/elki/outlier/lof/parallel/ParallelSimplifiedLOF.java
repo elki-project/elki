@@ -183,11 +183,8 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<Dis
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
+      new IntParameter(LOF.Parameterizer.K_ID) //
+          .grab(config, x -> k = x);
     }
 
     @Override

@@ -94,10 +94,8 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PageFileFactory<?>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class, MemoryPageFileFactory.class);
-      if(config.grab(pffP)) {
-        pageFileFactory = pffP.instantiateClass(config);
-      }
+      new ObjectParameter<PageFileFactory<?>>(PAGEFILE_ID, PageFileFactory.class, MemoryPageFileFactory.class) //
+          .grab(config, x -> pageFileFactory = x);
     }
 
     @Override

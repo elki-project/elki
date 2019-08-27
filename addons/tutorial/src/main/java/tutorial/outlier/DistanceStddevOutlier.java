@@ -149,11 +149,9 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
     protected void makeOptions(Parameterization config) {
       // The super class has the distance function parameter!
       super.makeOptions(config);
-      IntParameter kParam = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kParam)) {
-        k = kParam.getValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

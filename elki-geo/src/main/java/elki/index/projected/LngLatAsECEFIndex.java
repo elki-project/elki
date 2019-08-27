@@ -252,25 +252,12 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-        if(config.grab(modelP)) {
-          model = modelP.instantiateClass(config);
-        }
-
-        ObjectParameter<IndexFactory<O>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
-        if(config.grab(innerP)) {
-          inner = innerP.instantiateClass(config);
-        }
-
-        Flag materializeF = new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG);
-        if(config.grab(materializeF)) {
-          materialize = materializeF.isTrue();
-        }
-
-        Flag norefineF = new Flag(ProjectedIndex.Factory.Parameterizer.DISABLE_REFINE_FLAG);
-        if(config.grab(norefineF)) {
-          norefine = norefineF.isTrue();
-        }
+        new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
+            .grab(config, x -> model = x);
+        new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class) //
+            .grab(config, x -> inner = x);
+        new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG).grab(config, x -> materialize = x);
+        new Flag(ProjectedIndex.Factory.Parameterizer.DISABLE_REFINE_FLAG).grab(config, x -> norefine = x);
       }
 
       @Override

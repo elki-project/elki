@@ -124,18 +124,9 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pminDev = new DoubleParameter(DEV_MIN_ID, 0.);
-      if(config.grab(pminDev)) {
-        minDev = pminDev.getValue();
-      }
-      DoubleParameter pmaxDev = new DoubleParameter(DEV_MAX_ID);
-      if(config.grab(pmaxDev)) {
-        maxDev = pmaxDev.getValue();
-      }
-      Flag symmetricF = new Flag(SYMMETRIC_ID);
-      if(config.grab(symmetricF)) {
-        symmetric = symmetricF.isTrue();
-      }
+      new DoubleParameter(DEV_MIN_ID, 0.).grab(config, x -> minDev = x);
+      new DoubleParameter(DEV_MAX_ID).grab(config, x -> maxDev = x);
+      new Flag(SYMMETRIC_ID).grab(config, x -> symmetric = x);
     }
 
     @Override

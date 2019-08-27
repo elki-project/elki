@@ -168,10 +168,8 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<S> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, getSimilarityRestriction());
-      if(config.grab(param)) {
-        similarityFunction = param.instantiateClass(config);
-      }
+      new ObjectParameter<S>(SIMILARITY_FUNCTION_ID, getSimilarityRestriction()) //
+          .grab(config, x -> similarityFunction = x);
     }
 
     /**

@@ -331,22 +331,14 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KMeans.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<>(KMeans.INIT_ID, KMedoidsInitialization.class, ParkJun.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.intValue();
-      }
+      new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, ParkJun.class) //
+          .grab(config, x -> initializer = x);
+      new IntParameter(KMeans.MAXITER_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> maxiter = x);
     }
 
     @Override

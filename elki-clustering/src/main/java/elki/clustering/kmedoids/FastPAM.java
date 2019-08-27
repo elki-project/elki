@@ -334,12 +334,10 @@ public class FastPAM<V> extends FastPAM1<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter fasttolP = new DoubleParameter(FASTTOL_ID, 1.) //
+      new DoubleParameter(FASTTOL_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(fasttolP)) {
-        fasttol = fasttolP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> fasttol = x);
     }
 
     @Override

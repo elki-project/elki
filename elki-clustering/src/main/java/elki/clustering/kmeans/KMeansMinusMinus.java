@@ -318,15 +318,10 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(rateP)) {
-        rate = rateP.doubleValue();
-      }
-      Flag createNoiseCluster = new Flag(NOISE_FLAG_ID);
-      if(config.grab(createNoiseCluster)) {
-        noiseFlag = createNoiseCluster.getValue();
-      }
+      new DoubleParameter(RATE_ID, 0.05) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> rate = x);
+      new Flag(NOISE_FLAG_ID).grab(config, x -> noiseFlag = x);
     }
 
     @Override

@@ -320,16 +320,11 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       Class<SharedNearestNeighborSimilarity<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarity.class);
       similarityFunction = config.tryInstantiate(cls);
 
-      IntParameter epsilonP = new IntParameter(EPSILON_ID);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
-
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.intValue();
-      }
+      new IntParameter(EPSILON_ID) //
+          .grab(config, x -> epsilon = x);
+      new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x);
     }
 
     @Override

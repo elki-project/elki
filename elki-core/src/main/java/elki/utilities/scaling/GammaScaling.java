@@ -86,10 +86,8 @@ public class GammaScaling implements StaticScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter gammaP = new DoubleParameter(GAMMA_ID);
-      if(config.grab(gammaP)) {
-        gamma = gammaP.getValue();
-      }
+      new DoubleParameter(GAMMA_ID) //
+          .grab(config, x -> gamma = x);
     }
 
     @Override

@@ -936,16 +936,10 @@ public class GammaDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter kP = new DoubleParameter(K_ID);
-      if(config.grab(kP)) {
-        k = kP.doubleValue();
-      }
-
-      DoubleParameter thetaP = new DoubleParameter(THETA_ID);
-      if(config.grab(thetaP)) {
-        theta = thetaP.doubleValue();
-      }
+      new DoubleParameter(K_ID) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(THETA_ID) //
+          .grab(config, x -> theta = x);
     }
 
     @Override

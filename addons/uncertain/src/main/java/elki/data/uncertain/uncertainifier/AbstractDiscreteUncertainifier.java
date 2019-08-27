@@ -100,20 +100,17 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Uncertainifier<?>> innerP = new ObjectParameter<>(INNER_ID, Uncertainifier.class);
-      if(config.grab(innerP)) {
-        inner = innerP.instantiateClass(config);
-        if(inner instanceof AbstractDiscreteUncertainifier) {
-          LoggingUtil.warning("Using a discrete uncertainifier inside a discrete uncertainifier is likely a configuration error, and is likely to produce too many duplicate points. Did you mean to use a uniform or gaussian distribution instead?");
-        }
+      new ObjectParameter<Uncertainifier<?>>(INNER_ID, Uncertainifier.class) //
+          .grab(config, x -> inner = x);
+      if(inner instanceof AbstractDiscreteUncertainifier) {
+        LoggingUtil.warning("Using a discrete uncertainifier inside a discrete uncertainifier is likely a configuration error, and is likely to produce too many duplicate points. Did you mean to use a uniform or gaussian distribution instead?");
       }
-      IntParameter pmultMax = new IntParameter(MULT_MAX_ID, DEFAULT_SAMPLE_SIZE);
-      if(config.grab(pmultMax)) {
-        maxQuant = pmultMax.intValue();
-      }
-      IntParameter pmultMin = new IntParameter(MULT_MIN_ID) //
-      .setOptional(true);
-      minQuant = config.grab(pmultMin) ? pmultMin.intValue() : maxQuant;
+      new IntParameter(MULT_MAX_ID, DEFAULT_SAMPLE_SIZE) //
+          .grab(config, x -> maxQuant = x);
+      minQuant = maxQuant;
+      new IntParameter(MULT_MIN_ID) //
+          .setOptional(true) //
+          .grab(config, x -> minQuant = x);
     }
   }
 }

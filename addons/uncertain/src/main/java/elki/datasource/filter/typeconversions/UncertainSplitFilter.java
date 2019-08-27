@@ -119,11 +119,9 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimsP = new IntParameter(DIM_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(dimsP)) {
-        dims = dimsP.intValue();
-      }
+      new IntParameter(DIM_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dims = x);
     }
 
     @Override

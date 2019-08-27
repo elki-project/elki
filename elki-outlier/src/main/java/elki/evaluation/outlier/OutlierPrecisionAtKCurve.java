@@ -170,15 +170,11 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if(config.grab(positiveClassNameP)) {
-        positiveClassName = positiveClassNameP.getValue();
-      }
-      IntParameter maxkP = new IntParameter(MAX_K_ID) //
-          .setOptional(true);
-      if(config.grab(maxkP)) {
-        maxk = maxkP.getValue();
-      }
+      new PatternParameter(POSITIVE_CLASS_NAME_ID) //
+          .grab(config, x -> positiveClassName = x);
+      new IntParameter(MAX_K_ID) //
+          .setOptional(true) //
+          .grab(config, x -> maxk = x);
     }
 
     @Override

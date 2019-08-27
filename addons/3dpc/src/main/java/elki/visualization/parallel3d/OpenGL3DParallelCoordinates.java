@@ -652,10 +652,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Layouter3DPC<O>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class);
-      if(config.grab(layoutP)) {
-        layout = layoutP.instantiateClass(config);
-      }
+      new ObjectParameter<Layouter3DPC<O>>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class) //
+          .grab(config, x -> layout = x);
     }
 
     @Override

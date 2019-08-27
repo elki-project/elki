@@ -490,19 +490,13 @@ public class PoissonDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter nP = new IntParameter(N_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(nP)) {
-        n = nP.intValue();
-      }
-
-      DoubleParameter probP = new DoubleParameter(PROB_ID) //
+      new IntParameter(N_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> n = x);
+      new DoubleParameter(PROB_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(probP)) {
-        p = probP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> p = x);
     }
 
     @Override

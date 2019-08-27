@@ -144,15 +144,10 @@ public class OutlierThresholdClustering implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
-
-      DoubleListParameter thresholdP = new DoubleListParameter(THRESHOLD_ID);
-      if(config.grab(thresholdP)) {
-        threshold = thresholdP.getValue().clone();
-      }
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class) //
+          .grab(config, x -> scaling = x);
+      new DoubleListParameter(THRESHOLD_ID) //
+          .grab(config, x -> threshold = x.clone());
     }
 
     @Override

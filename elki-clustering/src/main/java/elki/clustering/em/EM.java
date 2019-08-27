@@ -461,36 +461,22 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      ObjectParameter<EMClusterModelFactory<V, M>> initialP = new ObjectParameter<>(INIT_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1e-7)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.getValue();
-      }
-
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID)//
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<EMClusterModelFactory<V, M>>(INIT_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
+          .grab(config, x -> initializer = x);
+      new DoubleParameter(DELTA_ID, 1e-7)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> delta = x);
+      new IntParameter(KMeans.MAXITER_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
-          .setOptional(true);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
-      }
-
-      DoubleParameter priorP = new DoubleParameter(PRIOR_ID) //
           .setOptional(true) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(priorP)) {
-        prior = priorP.doubleValue();
-      }
+          .grab(config, x -> maxiter = x);
+      new DoubleParameter(PRIOR_ID) //
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> prior = x);
     }
 
     @Override

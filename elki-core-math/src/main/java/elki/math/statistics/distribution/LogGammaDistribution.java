@@ -218,21 +218,12 @@ public class LogGammaDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter kP = new DoubleParameter(GammaDistribution.Parameterizer.K_ID);
-      if(config.grab(kP)) {
-        k = kP.doubleValue();
-      }
-
-      DoubleParameter thetaP = new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID);
-      if(config.grab(thetaP)) {
-        theta = thetaP.doubleValue();
-      }
-
-      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID);
-      if(config.grab(shiftP)) {
-        shift = shiftP.doubleValue();
-      }
+      new DoubleParameter(GammaDistribution.Parameterizer.K_ID) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID) //
+          .grab(config, x -> theta = x);
+      new DoubleParameter(SHIFT_ID) //
+          .grab(config, x -> shift = x);
     }
 
     @Override

@@ -143,11 +143,9 @@ public class StratifiedCrossValidation extends AbstractHoldout {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter nfoldP = new IntParameter(NFOLD_ID, N_DEFAULT)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(nfoldP)) {
-        nfold = nfoldP.intValue();
-      }
+      new IntParameter(NFOLD_ID, N_DEFAULT)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> nfold = x);
     }
 
     @Override

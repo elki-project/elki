@@ -182,22 +182,16 @@ public class DimensionSelectingLatLngDistance implements SpatialPrimitiveDistanc
       super.makeOptions(config);
       IntParameter dimlatP = new IntParameter(LATDIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(dimlatP)) {
-        dimlat = dimlatP.getValue();
-      }
+      dimlatP.grab(config, x -> dimlat = x);
       IntParameter dimlngP = new IntParameter(LNGDIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(dimlngP)) {
-        dimlng = dimlngP.getValue();
-      }
+      dimlngP.grab(config, x -> dimlng = x);
       // Non-formalized parameter constraint:
       if(dimlat == dimlng) {
         config.reportError(new WrongParameterValueException(dimlatP, "and", dimlngP, "should be different columns."));
       }
-      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if(config.grab(modelP)) {
-        model = modelP.instantiateClass(config);
-      }
+      new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
+          .grab(config, x -> model = x);
     }
 
     @Override

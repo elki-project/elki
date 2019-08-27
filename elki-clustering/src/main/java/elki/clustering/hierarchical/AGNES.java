@@ -365,11 +365,9 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<Linkage> linkageP = new ObjectParameter<>(LINKAGE_ID, Linkage.class);
-      linkageP.setDefaultValue(WardLinkage.class);
-      if(config.grab(linkageP)) {
-        linkage = linkageP.instantiateClass(config);
-      }
+      new ObjectParameter<Linkage>(LINKAGE_ID, Linkage.class) //
+          .setDefaultValue(WardLinkage.class) //
+          .grab(config, x -> linkage = x);
       super.makeOptions(config);
     }
 

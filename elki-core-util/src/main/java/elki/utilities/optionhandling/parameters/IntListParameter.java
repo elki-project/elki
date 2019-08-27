@@ -110,26 +110,6 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
   }
 
   /**
-   * Get the values as a bitmask.
-   *
-   * See also: {@link elki.utilities.datastructures.BitsUtil}
-   *
-   * @return Bitmask
-   */
-  public long[] getValueAsBitSet() {
-    int[] value = getValue();
-    int maxd = 0;
-    for(int d : value) {
-      maxd = (d > maxd) ? d : maxd;
-    }
-    long[] dimensions = new long[(maxd >>> 6) + 1];
-    for(int d : value) {
-      dimensions[d >>> 6] |= 1L << (d & 0x3F);
-    }
-    return dimensions;
-  }
-
-  /**
    * Get the parameter.
    *
    * @param config Parameterization

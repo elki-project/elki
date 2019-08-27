@@ -26,11 +26,7 @@ import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -178,40 +174,14 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
        */
       private NeighborSetPredicate.Factory<O> inner;
 
-      /**
-       * Inner neighborhood parameter.
-       * 
-       * @param config Parameterization
-       * @return Inner neighborhood.
-       */
-      protected static <O> NeighborSetPredicate.Factory<O> getParameterInnerNeighborhood(Parameterization config) {
-        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
-        if(config.grab(param)) {
-          return param.instantiateClass(config);
-        }
-        return null;
-      }
-
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        inner = getParameterInnerNeighborhood(config);
-        steps = getParameterSteps(config);
-      }
-
-      /**
-       * Get the number of steps to do in the neighborhood graph.
-       * 
-       * @param config Parameterization
-       * @return number of steps, default 1
-       */
-      public static int getParameterSteps(Parameterization config) {
-        final IntParameter param = new IntParameter(STEPS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(param)) {
-          return param.getValue();
-        }
-        return 1;
+        new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class) //
+            .grab(config, x -> inner = x);
+        new IntParameter(STEPS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> steps = x);
       }
 
       @Override

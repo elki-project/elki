@@ -94,10 +94,8 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistance.class);
-      if(config.grab(normP)) {
-        norm = normP.instantiateClass(config);
-      }
+      new ObjectParameter<Norm<? super V>>(NORM_ID, Norm.class, EuclideanDistance.class) //
+          .grab(config, x -> norm = x);
     }
 
     @Override

@@ -194,10 +194,8 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configDistance(Parameterization config) {
       // Get a distance function.
-      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceP)) {
-        distfun = distanceP.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distfun = x);
     }
 
     /**
@@ -207,10 +205,8 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configEpsilon(Parameterization config) {
       // Get the epsilon parameter
-      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
+      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+          .grab(config, x -> epsilon = x);
     }
   }
 }

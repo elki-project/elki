@@ -290,23 +290,15 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       out = super.getParameterOutputFile(config, "Output image file name.");
-      IntParameter stepsP = new IntParameter(STEPS_ID) //
-          .setOptional(true);
-      if(config.grab(stepsP)) {
-        steps = stepsP.intValue();
-      }
-      IntParameter resolutionP = new IntParameter(RESOLUTION_ID, 2000);
-      if(config.grab(resolutionP)) {
-        resolution = resolutionP.intValue();
-      }
-      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.XTD);
-      if(config.grab(modeP)) {
-        mode = modeP.getValue();
-      }
-      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if(config.grab(modelP)) {
-        model = modelP.instantiateClass(config);
-      }
+      new IntParameter(STEPS_ID) //
+          .setOptional(true) //
+          .grab(config, x -> steps = x);
+      new IntParameter(RESOLUTION_ID, 2000) //
+          .grab(config, x -> resolution = x);
+      new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.XTD) //
+          .grab(config, x -> mode = x);
+      new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
+          .grab(config, x -> model = x);
     }
 
     @Override

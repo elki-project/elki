@@ -483,38 +483,23 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startP = new IntParameter(STARTK_ID, 3) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(startP)) {
-        startk = startP.intValue();
-      }
-      IntParameter maxkP = new IntParameter(MAXK_ID, 20) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(maxkP)) {
-        maxk = maxkP.intValue();
-      }
-      IntParameter samplesP = new IntParameter(SAMPLE_ID, 1000) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(samplesP)) {
-        samples = samplesP.intValue();
-      }
-      RandomParameter seedP = new RandomParameter(SEED_ID);
-      if(config.grab(seedP)) {
-        rnd = seedP.getValue();
-      }
-      IntParameter dimP = new IntParameter(DIM_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(dimP)) {
-        dim = dimP.intValue();
-      }
-      EnumParameter<Aggregate> aggP = new EnumParameter<>(AGGREGATE_ID, Aggregate.class, Aggregate.MED_MAD);
-      if(config.grab(aggP)) {
-        agg = aggP.getValue();
-      }
-      EnumParameter<OutputFormat> formatP = new EnumParameter<>(FORMAT_ID, OutputFormat.class, OutputFormat.TABULAR);
-      if(config.grab(formatP)) {
-        format = formatP.getValue();
-      }
+      new IntParameter(STARTK_ID, 3) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> startk = x);
+      new IntParameter(MAXK_ID, 20) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> maxk = x);
+      new IntParameter(SAMPLE_ID, 1000) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> samples = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+      new IntParameter(DIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dim = x);
+      new EnumParameter<Aggregate>(AGGREGATE_ID, Aggregate.class, Aggregate.MED_MAD) //
+          .grab(config, x -> agg = x);
+      new EnumParameter<OutputFormat>(FORMAT_ID, OutputFormat.class, OutputFormat.TABULAR) //
+          .grab(config, x -> format = x);
     }
 
     @Override

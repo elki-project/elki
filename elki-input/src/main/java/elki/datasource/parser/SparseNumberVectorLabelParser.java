@@ -209,10 +209,8 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
+      new ObjectParameter<SparseNumberVector.Factory<V>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class) //
+          .grab(config, x -> factory = x);
     }
 
     @Override

@@ -171,10 +171,7 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag dropfirstP = new Flag(KEEPFIRST_ID);
-      if(config.grab(dropfirstP)) {
-        keepfirst = dropfirstP.isTrue();
-      }
+      new Flag(KEEPFIRST_ID).grab(config, x -> keepfirst = x);
     }
 
     @Override

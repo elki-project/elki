@@ -107,12 +107,9 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractVecto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter boostP = new DoubleParameter(BOOST_ID, 1.) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(boostP)) {
-        boost = boostP.doubleValue();
-      }
+      new DoubleParameter(BOOST_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> boost = x);
     }
 
     @Override

@@ -187,21 +187,12 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      PatternParameter patternP = new PatternParameter(PATTERN_ID);
-      if(config.grab(patternP)) {
-        pattern = patternP.getValue();
-      }
-
-      StringParameter positiveP = new StringParameter(POSITIVE_ID, "positive");
-      if(config.grab(positiveP)) {
-        positive = positiveP.getValue();
-      }
-
-      StringParameter negativeP = new StringParameter(NEGATIVE_ID, "negative");
-      if(config.grab(negativeP)) {
-        negative = negativeP.getValue();
-      }
+      new PatternParameter(PATTERN_ID) //
+          .grab(config, x -> pattern = x);
+      new StringParameter(POSITIVE_ID, "positive") //
+          .grab(config, x -> positive = x);
+      new StringParameter(NEGATIVE_ID, "negative") //
+          .grab(config, x -> negative = x);
     }
 
     @Override

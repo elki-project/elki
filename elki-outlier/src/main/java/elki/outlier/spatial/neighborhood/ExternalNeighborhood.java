@@ -20,12 +20,7 @@
  */
 package elki.outlier.spatial.neighborhood;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,11 +33,7 @@ import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
@@ -208,21 +199,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        file = getParameterNeighborhoodFile(config);
-      }
-
-      /**
-       * Get the neighborhood parameter.
-       * 
-       * @param config Parameterization
-       * @return Instance or null
-       */
-      protected static File getParameterNeighborhoodFile(Parameterization config) {
-        final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE);
-        if(config.grab(param)) {
-          return param.getValue();
-        }
-        return null;
+        new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE) //
+            .grab(config, x -> file = x);
       }
 
       @Override

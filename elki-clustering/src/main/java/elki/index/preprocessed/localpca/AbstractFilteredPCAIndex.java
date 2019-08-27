@@ -212,21 +212,13 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final ObjectParameter<Distance<NV>> pcaDistanceP = new ObjectParameter<>(PCA_DISTANCE_ID, Distance.class, EuclideanDistance.class);
+        new ObjectParameter<Distance<NV>>(PCA_DISTANCE_ID, Distance.class, EuclideanDistance.class) //
 
-        if(config.grab(pcaDistanceP)) {
-          pcaDistance = pcaDistanceP.instantiateClass(config);
-        }
-
-        ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
-        if(config.grab(pcaP)) {
-          pca = pcaP.instantiateClass(config);
-        }
-
-        ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-        if(config.grab(filterP)) {
-          filter = filterP.instantiateClass(config);
-        }
+            .grab(config, x -> pcaDistance = x);
+        new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+            .grab(config, x -> pca = x);
+        new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
+            .grab(config, x -> filter = x);
       }
     }
   }

@@ -336,26 +336,16 @@ public class ExportVisualizations implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter outputP = new FileParameter(FOLDER_ID, FileType.OUTPUT_FILE);
-      if(config.grab(outputP)) {
-        output = outputP.getValue();
-      }
-
-      DoubleParameter ratioP = new DoubleParameter(RATIO_ID, 1.33) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(ratioP)) {
-        ratio = ratioP.doubleValue();
-      }
-
-      EnumParameter<Format> formatP = new EnumParameter<>(FORMAT_ID, Format.class, Format.SVG);
-      if(config.grab(formatP)) {
-        format = formatP.getValue();
-      }
+      new FileParameter(FOLDER_ID, FileType.OUTPUT_FILE) //
+          .grab(config, x -> output = x);
+      new DoubleParameter(RATIO_ID, 1.33) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> ratio = x);
+      new EnumParameter<Format>(FORMAT_ID, Format.class, Format.SVG) //
+          .grab(config, x -> format = x);
       if(format == Format.PNG || format == Format.JPEG) {
-        IntParameter iwidthP = new IntParameter(IWIDTH_ID, 1000);
-        if(config.grab(iwidthP)) {
-          iwidth = iwidthP.intValue();
-        }
+        new IntParameter(IWIDTH_ID, 1000) //
+            .grab(config, x -> iwidth = x);
       }
 
       manager = config.tryInstantiate(VisualizerParameterizer.class);

@@ -156,11 +156,9 @@ public class EDRDistance extends DTWDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1.0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.doubleValue();
-      }
+      new DoubleParameter(DELTA_ID, 1.0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> delta = x);
     }
 
     /**

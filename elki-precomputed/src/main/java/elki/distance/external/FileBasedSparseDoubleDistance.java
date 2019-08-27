@@ -232,20 +232,12 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter matrixfileP = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(matrixfileP)) {
-        matrixfile = matrixfileP.getValue();
-      }
-
-      ObjectParameter<DistanceParser> parserP = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
-      if(config.grab(parserP)) {
-        parser = parserP.instantiateClass(config);
-      }
-
-      DoubleParameter distanceP = new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY);
-      if(config.grab(distanceP)) {
-        defaultDistance = distanceP.doubleValue();
-      }
+      new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> matrixfile = x);
+      new ObjectParameter<DistanceParser>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class) //
+          .grab(config, x -> parser = x);
+      new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY) //
+          .grab(config, x -> defaultDistance = x);
     }
 
     @Override

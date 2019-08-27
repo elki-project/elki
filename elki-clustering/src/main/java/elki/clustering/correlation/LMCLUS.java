@@ -559,29 +559,16 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter maxLMDimP = new IntParameter(MAXDIM_ID) //
+      new IntParameter(MAXDIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .setOptional(true);
-      if(config.grab(maxLMDimP)) {
-        maxdim = maxLMDimP.getValue();
-      }
-      IntParameter minsizeP = new IntParameter(MINSIZE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minsizeP)) {
-        minsize = minsizeP.getValue();
-      }
-      IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID, 100);
-      if(config.grab(samplingLevelP)) {
-        samplingLevel = samplingLevelP.getValue();
-      }
-      DoubleParameter sensivityThresholdP = new DoubleParameter(THRESHOLD_ID);
-      if(config.grab(sensivityThresholdP)) {
-        threshold = sensivityThresholdP.getValue();
-      }
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> maxdim = x);
+      new IntParameter(MINSIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minsize = x);
+      new IntParameter(SAMPLINGL_ID, 100).grab(config, x -> samplingLevel = x);
+      new DoubleParameter(THRESHOLD_ID).grab(config, x -> threshold = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

@@ -396,23 +396,14 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.instantiateClass(config);
-      }
-
+      new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class) //
+          .grab(config, x -> kernel = x);
       IntParameter kminP = new IntParameter(KMIN_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kminP)) {
-        kmin = kminP.intValue();
-      }
-
+      kminP.grab(config, x -> kmin = x);
       IntParameter kmaxP = new IntParameter(KMAX_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kmaxP)) {
-        kmax = kmaxP.intValue();
-      }
+      kmaxP.grab(config, x -> kmax = x);
       // Non-formalized parameter constraint: k_min <= k_max
       if(kmin > kmax) {
         config.reportError(new WrongParameterValueException(kminP, "must be at most", kmaxP, ""));
@@ -426,17 +417,12 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
         // bandwidth, when the kernel is configured.
         scale = scaleP.doubleValue() * ((kernel != null) ? kernel.canonicalBandwidth() : 1.);
       }
-      DoubleParameter minbwP = new DoubleParameter(KERNEL_MIN_ID) //
+      new DoubleParameter(KERNEL_MIN_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .setOptional(true);
-      if(config.grab(minbwP)) {
-        minBandwidth = minbwP.doubleValue();
-      }
-
-      IntParameter idimP = new IntParameter(IDIM_ID, 1);
-      if(config.grab(idimP)) {
-        idim = idimP.intValue();
-      }
+          .setOptional(true) //
+          .grab(config, x -> minBandwidth = x);
+      new IntParameter(IDIM_ID, 1) //
+          .grab(config, x -> idim = x);
     }
 
     @Override

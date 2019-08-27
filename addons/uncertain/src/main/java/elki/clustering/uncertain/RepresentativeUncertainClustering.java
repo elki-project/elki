@@ -20,11 +20,7 @@
  */
 package elki.clustering.uncertain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import elki.AbstractAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
@@ -45,11 +41,7 @@ import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.DBIDFactory;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
@@ -72,13 +64,10 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.pairs.DoubleObjPair;
 import elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -450,13 +439,11 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       distance = ClusteringAdjustedRandIndexSimilarity.STATIC;
-      ObjectParameter<ClusteringDistanceSimilarity> simP = new ObjectParameter<>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarity.class, ClusteringAdjustedRandIndexSimilarity.class);
-      if(config.grab(simP)) {
-        distance = simP.instantiateClass(config);
-      }
+      new ObjectParameter<ClusteringDistanceSimilarity>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarity.class, ClusteringAdjustedRandIndexSimilarity.class) //
+          .grab(config, x -> distance = x);
       // Configure Distance function
-      ListParameterization predef = new ListParameterization();
-      predef.addParameter(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, distance);
+      ListParameterization predef = new ListParameterization() //
+          .addParameter(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);
@@ -475,24 +462,14 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + samplesAlgorithm.getInputTypeRestriction()[0]));
         }
       }
-      IntParameter pdepth = new IntParameter(SAMPLES_ID, DEFAULT_ENSEMBLE_DEPTH);
-      if(config.grab(pdepth)) {
-        numsamples = pdepth.getValue();
-      }
-      Flag keepF = new Flag(KEEP_SAMPLES_ID);
-      if(config.grab(keepF)) {
-        keep = keepF.isTrue();
-      }
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
-      DoubleParameter palpha = new DoubleParameter(ALPHA_ID, 0.95) //
+      new IntParameter(SAMPLES_ID, DEFAULT_ENSEMBLE_DEPTH) //
+          .grab(config, x -> numsamples = x);
+      new Flag(KEEP_SAMPLES_ID).grab(config, x -> keep = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
+      new DoubleParameter(ALPHA_ID, 0.95) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(palpha)) {
-        alpha = palpha.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

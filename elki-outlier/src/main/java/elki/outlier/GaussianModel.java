@@ -159,10 +159,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final Flag flag = new Flag(INVERT_ID);
-      if(config.grab(flag)) {
-        invert = flag.getValue();
-      }
+      new Flag(INVERT_ID).grab(config, x -> invert = x);
     }
 
     @Override

@@ -517,11 +517,9 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter leafP = new IntParameter(MinimalisticMemoryKDTree.Factory.Parameterizer.LEAFSIZE_P, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(leafP)) {
-          leafsize = leafP.intValue();
-        }
+        new IntParameter(MinimalisticMemoryKDTree.Factory.Parameterizer.LEAFSIZE_P, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> leafsize = x);
       }
 
       @Override

@@ -346,17 +346,13 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config); // Distance
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(DELTA_ID) //
           .setDefaultValue(1.1) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.getValue();
-      }
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+          .grab(config, x -> delta = x);
     }
 
     @Override

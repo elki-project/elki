@@ -514,35 +514,22 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      IntParameter k_iP = new IntParameter(K_I_ID, 30) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(k_iP)) {
-        k_i = k_iP.getValue();
-      }
-      IntParameter lP = new IntParameter(L_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(lP)) {
-        l = lP.getValue();
-      }
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5) //
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(K_I_ID, 30) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k_i = x);
+      new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> l = x);
+      new DoubleParameter(ALPHA_ID, 0.5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
-      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if(config.grab(pcaP)) {
-        pca = pcaP.instantiateClass(config);
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> pca = x);
     }
 
     @Override

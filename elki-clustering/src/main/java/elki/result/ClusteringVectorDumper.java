@@ -231,22 +231,13 @@ public class ClusteringVectorDumper implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter outputP = new FileParameter(OUT_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .setOptional(true);
-      if(config.grab(outputP)) {
-        outputFile = outputP.getValue();
-      }
-
-      Flag appendF = new Flag(APPEND_ID);
-      if(config.grab(appendF)) {
-        append = appendF.isTrue();
-      }
-
-      StringParameter labelP = new StringParameter(FORCE_LABEL_ID) //
-          .setOptional(true);
-      if(config.grab(labelP)) {
-        forceLabel = labelP.getValue();
-      }
+      new FileParameter(OUT_ID, FileParameter.FileType.OUTPUT_FILE) //
+          .setOptional(true) //
+          .grab(config, x -> outputFile = x);
+      new Flag(APPEND_ID).grab(config, x -> append = x);
+      new StringParameter(FORCE_LABEL_ID) //
+          .setOptional(true) //
+          .grab(config, x -> forceLabel = x);
     }
 
     @Override

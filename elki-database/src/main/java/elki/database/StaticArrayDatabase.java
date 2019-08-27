@@ -205,16 +205,12 @@ public class StaticArrayDatabase extends AbstractDatabase {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dbcP)) {
-        databaseConnection = dbcP.instantiateClass(config);
-      }
+      new ObjectParameter<DatabaseConnection>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
+          .grab(config, x -> databaseConnection = x);
       // Get indexes.
-      ObjectListParameter<IndexFactory<?>> indexFactoryP = new ObjectListParameter<IndexFactory<?>>(INDEX_ID, IndexFactory.class) //
-          .setOptional(true);
-      if(config.grab(indexFactoryP)) {
-        indexFactories = indexFactoryP.instantiateClasses(config);
-      }
+      new ObjectListParameter<IndexFactory<?>>(INDEX_ID, IndexFactory.class) //
+          .setOptional(true) //
+          .grab(config, x -> indexFactories = x);
     }
 
     @Override

@@ -157,18 +157,12 @@ public class CSVReaderFormat {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR);
-      if(config.grab(colParam)) {
-        colSep = colParam.getValue();
-      }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_CHARS);
-      if(config.grab(quoteParam)) {
-        quoteChars = quoteParam.getValue();
-      }
-      PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
-      if(config.grab(commentP)) {
-        comment = commentP.getValue();
-      }
+      new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR) //
+          .grab(config, x -> colSep = x);
+      new StringParameter(QUOTE_ID, QUOTE_CHARS) //
+          .grab(config, x -> quoteChars = x);
+      new PatternParameter(COMMENT_ID, COMMENT_PATTERN) //
+          .grab(config, x -> comment = x);
     }
 
     @Override

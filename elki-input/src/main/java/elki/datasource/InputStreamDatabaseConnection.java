@@ -76,7 +76,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(Supplier<InputStream> in, List<ObjectFilter> filters, Parser parser) {
+  public InputStreamDatabaseConnection(Supplier<InputStream> in, List<? extends ObjectFilter> filters, Parser parser) {
     super(filters);
     this.in = in;
     this.parser = parser;
@@ -89,7 +89,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(InputStream ins, List<ObjectFilter> filters, Parser parser) {
+  public InputStreamDatabaseConnection(InputStream ins, List<? extends ObjectFilter> filters, Parser parser) {
     super(filters);
     this.ins = ins;
     this.parser = parser;
@@ -188,10 +188,8 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<InputStream> inP = new ObjectParameter<>(STREAM_ID, InputStream.class, System.in);
-      if(config.grab(inP)) {
-        instream = inP.instantiateClass(config);
-      }
+      new ObjectParameter<InputStream>(STREAM_ID, InputStream.class, System.in) //
+          .grab(config, x -> instream = x);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
       configFilters(config);
     }

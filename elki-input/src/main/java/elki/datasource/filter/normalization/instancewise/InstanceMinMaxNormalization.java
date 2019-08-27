@@ -162,13 +162,9 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter minP = new DoubleParameter(MIN_ID, 0.);
-      if(config.grab(minP)) {
-        min = minP.doubleValue();
-      }
+      minP.grab(config, x -> min = x);
       DoubleParameter maxP = new DoubleParameter(MAX_ID, 1.);
-      if(config.grab(maxP)) {
-        max = maxP.doubleValue();
-      }
+      maxP.grab(config, x -> max = x);
       // Non-formalized parameter constraint: min < max
       if(min >= max) {
         config.reportError(new WrongParameterValueException(minP, "must be less than", maxP, ""));

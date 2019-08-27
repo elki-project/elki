@@ -105,29 +105,20 @@ public abstract class AbstractXTreeFactory<O extends NumberVector, N extends Abs
       super.makeOptions(config);
       // Bulk loads are not supported yet:
       // super.configBulkLoad(config);
-      final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, 0.3);
-      MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(MIN_FANOUT_PARAMETER)) {
-        settings.relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
-      }
-      final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, 0.3);
-      REINSERT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      REINSERT_PARAMETER.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(REINSERT_PARAMETER)) {
-        float reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
-        settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistance.STATIC)));
-      }
-      final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
-      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(MAX_OVERLAP_PARAMETER)) {
-        settings.max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
-      }
-      final EnumParameter<XTreeSettings.Overlap> OVERLAP_TYPE_PARAMETER = new EnumParameter<>(OVERLAP_TYPE_ID, XTreeSettings.Overlap.class, XTreeSettings.Overlap.VOLUME_OVERLAP);
-      if(config.grab(OVERLAP_TYPE_PARAMETER)) {
-        settings.overlap_type = OVERLAP_TYPE_PARAMETER.getValue();
-      }
+      new DoubleParameter(MIN_FANOUT_ID, 0.3) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> settings.relativeMinFanout = x);
+      new DoubleParameter(REINSERT_ID, 0.3) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(x, SquaredEuclideanDistance.STATIC))));
+      new DoubleParameter(MAX_OVERLAP_ID, 0.2) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> settings.max_overlap = (float) x);
+      new EnumParameter<XTreeSettings.Overlap>(OVERLAP_TYPE_ID, XTreeSettings.Overlap.class, XTreeSettings.Overlap.VOLUME_OVERLAP) //
+          .grab(config, x -> settings.overlap_type = x);
     }
 
     @Override

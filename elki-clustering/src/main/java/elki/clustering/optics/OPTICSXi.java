@@ -742,27 +742,14 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter xiP = new DoubleParameter(XI_ID)//
+      new DoubleParameter(XI_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(xiP)) {
-        xi = xiP.doubleValue();
-      }
-
-      ClassParameter<OPTICSTypeAlgorithm> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICSHeap.class);
-      if(config.grab(opticsP)) {
-        optics = opticsP.instantiateClass(config);
-      }
-
-      Flag nocorrectF = new Flag(NOCORRECT_ID);
-      if(config.grab(nocorrectF)) {
-        nocorrect = nocorrectF.isTrue();
-      }
-
-      Flag keepsteepF = new Flag(KEEPSTEEP_ID);
-      if(config.grab(keepsteepF)) {
-        keepsteep = keepsteepF.isTrue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> xi = x);
+      new ClassParameter<OPTICSTypeAlgorithm>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICSHeap.class) //
+          .grab(config, x -> optics = x);
+      new Flag(NOCORRECT_ID).grab(config, x -> nocorrect = x);
+      new Flag(KEEPSTEEP_ID).grab(config, x -> keepsteep = x);
     }
 
     @Override

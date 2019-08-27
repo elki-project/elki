@@ -35,8 +35,8 @@ import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -193,15 +193,10 @@ public class EvaluateSquaredErrors implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistance<?>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distP)) {
-        distance = distP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
+      new ObjectParameter<NumberVectorDistance<?>>(DISTANCE_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
     }
 
     @Override

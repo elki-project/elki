@@ -169,10 +169,7 @@ public class OutlierGammaScaling implements OutlierScaling {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag normalizeF = new Flag(NORMALIZE_ID);
-      if(config.grab(normalizeF)) {
-        normalize = normalizeF.getValue();
-      }
+      new Flag(NORMALIZE_ID).grab(config, x -> normalize = x);
     }
 
     @Override

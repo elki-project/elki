@@ -326,10 +326,8 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<Similarity<? super O>> similarityP = new ObjectParameter<>(DISTANCE_ID, Similarity.class);
-        if(config.grab(similarityP)) {
-          similarityFunction = similarityP.instantiateClass(config);
-        }
+        new ObjectParameter<Similarity<? super O>>(DISTANCE_ID, Similarity.class) //
+            .grab(config, x -> similarityFunction = x);
       }
 
       @Override

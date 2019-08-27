@@ -26,7 +26,6 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorTypeInformation;
 import elki.datasource.filter.AbstractStreamConversionFilter;
-import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -43,11 +42,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> Vector type
  */
 public class MultivariateTimeSeriesFilter<V extends FeatureVector<?>> extends AbstractStreamConversionFilter<V, V> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(MultivariateTimeSeriesFilter.class);
-
   /**
    * Number of variates to use.
    */
@@ -104,14 +98,9 @@ public class MultivariateTimeSeriesFilter<V extends FeatureVector<?>> extends Ab
 
     @Override
     protected void makeOptions(Parameterization config) {
-      IntParameter variatesP = new IntParameter(VARIATES_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(variatesP)) {
-        variates = variatesP.intValue();
-        if(variates == 1) {
-          LOG.warning("For univariate series, you should not need to use this filter.");
-        }
-      }
+      new IntParameter(VARIATES_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> variates = x);
     }
 
     @Override

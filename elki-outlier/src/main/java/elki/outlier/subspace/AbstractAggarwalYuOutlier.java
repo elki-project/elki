@@ -227,16 +227,12 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      final IntParameter phiP = new IntParameter(PHI_ID)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(phiP)) {
-        phi = phiP.getValue();
-      }
+      new IntParameter(K_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(PHI_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> phi = x);
     }
   }
 }

@@ -138,23 +138,13 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter samplesizeP = new IntParameter(N_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(samplesizeP)) {
-        samplesize = samplesizeP.getValue();
-      }
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(scaleP)) {
-        scale = scaleP.getValue();
-      }
-
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        rnd = randomP.getValue();
-      }
+      new IntParameter(N_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> samplesize = x);
+      new DoubleParameter(SCALE_ID, 1.0) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> scale = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

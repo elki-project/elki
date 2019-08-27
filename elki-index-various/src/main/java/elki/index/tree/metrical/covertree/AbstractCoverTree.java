@@ -314,23 +314,19 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class);
-        if(config.grab(distanceFunctionP)) {
-          distanceFunction = distanceFunctionP.instantiateClass(config);
-          if(!distanceFunction.isMetric()) {
-            LoggingUtil.warning("CoverTree requires a metric to be exact.");
-          }
-        }
-        IntParameter truncateP = new IntParameter(TRUNCATE_ID, 10)//
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(truncateP)) {
-          truncate = truncateP.intValue();
-        }
-        DoubleParameter expansionP = new DoubleParameter(EXPANSION_ID, 1.3)//
-            .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
-        if(config.grab(expansionP)) {
-          expansion = expansionP.doubleValue();
-        }
+        new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class) //
+            .grab(config, x -> {
+              distanceFunction = x;
+              if(!distanceFunction.isMetric()) {
+                LoggingUtil.warning("CoverTree requires a metric to be exact.");
+              }
+            });
+        new IntParameter(TRUNCATE_ID, 10)//
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> truncate = x);
+        new DoubleParameter(EXPANSION_ID, 1.3)//
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+            .grab(config, x -> expansion = x);
       }
     }
   }

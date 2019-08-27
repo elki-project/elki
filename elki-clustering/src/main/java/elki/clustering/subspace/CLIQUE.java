@@ -552,23 +552,14 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter xsiP = new IntParameter(XSI_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(xsiP)) {
-        xsi = xsiP.intValue();
-      }
-
-      DoubleParameter tauP = new DoubleParameter(TAU_ID) //
+      new IntParameter(XSI_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> xsi = x);
+      new DoubleParameter(TAU_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(tauP)) {
-        tau = tauP.doubleValue();
-      }
-
-      Flag pruneF = new Flag(PRUNE_ID);
-      if(config.grab(pruneF)) {
-        prune = pruneF.isTrue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> tau = x);
+      new Flag(PRUNE_ID).grab(config, x -> prune = x);
     }
 
     @Override

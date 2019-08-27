@@ -661,14 +661,10 @@ public class ArffParser implements Parser {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter eidP = new PatternParameter(MAGIC_EID_ID, DEFAULT_ARFF_MAGIC_EID);
-      if(config.grab(eidP)) {
-        magic_eid = eidP.getValue();
-      }
-      PatternParameter classP = new PatternParameter(MAGIC_CLASS_ID, DEFAULT_ARFF_MAGIC_CLASS);
-      if(config.grab(classP)) {
-        magic_class = classP.getValue();
-      }
+      new PatternParameter(MAGIC_EID_ID, DEFAULT_ARFF_MAGIC_EID) //
+          .grab(config, x -> magic_eid = x);
+      new PatternParameter(MAGIC_CLASS_ID, DEFAULT_ARFF_MAGIC_CLASS) //
+          .grab(config, x -> magic_class = x);
     }
 
     @Override

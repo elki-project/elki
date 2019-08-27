@@ -91,16 +91,11 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter k_maxP = new IntParameter(K_ID);
-      k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(k_maxP)) {
-        settings.k_max = k_maxP.intValue();
-      }
-
-      ObjectParameter<SpatialPrimitiveDistance<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, DEFAULT_DISTANCE_FUNCTION);
-      if(config.grab(distanceFunctionP)) {
-        settings.distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> settings.k_max = x);
+      new ObjectParameter<SpatialPrimitiveDistance<NumberVector>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, DEFAULT_DISTANCE_FUNCTION) //
+          .grab(config, x -> settings.distanceFunction = x);
     }
 
     @Override

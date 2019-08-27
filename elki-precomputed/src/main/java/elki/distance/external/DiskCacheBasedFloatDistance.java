@@ -131,7 +131,7 @@ public class DiskCacheBasedFloatDistance extends AbstractDBIDRangeDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(param)) {
         File matrixfile = param.getValue();
         try {

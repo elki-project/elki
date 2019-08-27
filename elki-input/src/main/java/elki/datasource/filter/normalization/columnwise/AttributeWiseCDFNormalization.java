@@ -73,7 +73,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
   /**
    * Stores the distribution estimators
    */
-  protected List<DistributionEstimator<?>> estimators;
+  protected List<? extends DistributionEstimator<?>> estimators;
 
   /**
    * Stores the estimated distributions
@@ -90,7 +90,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    *
    * @param estimators Distribution estimators
    */
-  public AttributeWiseCDFNormalization(List<DistributionEstimator<?>> estimators) {
+  public AttributeWiseCDFNormalization(List<? extends DistributionEstimator<?>> estimators) {
     super();
     this.estimators = estimators;
   }
@@ -276,16 +276,14 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
     /**
      * Stores the distribution estimators
      */
-    private List<DistributionEstimator<?>> estimators;
+    private List<? extends DistributionEstimator<?>> estimators;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectListParameter<DistributionEstimator<?>> estP = new ObjectListParameter<>(DISTRIBUTIONS_ID, DistributionEstimator.class);
-      estP.setDefaultValue(Arrays.asList(BestFitEstimator.class));
-      if(config.grab(estP)) {
-        estimators = estP.instantiateClasses(config);
-      }
+      new ObjectListParameter<DistributionEstimator<?>>(DISTRIBUTIONS_ID, DistributionEstimator.class) //
+          .setDefaultValue(Arrays.asList(BestFitEstimator.class)) //
+          .grab(config, x -> estimators = x);
     }
 
     @Override

@@ -336,26 +336,17 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
     @Override
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.doubleValue();
-      }
-      IntParameter sampleSizep = new IntParameter(SAMPLE_SIZE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(sampleSizep)) {
-        sampleSize = sampleSizep.intValue();
-      }
-      DoubleParameter thresholdp = new DoubleParameter(THRESHOLD_ID, 0.5) //
+      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
+      new IntParameter(SAMPLE_SIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> sampleSize = x);
+      new DoubleParameter(THRESHOLD_ID, 0.5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(thresholdp)) {
-        threshold = thresholdp.doubleValue();
-      }
-      RandomParameter seedp = new RandomParameter(SEED_ID);
-      if(config.grab(seedp)) {
-        seed = seedp.getValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> threshold = x);
+      new RandomParameter(SEED_ID).grab(config, x -> seed = x);
     }
 
     @Override

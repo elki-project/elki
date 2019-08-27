@@ -187,16 +187,12 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get the similarity function.
-      ObjectParameter<Similarity<O>> distanceP = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, Similarity.class);
-      if(config.grab(distanceP)) {
-        distfun = distanceP.instantiateClass(config);
-      }
+      new ObjectParameter<Similarity<O>>(SIMILARITY_FUNCTION_ID, Similarity.class) //
+          .grab(config, x -> distfun = x);
       // Get the epsilon parameter
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.doubleValue();
-      }
+      new DoubleParameter(EPSILON_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
     }
 
     @Override

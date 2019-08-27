@@ -322,11 +322,9 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter perplexityP = new DoubleParameter(PERPLEXITY_ID, 4.5) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(perplexityP)) {
-        perplexity = perplexityP.doubleValue();
-      }
+      new DoubleParameter(PERPLEXITY_ID, 4.5) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> perplexity = x);
     }
 
     @Override

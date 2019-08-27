@@ -211,27 +211,14 @@ public class OutlierLinearScaling implements OutlierScaling {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minP = new DoubleParameter(MIN_ID).setOptional(true);
-      if(config.grab(minP)) {
-        min = minP.getValue();
+      new DoubleParameter(MIN_ID).setOptional(true) //
+          .grab(config, x -> min = x);
+      new DoubleParameter(MAX_ID).setOptional(true) //
+          .grab(config, x -> max = x);
+      if(min == null && max == null) {
+        new Flag(MEAN_ID).grab(config, x -> usemean = x);
       }
-
-      DoubleParameter maxP = new DoubleParameter(MAX_ID).setOptional(true);
-      if(config.grab(maxP)) {
-        max = maxP.getValue();
-      }
-
-      if(!minP.isDefined() && !maxP.isDefined()) {
-        Flag meanF = new Flag(MEAN_ID);
-        if(config.grab(meanF)) {
-          usemean = meanF.getValue();
-        }
-      }
-
-      Flag nozerosF = new Flag(NOZEROS_ID);
-      if(config.grab(nozerosF)) {
-        nozeros = nozerosF.getValue();
-      }
+      new Flag(NOZEROS_ID).grab(config, x -> nozeros = x);
     }
 
     @Override

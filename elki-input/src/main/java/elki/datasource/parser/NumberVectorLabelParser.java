@@ -403,10 +403,8 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
-      ObjectParameter<NumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
+      new ObjectParameter<NumberVector.Factory<V>>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class) //
+          .grab(config, x -> factory = x);
     }
 
     /**
@@ -415,11 +413,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
      * @param config Parameterization
      */
     protected void getLabelIndices(Parameterization config) {
-      IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID) //
-          .setOptional(true);
-      if(config.grab(labelIndicesP)) {
-        labelIndices = labelIndicesP.getValueAsBitSet();
-      }
+      new IntListParameter(LABEL_INDICES_ID) //
+          .setOptional(true) //
+          .grab(config, x -> labelIndices = BitsUtil.of(x));
     }
 
     @Override

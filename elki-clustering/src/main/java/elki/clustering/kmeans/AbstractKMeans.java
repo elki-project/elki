@@ -624,7 +624,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           }
           result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], Double.NaN)));
         }
-      } else {
+      }
+      else {
         double totalvariance = 0.;
         for(int i = 0; i < clusters.size(); i++) {
           DBIDs ids = clusters.get(i);
@@ -705,11 +706,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterK(Parameterization config) {
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     /**
@@ -752,10 +751,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterInitialization(Parameterization config) {
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
+      new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class) //
+          .grab(config, x -> initializer = x);
     }
 
     /**
@@ -764,11 +761,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterMaxIter(Parameterization config) {
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
-      }
+      new IntParameter(MAXITER_ID, 0)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> maxiter = x);
     }
 
     /**
@@ -777,8 +772,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterVarstat(Parameterization config) {
-      Flag varF = new Flag(VARSTAT_ID);
-      varstat = config.grab(varF) && varF.isTrue();
+      new Flag(VARSTAT_ID).grab(config, x -> varstat = x);
     }
 
     @Override

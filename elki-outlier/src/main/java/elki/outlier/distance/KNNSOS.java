@@ -186,11 +186,9 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KNN_ID, 15) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      new IntParameter(KNN_ID, 15) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

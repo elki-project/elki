@@ -86,10 +86,8 @@ public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
-      if(config.grab(param)) {
-        npredf = param.instantiateClass(config);
-      }
+      new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class) //
+          .grab(config, x -> npredf = x);
     }
   }
 }

@@ -66,7 +66,7 @@ import elki.utilities.xml.XMLNodeIterator;
 
 /**
  * Data source from an XML specification.
- *
+ * <p>
  * This data source will generate random (or pseudo-random, fixed seeds are
  * supported) data sets that satisfy a given specification file.
  *
@@ -211,7 +211,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @param reassignByDistance Reassign objects by distance instead of density
    * @param clusterRandom Random number generator
    */
-  public GeneratorXMLDatabaseConnection(List<ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
+  public GeneratorXMLDatabaseConnection(List<? extends ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
     super(filters);
     this.specfile = specfile;
     this.sizescale = sizescale;
@@ -769,32 +769,20 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Specification file
-      final FileParameter cfgparam = new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(cfgparam)) {
-        specfile = cfgparam.getValue();
-      }
+      new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> specfile = x);
       // Cluster size scaling
-      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, 1.);
-      if(config.grab(scalepar)) {
-        sizescale = scalepar.getValue().doubleValue();
-      }
+      new DoubleParameter(SIZE_SCALE_ID, 1.) //
+          .grab(config, x -> sizescale = x);
       // Reassign pattern
-      final PatternParameter reassignP = new PatternParameter(REASSIGN_ID) //
-          .setOptional(true);
-      if(config.grab(reassignP)) {
-        reassign = reassignP.getValue();
-      }
+      new PatternParameter(REASSIGN_ID) //
+          .setOptional(true) //
+          .grab(config, x -> reassign = x);
       if(reassign != null) {
-        final Flag bydistanceF = new Flag(REASSIGN_DISTANCE_ID);
-        if(config.grab(bydistanceF)) {
-          reassignByDistance = bydistanceF.isTrue();
-        }
+        new Flag(REASSIGN_DISTANCE_ID).grab(config, x -> reassignByDistance = x);
       }
       // Random generator
-      final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
-      if(config.grab(rndP)) {
-        clusterRandom = rndP.getValue();
-      }
+      new RandomParameter(RANDOMSEED_ID).grab(config, x -> clusterRandom = x);
       super.configFilters(config);
     }
 

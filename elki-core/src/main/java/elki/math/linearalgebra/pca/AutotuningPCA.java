@@ -271,10 +271,8 @@ public class AutotuningPCA extends PCARunner {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, SignificantEigenPairFilter.class);
-      if(config.grab(filterP)) {
-        filter = filterP.instantiateClass(config);
-      }
+      new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, SignificantEigenPairFilter.class) //
+          .grab(config, x -> filter = x);
     }
 
     @Override

@@ -81,11 +81,9 @@ public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter k_maxP = new IntParameter(K_ID);
-      k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(k_maxP)) {
-        settings.kmax = k_maxP.intValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> settings.kmax = x);
     }
 
     @Override

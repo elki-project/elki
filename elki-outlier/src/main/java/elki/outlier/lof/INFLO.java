@@ -306,17 +306,12 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter mP = new DoubleParameter(M_ID, 1.0)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(mP)) {
-        m = mP.doubleValue();
-      }
-
-      final IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      new DoubleParameter(M_ID, 1.0)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> m = x);
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

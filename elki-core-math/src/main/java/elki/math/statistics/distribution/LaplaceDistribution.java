@@ -199,16 +199,10 @@ public class LaplaceDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(locP)) {
-        location = locP.doubleValue();
-      }
-
-      DoubleParameter rateP = new DoubleParameter(RATE_ID);
-      if(config.grab(rateP)) {
-        rate = rateP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> location = x);
+      new DoubleParameter(RATE_ID) //
+          .grab(config, x -> rate = x);
     }
 
     @Override

@@ -249,12 +249,9 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter pK = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.intValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

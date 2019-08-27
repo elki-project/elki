@@ -186,21 +186,13 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
     @Override
     protected void makeOptions(Parameterization config) {
-      IntParameter trialsP = new IntParameter(TRIALS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(trialsP)) {
-        trials = trialsP.intValue();
-      }
-
-      ObjectParameter<KMeans<V, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
-      if(config.grab(kMeansVariantP)) {
-        kMeansVariant = kMeansVariantP.instantiateClass(config);
-      }
-
-      ObjectParameter<KMeansQualityMeasure<V>> qualityMeasureP = new ObjectParameter<>(QUALITYMEASURE_ID, KMeansQualityMeasure.class);
-      if(config.grab(qualityMeasureP)) {
-        qualityMeasure = qualityMeasureP.instantiateClass(config);
-      }
+      new IntParameter(TRIALS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> trials = x);
+      new ObjectParameter<KMeans<V, M>>(KMEANS_ID, KMeans.class) //
+          .grab(config, x -> kMeansVariant = x);
+      new ObjectParameter<KMeansQualityMeasure<V>>(QUALITYMEASURE_ID, KMeansQualityMeasure.class) //
+          .grab(config, x -> qualityMeasure = x);
     }
 
     @Override

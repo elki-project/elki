@@ -337,10 +337,8 @@ public class VoronoiVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.VORONOI);
-      if(config.grab(modeP)) {
-        mode = modeP.getValue();
-      }
+      new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.VORONOI) //
+          .grab(config, x -> mode = x);
     }
 
     @Override

@@ -126,11 +126,9 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minclustersP = new IntParameter(MINCLUSTERS_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(minclustersP)) {
-        minclusters = minclustersP.intValue();
-      }
+      new IntParameter(MINCLUSTERS_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> minclusters = x);
     }
 
     @Override

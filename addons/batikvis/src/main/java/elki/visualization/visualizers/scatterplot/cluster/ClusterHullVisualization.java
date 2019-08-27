@@ -366,10 +366,8 @@ public class ClusterHullVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
+      new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

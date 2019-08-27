@@ -190,16 +190,10 @@ public class RayleighDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter meanP = new DoubleParameter(LOCATION_ID, 0.);
-      if(config.grab(meanP)) {
-        mean = meanP.doubleValue();
-      }
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if(config.grab(scaleP)) {
-        scale = scaleP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID, 0.) //
+          .grab(config, x -> mean = x);
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> scale = x);
     }
 
     @Override

@@ -301,12 +301,9 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter minptsP = new IntParameter(MIN_PTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(minptsP)) {
-        minPts = minptsP.getValue();
-      }
+      new IntParameter(MIN_PTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> minPts = x);
     }
   }
 }

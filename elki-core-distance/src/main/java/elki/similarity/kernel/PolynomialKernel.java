@@ -134,16 +134,12 @@ public class PolynomialKernel extends AbstractVectorSimilarity implements Primit
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(degreeP)) {
-        degree = degreeP.intValue();
-      }
-      final DoubleParameter biasP = new DoubleParameter(BIAS_ID) //
-          .setOptional(true);
-      if(config.grab(biasP)) {
-        bias = biasP.doubleValue();
-      }
+      new IntParameter(DEGREE_ID, DEFAULT_DEGREE) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> degree = x);
+      new DoubleParameter(BIAS_ID) //
+          .setOptional(true) //
+          .grab(config, x -> bias = x);
     }
 
     @Override

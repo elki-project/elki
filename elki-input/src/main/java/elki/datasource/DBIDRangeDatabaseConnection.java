@@ -96,14 +96,10 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startp = new IntParameter(START_ID, 0);
-      if(config.grab(startp)) {
-        start = startp.intValue();
-      }
-      IntParameter countp = new IntParameter(COUNT_ID);
-      if(config.grab(countp)) {
-        count = countp.intValue();
-      }
+      new IntParameter(START_ID, 0) //
+          .grab(config, x -> start = x);
+      new IntParameter(COUNT_ID) //
+          .grab(config, x -> count = x);
     }
 
     @Override

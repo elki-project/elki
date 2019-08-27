@@ -205,15 +205,10 @@ public class JudgeOutlierScores implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if(config.grab(positiveClassNameP)) {
-        positiveClassName = positiveClassNameP.getValue();
-      }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
+      new PatternParameter(POSITIVE_CLASS_NAME_ID) //
+          .grab(config, x -> positiveClassName = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class) //
+          .grab(config, x -> scaling = x);
     }
 
     @Override

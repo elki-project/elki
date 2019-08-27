@@ -112,11 +112,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag absoluteF = new Flag(EIGENPAIR_FILTER_ABSOLUTE);
-      if(config.grab(absoluteF)) {
-        absolute = absoluteF.isTrue();
-      }
-
+      new Flag(EIGENPAIR_FILTER_ABSOLUTE).grab(config, x -> absolute = x);
       DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       // Conditional Constraint:
@@ -126,9 +122,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
         deltaP.setDefaultValue(DEFAULT_DELTA)//
             .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       }
-      if(config.grab(deltaP)) {
-        delta = deltaP.doubleValue();
-      }
+      deltaP.grab(config, x -> delta = x);
     }
 
     @Override

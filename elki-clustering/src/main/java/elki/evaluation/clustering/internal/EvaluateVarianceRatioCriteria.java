@@ -39,8 +39,8 @@ import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.math.linearalgebra.Centroid;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -257,17 +257,10 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
-
+      new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        Flag penalizeP = new Flag(NO_PENALIZE_ID);
-        if(config.grab(penalizeP)) {
-          penalize = penalizeP.isFalse();
-        }
+        new Flag(NO_PENALIZE_ID).grab(config, x -> penalize = !x);
       }
     }
 

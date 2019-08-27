@@ -181,11 +181,9 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter param = new IntParameter(D_ZERO_ID, 5) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(param)) {
-        d_zero = param.getValue();
-      }
+      new IntParameter(D_ZERO_ID, 5) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> d_zero = x);
     }
 
     @Override

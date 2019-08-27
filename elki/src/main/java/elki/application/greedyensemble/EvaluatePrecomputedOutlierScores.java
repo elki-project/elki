@@ -331,22 +331,16 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
       super.makeOptions(config);
       // Data input
       infile = super.getParameterInputFile(config, "Input file containing the outlier score vectors.");
-      ObjectParameter<StreamingParser> parserP = new ObjectParameter<>(PARSER_ID, StreamingParser.class, NumberVectorLabelParser.class);
-      if(config.grab(parserP)) {
-        parser = parserP.instantiateClass(config);
-      }
+      new ObjectParameter<StreamingParser>(PARSER_ID, StreamingParser.class, NumberVectorLabelParser.class) //
+          .grab(config, x -> parser = x);
       outfile = super.getParameterOutputFile(config, "File to output the resulting evaluation vectors to.");
       // Row name prefix
-      StringParameter nameP = new StringParameter(NAME_ID) //
-          .setOptional(true);
-      if(config.grab(nameP)) {
-        name = nameP.getValue();
-      }
+      new StringParameter(NAME_ID) //
+          .setOptional(true) //
+          .grab(config, x -> name = x);
       // Pattern for reversed methods:
-      PatternParameter reverseP = new PatternParameter(REVERSED_ID, KNOWN_REVERSED);
-      if(config.grab(reverseP)) {
-        reverse = reverseP.getValue();
-      }
+      new PatternParameter(REVERSED_ID, KNOWN_REVERSED) //
+          .grab(config, x -> reverse = x);
     }
 
     @Override

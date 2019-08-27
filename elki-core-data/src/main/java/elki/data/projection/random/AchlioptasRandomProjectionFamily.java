@@ -100,12 +100,10 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter sparsP = new DoubleParameter(SPARSITY_ID) //
+      new DoubleParameter(SPARSITY_ID) //
           .setDefaultValue(3.) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
-      if(config.grab(sparsP)) {
-        sparsity = sparsP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> sparsity = x);
     }
 
     @Override

@@ -189,10 +189,10 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter dimP = new IntParameter(DIM_P)//
+      new IntParameter(DIM_P)//
           .setOptional(true)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      dim = config.grab(dimP) ? dimP.intValue() : -1;
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dim = x);
     }
 
     @Override

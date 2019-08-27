@@ -81,10 +81,8 @@ public class InputStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if(config.grab(dbP)) {
-        database = dbP.instantiateClass(config);
-      }
+      new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
+          .grab(config, x -> database = x);
     }
 
     @Override

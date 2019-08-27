@@ -359,25 +359,17 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
-      if(config.grab(scalingReferenceP)) {
-        scalingreference = scalingReferenceP.getValue();
-      }
-      EnumParameter<NoiseDistribution> noisedistributionP = new EnumParameter<>(NOISEDISTRIBUTION_ID, NoiseDistribution.class, NoiseDistribution.UNIFORM);
-      if(config.grab(noisedistributionP)) {
-        noisedistribution = noisedistributionP.getValue();
-      }
-      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01) //
+      new EnumParameter<ScalingReference>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE) //
+          .grab(config, x -> scalingreference = x);
+      new EnumParameter<NoiseDistribution>(NOISEDISTRIBUTION_ID, NoiseDistribution.class, NoiseDistribution.UNIFORM) //
+          .grab(config, x -> noisedistribution = x);
+      new DoubleParameter(PERCENTAGE_ID, .01) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(percentageP)) {
-        percentage = percentageP.getValue();
-      }
-      LongParameter seedP = new LongParameter(SEED_ID) //
-          .setOptional(true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> percentage = x);
+      new LongParameter(SEED_ID) //
+          .setOptional(true) //
+          .grab(config, x -> seed = x);
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
           .setOptional(true);
       if(config.grab(minimaP)) {

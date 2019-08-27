@@ -127,10 +127,7 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

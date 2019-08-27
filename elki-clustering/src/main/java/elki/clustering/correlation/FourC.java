@@ -164,51 +164,15 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
       @Override
       protected void makeOptions(Parameterization config) {
         settings = new Settings();
-        configEpsilon(config);
-        configMinPts(config);
-        configDelta(config);
-        configKappa(config);
-        configLambda(config);
-      }
-
-      /**
-       * Configure the epsilon radius parameter.
-       *
-       * @param config Parameter source
-       */
-      protected void configEpsilon(Parameterization config) {
-        DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        if(config.grab(epsilonP)) {
-          settings.epsilon = epsilonP.doubleValue();
-        }
-      }
-
-      /**
-       * Configure the minPts aka "mu" parameter.
-       *
-       * @param config Parameter source
-       */
-      protected void configMinPts(Parameterization config) {
-        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(minptsP)) {
-          settings.minpts = minptsP.intValue();
-        }
-      }
-
-      /**
-       * Configure the delta parameter.
-       *
-       * @param config Parameter source
-       */
-      protected void configDelta(Parameterization config) {
+        new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+            .grab(config, x -> settings.epsilon = x);
+        new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> settings.minpts = x);
         // Flag for using absolute variances
-        Flag absoluteF = new Flag(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_ABSOLUTE);
-        if(config.grab(absoluteF)) {
-          settings.absolute = absoluteF.isTrue();
-        }
-
+        new Flag(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_ABSOLUTE) //
+            .grab(config, x -> settings.absolute = x);
         // Parameter delta
         DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
@@ -218,37 +182,15 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
         else {
           deltaP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
         }
-        if(config.grab(deltaP)) {
-          settings.delta = deltaP.doubleValue();
-        }
-      }
-
-      /**
-       * Configure the kappa parameter.
-       *
-       * @param config Parameter source
-       */
-      protected void configKappa(Parameterization config) {
-        DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
+        deltaP.grab(config, x -> settings.delta = x);
+        new DoubleParameter(KAPPA_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-            .setDefaultValue(KAPPA_DEFAULT);
-        if(config.grab(kappaP)) {
-          settings.kappa = kappaP.doubleValue();
-        }
-      }
-
-      /**
-       * Configure the delta parameter.
-       *
-       * @param config Parameter source
-       */
-      protected void configLambda(Parameterization config) {
-        IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
+            .setDefaultValue(KAPPA_DEFAULT) //
+            .grab(config, x1 -> settings.kappa = x1);
+        new IntParameter(LAMBDA_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-            .setOptional(true);
-        if(config.grab(lambdaP)) {
-          settings.lambda = lambdaP.intValue();
-        }
+            .setOptional(true) //
+            .grab(config, x -> settings.lambda = x);
       }
 
       @Override

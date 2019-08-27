@@ -207,10 +207,8 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Similarity<V>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, Similarity.class, PolynomialKernel.class);
-      if(config.grab(param)) {
-        kernelFunction = param.instantiateClass(config);
-      }
+      new ObjectParameter<Similarity<V>>(KERNEL_FUNCTION_ID, Similarity.class, PolynomialKernel.class) //
+          .grab(config, x -> kernelFunction = x);
     }
 
     @Override

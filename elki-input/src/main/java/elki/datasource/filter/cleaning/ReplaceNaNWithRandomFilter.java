@@ -220,14 +220,9 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distribution> distP = new ObjectParameter<>(REPLACEMENT_DISTRIBUTION, Distribution.class);
-      if(config.grab(distP)) {
-        dist = distP.instantiateClass(config);
-      }
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new ObjectParameter<Distribution>(REPLACEMENT_DISTRIBUTION, Distribution.class) //
+          .grab(config, x -> dist = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

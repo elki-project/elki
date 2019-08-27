@@ -148,14 +148,10 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter kP = new IntParameter(K_ID);
-        if(config.grab(kP)) {
-          k = kP.getValue();
-        }
-        final ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(DISTANCEFUNCTION_ID, Distance.class);
-        if(config.grab(distP)) {
-          distFunc = distP.instantiateClass(config);
-        }
+        new IntParameter(K_ID) //
+            .grab(config, x -> k = x);
+        new ObjectParameter<Distance<? super O>>(DISTANCEFUNCTION_ID, Distance.class) //
+            .grab(config, x -> distFunc = x);
       }
 
       @Override

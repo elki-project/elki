@@ -451,15 +451,10 @@ public class BetaDistribution implements Distribution {
 
     @Override
     protected void makeOptions(Parameterization config) {
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      DoubleParameter betaP = new DoubleParameter(BETA_ID);
-      if(config.grab(betaP)) {
-        beta = betaP.doubleValue();
-      }
+      new DoubleParameter(ALPHA_ID) //
+          .grab(config, x -> alpha = x);
+      new DoubleParameter(BETA_ID) //
+          .grab(config, x -> beta = x);
     }
 
     @Override

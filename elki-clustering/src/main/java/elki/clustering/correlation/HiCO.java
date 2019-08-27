@@ -437,32 +437,21 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter muP = new IntParameter(MU_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(muP)) {
-        mu = muP.getValue();
-      }
-
+      new IntParameter(MU_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> mu = x);
       IntParameter kP = new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
           .setOptional(true);
-      final int k = config.grab(kP) ? kP.getValue() : mu;
+      int k = config.grab(kP) ? kP.getValue() : mu;
 
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, DEFAULT_DELTA)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        delta = deltaP.doubleValue();
-      }
-
+      new DoubleParameter(DELTA_ID, DEFAULT_DELTA)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> delta = x);
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      double alpha = DEFAULT_ALPHA;
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
+      double alpha = config.grab(alphaP) ? alphaP.doubleValue() : DEFAULT_ALPHA;
       // Configure Distance function
       ListParameterization params = new ListParameterization();
       // preprocessor

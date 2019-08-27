@@ -213,18 +213,13 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag normF = new Flag(NORMALIZE_FLAG);
-      if(config.grab(normF)) {
-        normalize = normF.isTrue();
-      }
+      new Flag(NORMALIZE_FLAG).grab(config, x -> normalize = x);
     }
 
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
+      new ObjectParameter<SparseNumberVector.Factory<V>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class) //
+          .grab(config, x -> factory = x);
     }
 
     @Override

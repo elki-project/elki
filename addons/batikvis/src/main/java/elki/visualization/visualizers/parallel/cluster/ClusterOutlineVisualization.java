@@ -278,15 +278,9 @@ public class ClusterOutlineVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter alphaP = new DoubleParameter(ClusterHullVisualization.Parameterizer.ALPHA_ID, Double.POSITIVE_INFINITY);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      Flag bendP = new Flag(STRAIGHT_ID);
-      if(config.grab(bendP)) {
-        bend = bendP.isFalse();
-      }
+      new DoubleParameter(ClusterHullVisualization.Parameterizer.ALPHA_ID, Double.POSITIVE_INFINITY) //
+          .grab(config, x -> alpha = x);
+      new Flag(STRAIGHT_ID).grab(config, x -> bend = !x);
     }
 
     @Override

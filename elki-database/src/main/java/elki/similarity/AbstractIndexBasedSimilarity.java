@@ -138,10 +138,8 @@ public abstract class AbstractIndexBasedSimilarity<O, F extends IndexFactory<O>>
      * @param defaultClass Default class
      */
     protected void configIndexFactory(Parameterization config, final Class<?> restrictionClass, final Class<?> defaultClass) {
-      final ObjectParameter<F> param = new ObjectParameter<>(INDEX_ID, restrictionClass, defaultClass);
-      if(config.grab(param)) {
-        factory = param.instantiateClass(config);
-      }
+      new ObjectParameter<F>(INDEX_ID, restrictionClass, defaultClass) //
+          .grab(config, x -> factory = x);
     }
   }
 }

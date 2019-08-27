@@ -290,24 +290,14 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.getValue();
-      }
-      IntParameter numP = new IntParameter(NUM_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(numP)) {
-        num = numP.getValue();
-      }
-      Flag breadthF = new Flag(BREADTH_ID);
-      if(config.grab(breadthF)) {
-        breadth = breadthF.getValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(LOF.Parameterizer.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(NUM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> num = x);
+      new Flag(BREADTH_ID).grab(config, x -> breadth = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

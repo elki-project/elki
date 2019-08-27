@@ -354,27 +354,15 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Similarity<V>> simP = new ObjectParameter<>(SIM_ID, Similarity.class, SharedNearestNeighborSimilarity.class);
-      if(config.grab(simP)) {
-        similarityFunction = simP.instantiateClass(config);
-      }
-
-      final IntParameter knnP = new IntParameter(KNN_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(knnP)) {
-        knn = knnP.getValue();
-      }
-
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
-
-      final Flag modelsF = new Flag(MODELS_ID);
-      if(config.grab(modelsF)) {
-        models = modelsF.isTrue();
-      }
+      new ObjectParameter<Similarity<V>>(SIM_ID, Similarity.class, SharedNearestNeighborSimilarity.class) //
+          .grab(config, x -> similarityFunction = x);
+      new IntParameter(KNN_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> knn = x);
+      new DoubleParameter(ALPHA_ID, 1.1) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new Flag(MODELS_ID).grab(config, x -> models = x);
     }
 
     @Override

@@ -82,10 +82,8 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter fileNameP = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if(config.grab(fileNameP)) {
-        fileName = fileNameP.getValue().getPath();
-      }
+      new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE) //
+          .grab(config, x -> fileName = x.getPath());
     }
 
     @Override

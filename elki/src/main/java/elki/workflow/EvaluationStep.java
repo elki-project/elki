@@ -124,7 +124,7 @@ public class EvaluationStep implements WorkflowStep {
     /**
      * Evaluators to run
      */
-    private List<Evaluator> evaluators = null;
+    private List<? extends Evaluator> evaluators = null;
 
     /**
      * Parameter ID to specify the evaluators to run.
@@ -134,13 +134,9 @@ public class EvaluationStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      List<Class<? extends Evaluator>> def = Arrays.asList(AutomaticEvaluation.class);
-      // evaluator parameter
-      ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(EVALUATOR_ID, Evaluator.class);
-      evaluatorP.setDefaultValue(def);
-      if(config.grab(evaluatorP)) {
-        evaluators = evaluatorP.instantiateClasses(config);
-      }
+      new ObjectListParameter<Evaluator>(EVALUATOR_ID, Evaluator.class) //
+          .setDefaultValue(Arrays.asList(AutomaticEvaluation.class)) //
+          .grab(config, x -> evaluators = x);
     }
 
     @Override

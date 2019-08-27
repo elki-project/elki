@@ -203,13 +203,9 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(KMeans.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
+      new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
       ObjectParameter<KMeans<V, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class, BestOfMultipleKMeans.class);
       if(config.grab(kMeansVariantP)) {
         ListParameterization kMeansVariantParameters = new ListParameterization();

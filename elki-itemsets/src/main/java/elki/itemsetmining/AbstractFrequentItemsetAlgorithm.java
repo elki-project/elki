@@ -121,23 +121,17 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minsuppP = new DoubleParameter(MINSUPP_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(minsuppP)) {
-        minsupp = minsuppP.getValue();
-      }
-      IntParameter minlengthP = new IntParameter(MINLENGTH_ID) //
+      new DoubleParameter(MINSUPP_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> minsupp = x);
+      new IntParameter(MINLENGTH_ID) //
       .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minlengthP)) {
-        minlength = minlengthP.getValue();
-      }
-      IntParameter maxlengthP = new IntParameter(MAXLENGTH_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minlength = x);
+      new IntParameter(MAXLENGTH_ID) //
       .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(maxlengthP)) {
-        maxlength = maxlengthP.getValue();
-      }
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> maxlength = x);
     }
   }
 }

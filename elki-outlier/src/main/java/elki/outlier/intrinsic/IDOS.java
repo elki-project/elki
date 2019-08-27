@@ -254,23 +254,14 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<IntrinsicDimensionalityEstimator> estP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class);
-      if(config.grab(estP)) {
-        estimator = estP.instantiateClass(config);
-      }
-
-      IntParameter pKc = new IntParameter(KC_ID) //
-          .addConstraint(new GreaterEqualConstraint(5));
-      if(config.grab(pKc)) {
-        k_c = pKc.getValue();
-      }
-
-      IntParameter pKr = new IntParameter(KR_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(pKr)) {
-        k_r = pKr.getValue();
-      }
+      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class) //
+          .grab(config, x -> estimator = x);
+      new IntParameter(KC_ID) //
+          .addConstraint(new GreaterEqualConstraint(5)) //
+          .grab(config, x -> k_c = x);
+      new IntParameter(KR_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k_r = x);
     }
 
     @Override

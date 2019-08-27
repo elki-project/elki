@@ -495,21 +495,18 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter pK = new IntParameter(KREF_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(pK)) {
-        krefer = pK.intValue();
-      }
-
-      IntParameter pK2 = new IntParameter(KREACH_ID)//
+      new IntParameter(KREF_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> krefer = x);
+      kreach = krefer;
+      new IntParameter(KREACH_ID)//
           .setOptional(true) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      kreach = config.grab(pK2) ? pK2.intValue() : krefer;
-
-      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
-          .setOptional(true);
-      reachabilityDistance = config.grab(reachDistP) ? reachDistP.instantiateClass(config) : distanceFunction;
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> kreach = x);
+      reachabilityDistance = distanceFunction;
+      new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
+          .setOptional(true) //
+          .grab(config, x -> reachabilityDistance = x);
     }
 
     @Override

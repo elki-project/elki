@@ -307,15 +307,9 @@ public class BubbleVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag fillF = new Flag(FILL_ID);
-      if(config.grab(fillF)) {
-        fill = fillF.isTrue();
-      }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, OutlierLinearScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
+      new Flag(FILL_ID).grab(config, x -> fill = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, OutlierLinearScaling.class) //
+          .grab(config, x -> scaling = x);
     }
 
     @Override

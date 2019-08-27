@@ -439,34 +439,22 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     @Override
     protected void makeOptions(Parameterization config) {
       settings = new Settings();
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        settings.k = kP.intValue();
-      }
-      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if(config.grab(pcaP)) {
-        settings.pca = pcaP.instantiateClass(config);
-      }
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if(config.grab(filterP)) {
-        settings.filter = filterP.instantiateClass(config);
-      }
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(deltaP)) {
-        settings.delta = deltaP.doubleValue();
-      }
-      DoubleParameter tauP = new DoubleParameter(TAU_ID, 0.1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(tauP)) {
-        settings.tau = tauP.doubleValue();
-      }
-      IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        settings.minpts = minptsP.intValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> settings.k = x);
+      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> settings.pca = x);
+      new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
+          .grab(config, x -> settings.filter = x);
+      new DoubleParameter(DELTA_ID, 0.1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> settings.delta = x);
+      new DoubleParameter(TAU_ID, 0.1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> settings.tau = x);
+      new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> settings.minpts = x);
     }
 
     @Override

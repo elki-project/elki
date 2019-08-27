@@ -40,8 +40,8 @@ import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.math.linearalgebra.Centroid;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -251,16 +251,10 @@ public class EvaluatePBMIndex implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseHandling = noiseP.getValue();
-      }
+      new ObjectParameter<NumberVectorDistance<?>>(DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseHandling = x);
     }
 
     @Override

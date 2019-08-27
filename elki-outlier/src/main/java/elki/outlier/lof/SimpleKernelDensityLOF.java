@@ -218,17 +218,11 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.getValue();
-      }
-
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.instantiateClass(config);
-      }
+      new IntParameter(LOF.Parameterizer.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
+          .grab(config, x -> kernel = x);
     }
 
     @Override

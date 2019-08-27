@@ -228,11 +228,9 @@ public class LPIntegerNormDistance extends LPNormDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter paramP = new IntParameter(LPNormDistance.Parameterizer.P_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(paramP)) {
-        p = paramP.getValue();
-      }
+      new IntParameter(LPNormDistance.Parameterizer.P_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> p = x);
     }
 
     @Override

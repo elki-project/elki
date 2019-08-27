@@ -177,15 +177,10 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter iterP = new IntParameter(ITER_ID, 1000) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(iterP)) {
-        iterations = iterP.intValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(ITER_ID, 1000) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> iterations = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

@@ -123,14 +123,9 @@ public class OutputStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // result handlers
-      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<>(RESULT_HANDLER_ID, ResultHandler.class);
-      if(defaultHandlers != null) {
-        resultHandlerParam.setDefaultValue(defaultHandlers);
-      }
-      if(config.grab(resultHandlerParam)) {
-        resulthandlers = resultHandlerParam.instantiateClasses(config);
-      }
+      new ObjectListParameter<ResultHandler>(RESULT_HANDLER_ID, ResultHandler.class) //
+          .setDefaultValue(defaultHandlers) //
+          .grab(config, x -> resulthandlers = x);
     }
 
     @Override

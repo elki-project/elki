@@ -490,28 +490,17 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSelectingSubspaceDistance<V>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistance.class, SubspaceEuclideanDistance.class);
-      if(config.grab(param)) {
-        distance = param.instantiateClass(config);
-      }
-
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
-
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.getValue();
-      }
-
-      IntParameter mindimP = new IntParameter(MINDIM_ID) //
+      new ObjectParameter<DimensionSelectingSubspaceDistance<V>>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistance.class, SubspaceEuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new DoubleParameter(EPSILON_ID) //
+          .grab(config, x -> epsilon = x);
+      new IntParameter(MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .setOptional(true);
-      if(config.grab(mindimP)) {
-        mindim = mindimP.getValue();
-      }
+          .grab(config, x -> minpts = x);
+      new IntParameter(MINDIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true) //
+          .grab(config, x -> mindim = x);
     }
 
     @Override

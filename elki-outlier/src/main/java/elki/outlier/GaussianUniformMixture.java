@@ -243,14 +243,10 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter lP = new DoubleParameter(C_ID, 1E-7);
-      if(config.grab(lP)) {
-        l = lP.getValue();
-      }
-      final DoubleParameter cP = new DoubleParameter(C_ID, 1E-7);
-      if(config.grab(cP)) {
-        c = cP.getValue();
-      }
+      new DoubleParameter(C_ID, 1E-7) //
+          .grab(config, x -> l = x);
+      new DoubleParameter(C_ID, 1E-7) //
+          .grab(config, x -> c = x);
     }
 
     @Override

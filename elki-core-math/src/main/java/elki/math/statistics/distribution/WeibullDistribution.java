@@ -215,21 +215,12 @@ public class WeibullDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter thetaP = new DoubleParameter(LOCATION_ID, 0.);
-      if(config.grab(thetaP)) {
-        theta = thetaP.doubleValue();
-      }
-
-      DoubleParameter lambdaP = new DoubleParameter(SCALE_ID);
-      if(config.grab(lambdaP)) {
-        lambda = lambdaP.doubleValue();
-      }
-
-      DoubleParameter kP = new DoubleParameter(SHAPE_ID);
-      if(config.grab(kP)) {
-        k = kP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID, 0.) //
+          .grab(config, x -> theta = x);
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> lambda = x);
+      new DoubleParameter(SHAPE_ID) //
+          .grab(config, x -> k = x);
     }
 
     @Override

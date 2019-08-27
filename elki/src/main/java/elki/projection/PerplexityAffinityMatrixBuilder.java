@@ -246,12 +246,10 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter perplexityP = new DoubleParameter(PERPLEXITY_ID)//
+      new DoubleParameter(PERPLEXITY_ID)//
           .setDefaultValue(40.0) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(perplexityP)) {
-        perplexity = perplexityP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> perplexity = x);
     }
 
     @Override

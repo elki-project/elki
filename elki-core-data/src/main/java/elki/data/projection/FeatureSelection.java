@@ -177,17 +177,14 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
     /**
      * Dimensions to select.
      */
-    int[] dims = null;
+    int[] dims;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
-      if(config.grab(selectedAttributesP)) {
-        dims = selectedAttributesP.getValue().clone();
-      }
+      new IntListParameter(SELECTED_ATTRIBUTES_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+          .grab(config, x -> dims = x.clone());
     }
 
     @Override

@@ -228,20 +228,12 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(MATRIX_PARAM)) {
-        matrixfile = MATRIX_PARAM.getValue();
-      }
-
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
-      if(config.grab(PARSER_PARAM)) {
-        parser = PARSER_PARAM.instantiateClass(config);
-      }
-
-      DoubleParameter distanceP = new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY);
-      if(config.grab(distanceP)) {
-        defaultDistance = (float) distanceP.doubleValue();
-      }
+      new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> matrixfile = x);
+      new ObjectParameter<DistanceParser>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class) //
+          .grab(config, x -> parser = x);
+      new DoubleParameter(DEFAULTDIST_ID, Double.POSITIVE_INFINITY) //
+          .grab(config, x -> defaultDistance = (float) x);
     }
 
     @Override

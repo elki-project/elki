@@ -148,7 +148,7 @@ public class WeightedUncertainSplitFilter extends AbstractConversionFilter<Numbe
     /**
      * Field to hold the dimensional constraint.
      */
-    protected int dims = 0;
+    protected int dims = Integer.MAX_VALUE;
 
     /**
      * Column in which the probability is stored.
@@ -158,19 +158,13 @@ public class WeightedUncertainSplitFilter extends AbstractConversionFilter<Numbe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter dimsP = new IntParameter(DIM_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      IntParameter probP = new IntParameter(PROBCOL_ID);
-
-      if(config.grab(dimsP)) {
-        dims = dimsP.intValue();
-        // Add additional constraints:
-        probP.addConstraint(new LessConstraint(dimsP.intValue())) //
-            .addConstraint(new GreaterEqualConstraint(-dimsP.intValue()));
-      }
-      if(config.grab(probP)) {
-        probcol = probP.intValue();
-      }
+      new IntParameter(DIM_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dims = x);
+      new IntParameter(PROBCOL_ID) //
+          .addConstraint(new LessConstraint(dims)) //
+          .addConstraint(new GreaterEqualConstraint(-dims)) //
+          .grab(config, x -> probcol = x);
     }
 
     @Override

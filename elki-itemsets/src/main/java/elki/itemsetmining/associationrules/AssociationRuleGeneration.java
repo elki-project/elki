@@ -525,23 +525,15 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<AbstractFrequentItemsetAlgorithm> frequentItemAlgoP = new ObjectParameter<>(FREQUENTITEMALGO_ID, AbstractFrequentItemsetAlgorithm.class, FPGrowth.class);
-      if(config.grab(frequentItemAlgoP)) {
-        frequentItemAlgo = frequentItemAlgoP.instantiateClass(config);
-      }
-      ObjectParameter<InterestingnessMeasure> interestMeasureP = new ObjectParameter<>(INTERESTMEASURE_ID, InterestingnessMeasure.class, Confidence.class);
-      if(config.grab(interestMeasureP)) {
-        interestMeasure = interestMeasureP.instantiateClass(config);
-      }
-      DoubleParameter minmeasureP = new DoubleParameter(MINMEASURE_ID);
-      if(config.grab(minmeasureP)) {
-        minmeasure = minmeasureP.getValue();
-      }
-      DoubleParameter maxmeasureP = new DoubleParameter(MAXMEASURE_ID)//
-          .setOptional(true);
-      if(config.grab(maxmeasureP)) {
-        maxmeasure = maxmeasureP.getValue();
-      }
+      new ObjectParameter<AbstractFrequentItemsetAlgorithm>(FREQUENTITEMALGO_ID, AbstractFrequentItemsetAlgorithm.class, FPGrowth.class) //
+          .grab(config, x -> frequentItemAlgo = x);
+      new ObjectParameter<InterestingnessMeasure>(INTERESTMEASURE_ID, InterestingnessMeasure.class, Confidence.class) //
+          .grab(config, x -> interestMeasure = x);
+      new DoubleParameter(MINMEASURE_ID) //
+          .grab(config, x -> minmeasure = x);
+      new DoubleParameter(MAXMEASURE_ID)//
+          .setOptional(true) //
+          .grab(config, x -> maxmeasure = x);
     }
 
     @Override

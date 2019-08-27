@@ -266,11 +266,9 @@ public class LPNormDistance implements SpatialPrimitiveDistance<NumberVector>, N
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter paramP = new DoubleParameter(P_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(paramP)) {
-        p = paramP.getValue();
-      }
+      new DoubleParameter(P_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> p = x);
     }
 
     @Override

@@ -360,15 +360,10 @@ public class ColoredHistogramVisualizer implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag curvesF = new Flag(STYLE_CURVES_ID);
-      if(config.grab(curvesF)) {
-        curves = curvesF.isTrue();
-      }
-      IntParameter binsP = new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(binsP)) {
-        bins = binsP.intValue();
-      }
+      new Flag(STYLE_CURVES_ID).grab(config, x -> curves = x);
+      new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> bins = x);
     }
 
     @Override

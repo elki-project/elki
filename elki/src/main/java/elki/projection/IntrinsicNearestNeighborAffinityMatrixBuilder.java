@@ -263,10 +263,8 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class);
-      if(config.grab(estimatorP)) {
-        estimator = estimatorP.instantiateClass(config);
-      }
+      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
+          .grab(config, x -> estimator = x);
     }
 
     @Override

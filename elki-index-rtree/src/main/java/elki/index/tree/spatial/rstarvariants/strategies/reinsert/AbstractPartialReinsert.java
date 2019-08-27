@@ -88,16 +88,12 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter reinsertAmountP = new DoubleParameter(REINSERT_AMOUNT_ID, 0.3) //
+      new DoubleParameter(REINSERT_AMOUNT_ID, 0.3) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
-      if(config.grab(reinsertAmountP)) {
-        reinsertAmount = reinsertAmountP.getValue();
-      }
-      ObjectParameter<SpatialPrimitiveDistance<?>> distanceP = new ObjectParameter<>(REINSERT_DISTANCE_ID, SpatialPrimitiveDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distanceP)) {
-        distanceFunction = distanceP.instantiateClass(config);
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
+          .grab(config, x -> reinsertAmount = x);
+      new ObjectParameter<SpatialPrimitiveDistance<?>>(REINSERT_DISTANCE_ID, SpatialPrimitiveDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> distanceFunction = x);
     }
   }
 }

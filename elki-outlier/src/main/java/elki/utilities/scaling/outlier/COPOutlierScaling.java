@@ -150,10 +150,8 @@ public class COPOutlierScaling implements OutlierScaling {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter phiP = new DoubleParameter(PHI_ID);
-      if(config.grab(phiP)) {
-        phi = phiP.doubleValue();
-      }
+      new DoubleParameter(PHI_ID) //
+          .grab(config, x -> phi = x);
     }
 
     @Override

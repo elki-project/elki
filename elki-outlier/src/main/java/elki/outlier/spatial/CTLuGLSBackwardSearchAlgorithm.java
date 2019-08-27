@@ -303,10 +303,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
      * @param config Parameterization
      */
     protected void getParameterAlpha(Parameterization config) {
-      final DoubleParameter param = new DoubleParameter(ALPHA_ID);
-      if(config.grab(param)) {
-        alpha = param.getValue();
-      }
+      new DoubleParameter(ALPHA_ID) //
+          .grab(config, x -> alpha = x);
     }
 
     /**
@@ -315,10 +313,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
      * @param config Parameterization
      */
     protected void getParameterK(Parameterization config) {
-      final IntParameter param = new IntParameter(K_ID);
-      if(config.grab(param)) {
-        k = param.getValue();
-      }
+      new IntParameter(K_ID) //
+          .grab(config, x -> k = x);
     }
   }
 }

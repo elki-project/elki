@@ -312,11 +312,9 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class) //
-          .setDefaultValue(Linkage.WARD);
-      if(config.grab(linkageP)) {
-        linkage = linkageP.getValue();
-      }
+      new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
+          .setDefaultValue(Linkage.WARD) //
+          .grab(config, x -> linkage = x);
     }
 
     @Override

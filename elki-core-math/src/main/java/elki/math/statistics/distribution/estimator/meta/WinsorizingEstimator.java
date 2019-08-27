@@ -144,17 +144,12 @@ public class WinsorizingEstimator<D extends Distribution> implements Distributio
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistributionEstimator<D>> innerP = new ObjectParameter<>(INNER_ID, DistributionEstimator.class);
-      if(config.grab(innerP)) {
-        inner = innerP.instantiateClass(config);
-      }
-
-      DoubleParameter trimP = new DoubleParameter(WINSORIZE_ID)//
+      new ObjectParameter<DistributionEstimator<D>>(INNER_ID, DistributionEstimator.class) //
+          .grab(config, x -> inner = x);
+      new DoubleParameter(WINSORIZE_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
-      if(config.grab(trimP)) {
-        winsorize = trimP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
+          .grab(config, x -> winsorize = x);
     }
 
     @Override

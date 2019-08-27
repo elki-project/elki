@@ -75,7 +75,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
   /**
    * Indexes to add.
    */
-  protected Collection<IndexFactory<?>> indexFactories;
+  protected Collection<? extends IndexFactory<?>> indexFactories;
 
   /**
    * Classifier to evaluate.
@@ -95,7 +95,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
    * @param algorithm Classification algorithm
    * @param holdout Evaluation holdout
    */
-  public ClassifierHoldoutEvaluationTask(DatabaseConnection databaseConnection, Collection<IndexFactory<?>> indexFactories, Classifier<O> algorithm, Holdout holdout) {
+  public ClassifierHoldoutEvaluationTask(DatabaseConnection databaseConnection, Collection<? extends IndexFactory<?>> indexFactories, Classifier<O> algorithm, Holdout holdout) {
     this.databaseConnection = databaseConnection;
     this.indexFactories = indexFactories;
     this.algorithm = algorithm;
@@ -168,7 +168,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     /**
      * Indexes to add.
      */
-    protected Collection<IndexFactory<?>> indexFactories;
+    protected Collection<? extends IndexFactory<?>> indexFactories;
 
     /**
      * Classifier to evaluate.
@@ -184,25 +184,16 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dbcP)) {
-        databaseConnection = dbcP.instantiateClass(config);
-      }
+      new ObjectParameter<DatabaseConnection>(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
+          .grab(config, x -> databaseConnection = x);
       // Get indexes.
-      ObjectListParameter<IndexFactory<?>> indexFactoryP = new ObjectListParameter<IndexFactory<?>>(AbstractDatabase.Parameterizer.INDEX_ID, IndexFactory.class) //
-          .setOptional(true);
-      if(config.grab(indexFactoryP)) {
-        indexFactories = indexFactoryP.instantiateClasses(config);
-      }
-      ObjectParameter<Classifier<O>> algorithmP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, Classifier.class);
-      if(config.grab(algorithmP)) {
-        algorithm = algorithmP.instantiateClass(config);
-      }
-
-      ObjectParameter<Holdout> holdoutP = new ObjectParameter<>(HOLDOUT_ID, Holdout.class, StratifiedCrossValidation.class);
-      if(config.grab(holdoutP)) {
-        holdout = holdoutP.instantiateClass(config);
-      }
+      new ObjectListParameter<IndexFactory<?>>(AbstractDatabase.Parameterizer.INDEX_ID, IndexFactory.class) //
+          .setOptional(true) //
+          .grab(config, x -> indexFactories = x);
+      new ObjectParameter<Classifier<O>>(AbstractAlgorithm.ALGORITHM_ID, Classifier.class) //
+          .grab(config, x -> algorithm = x);
+      new ObjectParameter<Holdout>(HOLDOUT_ID, Holdout.class, StratifiedCrossValidation.class) //
+          .grab(config, x -> holdout = x);
     }
 
     @Override

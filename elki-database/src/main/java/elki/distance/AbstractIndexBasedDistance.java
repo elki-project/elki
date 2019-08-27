@@ -149,10 +149,8 @@ public abstract class AbstractIndexBasedDistance<O, F extends IndexFactory<O>> e
      * @param defaultClass Default value
      */
     public void configIndexFactory(Parameterization config, Class<?> restriction, Class<?> defaultClass) {
-      ObjectParameter<F> param = new ObjectParameter<>(INDEX_ID, restriction, defaultClass);
-      if(config.grab(param)) {
-        factory = param.instantiateClass(config);
-      }
+      new ObjectParameter<F>(INDEX_ID, restriction, defaultClass) //
+          .grab(config, x -> factory = x);
     }
   }
 }

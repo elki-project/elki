@@ -102,16 +102,11 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PageFileFactory<Page>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class, PersistentPageFileFactory.class);
-      if(config.grab(pffP)) {
-        pageFileFactory = pffP.instantiateClass(config);
-      }
-
-      IntParameter cacheSizeP = new IntParameter(CACHE_SIZE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(cacheSizeP)) {
-        cacheSize = cacheSizeP.getValue();
-      }
+      new ObjectParameter<PageFileFactory<Page>>(PAGEFILE_ID, PageFileFactory.class, PersistentPageFileFactory.class) //
+          .grab(config, x -> pageFileFactory = x);
+      new IntParameter(CACHE_SIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> cacheSize = x);
     }
 
     @Override

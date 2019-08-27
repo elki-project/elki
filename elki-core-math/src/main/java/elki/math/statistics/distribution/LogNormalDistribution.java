@@ -226,22 +226,13 @@ public class LogNormalDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter logmeanP = new DoubleParameter(LOGMEAN_ID);
-      if(config.grab(logmeanP)) {
-        logmean = logmeanP.doubleValue();
-      }
-
-      DoubleParameter logsigmaP = new DoubleParameter(LOGSTDDEV_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(logsigmaP)) {
-        logsigma = logsigmaP.doubleValue();
-      }
-
-      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID, 0.);
-      if(config.grab(shiftP)) {
-        shift = shiftP.doubleValue();
-      }
+      new DoubleParameter(LOGMEAN_ID) //
+          .grab(config, x -> logmean = x);
+      new DoubleParameter(LOGSTDDEV_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> logsigma = x);
+      new DoubleParameter(SHIFT_ID, 0.) //
+          .grab(config, x -> shift = x);
     }
 
     @Override

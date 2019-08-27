@@ -159,7 +159,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     final int items = (int) Math.ceil(rho * internal_k);
 
     long counter_all = 0;
-    
+
     Random rand = rnd.getSingleThreadedRandom();
 
     // initialize neighbors (depends on -setInitialNeighbors option)
@@ -606,29 +606,17 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        RandomParameter rndP = new RandomParameter(SEED_ID);
-        if(config.grab(rndP)) {
-          rnd = rndP.getValue();
-        }
-        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.001) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        if(config.grab(deltaP)) {
-          delta = deltaP.getValue();
-        }
-        DoubleParameter rhoP = new DoubleParameter(RHO_ID, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        if(config.grab(rhoP)) {
-          rho = rhoP.getValue();
-        }
-        Flag initialP = new Flag(INITIAL_ID);
-        if(config.grab(initialP)) {
-          noInitialNeighbors = initialP.isTrue();
-        }
-        IntParameter iterP = new IntParameter(ITER_ID, 100) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(iterP)) {
-          iterations = iterP.getValue();
-        }
+        new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+        new DoubleParameter(DELTA_ID, 0.001) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .grab(config, x -> delta = x);
+        new DoubleParameter(RHO_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+            .grab(config, x -> rho = x);
+        new Flag(INITIAL_ID).grab(config, x -> noInitialNeighbors = x);
+        new IntParameter(ITER_ID, 100) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> iterations = x);
       }
 
       @Override

@@ -175,18 +175,10 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Uncertainifier<UO>> generatorP = new ObjectParameter<>(UNCERTAINITY_MODEL_ID, Uncertainifier.class);
-      if(config.grab(generatorP)) {
-        generator = generatorP.instantiateClass(config);
-      }
-      Flag keepF = new Flag(KEEP_ID);
-      if(config.grab(keepF)) {
-        keep = keepF.isTrue();
-      }
-      RandomParameter randomP = new RandomParameter(SEED_ID);
-      if(config.grab(randomP)) {
-        rand = randomP.getValue();
-      }
+      new ObjectParameter<Uncertainifier<UO>>(UNCERTAINITY_MODEL_ID, Uncertainifier.class) //
+          .grab(config, x -> generator = x);
+      new Flag(KEEP_ID).grab(config, x -> keep = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rand = x);
     }
 
     @Override

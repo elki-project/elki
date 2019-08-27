@@ -128,15 +128,10 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Similarity<? super O>> param = new ObjectParameter<>(SIMILARITY_ID, Similarity.class, LinearKernel.class);
-      if(config.grab(param)) {
-        similarity = param.instantiateClass(config);
-      }
-
-      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      if(config.grab(quantileP)) {
-        quantile = quantileP.doubleValue();
-      }
+      new ObjectParameter<Similarity<? super O>>(SIMILARITY_ID, Similarity.class, LinearKernel.class) //
+          .grab(config, x -> similarity = x);
+      new DoubleParameter(QUANTILE_ID, .5) //
+          .grab(config, x -> quantile = x);
     }
 
     @Override

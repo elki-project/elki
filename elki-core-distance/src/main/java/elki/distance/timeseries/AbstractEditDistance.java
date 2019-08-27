@@ -107,12 +107,10 @@ public abstract class AbstractEditDistance extends AbstractNumberVectorDistance 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID) //
+      new DoubleParameter(BANDSIZE_ID) //
           .setOptional(true) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(bandSizeP)) {
-        bandSize = bandSizeP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> bandSize = x);
     }
   }
 }

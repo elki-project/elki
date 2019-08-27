@@ -220,22 +220,13 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter locP = new DoubleParameter(LOCATION_ID) //
-          .setDefaultValue(0.);
-      if(config.grab(locP)) {
-        mean = locP.doubleValue();
-      }
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if(config.grab(scaleP)) {
-        stddev = scaleP.doubleValue();
-      }
-
-      DoubleParameter rateP = new DoubleParameter(RATE_ID);
-      if(config.grab(rateP)) {
-        lambda = rateP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .setDefaultValue(0.) //
+          .grab(config, x -> mean = x);
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> stddev = x);
+      new DoubleParameter(RATE_ID) //
+          .grab(config, x -> lambda = x);
     }
 
     @Override

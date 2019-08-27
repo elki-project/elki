@@ -110,25 +110,23 @@ public class HSBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
      */
     public static final OptionID BPP_ID = new OptionID("hsbhist.bpp", "The dimensionality of the histogram in hue, saturation and brightness.");
 
-    int quanth = 0;
-
-    int quants = 0;
-
-    int quantb = 0;
+    /**
+     * Quantization factors for hue, saturation, brightness
+     */
+    int quanth = 0, quants = 0, quantb = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter param = new IntListParameter(BPP_ID) //
+      new IntListParameter(BPP_ID) //
           .addConstraint(new ListSizeConstraint(3)) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
-      if(config.grab(param)) {
-        int[] quant = param.getValue();
-        assert (quant.length == 3);
-        quanth = quant[0];
-        quants = quant[1];
-        quantb = quant[2];
-      }
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST) //
+          .grab(config, quant -> {
+            assert (quant.length == 3);
+            quanth = quant[0];
+            quants = quant[1];
+            quantb = quant[2];
+          });
     }
 
     @Override

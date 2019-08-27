@@ -127,14 +127,10 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // Get the minpts parameter
-      IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.intValue();
-        if(minpts <= 2) {
-          LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
-        }
+      if(new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x) && minpts <= 2) {
+        LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
       }
     }
 

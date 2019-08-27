@@ -169,20 +169,14 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if(config.grab(dbP)) {
-        database = dbP.instantiateClass(config);
-      }
+      new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
+          .grab(config, x -> database = x);
       // Distance function parameter
-      final ObjectParameter<Distance<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, Distance.class);
-      if(config.grab(dpar)) {
-        distance = dpar.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class) //
+          .grab(config, x -> distance = x);
       // Output file parameter
-      final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if(config.grab(cpar)) {
-        out = cpar.getValue();
-      }
+      new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE) //
+          .grab(config, x -> out = x);
     }
 
     @Override

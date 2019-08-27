@@ -48,7 +48,7 @@ import net.jafama.FastMath;
 
 /**
  * Project the data using a Beta distribution.
- *
+ * <p>
  * This is a crude heuristic, that may or may not work for your data set. There
  * currently is no theoretical foundation of why it may be sensible or not to do
  * this.
@@ -82,7 +82,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
    *
    * @param estimators Distribution estimators
    */
-  public AttributeWiseBetaNormalization(List<DistributionEstimator<?>> estimators, double alpha) {
+  public AttributeWiseBetaNormalization(List<? extends DistributionEstimator<?>> estimators, double alpha) {
     super(estimators);
     this.alpha = alpha;
   }
@@ -169,7 +169,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
     /**
      * Stores the distribution estimators
      */
-    private List<DistributionEstimator<?>> estimators;
+    private List<? extends DistributionEstimator<?>> estimators;
 
     /**
      * Expected outlier rate alpha.
@@ -179,16 +179,11 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectListParameter<DistributionEstimator<?>> estP = new ObjectListParameter<>(DISTRIBUTIONS_ID, DistributionEstimator.class);
-      estP.setDefaultValue(Arrays.asList(BestFitEstimator.class));
-      if(config.grab(estP)) {
-        estimators = estP.instantiateClasses(config);
-      }
-
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.1);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.doubleValue();
-      }
+      new ObjectListParameter<DistributionEstimator<?>>(DISTRIBUTIONS_ID, DistributionEstimator.class) //
+          .setDefaultValue(Arrays.asList(BestFitEstimator.class)) //
+          .grab(config, x -> estimators = x);
+      new DoubleParameter(ALPHA_ID, 0.1) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

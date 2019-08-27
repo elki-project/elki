@@ -395,10 +395,8 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter param = new DoubleParameter(D_ID);
-      if(config.grab(param)) {
-        eps = param.getValue();
-      }
+      new DoubleParameter(D_ID) //
+          .grab(config, x -> eps = x);
     }
 
     @Override

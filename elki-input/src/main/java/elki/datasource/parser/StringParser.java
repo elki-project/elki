@@ -131,15 +131,9 @@ public class StringParser implements Parser {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter commentP = new PatternParameter(CSVReaderFormat.Parameterizer.COMMENT_ID, "^\\s*#.*$");
-      if(config.grab(commentP)) {
-        comment = commentP.getValue();
-      }
-
-      Flag trimP = new Flag(TRIM_ID);
-      if(config.grab(trimP)) {
-        trimWhitespace = trimP.isTrue();
-      }
+      new PatternParameter(CSVReaderFormat.Parameterizer.COMMENT_ID, "^\\s*#.*$") //
+          .grab(config, x -> comment = x);
+      new Flag(TRIM_ID).grab(config, x -> trimWhitespace = x);
     }
 
     @Override

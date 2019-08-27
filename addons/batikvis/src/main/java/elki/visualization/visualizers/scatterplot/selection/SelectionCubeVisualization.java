@@ -230,10 +230,7 @@ public class SelectionCubeVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag nofillF = new Flag(NOFILL_ID);
-      if(config.grab(nofillF)) {
-        nofill = nofillF.isTrue();
-      }
+      new Flag(NOFILL_ID).grab(config, x -> nofill = x);
     }
 
     @Override

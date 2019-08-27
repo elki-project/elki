@@ -129,10 +129,8 @@ public class ExternalIDFilter implements ObjectFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID);
-      if(config.grab(externalIdIndexParam)) {
-        externalIdIndex = externalIdIndexParam.intValue();
-      }
+      new IntParameter(EXTERNALID_INDEX_ID) //
+          .grab(config, x -> externalIdIndex = x);
     }
 
     @Override

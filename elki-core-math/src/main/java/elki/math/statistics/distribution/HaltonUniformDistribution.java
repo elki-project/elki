@@ -332,21 +332,9 @@ public class HaltonUniformDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter minP = new DoubleParameter(UniformDistribution.Parameterizer.MIN_ID);
-      if(config.grab(minP)) {
-        min = minP.doubleValue();
-      }
-
-      DoubleParameter maxP = new DoubleParameter(UniformDistribution.Parameterizer.MAX_ID);
-      if(config.grab(maxP)) {
-        max = maxP.doubleValue();
-      }
-
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new DoubleParameter(UniformDistribution.Parameterizer.MIN_ID).grab(config, x -> min = x);
+      new DoubleParameter(UniformDistribution.Parameterizer.MAX_ID).grab(config, x -> max = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override

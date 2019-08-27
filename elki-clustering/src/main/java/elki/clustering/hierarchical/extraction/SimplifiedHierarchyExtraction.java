@@ -458,16 +458,11 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<HierarchicalClusteringAlgorithm> algorithmP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class);
-      if(config.grab(algorithmP)) {
-        algorithm = algorithmP.instantiateClass(config);
-      }
-
-      IntParameter minclustersP = new IntParameter(MINCLUSTERSIZE_ID, 1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minclustersP)) {
-        minClSize = minclustersP.intValue();
-      }
+      new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
+          .grab(config, x -> algorithm = x);
+      new IntParameter(MINCLUSTERSIZE_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minClSize = x);
     }
 
     @Override

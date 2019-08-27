@@ -99,10 +99,10 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     ArrayList<OutlierResult> results = new ArrayList<>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, LOG) : null;
-      for (Algorithm alg : algorithms) {
+      for(Algorithm alg : algorithms) {
         Object res = alg.run(database);
         List<OutlierResult> ors = OutlierResult.getOutlierResults(res);
-        for (OutlierResult or : ors) {
+        for(OutlierResult or : ors) {
           results.add(or);
           ids.addDBIDs(or.getScores().getDBIDs());
         }
@@ -115,27 +115,29 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     DoubleMinMax minmax = new DoubleMinMax();
     {
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", ids.size(), LOG) : null;
-      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         double[] scores = new double[num];
         int i = 0;
-        for (OutlierResult r : results) {
+        for(OutlierResult r : results) {
           double score = r.getScores().doubleValue(id);
-          if (!Double.isNaN(score)) {
+          if(!Double.isNaN(score)) {
             scores[i] = score;
             i++;
-          } else {
+          }
+          else {
             LOG.warning("DBID " + id + " was not given a score by result " + r);
           }
         }
-        if (i > 0) {
+        if(i > 0) {
           // Shrink array if necessary.
-          if (i < scores.length) {
+          if(i < scores.length) {
             scores = Arrays.copyOf(scores, i);
           }
           double combined = voting.combine(scores);
           sumscore.putDouble(id, combined);
           minmax.put(combined);
-        } else {
+        }
+        else {
           LOG.warning("DBID " + id + " was not given any score at all.");
         }
         LOG.incrementProcessed(cprog);
@@ -155,7 +157,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     TypeInformation[] trs = new TypeInformation[algorithms.size()];
-    for (int i = 0; i < trs.length; i++) {
+    for(int i = 0; i < trs.length; i++) {
       // FIXME: what if an algorithm needs more than one input data source?
       trs[i] = algorithms.get(i).getInputTypeRestriction()[0];
     }
@@ -187,17 +189,15 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class);
-      if (config.grab(algP)) {
+      if(config.grab(algP)) {
         ListParameterization subconfig = new ListParameterization();
         ChainedParameterization chain = new ChainedParameterization(subconfig, config);
         chain.errorsTo(config);
         algorithms = algP.instantiateClasses(chain);
         subconfig.logAndClearReportedErrors();
       }
-      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class);
-      if (config.grab(votingP)) {
-        voting = votingP.instantiateClass(config);
-      }
+      new ObjectParameter<EnsembleVoting>(VOTING_ID, EnsembleVoting.class) //
+          .grab(config, x -> voting = x);
     }
 
     @Override

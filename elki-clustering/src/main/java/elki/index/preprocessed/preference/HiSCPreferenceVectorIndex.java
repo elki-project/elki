@@ -242,19 +242,14 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final DoubleParameter alphaP = new DoubleParameter(HiSC.Parameterizer.ALPHA_ID, HiSC.Parameterizer.DEFAULT_ALPHA) //
+        new DoubleParameter(HiSC.Parameterizer.ALPHA_ID, HiSC.Parameterizer.DEFAULT_ALPHA) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-        if(config.grab(alphaP)) {
-          alpha = alphaP.doubleValue();
-        }
-
-        final IntParameter kP = new IntParameter(HiSC.Parameterizer.K_ID) //
+            .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+            .grab(config, x -> alpha = x);
+        new IntParameter(HiSC.Parameterizer.K_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-            .setOptional(true);
-        if(config.grab(kP)) {
-          k = kP.intValue();
-        }
+            .setOptional(true) //
+            .grab(config, x -> k = x);
       }
 
       @Override

@@ -194,16 +194,10 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       DoubleParameter t1P = new DoubleParameter(T1_ID);
-      if(config.grab(t1P)) {
-        t1 = t1P.doubleValue();
-      }
-
+      t1P.grab(config, x -> t1 = x);
       DoubleParameter t2P = new DoubleParameter(T2_ID);
-      if(config.grab(t2P)) {
-        t2 = t2P.doubleValue();
-      }
+      t2P.grab(config, x -> t2 = x);
       // Non-formalized parameter constraint: t1 >= t2
       if(t1 < t2) {
         config.reportError(new WrongParameterValueException(t1P, "must be larger than", t2P, ""));

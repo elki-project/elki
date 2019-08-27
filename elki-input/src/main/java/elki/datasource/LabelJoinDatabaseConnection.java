@@ -52,7 +52,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * The filters to invoke
    */
-  final protected List<DatabaseConnection> sources;
+  final protected List<? extends DatabaseConnection> sources;
 
   /**
    * Constructor.
@@ -60,7 +60,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
    * @param filters Filters to use.
    * @param sources Data sources to join.
    */
-  public LabelJoinDatabaseConnection(List<ObjectFilter> filters, List<DatabaseConnection> sources) {
+  public LabelJoinDatabaseConnection(List<? extends ObjectFilter> filters, List<? extends DatabaseConnection> sources) {
     super(filters);
     this.sources = sources;
   }
@@ -215,16 +215,14 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * The data souces to use.
      */
-    protected List<DatabaseConnection> sources;
+    protected List<? extends DatabaseConnection> sources;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       super.configFilters(config);
-      final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<>(SOURCES_ID, DatabaseConnection.class);
-      if(config.grab(sourcesParam)) {
-        sources = sourcesParam.instantiateClasses(config);
-      }
+      new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class) //
+          .grab(config, x -> sources = x);
     }
 
     @Override

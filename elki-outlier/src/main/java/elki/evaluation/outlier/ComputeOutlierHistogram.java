@@ -253,28 +253,15 @@ public class ComputeOutlierHistogram implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID) //
-          .setOptional(true);
-      if(config.grab(positiveClassNameP)) {
-        positiveClassName = positiveClassNameP.getValue();
-      }
-
-      IntParameter binsP = new IntParameter(BINS_ID, 50) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(binsP)) {
-        bins = binsP.getValue();
-      }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
-
-      Flag splitfreqF = new Flag(SPLITFREQ_ID);
-      if(config.grab(splitfreqF)) {
-        splitfreq = splitfreqF.getValue();
-      }
-
+      new PatternParameter(POSITIVE_CLASS_NAME_ID) //
+          .setOptional(true) //
+          .grab(config, x -> positiveClassName = x);
+      new IntParameter(BINS_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> bins = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class) //
+          .grab(config, x -> scaling = x);
+      new Flag(SPLITFREQ_ID).grab(config, x -> splitfreq = x);
     }
 
     @Override

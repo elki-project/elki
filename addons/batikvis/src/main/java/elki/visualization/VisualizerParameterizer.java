@@ -256,11 +256,9 @@ public class VisualizerParameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplingP = new IntParameter(SAMPLING_ID, DEFAULT_SAMPLE_SIZE) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
-      if(config.grab(samplingP)) {
-        samplesize = samplingP.intValue();
-      }
+      new IntParameter(SAMPLING_ID, DEFAULT_SAMPLE_SIZE) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT) //
+          .grab(config, x -> samplesize = x);
       StringParameter stylelibP = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
       if(config.grab(stylelibP)) {
         String filename = stylelibP.getValue();
@@ -271,11 +269,9 @@ public class VisualizerParameterizer {
           config.reportError(new WrongParameterValueException(stylelibP, filename, e.getMessage(), e));
         }
       }
-      PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID) //
-          .setOptional(true);
-      if(config.grab(enablevisP) && !"all".equals(enablevisP.getValueAsString())) {
-        enableVisualizers = enablevisP.getValue();
-      }
+      new PatternParameter(ENABLEVIS_ID) //
+          .setOptional(true) //
+          .grab(config, x -> enableVisualizers = x);
       MergedParameterization merged = new MergedParameterization(config);
       factories = collectFactorys(merged, enableVisualizers);
     }

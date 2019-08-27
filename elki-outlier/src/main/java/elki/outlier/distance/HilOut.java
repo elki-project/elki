@@ -955,31 +955,16 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter kP = new IntParameter(K_ID, 5);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      final IntParameter nP = new IntParameter(N_ID, 10);
-      if(config.grab(nP)) {
-        n = nP.getValue();
-      }
-
-      final IntParameter hP = new IntParameter(H_ID, 32);
-      if(config.grab(hP)) {
-        h = hP.getValue();
-      }
-
-      ObjectParameter<LPNormDistance> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distfunc = distP.instantiateClass(config);
-      }
-
-      final EnumParameter<ScoreType> tnP = new EnumParameter<>(TN_ID, ScoreType.class, ScoreType.TopN);
-      if(config.grab(tnP)) {
-        tn = tnP.getValue();
-      }
+      new IntParameter(K_ID, 5) //
+          .grab(config, x -> k = x);
+      new IntParameter(N_ID, 10) //
+          .grab(config, x -> n = x);
+      new IntParameter(H_ID, 32) //
+          .grab(config, x -> h = x);
+      new ObjectParameter<LPNormDistance>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distfunc = x);
+      new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN) //
+          .grab(config, x -> tn = x);
     }
 
     @Override

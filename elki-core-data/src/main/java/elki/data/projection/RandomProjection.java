@@ -37,7 +37,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Randomized projections of the data.
- * 
+ * <p>
  * This class allows projecting the data with different types of random
  * projections, in particular database friendly projections (as suggested by
  * Achlioptas, see {@link AchlioptasRandomProjectionFamily}), but also as
@@ -145,17 +145,12 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<RandomProjectionFamily> familyP = new ObjectParameter<>(FAMILY_ID, RandomProjectionFamily.class);
-      familyP.setDefaultValue(AchlioptasRandomProjectionFamily.class);
-      if(config.grab(familyP)) {
-        family = familyP.instantiateClass(config);
-      }
-
-      IntParameter dimP = new IntParameter(DIMENSIONALITY_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(dimP)) {
-        dimensionality = dimP.intValue();
-      }
+      new ObjectParameter<RandomProjectionFamily>(FAMILY_ID, RandomProjectionFamily.class) //
+          .setDefaultValue(AchlioptasRandomProjectionFamily.class) //
+          .grab(config, x -> family = x);
+      new IntParameter(DIMENSIONALITY_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> dimensionality = x);
     }
 
     @Override

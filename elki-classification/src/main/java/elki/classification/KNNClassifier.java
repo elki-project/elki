@@ -203,15 +203,11 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distanceFunction = distP.instantiateClass(config);
-      }
-      IntParameter kP = new IntParameter(K_ID, 1)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distanceFunction = x);
+      new IntParameter(K_ID, 1)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

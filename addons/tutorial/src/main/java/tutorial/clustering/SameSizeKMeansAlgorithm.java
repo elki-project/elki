@@ -37,14 +37,7 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDMIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -58,6 +51,7 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
@@ -321,7 +315,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         }
         // If the object would prefer a different cluster, put in outgoing
         // transfer list.
-        if (c.primary != preferences[0] && c.dists[c.primary] > c.dists[preferences[0]]) {
+        if(c.primary != preferences[0] && c.dists[c.primary] > c.dists[preferences[0]]) {
           transfers[c.primary].add(id);
         }
       }
@@ -475,30 +469,22 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(!(distanceFunction instanceof EuclideanDistance) && !(distanceFunction instanceof SquaredEuclideanDistance)) {
-          LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
-        }
-      }
-
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlus.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, -1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.intValue();
-      }
+      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> {
+            distanceFunction = x;
+            if(!(distanceFunction instanceof EuclideanDistance) //
+                && !(distanceFunction instanceof SquaredEuclideanDistance)) {
+              LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
+            }
+          });
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, KMeansPlusPlus.class) //
+          .grab(config, x -> initializer = x);
+      new IntParameter(MAXITER_ID, -1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT) //
+          .grab(config, x -> maxiter = x);
     }
 
     @Override

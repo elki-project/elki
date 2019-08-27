@@ -91,14 +91,10 @@ public class SigmoidKernel extends AbstractVectorSimilarity {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter cP = new DoubleParameter(C_ID, 1.);
-      if(config.grab(cP)) {
-        c = cP.doubleValue();
-      }
-      final DoubleParameter thetaP = new DoubleParameter(THETA_ID, 0.);
-      if(config.grab(thetaP)) {
-        theta = thetaP.doubleValue();
-      }
+      new DoubleParameter(C_ID, 1.) //
+          .grab(config, x -> c = x);
+      new DoubleParameter(THETA_ID, 0.) //
+          .grab(config, x -> theta = x);
     }
 
     @Override

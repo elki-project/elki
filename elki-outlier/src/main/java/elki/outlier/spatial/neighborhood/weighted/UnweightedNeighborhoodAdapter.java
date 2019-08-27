@@ -129,10 +129,8 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<NeighborSetPredicate.Factory<O>> innerP = new ObjectParameter<>(INNER_ID, NeighborSetPredicate.Factory.class);
-        if(config.grab(innerP)) {
-          inner = innerP.instantiateClass(config);
-        }
+        new ObjectParameter<NeighborSetPredicate.Factory<O>>(INNER_ID, NeighborSetPredicate.Factory.class) //
+            .grab(config, x -> inner = x);
       }
 
       @Override

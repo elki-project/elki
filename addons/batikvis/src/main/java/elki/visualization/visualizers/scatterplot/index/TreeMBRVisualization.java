@@ -226,10 +226,7 @@ public class TreeMBRVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag fillF = new Flag(FILL_ID);
-      if(config.grab(fillF)) {
-        fill = fillF.isTrue();
-      }
+      new Flag(FILL_ID).grab(config, x -> fill = x);
     }
 
     @Override

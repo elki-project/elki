@@ -296,15 +296,11 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter pK = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.getValue();
-      }
-      final ObjectParameter<ReferencePointsHeuristic> refpP = new ObjectParameter<>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
-      if(config.grab(refpP)) {
-        refp = refpP.instantiateClass(config);
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<ReferencePointsHeuristic>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class) //
+          .grab(config, x -> refp = x);
     }
 
     @Override

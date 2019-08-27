@@ -39,8 +39,8 @@ import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.math.MeanVariance;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -51,7 +51,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the simplified silhouette of a data set.
- *
+ * <p>
  * The simplified silhouette does not use pairwise distances, but distances to
  * centroids only.
  *
@@ -272,22 +272,12 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<NumberVectorDistance<?>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
-
+      new ObjectParameter<NumberVectorDistance<?>>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        Flag penalizeP = new Flag(EvaluateSilhouette.Parameterizer.NO_PENALIZE_ID);
-        if(config.grab(penalizeP)) {
-          penalize = penalizeP.isFalse();
-        }
+        new Flag(EvaluateSilhouette.Parameterizer.NO_PENALIZE_ID).grab(config, x -> penalize = !x);
       }
     }
 

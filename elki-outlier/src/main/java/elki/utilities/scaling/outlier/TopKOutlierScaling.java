@@ -145,16 +145,10 @@ public class TopKOutlierScaling implements OutlierScaling {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      Flag binaryF = new Flag(BINARY_ID);
-      if(config.grab(binaryF)) {
-        binary = binaryF.isTrue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new Flag(BINARY_ID).grab(config, x -> binary = x);
     }
 
     @Override

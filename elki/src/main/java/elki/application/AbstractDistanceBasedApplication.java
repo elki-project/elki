@@ -80,10 +80,8 @@ public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplic
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<Distance<? super O>> distP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distP)) {
-        distance = distP.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
     }
   }
 }

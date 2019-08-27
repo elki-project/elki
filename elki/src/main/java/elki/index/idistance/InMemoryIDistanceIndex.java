@@ -530,21 +530,13 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<Distance<? super V>> distanceP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
-        if(config.grab(distanceP)) {
-          distance = distanceP.instantiateClass(config);
-        }
-
-        ObjectParameter<KMedoidsInitialization<V>> initializationP = new ObjectParameter<>(REFERENCE_ID, KMedoidsInitialization.class);
-        if(config.grab(initializationP)) {
-          initialization = initializationP.instantiateClass(config);
-        }
-
-        IntParameter kP = new IntParameter(K_ID)//
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(kP)) {
-          k = kP.intValue();
-        }
+        new ObjectParameter<Distance<? super V>>(DISTANCE_ID, Distance.class) //
+            .grab(config, x -> distance = x);
+        new ObjectParameter<KMedoidsInitialization<V>>(REFERENCE_ID, KMedoidsInitialization.class) //
+            .grab(config, x -> initialization = x);
+        new IntParameter(K_ID)//
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> k = x);
       }
 
       @Override

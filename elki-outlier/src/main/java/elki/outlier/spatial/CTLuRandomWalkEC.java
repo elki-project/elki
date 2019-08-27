@@ -277,19 +277,13 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
-      }
-      final DoubleParameter cP = new DoubleParameter(C_ID);
-      if(config.grab(cP)) {
-        c = cP.getValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(ALPHA_ID, 0.5) //
+          .grab(config, x -> alpha = x);
+      new DoubleParameter(C_ID) //
+          .grab(config, x -> c = x);
     }
 
     @Override

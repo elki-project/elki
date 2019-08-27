@@ -180,19 +180,14 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1)//
+      new DoubleParameter(PDELTA_ID, 0.1)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(pDeltaP)) {
-        pDelta = pDeltaP.doubleValue();
-      }
-
-      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05)//
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> pDelta = x);
+      new DoubleParameter(PEPSILON_ID, 0.05)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(pEpsilonP)) {
-        pEpsilon = pEpsilonP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> pEpsilon = x);
     }
 
     @Override

@@ -140,16 +140,10 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag nocenterF = new Flag(NOCENTER_ID);
-      if(config.grab(nocenterF)) {
-        nocenter = nocenterF.getValue();
-      }
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(scaleP)) {
-        scale = scaleP.getValue();
-      }
+      new Flag(NOCENTER_ID).grab(config, x -> nocenter = x);
+      new DoubleParameter(SCALE_ID, 1.0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> scale = x);
     }
 
     @Override

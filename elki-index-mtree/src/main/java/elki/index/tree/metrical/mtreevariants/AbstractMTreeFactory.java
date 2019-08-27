@@ -100,18 +100,12 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       settings = makeSettings();
-      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        settings.distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
-      ObjectParameter<MTreeSplit<E, N>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
-      if(config.grab(splitStrategyP)) {
-        settings.splitStrategy = splitStrategyP.instantiateClass(config);
-      }
-      ObjectParameter<MTreeInsert<E, N>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
-      if(config.grab(insertStrategyP)) {
-        settings.insertStrategy = insertStrategyP.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> settings.distanceFunction = x);
+      new ObjectParameter<MTreeSplit<E, N>>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class) //
+          .grab(config, x -> settings.splitStrategy = x);
+      new ObjectParameter<MTreeInsert<E, N>>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class) //
+          .grab(config, x -> settings.insertStrategy = x);
     }
 
     abstract protected S makeSettings();

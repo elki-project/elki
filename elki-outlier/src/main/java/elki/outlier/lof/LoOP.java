@@ -389,34 +389,23 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kcompP = new IntParameter(KCOMP_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kcompP)) {
-        kcomp = kcompP.intValue();
-      }
-
-      final ObjectParameter<Distance<O>> compDistP = new ObjectParameter<>(COMPARISON_DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(compDistP)) {
-        comparisonDistance = compDistP.instantiateClass(config);
-      }
-
-      IntParameter kreachP = new IntParameter(KREACH_ID) //
+      new IntParameter(KCOMP_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .setOptional(true);
-      kreach = config.grab(kreachP) ? kreachP.intValue() : kcomp;
-
-      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
-          .setOptional(true);
-      if(config.grab(reachDistP)) {
-        reachabilityDistance = reachDistP.instantiateClass(config);
-      }
-
+          .grab(config, x -> kcomp = x);
+      new ObjectParameter<Distance<O>>(COMPARISON_DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> comparisonDistance = x);
+      kreach = kcomp;
+      new IntParameter(KREACH_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true) //
+          .grab(config, x -> kreach = x);
+      new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
+          .setOptional(true) //
+          .grab(config, x -> reachabilityDistance = x);
       // TODO: make default 1.0?
-      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 2.0) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(lambdaP)) {
-        lambda = lambdaP.doubleValue();
-      }
+      new DoubleParameter(LAMBDA_ID, 2.0) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> lambda = x);
     }
 
     @Override

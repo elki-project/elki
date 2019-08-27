@@ -157,10 +157,8 @@ public class WeightedManhattanDistance extends WeightedLPNormDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
-      if(config.grab(weightsP)) {
-        weights = weightsP.getValue().clone();
-      }
+      new DoubleListParameter(WEIGHTS_ID) //
+          .grab(config, x -> weights = x.clone());
     }
 
     @Override

@@ -65,10 +65,7 @@ public abstract class RandomizedHoldout extends AbstractHoldout {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter seedP = new RandomParameter(SEED_ID);
-      if(config.grab(seedP)) {
-        random = seedP.getValue();
-      }
+      new RandomParameter(SEED_ID).grab(config, x -> random = x);
     }
   }
 }

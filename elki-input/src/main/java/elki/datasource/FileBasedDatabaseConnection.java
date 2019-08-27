@@ -51,7 +51,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param infile File to load the data from
    */
-  public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, File infile) {
+  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, File infile) {
     super(() -> {
       try {
         return new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
@@ -69,7 +69,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param infile File to load the data from
    */
-  public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, String infile) {
+  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, String infile) {
     super(() -> {
       try {
         return new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
@@ -87,7 +87,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param in Input stream
    */
-  public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, InputStream in) {
+  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, InputStream in) {
     super(in, filters, parser);
   }
 
@@ -111,7 +111,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
     protected void makeOptions(Parameterization config) {
       Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
       // Add the input file first, for usability reasons.
-      final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+      FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(inputParam)) {
         infile = inputParam.getValue();
         String nam = infile.getName();

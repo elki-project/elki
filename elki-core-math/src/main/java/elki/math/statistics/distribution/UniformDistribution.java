@@ -146,16 +146,10 @@ public class UniformDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter minP = new DoubleParameter(MIN_ID);
-      if(config.grab(minP)) {
-        min = minP.doubleValue();
-      }
-
-      DoubleParameter maxP = new DoubleParameter(MAX_ID);
-      if(config.grab(maxP)) {
-        max = maxP.doubleValue();
-      }
+      new DoubleParameter(MIN_ID) //
+          .grab(config, x -> min = x);
+      new DoubleParameter(MAX_ID) //
+          .grab(config, x -> max = x);
     }
 
     @Override

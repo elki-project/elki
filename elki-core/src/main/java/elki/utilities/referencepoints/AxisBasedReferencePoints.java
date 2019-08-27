@@ -119,11 +119,9 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, 1.0)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(spacescaleP)) {
-        spacescale = spacescaleP.getValue();
-      }
+      new DoubleParameter(SPACE_SCALE_ID, 1.0)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> spacescale = x);
     }
 
     @Override

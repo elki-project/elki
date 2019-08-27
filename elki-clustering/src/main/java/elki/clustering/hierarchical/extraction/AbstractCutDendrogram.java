@@ -442,14 +442,9 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<HierarchicalClusteringAlgorithm> algorithmP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class);
-      if(config.grab(algorithmP)) {
-        algorithm = algorithmP.instantiateClass(config);
-      }
-      Flag hierarchicalF = new Flag(HIERARCHICAL_ID);
-      if(config.grab(hierarchicalF)) {
-        hierarchical = hierarchicalF.isTrue();
-      }
+      new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
+          .grab(config, x -> algorithm = x);
+      new Flag(HIERARCHICAL_ID).grab(config, x -> hierarchical = x);
     }
   }
 }

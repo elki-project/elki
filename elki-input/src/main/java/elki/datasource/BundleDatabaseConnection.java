@@ -64,7 +64,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
    * @param filters Filters
    * @param infile Input file
    */
-  public BundleDatabaseConnection(List<ObjectFilter> filters, File infile) {
+  public BundleDatabaseConnection(List<? extends ObjectFilter> filters, File infile) {
     super(filters);
     this.infile = infile;
   }
@@ -109,10 +109,8 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configFilters(config);
-      FileParameter infileP = new FileParameter(BUNDLE_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(infileP)) {
-        infile = infileP.getValue();
-      }
+      new FileParameter(BUNDLE_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> infile = x);
     }
 
     @Override

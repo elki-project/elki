@@ -52,14 +52,14 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   /**
    * The filters to invoke
    */
-  protected List<ObjectFilter> filters;
+  protected List<? extends ObjectFilter> filters;
 
   /**
    * Constructor.
    * 
    * @param filters Filters to apply, can be null
    */
-  protected AbstractDatabaseConnection(List<ObjectFilter> filters) {
+  protected AbstractDatabaseConnection(List<? extends ObjectFilter> filters) {
     this.filters = filters;
   }
 
@@ -143,7 +143,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
     /**
      * Filters
      */
-    protected List<ObjectFilter> filters;
+    protected List<? extends ObjectFilter> filters;
 
     /**
      * Parser to use
@@ -156,10 +156,9 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
      * @param config Parameterization
      */
     protected void configFilters(Parameterization config) {
-      ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class).setOptional(true);
-      if(config.grab(filterParam)) {
-        filters = filterParam.instantiateClasses(config);
-      }
+      new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class) //
+          .setOptional(true) //
+          .grab(config, x -> filters = x);
     }
 
     /**
@@ -170,10 +169,8 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
      * @param parserDefaultValueClass Default value
      */
     protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-      ObjectParameter<Parser> parserParam = new ObjectParameter<>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
-      if(config.grab(parserParam)) {
-        parser = parserParam.instantiateClass(config);
-      }
+      new ObjectParameter<Parser>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass) //
+          .grab(config, x -> parser = x);
     }
   }
 }

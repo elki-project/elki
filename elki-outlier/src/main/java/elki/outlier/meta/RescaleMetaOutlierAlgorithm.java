@@ -156,16 +156,10 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      ObjectParameter<Algorithm> algP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class);
-      if(config.grab(algP)) {
-        algorithm = algP.instantiateClass(config);
-      }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
+      new ObjectParameter<Algorithm>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class) //
+          .grab(config, x -> algorithm = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .grab(config, x -> scaling = x);
     }
 
     @Override

@@ -126,11 +126,9 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
-      if(config.grab(selectedAttributesP)) {
-        selectedAttributes = selectedAttributesP.getValueAsBitSet();
-      }
+      new IntListParameter(SELECTED_ATTRIBUTES_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+          .grab(config, x -> selectedAttributes = BitsUtil.of(x));
     }
 
     @Override

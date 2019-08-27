@@ -179,16 +179,12 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get a distance function.
-      ObjectParameter<Distance<O>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceP)) {
-        distfun = distanceP.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distfun = x);
       // Get the epsilon parameter
-      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
+      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> epsilon = x);
     }
 
     @Override

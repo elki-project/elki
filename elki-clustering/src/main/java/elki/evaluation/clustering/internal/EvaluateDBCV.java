@@ -41,8 +41,8 @@ import elki.evaluation.Evaluator;
 import elki.math.MathUtil;
 import elki.math.geometry.PrimsMinimumSpanningTree;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.AbstractParameterizer;
@@ -284,10 +284,8 @@ public class EvaluateDBCV<O> implements Evaluator {
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
     }
 
     @Override

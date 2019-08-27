@@ -337,33 +337,19 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter dimP = new IntParameter(DIM_ID, 0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(dimP)) {
-        dim = dimP.intValue();
-      }
-
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.instantiateClass(config);
-      }
-
-      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.BALLOON);
-      if(config.grab(modeP)) {
-        mode = modeP.getValue();
-      }
-
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      IntParameter windowP = new IntParameter(WINDOW_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(windowP)) {
-        minwindow = windowP.intValue();
-      }
+      new IntParameter(DIM_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> dim = x);
+      new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
+          .grab(config, x -> kernel = x);
+      new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.BALLOON) //
+          .grab(config, x -> mode = x);
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(WINDOW_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minwindow = x);
     }
 
     @Override

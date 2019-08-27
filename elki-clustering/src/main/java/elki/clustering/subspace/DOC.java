@@ -402,31 +402,18 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.2) //
+      new DoubleParameter(ALPHA_ID, 0.2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
-      }
-
-      DoubleParameter betaP = new DoubleParameter(BETA_ID, 0.8) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new DoubleParameter(BETA_ID, 0.8) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(betaP)) {
-        beta = betaP.getValue();
-      }
-
-      DoubleParameter wP = new DoubleParameter(W_ID, 0.05) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(wP)) {
-        w = wP.getValue();
-      }
-
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> beta = x);
+      new DoubleParameter(W_ID, 0.05) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> w = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
 
     @Override

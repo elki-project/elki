@@ -150,10 +150,8 @@ public class PCARunner {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<CovarianceMatrixBuilder> covarianceP = new ObjectParameter<>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
-      if(config.grab(covarianceP)) {
-        covarianceMatrixBuilder = covarianceP.instantiateClass(config);
-      }
+      new ObjectParameter<CovarianceMatrixBuilder>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class) //
+          .grab(config, x -> covarianceMatrixBuilder = x);
     }
 
     @Override

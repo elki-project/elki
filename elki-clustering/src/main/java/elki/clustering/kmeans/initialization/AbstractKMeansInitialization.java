@@ -77,10 +77,7 @@ public abstract class AbstractKMeansInitialization implements KMeansInitializati
 
     @Override
     protected void makeOptions(Parameterization config) {
-      RandomParameter rndP = new RandomParameter(KMeans.SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new RandomParameter(KMeans.SEED_ID).grab(config, x -> rnd = x);
     }
   }
 }

@@ -172,10 +172,8 @@ public class ERPDistance extends DTWDistance {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter gP = new DoubleParameter(G_ID, 0.);
-      if(config.grab(gP)) {
-        g = gP.doubleValue();
-      }
+      new DoubleParameter(G_ID, 0.) //
+          .grab(config, x -> g = x);
     }
 
     @Override

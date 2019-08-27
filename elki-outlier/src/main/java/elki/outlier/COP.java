@@ -364,29 +364,18 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(new GreaterConstraint(5));
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-      EnumParameter<DistanceDist> distP = new EnumParameter<>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA);
-      if(config.grab(distP)) {
-        dist = distP.getValue();
-      }
-      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.001) //
+      new IntParameter(K_ID) //
+          .addConstraint(new GreaterConstraint(5)) //
+          .grab(config, x -> k = x);
+      new EnumParameter<DistanceDist>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA) //
+          .grab(config, x -> dist = x);
+      new DoubleParameter(EXPECT_ID, 0.001) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(expectP)) {
-        expect = expectP.doubleValue();
-      }
-      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if(config.grab(pcaP)) {
-        pca = pcaP.instantiateClass(config);
-      }
-      Flag modelsF = new Flag(MODELS_ID);
-      if(config.grab(modelsF)) {
-        models = modelsF.isTrue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> expect = x);
+      new ObjectParameter<PCARunner>(PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> pca = x);
+      new Flag(MODELS_ID).grab(config, x -> models = x);
     }
 
     @Override

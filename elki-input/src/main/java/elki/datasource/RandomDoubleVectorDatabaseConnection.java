@@ -71,7 +71,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * @param rnd Random generator
    * @param filters Filters to use
    */
-  public RandomDoubleVectorDatabaseConnection(int dim, int size, RandomFactory rnd, List<ObjectFilter> filters) {
+  public RandomDoubleVectorDatabaseConnection(int dim, int size, RandomFactory rnd, List<? extends ObjectFilter> filters) {
     super(filters);
     this.dim = dim;
     this.size = size;
@@ -139,18 +139,9 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configFilters(config);
-      IntParameter dimParam = new IntParameter(DIM_ID);
-      if(config.grab(dimParam)) {
-        dim = dimParam.intValue();
-      }
-      IntParameter sizeParam = new IntParameter(SIZE_ID);
-      if(config.grab(sizeParam)) {
-        size = sizeParam.intValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(DIM_ID).grab(config, x -> dim = x);
+      new IntParameter(SIZE_ID).grab(config, x -> size = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

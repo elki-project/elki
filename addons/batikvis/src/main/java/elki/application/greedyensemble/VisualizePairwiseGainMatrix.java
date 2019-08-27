@@ -308,16 +308,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       vispar = config.tryInstantiate(VisualizerParameterizer.class);
 
       // Prescaling
-      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<ScalingFunction>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class) //
-          .setOptional(true);
-      if(config.grab(prescalingP)) {
-        prescaling = prescalingP.instantiateClass(config);
-      }
-
-      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
-      if(config.grab(votingP)) {
-        voting = votingP.instantiateClass(config);
-      }
+      new ObjectParameter<ScalingFunction>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
+          .grab(config, x -> prescaling = x);
+      new ObjectParameter<EnsembleVoting>(GreedyEnsembleExperiment.Parameterizer.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class) //
+          .grab(config, x -> voting = x);
     }
 
     @Override

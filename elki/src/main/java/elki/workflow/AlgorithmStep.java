@@ -157,15 +157,10 @@ public class AlgorithmStep implements WorkflowStep {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Time parameter
-      final Flag timeF = new Flag(TIME_ID);
-      if(config.grab(timeF)) {
-        time = timeF.getValue();
-      }
+      new Flag(TIME_ID).grab(config, x -> time = x);
       // parameter algorithm
-      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(ALGORITHM_ID, Algorithm.class);
-      if(config.grab(ALGORITHM_PARAM)) {
-        algorithms = ALGORITHM_PARAM.instantiateClasses(config);
-      }
+      new ObjectListParameter<Algorithm>(ALGORITHM_ID, Algorithm.class) //
+          .grab(config, x -> algorithms = x);
     }
 
     @Override

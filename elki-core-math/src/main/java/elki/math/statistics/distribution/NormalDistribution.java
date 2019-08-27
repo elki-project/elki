@@ -524,17 +524,11 @@ public class NormalDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter muP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(muP)) {
-        mu = muP.doubleValue();
-      }
-
-      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(sigmaP)) {
-        sigma = sigmaP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> mu = x);
+      new DoubleParameter(SCALE_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> sigma = x);
     }
 
     @Override

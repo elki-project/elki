@@ -155,15 +155,10 @@ public class AutomaticVisualization implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID) //
-          .setOptional(true);
-      if(config.grab(titleP)) {
-        title = titleP.getValue();
-      }
-      Flag singleF = new Flag(SINGLE_ID);
-      if(config.grab(singleF)) {
-        single = singleF.isTrue();
-      }
+      new StringParameter(WINDOW_TITLE_ID) //
+          .setOptional(true) //
+          .grab(config, x -> title = x);
+      new Flag(SINGLE_ID).grab(config, x -> single = x);
       manager = config.tryInstantiate(VisualizerParameterizer.class);
     }
 

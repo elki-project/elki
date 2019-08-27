@@ -115,10 +115,8 @@ public class ConvertToBundleApplication extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> inputP = new ObjectParameter<>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(inputP)) {
-        input = inputP.instantiateClass(config);
-      }
+      new ObjectParameter<DatabaseConnection>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
+          .grab(config, x -> input = x);
       outfile = super.getParameterOutputFile(config, "File name to serialize the bundle to.");
     }
 

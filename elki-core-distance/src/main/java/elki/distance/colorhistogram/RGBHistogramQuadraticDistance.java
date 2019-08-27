@@ -98,15 +98,16 @@ public class RGBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
      */
     public static final OptionID BPP_ID = new OptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
 
+    /**
+     * Bits per color plane.
+     */
     int bpp = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter param = new IntParameter(BPP_ID);
-      if(config.grab(param)) {
-        bpp = param.getValue();
-      }
+      new IntParameter(BPP_ID) //
+          .grab(config, x -> bpp = x);
     }
 
     @Override

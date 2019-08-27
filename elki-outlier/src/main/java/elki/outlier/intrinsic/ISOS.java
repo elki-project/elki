@@ -284,15 +284,11 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KNN_ID, 100) //
-          .addConstraint(new GreaterEqualConstraint(5));
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
-      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class);
-      if(config.grab(estimatorP)) {
-        estimator = estimatorP.instantiateClass(config);
-      }
+      new IntParameter(KNN_ID, 100) //
+          .addConstraint(new GreaterEqualConstraint(5)) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
+          .grab(config, x -> estimator = x);
     }
 
     @Override

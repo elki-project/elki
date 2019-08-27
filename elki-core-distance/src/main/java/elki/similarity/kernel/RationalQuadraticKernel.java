@@ -82,11 +82,9 @@ public class RationalQuadraticKernel extends AbstractVectorSimilarity {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter cP = new DoubleParameter(C_ID, 1.) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(cP)) {
-        c = cP.doubleValue();
-      }
+      new DoubleParameter(C_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> c = x);
     }
 
     @Override

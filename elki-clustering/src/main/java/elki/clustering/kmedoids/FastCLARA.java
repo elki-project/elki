@@ -233,28 +233,17 @@ public class FastCLARA<V> extends FastPAM<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter numsamplesP = new IntParameter(NUMSAMPLES_ID, 5) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(numsamplesP)) {
-        numsamples = numsamplesP.intValue();
-      }
-
+      new IntParameter(NUMSAMPLES_ID, 5) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> numsamples = x);
       // Larger sample size, used by Schubert and Rousseeuw, 2019
-      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 80 + 4. * k) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(samplingP)) {
-        sampling = samplingP.doubleValue();
+      new DoubleParameter(SAMPLESIZE_ID, 80 + 4. * k) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> sampling = x);
+      if(numsamples > 1) {
+        new Flag(NOKEEPMED_ID).grab(config, x -> keepmed = !x);
       }
-
-      Flag nokeepmedF = new Flag(NOKEEPMED_ID);
-      if(numsamples != 1 && config.grab(nokeepmedF)) {
-        keepmed = nokeepmedF.isFalse();
-      }
-
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
 
     @Override

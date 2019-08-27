@@ -153,17 +153,12 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistributionEstimator<D>> innerP = new ObjectParameter<>(INNER_ID, DistributionEstimator.class);
-      if(config.grab(innerP)) {
-        inner = innerP.instantiateClass(config);
-      }
-
-      DoubleParameter trimP = new DoubleParameter(TRIM_ID) //
+      new ObjectParameter<DistributionEstimator<D>>(INNER_ID, DistributionEstimator.class) //
+          .grab(config, x -> inner = x);
+      new DoubleParameter(TRIM_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
-      if(config.grab(trimP)) {
-        trim = trimP.doubleValue();
-      }
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
+          .grab(config, x -> trim = x);
     }
 
     @Override

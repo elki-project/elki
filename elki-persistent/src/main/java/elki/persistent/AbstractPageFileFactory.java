@@ -79,11 +79,9 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter pageSizeP = new IntParameter(PAGE_SIZE_ID, 4000) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(pageSizeP)) {
-        pageSize = pageSizeP.getValue();
-      }
+      new IntParameter(PAGE_SIZE_ID, 4000) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> pageSize = x);
     }
 
     @Override

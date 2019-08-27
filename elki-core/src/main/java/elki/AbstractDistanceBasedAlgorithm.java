@@ -83,10 +83,8 @@ public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> e
 
     @Override
     protected void makeOptions(Parameterization config) {
-      ObjectParameter<D> distanceFunctionP = new ObjectParameter<D>(DISTANCE_FUNCTION_ID, getDistanceRestriction(), getDefaultDistance());
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
+      new ObjectParameter<D>(DISTANCE_FUNCTION_ID, getDistanceRestriction(), getDefaultDistance()) //
+          .grab(config, x -> distanceFunction = x);
     }
 
     /**

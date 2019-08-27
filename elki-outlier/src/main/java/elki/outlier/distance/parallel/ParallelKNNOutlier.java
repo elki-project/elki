@@ -166,11 +166,8 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(KNNOutlier.Parameterizer.K_ID);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
+      new IntParameter(KNNOutlier.Parameterizer.K_ID) //
+          .grab(config, x -> k = x);
     }
 
     @Override

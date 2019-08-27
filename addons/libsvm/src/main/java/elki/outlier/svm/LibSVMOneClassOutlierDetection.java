@@ -285,16 +285,10 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      EnumParameter<SVMKernel> kernelP = new EnumParameter<>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.getValue();
-      }
-
-      DoubleParameter nuP = new DoubleParameter(NU_ID, 0.05);
-      if(config.grab(nuP)) {
-        nu = nuP.doubleValue();
-      }
+      new EnumParameter<SVMKernel>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF) //
+          .grab(config, x -> kernel = x);
+      new DoubleParameter(NU_ID, 0.05) //
+          .grab(config, x -> nu = x);
     }
 
     @Override

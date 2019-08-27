@@ -286,11 +286,9 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(new GreaterEqualConstraint(3));
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(new GreaterEqualConstraint(3)) //
+          .grab(config, x -> k = x);
     }
 
     @Override

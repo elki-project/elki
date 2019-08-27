@@ -213,16 +213,10 @@ public class InverseGaussianDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(meanP)) {
-        mean = meanP.doubleValue();
-      }
-
-      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if(config.grab(shapeP)) {
-        shape = shapeP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> mean = x);
+      new DoubleParameter(SHAPE_ID) //
+          .grab(config, x -> shape = x);
     }
 
     @Override

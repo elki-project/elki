@@ -222,21 +222,12 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter muP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(muP)) {
-        mu = muP.doubleValue();
-      }
-
-      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
-      if(config.grab(sigmaP)) {
-        sigma = sigmaP.doubleValue();
-      }
-
-      DoubleParameter kP = new DoubleParameter(SHAPE_ID);
-      if(config.grab(kP)) {
-        k = kP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> mu = x);
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> sigma = x);
+      new DoubleParameter(SHAPE_ID) //
+          .grab(config, x -> k = x);
     }
 
     @Override

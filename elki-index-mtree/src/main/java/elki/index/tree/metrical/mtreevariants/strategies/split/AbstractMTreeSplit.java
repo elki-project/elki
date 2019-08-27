@@ -101,10 +101,8 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistributionStrategy> distributorP = new ObjectParameter<>(DISTRIBUTOR_ID, DistributionStrategy.class, GeneralizedHyperplaneDistribution.class);
-      if(config.grab(distributorP)) {
-        distributor = distributorP.instantiateClass(config);
-      }
+      new ObjectParameter<DistributionStrategy>(DISTRIBUTOR_ID, DistributionStrategy.class, GeneralizedHyperplaneDistribution.class) //
+          .grab(config, x -> distributor = x);
     }
 
     @Override

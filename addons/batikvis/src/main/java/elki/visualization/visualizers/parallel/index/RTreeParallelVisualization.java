@@ -226,11 +226,9 @@ public class RTreeParallelVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag fillF = new Flag(TreeMBRVisualization.Parameterizer.FILL_ID) //
-          .setDefaultValue(Boolean.TRUE);
-      if(config.grab(fillF)) {
-        fill = fillF.isTrue();
-      }
+      new Flag(TreeMBRVisualization.Parameterizer.FILL_ID) //
+          .setDefaultValue(Boolean.TRUE) //
+          .grab(config, x -> fill = x);
     }
 
     @Override

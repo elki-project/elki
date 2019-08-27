@@ -112,13 +112,10 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(K_ID) //
+      new IntParameter(K_ID) //
       .setDefaultValue(0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(kP)) {
-        k = kP.intValue();
-      }
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

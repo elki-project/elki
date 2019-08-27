@@ -100,11 +100,9 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(ralphaP)) {
-        ralpha = ralphaP.getValue();
-      }
+      new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> ralpha = x);
     }
 
     @Override

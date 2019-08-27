@@ -205,16 +205,10 @@ public class LogisticDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if(config.grab(scaleP)) {
-        scale = scaleP.doubleValue();
-      }
-
-      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(locationP)) {
-        location = locationP.doubleValue();
-      }
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> scale = x);
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> location = x);
     }
 
     @Override

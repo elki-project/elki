@@ -96,10 +96,8 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Projection<I, O>> projP = new ObjectParameter<>(PROJ_ID, Projection.class);
-      if(config.grab(projP)) {
-        projection = projP.instantiateClass(config);
-      }
+      new ObjectParameter<Projection<I, O>>(PROJ_ID, Projection.class) //
+          .grab(config, x -> projection = x);
     }
 
     @Override

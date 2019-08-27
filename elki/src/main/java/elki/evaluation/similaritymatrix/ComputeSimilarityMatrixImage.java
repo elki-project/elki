@@ -341,19 +341,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<O>> distanceFunctionP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
-          .setOptional(true);
-      if(config.grab(scalingP)) {
-        scaling = scalingP.instantiateClass(config);
-      }
-      Flag skipzeroP = new Flag(SKIPZERO_ID);
-      if(config.grab(skipzeroP)) {
-        skipzero = skipzeroP.getValue();
-      }
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distanceFunction = x);
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
+          .grab(config, x -> scaling = x);
+      new Flag(SKIPZERO_ID).grab(config, x -> skipzero = x);
     }
 
     @Override

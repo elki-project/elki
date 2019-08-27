@@ -131,11 +131,9 @@ public class SparseLPNormDistance implements PrimitiveDistance<SparseNumberVecto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pP = new DoubleParameter(LPNormDistance.Parameterizer.P_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(pP)) {
-        p = pP.getValue();
-      }
+      new DoubleParameter(LPNormDistance.Parameterizer.P_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> p = x);
     }
 
     @Override

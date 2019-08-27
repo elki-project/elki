@@ -372,23 +372,15 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<LocalitySensitiveHashFunctionFamily<? super V>> familyP = new ObjectParameter<>(FAMILY_ID, LocalitySensitiveHashFunctionFamily.class);
-      if(config.grab(familyP)) {
-        family = familyP.instantiateClass(config);
-      }
-
-      IntParameter lP = new IntParameter(L_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(lP)) {
-        l = lP.intValue();
-      }
-
-      IntParameter bucketsP = new IntParameter(BUCKETS_ID) //
-          .setDefaultValue(7919); // Primes work best, apparently.
-      bucketsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(bucketsP)) {
-        numberOfBuckets = bucketsP.intValue();
-      }
+      new ObjectParameter<LocalitySensitiveHashFunctionFamily<? super V>>(FAMILY_ID, LocalitySensitiveHashFunctionFamily.class) //
+          .grab(config, x -> family = x);
+      new IntParameter(L_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> l = x);
+      new IntParameter(BUCKETS_ID) //
+          .setDefaultValue(7919) // Primes work best, apparently.
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> numberOfBuckets = x);
     }
 
     @Override

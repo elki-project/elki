@@ -264,21 +264,12 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter dimP = new IntParameter(DIM_ID);
-      if(config.grab(dimP)) {
-        tdim = dimP.intValue();
-      }
-
-      ObjectParameter<PrimitiveDistance<? super I>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distP)) {
-        dist = distP.instantiateClass(config);
-      }
-
-      ObjectParameter<NumberVector.Factory<O>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
+      new IntParameter(DIM_ID) //
+          .grab(config, x -> tdim = x);
+      new ObjectParameter<PrimitiveDistance<? super I>>(DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> dist = x);
+      new ObjectParameter<NumberVector.Factory<O>>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class) //
+          .grab(config, x -> factory = x);
     }
 
     @Override

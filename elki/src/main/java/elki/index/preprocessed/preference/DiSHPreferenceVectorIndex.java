@@ -508,25 +508,15 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter minptsP = new IntParameter(MINPTS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(minptsP)) {
-          minpts = minptsP.getValue();
-        }
-
-        // parameter epsilon
-        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID) //
+        new IntParameter(MINPTS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> minpts = x);
+        new DoubleListParameter(EPSILON_ID) //
             .setDefaultValue(new double[] { DEFAULT_EPSILON }) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE_LIST);
-        if(config.grab(epsilonP)) {
-          epsilon = epsilonP.getValue().clone();
-        }
-
-        // parameter strategy
-        final EnumParameter<Strategy> strategyP = new EnumParameter<>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY);
-        if(config.grab(strategyP)) {
-          strategy = strategyP.getValue();
-        }
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE_LIST) //
+            .grab(config, x -> epsilon = x.clone());
+        new EnumParameter<Strategy>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY) //
+            .grab(config, x -> strategy = x);
       }
 
       @Override

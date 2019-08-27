@@ -199,10 +199,8 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<WeightFunction> weightfunctionP = new ObjectParameter<>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
-      if(config.grab(weightfunctionP)) {
-        weightfunction = weightfunctionP.instantiateClass(config);
-      }
+      new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class) //
+          .grab(config, x -> weightfunction = x);
     }
 
     @Override

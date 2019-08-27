@@ -142,22 +142,13 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter randP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
-      if(config.grab(randP)) {
-        random = randP.getValue();
-      }
-
-      DoubleParameter widthP = new DoubleParameter(WIDTH_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(widthP)) {
-        width = widthP.doubleValue();
-      }
-
-      IntParameter lP = new IntParameter(NUMPROJ_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(lP)) {
-        k = lP.intValue();
-      }
+      new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT).grab(config, x -> random = x);
+      new DoubleParameter(WIDTH_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> width = x);
+      new IntParameter(NUMPROJ_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
   }
 }

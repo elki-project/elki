@@ -162,10 +162,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if(config.grab(rndP)) {
-        random = rndP.getValue();
-      }
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
   }
 }

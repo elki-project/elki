@@ -38,8 +38,8 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.result.EvaluationResult;
-import elki.result.Metadata;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.datastructures.heap.DoubleHeap;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
@@ -113,7 +113,6 @@ public class EvaluateCIndex<O> implements Evaluator {
    * Evaluate a single clustering.
    * @param rel Data relation
    * @param c Clustering
-   *
    * @return C-Index
    */
   public double evaluateClustering(Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
@@ -291,15 +290,10 @@ public class EvaluateCIndex<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, Distance.class, EuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
-
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
-      }
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+          .grab(config, x -> noiseOption = x);
     }
 
     @Override

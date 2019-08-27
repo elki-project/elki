@@ -170,11 +170,9 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter kP = new IntParameter(K_ID) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-        if(config.grab(kP)) {
-          k = kP.intValue();
-        }
+        new IntParameter(K_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+            .grab(config, x -> k = x);
       }
 
       @Override

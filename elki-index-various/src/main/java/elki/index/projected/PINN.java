@@ -132,33 +132,18 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<IndexFactory<O>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
-      if(config.grab(innerP)) {
-        inner = innerP.instantiateClass(config);
-      }
-
-      IntParameter tP = new IntParameter(T_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(tP)) {
-        t = tP.intValue();
-      }
-
-      DoubleParameter sP = new DoubleParameter(S_ID, 1.) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
-      if(config.grab(sP)) {
-        s = sP.doubleValue();
-      }
-
-      DoubleParameter hP = new DoubleParameter(H_ID, 3.) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
-      if(config.grab(hP)) {
-        h = hP.doubleValue();
-      }
-
-      RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if(config.grab(randomP)) {
-        random = randomP.getValue();
-      }
+      new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class) //
+          .grab(config, x -> inner = x);
+      new IntParameter(T_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> t = x);
+      new DoubleParameter(S_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> s = x);
+      new DoubleParameter(H_ID, 3.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> h = x);
+      new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
 
     @Override

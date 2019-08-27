@@ -131,10 +131,8 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ReinsertStrategy> strategyP = new ObjectParameter<>(REINSERT_STRATEGY_ID, ReinsertStrategy.class, CloseReinsert.class);
-      if(config.grab(strategyP)) {
-        reinsertStrategy = strategyP.instantiateClass(config);
-      }
+      new ObjectParameter<ReinsertStrategy>(REINSERT_STRATEGY_ID, ReinsertStrategy.class, CloseReinsert.class) //
+          .grab(config, x -> reinsertStrategy = x);
     }
 
     @Override

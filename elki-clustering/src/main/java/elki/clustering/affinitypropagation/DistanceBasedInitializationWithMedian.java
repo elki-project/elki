@@ -123,15 +123,10 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Distance<? super O>> param = new ObjectParameter<>(DISTANCE_ID, Distance.class, SquaredEuclideanDistance.class);
-      if(config.grab(param)) {
-        distance = param.instantiateClass(config);
-      }
-
-      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      if(config.grab(quantileP)) {
-        quantile = quantileP.doubleValue();
-      }
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new DoubleParameter(QUANTILE_ID, .5) //
+          .grab(config, x -> quantile = x);
     }
 
     @Override

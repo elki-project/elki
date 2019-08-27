@@ -98,7 +98,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
   /**
    * Spatial curve generators
    */
-  final List<SpatialSorter> curvegen;
+  final List<? extends SpatialSorter> curvegen;
 
   /**
    * Curve window size
@@ -151,7 +151,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
    * @param proj Random projection to apply
    * @param random Random number generator
    */
-  public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, Random random) {
+  public SpacefillingKNNPreprocessor(Relation<O> relation, List<? extends SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, Random random) {
     super();
     this.relation = relation;
     this.curvegen = curvegen;
@@ -414,7 +414,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
     /**
      * Spatial curve generators
      */
-    List<SpatialSorter> curvegen;
+    List<? extends SpatialSorter> curvegen;
 
     /**
      * Curve window size
@@ -451,7 +451,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
      * @param proj Random projection family
      * @param random Random number generator
      */
-    public Factory(List<SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, RandomFactory random) {
+    public Factory(List<? extends SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, RandomFactory random) {
       super();
       this.curvegen = curvegen;
       this.window = window;
@@ -510,7 +510,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       /**
        * Spatial curve generators.
        */
-      List<SpatialSorter> curvegen;
+      List<? extends SpatialSorter> curvegen;
 
       /**
        * Curve window size.
@@ -540,35 +540,21 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
-        if(config.grab(curveP)) {
-          curvegen = curveP.instantiateClasses(config);
-        }
-        DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if(config.grab(windowP)) {
-          window = windowP.doubleValue();
-        }
-        IntParameter variantsP = new IntParameter(VARIANTS_ID, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(variantsP)) {
-          variants = variantsP.getValue();
-        }
-        IntParameter dimP = new IntParameter(DIM_ID) //
+        new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class) //
+            .grab(config, x -> curvegen = x);
+        new DoubleParameter(WINDOW_ID, 10.0) //
+            .grab(config, x -> window = x);
+        new IntParameter(VARIANTS_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> variants = x);
+        new IntParameter(DIM_ID) //
             .setOptional(true) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(dimP)) {
-          odim = dimP.intValue();
-        }
-
-        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
-            .setOptional(true);
-        if(config.grab(projP)) {
-          proj = projP.instantiateClass(config);
-        }
-        RandomParameter randomP = new RandomParameter(RANDOM_ID);
-        if(config.grab(randomP)) {
-          random = randomP.getValue();
-        }
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> odim = x);
+        new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
+            .setOptional(true) //
+            .grab(config, x -> proj = x);
+        new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
       }
 
       @Override

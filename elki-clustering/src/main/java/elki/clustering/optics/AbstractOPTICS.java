@@ -135,17 +135,12 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
-          .setOptional(true);
-      if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
-      }
-
-      IntParameter minptsP = new IntParameter(MINPTS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minptsP)) {
-        minpts = minptsP.intValue();
-      }
+      new DoubleParameter(EPSILON_ID) //
+          .setOptional(true) //
+          .grab(config, x -> epsilon = x);
+      new IntParameter(MINPTS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> minpts = x);
     }
   }
 }

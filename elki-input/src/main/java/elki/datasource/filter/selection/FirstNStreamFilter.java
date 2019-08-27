@@ -98,11 +98,9 @@ public class FirstNStreamFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter nP = new IntParameter(SIZE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(nP)) {
-        n = nP.getValue().intValue();
-      }
+      new IntParameter(SIZE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> n = x);
     }
 
     @Override

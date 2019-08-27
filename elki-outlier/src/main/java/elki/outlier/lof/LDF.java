@@ -270,27 +270,15 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter pK = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.getValue();
-      }
-
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
-      if(config.grab(kernelP)) {
-        kernel = kernelP.instantiateClass(config);
-      }
-
-      DoubleParameter hP = new DoubleParameter(H_ID);
-      if(config.grab(hP)) {
-        h = hP.doubleValue();
-      }
-
-      DoubleParameter cP = new DoubleParameter(C_ID, 0.1);
-      if(config.grab(cP)) {
-        c = cP.doubleValue();
-      }
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class) //
+          .grab(config, x -> kernel = x);
+      new DoubleParameter(H_ID) //
+          .grab(config, x -> h = x);
+      new DoubleParameter(C_ID, 0.1) //
+          .grab(config, x -> c = x);
     }
 
     @Override

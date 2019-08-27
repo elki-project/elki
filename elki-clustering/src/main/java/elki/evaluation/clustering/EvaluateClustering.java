@@ -304,20 +304,10 @@ public class EvaluateClustering implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ClusteringAlgorithm<?>> referencealgP = new ObjectParameter<>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelOrAllInOneClustering.class);
-      if(config.grab(referencealgP)) {
-        referencealg = referencealgP.instantiateClass(config);
-      }
-
-      Flag noiseSpecialHandlingF = new Flag(NOISE_ID);
-      if(config.grab(noiseSpecialHandlingF)) {
-        noiseSpecialHandling = noiseSpecialHandlingF.getValue();
-      }
-
-      Flag selfPairingF = new Flag(SELFPAIR_ID);
-      if(config.grab(selfPairingF)) {
-        selfPairing = selfPairingF.getValue();
-      }
+      new ObjectParameter<ClusteringAlgorithm<?>>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelOrAllInOneClustering.class) //
+          .grab(config, x -> referencealg = x);
+      new Flag(NOISE_ID).grab(config, x -> noiseSpecialHandling = x);
+      new Flag(SELFPAIR_ID).grab(config, x -> selfPairing = x);
     }
 
     @Override

@@ -207,21 +207,12 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if(config.grab(locationP)) {
-        location = locationP.doubleValue();
-      }
-
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if(config.grab(scaleP)) {
-        scale = scaleP.doubleValue();
-      }
-
-      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if(config.grab(shapeP)) {
-        shape = shapeP.doubleValue();
-      }
+      new DoubleParameter(LOCATION_ID) //
+          .grab(config, x -> location = x);
+      new DoubleParameter(SCALE_ID) //
+          .grab(config, x -> scale = x);
+      new DoubleParameter(SHAPE_ID) //
+          .grab(config, x -> shape = x);
     }
 
     @Override

@@ -333,20 +333,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
     @Override
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KMeans.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
-      }
-      RandomParameter rndP = new RandomParameter(KMeans.SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new IntParameter(KMeans.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
+      new IntParameter(KMeans.MAXITER_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> maxiter = x);
+      new RandomParameter(KMeans.SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

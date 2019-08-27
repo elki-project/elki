@@ -299,10 +299,7 @@ public class TreeSphereVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag fillF = new Flag(TreeMBRVisualization.Parameterizer.FILL_ID);
-      if(config.grab(fillF)) {
-        fill = fillF.isTrue();
-      }
+      new Flag(TreeMBRVisualization.Parameterizer.FILL_ID).grab(config, x -> fill = x);
     }
 
     @Override

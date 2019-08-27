@@ -224,12 +224,9 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(pK)) {
-        k = pK.getValue();
-      }
+      new IntParameter(LOF.Parameterizer.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override

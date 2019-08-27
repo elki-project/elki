@@ -118,16 +118,11 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter probP = new DoubleParameter(PROB_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(probP)) {
-        prob = probP.getValue().doubleValue();
-      }
-      RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
-        rnd = rndP.getValue();
-      }
+      new DoubleParameter(PROB_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> prob = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

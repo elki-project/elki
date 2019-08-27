@@ -695,15 +695,11 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<Split> splitP = new EnumParameter<>(SPLIT_ID, Split.class, Split.MIDPOINT);
-      if(config.grab(splitP)) {
-        split = splitP.getValue();
-      }
-      IntParameter leafsizeP = new IntParameter(LEAFSIZE_ID, 5) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(leafsizeP)) {
-        leafsize = leafsizeP.intValue();
-      }
+      new EnumParameter<Split>(SPLIT_ID, Split.class, Split.MIDPOINT) //
+          .grab(config, x -> split = x);
+      new IntParameter(LEAFSIZE_ID, 5) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> leafsize = x);
     }
 
     @Override

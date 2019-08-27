@@ -367,29 +367,20 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
-      ObjectParameter<NeighborPredicate<?>> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
-      if(config.grab(npredOpt)) {
-        npred = npredOpt.instantiateClass(config);
-      }
-
+      new ObjectParameter<NeighborPredicate<?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
+          .grab(config, x -> npred = x);
       // Core point predicate
-      ObjectParameter<CorePredicate<?>> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
-      if(config.grab(corepredOpt)) {
-        corepred = corepredOpt.instantiateClass(config);
-      }
+      ObjectParameter<CorePredicate<?>> corepredP = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
+      corepredP.grab(config, x -> corepred = x);
       if(npred != null && corepred != null) {
         // Ignore the generic, we do a run-time test below:
         @SuppressWarnings("unchecked")
         CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
         if(!cp.acceptsType(npred.getOutputType())) {
-          config.reportError(new WrongParameterValueException(corepredOpt, corepredOpt.getValueAsString(), "Neighbor predicate and core predicate are not compatible."));
+          config.reportError(new WrongParameterValueException(corepredP, corepredP.getValueAsString(), "Neighbor predicate and core predicate are not compatible."));
         }
       }
-
-      Flag coremodelOpt = new Flag(COREMODEL_ID);
-      if(config.grab(coremodelOpt)) {
-        coremodel = coremodelOpt.isTrue();
-      }
+      new Flag(COREMODEL_ID).grab(config, x -> coremodel = x);
     }
 
     @Override

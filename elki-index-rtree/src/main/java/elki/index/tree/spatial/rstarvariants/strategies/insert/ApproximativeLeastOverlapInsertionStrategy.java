@@ -153,11 +153,9 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter insertionCandidatesP = new IntParameter(INSERTION_CANDIDATES_ID, numCandidates) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(insertionCandidatesP)) {
-        numCandidates = insertionCandidatesP.getValue();
-      }
+      new IntParameter(INSERTION_CANDIDATES_ID, numCandidates) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> numCandidates = x);
     }
 
     @Override

@@ -122,10 +122,8 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter distP = new DoubleParameter(THRESHOLD_ID);
-      if(config.grab(distP)) {
-        threshold = distP.getValue();
-      }
+      new DoubleParameter(THRESHOLD_ID) //
+          .grab(config, x -> threshold = x);
     }
 
     @Override

@@ -127,10 +127,8 @@ public class LuceneDatabase extends AbstractDatabase {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter fileP = new FileParameter(INDEX_DIR_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(fileP)) {
-        idir = fileP.getValue();
-      }
+      new FileParameter(INDEX_DIR_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> idir = x);
     }
 
     @Override

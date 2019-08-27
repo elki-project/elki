@@ -162,11 +162,9 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configEpsilon(Parameterization config) {
-        DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        if(config.grab(epsilonP)) {
-          settings.epsilon = epsilonP.doubleValue();
-        }
+        new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+            .grab(config, x -> settings.epsilon = x);
       }
 
       /**
@@ -175,11 +173,9 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configMinPts(Parameterization config) {
-        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(minptsP)) {
-          settings.minpts = minptsP.intValue();
-        }
+        new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+            .grab(config, x -> settings.minpts = x);
       }
 
       /**
@@ -188,11 +184,9 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configDelta(Parameterization config) {
-        DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        if(config.grab(deltaP)) {
-          settings.delta = deltaP.doubleValue();
-        }
+        new DoubleParameter(DELTA_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .grab(config, x -> settings.delta = x);
       }
 
       /**
@@ -201,12 +195,10 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configKappa(Parameterization config) {
-        DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
+        new DoubleParameter(KAPPA_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-            .setDefaultValue(KAPPA_DEFAULT);
-        if(config.grab(kappaP)) {
-          settings.kappa = kappaP.doubleValue();
-        }
+            .setDefaultValue(KAPPA_DEFAULT) //
+            .grab(config, x -> settings.kappa = x);
       }
 
       /**
@@ -215,12 +207,10 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configLambda(Parameterization config) {
-        IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
+        new IntParameter(LAMBDA_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-            .setOptional(true);
-        if(config.grab(lambdaP)) {
-          settings.lambda = lambdaP.intValue();
-        }
+            .setOptional(true) //
+            .grab(config, x -> settings.lambda = x);
       }
 
       @Override

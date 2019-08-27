@@ -250,11 +250,9 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(sigmaP)) {
-        sigma = sigmaP.doubleValue();
-      }
+      new DoubleParameter(SIGMA_ID)//
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> sigma = x);
     }
 
     @Override

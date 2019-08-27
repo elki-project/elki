@@ -240,17 +240,12 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         // number of neighbors
-        final IntParameter kP = new IntParameter(K_ID) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-        if(config.grab(kP)) {
-          k = kP.getValue();
-        }
-
+        new IntParameter(K_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+            .grab(config, x -> k = x);
         // distance function
-        final ObjectParameter<Distance<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
-        if(config.grab(distanceFunctionP)) {
-          distanceFunction = distanceFunctionP.instantiateClass(config);
-        }
+        new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+            .grab(config, x -> distanceFunction = x);
       }
 
       @Override

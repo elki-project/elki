@@ -287,21 +287,15 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter halflifeP = new DoubleParameter(HALFLIFE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(halflifeP)) {
-        halflife = halflifeP.doubleValue();
-      }
-      DoubleParameter biasP = new DoubleParameter(BIAS_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(biasP)) {
-        bias = biasP.doubleValue();
-      }
-      DoubleParameter minsigmaP = new DoubleParameter(MINSIGMA_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(minsigmaP)) {
-        minsigma = minsigmaP.getValue();
-      }
+      new DoubleParameter(HALFLIFE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> halflife = x);
+      new DoubleParameter(BIAS_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .grab(config, x -> bias = x);
+      new DoubleParameter(MINSIGMA_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .grab(config, x -> minsigma = x);
     }
 
     @Override

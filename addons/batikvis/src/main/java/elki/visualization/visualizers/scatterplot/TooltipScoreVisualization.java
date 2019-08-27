@@ -232,15 +232,13 @@ public class TooltipScoreVisualization implements VisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter digitsP = new IntParameter(DIGITS_ID, 4) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-
-      if(config.grab(digitsP)) {
-        int digits = digitsP.intValue();
-        nf = NumberFormat.getInstance(Locale.ROOT);
-        nf.setGroupingUsed(false);
-        nf.setMaximumFractionDigits(digits);
-      }
+      new IntParameter(DIGITS_ID, 4) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> {
+            nf = NumberFormat.getInstance(Locale.ROOT);
+            nf.setGroupingUsed(false);
+            nf.setMaximumFractionDigits(x);
+          });
     }
 
     @Override
