@@ -28,7 +28,6 @@ import elki.evaluation.AutomaticEvaluation;
 import elki.evaluation.Evaluator;
 import elki.result.Metadata;
 import elki.result.ResultListener;
-import elki.result.ResultListenerList;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -70,7 +69,7 @@ public class EvaluationStep implements WorkflowStep {
     Metadata.of(stepresult).setLongName("Evaluation Step");
     // Run evaluation helpers
     if(evaluators != null) {
-      new Evaluation(evaluators).update(db);
+      new Evaluation(evaluators, db);
     }
   }
 
@@ -90,9 +89,10 @@ public class EvaluationStep implements WorkflowStep {
      *
      * @param evaluators Evaluators
      */
-    public Evaluation(List<? extends Evaluator> evaluators) {
+    public Evaluation(List<? extends Evaluator> evaluators, Database db) {
       this.evaluators = evaluators;
-      ResultListenerList.addListener(this);
+      Metadata.of(db).addResultListener(this);
+      update(db);
     }
 
     /**
@@ -112,16 +112,6 @@ public class EvaluationStep implements WorkflowStep {
     public void resultAdded(Object child, Object parent) {
       // Re-run evaluators on result
       update(child);
-    }
-
-    @Override
-    public void resultChanged(Object current) {
-      // Ignore for now. TODO: re-evaluate?
-    }
-
-    @Override
-    public void resultRemoved(Object child, Object parent) {
-      // TODO: Implement
     }
   }
 

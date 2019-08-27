@@ -35,6 +35,7 @@ import elki.logging.Logging;
 import elki.result.ResultUtil;
 import elki.result.SamplingResult;
 import elki.result.SettingsResult;
+import elki.result.SettingsResult.SettingInformation;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.exceptions.AbortException;
@@ -44,9 +45,7 @@ import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.MergedParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameterization.TrackedParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.Parameter;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 import elki.utilities.optionhandling.parameters.StringParameter;
 import elki.utilities.random.RandomFactory;
@@ -148,7 +147,7 @@ public class VisualizerParameterizer {
    * @return generated title
    */
   public static String getTitle(Database db, Object result) {
-    List<TrackedParameter> settings = new ArrayList<>();
+    List<SettingInformation> settings = new ArrayList<>();
     for(SettingsResult sr : SettingsResult.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -156,21 +155,18 @@ public class VisualizerParameterizer {
     String distance = null;
     String dataset = null;
 
-    for(TrackedParameter setting : settings) {
-      Parameter<?> param = setting.getParameter();
-      OptionID option = param.getOptionID();
-      String value = param.isDefined() ? param.getValueAsString() : null;
-      if(option.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
-        algorithm = value;
+    for(SettingInformation setting : settings) {
+      if(setting.name.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID.getName())) {
+        algorithm = setting.value;
       }
-      if(option.equals(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID)) {
-        distance = value;
+      if(setting.name.equals(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID.getName())) {
+        distance = setting.value;
       }
-      if(option.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
-        dataset = value;
+      if(setting.name.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID.getName())) {
+        dataset = setting.value;
       }
     }
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(200);
     if(algorithm != null) {
       buf.append(shortenClassname(algorithm.split(",")[0], '.'));
     }
@@ -186,10 +182,7 @@ public class VisualizerParameterizer {
       }
       buf.append(shortenClassname(dataset, File.separatorChar));
     }
-    if(buf.length() > 0) {
-      return buf.toString();
-    }
-    return null;
+    return buf.length() > 0 ? buf.toString() : null;
   }
 
   /**

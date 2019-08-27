@@ -139,20 +139,10 @@ public class VisualizerContext implements DataStoreListener {
     db.addDataStoreListener(this);
     // Add a result listener.
     // Don't expose these methods to avoid inappropriate use.
-    addResultListener(new ResultListener() {
+    Metadata.of(baseResult).addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Object child, Object parent) {
         notifyFactories(child);
-      }
-
-      @Override
-      public void resultChanged(Object current) {
-        // FIXME: need to do anything?
-      }
-
-      @Override
-      public void resultRemoved(Object child, Object parent) {
-        // FIXME: implement
       }
     });
   }
@@ -261,7 +251,7 @@ public class VisualizerContext implements DataStoreListener {
    */
   public void setSelection(DBIDSelection sel) {
     selection.setSelection(sel);
-    ResultListenerList.resultChanged(selection);
+    Metadata.of(selection).notifyChanged();
   }
 
   /**
@@ -306,7 +296,7 @@ public class VisualizerContext implements DataStoreListener {
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
-    ResultListenerList.addListener(listener);
+    Metadata.of(baseResult).addResultListener(listener);
   }
 
   /**
@@ -315,7 +305,7 @@ public class VisualizerContext implements DataStoreListener {
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
-    ResultListenerList.removeListener(listener);
+    Metadata.of(baseResult).removeResultListener(listener);
   }
 
   /**

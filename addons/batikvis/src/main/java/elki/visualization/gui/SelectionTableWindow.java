@@ -343,16 +343,6 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   }
 
   @Override
-  public void resultAdded(Object child, Object parent) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void resultRemoved(Object child, Object parent) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public void resultChanged(Object current) {
     if (current instanceof SelectionResult || current instanceof Database) {
       updateFromSelection();

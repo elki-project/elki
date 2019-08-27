@@ -106,12 +106,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
    */
   public static int registerImage(RenderedImage img) {
     synchronized(images) {
-      int key = counter;
-      counter++;
-      assert (images.get(key) == null);
-      images.put(key, new SoftReference<>(img));
       // Reorganize map, purge old entries
-      if(counter % 50 == 49) {
+      if((counter & 0x0F) == 0x0F) {
         for(Iterator<SoftReference<RenderedImage>> iter = images.values().iterator(); iter.hasNext();) {
           SoftReference<RenderedImage> ref = iter.next();
           if(ref == null || ref.get() == null) {
@@ -119,16 +115,14 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
           }
         }
       }
-      if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Registered image: " + key);
-      }
+      final int key = counter++;
+      images.put(key, new SoftReference<>(img));
       return key;
     }
   }
 
   @Override
   public boolean isCompatibleURL(ParsedURL url) {
-    // logger.warning("isCompatible " + url.toString());
     return isCompatibleURLStatic(url);
   }
 
@@ -145,11 +139,9 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   @Override
   public Filter handleURL(ParsedURL url, boolean needRawData) {
     Filter ret = handleURL(url);
-    if(ret != null) {
-      return ret;
-    }
+    return ret != null ? ret : //
     // Image not found in registry.
-    return ImageTagRegistry.getBrokenLinkImage(this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
+        ImageTagRegistry.getBrokenLinkImage(this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
   }
 
   /**
@@ -159,9 +151,6 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
    * @return Image, or null
    */
   public static Filter handleURL(ParsedURL url) {
-    if(LOG.isDebuggingFiner()) {
-      LOG.debugFiner("handleURL " + url.toString());
-    }
     if(!isCompatibleURLStatic(url)) {
       return null;
     }
@@ -175,12 +164,10 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
     SoftReference<RenderedImage> ref = images.get(id);
     if(ref != null) {
       RenderedImage ri = ref.get();
-      if(ri == null) {
-        LOG.warning("Referenced image has expired from the cache!");
-      }
-      else {
+      if(ri != null) {
         return new RedRable(GraphicsUtil.wrap(ri));
       }
+      LOG.warning("Referenced image has expired from the cache!");
     }
     // Image not found in registry.
     return null;
@@ -215,21 +202,14 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
     @SuppressWarnings("rawtypes")
     @Override
     public InputStream openStream(String userAgent, Iterator mimeTypes) throws IOException {
-      // Return null, since we don't want to use streams.
-      return null;
+      return null; // Return null, since we don't want to use streams.
     }
   }
 
   @Override
   public ParsedURLData parseURL(String urlStr) {
-    if(LOG.isDebuggingFinest()) {
-      LOG.debugFinest("parseURL: " + urlStr);
-    }
-    if(urlStr.startsWith(INTERNAL_PREFIX)) {
-      InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));
-      return ret;
-    }
-    return null;
+    return urlStr.startsWith(INTERNAL_PREFIX) ? //
+        new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length())) : null;
   }
 
   @Override

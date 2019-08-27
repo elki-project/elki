@@ -38,7 +38,6 @@ import elki.logging.Logging;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;
-import elki.result.ResultListenerList;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -279,8 +278,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(3, "Inform listeners.", LOG);
       }
-      ResultListenerList.resultChanged(lofResult.getResult());
-
+      Metadata.of(lofResult.getResult()).notifyChanged();
       LOG.setCompleted(stepprog);
     }
 
@@ -337,8 +335,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(4, "Inform listeners.", LOG);
       }
-      ResultListenerList.resultChanged(lofResult.getResult());
-
+      Metadata.of(lofResult.getResult()).notifyChanged();
       LOG.setCompleted(stepprog);
     }
 

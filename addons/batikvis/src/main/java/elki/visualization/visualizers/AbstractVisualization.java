@@ -162,11 +162,6 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   public abstract void fullRedraw();
 
   @Override
-  public void resultAdded(Object child, Object parent) {
-    // Ignore by default
-  }
-
-  @Override
   public void resultChanged(Object current) {
     // Default is to redraw when the result we are attached to changed.
     if(task.getResult() == current //
@@ -175,12 +170,6 @@ public abstract class AbstractVisualization implements Visualization, ResultList
       svgp.requestRedraw(task, this);
       return;
     }
-  }
-
-  @Override
-  public void resultRemoved(Object child, Object parent) {
-    // Ignore by default.
-    // TODO: auto-remove if parent result is removed?
   }
 
   @Override

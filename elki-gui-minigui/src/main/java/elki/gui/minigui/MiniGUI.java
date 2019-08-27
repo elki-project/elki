@@ -43,6 +43,7 @@ import elki.gui.util.*;
 import elki.logging.CLISmartHandler;
 import elki.logging.Logging;
 import elki.logging.LoggingConfiguration;
+import elki.result.Metadata;
 import elki.utilities.Alias;
 import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.io.FormatUtil;
@@ -588,6 +589,7 @@ public class MiniGUI extends AbstractApplication {
 
     outputArea.clear();
     System.gc();
+    Metadata.expungeStaleEntries();
 
     SerializedParameterization config = new SerializedParameterization(params);
     config.tryInstantiate(LoggingStep.class);
@@ -610,6 +612,7 @@ public class MiniGUI extends AbstractApplication {
         }
         SwingUtilities.invokeLater(() -> {
           runButton.setEnabled(true);
+          Metadata.expungeStaleEntries();
         });
       }
     }.start();

@@ -26,8 +26,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.result.SettingsResult;
-import elki.utilities.optionhandling.parameterization.TrackedParameter;
-import elki.utilities.optionhandling.parameters.ClassParameter;
+import elki.result.SettingsResult.SettingInformation;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
@@ -67,7 +66,7 @@ public class SettingsVisualization implements VisFactory {
   public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     SettingsResult sr = task.getResult();
 
-    Collection<TrackedParameter> settings = sr.getSettings();
+    Collection<SettingInformation> settings = sr.getSettings();
 
     Element layer = plot.svgElement(SVGConstants.SVG_G_TAG);
 
@@ -75,45 +74,18 @@ public class SettingsVisualization implements VisFactory {
 
     int i = 0;
     Object last = null;
-    for(TrackedParameter setting : settings) {
-      if(setting.getOwner() != last && setting.getOwner() != null) {
-        String name;
-        try {
-          if(setting.getOwner() instanceof Class) {
-            name = ((Class<?>) setting.getOwner()).getName();
-          }
-          else {
-            name = setting.getOwner().getClass().getName();
-          }
-          if(ClassParameter.class.isInstance(setting.getOwner())) {
-            name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
-          }
-        }
-        catch(NullPointerException e) {
-          name = "[null]";
-        }
-        Element object = plot.svgText(0, i + 0.7, name);
+    for(SettingInformation setting : settings) {
+      if(setting.owner != last) {
+        Element object = plot.svgText(0, i + 0.7, setting.owner);
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
         layer.appendChild(object);
         i++;
-        last = setting.getOwner();
+        last = setting.owner;
       }
-      // get name and value
-      String name = setting.getParameter().getOptionID().getName();
-      String value = "[unset]";
-      try {
-        if(setting.getParameter().isDefined()) {
-          value = setting.getParameter().getValueAsString();
-        }
-      }
-      catch(NullPointerException e) {
-        value = "[null]";
-      }
-
-      Element label = plot.svgText(0, i + 0.7, name);
+      Element label = plot.svgText(0, i + 0.7, setting.name);
       label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(label);
-      Element vale = plot.svgText(7.5, i + 0.7, value);
+      Element vale = plot.svgText(7.5, i + 0.7, setting.value);
       vale.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(vale);
       // only advance once, since we want these two to be in the same line.

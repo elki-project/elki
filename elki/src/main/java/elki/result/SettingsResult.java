@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import elki.utilities.optionhandling.parameterization.TrackedParameter;
+import elki.utilities.optionhandling.parameters.ClassParameter;
 
 /**
  * Result that keeps track of settings that were used in generating this
@@ -37,7 +38,7 @@ public class SettingsResult {
   /**
    * Settings storage.
    */
-  Collection<TrackedParameter> settings;
+  Collection<SettingInformation> settings = new ArrayList<>();
 
   /**
    * Constructor.
@@ -47,7 +48,41 @@ public class SettingsResult {
   public SettingsResult(Collection<TrackedParameter> settings) {
     super();
     Metadata.of(this).setLongName("Settings");
-    this.settings = settings;
+    // Retain only a string representation, in order to not leak references to
+    // large objects via the database - beware of memory leak potential here!
+    Object lastOwner = new Object();
+    String ownername = "[unknown]";
+    for(TrackedParameter setting : settings) {
+      if(setting.getOwner() != lastOwner && setting.getOwner() != null) {
+        try {
+          if(setting.getOwner() instanceof Class) {
+            ownername = ((Class<?>) setting.getOwner()).getName();
+          }
+          else {
+            ownername = setting.getOwner().getClass().getName();
+          }
+          if(ClassParameter.class.isInstance(setting.getOwner())) {
+            ownername = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
+          }
+        }
+        catch(NullPointerException e) {
+          ownername = "[null]";
+        }
+        lastOwner = setting.getOwner();
+      }
+      // get name and value
+      String name = setting.getParameter().getOptionID().getName();
+      String value = "[unset]";
+      try {
+        if(setting.getParameter().isDefined()) {
+          value = setting.getParameter().getValueAsString();
+        }
+      }
+      catch(NullPointerException e) {
+        value = "[null]";
+      }
+      this.settings.add(new SettingInformation(ownername, name, value));
+    }
   }
 
   /**
@@ -55,7 +90,7 @@ public class SettingsResult {
    * 
    * @return the settings
    */
-  public Collection<TrackedParameter> getSettings() {
+  public Collection<SettingInformation> getSettings() {
     return settings;
   }
 
@@ -68,5 +103,40 @@ public class SettingsResult {
   public static List<SettingsResult> getSettingsResults(Object r) {
     return Metadata.hierarchyOf(r).iterDescendantsSelf()//
         .filter(SettingsResult.class).collect(new ArrayList<>());
+  }
+
+  /**
+   * Settings information.
+   *
+   * @author Erich Schubert
+   */
+  public static class SettingInformation {
+    /**
+     * Owner object of this setting
+     */
+    public String owner;
+
+    /**
+     * Parameter name
+     */
+    public String name;
+
+    /**
+     * Parameter value
+     */
+    public String value;
+
+    /**
+     * Constructor.
+     *
+     * @param owner Owner name
+     * @param name Parameter name
+     * @param value Value name
+     */
+    public SettingInformation(String owner, String name, String value) {
+      this.owner = owner;
+      this.name = name;
+      this.value = value;
+    }
   }
 }

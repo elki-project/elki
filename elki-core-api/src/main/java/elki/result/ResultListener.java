@@ -35,20 +35,26 @@ public interface ResultListener extends EventListener {
    * @param child New child result added
    * @param parent Parent result that was added to
    */
-  void resultAdded(Object child, Object parent);
-  
+  default void resultAdded(Object child, Object parent) {
+    // nothing to do
+  }
+
   /**
    * Notify that the current result has changed substantially.
    * 
    * @param current Result that has changed.
    */
-  void resultChanged(Object current);
-  
+  default void resultChanged(Object current) {
+    // nothing to do
+  }
+
   /**
    * A result was removed.
    * 
    * @param child result that was removed
    * @param parent Parent result that was removed from
    */
-  void resultRemoved(Object child, Object parent);
+  default void resultRemoved(Object child, Object parent) {
+    // nothing to do
+  }
 }

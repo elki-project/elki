@@ -23,20 +23,10 @@ package elki.result.textwriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.FeatureVector;
-import elki.data.HierarchicalClassLabel;
-import elki.data.LabelList;
-import elki.data.SimpleClassLabel;
+import elki.data.*;
 import elki.data.model.Model;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -47,28 +37,14 @@ import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
 import elki.evaluation.classification.ConfusionMatrixEvaluationResult;
 import elki.math.geometry.XYCurve;
-import elki.result.CollectionResult;
-import elki.result.IterableResult;
-import elki.result.Metadata;
-import elki.result.OrderingResult;
-import elki.result.SettingsResult;
+import elki.result.*;
+import elki.result.SettingsResult.SettingInformation;
 import elki.result.textwriter.naming.NamingScheme;
 import elki.result.textwriter.naming.SimpleEnumeratingScheme;
-import elki.result.textwriter.writers.TextWriterConfusionMatrixResult;
-import elki.result.textwriter.writers.TextWriterDoubleArray;
-import elki.result.textwriter.writers.TextWriterDoubleDoublePair;
-import elki.result.textwriter.writers.TextWriterIntArray;
-import elki.result.textwriter.writers.TextWriterObjectArray;
-import elki.result.textwriter.writers.TextWriterObjectComment;
-import elki.result.textwriter.writers.TextWriterObjectInline;
-import elki.result.textwriter.writers.TextWriterPair;
-import elki.result.textwriter.writers.TextWriterTextWriteable;
-import elki.result.textwriter.writers.TextWriterXYCurve;
+import elki.result.textwriter.writers.*;
 import elki.utilities.HandlerList;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.optionhandling.parameterization.SerializedParameterization;
-import elki.utilities.optionhandling.parameterization.TrackedParameter;
-import elki.utilities.optionhandling.parameters.ClassParameter;
 import elki.utilities.pairs.DoubleDoublePair;
 import elki.utilities.pairs.Pair;
 
@@ -350,40 +326,15 @@ public class TextWriter {
 
     for(SettingsResult settings : rs) {
       Object last = null;
-      for(TrackedParameter setting : settings.getSettings()) {
-        if(setting.getOwner() != last && setting.getOwner() != null) {
+      for(SettingInformation setting : settings.getSettings()) {
+        if(setting.owner != last) {
           if(last != null) {
             out.commentPrintLn("");
           }
-          String name;
-          try {
-            if(setting.getOwner() instanceof Class) {
-              name = ((Class<?>) setting.getOwner()).getName();
-            }
-            else {
-              name = setting.getOwner().getClass().getName();
-            }
-            if(ClassParameter.class.isInstance(setting.getOwner())) {
-              name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
-            }
-          }
-          catch(NullPointerException e) {
-            name = "[null]";
-          }
-          out.commentPrintLn(name);
-          last = setting.getOwner();
+          out.commentPrintLn(setting.owner);
+          last = setting.owner;
         }
-        String name = setting.getParameter().getOptionID().getName();
-        String value = "[unset]";
-        try {
-          if(setting.getParameter().isDefined()) {
-            value = setting.getParameter().getValueAsString();
-          }
-        }
-        catch(NullPointerException e) {
-          value = "[null]";
-        }
-        out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
+        out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + setting.name + " " + setting.value);
       }
     }
     out.flush();

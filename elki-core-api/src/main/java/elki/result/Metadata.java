@@ -21,12 +21,16 @@
 package elki.result;
 
 import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.Consumer;
 
+import elki.logging.Logging;
 import elki.utilities.datastructures.iterator.EmptyIterator;
 import elki.utilities.datastructures.iterator.It;
 
@@ -55,7 +59,47 @@ import elki.utilities.datastructures.iterator.It;
  *
  * @author Erich Schubert
  */
-public class Metadata {
+public class Metadata extends WeakReference<Object> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(Metadata.class);
+
+  /**
+   * Reference queue for CLEANER.
+   */
+  private static ReferenceQueue<? super Object> queue = new ReferenceQueue<>();
+
+  /**
+   * Cleanup thread.
+   */
+  private static CleanerThread CLEANER;
+
+  /**
+   * Cleanup thread.
+   *
+   * @author Erich Schubert
+   */
+  private static class CleanerThread extends Thread {
+    public CleanerThread() {
+      super("ELKI Garbage Collection");
+      setDaemon(true); // Don't prevent program termination
+    }
+
+    public void run() {
+      LOG.debugFinest("Garbage collection thread started.");
+      try {
+        while(!global.isEmpty()) {
+          ((Metadata) queue.remove()).cleanup();
+        }
+      }
+      catch(InterruptedException e) {
+        // Ok to stop.
+      }
+      LOG.debugFinest("Garbage collection thread has quit.");
+    };
+  };
+
   /**
    * Get <b>or create</b> the Metadata of an object.
    *
@@ -63,10 +107,16 @@ public class Metadata {
    * @return Metadata
    */
   public static Metadata of(Object o) {
+    assert !(o instanceof Reference);
+    expungeStaleEntries();
     synchronized(global) {
       Metadata ret = global.get(o);
       if(ret == null) {
         global.put(o, ret = new Metadata(o));
+        if(global.size() == 1 && (CLEANER == null || !CLEANER.isAlive())) {
+          CLEANER = new CleanerThread();
+          CLEANER.start();
+        }
       }
       return ret;
     }
@@ -79,6 +129,8 @@ public class Metadata {
    * @return Metadata
    */
   public static Metadata get(Object o) {
+    assert !(o instanceof Reference);
+    expungeStaleEntries();
     synchronized(global) {
       return global.get(o);
     }
@@ -91,7 +143,7 @@ public class Metadata {
    * @return Hierarchy
    */
   public static Hierarchy hierarchyOf(Object o) {
-    return Metadata.of(o).hierarchy();
+    return of(o).hierarchy();
   }
 
   /**
@@ -100,14 +152,14 @@ public class Metadata {
   private static final Map<Object, Metadata> global = new WeakHashMap<>();
 
   /**
-   * Object owning the metadata.
-   */
-  private WeakReference<Object> owner;
-
-  /**
    * Hierarchy information.
    */
   private Hierarchy hierarchy = new Hierarchy();
+
+  /**
+   * Attached result listeners
+   */
+  private ArrayList<ResultListener> listeners = null;
 
   /**
    * Human-readable name of the entry.
@@ -120,7 +172,41 @@ public class Metadata {
    * @param o Object
    */
   private Metadata(Object o) {
-    this.owner = new WeakReference<>(o);
+    super(o, queue);
+    // For debugging garbage collection below...
+    if(LOG.isDebuggingFine()) {
+      name = getLongName();
+      name = name != null ? name : o.toString();
+    }
+    expungeStaleEntries();
+  }
+
+  /**
+   * Expunges stale entries from the table.
+   */
+  public static void expungeStaleEntries() {
+    for(Metadata x; (x = (Metadata) queue.poll()) != null;) {
+      x.cleanup();
+    }
+    global.size(); // Trigger CLEANER in weak hash map, too.
+  }
+
+  /**
+   * Cleanup function to help garbage collection.
+   */
+  private void cleanup() {
+    if(LOG.isDebuggingFine()) {
+      String name = getLongName();
+      name = name != null ? name : get() != null ? get().toString() : "<garbage collected>";
+      LOG.debugFine("Garbage collecting: " + name);
+    }
+    listeners = null;
+    for(int i = hierarchy.numc - 1; i >= 0; i--) {
+      Metadata.of(hierarchy.children[i]).hierarchy().removeParentInt(this);
+    }
+    hierarchy.nump = hierarchy.numc = 0;
+    Arrays.fill(hierarchy.children, null);
+    Arrays.fill(hierarchy.parents, null);
   }
 
   /**
@@ -132,15 +218,25 @@ public class Metadata {
     return hierarchy;
   }
 
+  /**
+   * Set the long name of a result.
+   *
+   * @param name Result name
+   */
   public void setLongName(String name) {
     this.name = name;
   }
 
+  /**
+   * Get the long name of a result.
+   *
+   * @return name
+   */
   public String getLongName() {
     if(name != null) {
       return name;
     }
-    Object owner = this.owner.get();
+    Object owner = this.get();
     if(owner == null) {
       return "<garbage collected>";
     }
@@ -158,11 +254,6 @@ public class Metadata {
   }
 
   /**
-   * Empty list.
-   */
-  private static final Object[] EMPTY = new Object[0];
-
-  /**
    * Automatically expand a reference.
    * 
    * @param ret Object
@@ -173,6 +264,16 @@ public class Metadata {
   }
 
   /**
+   * Empty list.
+   */
+  private static final Object[] EMPTY_CHILDREN = new Object[0];
+
+  /**
+   * Empty list.
+   */
+  private static final Metadata[] EMPTY_PARENTS = new Metadata[0];
+
+  /**
    * Class to represent hierarchy information.
    *
    * @author Erich Schubert
@@ -181,22 +282,22 @@ public class Metadata {
     /**
      * Number of parents.
      */
-    int nump = 0;
+    private int nump = 0;
 
     /**
      * Number of children.
      */
-    int numc = 0;
+    private int numc = 0;
 
     /**
      * Parents.
      */
-    Object[] parents = EMPTY;
+    private Metadata[] parents = EMPTY_PARENTS;
 
     /**
      * Children.
      */
-    Object[] children = EMPTY;
+    private Object[] children = EMPTY_CHILDREN;
 
     /**
      * Add a child to this node.
@@ -205,11 +306,11 @@ public class Metadata {
      * @return {@code true} on success
      */
     public boolean addChild(Object c) {
-      Object o = Metadata.this.owner.get();
+      Object o = Metadata.this.get();
       assert o != c;
       if(o != null && addChildInt(c)) {
-        Metadata.of(c).hierarchy().addParentInt(o);
-        ResultListenerList.resultAdded(c, o);
+        Metadata.of(c).hierarchy().addParentInt(Metadata.this);
+        Metadata.of(o).notifyChildAdded(c);
         return true;
       }
       return false;
@@ -223,11 +324,11 @@ public class Metadata {
      * @return {@code true} on success
      */
     public boolean addWeakChild(Object c) {
-      Object o = Metadata.this.owner.get();
+      Object o = Metadata.this.get();
       assert o != c;
       if(o != null && addChildInt(new WeakReference<>(c))) {
-        Metadata.of(c).hierarchy().addParentInt(o);
-        ResultListenerList.resultAdded(c, o);
+        Metadata.of(c).hierarchy().addParentInt(Metadata.this);
+        Metadata.of(o).notifyChildAdded(c);
         return true;
       }
       return false;
@@ -241,8 +342,11 @@ public class Metadata {
      */
     public boolean removeChild(Object c) {
       if(removeChildInt(c)) {
-        Metadata.of(c).hierarchy().removeParentInt(Metadata.this.owner.get());
-        ResultListenerList.resultRemoved(c, Metadata.this.owner.get());
+        Metadata.of(c).hierarchy().removeParentInt(Metadata.this);
+        final Object o = Metadata.this.get();
+        if(o != null) {
+          Metadata.of(o).notifyChildRemoved(c);
+        }
         return true;
       }
       return false;
@@ -254,15 +358,18 @@ public class Metadata {
      * @param parent Parent to add.
      * @return {@code true} when changed
      */
-    synchronized private boolean addParentInt(Object parent) {
-      if(parents == EMPTY) {
-        parents = new Object[1];
-        parents[0] = parent;
+    synchronized private boolean addParentInt(Metadata parent) {
+      final Object p = parent.get();
+      if(p == null) {
+        return false;
+      }
+      if(parents == EMPTY_CHILDREN) {
+        parents = new Metadata[] { parent };
         nump = 1;
         return true;
       }
       for(int i = 0; i < nump; i++) {
-        if(parent.equals(parents[i])) {
+        if(parent == parents[i] || p == parents[i].get()) {
           return false; // Exists already.
         }
       }
@@ -281,7 +388,7 @@ public class Metadata {
      * @return {@code true} when changed
      */
     synchronized private boolean addChildInt(Object child) {
-      if(children == EMPTY) {
+      if(children == EMPTY_CHILDREN) {
         children = new Object[5];
         children[0] = child;
         numc = 1;
@@ -305,17 +412,19 @@ public class Metadata {
      * @param parent Parent to remove.
      * @return {@code true} when changed
      */
-    synchronized private boolean removeParentInt(Object parent) {
-      if(parents == EMPTY) {
+    synchronized private boolean removeParentInt(Metadata parent) {
+      if(parents == EMPTY_PARENTS) {
         return false;
       }
+      Object p = parent.get();
       for(int i = 0; i < nump; i++) {
-        if(parent.equals(parents[i])) {
-          --nump;
-          System.arraycopy(parents, i + 1, parents, i, nump - i);
-          parents[nump] = null;
-          if(nump == 0) {
-            parents = EMPTY;
+        if(parent == parents[i] || (p != null && p == parents[i].get())) {
+          if(--nump == 0) {
+            parents = EMPTY_PARENTS;
+          }
+          else {
+            System.arraycopy(parents, i + 1, parents, i, nump - i);
+            parents[nump] = null;
           }
           return true;
         }
@@ -330,16 +439,17 @@ public class Metadata {
      * @return {@code true} when changed
      */
     synchronized private boolean removeChildInt(Object child) {
-      if(children == EMPTY) {
+      if(children == EMPTY_CHILDREN) {
         return false;
       }
       for(int i = 0; i < numc; i++) {
         if(child.equals(children[i])) {
-          --numc;
-          System.arraycopy(children, i + 1, children, i, numc - i);
-          children[numc] = null;
-          if(numc == 0) {
-            children = EMPTY;
+          if(--numc == 0) {
+            children = EMPTY_CHILDREN;
+          }
+          else {
+            System.arraycopy(children, i + 1, children, i, numc - i);
+            children[numc] = null;
           }
           return true;
         }
@@ -398,7 +508,7 @@ public class Metadata {
      * @return Iterator for descendants
      */
     public It<Object> iterAncestorsSelf() {
-      return new ItrAnc(owner.get());
+      return new ItrAnc(Metadata.this.get());
     }
 
     /**
@@ -434,7 +544,7 @@ public class Metadata {
      * @return Iterator for descendants
      */
     public It<Object> iterDescendantsSelf() {
-      return new ItrDesc(owner.get());
+      return new ItrDesc(Metadata.this.get());
     }
 
     /**
@@ -464,7 +574,6 @@ public class Metadata {
         }
         return this;
       }
-
     }
 
     /**
@@ -730,12 +839,105 @@ public class Metadata {
   }
 
   /**
+   * Register a result listener.
+   *
+   * @param listener Result listener.
+   */
+  public void addResultListener(ResultListener listener) {
+    if(listeners == null) {
+      listeners = new ArrayList<>();
+    }
+    for(int i = 0; i < listeners.size(); i++) {
+      if(listeners.get(i) == listener) {
+        return;
+      }
+    }
+    listeners.add(listener);
+  }
+
+  /**
+   * Remove a result listener.
+   *
+   * @param listener Result listener.
+   */
+  public void removeResultListener(ResultListener listener) {
+    if(listeners != null) {
+      listeners.remove(listener);
+    }
+  }
+
+  /**
+   * Informs all registered {@link ResultListener} that a new result was added.
+   *
+   * @param child New child result added
+   */
+  private void notifyChildAdded(Object child) {
+    Object parent = this.get();
+    if(parent == null || child == null) {
+      return;
+    }
+    if(LOG.isDebugging()) {
+      LOG.debug("Result added: " + child + " <- " + parent);
+    }
+    doNotify(x -> x.resultAdded(child, parent));
+  }
+
+  /**
+   * Informs all registered {@link ResultListener} that a result has changed.
+   */
+  public void notifyChanged() {
+    Object current = this.get();
+    if(current == null) {
+      return;
+    }
+    if(LOG.isDebugging()) {
+      LOG.debug("Result changed: " + current);
+    }
+    doNotify(x -> x.resultChanged(current));
+  }
+
+  /**
+   * Informs all registered {@link ResultListener} that a new result has been
+   * removed.
+   *
+   * @param child result that has been removed
+   */
+  private void notifyChildRemoved(Object child) {
+    Object parent = this.get();
+    if(LOG.isDebugging()) {
+      LOG.debug("Result removed: " + child + " <- " + parent);
+    }
+    doNotify(x -> x.resultRemoved(child, parent));
+  }
+
+  /**
+   * Notify, also via all parent listeners.
+   *
+   * @param f Listener consumer
+   */
+  private void doNotify(Consumer<ResultListener> f) {
+    if(listeners != null) {
+      for(int i = listeners.size(); --i >= 0;) {
+        f.accept(listeners.get(i));
+      }
+    }
+    for(It<Object> it = hierarchy.iterAncestors(); it.valid(); it.advance()) {
+      ArrayList<ResultListener> l = Metadata.of(it.get()).listeners;
+      if(l != null) {
+        for(int i = l.size(); --i >= 0;) {
+          f.accept(l.get(i));
+        }
+      }
+    }
+  }
+
+  /**
    * Base class for iterators that need to look ahead, e.g. to check
    * conditions on the next element.
    *
    * @author Erich Schubert
    *
-   * @param <O>
+   * @param <O> Object type
    */
   private static abstract class EagerIt<O> implements It<O> {
     /**
