@@ -20,8 +20,11 @@
  */
 package elki.index.distancematrix;
 
+import java.lang.ref.WeakReference;
+
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
+import elki.database.query.distance.DatabaseDistanceQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -68,17 +71,12 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   /**
    * Data relation.
    */
-  protected final Relation<O> relation;
+  protected final WeakReference<Relation<O>> refrelation;
 
   /**
    * Nested distance function.
    */
   protected final Distance<? super O> distanceFunction;
-
-  /**
-   * Nested distance query.
-   */
-  protected DistanceQuery<O> distanceQuery;
 
   /**
    * Distance matrix.
@@ -104,7 +102,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    */
   public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, Distance<? super O> distanceFunction) {
     super();
-    this.relation = relation;
+    this.refrelation = new WeakReference<>(relation);
     this.ids = range;
     this.distanceFunction = distanceFunction;
 
@@ -119,8 +117,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     if(size > 65536) {
       throw new AbortException("Distance matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
     }
-
-    distanceQuery = distanceFunction.instantiate(relation);
+    DistanceQuery<O> distanceQuery = distanceFunction.instantiate(refrelation.get());
 
     final int msize = triangleSize(size);
     matrix = new double[msize];
@@ -208,7 +205,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    *
    * @author Erich Schubert
    */
-  private class PrecomputedDistanceQuery implements DistanceQuery<O> {
+  private class PrecomputedDistanceQuery implements DatabaseDistanceQuery<O> {
     @Override
     public double distance(DBIDRef id1, DBIDRef id2) {
       final int x = ids.getOffset(id1), y = ids.getOffset(id2);
@@ -216,28 +213,13 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     @Override
-    public double distance(O o1, DBIDRef id2) {
-      return distanceQuery.distance(o1, id2);
-    }
-
-    @Override
-    public double distance(DBIDRef id1, O o2) {
-      return distanceQuery.distance(id1, o2);
-    }
-
-    @Override
-    public double distance(O o1, O o2) {
-      return distanceQuery.distance(o1, o2);
-    }
-
-    @Override
     public Distance<? super O> getDistance() {
-      return distanceQuery.getDistance();
+      return distanceFunction;
     }
 
     @Override
     public Relation<? extends O> getRelation() {
-      return relation;
+      return refrelation.get();
     }
   }
 
