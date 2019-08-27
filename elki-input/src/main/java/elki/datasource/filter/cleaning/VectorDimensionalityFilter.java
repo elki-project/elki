@@ -29,7 +29,6 @@ import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
 import elki.datasource.filter.FilterUtil;
 import elki.logging.Logging;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -81,7 +80,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     if(meta == null) {
       updateMeta();
     }
-    return source.getMeta();
+    return meta;
   }
 
   @Override
@@ -138,36 +137,27 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     BundleMeta origmeta = source.getMeta();
     for(int i = 0; i < origmeta.size(); i++) {
       SimpleTypeInformation<?> type = origmeta.get(i);
-      if(column < 0) {
+      if(column < 0 || i == column) {
         // Test whether this type matches
         if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(type)) {
           if(type instanceof VectorFieldTypeInformation) {
             @SuppressWarnings("unchecked")
             final VectorFieldTypeInformation<V> castType = (VectorFieldTypeInformation<V>) type;
-            if(dim != -1 && castType.mindim() > dim) {
-              throw new AbortException("Would filter all vectors: minimum dimensionality " + castType.mindim() + " > desired dimensionality " + dim);
-            }
-            if(dim != -1 && castType.maxdim() < dim) {
-              throw new AbortException("Would filter all vectors: maximum dimensionality " + castType.maxdim() + " < desired dimensionality " + dim);
-            }
             if(dim == -1) {
               dim = castType.mindim();
             }
-            if(castType.mindim() == castType.maxdim()) {
-              meta.add(castType);
+            if(castType.mindim() == dim && castType.maxdim() == dim) {
+              meta.add(castType); // Can use this without changing
               column = i;
               continue;
             }
           }
           @SuppressWarnings("unchecked")
           final VectorTypeInformation<V> castType = (VectorTypeInformation<V>) type;
-          if(dim != -1) {
-            meta.add(new VectorFieldTypeInformation<>(FilterUtil.guessFactory(castType), dim, dim, castType.getSerializer()));
+          if(dim == -1) {
+            dim = castType.mindim();
           }
-          else {
-            LOG.warning("No dimensionality yet for column " + i);
-            meta.add(castType);
-          }
+          meta.add(new VectorFieldTypeInformation<>(FilterUtil.guessFactory(castType), dim, dim, castType.getSerializer()));
           column = i;
           continue;
         }
