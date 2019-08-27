@@ -507,8 +507,8 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       kreach = config.grab(pK2) ? pK2.intValue() : krefer;
 
-      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class);
-      reachDistP.setOptional(true);
+      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
+          .setOptional(true);
       reachabilityDistance = config.grab(reachDistP) ? reachDistP.instantiateClass(config) : distanceFunction;
     }
 

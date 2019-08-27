@@ -441,8 +441,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
       // Output
       outfile = super.getParameterOutputFile(config, "File to output the resulting score vectors to.");
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
-      scalingP.setOptional(true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

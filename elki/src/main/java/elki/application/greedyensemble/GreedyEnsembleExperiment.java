@@ -663,14 +663,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         distance = distanceP.getValue();
       }
       // Prescaling
-      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<>(PRESCALING_ID, ScalingFunction.class);
-      prescalingP.setOptional(true);
+      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<ScalingFunction>(PRESCALING_ID, ScalingFunction.class) //
+          .setOptional(true);
       if(config.grab(prescalingP)) {
         prescaling = prescalingP.instantiateClass(config);
       }
       // Ensemble scaling
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
-      scalingP.setOptional(true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

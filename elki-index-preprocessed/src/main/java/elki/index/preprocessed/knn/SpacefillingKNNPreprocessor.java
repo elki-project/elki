@@ -546,7 +546,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
         }
         DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
         if(config.grab(windowP)) {
-          window = windowP.getValue();
+          window = windowP.doubleValue();
         }
         IntParameter variantsP = new IntParameter(VARIANTS_ID, 1) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
@@ -560,8 +560,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
           odim = dimP.intValue();
         }
 
-        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<>(PROJECTION_ID, RandomProjectionFamily.class);
-        projP.setOptional(true);
+        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
+            .setOptional(true);
         if(config.grab(projP)) {
           proj = projP.instantiateClass(config);
         }

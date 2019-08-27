@@ -308,8 +308,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       vispar = config.tryInstantiate(VisualizerParameterizer.class);
 
       // Prescaling
-      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class);
-      prescalingP.setOptional(true);
+      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<ScalingFunction>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class) //
+          .setOptional(true);
       if(config.grab(prescalingP)) {
         prescaling = prescalingP.instantiateClass(config);
       }

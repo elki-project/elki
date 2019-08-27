@@ -438,8 +438,8 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
           projections = projectionsP.getValue();
         }
 
-        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<>(PROJECTION_ID, RandomProjectionFamily.class);
-        projP.setOptional(true);
+        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<RandomProjectionFamily>(PROJECTION_ID, RandomProjectionFamily.class) //
+            .setOptional(true);
         if(config.grab(projP)) {
           proj = projP.instantiateClass(config);
         }

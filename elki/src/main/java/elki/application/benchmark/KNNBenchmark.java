@@ -249,8 +249,8 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       if(config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
-      queryP.setOptional(true);
+      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+          .setOptional(true);
       if(config.grab(queryP)) {
         queries = queryP.instantiateClass(config);
       }

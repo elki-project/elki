@@ -327,8 +327,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
         pattern = patternP.getValue();
       }
       else {
-        ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
-        queryP.setOptional(true);
+        ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+            .setOptional(true);
         if(config.grab(queryP)) {
           queries = queryP.instantiateClass(config);
         }
