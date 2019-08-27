@@ -124,7 +124,7 @@ public class AutomaticEvaluation implements Evaluator {
   protected void autoEvaluateClusterings(Object newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     if(LOG.isDebugging()) {
-      LOG.warning("Number of new clustering results: " + clusterings.size());
+      LOG.debug("Number of new clustering results: " + clusterings.size());
     }
     for(Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
       if(c.next() instanceof ReferenceClustering) {
